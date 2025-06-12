@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Http;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Container\Container;
@@ -11,8 +12,12 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
+use ReflectionException;
+use ReflectionProperty;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -311,32 +316,105 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @param  class-string|object  $target
      * @return object An instance of the given target with the mapped data from the request.
+     * @throws ReflectionException
      */
     public function mapTo(string|object $target): object
     {
         $targetInstance = is_string($target) ? new $target() : $target;
 
-        foreach ($this->all() as $property => $value) {
-            if ($this->targetHasProperty($targetInstance, $property)) {
-                $targetInstance->{$property} = $value;
+        return $this->mapToTarget($targetInstance, $this->all());
+    }
+
+    /**
+     * Maps the given properties to the given target.
+     *
+     * @param  object  $target
+     * @param  array  $properties
+     * @return object An instance of the given target with the mapped data from the given properties.
+     * @throws ReflectionException
+     */
+    private function mapToTarget(object $target, array $properties): object
+    {
+        foreach ($properties as $property => $value) {
+            if ($this->targetHasProperty($target, $property)) {
+                $this->mapProperty($target, $property, $value);
             }
 
             $snakedProperty = Str::snake($property);
-            if ($this->targetHasProperty($targetInstance, $snakedProperty)) {
-                $targetInstance->{$snakedProperty} = $value;
+            if ($this->targetHasProperty($target, $snakedProperty)) {
+                $this->mapProperty($target, $snakedProperty, $value);
             }
 
             $camelProperty = Str::camel($property);
-            if ($this->targetHasProperty($targetInstance, $camelProperty)) {
-                $targetInstance->{$camelProperty} = $value;
+            if ($this->targetHasProperty($target, $camelProperty)) {
+                $this->mapProperty($target, $camelProperty, $value);
             }
         }
 
-        return $targetInstance;
+        return $target;
     }
 
+    /**
+     * Checks if the given target has the given property
+     * @param  object  $target
+     * @param  string  $property
+     * @return bool
+     */
     private function targetHasProperty(object $target, string $property): bool
     {
         return property_exists($target, $property) || ($target instanceof Model && $target->isFillable($property));
+    }
+
+    /**
+     * Maps the given value to the given property of the given target
+     *
+     * @param  object  $target
+     * @param  string  $property
+     * @param  mixed  $value
+     * @return void
+     * @throws ReflectionException
+     */
+    private function mapProperty(object $target, string $property, mixed $value): void
+    {
+        if ($target instanceof Model) {
+            $target->{$property} = $value;
+            return;
+        }
+
+        $this->mapObjectProperty($target, $property, $value);
+    }
+
+    /**
+     * Maps the given value to the given property of the given target object
+     *
+     * @param  object  $target
+     * @param  string  $property
+     * @param  mixed  $value
+     * @return void
+     * @throws ReflectionException
+     */
+    private function mapObjectProperty(object $target, string $property, mixed $value): void
+    {
+        $valueIsArray = is_array($value);
+        $reflection = new ReflectionProperty($target::class, $property);
+        $type = $reflection->getType();
+        if ($type === null) {
+            $target->{$property} = $value;
+            return;
+        }
+
+        match (true) {
+            $type->getName() === Collection::class && $valueIsArray => $formattedValue = Collection::make($value),
+            $this->isCarbonProperty($type->getName()) => $formattedValue = Carbon::parse($value),
+            ! $type->isBuiltin() && $valueIsArray => $formattedValue = $this->mapToTarget(new ($type->getName()), $value),
+            default => $formattedValue = $value,
+        };
+
+        $target->{$property} = $formattedValue;
+    }
+
+    private function isCarbonProperty(string $propertyType): bool
+    {
+        return $propertyType === Carbon::class || $propertyType === \Carbon\Carbon::class || $propertyType === CarbonImmutable::class;
     }
 }

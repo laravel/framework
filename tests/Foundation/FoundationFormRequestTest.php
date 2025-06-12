@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Access\Response;
@@ -14,6 +15,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Validation\ValidationException;
 use Mockery as m;
@@ -277,6 +279,26 @@ class FoundationFormRequestTest extends TestCase
 
         $this->assertInstanceOf(DummyUserNameSnake::class, $user);
         $this->assertEquals('taylor', $user->user_name);
+    }
+
+    public function testRequestMapNestedData()
+    {
+        $request = $this->createRequest([
+            'email' => 'test@laravel.com',
+            'username' => ['user_name' => 'taylor'],
+            'list' => [1, 2, 3],
+            'date' => '2025-06-12',
+        ]);
+        $user = $request->mapTo(DummyUserNested::class);
+
+        $this->assertInstanceOf(DummyUserNested::class, $user);
+        $this->assertEquals('test@laravel.com', $user->email);
+        $this->assertInstanceOf(DummyUserNameCamel::class, $user->username);
+        $this->assertEquals('taylor', $user->username->userName);
+        $this->assertInstanceOf(Collection::class, $user->list);
+        $this->assertEquals(collect([1, 2, 3]), $user->list);
+        $this->assertInstanceOf(Carbon::class, $user->date);
+        $this->assertEquals('2025-06-12', $user->date->format('Y-m-d'));
     }
 
     /**
@@ -581,10 +603,21 @@ class DummyUserModel extends Model
 
 class DummyUserNameCamel
 {
-    public $userName;
+    public string $userName;
 }
 
 class DummyUserNameSnake
 {
     public $user_name;
+}
+
+class DummyUserNested
+{
+    public string $email;
+
+    public DummyUserNameCamel $username;
+
+    public Collection $list;
+
+    public Carbon $date;
 }
