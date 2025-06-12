@@ -310,7 +310,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * Maps the request data into the given target.
      *
      * @param  class-string|object  $target
-     * @return  object  An instance of the given target with the mapped data from the request.
+     * @return object An instance of the given target with the mapped data from the request.
      */
     public function mapTo(string|object $target): object
     {
