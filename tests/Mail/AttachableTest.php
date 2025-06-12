@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Http\Testing\File;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
@@ -137,5 +138,35 @@ class AttachableTest extends TestCase
                 'mime' => 'application/pdf',
             ],
         ], $mailable->attachments[0]);
+    }
+
+    public function testFromUploadedFileMethod()
+    {
+        $mailable = new class extends Mailable
+        {
+            public function build()
+            {
+                $this->attach(new class implements Attachable
+                {
+                    public function toMailAttachment()
+                    {
+                        return Attachment::fromUploadedFile(
+                            File::createWithContent('example.pdf', 'content')
+                                ->mimeType('application/pdf')
+                        );
+                    }
+                });
+            }
+        };
+
+        $mailable->build();
+
+        $this->assertSame([
+            'data' => 'content',
+            'name' => 'example.pdf',
+            'options' => [
+                'mime' => 'application/pdf',
+            ],
+        ], $mailable->rawAttachments[0]);
     }
 }
