@@ -58,7 +58,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             $this->container->make(Dispatcher::class),
             $this->locale,
         ])->sendNow($notifiables, $notification, $channels);
-
     }
 
     /**
