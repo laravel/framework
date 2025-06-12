@@ -951,6 +951,22 @@ trait QueriesRelationships
         return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
     }
 
+        /**
+     * Add a relationship count conditionally, with an optional alias.
+     *
+     * @param  string  $relation
+     * @param  Closure  $closure
+     * @param  string|null  $as
+     * @return $this
+     */
+    public function withCountIf($relation, Closure $closure, $as = null)
+    {
+        $as ??= "{$relation}";
+        return $this->withCount([
+            "{$relation} as {$as}" => $closure
+        ]);
+    }
+
     /**
      * Add subselect queries to include the max of the relation's column.
      *
