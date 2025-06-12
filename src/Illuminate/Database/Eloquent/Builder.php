@@ -478,6 +478,24 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Retrieve one or more random model instances.
+     *
+     * @param  int  $count
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|null|\Illuminate\Database\Eloquent\Collection
+     */
+    public function findRandom(int $count = 1, array $columns = ['*'])
+    {
+        if ($count < 1) {
+            return $this->newModelInstance()->newCollection();
+        }
+
+        return $count === 1
+            ? $this->inRandomOrder()->first($columns)
+            : $this->inRandomOrder()->limit($count)->get($columns);
+    }
+
+    /**
      * Find a sole model by its primary key.
      *
      * @param  mixed  $id
