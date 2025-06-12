@@ -129,7 +129,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return int|null
      */
-    public function creationTimeOfOldestPendingJob$queue = null)
+    public function creationTimeOfOldestPendingJob($queue = null)
     {
         return $this->database->table($this->table)
             ->where('queue', $this->getQueue($queue))

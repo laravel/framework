@@ -9,7 +9,6 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -19,7 +18,6 @@ use PHPUnit\Framework\Assert as PHPUnit;
 class QueueFake extends QueueManager implements Fake, Queue
 {
     use ReflectsClosures;
-    use InteractsWithTime;
 
     /**
      * The original queue manager.
@@ -48,27 +46,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @var array
      */
     protected $jobs = [];
-
-    /**
-     * All of the jobs that have been pushed and are pending.
-     *
-     * @var array
-     */
-    protected array $pendingJobs = [];
-
-    /**
-     * All of the jobs that have been delayed.
-     *
-     * @var array
-     */
-    protected array $delayedJobs = [];
-
-    /**
-     * All of the jobs that have been reserved.
-     *
-     * @var array
-     */
-    protected array $reservedJobs = [];
 
     /**
      * All of the payloads that have been raw pushed.
@@ -439,9 +416,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function pendingSize($queue = null)
     {
-        return collect($this->pendingJobs)
-            ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] <= now()->getTimestamp())
-            ->count();
+        return $this->size($queue);
     }
 
     /**
@@ -452,9 +427,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function delayedSize($queue = null)
     {
-        return collect($this->delayedJobs)
-            ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] > now()->getTimestamp())
-            ->count();
+        return 0;
     }
 
     /**
@@ -465,23 +438,18 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function reservedSize($queue = null)
     {
-        return collect($this->reservedJobs)
-            ->filter(fn ($job) => $job['queue'] === $queue)
-            ->count();
+        return 0;
     }
 
     /**
-     * Get the timestamp of the oldest pending job.
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
      *
      * @param  string|null  $queue
      * @return int|null
      */
-    public function creationTimeOfOldestPendingJob$queue = null)
+    public function creationTimeOfOldestPendingJob($queue = null)
     {
-        return collect($this->pendingJobs)
-            ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] <= now()->getTimestamp())
-            ->sortBy('available_at')
-            ->first()['available_at'] ?? null;
+        return null;
     }
 
     /**
@@ -499,15 +467,11 @@ class QueueFake extends QueueManager implements Fake, Queue
                 $job = CallQueuedClosure::create($job);
             }
 
-            $record = [
+            $this->jobs[is_object($job) ? get_class($job) : $job][] = [
                 'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
                 'queue' => $queue,
                 'data' => $data,
-                'available_at' => now()->getTimestamp(),
             ];
-
-            $this->pendingJobs[] = $record;
-            $this->jobs[is_object($job) ? get_class($job) : $job][] = $record;
         } else {
             is_object($job) && isset($job->connection)
                 ? $this->queue->connection($job->connection)->push($job, $data, $queue)
@@ -581,60 +545,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        if ($this->shouldFakeJob($job)) {
-            if ($job instanceof Closure) {
-                $job = CallQueuedClosure::create($job);
-            }
-
-            $availableAt = now()->addSeconds($this->secondsUntil($delay))->getTimestamp();
-
-            $record = [
-                'job' => $this->serializeAndRestore ? $this->serializeAndRestoreJob($job) : $job,
-                'queue' => $queue,
-                'data' => $data,
-                'available_at' => $availableAt,
-            ];
-
-            $this->delayedJobs[] = $record;
-            $this->jobs[is_object($job) ? get_class($job) : $job][] = $record;
-        } else {
-            return $this->queue->later($delay, $job, $data, $queue);
-        }
-    }
-
-    /**
-     * Mark a job as reserved.
-     *
-     * @param  mixed  $job
-     * @param  string|null  $queue
-     * @return void
-     */
-    public function markJobAsReserved($job, $queue = null)
-    {
-        $this->reservedJobs[] = [
-            'job' => $job,
-            'queue' => $queue,
-            'reserved_at' => now()->getTimestamp(),
-        ];
-    }
-
-    /**
-     * Process the next pending job as if it was dequeued by a worker.
-     *
-     * @param  string|null  $queue
-     * @return void
-     */
-    public function process($queue = null)
-    {
-        foreach ($this->pendingJobs as $index => $job) {
-            if ($job['queue'] === $queue && $job['available_at'] <= now()->getTimestamp()) {
-                $this->markJobAsReserved($job['job'], $queue);
-                unset($this->pendingJobs[$index]);
-                $this->pendingJobs = array_values($this->pendingJobs);
-
-                return;
-            }
-        }
+        return $this->push($job, $data, $queue);
     }
 
     /**

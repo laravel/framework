@@ -6,7 +6,7 @@ namespace Illuminate\Contracts\Queue;
  * @method int pendingSize(string|null $queue = null)
  * @method int delayedSize(string|null $queue = null)
  * @method int reservedSize(string|null $queue = null)
- * @method int|null creationTimeOfOldestPendingJobstring|null $queue = null)
+ * @method int|null creationTimeOfOldestPendingJob(string|null $queue = null)
  */
 interface Queue
 {

@@ -56,7 +56,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return int|null
      */
-    public function creationTimeOfOldestPendingJob$queue = null)
+    public function creationTimeOfOldestPendingJob($queue = null)
     {
         return null;
     }

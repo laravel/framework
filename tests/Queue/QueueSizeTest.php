@@ -42,12 +42,12 @@ class QueueSizeTest extends TestCase
         $this->assertEquals(2, $queue->pendingSize());
         $this->assertEquals(1, $queue->delayedSize());
         $this->assertEquals(0, $queue->reservedSize());
-        $this->assertIsInt($queue->creationTimeOfOldestPendingJob));
+        $this->assertIsInt($queue->creationTimeOfOldestPendingJob());
 
         $this->assertEquals(1, $queue->pendingSize('Q2'));
         $this->assertEquals(0, $queue->delayedSize('Q2'));
         $this->assertEquals(0, $queue->reservedSize('Q2'));
-        $this->assertIsInt($queue->creationTimeOfOldestPendingJob'Q2'));
+        $this->assertIsInt($queue->creationTimeOfOldestPendingJob('Q2'));
 
         $queue->process();
         $queue->process('Q2');
