@@ -263,6 +263,20 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert whether the response is redirecting back to the previous location with no errors in the session.
+     *
+     * @return $this
+     */
+    public function assertRedirectBackWithoutErrors()
+    {
+        $this->assertRedirectBack();
+
+        $this->assertSessionHasNoErrors();
+
+        return $this;
+    }
+
+    /**
      * Assert whether the response is redirecting to a given route.
      *
      * @param  \BackedEnum|string  $name
