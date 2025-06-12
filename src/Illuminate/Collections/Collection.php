@@ -165,7 +165,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             $results[$key] = $values;
         }
 
-        if (!$results) {
+        if (! $results) {
             return $this;
         }
 
