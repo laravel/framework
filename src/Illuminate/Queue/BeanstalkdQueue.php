@@ -71,7 +71,11 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
+        $stats = $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)));
+
+        return $stats->currentJobsReady
+            + $stats->currentJobsDelayed
+            + $stats->currentJobsReserved;
     }
 
     /**
@@ -82,7 +86,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function sizePending($queue = null)
     {
-        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
     }
 
     /**
@@ -93,7 +97,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function sizeDelayed($queue = null)
     {
-        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsDelayed;
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsDelayed;
     }
 
     /**
@@ -104,7 +108,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function sizeReserved($queue = null)
     {
-        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReserved;
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReserved;
     }
 
     /**
