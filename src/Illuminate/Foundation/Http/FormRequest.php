@@ -316,6 +316,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      *
      * @param  class-string|object  $target
      * @return object An instance of the given target with the mapped data from the request.
+     *
      * @throws ReflectionException
      */
     public function mapTo(string|object $target): object
@@ -331,6 +332,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  object  $target
      * @param  array  $properties
      * @return object An instance of the given target with the mapped data from the given properties.
+     *
      * @throws ReflectionException
      */
     private function mapToTarget(object $target, array $properties): object
@@ -355,7 +357,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Checks if the given target has the given property
+     * Checks if the given target has the given property.
      * @param  object  $target
      * @param  string  $property
      * @return bool
@@ -366,12 +368,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Maps the given value to the given property of the given target
+     * Maps the given value to the given property of the given target.
      *
      * @param  object  $target
      * @param  string  $property
      * @param  mixed  $value
      * @return void
+     *
      * @throws ReflectionException
      */
     private function mapProperty(object $target, string $property, mixed $value): void
@@ -385,12 +388,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Maps the given value to the given property of the given target object
+     * Maps the given value to the given property of the given target object.
      *
      * @param  object  $target
      * @param  string  $property
      * @param  mixed  $value
      * @return void
+     *
      * @throws ReflectionException
      */
     private function mapObjectProperty(object $target, string $property, mixed $value): void
