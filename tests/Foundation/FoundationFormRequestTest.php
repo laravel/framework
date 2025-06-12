@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -227,6 +228,55 @@ class FoundationFormRequestTest extends TestCase
         $request = $this->createRequest(['a' => 1], FoundationTestFormRequestWithGetRules::class);
 
         $request->validateResolved();
+    }
+
+    public function testRequestMapToStringClass()
+    {
+        $request = $this->createRequest(['email' => 'test@laravel.com', 'name' => 'Taylor']);
+        $user = $request->mapTo(DummyUser::class);
+
+        $this->assertInstanceOf(DummyUser::class, $user);
+        $this->assertEquals('Taylor', $user->name);
+        $this->assertEquals('test@laravel.com', $user->email);
+    }
+
+    public function testRequestMapToClassInstance()
+    {
+        $request = $this->createRequest(['email' => 'test@laravel.com', 'name' => 'Taylor']);
+        $user = new DummyUser();
+        $user = $request->mapTo($user);
+
+        $this->assertInstanceOf(DummyUser::class, $user);
+        $this->assertEquals('Taylor', $user->name);
+        $this->assertEquals('test@laravel.com', $user->email);
+    }
+
+    public function testRequestMapToModel()
+    {
+        $request = $this->createRequest(['email' => 'test@laravel.com', 'name' => 'Taylor']);
+        $user = $request->mapTo(DummyUserModel::class);
+
+        $this->assertInstanceOf(DummyUserModel::class, $user);
+        $this->assertEquals('Taylor', $user->name);
+        $this->assertEquals('test@laravel.com', $user->email);
+    }
+
+    public function testRequestMapToCamelCase()
+    {
+        $request = $this->createRequest(['user_name' => 'taylor']);
+        $user = $request->mapTo(DummyUserNameCamel::class);
+
+        $this->assertInstanceOf(DummyUserNameCamel::class, $user);
+        $this->assertEquals('taylor', $user->userName);
+    }
+
+    public function testRequestMapToSnakeCase()
+    {
+        $request = $this->createRequest(['userName' => 'taylor']);
+        $user = $request->mapTo(DummyUserNameSnake::class);
+
+        $this->assertInstanceOf(DummyUserNameSnake::class, $user);
+        $this->assertEquals('taylor', $user->user_name);
     }
 
     /**
@@ -515,4 +565,26 @@ class FoundationTestFormRequestWithGetRules extends FormRequest
             ];
         }
     }
+}
+
+class DummyUser
+{
+    public string $email;
+
+    public string $name;
+}
+
+class DummyUserModel extends Model
+{
+    protected $fillable = ['email', 'name'];
+}
+
+class DummyUserNameCamel
+{
+    public $userName;
+}
+
+class DummyUserNameSnake
+{
+    public $user_name;
 }

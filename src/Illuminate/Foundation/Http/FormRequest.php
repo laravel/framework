@@ -8,8 +8,10 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 class FormRequest extends Request implements ValidatesWhenResolved
@@ -302,5 +304,39 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $this->container = $container;
 
         return $this;
+    }
+
+    /**
+     * Maps the request data into the given target.
+     *
+     * @param  class-string|object  $target
+     * @return  object  An instance of the given target with the mapped data from the request.
+     */
+    public function mapTo(string|object $target): object
+    {
+        $targetInstance = is_string($target) ? new $target() : $target;
+
+        foreach ($this->all() as $property => $value) {
+            if ($this->targetHasProperty($targetInstance, $property)) {
+                $targetInstance->{$property} = $value;
+            }
+
+            $snakedProperty = Str::snake($property);
+            if ($this->targetHasProperty($targetInstance, $snakedProperty)) {
+                $targetInstance->{$snakedProperty} = $value;
+            }
+
+            $camelProperty = Str::camel($property);
+            if ($this->targetHasProperty($targetInstance, $camelProperty)) {
+                $targetInstance->{$camelProperty} = $value;
+            }
+        }
+
+        return $targetInstance;
+    }
+
+    private function targetHasProperty(object $target, string $property): bool
+    {
+        return property_exists($target, $property) || ($target instanceof Model && $target->isFillable($property));
     }
 }
