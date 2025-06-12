@@ -20,7 +20,6 @@ class MonitorCommand extends Command
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
                        {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}
-                       {--metrics : Output queue metrics}
                        {--json : Output the queue size as JSON}';
 
     /**

@@ -631,6 +631,7 @@ class QueueFake extends QueueManager implements Fake, Queue
                 $this->markJobAsReserved($job['job'], $queue);
                 unset($this->pendingJobs[$index]);
                 $this->pendingJobs = array_values($this->pendingJobs);
+
                 return;
             }
         }
