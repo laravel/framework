@@ -117,7 +117,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return int|null
      */
-    public function oldestPending($queue = null)
+    public function creationTimeOfOldestPendingJob$queue = null)
     {
         // Not supported by Beanstalkd...
         return null;

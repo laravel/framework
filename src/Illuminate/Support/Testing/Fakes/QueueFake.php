@@ -476,7 +476,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  string|null  $queue
      * @return int|null
      */
-    public function oldestPending($queue = null)
+    public function creationTimeOfOldestPendingJob$queue = null)
     {
         return collect($this->pendingJobs)
             ->filter(fn ($job) => $job['queue'] === $queue && $job['available_at'] <= now()->getTimestamp())

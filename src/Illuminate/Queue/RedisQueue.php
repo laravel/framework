@@ -148,7 +148,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return int|null
      */
-    public function oldestPending($queue = null)
+    public function creationTimeOfOldestPendingJob$queue = null)
     {
         $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
 

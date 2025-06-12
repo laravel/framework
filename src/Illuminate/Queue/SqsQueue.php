@@ -141,7 +141,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return int|null
      */
-    public function oldestPending($queue = null)
+    public function creationTimeOfOldestPendingJob$queue = null)
     {
         // Not supported by SQS...
         return null;
