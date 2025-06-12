@@ -1772,6 +1772,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new $collection([[1 => 'a'], [3 => 'c'], [2 => 'b'], 'drop']);
         $this->assertEquals([1 => 'a', 3 => 'c', 2 => 'b'], $data->collapseWithKeys()->all());
+
+        // Case with an already flat collection
+        $data = new $collection(['a', 'b', 'c']);
+        $this->assertEquals(['a', 'b', 'c'], $data->collapseWithKeys()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
