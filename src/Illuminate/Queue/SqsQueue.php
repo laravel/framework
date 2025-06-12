@@ -71,45 +71,48 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     {
         $response = $this->sqs->getQueueAttributes([
             'QueueUrl' => $this->getQueue($queue),
+            'AttributeNames' => [
+                'ApproximateNumberOfMessages',
+                'ApproximateNumberOfMessagesDelayed',
+                'ApproximateNumberOfMessagesNotVisible',
+            ],
+        ]);
+
+        $a = $response['Attributes'];
+
+        return (int) $a['ApproximateNumberOfMessages']
+            + (int) $a['ApproximateNumberOfMessagesDelayed']
+            + (int) $a['ApproximateNumberOfMessagesNotVisible'];
+    }
+
+    public function sizePending($queue = null)
+    {
+        $response = $this->sqs->getQueueAttributes([
+            'QueueUrl' => $this->getQueue($queue),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
-        $attributes = $response->get('Attributes');
-
-        return (int) $attributes['ApproximateNumberOfMessages'];
+        return (int) $response['Attributes']['ApproximateNumberOfMessages'] ?? 0;
     }
 
-    /**
-     * Get the number of pending jobs (ready to run).
-     *
-     * @param  string|null  $queue
-     * @return int
-     */
-    public function sizePending($queue = null)
-    {
-        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessages');
-    }
-
-    /**
-     * Get the number of delayed jobs (waiting for future execution).
-     *
-     * @param  string|null  $queue
-     * @return int
-     */
     public function sizeDelayed($queue = null)
     {
-        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessagesDelayed');
+        $response = $this->sqs->getQueueAttributes([
+            'QueueUrl' => $this->getQueue($queue),
+            'AttributeNames' => ['ApproximateNumberOfMessagesDelayed'],
+        ]);
+
+        return (int) $response['Attributes']['ApproximateNumberOfMessagesDelayed'] ?? 0;
     }
 
-    /**
-     * Get the number of reserved jobs (currently running).
-     *
-     * @param  string|null  $queue
-     * @return int
-     */
     public function sizeReserved($queue = null)
     {
-        return $this->getQueueAttribute($queue, 'ApproximateNumberOfMessagesNotVisible');
+        $response = $this->sqs->getQueueAttributes([
+            'QueueUrl' => $this->getQueue($queue),
+            'AttributeNames' => ['ApproximateNumberOfMessagesNotVisible'],
+        ]);
+
+        return (int) $response['Attributes']['ApproximateNumberOfMessagesNotVisible'] ?? 0;
     }
 
     /**
