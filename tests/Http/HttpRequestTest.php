@@ -804,6 +804,9 @@ class HttpRequestTest extends TestCase
 
         $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
 
+        $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
+
         $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
         $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));

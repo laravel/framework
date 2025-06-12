@@ -249,7 +249,11 @@ class NotificationSender
                 }
 
                 $this->bus->dispatch(
-                    (new SendQueuedNotifications($notifiable, $notification, [$channel]))
+                    $this->manager->getContainer()->make(SendQueuedNotifications::class, [
+                        'notifiables' => $notifiable,
+                        'notification' => $notification,
+                        'channels' => [$channel],
+                    ])
                         ->onConnection($connection)
                         ->onQueue($queue)
                         ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)

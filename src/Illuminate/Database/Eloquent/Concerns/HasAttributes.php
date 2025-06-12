@@ -50,23 +50,30 @@ trait HasAttributes
     /**
      * The model's attributes.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $attributes = [];
 
     /**
      * The model attribute's original state.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $original = [];
 
     /**
      * The changed model attributes.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $changes = [];
+
+    /**
+     * The previous state of the changed model attributes.
+     *
+     * @var array<string, mixed>
+     */
+    protected $previous = [];
 
     /**
      * The attributes that should be cast.
@@ -202,7 +209,7 @@ trait HasAttributes
     /**
      * Convert the model's attributes to an array.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function attributesToArray()
     {
@@ -237,8 +244,8 @@ trait HasAttributes
     /**
      * Add the date attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
      */
     protected function addDateAttributesToArray(array $attributes)
     {
@@ -258,9 +265,9 @@ trait HasAttributes
     /**
      * Add the mutated attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @param  array  $mutatedAttributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $mutatedAttributes
+     * @return array<string, mixed>
      */
     protected function addMutatedAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -286,9 +293,9 @@ trait HasAttributes
     /**
      * Add the casted attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @param  array  $mutatedAttributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $mutatedAttributes
+     * @return array<string, mixed>
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
@@ -341,7 +348,7 @@ trait HasAttributes
     /**
      * Get an attribute array of all arrayable attributes.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     protected function getArrayableAttributes()
     {
@@ -980,6 +987,21 @@ trait HasAttributes
     {
         return $this->resolveCasterClass($key)->serialize(
             $this, $key, $value, $this->attributes
+        );
+    }
+
+    /**
+     * Compare two values for the given attribute using the custom cast class.
+     *
+     * @param  string  $key
+     * @param  mixed  $original
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected function compareClassCastableAttribute($key, $original, $value)
+    {
+        return $this->resolveCasterClass($key)->compare(
+            $this, $key, $original, $value
         );
     }
 
@@ -1794,6 +1816,19 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the key is comparable using a custom class.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isClassComparable($key)
+    {
+        return ! $this->isEnumCastable($key) &&
+            $this->isClassCastable($key) &&
+            method_exists($this->resolveCasterClass($key), 'compare');
+    }
+
+    /**
      * Resolve the custom caster class for a given key.
      *
      * @param  string  $key
@@ -1953,7 +1988,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return ($key is null ? array<string, mixed> : mixed)
      */
     public function getOriginal($key = null, $default = null)
     {
@@ -1967,7 +2002,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return ($key is null ? array<string, mixed> : mixed)
      */
     protected function getOriginalWithoutRewindingModel($key = null, $default = null)
     {
@@ -1987,7 +2022,7 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return mixed|array
+     * @return ($key is null ? array<string, mixed> : mixed)
      */
     public function getRawOriginal($key = null, $default = null)
     {
@@ -1997,8 +2032,8 @@ trait HasAttributes
     /**
      * Get a subset of the model's attributes.
      *
-     * @param  array|mixed  $attributes
-     * @return array
+     * @param  array<string>|mixed  $attributes
+     * @return array<string, mixed>
      */
     public function only($attributes)
     {
@@ -2014,7 +2049,7 @@ trait HasAttributes
     /**
      * Get all attributes except the given ones.
      *
-     * @param  array|mixed  $attributes
+     * @param  array<string>|mixed  $attributes
      * @return array
      */
     public function except($attributes)
@@ -2058,7 +2093,7 @@ trait HasAttributes
     /**
      * Sync multiple original attribute with their current values.
      *
-     * @param  array|string  $attributes
+     * @param  array<string>|string  $attributes
      * @return $this
      */
     public function syncOriginalAttributes($attributes)
@@ -2082,6 +2117,7 @@ trait HasAttributes
     public function syncChanges()
     {
         $this->changes = $this->getDirty();
+        $this->previous = array_intersect_key($this->getRawOriginal(), $this->changes);
 
         return $this;
     }
@@ -2089,7 +2125,7 @@ trait HasAttributes
     /**
      * Determine if the model or any of the given attribute(s) have been modified.
      *
-     * @param  array|string|null  $attributes
+     * @param  array<string>|string|null  $attributes
      * @return bool
      */
     public function isDirty($attributes = null)
@@ -2102,7 +2138,7 @@ trait HasAttributes
     /**
      * Determine if the model or all the given attribute(s) have remained the same.
      *
-     * @param  array|string|null  $attributes
+     * @param  array<string>|string|null  $attributes
      * @return bool
      */
     public function isClean($attributes = null)
@@ -2117,7 +2153,7 @@ trait HasAttributes
      */
     public function discardChanges()
     {
-        [$this->attributes, $this->changes] = [$this->original, []];
+        [$this->attributes, $this->changes, $this->previous] = [$this->original, [], []];
 
         return $this;
     }
@@ -2125,7 +2161,7 @@ trait HasAttributes
     /**
      * Determine if the model or any of the given attribute(s) were changed when the model was last saved.
      *
-     * @param  array|string|null  $attributes
+     * @param  array<string>|string|null  $attributes
      * @return bool
      */
     public function wasChanged($attributes = null)
@@ -2138,8 +2174,8 @@ trait HasAttributes
     /**
      * Determine if any of the given attributes were changed when the model was last saved.
      *
-     * @param  array  $changes
-     * @param  array|string|null  $attributes
+     * @param  array<string>  $changes
+     * @param  array<string>|string|null  $attributes
      * @return bool
      */
     protected function hasChanges($changes, $attributes = null)
@@ -2166,7 +2202,7 @@ trait HasAttributes
     /**
      * Get the attributes that have been changed since the last sync.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getDirty()
     {
@@ -2184,7 +2220,7 @@ trait HasAttributes
     /**
      * Get the attributes that have been changed since the last sync for an update operation.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     protected function getDirtyForUpdate()
     {
@@ -2194,11 +2230,21 @@ trait HasAttributes
     /**
      * Get the attributes that were changed when the model was last saved.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    /**
+     * Get the attributes that were previously original before the model was last saved.
+     *
+     * @return array<string, mixed>
+     */
+    public function getPrevious()
+    {
+        return $this->previous;
     }
 
     /**
@@ -2247,6 +2293,8 @@ trait HasAttributes
             }
 
             return false;
+        } elseif ($this->isClassComparable($key)) {
+            return $this->compareClassCastableAttribute($key, $original, $attribute);
         }
 
         return is_numeric($attribute) && is_numeric($original)
@@ -2299,7 +2347,7 @@ trait HasAttributes
     /**
      * Append attributes to query when building a query.
      *
-     * @param  array|string  $attributes
+     * @param  array<string>|string  $attributes
      * @return $this
      */
     public function append($attributes)

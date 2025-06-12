@@ -19,7 +19,8 @@ class MonitorCommand extends Command
      */
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
-                       {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}';
+                       {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}
+                       {--json : Output the queue size as JSON}';
 
     /**
      * The console command description.
@@ -65,7 +66,15 @@ class MonitorCommand extends Command
     {
         $queues = $this->parseQueues($this->argument('queues'));
 
-        $this->displaySizes($queues);
+        if ($this->option('json')) {
+            $this->output->writeln((new Collection($queues))->map(function ($queue) {
+                return array_merge($queue, [
+                    'status' => str_contains($queue['status'], 'ALERT') ? 'ALERT' : 'OK',
+                ]);
+            })->toJson());
+        } else {
+            $this->displaySizes($queues);
+        }
 
         $this->dispatchEvents($queues);
     }

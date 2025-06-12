@@ -1,6 +1,92 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.14.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.17.0...12.x)
+
+## [v12.17.0](https://github.com/laravel/framework/compare/v12.16.0...v12.17.0) - 2025-06-03
+
+* [11.x] Backport `TestResponse::assertRedirectBack` by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/55780
+* Add support for sending raw (non-encoded) attachments in Resend mail by [@Roywcm](https://github.com/Roywcm) in https://github.com/laravel/framework/pull/55837
+* [12.x] chore: return Collection from timestamps methods by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55871
+* [12.x] fix: fully qualify collection return type by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55873
+* [12.x] Fix Blade nested default component resolution for custom namespaces by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55874
+* [12.x] Fix return types in console command handlers to void by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/55876
+* [12.x] Ability to perform higher order static calls on collection items by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/55880
+* Adds Resource helpers to cursor paginator by [@jsandfordhughescoop](https://github.com/jsandfordhughescoop) in https://github.com/laravel/framework/pull/55879
+* Add reorderDesc() to Query Builder by [@ghabriel25](https://github.com/ghabriel25) in https://github.com/laravel/framework/pull/55885
+* [11.x] Fixes Symfony Console 7.3 deprecations on closure command by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55888
+* [12.x] Add `AsUri` model cast by [@ash-jc-allen](https://github.com/ash-jc-allen) in https://github.com/laravel/framework/pull/55909
+* [12.x] feat: Add Contextual Implementation/Interface Binding via PHP8 Attribute by [@yitzwillroth](https://github.com/yitzwillroth) in https://github.com/laravel/framework/pull/55904
+* [12.x] Add tests for the `AuthenticateSession` Middleware by [@imanghafoori1](https://github.com/imanghafoori1) in https://github.com/laravel/framework/pull/55900
+* [12.x] Allow brick/math ^0.13 by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/54964
+* [12.x] fix: Factory::state and ::prependState generics by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55915
+
+## [v12.16.0](https://github.com/laravel/framework/compare/v12.15.0...v12.16.0) - 2025-05-27
+
+* [12.x] Change priority in optimize:clear by [@amirmohammadnajmi](https://github.com/amirmohammadnajmi) in https://github.com/laravel/framework/pull/55792
+* [12.x] Fix `TestResponse::assertSessionMissing()` when given an array of keys by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55800
+* [12.x] Allowing `Context` Attribute to Interact with Hidden by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55799
+* Add support for sending raw (non-encoded) attachments in Resend mail driver by [@Roywcm](https://github.com/Roywcm) in https://github.com/laravel/framework/pull/55803
+* [12.x] Added option to always defer for flexible cache by [@Zwartpet](https://github.com/Zwartpet) in https://github.com/laravel/framework/pull/55802
+* [12.x] style: Use null coalescing assignment (??=) for cleaner code by [@mohsenetm](https://github.com/mohsenetm) in https://github.com/laravel/framework/pull/55823
+* [12.x] Introducing `Arr::hasAll` by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55815
+* [12.x] Restore lazy loading check by [@decadence](https://github.com/decadence) in https://github.com/laravel/framework/pull/55817
+* [12.x] Minor language update by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55812
+* fix(cache/redis): use connectionAwareSerialize in RedisStore::putMany() by [@superbiche](https://github.com/superbiche) in https://github.com/laravel/framework/pull/55814
+* [12.x] Fix `ResponseFactory` should also accept `null` callback by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55833
+* [12.x] Add template variables to scope by [@wietsewarendorff](https://github.com/wietsewarendorff) in https://github.com/laravel/framework/pull/55830
+* [12.x] Introducing `toUri` to the `Stringable` Class by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55862
+* [12.x] Remove remaining [@return](https://github.com/return) tags from constructors by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55858
+* [12.x] Replace alias `is_integer()` with `is_int()` to comply with Laravel Pint by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/55851
+* Fix argument types for Illuminate/Database/Query/Builder::upsert() by [@jellisii](https://github.com/jellisii) in https://github.com/laravel/framework/pull/55849
+* [12.x] Add `in_array_keys` validation rule to check for presence of specified array keys by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/55807
+* [12.x] Add `Rule::contains` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/55809
+
+## [v12.15.0](https://github.com/laravel/framework/compare/v12.14.1...v12.15.0) - 2025-05-20
+
+* [12.x] Add locale-aware number parsing methods to Number class by [@informagenie](https://github.com/informagenie) in https://github.com/laravel/framework/pull/55725
+* [12.x] Add a default option when retrieving an enum from data by [@elbojoloco](https://github.com/elbojoloco) in https://github.com/laravel/framework/pull/55735
+* Revert "[12.x] Update "Number::fileSize" to use correct prefix and add prefix param" by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/55741
+* [12.x] Remove apc by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55745
+* [12.x] Add param type for `assertJsonStructure` & `assertExactJsonStructure` methods by [@milwad-dev](https://github.com/milwad-dev) in https://github.com/laravel/framework/pull/55743
+* [12.x] Fix type casting for environment variables in config files by [@adamwhp](https://github.com/adamwhp) in https://github.com/laravel/framework/pull/55737
+* [12.x] Preserve "previous" model state by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55729
+* [12.x] Passthru `getCountForPagination` on an Eloquent\Builder by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/55752
+* [12.x] Add `assertClientError` method to `TestResponse` by [@shane-zeng](https://github.com/shane-zeng) in https://github.com/laravel/framework/pull/55750
+* Install Broadcasting Command Fix for Livewire Starter Kit by [@joshcirre](https://github.com/joshcirre) in https://github.com/laravel/framework/pull/55774
+* Clarify units for benchmark value for IDE accessibility by [@mike-healy](https://github.com/mike-healy) in https://github.com/laravel/framework/pull/55781
+* Improved PHPDoc Return Types for Eloquent's Original Attribute Methods by [@clementbirkle](https://github.com/clementbirkle) in https://github.com/laravel/framework/pull/55779
+* [12.x] Prevent `preventsLazyLoading` exception when using `automaticallyEagerLoadRelationships` by [@devajmeireles](https://github.com/devajmeireles) in https://github.com/laravel/framework/pull/55771
+* [12.x] Add `hash` string helper by [@istiak-tridip](https://github.com/istiak-tridip) in https://github.com/laravel/framework/pull/55767
+* [12.x] Update `assertSessionMissing()` signature to match `assertSessionHas()` by [@nexxai](https://github.com/nexxai) in https://github.com/laravel/framework/pull/55763
+* Fix: php artisan db command if no password by [@mr-chetan](https://github.com/mr-chetan) in https://github.com/laravel/framework/pull/55761
+* [12.x] Types: InteractsWithPivotTable::sync by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/55762
+* [12.x] feat: Add `current_page_url` to Paginator by [@mariomka](https://github.com/mariomka) in https://github.com/laravel/framework/pull/55789
+* Correct return type in PhpDoc for command fail method by [@Muetze42](https://github.com/Muetze42) in https://github.com/laravel/framework/pull/55783
+* [12.x] Add `assertRedirectToAction` method to test redirection to controller actions by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/55788
+* [12.x] Add Context contextual attribute by [@martinbean](https://github.com/martinbean) in https://github.com/laravel/framework/pull/55760
+
+## [v12.14.1](https://github.com/laravel/framework/compare/v12.14.0...v12.14.1) - 2025-05-13
+
+* [10.x] Refine error messages for detecting lost connections (Debian bookworm compatibility) by [@mfn](https://github.com/mfn) in https://github.com/laravel/framework/pull/53794
+* [10.x] Bump minimum `league/commonmark` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/53829
+* [10.x] Backport 11.x PHP 8.4 fix for str_getcsv deprecation by [@aka-tpayne](https://github.com/aka-tpayne) in https://github.com/laravel/framework/pull/54074
+* [10.x] Fix attribute name used on `Validator` instance within certain rule classes by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54943
+* Add `Illuminate\Support\EncodedHtmlString` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/54737
+* [11.x] Fix missing `return $this` for `assertOnlyJsonValidationErrors` by [@LeTamanoir](https://github.com/LeTamanoir) in https://github.com/laravel/framework/pull/55099
+* [11.x] Fix `Illuminate\Support\EncodedHtmlString` from causing breaking change by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55149
+* [11.x] Respect custom path for cached views by the `AboutCommand` by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/55179
+* [11.x] Include all invisible characters in Str::trim by [@laserhybiz](https://github.com/laserhybiz) in https://github.com/laravel/framework/pull/54281
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55302
+* [11.x] Remove incorrect syntax from mail's `message` template by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55530
+* [11.x] Allows to toggle markdown email encoding by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55539
+* [11.x] Fix `EncodedHtmlString` to ignore instance of `HtmlString` by [@jbraband](https://github.com/jbraband) in https://github.com/laravel/framework/pull/55543
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55549
+* [11.x] Install Passport 13.x by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/55621
+* [11.x] Bump minimum league/commonmark by [@andrextor](https://github.com/andrextor) in https://github.com/laravel/framework/pull/55660
+* Backporting Timebox fixes to 11.x by [@valorin](https://github.com/valorin) in https://github.com/laravel/framework/pull/55705
+* Test SQLServer 2017 on Ubuntu 22.04 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55716
+* [11.x] Fix Symfony 7.3 deprecations by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55711
+* Easily implement broadcasting in a React/Vue Typescript app (Starter Kits) by [@tnylea](https://github.com/tnylea) in https://github.com/laravel/framework/pull/55170
 
 ## [v12.14.0](https://github.com/laravel/framework/compare/v12.13.0...v12.14.0) - 2025-05-13
 

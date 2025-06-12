@@ -496,6 +496,30 @@ class Arr
     }
 
     /**
+     * Determine if all keys exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function hasAll($array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (! $array || $keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (! static::has($array, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
@@ -534,7 +558,7 @@ class Arr
     {
         $value = Arr::get($array, $key, $default);
 
-        if (! is_integer($value)) {
+        if (! is_int($value)) {
             throw new InvalidArgumentException(
                 sprintf('Array value for key [%s] must be an integer, %s found.', $key, gettype($value))
             );

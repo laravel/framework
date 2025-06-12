@@ -62,7 +62,7 @@ class BroadcastingInstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
     public function handle()
     {
@@ -114,6 +114,18 @@ class BroadcastingInstallCommand extends Command
                     file_put_contents(
                         $bootstrapScriptPath,
                         trim($bootstrapScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
+                    );
+                }
+            } elseif (file_exists($appScriptPath = $this->laravel->resourcePath('js/app.js'))) {
+                // If no bootstrap.js, try app.js...
+                $appScript = file_get_contents(
+                    $appScriptPath
+                );
+
+                if (! str_contains($appScript, './echo')) {
+                    file_put_contents(
+                        $appScriptPath,
+                        trim($appScript.PHP_EOL.file_get_contents(__DIR__.'/stubs/echo-bootstrap-js.stub')).PHP_EOL,
                     );
                 }
             }

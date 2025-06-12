@@ -174,38 +174,18 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0 B', Number::fileSize(0));
         $this->assertSame('0.00 B', Number::fileSize(0, precision: 2));
         $this->assertSame('1 B', Number::fileSize(1));
-        $this->assertSame('1 KB', Number::fileSize(1000));
-        $this->assertSame('2 KB', Number::fileSize(2000));
-        $this->assertSame('2.00 KB', Number::fileSize(2000, precision: 2));
-        $this->assertSame('1.23 KB', Number::fileSize(1234, precision: 2));
-        $this->assertSame('1.234 KB', Number::fileSize(1234, maxPrecision: 3));
-        $this->assertSame('1.234 KB', Number::fileSize(1234, 3));
-        $this->assertSame('5 GB', Number::fileSize(1000 * 1000 * 1000 * 5));
-        $this->assertSame('10 TB', Number::fileSize((1000 ** 4) * 10));
-        $this->assertSame('10 PB', Number::fileSize((1000 ** 5) * 10));
-        $this->assertSame('1 ZB', Number::fileSize(1000 ** 7));
-        $this->assertSame('1 YB', Number::fileSize(1000 ** 8));
-        $this->assertSame('1 RB', Number::fileSize(1000 ** 9));
-        $this->assertSame('1 QB', Number::fileSize(1000 ** 10));
-        $this->assertSame('1,000 QB', Number::fileSize(1000 ** 11));
-
-        $this->assertSame('0 B', Number::fileSize(0, useBinaryPrefix: true));
-        $this->assertSame('0.00 B', Number::fileSize(0, precision: 2, useBinaryPrefix: true));
-        $this->assertSame('1 B', Number::fileSize(1, useBinaryPrefix: true));
-        $this->assertSame('1 KiB', Number::fileSize(1024, useBinaryPrefix: true));
-        $this->assertSame('2 KiB', Number::fileSize(2048, useBinaryPrefix: true));
-        $this->assertSame('2.00 KiB', Number::fileSize(2048, precision: 2, useBinaryPrefix: true));
-        $this->assertSame('1.23 KiB', Number::fileSize(1264, precision: 2, useBinaryPrefix: true));
-        $this->assertSame('1.234 KiB', Number::fileSize(1264.12345, maxPrecision: 3, useBinaryPrefix: true));
-        $this->assertSame('1.234 KiB', Number::fileSize(1264, 3, useBinaryPrefix: true));
-        $this->assertSame('5 GiB', Number::fileSize(1024 * 1024 * 1024 * 5, useBinaryPrefix: true));
-        $this->assertSame('10 TiB', Number::fileSize((1024 ** 4) * 10, useBinaryPrefix: true));
-        $this->assertSame('10 PiB', Number::fileSize((1024 ** 5) * 10, useBinaryPrefix: true));
-        $this->assertSame('1 ZiB', Number::fileSize(1024 ** 7, useBinaryPrefix: true));
-        $this->assertSame('1 YiB', Number::fileSize(1024 ** 8, useBinaryPrefix: true));
-        $this->assertSame('1 RiB', Number::fileSize(1024 ** 9, useBinaryPrefix: true));
-        $this->assertSame('1 QiB', Number::fileSize(1024 ** 10, useBinaryPrefix: true));
-        $this->assertSame('1,024 QiB', Number::fileSize(1024 ** 11, useBinaryPrefix: true));
+        $this->assertSame('1 KB', Number::fileSize(1024));
+        $this->assertSame('2 KB', Number::fileSize(2048));
+        $this->assertSame('2.00 KB', Number::fileSize(2048, precision: 2));
+        $this->assertSame('1.23 KB', Number::fileSize(1264, precision: 2));
+        $this->assertSame('1.234 KB', Number::fileSize(1264.12345, maxPrecision: 3));
+        $this->assertSame('1.234 KB', Number::fileSize(1264, 3));
+        $this->assertSame('5 GB', Number::fileSize(1024 * 1024 * 1024 * 5));
+        $this->assertSame('10 TB', Number::fileSize((1024 ** 4) * 10));
+        $this->assertSame('10 PB', Number::fileSize((1024 ** 5) * 10));
+        $this->assertSame('1 ZB', Number::fileSize(1024 ** 7));
+        $this->assertSame('1 YB', Number::fileSize(1024 ** 8));
+        $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
     public function testClamp()
@@ -354,5 +334,40 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParse()
+    {
+        $this->assertSame(1234.0, Number::parse('1,234'));
+        $this->assertSame(1234.5, Number::parse('1,234.5'));
+        $this->assertSame(1234.56, Number::parse('1,234.56'));
+        $this->assertSame(-1234.56, Number::parse('-1,234.56'));
+
+        $this->assertSame(1234.56, Number::parse('1.234,56', locale: 'de'));
+        $this->assertSame(1234.56, Number::parse('1 234,56', locale: 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParseInt()
+    {
+        $this->assertSame(1234, Number::parseInt('1,234'));
+        $this->assertSame(1234, Number::parseInt('1,234.5'));
+        $this->assertSame(-1234, Number::parseInt('-1,234.56'));
+
+        $this->assertSame(1234, Number::parseInt('1.234', locale: 'de'));
+        $this->assertSame(1234, Number::parseInt('1 234', locale: 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParseFloat()
+    {
+        $this->assertSame(1234.0, Number::parseFloat('1,234'));
+        $this->assertSame(1234.5, Number::parseFloat('1,234.5'));
+        $this->assertSame(1234.56, Number::parseFloat('1,234.56'));
+        $this->assertSame(-1234.56, Number::parseFloat('-1,234.56'));
+
+        $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
+        $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
 }

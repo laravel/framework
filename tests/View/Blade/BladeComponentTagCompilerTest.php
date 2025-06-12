@@ -161,6 +161,19 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
     }
 
+    public function testCustomNamespaceNestedDefaultComponentParsing()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(namespaces: ['nightshade' => 'Nightshade\\View\\Components'])->compileTags('<div><x-nightshade::accordion /></div>');
+
+        $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Nightshade\View\Components\Accordion\Accordion', 'nightshade::accordion', [])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Nightshade\View\Components\Accordion\Accordion::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
     public function testBasicComponentWithEmptyAttributesParsing()
     {
         $this->mockViewFactory();
@@ -373,6 +386,18 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
+    public function testClassesCanBeFoundByComponents()
+    {
+        $this->mockViewFactory();
+        $compiler = $this->compiler(namespaces: ['nightshade' => 'Nightshade\\View\\Components']);
+
+        $result = $compiler->findClassByComponent('nightshade::calendar');
+        $this->assertSame('Nightshade\\View\\Components\\Calendar', trim($result));
+
+        $result = $compiler->findClassByComponent('nightshade::accordion');
+        $this->assertSame('Nightshade\\View\\Components\\Accordion\\Accordion', trim($result));
     }
 
     public function testClassNamesCanBeGuessed()
@@ -1002,5 +1027,29 @@ class Card extends Component
     public function render()
     {
         return 'card';
+    }
+}
+
+namespace Nightshade\View\Components;
+
+use Illuminate\View\Component;
+
+class Calendar extends Component
+{
+    public function render()
+    {
+        return 'calendar';
+    }
+}
+
+namespace Nightshade\View\Components\Accordion;
+
+use Illuminate\View\Component;
+
+class Accordion extends Component
+{
+    public function render()
+    {
+        return 'accordion';
     }
 }

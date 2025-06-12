@@ -261,6 +261,21 @@ class Rule
     }
 
     /**
+     * Get a contains rule builder instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @return \Illuminate\Validation\Rules\Contains
+     */
+    public static function contains($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Rules\Contains(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
      * Compile a set of rules for an attribute.
      *
      * @param  string  $attribute

@@ -21,6 +21,7 @@ class PaginatorTest extends TestCase
             'per_page' => 2,
             'current_page' => 2,
             'first_page_url' => '/?page=1',
+            'current_page_url' => '/?page=2',
             'next_page_url' => '/?page=3',
             'prev_page_url' => '/?page=1',
             'from' => 3,

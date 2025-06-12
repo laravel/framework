@@ -409,6 +409,10 @@ class ComponentTagCompiler
         if (class_exists($class = $this->namespaces[$prefix].'\\'.$this->formatClassName($segments[1]))) {
             return $class;
         }
+
+        if (class_exists($class = $class.'\\'.Str::afterLast($class, '\\'))) {
+            return $class;
+        }
     }
 
     /**

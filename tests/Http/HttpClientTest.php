@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
@@ -1304,6 +1306,81 @@ class HttpClientTest extends TestCase
         throw new RequestException(new Response($response));
     }
 
+    public function testRequestLevelTruncationLevelOnRequestException()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testNoTruncationOnRequestLevel()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->throw()->dontTruncateExceptions()->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testRequestExceptionDoesNotTruncateButRequestDoes()
+    {
+        RequestException::dontTruncate();
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertFalse(RequestException::$truncateAt);
+    }
+
+    public function testAsyncRequestExceptionsRespectRequestTruncation()
+    {
+        RequestException::dontTruncate();
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = $this->factory->async()->throw()->truncateExceptionsAt(4)->get('http://foo.com/json')->wait();
+
+        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertFalse(RequestException::$truncateAt);
+    }
+
     public function testRequestExceptionEmptyBody()
     {
         $this->expectException(RequestException::class);
@@ -2514,6 +2591,22 @@ class HttpClientTest extends TestCase
                 $request->url() === 'https://laravel.example' &&
                 $request->hasHeader('X-Test-Header', 'Test');
         });
+    }
+
+    public function testSslCertificateErrorsConvertedToConnectionException()
+    {
+        $this->factory->fake(function () {
+            $request = new GuzzleRequest('HEAD', 'https://ssl-error.laravel.example');
+            throw new GuzzleRequestException(
+                'cURL error 60: SSL certificate problem: unable to get local issuer certificate',
+                $request
+            );
+        });
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
+
+        $this->factory->head('https://ssl-error.laravel.example');
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()

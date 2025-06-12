@@ -5007,6 +5007,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testHigherOrderCollectionStaticCall($collection)
+    {
+        $class1 = TestSupportCollectionHigherOrderStaticClass1::class;
+        $class2 = TestSupportCollectionHigherOrderStaticClass2::class;
+
+        $classes = new $collection([$class1, $class2]);
+
+        $this->assertEquals(['TAYLOR', 't a y l o r'], $classes->map->transform('taylor')->toArray());
+        $this->assertEquals($class1, $classes->first->matches('Taylor'));
+        $this->assertEquals($class2, $classes->first->matches('Otwell'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testPartition($collection)
     {
         $data = new $collection(range(1, 10));
@@ -5714,6 +5727,32 @@ class TestSupportCollectionHigherOrderItem
     public function is($name)
     {
         return $this->name === $name;
+    }
+}
+
+class TestSupportCollectionHigherOrderStaticClass1
+{
+    public static function transform($name)
+    {
+        return strtoupper($name);
+    }
+
+    public static function matches($name)
+    {
+        return str_starts_with($name, 'T');
+    }
+}
+
+class TestSupportCollectionHigherOrderStaticClass2
+{
+    public static function transform($name)
+    {
+        return trim(chunk_split($name, 1, ' '));
+    }
+
+    public static function matches($name)
+    {
+        return str_starts_with($name, 'O');
     }
 }
 

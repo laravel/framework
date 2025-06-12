@@ -90,6 +90,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest stub(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest async(bool $async = true)
  * @method static \GuzzleHttp\Promise\PromiseInterface|null getPromise()
+ * @method static \Illuminate\Http\Client\PendingRequest truncateExceptionsAt(int $length)
+ * @method static \Illuminate\Http\Client\PendingRequest dontTruncateExceptions()
  * @method static \Illuminate\Http\Client\PendingRequest setClient(\GuzzleHttp\Client $client)
  * @method static \Illuminate\Http\Client\PendingRequest setHandler(callable $handler)
  * @method static array getOptions()
