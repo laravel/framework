@@ -20,7 +20,7 @@ class RetryCommand extends Command
      * @var string
      */
     protected $signature = 'queue:retry
-                            {id?* : The ID of the failed job or "all" to retry all jobs}
+                            {id?* : The uuid of the failed job or "all" to retry all jobs}
                             {--queue= : Retry all of the failed jobs for the specified queue}
                             {--range=* : Range of job IDs (numeric) to be retried (e.g. 1-5)}';
 
