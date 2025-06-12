@@ -207,6 +207,20 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
+     * Add an array of commands to the console.
+     *
+     * @param  array<int, \Symfony\Component\Console\Command\Command>  $commands
+     * @return void
+     */
+    #[\Override]
+    public function addCommands(array $commands): void
+    {
+        foreach ($commands as $command) {
+            $this->add($command);
+        }
+    }
+
+    /**
      * Add a command to the console.
      *
      * @param  \Symfony\Component\Console\Command\Command  $command
