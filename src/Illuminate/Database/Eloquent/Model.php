@@ -1654,7 +1654,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $builderClass = $this->resolveCustomBuilderClass();
 
-        if ($builderClass !== null && is_subclass_of($builderClass, Builder::class)) {
+        if ($builderClass && is_subclass_of($builderClass, Builder::class)) {
             return new $builderClass($query);
         }
 
