@@ -168,6 +168,54 @@ interface ConnectionInterface
     public function transactionLevel();
 
     /**
+     * Create a savepoint within the current transaction. Optionally provide a callback
+     * to be executed following creation of the savepoint. If the callback fails, the transaction
+     * will be rolled back to the savepoint. The savepoint will be released after the callback
+     * has been executed.
+     */
+    public function savepoint(string $name, ?callable $callback = null): mixed;
+
+    /**
+     * Release a savepoint in the database.
+     */
+    public function releaseSavepoint(string $name, ?int $level = null): void;
+
+    /**
+     * Release all savepoints in the database.
+     */
+    public function purgeSavepoints(?int $level = null): void;
+
+    /**
+     * Rollback to a savepoint in the database.
+     */
+    public function rollbackToSavepoint(string $name): void;
+
+    /**
+     * Determine if a savepoint exists in the database.
+     */
+    public function hasSavepoint(string $name): bool;
+
+    /**
+     * Get the names of all savepoints in the database.
+     */
+    public function getSavepoints(): array;
+
+    /**
+     * Get the current savepoint name.
+     */
+    public function getCurrentSavepoint(): ?string;
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepoints(): bool;
+
+    /**
+     * Determine if the connection releases savepoints.
+     */
+    public function supportsSavepointRelease(): bool;
+
+    /**
      * Execute the given callback in "dry run" mode.
      *
      * @param  \Closure  $callback

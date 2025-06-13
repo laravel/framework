@@ -53,4 +53,44 @@ class MariaDbGrammar extends MySqlGrammar
     {
         return false;
     }
+
+    /**
+     * Determine if the connection supports savepoints.
+     */
+    public function supportsSavepoints(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepointRelease(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     */
+    public function compileSavepoint(string $name): string
+    {
+        return 'SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint rollback.
+     */
+    public function compileRollbackToSavepoint(string $name): string
+    {
+        return 'ROLLBACK TO SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint release.
+     */
+    public function compileReleaseSavepoint(string $name): string
+    {
+        return 'RELEASE SAVEPOINT '.$this->wrapValue($name);
+    }
 }

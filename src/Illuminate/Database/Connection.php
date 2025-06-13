@@ -30,6 +30,7 @@ class Connection implements ConnectionInterface
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
         Concerns\ManagesTransactions,
+        Concerns\ManagesSavepoints,
         InteractsWithTime,
         Macroable;
 
@@ -228,6 +229,8 @@ class Connection implements ConnectionInterface
         $this->useDefaultQueryGrammar();
 
         $this->useDefaultPostProcessor();
+
+        $this->initializeSavepointManagement();
     }
 
     /**
@@ -1457,6 +1460,8 @@ class Connection implements ConnectionInterface
     public function setEventDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+
+        $this->initializeSavepointManagement();
 
         return $this;
     }
