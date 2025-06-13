@@ -3281,6 +3281,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($user->getAttribute('name'));
     }
 
+    public function testDiscardChangesWithCasts()
+    {
+        $model = new EloquentModelWithPrimitiveCasts();
+
+        $model->address_line_one = '123 Main Street';
+
+        $this->assertEquals('123 Main Street', $model->address->lineOne);
+        $this->assertEquals('123 MAIN STREET', $model->address_in_caps);
+
+        $model->discardChanges();
+
+        $this->assertNull($model->address->lineOne);
+        $this->assertNull($model->address_in_caps);
+    }
+
     public function testHasAttribute()
     {
         $user = new EloquentModelStub([
@@ -4009,6 +4024,17 @@ class EloquentModelWithPrimitiveCasts extends Model
     {
         return Attribute::get(fn () => 'ok');
     }
+
+    public function addressInCaps(): Attribute
+    {
+        return Attribute::get(
+            function () {
+                $value = $this->getAttributes()['address_line_one'] ?? null;
+
+                return is_string($value) ? strtoupper($value) : $value;
+            }
+        )->shouldCache();
+    }
 }
 
 enum CastableBackedEnum: string
@@ -4018,6 +4044,12 @@ enum CastableBackedEnum: string
 
 class Address implements Castable
 {
+    public function __construct(
+        public ?string $lineOne = null,
+        public ?string $lineTwo = null
+    ) {
+    }
+
     public static function castUsing(array $arguments): CastsAttributes
     {
         return new class implements CastsAttributes

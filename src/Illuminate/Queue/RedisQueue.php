@@ -110,6 +110,58 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null)
+    {
+        return $this->getConnection()->llen($this->getQueue($queue));
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':delayed');
+    }
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':reserved');
+    }
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null)
+    {
+        $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
+
+        if (! $payload) {
+            return null;
+        }
+
+        $data = json_decode($payload, true);
+
+        return $data['createdAt'] ?? null;
+    }
+
+    /**
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs

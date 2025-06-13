@@ -165,6 +165,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             $results[$key] = $values;
         }
 
+        if (! $results) {
+            return new static;
+        }
+
         return new static(array_replace(...$results));
     }
 
