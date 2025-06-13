@@ -18,7 +18,7 @@ class RetryIf
      * @param  class-string<\Throwable>  ...$exceptions
      * @return static
      */
-    public static function failureIsNotException(...$exceptions): static
+    public static function failureIsNot(...$exceptions): static
     {
         return new static(static function (Throwable $throwable) use ($exceptions) {
             foreach ($exceptions as $exception) {

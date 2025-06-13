@@ -88,6 +88,6 @@ class RetryIfMiddlewareJob implements ShouldQueue
 
     public function middleware(): array
     {
-        return [RetryIf::failureIsNotException(InvalidArgumentException::class)];
+        return [RetryIf::failureIsNot(InvalidArgumentException::class)];
     }
 }
