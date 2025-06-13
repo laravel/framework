@@ -11,9 +11,11 @@ use Illuminate\Queue\Middleware\RetryIf;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use LogicException;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[WithConfig('queue.default', 'database')]
 class RetryIfMiddlewareTest extends TestCase
 {
     use DatabaseMigrations;
