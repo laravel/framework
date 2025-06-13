@@ -90,6 +90,7 @@ class RedisTagSet extends TagSet
      * Flush the tag from the cache.
      *
      * @param  string  $name
+     * @return string
      */
     public function flushTag($name)
     {
