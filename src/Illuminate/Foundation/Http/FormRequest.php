@@ -340,16 +340,22 @@ class FormRequest extends Request implements ValidatesWhenResolved
         foreach ($properties as $property => $value) {
             if ($this->targetHasProperty($target, $property)) {
                 $this->mapProperty($target, $property, $value);
+
+                continue;
             }
 
             $snakedProperty = Str::snake($property);
             if ($this->targetHasProperty($target, $snakedProperty)) {
                 $this->mapProperty($target, $snakedProperty, $value);
+
+                continue;
             }
 
             $camelProperty = Str::camel($property);
             if ($this->targetHasProperty($target, $camelProperty)) {
                 $this->mapProperty($target, $camelProperty, $value);
+
+                continue;
             }
         }
 
@@ -401,6 +407,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     private function mapObjectProperty(object $target, string $property, mixed $value): void
     {
+        $formattedValue = null;
         $valueIsArray = is_array($value);
         $reflection = new ReflectionProperty($target::class, $property);
         $type = $reflection->getType();
