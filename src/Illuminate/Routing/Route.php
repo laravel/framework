@@ -412,6 +412,18 @@ class Route
     }
 
     /**
+     * Check if the route has a specific parameter in the route definition
+     * Note: hasParameter() checks if the parameter is bound on the route.
+     *
+     * @param  string  $parameter
+     * @return bool
+     */
+    public function hasParameterName($parameter)
+    {
+        return in_array($parameter, $this->parameterNames());
+    }
+
+    /**
      * Get a given parameter from the route.
      *
      * @param  string  $name

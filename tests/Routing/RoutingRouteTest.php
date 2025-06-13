@@ -605,6 +605,22 @@ class RoutingRouteTest extends TestCase
         $this->assertTrue($route->hasParameters());
     }
 
+    public function testHasParameterName()
+    {
+        $route = new Route('GET', 'images/{id}.{ext}', function () {
+            //
+        });
+        $this->assertFalse($route->hasParameters());
+
+        // parameters were not bound
+        $this->assertFalse($route->hasParameter('id'));
+        $this->assertFalse($route->hasParameter('ext'));
+
+        // but parameters were defined
+        $this->assertTrue($route->hasParameterName('id'));
+        $this->assertTrue($route->hasParameterName('ext'));
+    }
+
     public function testForgetParameter()
     {
         $route = new Route('GET', 'images/{id}.{ext}', function () {
