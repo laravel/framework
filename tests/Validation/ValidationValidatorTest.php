@@ -18,7 +18,6 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Stringable;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -9622,10 +9621,7 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $validator = new Validator($trans, ['foo' => $value], ['foo' => 'numeric|min:3']);
 
-        $this->expectException(MathException::class);
-        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
-
-        $validator->passes();
+        $this->assertFalse($validator->passes());
     }
 
     public static function outsideRangeExponents()
@@ -9680,10 +9676,8 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('1.0e-1000', $value);
 
         $withinRange = false;
-        $this->expectException(MathException::class);
-        $this->expectExceptionMessage('Scientific notation exponent outside of allowed range.');
 
-        $validator->passes();
+        $this->assertFalse($validator->passes());
     }
 
     protected function getTranslator()

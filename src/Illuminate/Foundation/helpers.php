@@ -546,6 +546,19 @@ if (! function_exists('info')) {
     }
 }
 
+if (! function_exists('lang_path')) {
+    /**
+     * Get the path to the language folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function lang_path($path = '')
+    {
+        return app()->langPath($path);
+    }
+}
+
 if (! function_exists('logger')) {
     /**
      * Log a debug message to the logs.
@@ -560,19 +573,6 @@ if (! function_exists('logger')) {
         }
 
         return app('log')->debug($message, $context);
-    }
-}
-
-if (! function_exists('lang_path')) {
-    /**
-     * Get the path to the language folder.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    function lang_path($path = '')
-    {
-        return app()->langPath($path);
     }
 }
 

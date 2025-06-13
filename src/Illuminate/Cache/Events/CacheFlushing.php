@@ -23,7 +23,6 @@ class CacheFlushing
      *
      * @param  string|null  $storeName
      * @param  array  $tags
-     * @return void
      */
     public function __construct($storeName, array $tags = [])
     {

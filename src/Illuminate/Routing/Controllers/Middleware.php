@@ -11,6 +11,8 @@ class Middleware
      * Create a new controller middleware definition.
      *
      * @param  \Closure|string|array  $middleware
+     * @param  array<string>|null  $only
+     * @param  array<string>|null  $except
      */
     public function __construct(public Closure|string|array $middleware, public ?array $only = null, public ?array $except = null)
     {

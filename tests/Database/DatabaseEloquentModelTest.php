@@ -3365,6 +3365,39 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testUseCustomBuilderWithUseEloquentBuilderAttribute()
+    {
+        $model = new EloquentModelWithUseEloquentBuilderAttributeStub();
+
+        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $eloquentBuilder = $model->newEloquentBuilder($query);
+
+        $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
+    }
+
+    public function testDefaultBuilderIsUsedWhenUseEloquentBuilderAttributeIsNotPresent()
+    {
+        $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
+
+        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $eloquentBuilder = $model->newEloquentBuilder($query);
+
+        $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
+    }
+}
+
+class CustomBuilder extends Builder
+{
+}
+
+#[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(CustomBuilder::class)]
+class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
+{
+}
+
+class EloquentModelWithoutUseEloquentBuilderAttributeStub extends Model
+{
 }
 
 class EloquentTestObserverStub
