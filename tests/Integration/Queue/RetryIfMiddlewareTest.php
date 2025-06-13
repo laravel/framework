@@ -11,18 +11,13 @@ use Illuminate\Queue\Middleware\RetryIf;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[WithConfig('queue.default', 'database')]
-class RetryIfMiddlewareTest extends QueueTestCase
+class RetryIfMiddlewareTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function defineEnvironment($app)
-    {
-        parent::defineEnvironment($app);
-        $this->driver = 'database';
-    }
 
     public static function markFailedForRetryIfDataProvider(): array
     {
@@ -56,7 +51,13 @@ class RetryIfMiddlewareTest extends QueueTestCase
             $failsCalled++;
         });
 
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true, '--sleep' => 1], 2);
+        for ($i = 0; $i < 2; $i++) {
+            $this->artisan('queue:work', [
+                '--memory' => 1024,
+                '--stop-when-empty' => true,
+                '--sleep' => 1,
+            ])->assertSuccessful();
+        }
 
         $this->assertEquals($expectedExceptions, $exceptionsOccurred);
         $this->assertEquals($expectedFails, $failsCalled);
@@ -86,6 +87,6 @@ class RetryIfMiddlewareJob implements ShouldQueue
 
     public function middleware(): array
     {
-        return [RetryIf::failForExceptions(InvalidArgumentException::class)];
+        return [RetryIf::failureIsNotException(InvalidArgumentException::class)];
     }
 }
