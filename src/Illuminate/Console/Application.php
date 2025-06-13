@@ -255,10 +255,10 @@ class Application extends SymfonyApplication implements ApplicationContract
         }
 
         if ($command instanceof Command) {
-            return $this->add($command);
+            return $this->addCommand($command);
         }
 
-        return $this->add($this->laravel->make($command));
+        return $this->addCommand($this->laravel->make($command));
     }
 
     /**
