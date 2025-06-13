@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RetryIf;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[WithConfig('queue.default', 'database')]
 class RetryIfMiddlewareTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     public static function markFailedForRetryIfDataProvider(): array
     {
