@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use LogicException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class RetryIfMiddlewareTest extends TestCase
 {
@@ -69,11 +70,37 @@ class RetryIfMiddlewareTest extends TestCase
             $instance->call($fakeJob, [
                 'command' => serialize($job),
             ]);
+            $this->fail('Did not throw exception');
         } catch (\Throwable $e) {
             $this->assertInstanceOf($thrown, $e);
         }
 
         $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
+    }
+
+    #[TestWith(['abc', false])]
+    #[TestWith(['tots', true])]
+    public function test_can_test_against_job($value, bool $expectedToFail): void
+    {
+        RetryIfMiddlewareJob::$_middleware = [new RetryIf(fn ($thrown, $job) => $job->value === 'abc')];
+
+        $job = new RetryIfMiddlewareJob(InvalidArgumentException::class, $value);
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $fakeJob = new FakeJob();
+        $job->setJob($fakeJob);
+
+        try {
+            $instance->call($fakeJob, [
+                'command' => serialize($job),
+            ]);
+            $this->fail('Did not throw exception');
+        } catch (\Throwable $e) {
+            //
+        }
+
+        $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
+
     }
 }
 
@@ -87,7 +114,7 @@ class RetryIfMiddlewareJob implements ShouldQueue
 
     public int $tries = 2;
 
-    public function __construct(private $throws)
+    public function __construct(private $throws, public $value = null)
     {
     }
 
