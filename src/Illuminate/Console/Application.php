@@ -208,7 +208,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add a command to the console.
      *
-     * @param  \Symfony\Component\Console\Command\Command|callable  $command
+     * @param  \Symfony\Component\Console\Command\Command  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
     #[\Override]
@@ -218,6 +218,17 @@ class Application extends SymfonyApplication implements ApplicationContract
             $command->setLaravel($this->laravel);
         }
 
+        return $this->addToParent($command);
+    }
+
+    /**
+     * Add the command to the parent instance.
+     *
+     * @param  \Symfony\Component\Console\Command\Command|callable  $command
+     * @return \Symfony\Component\Console\Command\Command
+     */
+    protected function addToParent(SymfonyCommand|callable $command)
+    {
         return parent::addCommand($command);
     }
 
