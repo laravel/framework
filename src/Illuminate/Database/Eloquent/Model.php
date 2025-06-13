@@ -27,6 +27,7 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use JsonException;
 use JsonSerializable;
 use LogicException;
+use ReflectionClass;
 use ReflectionMethod;
 use Stringable;
 
@@ -1662,24 +1663,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Resolve the custom Eloquent builder class from model attributes.
+     * Resolve the custom Eloquent builder class from the model attributes.
      *
      * @return class-string<\Illuminate\Database\Eloquent\Builder>|false
      */
     protected function resolveCustomBuilderClass()
     {
-        $reflection = new \ReflectionClass($this);
+        $attributes = (new ReflectionClass($this))
+            ->getAttributes(UseEloquentBuilder::class);
 
-        $attributes = $reflection->getAttributes(UseEloquentBuilder::class);
-
-        if (! empty($attributes)) {
-            /** @var \Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder $attribute */
-            $attribute = $attributes[0]->newInstance();
-
-            return $attribute->builderClass;
-        }
-
-        return false;
+        return ! empty($attributes)
+            ? $attributes[0]->newInstance()->builderClass
+            : false;
     }
 
     /**
