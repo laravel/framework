@@ -186,6 +186,13 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::startsWith('你好', 'a'));
     }
 
+    public function testEllipsis()
+    {
+        $this->assertSame('Jordancho Eft...', Str::ellipsis('Jordancho Eftimov', 13));
+        $this->assertSame('Jordancho Eftimov', Str::ellipsis('Jordancho Eftimov', 30));
+        $this->assertSame('Jorda..', Str::ellipsis('Jordancho Eftimov', 5, '..'));
+    }
+
     public function testEndsWith()
     {
         $this->assertTrue(Str::endsWith('jason', 'on'));

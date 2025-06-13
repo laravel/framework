@@ -380,6 +380,25 @@ class Str
     }
 
     /**
+     * Truncates a string to a specified character limit and appends an ellipsis if necessary.
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $ellipsis
+     * @return string
+     */
+    public static function ellipsis(string $value, int $limit, string $ellipsis = '…'): string
+    {
+        if (mb_strlen($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
+
+        $cut = $limit - mb_strlen($ellipsis, 'UTF-8');
+
+        return mb_substr($value, 0, $cut, 'UTF-8') . $ellipsis;
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack

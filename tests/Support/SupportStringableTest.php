@@ -252,6 +252,13 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
     }
 
+    public function testEllipsis()
+    {
+        $this->assertSame('Jordancho Eft...', $this->stringable('Jordancho Eftimov')->ellipsis(13));
+        $this->assertSame('Jordancho Eftimov', $this->stringable('Jordancho Eftimov')->ellipsis(30));
+        $this->assertSame('Jorda..', $this->stringable('Jordancho Eftimov')->ellipsis(5, '..'));
+    }
+
     public function testWhenEndsWith()
     {
         $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenEndsWith('ark', function ($stringable) {

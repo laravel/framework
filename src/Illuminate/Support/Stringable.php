@@ -257,6 +257,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Truncates a string to a specified character limit and appends an ellipsis if necessary.
+     *
+     * @param  int  $limit
+     * @param  string  $ellipsis
+     * @return string
+     */
+    public function ellipsis(int $limit, string $ellipsis = '…'): string
+    {
+        return Str::ellipsis($this->value, $limit, $ellipsis);
+    }
+
+    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string|iterable<string>  $needles
