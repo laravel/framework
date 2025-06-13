@@ -387,7 +387,7 @@ class Str
      * @param  string  $ellipsis
      * @return string
      */
-    public static function ellipsis(string $value, int $limit, string $ellipsis = '…'): string
+    public static function ellipsis(string $value, int $limit, string $ellipsis = '...'): string
     {
         if (mb_strlen($value) <= $limit) {
             return $value;

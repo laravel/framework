@@ -263,7 +263,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string  $ellipsis
      * @return string
      */
-    public function ellipsis(int $limit, string $ellipsis = '…'): string
+    public function ellipsis(int $limit, string $ellipsis = '...'): string
     {
         return Str::ellipsis($this->value, $limit, $ellipsis);
     }
