@@ -12,6 +12,7 @@ use Illuminate\Queue\Middleware\RetryIf;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\Attributes\WithConfig;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
