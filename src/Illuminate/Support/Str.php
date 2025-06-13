@@ -395,7 +395,7 @@ class Str
 
         $cut = $limit - mb_strlen($ellipsis);
 
-        return mb_substr($value, 0, $cut) . $ellipsis;
+        return mb_substr($value, 0, $cut).$ellipsis;
     }
 
     /**
