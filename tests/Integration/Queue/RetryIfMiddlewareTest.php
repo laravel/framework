@@ -6,17 +6,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Middleware\RetryIf;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
-use Orchestra\Testbench\Attributes\WithConfig;
-use Orchestra\Testbench\Attributes\WithMigration;
+use LogicException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[WithConfig('queue.default', 'database')]
 class RetryIfMiddlewareTest extends TestCase
 {
     use DatabaseMigrations;
@@ -30,7 +27,7 @@ class RetryIfMiddlewareTest extends TestCase
                 1,
             ],
             'middleware retries if exception does not match' => [
-                \LogicException::class,
+                LogicException::class,
                 2,
                 1,
             ],
@@ -43,6 +40,8 @@ class RetryIfMiddlewareTest extends TestCase
         int $expectedExceptions,
         int $expectedFails
     ) {
+        $this->markTestSkippedWhen(config('queue.default') === 'sync', 'Does not run when sync.');
+
         RetryIfMiddlewareJob::dispatch($throws)->onQueue('default')->onConnection('database');
 
         $failsCalled = $exceptionsOccurred = 0;
