@@ -1,69 +1,79 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Queue;
+namespace Illuminate\Tests\Queue;
 
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Queue\Middleware\RetryIf;
-use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use LogicException;
-use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[WithConfig('queue.default', 'database')]
 class RetryIfMiddlewareTest extends TestCase
 {
-    use DatabaseMigrations;
+    protected function setUp(): void
+    {
+        parent::setUp();
+        RetryIfMiddlewareJob::$_middleware = [];
+    }
 
-    public static function markFailedForRetryIfDataProvider(): array
+    /**
+     * @return array<string, array{class-string<\Throwable>, RetryIf}>
+     */
+    public static function expectedToFailDataProvider(): array
     {
         return [
-            'middleware fails on thrown exception' => [
+            'failureIsNot and exception is in list' => [
                 InvalidArgumentException::class,
-                1,
-                1,
+                RetryIf::failureIsNot(InvalidArgumentException::class),
+                true,
             ],
-            'middleware retries if exception does not match' => [
+            'failureIs and exception is not in list' => [
                 LogicException::class,
-                2,
-                1,
+                RetryIf::failureIs(InvalidArgumentException::class),
+                true,
+            ],
+            'failureIsNot and exception not in list' => [
+                LogicException::class,
+                RetryIf::failureIsNot(InvalidArgumentException::class),
+                false,
+            ],
+            'failureIs and exception is in list' => [
+                InvalidArgumentException::class,
+                RetryIf::failureIs(InvalidArgumentException::class),
+                false,
             ],
         ];
     }
 
-    #[DataProvider('markFailedForRetryIfDataProvider')]
-    public function test_retry_if_middleware(
-        $throws,
-        int $expectedExceptions,
-        int $expectedFails
-    ) {
-        $this->markTestSkippedWhen(config('queue.default') === 'sync', 'Does not run when sync.');
+    #[DataProvider('expectedToFailDataProvider')]
+    public function test_middleware(
+        string $thrown,
+        RetryIf $middleware,
+        bool $expectedToFail
+    ): void {
+        RetryIfMiddlewareJob::$_middleware = [$middleware];
+        $job = new RetryIfMiddlewareJob($thrown);
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
-        RetryIfMiddlewareJob::dispatch($throws)->onQueue('default')->onConnection('database');
+        $fakeJob = new FakeJob();
+        $job->setJob($fakeJob);
 
-        $failsCalled = $exceptionsOccurred = 0;
-        Queue::exceptionOccurred(function () use (&$exceptionsOccurred) {
-            $exceptionsOccurred++;
-        });
-        Queue::failing(function () use (&$failsCalled) {
-            $failsCalled++;
-        });
-
-        for ($i = 0; $i < 2; $i++) {
-            $this->artisan('queue:work', [
-                '--memory' => 1024,
-                '--stop-when-empty' => true,
-                '--sleep' => 1,
-            ])->assertSuccessful();
+        try {
+            $instance->call($fakeJob, [
+                'command' => serialize($job),
+            ]);
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf($thrown, $e);
         }
 
-        $this->assertEquals($expectedExceptions, $exceptionsOccurred);
-        $this->assertEquals($expectedFails, $failsCalled);
+        $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
     }
 }
 
@@ -73,6 +83,8 @@ class RetryIfMiddlewareJob implements ShouldQueue
     use Queueable;
     use Dispatchable;
 
+    public static array $_middleware = [];
+
     public int $tries = 2;
 
     public function __construct(private $throws)
@@ -81,15 +93,11 @@ class RetryIfMiddlewareJob implements ShouldQueue
 
     public function handle()
     {
-        if ($this->throws === null) {
-            return; // success
-        }
-
-        throw new ($this->throws);
+        throw new $this->throws;
     }
 
     public function middleware(): array
     {
-        return [RetryIf::failureIsNot(InvalidArgumentException::class)];
+        return self::$_middleware;
     }
 }

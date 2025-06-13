@@ -15,6 +15,8 @@ class RetryIf
     }
 
     /**
+     * Do not retry if any of the exceptions were thrown.
+     *
      * @param  class-string<\Throwable>  ...$exceptions
      * @return static
      */
@@ -28,6 +30,25 @@ class RetryIf
             }
 
             return true;
+        });
+    }
+
+    /**
+     * Only retry if the exception thrown matches.
+     *
+     * @param  class-string<\Throwable>  ...$exceptions
+     * @return static
+     */
+    public static function failureIs(...$exceptions): static
+    {
+        return new static(static function (Throwable $throwable) use ($exceptions) {
+            foreach ($exceptions as $exception) {
+                if ($throwable instanceof $exception) {
+                    return true;
+                }
+            }
+
+            return false;
         });
     }
 
