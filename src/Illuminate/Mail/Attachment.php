@@ -83,7 +83,7 @@ class Attachment
     /**
      * Create a mail attachment from an UploadedFile instance.
      *
-     * @param  UploadedFile  $file
+     * @param  \Illuminate\Http\UploadedFile  $file
      * @return static
      */
     public static function fromUploadedFile(UploadedFile $file)
