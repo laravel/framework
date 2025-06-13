@@ -389,13 +389,13 @@ class Str
      */
     public static function ellipsis(string $value, int $limit, string $ellipsis = '…'): string
     {
-        if (mb_strlen($value, 'UTF-8') <= $limit) {
+        if (mb_strlen($value) <= $limit) {
             return $value;
         }
 
-        $cut = $limit - mb_strlen($ellipsis, 'UTF-8');
+        $cut = $limit - mb_strlen($ellipsis);
 
-        return mb_substr($value, 0, $cut, 'UTF-8') . $ellipsis;
+        return mb_substr($value, 0, $cut) . $ellipsis;
     }
 
     /**
