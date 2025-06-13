@@ -190,7 +190,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Jordancho...', Str::ellipsis('Jordancho Eftimov', 12));
         $this->assertSame('Jordancho Eftimov', Str::ellipsis('Jordancho Eftimov', 30));
-        $this->assertSame('Jo..', Str::ellipsis('Jordancho Eftimov', 5, '..'));
+        $this->assertSame('Jor..', Str::ellipsis('Jordancho Eftimov', 5, '..'));
     }
 
     public function testEndsWith()

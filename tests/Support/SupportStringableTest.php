@@ -256,7 +256,7 @@ class SupportStringableTest extends TestCase
     {
         $this->assertSame('Jordancho...', $this->stringable('Jordancho Eftimov')->ellipsis(12));
         $this->assertSame('Jordancho Eftimov', $this->stringable('Jordancho Eftimov')->ellipsis(30));
-        $this->assertSame('Jo..', $this->stringable('Jordancho Eftimov')->ellipsis(5, '..'));
+        $this->assertSame('Jor..', $this->stringable('Jordancho Eftimov')->ellipsis(5, '..'));
     }
 
     public function testWhenEndsWith()
