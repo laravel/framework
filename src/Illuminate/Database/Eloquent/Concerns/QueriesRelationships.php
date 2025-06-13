@@ -951,19 +951,18 @@ trait QueriesRelationships
         return $this->withAggregate(is_array($relations) ? $relations : func_get_args(), '*', 'count');
     }
 
-        /**
+    /**
      * Add a relationship count conditionally, with an optional alias.
      *
      * @param  string  $relation
-     * @param  Closure  $closure
+     * @param Closure(\Illuminate\Database\Eloquent\Builder): mixed $closure
      * @param  string|null  $as
      * @return $this
      */
-    public function withCountIf($relation, Closure $closure, $as = null)
+    public function withCountWhere($relation, Closure $closure, $as = null)
     {
-        $as ??= "{$relation}";
         return $this->withCount([
-            "{$relation} as {$as}" => $closure
+            implode(' as ', array_filter([$relation, $as])) => $closure
         ]);
     }
 
