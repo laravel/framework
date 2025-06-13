@@ -33,4 +33,9 @@ class CacheNullStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
         $this->assertFalse($store->decrement('foo'));
     }
+
+    public function testTouchReturnsFalse(): void
+    {
+        $this->assertFalse((new NullStore)->touch('foo', 30));
+    }
 }
