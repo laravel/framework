@@ -607,11 +607,13 @@ class Arr
             return implode($glue, $array);
         }
 
-        if (count($array) === 0) {
+        $countArray = count($array);
+
+        if ($countArray === 0) {
             return '';
         }
 
-        if (count($array) === 1) {
+        if ($countArray === 1) {
             return end($array);
         }
 
@@ -913,6 +915,12 @@ class Arr
         }
 
         $keys = explode('.', $key);
+
+        if (count($keys) === 1) {
+            $array[$keys[0]] = $value;
+
+            return $array;
+        }
 
         foreach ($keys as $i => $key) {
             if (count($keys) === 1) {
