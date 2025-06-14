@@ -8,14 +8,18 @@ use Throwable;
 class RetryIf
 {
     /**
-     * @param  \Closure(\Throwable, ?mixed): bool  $retryIf  The condition of the failure that will retry the job.
+     * A middleware that allows short-circuiting job retries. This does not
+     * override the retry mechanism of the job and queue, so do not use
+     * this middleware to extend tries beyond the those conditions.
+     *
+     * @param  \Closure(\Throwable, mixed): bool  $retryIf  The truth-test callback to determine if the job should be retried or failed.
      */
     public function __construct(protected Closure $retryIf)
     {
     }
 
     /**
-     * Do not retry if any of the exceptions were thrown.
+     * Short-circuit retries if any of the exceptions were thrown.
      *
      * @param  class-string<\Throwable>  ...$exceptions
      * @return static
@@ -34,7 +38,7 @@ class RetryIf
     }
 
     /**
-     * Only retry if the exception thrown matches.
+     * Continue retries for any of the specified exceptions.
      *
      * @param  class-string<\Throwable>  ...$exceptions
      * @return static

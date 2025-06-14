@@ -15,6 +15,7 @@ use LogicException;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
+use Throwable;
 
 class RetryIfMiddlewareTest extends TestCase
 {
@@ -25,7 +26,7 @@ class RetryIfMiddlewareTest extends TestCase
     }
 
     /**
-     * @return array<string, array{class-string<\Throwable>, RetryIf}>
+     * @return array<string, array{class-string<\Throwable>, RetryIf, bool}>
      */
     public static function expectedToFailDataProvider(): array
     {
@@ -71,7 +72,7 @@ class RetryIfMiddlewareTest extends TestCase
                 'command' => serialize($job),
             ]);
             $this->fail('Did not throw exception');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf($thrown, $e);
         }
 
@@ -80,7 +81,7 @@ class RetryIfMiddlewareTest extends TestCase
 
     #[TestWith(['abc', false])]
     #[TestWith(['tots', true])]
-    public function test_can_test_against_job($value, bool $expectedToFail): void
+    public function test_can_test_against_job_properties($value, bool $expectedToFail): void
     {
         RetryIfMiddlewareJob::$_middleware = [new RetryIf(fn ($thrown, $job) => $job->value === 'abc')];
 
@@ -95,12 +96,11 @@ class RetryIfMiddlewareTest extends TestCase
                 'command' => serialize($job),
             ]);
             $this->fail('Did not throw exception');
-        } catch (\Throwable $e) {
+        } catch (Throwable) {
             //
         }
 
         $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
-
     }
 }
 
