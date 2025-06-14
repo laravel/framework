@@ -206,27 +206,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
-     * Add an array of commands to the console.
-     *
-     * @param  array<int, \Symfony\Component\Console\Command\Command>  $commands
-     * @return void
-     */
-    #[\Override]
-    public function addCommands(array $commands): void
-    {
-        foreach ($commands as $command) {
-            $this->add($command);
-        }
-    }
-
-    /**
      * Add a command to the console.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param  \Symfony\Component\Console\Command\Command|callable  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
     #[\Override]
-    public function add(SymfonyCommand $command): ?SymfonyCommand
+    public function addCommand(SymfonyCommand|callable $command): ?SymfonyCommand
     {
         if ($command instanceof Command) {
             $command->setLaravel($this->laravel);
@@ -238,12 +224,12 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add the command to the parent instance.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param  \Symfony\Component\Console\Command\Command|callable  $command
      * @return \Symfony\Component\Console\Command\Command
      */
-    protected function addToParent(SymfonyCommand $command)
+    protected function addToParent(SymfonyCommand|callable $command)
     {
-        return parent::add($command);
+        return parent::addCommand($command);
     }
 
     /**
@@ -269,10 +255,10 @@ class Application extends SymfonyApplication implements ApplicationContract
         }
 
         if ($command instanceof Command) {
-            return $this->add($command);
+            return $this->addCommand($command);
         }
 
-        return $this->add($this->laravel->make($command));
+        return $this->addCommand($this->laravel->make($command));
     }
 
     /**
