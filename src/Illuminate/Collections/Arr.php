@@ -917,7 +917,7 @@ class Arr
         $keys = explode('.', $key);
 
         if (count($keys) === 1) {
-            $array[$keys[0]] = $value;
+            $array[array_shift($keys)] = $value;
 
             return $array;
         }
