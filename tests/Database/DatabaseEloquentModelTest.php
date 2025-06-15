@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsFluent;
 use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Casts\AsUri;
@@ -47,6 +48,7 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
@@ -302,6 +304,30 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asUriAttribute = new Uri('https://www.updated.com:1234?query=param&another=value');
         $this->assertTrue($model->isDirty('asUriAttribute'));
+    }
+
+    public function testDirtyOnCastedFluent()
+    {
+        $value = [
+            'address' => [
+                'street' => 'test_street',
+                'city' => 'test_city',
+            ],
+        ];
+
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes(['asFluentAttribute' => json_encode($value)]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Fluent::class, $model->asFluentAttribute);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $model->asFluentAttribute = new Fluent($value);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $value['address']['street'] = 'updated_street';
+        $model->asFluentAttribute = new Fluent($value);
+        $this->assertTrue($model->isDirty('asFluentAttribute'));
     }
 
     // public function testDirtyOnCastedEncryptedCollection()
@@ -3802,6 +3828,7 @@ class EloquentModelCastingStub extends Model
             'asStringableAttribute' => AsStringable::class,
             'asHtmlStringAttribute' => AsHtmlString::class,
             'asUriAttribute' => AsUri::class,
+            'asFluentAttribute' => AsFluent::class,
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
