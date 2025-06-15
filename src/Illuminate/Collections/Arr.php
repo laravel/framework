@@ -1177,4 +1177,22 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Convert each item in the given array to an integer.
+     * Optionally filters out zero values.
+     *
+     * @param  array  $value        The array of values to convert.
+     * @param  bool   $filterZeros  Whether to filter out zero values after conversion. Default is true.
+     * @return array                The array of converted integers, optionally with zeros filtered out.
+     */
+    public static function intval($value, $filterZeros = true) {
+        if(!is_array($value)) {
+            return [];
+        }
+
+        $convertedItems = array_map('intval', $value);
+
+        return $filterZeros ? static::where($convertedItems, fn ($value) => $value > 0) : $convertedItems;
+    }
 }
