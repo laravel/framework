@@ -51,6 +51,19 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Remove the given route from the collection.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function remove(Route $route)
+    {
+        $this->removeFromCollections($route);
+
+        $this->removeLookups($route);
+    }
+
+    /**
      * Add the given route to the arrays of routes.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -81,6 +94,24 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Remove the given route from the arrays of routes.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeFromCollections(Route $route)
+    {
+        $methods = $route->methods();
+        $domainAndUri = $route->getDomain().$route->uri();
+
+        foreach ($methods as $method) {
+            unset($this->routes[$method][$domainAndUri]);
+        }
+
+        unset($this->allRoutes[implode('|', $methods).$domainAndUri]);
+    }
+
+    /**
      * Add the route to any look-up tables if necessary.
      *
      * @param  \Illuminate\Routing\Route  $route
@@ -106,6 +137,24 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Remove the route from any look-up tables.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    protected function removeLookups(Route $route)
+    {
+        if ($name = $route->getName()) {
+            unset($this->nameList[$name]);
+        }
+
+        $action = $route->getAction();
+        if (isset($action['controller'])) {
+            $this->removeFromActionList($action);
+        }
+    }
+
+    /**
      * Add a route to the controller action dictionary.
      *
      * @param  array  $action
@@ -115,6 +164,17 @@ class RouteCollection extends AbstractRouteCollection
     protected function addToActionList($action, $route)
     {
         $this->actionList[trim($action['controller'], '\\')] = $route;
+    }
+
+    /**
+     * Remove a route from the controller action dictionary.
+     *
+     * @param  array  $action
+     * @return void
+     */
+    protected function removeFromActionList(array $action)
+    {
+        unset($this->actionList[trim($action['controller'], '\\')]);
     }
 
     /**
