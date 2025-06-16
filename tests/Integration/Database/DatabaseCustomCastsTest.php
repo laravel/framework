@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
+use Illuminate\Database\Eloquent\Casts\AsFluent;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -215,6 +216,21 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
         $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
         $this->assertSame('bar', $model->collection->first()->foo);
     }
+
+    public function test_as_custom_fluent(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'fluent' => AsFluent::using(CustomFluent::class),
+        ]);
+
+        $model->setRawAttributes([
+            'fluent' => json_encode(['foo' => 'bar']),
+        ]);
+
+        $this->assertInstanceOf(CustomFluent::class, $model->fluent);
+        $this->assertSame('bar', $model->fluent->foo);
+    }
 }
 
 class TestEloquentModelWithCustomCasts extends Model
@@ -272,4 +288,9 @@ class FluentWithCallback extends Fluent
 
 class CustomCollection extends Collection
 {
+}
+
+class CustomFluent extends Fluent
+{
+    //
 }
