@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\CallQueuedHandler;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\FakeJob;
-use Illuminate\Queue\Middleware\RetryIf;
+use Illuminate\Queue\Middleware\FailOnException;
 use InvalidArgumentException;
 use LogicException;
 use Orchestra\Testbench\TestCase;
@@ -17,51 +17,41 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use Throwable;
 
-class RetryIfMiddlewareTest extends TestCase
+class FailOnExceptionMiddlewareTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        RetryIfMiddlewareJob::$_middleware = [];
+        FailOnExceptionMiddlewareTestJob::$_middleware = [];
     }
 
     /**
-     * @return array<string, array{class-string<\Throwable>, RetryIf, bool}>
+     * @return array<string, array{class-string<\Throwable>, FailOnException, bool}>
      */
-    public static function expectedToFailDataProvider(): array
+    public static function testMiddlewareDataProvider(): array
     {
         return [
-            'failureIsNot and exception is in list' => [
+            'exception is in list' => [
                 InvalidArgumentException::class,
-                RetryIf::failureIsNot(InvalidArgumentException::class),
+                new FailOnException([InvalidArgumentException::class]),
                 true,
             ],
-            'failureIs and exception is not in list' => [
+            'exception is not in list' => [
                 LogicException::class,
-                RetryIf::failureIs(InvalidArgumentException::class),
-                true,
-            ],
-            'failureIsNot and exception not in list' => [
-                LogicException::class,
-                RetryIf::failureIsNot(InvalidArgumentException::class),
-                false,
-            ],
-            'failureIs and exception is in list' => [
-                InvalidArgumentException::class,
-                RetryIf::failureIs(InvalidArgumentException::class),
+                new FailOnException([InvalidArgumentException::class]),
                 false,
             ],
         ];
     }
 
-    #[DataProvider('expectedToFailDataProvider')]
+    #[DataProvider('testMiddlewareDataProvider')]
     public function test_middleware(
         string $thrown,
-        RetryIf $middleware,
+        FailOnException $middleware,
         bool $expectedToFail
     ): void {
-        RetryIfMiddlewareJob::$_middleware = [$middleware];
-        $job = new RetryIfMiddlewareJob($thrown);
+        FailOnExceptionMiddlewareTestJob::$_middleware = [$middleware];
+        $job = new FailOnExceptionMiddlewareTestJob($thrown);
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $fakeJob = new FakeJob();
@@ -79,13 +69,15 @@ class RetryIfMiddlewareTest extends TestCase
         $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
     }
 
-    #[TestWith(['abc', false])]
-    #[TestWith(['tots', true])]
+    #[TestWith(['abc', true])]
+    #[TestWith(['tots', false])]
     public function test_can_test_against_job_properties($value, bool $expectedToFail): void
     {
-        RetryIfMiddlewareJob::$_middleware = [new RetryIf(fn ($thrown, $job) => $job->value === 'abc')];
+        FailOnExceptionMiddlewareTestJob::$_middleware = [
+            new FailOnException(fn ($thrown, $job) => $job->value === 'abc'),
+        ];
 
-        $job = new RetryIfMiddlewareJob(InvalidArgumentException::class, $value);
+        $job = new FailOnExceptionMiddlewareTestJob(InvalidArgumentException::class, $value);
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $fakeJob = new FakeJob();
@@ -104,7 +96,7 @@ class RetryIfMiddlewareTest extends TestCase
     }
 }
 
-class RetryIfMiddlewareJob implements ShouldQueue
+class FailOnExceptionMiddlewareTestJob implements ShouldQueue
 {
     use InteractsWithQueue;
     use Queueable;
