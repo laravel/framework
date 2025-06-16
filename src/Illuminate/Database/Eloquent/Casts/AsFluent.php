@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent\Casts;
 use BadMethodCallException;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 
@@ -35,7 +34,7 @@ class AsFluent implements Castable
                 $fluentClass = empty($this->arguments[0]) ? Fluent::class : $this->arguments[0];
 
                 throw_unless(
-                    is_a($fluentClass, Fluent::class, true), 
+                    is_a($fluentClass, Fluent::class, true),
                     new InvalidArgumentException('The provided class must extend ['.Fluent::class.'].')
                 );
 
