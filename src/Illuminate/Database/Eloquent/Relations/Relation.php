@@ -15,9 +15,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use ReflectionClassConstant;
 use ReflectionEnum;
-use ReflectionEnumBackedCase;
 
 use function Illuminate\Support\enum_value;
 
