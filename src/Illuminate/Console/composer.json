@@ -23,8 +23,8 @@
         "illuminate/view": "^13.0",
         "laravel/prompts": "^0.3.0",
         "nunomaduro/termwind": "^2.0",
-        "symfony/console": "^7.2.0",
-        "symfony/process": "^7.2.0"
+        "symfony/console": "^7.4.0|^8.0.0",
+        "symfony/process": "^7.4.0|^8.0.0"
     },
     "autoload": {
         "psr-4": {
