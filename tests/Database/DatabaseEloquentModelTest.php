@@ -330,6 +330,30 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->isDirty('asFluentAttribute'));
     }
 
+    public function testCustomAsFluent()
+    {
+        $value = [
+            'address' => [
+                'street' => 'test_street',
+                'city' => 'test_city',
+            ],
+        ];
+
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes(['asCustomFluentAttribute' => json_encode($value)]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(CustomFluent::class, $model->asCustomFluentAttribute);
+        $this->assertFalse($model->isDirty('asCustomFluentAttribute'));
+
+        $model->asCustomFluentAttribute = new CustomFluent($value);
+        $this->assertFalse($model->isDirty('asCustomFluentAttribute'));
+
+        $value['address']['street'] = 'updated_street';
+        $model->asCustomFluentAttribute = new CustomFluent($value);
+        $this->assertTrue($model->isDirty('asCustomFluentAttribute'));
+    }
+
     // public function testDirtyOnCastedEncryptedCollection()
     // {
     //     $this->encrypter = m::mock(Encrypter::class);
@@ -3829,6 +3853,7 @@ class EloquentModelCastingStub extends Model
             'asHtmlStringAttribute' => AsHtmlString::class,
             'asUriAttribute' => AsUri::class,
             'asFluentAttribute' => AsFluent::class,
+            'asCustomFluentAttribute' => AsFluent::using(CustomFluent::class),
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
@@ -4021,6 +4046,11 @@ class Uppercase implements CastsInboundAttributes
     {
         return is_string($value) ? strtoupper($value) : $value;
     }
+}
+
+class CustomFluent extends Fluent
+{
+    //
 }
 
 class CustomCollection extends BaseCollection
