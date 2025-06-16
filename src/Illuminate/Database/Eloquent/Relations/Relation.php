@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,11 +14,18 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use ReflectionClassConstant;
+use ReflectionEnum;
+use ReflectionEnumBackedCase;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
  * @template TResult
+ * @template TMorphMapEnum of \BackedEnum
  *
  * @mixin \Illuminate\Database\Eloquent\Builder<TRelatedModel>
  */
@@ -65,7 +73,7 @@ abstract class Relation implements BuilderContract
     /**
      * An array to map morph names to their class names in the database.
      *
-     * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>
+     * @var array<string, class-string<\Illuminate\Database\Eloquent\Model>>|TMorphMapMapEnum
      */
     public static $morphMap = [];
 
@@ -452,7 +460,7 @@ abstract class Relation implements BuilderContract
     /**
      * Define the morph map for polymorphic relations and require all morphed models to be explicitly mapped.
      *
-     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>  $map
+     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|class-string<\BackedEnum>  $map
      * @param  bool  $merge
      * @return array
      */
@@ -466,15 +474,25 @@ abstract class Relation implements BuilderContract
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null  $map
+     * @param  array<string, class-string<\Illuminate\Database\Eloquent\Model>>|class-string<\BackedEnum>|null  $map
      * @param  bool  $merge
-     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|class-string<\BackedEnum>
      */
-    public static function morphMap(?array $map = null, $merge = true)
+    public static function morphMap(array|string|null $map = null, $merge = null)
     {
         $map = static::buildMorphMapFromModels($map);
 
-        if (is_array($map)) {
+        $merge ??= is_string($map) ? false : true;
+
+        if (is_string($map) && (! enum_exists($map) || ! (new ReflectionEnum($map))->isBacked())) {
+            throw new InvalidArgumentException('Mapping must be a an array, null, or a backed enum!');
+        }
+
+        if ((is_string($map) && $merge) || ($map !== null && is_string(static::$morphMap) && $merge)) {
+            throw new InvalidArgumentException('Enum morph maps cannot be merged!');
+        }
+
+        if (is_array($map) || is_string($map)) {
             static::$morphMap = $merge && static::$morphMap
                 ? $map + static::$morphMap
                 : $map;
@@ -486,12 +504,12 @@ abstract class Relation implements BuilderContract
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param  list<class-string<\Illuminate\Database\Eloquent\Model>>|null  $models
-     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|null
+     * @param  list<class-string<\Illuminate\Database\Eloquent\Model>>|class-string<\BackedEnum>|null  $models
+     * @return array<string, class-string<\Illuminate\Database\Eloquent\Model>>|class-string<\BackedEnum>|null
      */
-    protected static function buildMorphMapFromModels(?array $models = null)
+    protected static function buildMorphMapFromModels(array|string|null $models = null)
     {
-        if (is_null($models) || ! array_is_list($models)) {
+        if (is_null($models) || is_string($models) || ! array_is_list($models)) {
             return $models;
         }
 
@@ -503,22 +521,40 @@ abstract class Relation implements BuilderContract
     /**
      * Get the model associated with a custom polymorphic type.
      *
-     * @param  string  $alias
+     * @param  string|key-of<TMorphMapEnum>  $alias
      * @return class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     public static function getMorphedModel($alias)
     {
+        if (is_string(static::$morphMap)) {
+            $reflection = new ReflectionEnum(static::$morphMap);
+
+            if ($reflection->hasCase($alias)) {
+                return $reflection->getCase($alias)->getValue()->value;
+            }
+
+            return null;
+        }
+
         return static::$morphMap[$alias] ?? null;
     }
 
     /**
      * Get the alias associated with a custom polymorphic class.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $className
-     * @return int|string
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>|value-of<TMorphMapEnum>  $className
+     * @return int|string|key-of<TMorphMapEnum>
      */
-    public static function getMorphAlias(string $className)
+    public static function getMorphAlias(string|BackedEnum $className)
     {
+        if (is_string(static::$morphMap)) {
+            return static::$morphMap::tryFrom(enum_value($className))->name ?? $className;
+        }
+
+        if (! is_string($className)) {
+            throw new InvalidArgumentException('Class name cannot be an enum value when the morph map is not an enum!');
+        }
+        
         return array_search($className, static::$morphMap, strict: true) ?: $className;
     }
 
