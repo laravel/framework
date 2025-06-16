@@ -32,7 +32,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
         Relation::morphMap($fqn, true);
     }
 
-    #[TestWith([MorphMap::class, [ 'a' => A::class ]])]
+    #[TestWith([MorphMap::class, ['a' => A::class]])]
     public function testMorphMapEnumMergePrevious(string $first, array $second)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -49,7 +49,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
         Relation::morphMap($input);
     }
 
-    #[TestWith([[ A::class, B::class ], ['a_s' => A::class, 'b_s' => B::class]])]
+    #[TestWith([[A::class, B::class], ['a_s' => A::class, 'b_s' => B::class]])]
     public function testMorphMapList(array $input, array $output)
     {
         $map = Relation::morphMap($input);
@@ -57,7 +57,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
         $this->assertSame($output, Relation::morphMap());
     }
 
-    #[TestWith([[ 'a' => A::class ]])]
+    #[TestWith([['a' => A::class]])]
     public function testMorphMapAssociativeArray(array $map)
     {
         $res = Relation::morphMap($map);
@@ -77,7 +77,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
     #[TestWith(['b', null])]
     public function testGetMorphedModelArray(string $alias, ?string $model)
     {
-        Relation::morphMap([ 'a' => A::class ]);
+        Relation::morphMap(['a' => A::class]);
         $this->assertSame($model, Relation::getMorphedModel($alias));
     }
 
@@ -94,7 +94,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
     #[TestWith(['gibberish', 'gibberish'])]
     public function testGetMorphAliasArray(string $className, string $alias)
     {
-        Relation::morphMap([ 'a' => A::class ]);
+        Relation::morphMap(['a' => A::class]);
         $this->assertSame($alias, Relation::getMorphAlias($className));
     }
 
@@ -103,7 +103,7 @@ class EloquentRelationMorphMapTest extends DatabaseTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Class name cannot be an enum value when the morph map is not an enum!');
-        Relation::morphMap([ 'a' => A::class ]);
+        Relation::morphMap(['a' => A::class]);
         Relation::getMorphAlias($className);
     }
 }
@@ -114,5 +114,9 @@ enum MorphMap: string
     case B = B::class;
 }
 
-class A extends Model {}
-class B extends Model {}
+class A extends Model
+{
+}
+class B extends Model
+{
+}

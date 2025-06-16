@@ -552,7 +552,7 @@ abstract class Relation implements BuilderContract
         if (! is_string($className)) {
             throw new InvalidArgumentException('Class name cannot be an enum value when the morph map is not an enum!');
         }
-        
+
         return array_search($className, static::$morphMap, strict: true) ?: $className;
     }
 
