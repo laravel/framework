@@ -1186,7 +1186,6 @@ class Arr
      *
      * @param  array<ArrayAKeys, ArrayAValues>  $a
      * @param  array<ArrayBKeys, ArrayBValues>  $b
-     *
      * @return array<ArrayAKeys|ArrayBKeys, ArrayAValues|ArrayBValues>
      */
     public static function diff(array $a, array $b): array
