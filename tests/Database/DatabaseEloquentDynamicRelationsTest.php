@@ -101,7 +101,7 @@ class DynamicRelationModel2 extends Model
         //
     }
 
-    public function newQuery()
+    public function newQuery(?array $fetchModes = [])
     {
         $query = new class extends Query
         {
