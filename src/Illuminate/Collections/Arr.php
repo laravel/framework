@@ -1177,4 +1177,20 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * @template ArrayAKeys
+     * @template ArrayBKeys
+     * @template ArrayAValues
+     * @template ArrayBValues
+     * 
+     * @param  array<ArrayAKeys, ArrayAValues>  $a
+     * @param  array<ArrayBKeys, ArrayBValues>  $b
+     * 
+     * @return  array<ArrayAKeys|ArrayBKeys, ArrayAValues|ArrayBValues>
+     */
+    public static function diff(array $a, array $b): array
+    {
+        return array_udiff($a, $b, fn () => $a <=> $b);
+    }
 }
