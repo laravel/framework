@@ -98,7 +98,7 @@ class PruneCommand extends Command
             ? $instance->prunableChunkSize
             : $this->option('chunk');
 
-        $total = $this->isPrunable($model)
+        $total = $model::isPrunable()
             ? $instance->pruneAll($chunkSize)
             : 0;
 
