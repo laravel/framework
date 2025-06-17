@@ -5,6 +5,9 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Database\Events\ModelsPruned;
 use LogicException;
 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Model
+ */
 trait MassPrunable
 {
     /**
@@ -23,10 +26,8 @@ trait MassPrunable
 
         $total = 0;
 
-        $softDeletable = in_array(SoftDeletes::class, class_uses_recursive(get_class($this)));
-
         do {
-            $total += $count = $softDeletable
+            $total += $count = static::isSoftDeletable()
                 ? $query->forceDelete()
                 : $query->delete();
 
