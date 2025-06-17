@@ -133,6 +133,23 @@ class PruneCommandTest extends TestCase
         );
     }
 
+    public function testNonModelFilesAreIgnoredTest()
+    {
+        $output = $this->artisan(['--path' => 'Models']);
+
+        $output = $output->fetch();
+
+        $this->assertStringNotContainsString(
+            'Illuminate\Tests\Database\Pruning\Models\SomeClass',
+            $output,
+        );
+
+        $this->assertStringNotContainsString(
+            'Illuminate\Tests\Database\Pruning\Models\SomeEnum',
+            $output,
+        );
+    }
+
     public function testTheCommandMayBePretended()
     {
         $db = new DB;
