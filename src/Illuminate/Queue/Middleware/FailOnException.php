@@ -17,7 +17,7 @@ class FailOnException
     /**
      * Create a middleware instance.
      *
-     * @param  (\Closure(\Throwable, mixed): bool)|array<int, class-string<\Throwable>>  $callback
+     * @param  (\Closure(\Throwable, mixed): bool)|array<array-key, class-string<\Throwable>>  $callback
      */
     public function __construct($callback)
     {
@@ -29,7 +29,7 @@ class FailOnException
     }
 
     /**
-     * @param  array<int, class-string<\Throwable>>  $exceptions
+     * @param  array<array-key, class-string<\Throwable>>  $exceptions
      * @return \Closure(\Throwable, mixed): bool
      */
     protected function failForExceptions(array $exceptions)
@@ -46,6 +46,8 @@ class FailOnException
     }
 
     /**
+     * Mark the job as failed if an exception is thrown that passes a truth-test callback.
+     *
      * @param  mixed  $job
      * @param  callable  $next
      * @return mixed
