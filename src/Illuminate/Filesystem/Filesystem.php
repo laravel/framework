@@ -305,7 +305,7 @@ class Filesystem
 
         foreach ($paths as $path) {
             try {
-                if (is_file($path) && @unlink($path)) {
+                if (@unlink($path)) {
                     clearstatcache(false, $path);
                 } else {
                     $success = false;
