@@ -8,6 +8,7 @@ use Illuminate\Database\Console\Migrations\FreshCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Console\Migrations\RedoCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
@@ -28,6 +29,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         'Migrate' => MigrateCommand::class,
         'MigrateFresh' => FreshCommand::class,
         'MigrateInstall' => InstallCommand::class,
+        'MigrateRedo' => RedoCommand::class,
         'MigrateRefresh' => RefreshCommand::class,
         'MigrateReset' => ResetCommand::class,
         'MigrateRollback' => RollbackCommand::class,
@@ -166,6 +168,16 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
 
             return new MigrateMakeCommand($creator, $composer);
         });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrateRedoCommand()
+    {
+        $this->app->singleton(RedoCommand::class);
     }
 
     /**
