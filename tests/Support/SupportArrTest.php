@@ -292,8 +292,8 @@ class SupportArrTest extends TestCase
         $array = array_values(Arr::whereNotNull(['a', null, 'b', null, 'c']));
         $this->assertEquals(['a', 'b', 'c'], $array);
 
-        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], new stdClass(), fn () => null]));
-        $this->assertEquals([1, 'string', 0.0, false, [], new stdClass(), fn () => null], $array);
+        $array = array_values(Arr::whereNotNull([null, 1, 'string', 0.0, false, [], $class = new stdClass(), $function = fn () => null]));
+        $this->assertEquals([1, 'string', 0.0, false, [], $class, $function], $array);
     }
 
     public function testFirst()
