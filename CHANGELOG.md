@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.19.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.19.1...12.x)
+
+## [v12.19.1](https://github.com/laravel/framework/compare/v12.19.0...v12.19.1) - 2025-06-17
+
+* Revert "[12.x] Check if file exists before trying to delete it" by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56072
 
 ## [v12.19.0](https://github.com/laravel/framework/compare/v12.18.0...v12.19.0) - 2025-06-17
 
