@@ -684,31 +684,31 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'/{one}/{two}', RouteTestAnotherControllerWithParameterStub::class.'@oneArgument');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
-        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments and receives two
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'/{one}/{two}', RouteTestAnotherControllerWithParameterStub::class.'@twoArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
-        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments but with different names from the ones passed from the route
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'/{one}/{two}', RouteTestAnotherControllerWithParameterStub::class.'@differentArgumentNames');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
-        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
 
         // Has two arguments with same name but argument order is reversed
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'/{one}/{two}', RouteTestAnotherControllerWithParameterStub::class.'@reversedArguments');
         $router->dispatch(Request::create($str.'/one/two', 'GET'));
-        $this->assertEquals(['one' => 'one', 'two' => 'two'], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame(['two' => 'two', 'one' => 'one'], $_SERVER['__test.controller_callAction_parameters']);
 
         // No route parameters while method has parameters
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'', RouteTestAnotherControllerWithParameterStub::class.'@oneArgument');
         $router->dispatch(Request::create($str, 'GET'));
-        $this->assertEquals([], $_SERVER['__test.controller_callAction_parameters']);
+        $this->assertSame([], $_SERVER['__test.controller_callAction_parameters']);
 
         // With model bindings
         unset($_SERVER['__test.controller_callAction_parameters']);
