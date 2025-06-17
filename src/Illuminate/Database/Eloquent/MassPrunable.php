@@ -25,9 +25,10 @@ trait MassPrunable
         });
 
         $total = 0;
+        $softDeleted = static::isSoftDeletable();
 
         do {
-            $total += $count = static::isSoftDeletable()
+            $total += $count = $softDeleted
                 ? $query->forceDelete()
                 : $query->delete();
 
