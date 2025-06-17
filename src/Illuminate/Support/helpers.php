@@ -106,15 +106,16 @@ if (! function_exists('class_uses_recursive')) {
             if (is_object($class)) {
                 $class = get_class($class);
             }
-    
+
             $results = [];
-    
+
             foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
                 $results += trait_uses_recursive($class, $cache);
             }
-    
+
             return array_unique($results);
         };
+
         return $cache ? once($callback) : call_user_func($callback);
     }
 }
@@ -473,6 +474,7 @@ if (! function_exists('trait_uses_recursive')) {
 
             return $traits;
         };
+
         return $cache ? once($callback) : call_user_func($callback);
     }
 }
