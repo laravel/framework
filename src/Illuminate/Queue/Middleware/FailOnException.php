@@ -8,7 +8,7 @@ use Throwable;
 class FailOnException
 {
     /**
-     * The truth-test callback to determine if the job should stop retries.
+     * The truth-test callback to determine if the job should fail.
      *
      * @var \Closure(\Throwable, mixed): bool
      */
@@ -29,6 +29,8 @@ class FailOnException
     }
 
     /**
+     * Indicate that the job should fail if it encounters the given exceptions.
+     *
      * @param  array<array-key, class-string<\Throwable>>  $exceptions
      * @return \Closure(\Throwable, mixed): bool
      */
