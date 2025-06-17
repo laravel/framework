@@ -5,9 +5,6 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Database\Events\ModelsPruned;
 use LogicException;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Model
- */
 trait MassPrunable
 {
     /**
@@ -25,6 +22,7 @@ trait MassPrunable
         });
 
         $total = 0;
+
         $softDeletable = static::isSoftDeletable();
 
         do {

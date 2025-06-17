@@ -7,9 +7,6 @@ use Illuminate\Database\Events\ModelsPruned;
 use LogicException;
 use Throwable;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Model
- */
 trait Prunable
 {
     /**

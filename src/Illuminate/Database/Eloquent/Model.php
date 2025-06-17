@@ -2290,6 +2290,30 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if the model is soft deletable.
+     */
+    public static function isSoftDeletable(): bool
+    {
+        return in_array(SoftDeletes::class, class_uses_recursive(static::class));
+    }
+
+    /**
+     * Determine if the model is prunable.
+     */
+    protected function isPrunable(): bool
+    {
+        return in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
+    }
+
+    /**
+     * Determine if the model is mass prunable.
+     */
+    protected function isMassPrunable(): bool
+    {
+        return in_array(MassPrunable::class, class_uses_recursive(static::class));
+    }
+
+    /**
      * Determine if lazy loading is disabled.
      *
      * @return bool
@@ -2511,30 +2535,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->escapeWhenCastingToString = $escape;
 
         return $this;
-    }
-
-    /**
-     * Determine if the given model class is soft deletable.
-     */
-    public static function isSoftDeletable(): bool
-    {
-        return in_array(SoftDeletes::class, class_uses_recursive(static::class));
-    }
-
-    /**
-     * Determine if the given model class is prunable.
-     */
-    protected function isPrunable(): bool
-    {
-        return in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
-    }
-
-    /**
-     * Determine if the given model class is mass prunable.
-     */
-    protected function isMassPrunable(): bool
-    {
-        return in_array(MassPrunable::class, class_uses_recursive(static::class));
     }
 
     /**
