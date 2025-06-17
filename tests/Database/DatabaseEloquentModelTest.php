@@ -3424,6 +3424,20 @@ class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
 
 class EloquentModelWithoutUseEloquentBuilderAttributeStub extends Model
 {
+    public function testNestedModelBootingIsDisallowed()
+    {
+        $this->expectExceptionMessageMatches('/The \[(.+)] method may not be called on model \[(.+)\] while it is being booted\./');
+
+        $model = new class extends Model
+        {
+            protected static function boot()
+            {
+                parent::boot();
+
+                $tableName = (new static())->getTable();
+            }
+        };
+    }
 }
 
 class EloquentTestObserverStub

@@ -57,7 +57,7 @@ class ClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
@@ -70,7 +70,9 @@ class ClearCommand extends Command
         $this->flushFacades();
 
         if (! $successful) {
-            return $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+            $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+
+            return 1;
         }
 
         $this->laravel['events']->dispatch(

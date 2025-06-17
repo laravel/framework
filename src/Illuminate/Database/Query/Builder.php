@@ -263,6 +263,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * The custom arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @var array
+     */
+    public array $fetchUsing = [];
+
+    /**
      * Create a new query builder instance.
      */
     public function __construct(
@@ -767,6 +774,49 @@ class Builder implements BuilderContract
         $this->joins[] = $this->newJoinClause($this, 'cross', new Expression($expression));
 
         return $this;
+    }
+
+    /**
+     * Add a straight join to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure|string  $first
+     * @param  string|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
+     * @return $this
+     */
+    public function straightJoin($table, $first, $operator = null, $second = null)
+    {
+        return $this->join($table, $first, $operator, $second, 'straight_join');
+    }
+
+    /**
+     * Add a "straight join where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  string  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $second
+     * @return $this
+     */
+    public function straightJoinWhere($table, $first, $operator, $second)
+    {
+        return $this->joinWhere($table, $first, $operator, $second, 'straight_join');
+    }
+
+    /**
+     * Add a subquery straight join to the query.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
+     * @param  string  $as
+     * @param  \Closure|\Illuminate\Contracts\Database\Query\Expression|string  $first
+     * @param  string|null  $operator
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string|null  $second
+     * @return $this
+     */
+    public function straightJoinSub($query, $as, $first, $operator = null, $second = null)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'straight_join');
     }
 
     /**
@@ -3112,9 +3162,13 @@ class Builder implements BuilderContract
      */
     public function get($columns = ['*'])
     {
-        $items = new Collection($this->onceWithColumns(Arr::wrap($columns), function () {
-            return $this->processor->processSelect($this, $this->runSelect());
-        }));
+        $original = $this->columns;
+
+        $this->columns ??= Arr::wrap($columns);
+
+        $items = new Collection($this->processor->processSelect($this, $this->runSelect()));
+
+        $this->columns = $original;
 
         return $this->applyAfterQueryCallbacks(
             isset($this->groupLimit) ? $this->withoutGroupLimitKeys($items) : $items
@@ -3129,7 +3183,7 @@ class Builder implements BuilderContract
     protected function runSelect()
     {
         return $this->connection->select(
-            $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+            $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
         );
     }
 
@@ -3349,7 +3403,7 @@ class Builder implements BuilderContract
 
         return (new LazyCollection(function () {
             yield from $this->connection->cursor(
-                $this->toSql(), $this->getBindings(), ! $this->useWritePdo
+                $this->toSql(), $this->getBindings(), ! $this->useWritePdo, $this->fetchUsing
             );
         }))->map(function ($item) {
             return $this->applyAfterQueryCallbacks(new Collection([$item]))->first();
@@ -3379,17 +3433,18 @@ class Builder implements BuilderContract
      */
     public function pluck($column, $key = null)
     {
+        $original = $this->columns;
+
         // First, we will need to select the results of the query accounting for the
         // given columns / key. Once we have the results, we will be able to take
         // the results and get the exact data that was requested for the query.
-        $queryResult = $this->onceWithColumns(
-            is_null($key) || $key === $column ? [$column] : [$column, $key],
-            function () {
-                return $this->processor->processSelect(
-                    $this, $this->runSelect()
-                );
-            }
-        );
+        $this->columns ??= is_null($key) || $key === $column
+            ? [$column]
+            : [$column, $key];
+
+        $queryResult = $this->processor->processSelect($this, $this->runSelect());
+
+        $this->columns = $original;
 
         if (empty($queryResult)) {
             return new Collection;
@@ -3682,32 +3737,6 @@ class Builder implements BuilderContract
         }
 
         return $this;
-    }
-
-    /**
-     * Execute the given callback while selecting the given columns.
-     *
-     * After running the callback, the columns are reset to the original value.
-     *
-     * @template TResult
-     *
-     * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @param  callable(): TResult  $callback
-     * @return TResult
-     */
-    protected function onceWithColumns($columns, $callback)
-    {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $result = $callback();
-
-        $this->columns = $original;
-
-        return $result;
     }
 
     /**
@@ -4330,6 +4359,19 @@ class Builder implements BuilderContract
     public function useWritePdo()
     {
         $this->useWritePdo = true;
+
+        return $this;
+    }
+
+    /**
+     * Specify arguments for the PDOStatement::fetchAll / fetch functions.
+     *
+     * @param  mixed  ...$fetchUsing
+     * @return $this
+     */
+    public function fetchUsing(...$fetchUsing)
+    {
+        $this->fetchUsing = $fetchUsing;
 
         return $this;
     }

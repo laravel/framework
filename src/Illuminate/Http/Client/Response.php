@@ -323,14 +323,13 @@ class Response implements ArrayAccess, Stringable
     /**
      * Throw an exception if a server or client error occurred.
      *
+     * @param  null|(\Closure(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\RequestException): mixed)  $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throw()
+    public function throw($callback = null)
     {
-        $callback = func_get_args()[0] ?? null;
-
         if ($this->failed()) {
             throw tap($this->toException(), function ($exception) use ($callback) {
                 if ($callback && is_callable($callback)) {
@@ -346,13 +345,14 @@ class Response implements ArrayAccess, Stringable
      * Throw an exception if a server or client error occurred and the given condition evaluates to true.
      *
      * @param  \Closure|bool  $condition
+     * @param  null|(\Closure(\Illuminate\Http\Client\Response, \Illuminate\Http\Client\RequestException): mixed)  $callback
      * @return $this
      *
      * @throws \Illuminate\Http\Client\RequestException
      */
-    public function throwIf($condition)
+    public function throwIf($condition, $callback = null)
     {
-        return value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+        return value($condition, $this) ? $this->throw($callback) : $this;
     }
 
     /**

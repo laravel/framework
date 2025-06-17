@@ -51,6 +51,13 @@ class BroadcastEvent implements ShouldQueue
     public $maxExceptions;
 
     /**
+     * Indicates if the job should be deleted when models are missing.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
@@ -63,6 +70,7 @@ class BroadcastEvent implements ShouldQueue
         $this->backoff = property_exists($event, 'backoff') ? $event->backoff : null;
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
         $this->maxExceptions = property_exists($event, 'maxExceptions') ? $event->maxExceptions : null;
+        $this->deleteWhenMissingModels = property_exists($event, 'deleteWhenMissingModels') ? $event->deleteWhenMissingModels : null;
     }
 
     /**
