@@ -100,19 +100,22 @@ if (! function_exists('class_uses_recursive')) {
      * @param  object|string  $class
      * @return array
      */
-    function class_uses_recursive($class)
+    function class_uses_recursive($class, bool $cache = false)
     {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
-
-        $results = [];
-
-        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
-            $results += trait_uses_recursive($class);
-        }
-
-        return array_unique($results);
+        $callback = function () use ($class, $cache) {
+            if (is_object($class)) {
+                $class = get_class($class);
+            }
+    
+            $results = [];
+    
+            foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
+                $results += trait_uses_recursive($class, $cache);
+            }
+    
+            return array_unique($results);
+        };
+        return $cache ? once($callback) : call_user_func($callback);
     }
 }
 
@@ -459,15 +462,18 @@ if (! function_exists('trait_uses_recursive')) {
      * @param  object|string  $trait
      * @return array
      */
-    function trait_uses_recursive($trait)
+    function trait_uses_recursive($trait, bool $cache = false)
     {
-        $traits = class_uses($trait) ?: [];
+        $callback = function () use ($trait) {
+            $traits = class_uses($trait) ?: [];
 
-        foreach ($traits as $trait) {
-            $traits += trait_uses_recursive($trait);
-        }
+            foreach ($traits as $trait) {
+                $traits += trait_uses_recursive($trait);
+            }
 
-        return $traits;
+            return $traits;
+        };
+        return $cache ? once($callback) : call_user_func($callback);
     }
 }
 
