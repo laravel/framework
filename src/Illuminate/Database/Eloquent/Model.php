@@ -251,17 +251,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static string $collectionClass = Collection::class;
 
     /**
-     * Whether it implements the SoftDeletes trait
+     * Whether it implements the SoftDeletes trait.
      */
     protected static bool $isSoftDeletable;
 
     /**
-     * Whether it implements the Prunable trait
+     * Whether it implements the Prunable trait.
      */
     protected static bool $isPrunable;
 
     /**
-     * Whether it implements the MassPrunable trait
+     * Whether it implements the MassPrunable trait.
      */
     protected static bool $isMassPrunable;
 
