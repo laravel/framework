@@ -140,12 +140,12 @@ class PruneCommandTest extends TestCase
         $output = $output->fetch();
 
         $this->assertStringNotContainsString(
-            'Illuminate\Tests\Database\Pruning\Models\SomeClass',
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\SomeClass] records found.',
             $output,
         );
 
         $this->assertStringNotContainsString(
-            'Illuminate\Tests\Database\Pruning\Models\SomeEnum',
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\SomeEnum] records found.',
             $output,
         );
     }
