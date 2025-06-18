@@ -465,7 +465,7 @@ if (! function_exists('trait_uses_recursive')) {
      */
     function trait_uses_recursive($trait, bool $cache = false)
     {
-        $callback = function () use ($trait) {
+        $callback = function () use ($trait, $cache) {
             $traits = class_uses($trait) ?: [];
 
             foreach ($traits as $trait) {
