@@ -4,6 +4,7 @@ namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchRepository;
+use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\ManuallyFailedException;
@@ -194,7 +195,7 @@ abstract class Job
         // the proper value. Otherwise, the current transaction will never commit.
         if ($e instanceof TimeoutExceededException &&
             $commandName &&
-            in_array(Batchable::class, class_uses_recursive($commandName))) {
+            ClassUsesRecursive::inArray(Batchable::class, $commandName)) {
             $batchRepository = $this->resolve(BatchRepository::class);
 
             try {
