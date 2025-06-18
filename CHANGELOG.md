@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.19.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.19.3...12.x)
+
+## [v12.19.3](https://github.com/laravel/framework/compare/v12.19.2...v12.19.3) - 2025-06-18
+
+* [12.x] Fix model pruning when non model files are in the same directory by [@rojtjo](https://github.com/rojtjo) in https://github.com/laravel/framework/pull/56071
 
 ## [v12.19.2](https://github.com/laravel/framework/compare/v12.19.1...v12.19.2) - 2025-06-17
 
