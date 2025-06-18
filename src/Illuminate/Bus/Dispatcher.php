@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
@@ -113,7 +114,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchNow($command, $handler = null)
     {
-        $uses = class_uses_recursive($command);
+        $uses = ClassUsesRecursive::classUsesRecursive($command);
 
         if (isset($uses[InteractsWithQueue::class], $uses[Queueable::class]) && ! $command->job) {
             $command->setJob(new SyncJob($this->container, json_encode([]), 'sync', 'sync'));

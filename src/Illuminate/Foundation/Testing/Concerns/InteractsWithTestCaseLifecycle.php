@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -201,7 +202,7 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $uses = array_flip(ClassUsesRecursive::classUsesRecursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();

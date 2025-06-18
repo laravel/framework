@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\UniqueLock;
+use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -155,7 +156,7 @@ class CallQueuedHandler
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
+        if (ClassUsesRecursive::inArray(InteractsWithQueue::class, $instance)) {
             $instance->setJob($job);
         }
 
@@ -183,10 +184,8 @@ class CallQueuedHandler
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
     {
-        $uses = class_uses_recursive($command);
-
-        if (! in_array(Batchable::class, $uses) ||
-            ! in_array(InteractsWithQueue::class, $uses)) {
+        if (! ClassUsesRecursive::inArray(Batchable::class, $command) ||
+            ! ClassUsesRecursive::inArray(InteractsWithQueue::class, $command)) {
             return;
         }
 
@@ -311,7 +310,7 @@ class CallQueuedHandler
      */
     protected function ensureFailedBatchJobIsRecorded(string $uuid, $command, $e)
     {
-        if (! in_array(Batchable::class, class_uses_recursive($command))) {
+        if (! ClassUsesRecursive::inArray(Batchable::class, $command)) {
             return;
         }
 
