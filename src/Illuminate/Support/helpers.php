@@ -469,7 +469,7 @@ if (! function_exists('trait_uses_recursive')) {
             $traits = class_uses($trait) ?: [];
 
             foreach ($traits as $trait) {
-                $traits += trait_uses_recursive($trait);
+                $traits += trait_uses_recursive($trait, $cache);
             }
 
             return $traits;
