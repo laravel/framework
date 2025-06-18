@@ -251,6 +251,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static string $collectionClass = Collection::class;
 
     /**
+     * Whether it implements the SoftDeletes trait
+     */
+    protected static bool $isSoftDeletable;
+
+    /**
+     * Whether it implements the Prunable trait
+     */
+    protected static bool $isPrunable;
+
+    /**
+     * Whether it implements the MassPrunable trait
+     */
+    protected static bool $isMassPrunable;
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -2294,7 +2309,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function isSoftDeletable(): bool
     {
-        return in_array(SoftDeletes::class, class_uses_recursive(static::class));
+        return self::$isSoftDeletable ??= in_array(SoftDeletes::class, class_uses_recursive(static::class));
     }
 
     /**
@@ -2302,7 +2317,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isPrunable(): bool
     {
-        return in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
+        return self::$isPrunable ??= in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
     }
 
     /**
@@ -2310,7 +2325,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isMassPrunable(): bool
     {
-        return in_array(MassPrunable::class, class_uses_recursive(static::class));
+        return self::$isMassPrunable ??= in_array(MassPrunable::class, class_uses_recursive(static::class));
     }
 
     /**
