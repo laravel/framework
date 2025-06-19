@@ -1719,6 +1719,25 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 
+    public function testChecksum()
+    {
+        $this->assertSame('z8SuHQ==', Str::checksum('foo'));
+        $this->assertSame('pcT+SQ==', Str::checksum('foo', 'crc32'));
+        $this->assertSame('jHNlIQ==', Str::checksum('foo', 'crc32b'));
+        $this->assertSame('z8SuHQ==', Str::checksum('foo', 'crc32c'));
+        $this->assertSame('rL0Y20zC+Fzt72VPzMSk2A==', Str::checksum('foo', 'md5'));
+    }
+
+    public function testIsChecksum()
+    {
+        $this->assertTrue(Str::isChecksum('foo', 'z8SuHQ=='));
+        $this->assertTrue(Str::isChecksum('foo', 'z8SuHQ==', 'crc32c'));
+        $this->assertTrue(Str::isChecksum('foo', 'rL0Y20zC+Fzt72VPzMSk2A==', 'md5'));
+
+        $this->assertFalse(Str::isChecksum('foo', 'invalid'));
+        $this->assertFalse(Str::isChecksum('foo', 'invalid', 'md5'));
+    }
+
     public function testChopStart()
     {
         foreach ([

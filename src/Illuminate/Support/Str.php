@@ -1793,6 +1793,31 @@ class Str
     }
 
     /**
+     * Returns the fingerprint of the string in BASE 64.
+     *
+     * @param  string  $string
+     * @param  string|null  $algorithm
+     * @return string
+     */
+    public static function checksum($string, $algorithm = null)
+    {
+        return static::toBase64(hash($algorithm ?? 'crc32c', $string, true));
+    }
+
+    /**
+     * Determine if the string is equal to the given checksum encoded in BASE 64.
+     *
+     * @param  string  $string
+     * @param  string  $checksum
+     * @param  string|null  $algorithm
+     * @return bool
+     */
+    public static function isChecksum($string, $checksum, $algorithm = null)
+    {
+        return hash_equals(static::checksum($string, $algorithm), $checksum);
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string

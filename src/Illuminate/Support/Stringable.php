@@ -337,6 +337,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Returns the fingerprint of the string.
+     *
+     * @param  string|null  $algorithm
+     * @return static
+     */
+    public function checksum($algorithm = null)
+    {
+        return new static(Str::checksum($this->value, $algorithm));
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
@@ -356,6 +367,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function isAscii()
     {
         return Str::isAscii($this->value);
+    }
+
+    /**
+     * Determine if the string is equal to given checksum.
+     *
+     * @param  string  $checksum
+     * @param  string|null  $algorithm
+     * @return bool
+     */
+    public function isChecksum($checksum, $algorithm = null)
+    {
+        return Str::isChecksum($this->value, $checksum, $algorithm);
     }
 
     /**

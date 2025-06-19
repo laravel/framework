@@ -786,6 +786,15 @@ class SupportStringableTest extends TestCase
         $this->assertSame('abcbbc', (string) $this->stringable('abcbbcbc')->finish('bc'));
     }
 
+    public function testChecksum()
+    {
+        $this->assertSame('z8SuHQ==', (string) $this->stringable('foo')->checksum());
+        $this->assertSame('pcT+SQ==', (string) $this->stringable('foo')->checksum('crc32'));
+        $this->assertSame('jHNlIQ==', (string) $this->stringable('foo')->checksum('crc32b'));
+        $this->assertSame('z8SuHQ==', (string) $this->stringable('foo')->checksum('crc32c'));
+        $this->assertSame('rL0Y20zC+Fzt72VPzMSk2A==', (string) $this->stringable('foo')->checksum('md5'));
+    }
+
     public function testIs()
     {
         $this->assertTrue($this->stringable('/')->is('/'));
@@ -862,6 +871,16 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable($multilineValue)->is('use Exception;'));
         $this->assertFalse($this->stringable($multilineValue)->is('use Exception;*'));
         $this->assertTrue($this->stringable($multilineValue)->is('*use Exception;'));
+    }
+
+    public function testIsChecksum()
+    {
+        $this->assertTrue($this->stringable('foo')->isChecksum('z8SuHQ=='));
+        $this->assertTrue($this->stringable('foo')->isChecksum('z8SuHQ==', 'crc32c'));
+        $this->assertTrue($this->stringable('foo')->isChecksum('rL0Y20zC+Fzt72VPzMSk2A==', 'md5'));
+
+        $this->assertFalse($this->stringable('foo')->isChecksum('invalid'));
+        $this->assertFalse($this->stringable('foo')->isChecksum('invalid', 'md5'));
     }
 
     public function testKebab()
