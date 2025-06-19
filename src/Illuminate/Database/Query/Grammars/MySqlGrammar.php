@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -494,6 +495,46 @@ class MySqlGrammar extends Grammar
     public function compileThreadCount()
     {
         return 'select variable_value as `Value` from performance_schema.session_status where variable_name = \'threads_connected\'';
+    }
+
+    /**
+     * Determine if the connection supports savepoints.
+     */
+    public function supportsSavepoints(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepointRelease(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     */
+    public function compileSavepoint(string $name): string
+    {
+        return 'SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint rollback.
+     */
+    public function compileRollbackToSavepoint(string $name): string
+    {
+        return 'ROLLBACK TO SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint release.
+     */
+    public function compileReleaseSavepoint(string $name): string
+    {
+        return 'RELEASE SAVEPOINT '.$this->wrapValue($name);
     }
 
     /**
