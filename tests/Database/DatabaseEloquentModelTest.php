@@ -3406,6 +3406,7 @@ class DatabaseEloquentModelTest extends TestCase
             }
         };
     }
+
     public function testUseCustomBuilderWithUseEloquentBuilderAttribute()
     {
         $model = new EloquentModelWithUseEloquentBuilderAttributeStub();
