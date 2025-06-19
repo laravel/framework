@@ -59,7 +59,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
     {
         return $this->connection->table($this->table)
             ->orderByDesc('id')
-            ->take($limit)
+            ->limit($limit)
             ->when($before, fn ($q) => $q->where('id', '<', $before))
             ->get()
             ->map(function ($batch) {
@@ -247,7 +247,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         $totalDeleted = 0;
 
         do {
-            $deleted = $query->take(1000)->delete();
+            $deleted = $query->limit(1000)->delete();
 
             $totalDeleted += $deleted;
         } while ($deleted !== 0);
@@ -270,7 +270,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         $totalDeleted = 0;
 
         do {
-            $deleted = $query->take(1000)->delete();
+            $deleted = $query->limit(1000)->delete();
 
             $totalDeleted += $deleted;
         } while ($deleted !== 0);
@@ -293,7 +293,7 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         $totalDeleted = 0;
 
         do {
-            $deleted = $query->take(1000)->delete();
+            $deleted = $query->limit(1000)->delete();
 
             $totalDeleted += $deleted;
         } while ($deleted !== 0);
