@@ -8,7 +8,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -971,7 +970,7 @@ abstract class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        if ($method === 'trashed' && in_array(SoftDeletes::class, class_uses_recursive($this->modelName()))) {
+        if ($method === 'trashed' && $this->modelName()::isSoftDeletable()) {
             return $this->state([
                 $this->newModel()->getDeletedAtColumn() => $parameters[0] ?? Carbon::now()->subDay(),
             ]);

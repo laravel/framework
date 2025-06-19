@@ -108,6 +108,7 @@ class MemoizedStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */

@@ -22,6 +22,7 @@ class CacheFlushed
      * Create a new event instance.
      *
      * @param  string|null  $storeName
+     * @param  array  $tags
      */
     public function __construct($storeName, array $tags = [])
     {

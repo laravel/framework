@@ -1,6 +1,39 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.18.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.19.2...12.x)
+
+## [v12.19.2](https://github.com/laravel/framework/compare/v12.19.1...v12.19.2) - 2025-06-17
+
+## [v12.19.1](https://github.com/laravel/framework/compare/v12.19.0...v12.19.1) - 2025-06-17
+
+* Revert "[12.x] Check if file exists before trying to delete it" by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56072
+
+## [v12.19.0](https://github.com/laravel/framework/compare/v12.18.0...v12.19.0) - 2025-06-17
+
+* [11.x] Fix validation to not throw incompatible validation exception by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/55963
+* [12.x] Correct testEncryptAndDecrypt to properly test new methods by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/55985
+* [12.x] Check if file exists before trying to delete it by [@Jellyfrog](https://github.com/Jellyfrog) in https://github.com/laravel/framework/pull/55994
+* Clear cast caches when discarding changes by [@willtj](https://github.com/willtj) in https://github.com/laravel/framework/pull/55992
+* [12.x] Handle Null Check in Str::contains by [@Jellyfrog](https://github.com/Jellyfrog) in https://github.com/laravel/framework/pull/55991
+* [12.x] Remove call to deprecated `getDefaultDescription` method by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/55990
+* Bump brace-expansion from 2.0.1 to 2.0.2 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot) in https://github.com/laravel/framework/pull/55999
+* Enhance error handling in PendingRequest to convert TooManyRedirectsE… by [@achrafAa](https://github.com/achrafAa) in https://github.com/laravel/framework/pull/55998
+* [12.x] fix: remove Model intersection from UserProvider contract by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56013
+* [12.x] Remove the only [@return](https://github.com/return) tag left on a constructor by [@JordanchoEftimov](https://github.com/JordanchoEftimov) in https://github.com/laravel/framework/pull/56001
+* [12.x] Introduce `ComputesOnceableHashInterface` by [@Jacobs63](https://github.com/Jacobs63) in https://github.com/laravel/framework/pull/56009
+* [12.x] Add assertRedirectBackWithErrors to TestResponse by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55987
+* [12.x] collapseWithKeys - Prevent exception in base case by [@DeanWunder](https://github.com/DeanWunder) in https://github.com/laravel/framework/pull/56002
+* [12.x] Standardize size() behavior and add extended queue metrics support by [@sylvesterdamgaard](https://github.com/sylvesterdamgaard) in https://github.com/laravel/framework/pull/56010
+* [11.x] Fix `symfony/console:7.4` compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56015
+* [12.x] Improve constructor PHPDoc for controller middleware definition by [@JordanchoEftimov](https://github.com/JordanchoEftimov) in https://github.com/laravel/framework/pull/56021
+* Remove `@return` tags from constructors by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/56024
+* [12.x] sort helper functions in alphabetic order by [@gigabites19](https://github.com/gigabites19) in https://github.com/laravel/framework/pull/56031
+* [12.x] add Attachment::fromUploadedFile method by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/56027
+* [12.x]: Add UseEloquentBuilder attribute to register custom Eloquent Builder by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/56025
+* [12.x] Improve PHPDoc for the Illuminate\Cache folder files by [@JordanchoEftimov](https://github.com/JordanchoEftimov) in https://github.com/laravel/framework/pull/56028
+* [12.x] Add a new model cast named asFluent by [@azim-kordpour](https://github.com/azim-kordpour) in https://github.com/laravel/framework/pull/56046
+* [12.x] Introduce `FailOnException` job middleware by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56037
+* [12.x] isSoftDeletable(), isPrunable(), and isMassPrunable() to model class by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/56060
 
 ## [v12.18.0](https://github.com/laravel/framework/compare/v12.17.0...v12.18.0) - 2025-06-10
 
