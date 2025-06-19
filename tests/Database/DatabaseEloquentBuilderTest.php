@@ -288,7 +288,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testFirstMethod()
     {
         $builder = m::mock(Builder::class.'[get,take]', [$this->getMockQueryBuilder()]);
-        $builder->shouldReceive('take')->with(1)->andReturnSelf();
+        $builder->shouldReceive('limit')->with(1)->andReturnSelf();
         $builder->shouldReceive('get')->with(['*'])->andReturn(new Collection(['bar']));
 
         $result = $builder->first();
