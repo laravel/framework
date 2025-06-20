@@ -284,6 +284,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
     public function registerMaintenanceModeManager()
     {
         $this->app->singleton(MaintenanceModeManager::class);
+        $this->app->alias(MaintenanceModeManager::class, 'maintenance.manager');
 
         $this->app->bind(
             MaintenanceModeContract::class,
