@@ -25,7 +25,7 @@ class TestResponseAssert
     /**
      * Create a new TestResponse assertion helper.
      */
-    public static function withResponse(TestResponse $response): self
+    public static function withResponse(TestResponse $response): static
     {
         return new static($response);
     }
