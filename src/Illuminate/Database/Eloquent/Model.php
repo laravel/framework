@@ -252,18 +252,24 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Whether it implements the SoftDeletes trait.
+     *
+     * @var array<class-string<self>, bool>
      */
-    protected static bool $isSoftDeletable;
+    protected static array $isSoftDeletable;
 
     /**
      * Whether it implements the Prunable trait.
+     *
+     * @var array<class-string<self>, bool>
      */
-    protected static bool $isPrunable;
+    protected static array $isPrunable;
 
     /**
      * Whether it implements the MassPrunable trait.
+     *
+     * @var array<class-string<self>, bool>
      */
-    protected static bool $isMassPrunable;
+    protected static array $isMassPrunable;
 
     /**
      * The name of the "created at" column.
@@ -2309,7 +2315,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function isSoftDeletable(): bool
     {
-        return self::$isSoftDeletable ??= in_array(SoftDeletes::class, class_uses_recursive(static::class));
+        return static::$isSoftDeletable[static::class] ??= in_array(SoftDeletes::class, class_uses_recursive(static::class));
     }
 
     /**
@@ -2317,7 +2323,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isPrunable(): bool
     {
-        return self::$isPrunable ??= in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
+        return self::$isPrunable[static::class] ??= in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
     }
 
     /**
@@ -2325,7 +2331,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isMassPrunable(): bool
     {
-        return self::$isMassPrunable ??= in_array(MassPrunable::class, class_uses_recursive(static::class));
+        return self::$isMassPrunable[static::class] ??= in_array(MassPrunable::class, class_uses_recursive(static::class));
     }
 
     /**
