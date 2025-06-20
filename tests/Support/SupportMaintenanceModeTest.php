@@ -20,11 +20,19 @@ class SupportMaintenanceModeTest extends TestCase
 
 class TestMaintenanceMode implements MaintenanceModeContract
 {
-    public function activate(array $payload): void {}
+    public function activate(array $payload): void
+    {
+    }
 
-    public function deactivate(): void {}
+    public function deactivate(): void
+    {
+    }
 
-    public function active(): bool {}
+    public function active(): bool
+    {
+    }
 
-    public function data(): array {}
+    public function data(): array
+    {
+    }
 }
