@@ -3567,6 +3567,18 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testContainsAny($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAny(1));
+        $this->assertTrue($c->containsAny([1, 3]));
+        $this->assertFalse($c->containsAny(2));
+        $this->assertFalse($c->containsAny([2, 4]));
+        $this->assertTrue($c->containsAny([2, 5]));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testDoesntContain($collection)
     {
         $c = new $collection([1, 3, 5]);

@@ -196,6 +196,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if one or multiple items exists in the collection.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function containsAny($value = null)
+    {
+        return $this->contains(fn ($item) => in_array($item, Arr::wrap($value)));
+    }
+
+    /**
      * Determine if an item exists, using strict comparison.
      *
      * @param  (callable(TValue): bool)|TValue|array-key  $key
