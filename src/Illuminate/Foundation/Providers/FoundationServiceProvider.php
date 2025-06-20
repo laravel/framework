@@ -283,12 +283,12 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerMaintenanceModeManager()
     {
-        $this->app->singleton(MaintenanceModeManager::class);
-        $this->app->alias(MaintenanceModeManager::class, 'maintenance.manager');
+        $this->app->singleton('maintenance.manager', function ($app) {
+            return new MaintenanceModeManager($app);
+        });
 
-        $this->app->bind(
-            MaintenanceModeContract::class,
-            fn () => $this->app->make(MaintenanceModeManager::class)->driver()
-        );
+        $this->app->bind('maintenance', function ($app) {
+            return $app['maintenance.manager']->driver();
+        });
     }
 }
