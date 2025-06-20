@@ -251,7 +251,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if one or multiple items exists in the collection.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool
      */
     public function containsAny($value = null)
