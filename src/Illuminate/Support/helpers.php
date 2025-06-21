@@ -102,17 +102,7 @@ if (! function_exists('class_uses_recursive')) {
      */
     function class_uses_recursive($class)
     {
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
-
-        $results = [];
-
-        foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
-            $results += trait_uses_recursive($class);
-        }
-
-        return array_unique($results);
+        return \Illuminate\Support\Reflector::classUsesRecursive($class);
     }
 }
 

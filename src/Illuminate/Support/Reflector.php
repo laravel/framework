@@ -11,6 +11,43 @@ use ReflectionUnionType;
 
 class Reflector
 {
+    private static array $classesUsesRecursive = [];
+
+    /**
+     * Returns all traits used by a class, its parent classes and trait of their traits.
+     *
+     * @param  object|string  $class
+     * @return array
+     */
+    public static function classUsesRecursive(object|string $class)
+    {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        if (! isset(self::$classesUsesRecursive[$class])) {
+            $results = [];
+
+            foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
+                $results += trait_uses_recursive($class);
+            }
+
+            self::$classesUsesRecursive[$class] = array_unique($results);
+        }
+
+        return self::$classesUsesRecursive[$class];
+    }
+
+    /**
+     * Flush the component's cached state..
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$classesUsesRecursive = [];
+    }
+
     /**
      * This is a PHP 7.4 compatible implementation of is_callable.
      *

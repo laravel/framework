@@ -31,6 +31,7 @@ use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
@@ -181,6 +182,7 @@ trait InteractsWithTestCaseLifecycle
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
+        Reflector::flushState();
         RegisterProviders::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
