@@ -244,7 +244,7 @@ class WorkCommand extends Command
 
             $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
                 $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
-                ) - 33, 0);
+            ) - 33, 0);
 
             $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
 
@@ -255,7 +255,7 @@ class WorkCommand extends Command
 
         $dots = max(terminal()->width() - mb_strlen($job->resolveName()) - (
             $isVerbose ? mb_strlen($job->getJobId()) + mb_strlen($job->getConnectionName()) + mb_strlen($job->getQueue()) + 2 : 0
-            ) - mb_strlen($runTime) - 31, 0);
+        ) - mb_strlen($runTime) - 31, 0);
 
         $this->output->write(' '.str_repeat('<fg=gray>.</>', $dots));
         $this->output->write(" <fg=gray>$runTime</>");
