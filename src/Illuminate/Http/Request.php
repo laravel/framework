@@ -5,6 +5,7 @@ namespace Illuminate\Http;
 use ArrayAccess;
 use Closure;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method bool hasValidSignature(bool $absolute = true)
  */
-class Request extends SymfonyRequest implements Arrayable, ArrayAccess
+class Request extends SymfonyRequest implements Arrayable, Jsonable, ArrayAccess
 {
     use Concerns\CanBePrecognitive,
         Concerns\InteractsWithContentTypes,
@@ -736,6 +737,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function toArray(): array
     {
         return $this->all();
+    }
+
+    /**
+     * Convert the object to its JSON representation.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toJson($options = 0)
+    {
+        return json_encode($this->toArray(), $options);
     }
 
     /**
