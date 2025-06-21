@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -32,6 +31,7 @@ use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
+use Illuminate\Support\Reflector;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
@@ -182,6 +182,7 @@ trait InteractsWithTestCaseLifecycle
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
+        Reflector::flushState();
         RegisterProviders::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
@@ -202,7 +203,7 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(ClassUsesRecursive::classUsesRecursive(static::class));
+        $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
@@ -127,7 +126,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         parent::__construct();
 
-        if (ClassUsesRecursive::inArray(CreatesMatchingTest::class, $this)) {
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->addTestOptions();
         }
 
@@ -183,7 +182,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
         $info = $this->type;
 
-        if (ClassUsesRecursive::inArray(CreatesMatchingTest::class, $this)) {
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->handleTestCreation($path);
         }
 

@@ -3,7 +3,6 @@
 namespace Illuminate\Events;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -123,7 +122,7 @@ class CallQueuedListener implements ShouldQueue
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
-        if (ClassUsesRecursive::inArray(InteractsWithQueue::class, $instance)) {
+        if (in_array(InteractsWithQueue::class, class_uses_recursive($instance))) {
             $instance->setJob($job);
         }
 
