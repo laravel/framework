@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database;
 
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Console\Command;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Container\Container;
@@ -189,7 +188,7 @@ abstract class Seeder
             ? $this->container->call([$this, 'run'], $parameters)
             : $this->run(...$parameters);
 
-        $uses = array_flip(ClassUsesRecursive::classUsesRecursive(static::class));
+        $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[WithoutModelEvents::class])) {
             $callback = $this->withoutModelEvents($callback);

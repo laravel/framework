@@ -4,7 +4,6 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Closure;
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Contracts\Broadcasting\HasBroadcastChannel;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
@@ -361,7 +360,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$traitInitializers[$class] = [];
 
-        foreach (ClassUsesRecursive::classUsesRecursive($class) as $trait) {
+        foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
             if (method_exists($class, $method) && ! in_array($method, $booted)) {
@@ -1846,7 +1845,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $this->load((new BaseCollection($this->relations))->reject(
             fn ($relation) => $relation instanceof Pivot
-                || (is_object($relation) && in_array(AsPivot::class, ClassUsesRecursive::classUsesRecursive($relation), true))
+                || (is_object($relation) && in_array(AsPivot::class, class_uses_recursive($relation), true))
         )->keys()->all());
 
         $this->syncOriginal();
@@ -2316,7 +2315,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function isSoftDeletable(): bool
     {
-        return static::$isSoftDeletable[static::class] ??= ClassUsesRecursive::inArray(SoftDeletes::class, static::class);
+        return static::$isSoftDeletable[static::class] ??= in_array(SoftDeletes::class, class_uses_recursive(static::class));
     }
 
     /**
@@ -2324,7 +2323,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isPrunable(): bool
     {
-        return self::$isPrunable[static::class] ??= ClassUsesRecursive::inArray(Prunable::class, static::class) || static::isMassPrunable();
+        return self::$isPrunable[static::class] ??= in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
     }
 
     /**
@@ -2332,7 +2331,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isMassPrunable(): bool
     {
-        return self::$isMassPrunable[static::class] ??= ClassUsesRecursive::inArray(MassPrunable::class, static::class);
+        return self::$isMassPrunable[static::class] ??= in_array(MassPrunable::class, class_uses_recursive(static::class));
     }
 
     /**

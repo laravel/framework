@@ -4,7 +4,6 @@ namespace Illuminate\Bus;
 
 use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
@@ -102,7 +101,7 @@ class PendingBatch
                 return;
             }
 
-            if (! (static::$batchableClasses[$job::class] ?? false) && ! in_array(Batchable::class, ClassUsesRecursive::classUsesRecursive($job))) {
+            if (! (static::$batchableClasses[$job::class] ?? false) && ! in_array(Batchable::class, class_uses_recursive($job))) {
                 static::$batchableClasses[$job::class] = false;
 
                 throw new RuntimeException(sprintf('Attempted to batch job [%s], but it does not use the Batchable trait.', $job::class));

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Testing\Concerns;
 
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing;
 use Illuminate\Support\Arr;
@@ -38,7 +37,7 @@ trait TestDatabases
         });
 
         ParallelTesting::setUpTestCase(function ($testCase) {
-            $uses = array_flip(ClassUsesRecursive::classUsesRecursive(get_class($testCase)));
+            $uses = array_flip(class_uses_recursive(get_class($testCase)));
 
             $databaseTraits = [
                 Testing\DatabaseMigrations::class,

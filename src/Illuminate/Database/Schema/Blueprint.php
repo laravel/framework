@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
-use Illuminate\Cache\ClassUsesRecursive;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
@@ -1035,7 +1034,7 @@ class Blueprint
                 ->referencesModelColumn($model->getKeyName());
         }
 
-        $modelTraits = ClassUsesRecursive::classUsesRecursive($model);
+        $modelTraits = class_uses_recursive($model);
 
         if (in_array(HasUlids::class, $modelTraits, true)) {
             return $this->foreignUlid($column, 26)
