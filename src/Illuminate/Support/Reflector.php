@@ -11,7 +11,10 @@ use ReflectionUnionType;
 
 class Reflector
 {
-    private static array $classesUsesRecursive = [];
+    /**
+     * @var array<class-string, list<class-string>>
+     */
+    protected static array $classesUsesRecursive = [];
 
     /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
