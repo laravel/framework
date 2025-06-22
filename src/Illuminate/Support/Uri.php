@@ -421,9 +421,9 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     /**
      * Convert the object into something JSON serializable.
      *
-     * @return array
+     * @return string
      */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): string
     {
         return $this->value();
     }
