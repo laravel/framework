@@ -411,20 +411,20 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
-     * Get the string representation of the URI.
-     */
-    public function __toString(): string
-    {
-        return $this->uri->toString();
-    }
-
-    /**
-     * Convert the object into something JSON serializable.
+     * Convert the object into a value that is JSON serializable.
      *
      * @return string
      */
     public function jsonSerialize(): string
     {
         return $this->value();
+    }
+
+    /**
+     * Get the string representation of the URI.
+     */
+    public function __toString(): string
+    {
+        return $this->uri->toString();
     }
 }
