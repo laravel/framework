@@ -1601,3 +1601,58 @@ class SupportTestCountable implements Countable
         return 0;
     }
 }
+
+class ArrayMergeIfTest
+{
+    public function testArrayMergeIfTrue()
+    {
+        $result = array_merge_if(true, [1, 2], [3, 4]);
+        assert($result === [1, 2, 3, 4]);
+
+        $result = array_merge_if(true, ['a' => 1], ['b' => 2]);
+        assert($result === ['a' => 1, 'b' => 2]);
+    }
+
+    public function testArrayMergeIfFalse()
+    {
+        $result = array_merge_if(false, [1, 2], [3, 4]);
+        assert($result === [1, 2]);
+
+        $result = array_merge_if(false, ['a' => 1], ['b' => 2]);
+        assert($result === ['a' => 1]);
+    }
+
+    public function testArrayMergeIfMultipleArrays()
+    {
+        $result = array_merge_if(true, [1], [2], [3], [4]);
+        assert($result === [1, 2, 3, 4]);
+
+        $result = array_merge_if(false, [1], [2], [3], [4]);
+        assert($result === [1]);
+    }
+
+    public function testArrayMergeIfEmptyArrays()
+    {
+        $result = array_merge_if(true);
+        assert($result === []);
+
+        $result = array_merge_if(false);
+        assert($result === []);
+    }
+
+    public function testArrayMergeIfWithCallable()
+    {
+        $user = (object) ['role' => 'admin'];
+
+        $basePermissions = ['read', 'write'];
+        $adminPermissions = ['delete', 'manage'];
+
+        $permissions = array_merge_if(
+            $user->role === 'admin',
+            $basePermissions,
+            $adminPermissions
+        );
+
+        assert($permissions === ['read', 'write', 'delete', 'manage']);
+    }
+}

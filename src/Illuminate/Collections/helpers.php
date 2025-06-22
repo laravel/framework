@@ -257,3 +257,23 @@ if (! function_exists('when')) {
         return value($default, $condition);
     }
 }
+
+
+if (! function_exists('array_merge_if')) {
+    /**
+     * Conditionally merge arrays based on a boolean condition.
+     *
+     * @param  bool  $condition
+     * @param  array  ...$arrays
+     * @return array
+     */
+    function array_merge_if($condition, ...$arrays)
+    {
+        if (! $condition) {
+            return $arrays[0] ?? [];
+        }
+
+        return array_merge(...$arrays);
+    }
+}
+
