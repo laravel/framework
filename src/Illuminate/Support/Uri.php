@@ -11,12 +11,13 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use JsonSerializable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable, Responsable, Stringable
+class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
 {
     use Conditionable, Dumpable, Macroable, Tappable;
 
@@ -415,5 +416,15 @@ class Uri implements Htmlable, Responsable, Stringable
     public function __toString(): string
     {
         return $this->uri->toString();
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return array
+     */
+    public function jsonSerialize(): mixed
+    {
+        return $this->value();
     }
 }
