@@ -419,7 +419,7 @@ class Number
      *
      * @return void
      *
-     * @throws RuntimeException
+     * @throws \RuntimeException
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
