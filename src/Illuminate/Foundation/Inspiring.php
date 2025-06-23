@@ -107,6 +107,7 @@ class Inspiring
             'Always remember that you are absolutely unique. Just like everyone else. - Margaret Mead',
             'You must be the change you wish to see in the world. - Mahatma Gandhi',
             'We must ship. - Taylor Otwell',
+            'Bam Bam Boom. - Nuno Maduro',
         ]);
     }
 
