@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Illuminate\Support\Uri;
 use stdClass;
 
 trait InteractsWithData
@@ -242,6 +243,18 @@ trait InteractsWithData
     public function string($key, $default = null)
     {
         return Str::of($this->data($key, $default));
+    }
+
+    /**
+     * Retrieve data from the instance as a Uri instance.
+     *
+     * @param  string  $key
+     * @param  string  $default
+     * @return \Illuminate\Support\Uri
+     */
+    public function uri($key, $default = '')
+    {
+        return Uri::of($this->data($key, $default));
     }
 
     /**
