@@ -1729,8 +1729,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Transform each item in the collection using a callback.
      *
-     * @param  callable(TValue, TKey): TValue  $callback
-     * @return $this
+     * @template TMapValue
+     *
+     * @param  callable(TValue, TKey): TMapValue  $callback
+     * @return $this<TKey, TMapValue>
      */
     public function transform(callable $callback)
     {
