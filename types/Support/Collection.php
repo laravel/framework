@@ -1049,11 +1049,18 @@ assertType(
 assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1, 1, [new User]));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection->transform(function ($user, $int) {
+assertType('mixed', $collection->transform(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return new User;
+}));
+
+assertType('mixed', $collection->transform(function ($user, $int): int {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return $int * 2;
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User));
