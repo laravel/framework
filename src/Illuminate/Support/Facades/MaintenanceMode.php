@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Foundation\MaintenanceModeManager;
+
 class MaintenanceMode extends Facade
 {
     /**
@@ -11,6 +13,6 @@ class MaintenanceMode extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'maintenance.manager';
+        return MaintenanceModeManager::class;
     }
 }

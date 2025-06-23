@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Grammar;
@@ -282,12 +283,11 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerMaintenanceModeManager()
     {
-        $this->app->singleton('maintenance.manager', function ($app) {
-            return new MaintenanceModeManager($app);
-        });
+        $this->app->singleton(MaintenanceModeManager::class);
 
-        $this->app->bind('maintenance', function ($app) {
-            return $app['maintenance.manager']->driver();
-        });
+        $this->app->bind(
+            MaintenanceModeContract::class,
+            fn () => $this->app->make(MaintenanceModeManager::class)->driver()
+        );
     }
 }
