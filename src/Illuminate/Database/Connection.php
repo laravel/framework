@@ -851,7 +851,7 @@ class Connection implements ConnectionInterface
         $this->event(new QueryExecuted($query, $bindings, $time, $this));
 
         $query = $this->pretending === true
-            ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
+            ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $this->prepareBindings($bindings)) ?? $query
             : $query;
 
         if ($this->loggingQueries) {
