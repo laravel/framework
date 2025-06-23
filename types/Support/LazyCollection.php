@@ -373,6 +373,12 @@ assertType("Illuminate\Support\LazyCollection<int, array{string: int}>", $collec
 assertType("Illuminate\Support\LazyCollection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotInStrict('string', [2]));
 
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
+    ->whereLike('string', '%str%'));
+
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
+    ->whereNotLike('string', '%int%'));
+
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf(User::class));
 

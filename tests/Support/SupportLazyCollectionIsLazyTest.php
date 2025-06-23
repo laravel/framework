@@ -1647,6 +1647,36 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testWhereLikeIsLazy()
+    {
+        $data = $this->make([['name' => 'Taylor Otwell'], ['name' => 'Abigail Otwell'], ['name' => 'Joe Dixon'], ['name' => 'John Doe']]);
+
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereLike('name', '%Otw_ll%');
+        });
+
+
+        $this->assertEnumeratesCollection($data, 3, function ($collection) {
+            $collection->whereLike('name', 'Jo%')->take(1)->all();
+        });
+    }
+
+    public function testWhereNotLikeIsLazy()
+    {
+        $data = $this->make([['name' => 'Taylor Otwell'], ['name' => 'Abigail Otwell'], ['name' => 'Joe Dixon'], ['name' => 'John Doe']]);
+
+
+        $this->assertDoesNotEnumerateCollection($data, function ($collection) {
+            $collection->whereNotLike('name', '%Otw_ll%');
+        });
+
+
+        $this->assertEnumeratesCollection($data, 2, function ($collection) {
+            $collection->whereNotLike('name', '%Taylor%')->take(1)->all();
+        });
+    }
+
     public function testWhereNotNullIsLazy()
     {
         $data = $this->make([['a' => 1], ['a' => null], ['a' => 2], ['a' => 3]]);

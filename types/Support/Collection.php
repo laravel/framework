@@ -477,6 +477,12 @@ assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection
 assertType("Illuminate\Support\Collection<int, array{string: int}>", $collection::make([['string' => 2]])
     ->whereNotInStrict('string', [2]));
 
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
+    ->whereLike('string', '%str%'));
+
+assertType("Illuminate\Support\Collection<int, array{string: string}>", $collection::make([['string' => 'string']])
+    ->whereNotLike('string', '%int%'));
+
 assertType('Illuminate\Support\Collection<int, User>', $collection::make([new User, 1])
     ->whereInstanceOf(User::class));
 
