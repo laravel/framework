@@ -418,6 +418,8 @@ class Number
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected static function ensureIntlExtensionIsInstalled()
     {
