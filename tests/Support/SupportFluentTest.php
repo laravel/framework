@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
@@ -179,6 +180,17 @@ class SupportFluentTest extends TestCase
         $this->assertSame('', $fluent->string('empty_str')->value());
         $this->assertSame('', $fluent->string('null')->value());
         $this->assertSame('', $fluent->string('unknown_key')->value());
+    }
+
+    public function testUriMethod()
+    {
+        $fluent = new Fluent([
+            'uri' => 'https://example.com',
+            'empty_str' => '',
+        ]);
+        $this->assertTrue($fluent->uri('uri') instanceof Uri);
+        $this->assertTrue($fluent->uri('empty_str') instanceof Uri);
+        $this->assertTrue($fluent->uri('unknown_key') instanceof Uri);
     }
 
     public function testBooleanMethod()
