@@ -3262,7 +3262,7 @@ class Builder implements BuilderContract
      * Get the count of the total records for the paginator.
      *
      * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @return int
+     * @return int<0, max>
      */
     public function getCountForPagination($columns = ['*'])
     {
@@ -3551,7 +3551,7 @@ class Builder implements BuilderContract
      * Retrieve the "count" result of the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
-     * @return int
+     * @return int<0, max>
      */
     public function count($columns = '*')
     {
@@ -3753,7 +3753,7 @@ class Builder implements BuilderContract
     /**
      * Insert new records into the database while ignoring errors.
      *
-     * @return int
+     * @return int<0, max>
      */
     public function insertOrIgnore(array $values)
     {
@@ -3835,7 +3835,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @return int
+     * @return int<0, max>
      */
     public function update(array $values)
     {
@@ -3953,7 +3953,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -3971,7 +3971,7 @@ class Builder implements BuilderContract
      *
      * @param  array<string, float|int|numeric-string>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -3995,7 +3995,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -4013,7 +4013,7 @@ class Builder implements BuilderContract
      *
      * @param  array<string, float|int|numeric-string>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
