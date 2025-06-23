@@ -251,6 +251,27 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static string $collectionClass = Collection::class;
 
     /**
+     * Cache of soft deletable models.
+     *
+     * @var array<class-string<self>, bool>
+     */
+    protected static array $isSoftDeletable;
+
+    /**
+     * Cache of prunable models.
+     *
+     * @var array<class-string<self>, bool>
+     */
+    protected static array $isPrunable;
+
+    /**
+     * Cache of mass prunable models.
+     *
+     * @var array<class-string<self>, bool>
+     */
+    protected static array $isMassPrunable;
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -2294,7 +2315,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public static function isSoftDeletable(): bool
     {
-        return in_array(SoftDeletes::class, class_uses_recursive(static::class));
+        return static::$isSoftDeletable[static::class] ??= in_array(SoftDeletes::class, class_uses_recursive(static::class));
     }
 
     /**
@@ -2302,7 +2323,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isPrunable(): bool
     {
-        return in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
+        return self::$isPrunable[static::class] ??= in_array(Prunable::class, class_uses_recursive(static::class)) || static::isMassPrunable();
     }
 
     /**
@@ -2310,7 +2331,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function isMassPrunable(): bool
     {
-        return in_array(MassPrunable::class, class_uses_recursive(static::class));
+        return self::$isMassPrunable[static::class] ??= in_array(MassPrunable::class, class_uses_recursive(static::class));
     }
 
     /**
