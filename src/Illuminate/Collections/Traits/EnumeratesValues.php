@@ -743,7 +743,7 @@ trait EnumeratesValues
     }
 
     /**
-     * Filter items such that the given string matches the value of the given key using SQL LIKE pattern matching
+     * Filter items such that the given string matches the value of the given key using SQL LIKE pattern matching.
      *
      * @param  string  $key
      * @param  string  $pattern
@@ -754,17 +754,15 @@ trait EnumeratesValues
     {
         $regex = $this->parseSqlLikeRegex($pattern, $caseSensitive);
 
-
         return $this->filter(function ($item) use ($key, $regex) {
             $value = data_get($item, $key);
-
 
             return is_string($value) && preg_match($regex, $value);
         });
     }
 
     /**
-     * Filter items such that the given string does not match the value of the given key using SQL LIKE pattern matching
+     * Filter items such that the given string does not match the value of the given key using SQL LIKE pattern matching.
      *
      * @param  string  $key
      * @param  string  $pattern
@@ -775,10 +773,8 @@ trait EnumeratesValues
     {
         $regex = $this->parseSqlLikeRegex($pattern, $caseSensitive);
 
-
         return $this->reject(function ($item) use ($key, $regex) {
             $value = data_get($item, $key);
-
 
             return is_string($value) && preg_match($regex, $value);
         });
@@ -1227,24 +1223,22 @@ trait EnumeratesValues
      * @param  bool  $caseSensitive
      * @return string
      */
-    protected function parseSqlLikeRegex($pattern, $caseSensitive) {
+    protected function parseSqlLikeRegex($pattern, $caseSensitive)
+    {
         $pattern = preg_quote($pattern, '/');
 
-
-        $pattern = preg_replace_callback("/\\\\[%_]|(?<!\\\\)[%_]/", function ($matches) {
+        $pattern = preg_replace_callback('/\\\\[%_]|(?<!\\\\)[%_]/', function ($matches) {
             return match ($matches[0]) {
-                "\%" => "%",
-                "\_" => "_",
-                "%" => ".*",
-                "_" => ".",
+                "\%" => '%',
+                "\_" => '_',
+                '%' => '.*',
+                '_' => '.',
                 default => $matches[0]
             };
         }, $pattern);
 
-
-        $regex = "/^" . $pattern . '$/' . ($caseSensitive ? "" : 'i');
+        $regex = '/^'.$pattern.'$/'.($caseSensitive ? '' : 'i');
 
         return $regex;
-
     }
 }

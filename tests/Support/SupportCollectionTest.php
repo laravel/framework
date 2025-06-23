@@ -1122,16 +1122,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['email' => 'test@example.org']], $c->whereLike('email', '%@ex__ple.o_g%')->values()->all());
         $this->assertEquals([['email' => 'test@example.net']], $c->whereLike('email', 'test@example.net')->values()->all());
 
-
         $c = new $collection([['name' => 'Taylor Otwell'], ['name' => 'taylor otWeLl']]);
         $this->assertEquals([['name' => 'Taylor Otwell'], ['name' => 'taylor otWeLl']], $c->whereLike('name', '%otwell%', false)->values()->all());
         $this->assertEquals([['name' => 'taylor otWeLl']], $c->whereLike('name', '%taylor%', true)->values()->all());
 
-
         $c = new $collection([['name' => 'Taylor Otwell', 'contact' => ['email' => 'test@example.com']], ['name' => 'Abigail Otwell', 'contact' => ['email' => 'test_1@example.org']], ['name' => 'Joe Dixon', 'contact' => ['email' => 'test@example.net']]]);
         $this->assertEquals([['name' => 'Taylor Otwell', 'contact' => ['email' => 'test@example.com']]], $c->whereLike('contact.email', 'test@%.co_')->values()->all());
         $this->assertEquals([['name' => 'Abigail Otwell', 'contact' => ['email' => 'test_1@example.org']]], $c->whereLike('contact.email', 'test\_1@ex_mple.%')->values()->all());
-
 
         $c = new $collection([['percent' => '99%'], ['percent' => '70.70%'], ['percent' => '59%']]);
         $this->assertEquals([['percent' => '99%']], $c->whereLike('percent', '99\%')->values()->all());
@@ -1147,16 +1144,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['email' => 'test@example.com'], ['email' => 'test@example.net']], $c->whereNotLike('email', '%@ex__ple.o_g%')->values()->all());
         $this->assertEquals([['email' => 'test@example.com'], ['email' => 'test@example.org']], $c->whereNotLike('email', 'test@example.net')->values()->all());
 
-
         $c = new $collection([['name' => 'Taylor Otwell'], ['name' => 'taylor otWeLl']]);
         $this->assertEquals([], $c->whereNotLike('name', '%otwell%', false)->values()->all());
         $this->assertEquals([['name' => 'Taylor Otwell']], $c->whereNotLike('name', '%taylor%', true)->values()->all());
 
-
         $c = new $collection([['name' => 'Taylor Otwell', 'contact' => ['email' => 'test@example.com']], ['name' => 'Abigail Otwell', 'contact' => ['email' => 'test_1@example.org']], ['name' => 'Joe Dixon', 'contact' => ['email' => 'test@example.net']]]);
         $this->assertEquals([['name' => 'Abigail Otwell', 'contact' => ['email' => 'test_1@example.org']], ['name' => 'Joe Dixon', 'contact' => ['email' => 'test@example.net']]], $c->whereNotLike('contact.email', 'test@%.co_')->values()->all());
         $this->assertEquals([['name' => 'Taylor Otwell', 'contact' => ['email' => 'test@example.com']], ['name' => 'Joe Dixon', 'contact' => ['email' => 'test@example.net']]], $c->whereNotLike('contact.email', 'test\_1@ex_mple.%')->values()->all());
-
 
         $c = new $collection([['percent' => '99%'], ['percent' => '70.70%'], ['percent' => '59%']]);
         $this->assertEquals([['percent' => '70.70%'], ['percent' => '59%']], $c->whereNotLike('percent', '99\%')->values()->all());

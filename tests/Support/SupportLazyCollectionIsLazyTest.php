@@ -1651,11 +1651,9 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $data = $this->make([['name' => 'Taylor Otwell'], ['name' => 'Abigail Otwell'], ['name' => 'Joe Dixon'], ['name' => 'John Doe']]);
 
-
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {
             $collection->whereLike('name', '%Otw_ll%');
         });
-
 
         $this->assertEnumeratesCollection($data, 3, function ($collection) {
             $collection->whereLike('name', 'Jo%')->take(1)->all();
@@ -1666,11 +1664,9 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $data = $this->make([['name' => 'Taylor Otwell'], ['name' => 'Abigail Otwell'], ['name' => 'Joe Dixon'], ['name' => 'John Doe']]);
 
-
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {
             $collection->whereNotLike('name', '%Otw_ll%');
         });
-
 
         $this->assertEnumeratesCollection($data, 2, function ($collection) {
             $collection->whereNotLike('name', '%Taylor%')->take(1)->all();
