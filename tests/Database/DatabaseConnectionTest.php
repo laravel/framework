@@ -509,18 +509,20 @@ class DatabaseConnectionTest extends TestCase
 
     public function testPretendProducesSqlWithSubstitutedBindings()
     {
-        $connection = $this->getMockConnection();
         $args = [1, 1.1, true, 'a', new DateTime('2025-01-01'), null];
         $query = implode(' ', array_fill(0, count($args), '?'));
         $expected = "1 1.1 1 'a' '2025-01-01 00:00:00' null";
 
+        $connection = $this->getMockConnection();
         $queryGrammar = $this->createMock(Grammar::class);
         $queryGrammar->expects($this->once())
             ->method('substituteBindingsIntoRawSql')
-            ->with($query, $connection->prepareBindings($args))
+            ->with($query, [1, 1.1, 1, 'a', '2025-01-01 00:00:00', null])
             ->willReturn($expected);
+        $queryGrammar->expects($this->once())
+            ->method('getDateFormat')
+            ->willReturn('Y-m-d H:i:s');
         $connection->setQueryGrammar($queryGrammar);
-
         $queries = $connection->pretend(fn () => $connection->select($query, $args));
 
         $this->assertSame($expected, $queries[0]['query']);
