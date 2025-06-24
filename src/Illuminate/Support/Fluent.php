@@ -111,6 +111,18 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
+     * Retrieve data from the instance as a Uri instance.
+     *
+     * @param  string  $key
+     * @param  string  $default
+     * @return \Illuminate\Support\Uri
+     */
+    public function uri($key, $default = '')
+    {
+        return Uri::of($this->data($key, $default));
+    }
+
+    /**
      * Get the value of the given key as a new Fluent instance.
      *
      * @param  string  $key

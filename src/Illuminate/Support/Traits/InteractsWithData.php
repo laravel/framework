@@ -246,18 +246,6 @@ trait InteractsWithData
     }
 
     /**
-     * Retrieve data from the instance as a Uri instance.
-     *
-     * @param  string  $key
-     * @param  string  $default
-     * @return \Illuminate\Support\Uri
-     */
-    public function uri($key, $default = '')
-    {
-        return Uri::of($this->data($key, $default));
-    }
-
-    /**
      * Retrieve data as a boolean value.
      *
      * Returns true when value is "1", "true", "on", and "yes". Otherwise, returns false.
