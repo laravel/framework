@@ -162,9 +162,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $values->first();
         }
 
-        $index    = $p * ($count - 1);
-        $lower    = (int) floor($index);
-        $upper    = (int) ceil($index);
+        $index = $p * ($count - 1);
+        $lower = (int) floor($index);
+        $upper = (int) ceil($index);
         $fraction = $index - $lower;
 
         return $lower === $upper

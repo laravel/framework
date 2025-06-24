@@ -4763,7 +4763,7 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testPercentileOnLargerDataSetMatchesMedian($collection)
     {
-        $data = new $collection(range(1, 101)); 
+        $data = new $collection(range(1, 101));
 
         $this->assertSame(51, $data->percentile(0.5));
     }
