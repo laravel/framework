@@ -1059,7 +1059,7 @@ class Arr
     /**
      * Conditionally compile classes from an array into a CSS class list.
      *
-     * @param  array  $array
+     * @param  array|string  $array
      * @return string
      */
     public static function toCssClasses($array)
@@ -1082,7 +1082,7 @@ class Arr
     /**
      * Conditionally compile styles from an array into a style list.
      *
-     * @param  array  $array
+     * @param  array|string  $array
      * @return string
      */
     public static function toCssStyles($array)
