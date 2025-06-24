@@ -133,6 +133,48 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the value at a given percentile.
+     *
+     * @param  float  $p  A number between 0 (exclusive) and 1 (inclusive).
+     * @param  string|array<array-key, string>|null  $key
+     * @return float|int|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function percentile(float $p, $key = null)
+    {
+        if ($p <= 0 || $p > 1) {
+            throw new InvalidArgumentException('Percentile must be greater than 0 and at most 1.');
+        }
+
+        $values = (isset($key) ? $this->pluck($key) : $this)
+            ->reject(fn ($v) => is_null($v))
+            ->sort()
+            ->values();
+
+        $count = $values->count();
+
+        if ($count === 0) {
+            return;
+        }
+
+        if ($count === 1) {
+            return $values->first();
+        }
+
+        $index    = $p * ($count - 1);
+        $lower    = (int) floor($index);
+        $upper    = (int) ceil($index);
+        $fraction = $index - $lower;
+
+        return $lower === $upper
+            ? $values->get($lower)
+            : $values->get($lower) + $fraction * ($values->get($upper) - $values->get($lower));
+    }
+
+
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return static<int, mixed>

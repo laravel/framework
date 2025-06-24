@@ -110,6 +110,17 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function mode($key = null);
 
     /**
+     * Get the value at a given percentile.
+     *
+     * @param  float  $p  A number between 0 (exclusive) and 1 (inclusive).
+     * @param  string|array<array-key, string>|null  $key
+     * @return float|int|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function percentile(float $p, $key = null);
+
+    /**
      * Collapse the items into a single enumerable.
      *
      * @return static<int, mixed>

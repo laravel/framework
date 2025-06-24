@@ -181,6 +181,20 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Get the value at a given percentile.
+     *
+     * @param  float  $p  A number between 0 (exclusive) and 1 (inclusive).
+     * @param  string|array<array-key, string>|null  $key
+     * @return float|int|null
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function percentile(float $p, $key = null)
+    {
+        return $this->collect()->percentile($p, $key);
+    }
+
+    /**
      * Collapse the collection of items into a single array.
      *
      * @return static<int, mixed>

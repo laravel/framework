@@ -4751,6 +4751,63 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testPercentileLinearInterpolation($collection)
+    {
+        $data = new $collection([1, 2, 3, 4]);
+
+        $this->assertEquals(1.75, $data->percentile(0.25));
+        $this->assertEquals(2.5, $data->percentile(0.5));
+        $this->assertEquals(3.25, $data->percentile(0.75));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileOnLargerDataSetMatchesMedian($collection)
+    {
+        $data = new $collection(range(1, 101)); 
+
+        $this->assertSame(51, $data->percentile(0.5));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileWithKeyExtraction($collection)
+    {
+        $data = new $collection([
+            ['score' => 10],
+            ['score' => 20],
+            ['score' => 30],
+            ['score' => 40],
+        ]);
+
+        $this->assertEquals(25, $data->percentile(0.5, 'score'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileReturnsNullForEmptyCollection($collection)
+    {
+        $this->assertNull((new $collection)->percentile(0.75));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileReturnsTheOnlyElementForSingletonCollection($collection)
+    {
+        $this->assertSame(42, (new $collection([42]))->percentile(0.1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileThrowsExceptionWhenPIsOutOfRange($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        (new $collection([1, 2, 3]))->percentile(1.5);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testPercentileThrowsExceptionWhenPIsZeroOrNegative($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        (new $collection([1, 2, 3]))->percentile(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testSliceOffset($collection)
     {
         $data = new $collection([1, 2, 3, 4, 5, 6, 7, 8]);
