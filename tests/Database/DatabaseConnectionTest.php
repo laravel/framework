@@ -15,6 +15,7 @@ use Illuminate\Database\Events\TransactionRolledBack;
 use Illuminate\Database\MultipleColumnsSelectedException;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Builder;
@@ -511,9 +512,18 @@ class DatabaseConnectionTest extends TestCase
         $connection = $this->getMockConnection();
         $args = [1, 1.1, true, 'a', new DateTime('2025-01-01'), null];
         $query = implode(' ', array_fill(0, count($args), '?'));
+        $expected = "1 1.1 1 'a' '2025-01-01 00:00:00' null";
+
+        $queryGrammar = $this->createMock(Grammar::class);
+        $queryGrammar->expects($this->once())
+            ->method('substituteBindingsIntoRawSql')
+            ->with($query, $connection->prepareBindings($args))
+            ->willReturn($expected);
+        $connection->setQueryGrammar($queryGrammar);
+
         $queries = $connection->pretend(fn () => $connection->select($query, $args));
 
-        $this->assertSame("1 1.1 1 'a' '2025-01-01 00:00:00' null", $queries[0]['query']);
+        $this->assertSame($expected, $queries[0]['query']);
         $this->assertEquals($args, $queries[0]['bindings']);
     }
 
