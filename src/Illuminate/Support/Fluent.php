@@ -111,7 +111,7 @@ class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
     }
 
     /**
-     * Retrieve data from the instance as a Uri instance.
+     * Get the value of the given key as a Uri instance.
      *
      * @param  string  $key
      * @param  string  $default
