@@ -172,8 +172,6 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             : $values->get($lower) + $fraction * ($values->get($upper) - $values->get($lower));
     }
 
-
-
     /**
      * Collapse the collection of items into a single array.
      *
