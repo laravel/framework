@@ -40,7 +40,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
         $token = hash_hmac('sha256', Str::random(40), $this->hashKey);
 
         $this->cache->put(
-            $this->makeCacheKey($user),
+            $this->cacheKey($user),
             [$this->hasher->make($token), Carbon::now()->format($this->format)],
             $this->expires,
         );
@@ -57,7 +57,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token)
     {
-        [$record, $createdAt] = $this->cache->get($this->makeCacheKey($user));
+        [$record, $createdAt] = $this->cache->get($this->cacheKey($user));
 
         return $record
             && ! $this->tokenExpired($createdAt)
@@ -83,7 +83,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
     {
-        [$record, $createdAt] = $this->cache->get($this->makeCacheKey($user));
+        [$record, $createdAt] = $this->cache->get($this->cacheKey($user));
 
         return $record && $this->tokenRecentlyCreated($createdAt);
     }
@@ -113,7 +113,7 @@ class CacheTokenRepository implements TokenRepositoryInterface
      */
     public function delete(CanResetPasswordContract $user)
     {
-        $this->cache->forget($this->makeCacheKey($user));
+        $this->cache->forget($this->cacheKey($user));
     }
 
     /**
@@ -126,12 +126,12 @@ class CacheTokenRepository implements TokenRepositoryInterface
     }
 
     /**
-     * Determine the cache key to use.
+     * Determine the cache key for the given user.
      *
      * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return string
      */
-    public function makeCacheKey(CanResetPasswordContract $user): string
+    public function cacheKey(CanResetPasswordContract $user): string
     {
         return hash('sha256', $user->getEmailForPasswordReset());
     }
