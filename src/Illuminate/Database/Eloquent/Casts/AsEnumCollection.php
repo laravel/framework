@@ -69,7 +69,7 @@ class AsEnumCollection implements Castable
                 })->toArray();
             }
 
-            protected function getStorableEnumValue($value)
+            protected function getStorableEnumValue($enum)
             {
                 if (is_string($enum) || is_int($enum)) {
                     $enumClass = $this->arguments[0];
