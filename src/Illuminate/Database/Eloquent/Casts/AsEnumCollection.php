@@ -71,10 +71,12 @@ class AsEnumCollection implements Castable
 
             protected function getStorableEnumValue($value)
             {
-                $enumClass = $this->arguments[0];
-                $enum = is_subclass_of($enumClass, BackedEnum::class)
-                    ? $enumClass::from($value)
-                    : constant($enumClass.'::'.$value);
+                if (is_string($enum) || is_int($enum)) {
+                    $enumClass = $this->arguments[0];
+                    $enum = is_subclass_of($enumClass, BackedEnum::class)
+                        ? $enumClass::from($enum)
+                        : constant($enumClass.'::'.$enum);
+                }
 
                 return enum_value($enum);
             }
