@@ -1436,7 +1436,7 @@ trait HasAttributes
      *
      * @return \Illuminate\Contracts\Encryption\Encrypter
      */
-    protected static function currentEncrypter()
+    public static function currentEncrypter()
     {
         return static::$encrypter ?? Crypt::getFacadeRoot();
     }
