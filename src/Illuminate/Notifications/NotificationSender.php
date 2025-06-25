@@ -146,6 +146,8 @@ class NotificationSender
      * @param  mixed  $notification
      * @param  string  $channel
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {

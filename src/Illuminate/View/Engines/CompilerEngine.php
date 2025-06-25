@@ -54,6 +54,8 @@ class CompilerEngine extends PhpEngine
      * @param  string  $path
      * @param  array  $data
      * @return string
+     *
+     * @throws ViewException
      */
     public function get($path, array $data = [])
     {
