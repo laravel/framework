@@ -390,6 +390,44 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testDefaultUsingCuidMorph()
+    {
+        Builder::defaultMorphKeyType('cuid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->morphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) not null',
+            'alter table `comments` add `commentable_id` char(32) not null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDefaultUsingNullableCuidMorph()
+    {
+        Builder::defaultMorphKeyType('cuid');
+
+        $base = new Blueprint('comments', function ($table) {
+            $table->nullableMorphs('commentable');
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `comments` add `commentable_type` varchar(255) null',
+            'alter table `comments` add `commentable_id` char(32) null',
+            'alter table `comments` add index `comments_commentable_type_commentable_id_index`(`commentable_type`, `commentable_id`)',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testGenerateRelationshipColumnWithIncrementalModel()
     {
         $base = new Blueprint('posts', function ($table) {
@@ -432,6 +470,27 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals([
             'alter table `posts` add `model_using_uuid_id` char(36) not null',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testGenerateRelationshipColumnWithCuidModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->foreignIdFor(Fixtures\Models\EloquentModelUsingCuid::class);
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table "posts" add column "model_using_cuid_id" char(32) not null',
+        ], $blueprint->toSql($connection, new PostgresGrammar));
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` add `model_using_cuid_id` char(32) not null',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
@@ -534,6 +593,21 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 
+    public function testDropRelationshipColumnWithCuidModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropForeignIdFor(Fixtures\Models\EloquentModelUsingCuid::class);
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_model_using_cuid_id_foreign`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
     public function testDropConstrainedRelationshipColumnWithUuidModel()
     {
         $base = new Blueprint('posts', function ($table) {
@@ -547,6 +621,22 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals([
             'alter table `posts` drop foreign key `posts_model_using_uuid_id_foreign`',
             'alter table `posts` drop `model_using_uuid_id`',
+        ], $blueprint->toSql($connection, new MySqlGrammar));
+    }
+
+    public function testDropConstrainedRelationshipColumnWithCuidModel()
+    {
+        $base = new Blueprint('posts', function ($table) {
+            $table->dropConstrainedForeignIdFor(Fixtures\Models\EloquentModelUsingCuid::class);
+        });
+
+        $connection = m::mock(Connection::class);
+
+        $blueprint = clone $base;
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_model_using_cuid_id_foreign`',
+            'alter table `posts` drop `model_using_cuid_id`',
         ], $blueprint->toSql($connection, new MySqlGrammar));
     }
 

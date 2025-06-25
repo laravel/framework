@@ -18,6 +18,7 @@
         "php": "^8.2",
         "ext-ctype": "*",
         "ext-filter": "*",
+        "ext-gmp": "*",
         "ext-hash": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
@@ -57,6 +58,7 @@
         "symfony/uid": "^7.0.3",
         "symfony/var-dumper": "^7.0.3",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5",
+        "visus/cuid2": "^5.0.0",
         "vlucas/phpdotenv": "^5.6.1",
         "voku/portable-ascii": "^2.0.2"
     },
@@ -98,7 +100,6 @@
         "spatie/once": "*"
     },
     "require-dev": {
-        "ext-gmp": "*",
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.322.9",
         "fakerphp/faker": "^1.24",
