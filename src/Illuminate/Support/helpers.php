@@ -451,13 +451,7 @@ if (! function_exists('trait_uses_recursive')) {
      */
     function trait_uses_recursive($trait)
     {
-        $traits = class_uses($trait) ?: [];
-
-        foreach ($traits as $trait) {
-            $traits += trait_uses_recursive($trait);
-        }
-
-        return $traits;
+        return \Illuminate\Support\Reflector::traitUsesRecursive($trait);
     }
 }
 

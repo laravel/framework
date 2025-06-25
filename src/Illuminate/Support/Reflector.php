@@ -17,6 +17,11 @@ class Reflector
     protected static array $classesUsesRecursive = [];
 
     /**
+     * @var array<class-string, array<int, class-string>>
+     */
+    protected static array $traitsUsesRecursive = [];
+
+    /**
      * Returns all traits used by a class, its parent classes and trait of their traits.
      *
      * @return array<int, class-string>
@@ -38,6 +43,26 @@ class Reflector
         }
 
         return self::$classesUsesRecursive[$class];
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @return array<int, class-string>
+     */
+    public static function traitUsesRecursive(object|string $trait): array
+    {
+        if (! isset(self::$traitsUsesRecursive[$trait])) {
+            $traits = class_uses($trait) ?: [];
+
+            foreach ($traits as $trait) {
+                $traits += trait_uses_recursive($trait);
+            }
+
+            self::$traitsUsesRecursive[$trait] = $traits;
+        }
+
+        return self::$traitsUsesRecursive[$trait];
     }
 
     /**
