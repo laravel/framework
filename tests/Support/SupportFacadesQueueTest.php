@@ -19,7 +19,7 @@ class SupportFacadesQueueTest extends TestCase
     {
         parent::setUp();
 
-        $this->queueManager = m::mock(\Illuminate\Contracts\Queue\Factory::class);
+        $this->queueManager = m::mock(Factory::class);
 
         $container = new Container;
         $container->instance('queue', $this->queueManager);

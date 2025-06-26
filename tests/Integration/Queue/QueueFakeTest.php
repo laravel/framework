@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Orchestra\Testbench\TestCase;
 
 class QueueFakeTest extends TestCase
@@ -31,7 +32,7 @@ class QueueFakeTest extends TestCase
     {
         $fake = Queue::fakeExcept([TestJob::class]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Testing\Fakes\QueueFake::class, $fake);
+        $this->assertInstanceOf(QueueFake::class, $fake);
     }
 
     public function testFakeForReturnValue()
