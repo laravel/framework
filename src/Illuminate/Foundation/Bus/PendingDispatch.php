@@ -7,10 +7,12 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
 
 class PendingDispatch
 {
+    use InteractsWithQueueAndConnection;
     use InteractsWithUniqueJobs;
 
     /**
@@ -190,6 +192,36 @@ class PendingDispatch
     }
 
     /**
+     * Set the job's queue and connection values based on the job's OnQueue/OnConnection attributes.
+     *
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    protected function setQueueAndConnectionFromAttributesIfNotSet(): void
+    {
+        $hasQueueSet = isset($this->job->queue);
+        $hasConnectionSet = isset($this->job->connection);
+
+        if ($hasQueueSet && $hasConnectionSet) {
+            return;
+        }
+
+        $reflectionClass = new \ReflectionClass($this->job);
+        if (! $hasQueueSet) {
+            if ($queue = $this->getQueueFromOnQueueAttribute($reflectionClass)) {
+                $this->onQueue($queue);
+            }
+        }
+
+        if (! $hasConnectionSet) {
+            if ($connection = $this->getConnectionFromOnConnectionAttribute($reflectionClass)) {
+                $this->onConnection($connection);
+            }
+        }
+    }
+
+    /**
      * Dynamically proxy methods to the underlying job.
      *
      * @param  string  $method
@@ -211,6 +243,7 @@ class PendingDispatch
     public function __destruct()
     {
         $this->addUniqueJobInformationToContext($this->job);
+        $this->setQueueAndConnectionFromAttributesIfNotSet();
 
         if (! $this->shouldDispatch()) {
             $this->removeUniqueJobInformationFromContext($this->job);

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Foundation\Queue\InteractsWithQueueAndConnection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -21,9 +22,11 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
 
+use function Illuminate\Support\enum_value;
+
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReflectsClosures;
+    use InteractsWithQueueAndConnection, Macroable, ReflectsClosures;
 
     /**
      * The IoC container instance.
@@ -618,13 +621,21 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
+        /**
+         * We determine connection and queue based on the ways the user may specify it for the listener,
+         * stopping once we find the first value set. In order of precedence: via* methods,
+         * property, and finally On* attributes.
+         */
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
-            : $listener->connection ?? null);
+            : $listener->connection
+            ?? enum_value($this->getConnectionFromOnConnectionAttribute($listenerReflectionClass = new ReflectionClass($listener)))
+        );
 
         $queue = method_exists($listener, 'viaQueue')
             ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
-            : $listener->queue ?? null;
+            : $listener->queue
+            ?? enum_value($this->getQueueFromOnQueueAttribute($listenerReflectionClass ?? new ReflectionClass($listener)));
 
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
