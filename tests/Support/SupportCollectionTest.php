@@ -343,7 +343,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(new Collection(['baz', 'bar', 'foo']), (new Collection(['foo', 'bar', 'baz']))->pop(6));
     }
 
-     public function testPopReturnsEmptyCollectionWhenCountIsZero()
+    public function testPopReturnsEmptyCollectionWhenCountIsZero()
     {
         $c = new Collection(['foo', 'bar', 'baz']);
 

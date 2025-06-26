@@ -993,7 +993,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $count
      * @return static<int, TValue>|TValue|null
-     * 
+     *
      * @throws \InvalidArgumentException
      */
     public function pop($count = 1)
