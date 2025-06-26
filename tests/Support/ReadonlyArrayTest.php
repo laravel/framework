@@ -2,14 +2,15 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Support\ToReadonlyArray;
 use Illuminate\Support\Traits\CastsToReadonlyArray;
+use PHPUnit\Framework\TestCase;
 
 class ReadonlyArrayTest extends TestCase
 {
     public function testToReadonlyArray()
     {
+
         $dto = new class() implements ToReadonlyArray {
             use CastsToReadonlyArray;
 
