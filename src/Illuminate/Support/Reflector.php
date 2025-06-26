@@ -73,6 +73,7 @@ class Reflector
     public static function flushState(): void
     {
         static::$classesUsesRecursive = [];
+        static::$traitsUsesRecursive = [];
     }
 
     /**
