@@ -66,11 +66,11 @@ class Reflector
     }
 
     /**
-     * Flush the component's cached state..
+     * Flush the component's cached state.
      *
      * @return void
      */
-    public static function flushState()
+    public static function flushState(): void
     {
         static::$classesUsesRecursive = [];
     }
