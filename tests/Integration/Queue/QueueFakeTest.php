@@ -9,6 +9,11 @@ use Orchestra\Testbench\TestCase;
 
 class QueueFakeTest extends TestCase
 {
+    protected function defineEnvironment($app)
+    {
+        $app['config']->set('queue.default', 'sync');
+    }
+
     public function testFakeFor()
     {
         Queue::fakeFor(function () {
