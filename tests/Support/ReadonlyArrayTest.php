@@ -10,7 +10,6 @@ class ReadonlyArrayTest extends TestCase
 {
     public function testToReadonlyArray()
     {
-
         $dto = new class() implements ToReadonlyArray
         {
             use CastsToReadonlyArray;
