@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Support;
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Support\ToReadonlyArray;
 use Illuminate\Support\Traits\CastsToReadonlyArray;
-use PHPUnit\Framework\TestCase;
 
 class ReadonlyArrayTest extends TestCase
 {
-    public function test_can_convert_to_readonly_array(): void
+    public function testToReadonlyArray()
     {
-        $dto = new class implements ToReadonlyArray
-        {
+        $dto = new class() implements ToReadonlyArray {
             use CastsToReadonlyArray;
 
             public function __construct(
                 public readonly string $name = 'Zoran',
-                public readonly int $age = 33,
-            ) {}
+                public readonly int $age = 33
+            ) {
+            }
         };
 
         $this->assertEquals([
