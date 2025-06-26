@@ -35,6 +35,7 @@ class SupportFacadesQueueTest extends TestCase
 
         m::close();
     }
+
     public function testFakeFor()
     {
         Queue::fakeFor(function () {
@@ -56,6 +57,7 @@ class SupportFacadesQueueTest extends TestCase
 
         $this->assertSame($this->queueManager, Queue::getFacadeRoot());
     }
+
     public function testFakeExcept()
     {
         $fake = Queue::fakeExcept(QueueJobStub::class);
