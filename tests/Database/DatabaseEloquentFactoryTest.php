@@ -831,6 +831,14 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertNull($post->user_id);
     }
 
+    public function test_can_default_to_without_parents()
+    {
+        FactoryTestPostFactory::$defaultExpandRelationships = false;
+
+        $post = FactoryTestPostFactory::new()->make();
+        $this->assertNull($post->user_id);
+    }
+
     public function test_factory_model_names_correct()
     {
         $this->assertEquals(FactoryTestUseFactoryAttribute::factory()->modelName(), FactoryTestUseFactoryAttribute::class);
