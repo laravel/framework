@@ -87,6 +87,10 @@ trait InteractsWithPivotTable
             'attached' => [], 'detached' => [], 'updated' => [],
         ];
 
+        if (empty($ids) && ! $detaching) {
+            return $changes;
+        }
+
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
