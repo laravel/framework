@@ -962,6 +962,7 @@ abstract class Factory
         static::$modelNameResolvers = [];
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
+        static::$defaultExpandRelationships = true;
     }
 
     /**
