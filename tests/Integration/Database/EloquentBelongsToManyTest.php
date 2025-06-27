@@ -909,6 +909,25 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         );
     }
 
+    public function testSyncMethodWithEmptyArrayDoesNotQueryWhenDetachingDisabled()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::enableQueryLog();
+
+        $result = $post->tags()->sync([], false);
+
+        $queries = DB::getQueryLog();
+
+        $this->assertEquals([
+            'attached' => [],
+            'detached' => [],
+            'updated' => [],
+        ], $result);
+
+        $this->assertCount(0, $queries);
+    }
+
     public function testToggleMethod()
     {
         $post = Post::create(['title' => Str::random()]);
