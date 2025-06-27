@@ -661,7 +661,7 @@ class Repository
     }
 
     /**
-     * Add a context value if it does not exist yet, and returns the value.
+     * Add a context value if it does not exist yet, and return the value.
      *
      * @param  string  $key
      * @param  Closure  $value
@@ -679,7 +679,7 @@ class Repository
     }
 
     /**
-     * Add a hidden context value if it does not exist yet, and returns the value.
+     * Add a hidden context value if it does not exist yet, and return the value.
      *
      * @param  string  $key
      * @param  Closure  $value
