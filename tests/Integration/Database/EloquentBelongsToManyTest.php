@@ -926,6 +926,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         }
 
         $this->assertEmpty(DB::getQueryLog());
+
+        DB::disableQueryLog();
     }
 
     public function testToggleMethod()
