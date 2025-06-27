@@ -87,7 +87,9 @@ trait InteractsWithPivotTable
             'attached' => [], 'detached' => [], 'updated' => [],
         ];
 
-        if (empty($ids) && ! $detaching) {
+        $records = $this->formatRecordsList($this->parseIds($ids));
+
+        if (empty($records) && ! $detaching) {
             return $changes;
         }
 
@@ -96,8 +98,6 @@ trait InteractsWithPivotTable
         // if they exist in the array of current ones, and if not we will insert.
         $current = $this->getCurrentlyAttachedPivots()
             ->pluck($this->relatedPivotKey)->all();
-
-        $records = $this->formatRecordsList($this->parseIds($ids));
 
         // Next, we will take the differences of the currents and given IDs and detach
         // all of the entities that exist in the "current" array but are not in the
