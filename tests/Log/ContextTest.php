@@ -662,6 +662,36 @@ class ContextTest extends TestCase
         Context::decrement('foo', 2);
         $this->assertSame(0, Context::get('foo'));
     }
+
+    public function test_it_remembers_a_value()
+    {
+        $closureRunCount = 0;
+        $closure = function () use (&$closureRunCount) {
+            $closureRunCount++;
+            return 'bar';
+        };
+
+        $this->assertSame('bar', Context::remember('foo', $closure));
+        $this->assertSame('bar', Context::get('foo'));
+
+        Context::remember('foo', $closure);
+        $this->assertSame(1, $closureRunCount);
+    }
+
+    public function test_it_remembers_a_hidden_value()
+    {
+        $closureRunCount = 0;
+        $closure = function () use (&$closureRunCount) {
+            $closureRunCount++;
+            return 'bar';
+        };
+
+        $this->assertSame('bar', Context::rememberHidden('foo', $closure));
+        $this->assertSame('bar', Context::getHidden('foo'));
+
+        Context::rememberHidden('foo', $closure);
+        $this->assertSame(1, $closureRunCount);
+    }
 }
 
 enum Suit

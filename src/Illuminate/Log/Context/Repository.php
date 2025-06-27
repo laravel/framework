@@ -659,4 +659,40 @@ class Repository
 
         return $this;
     }
+
+    /**
+     * Add a context value if it does not exist yet, and returns the value.
+     *
+     * @param  string  $key
+     * @param  Closure  $value
+     * @return mixed $value
+     */
+    public function remember($key, Closure $value)
+    {
+        if ($this->has($key)) {
+            return $this->get($key);
+        }
+
+        return tap($value(), function ($value) use ($key) {
+            $this->add($key, $value);
+        });
+    }
+
+    /**
+     * Add a hidden context value if it does not exist yet, and returns the value.
+     *
+     * @param  string  $key
+     * @param  Closure  $value
+     * @return mixed $value
+     */
+    public function rememberHidden($key, Closure $value)
+    {
+        if ($this->hasHidden($key)) {
+            return $this->getHidden($key);
+        }
+
+        return tap($value(), function ($value) use ($key) {
+            $this->addHidden($key, $value);
+        });
+    }
 }
