@@ -616,6 +616,45 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql('Postgres'));
     }
 
+    public function testColumnDefault()
+    {
+        // Test a normal string literal column default.
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tinyText('note')->default('this will work');
+            })->toSql();
+        };
+
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+
+        // Test a string literal column default containing an apostrophe (#56124)
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tinyText('note')->default('this\'ll work too');
+            })->toSql();
+        };
+
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+
+        // Test a backed enumeration column default
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $enum = ApostropheBackedEnum::ValueWithoutApostrophe;
+                $table->tinyText('note')->default($enum);
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+
+        // Test a backed enumeration column default containing an apostrophe (#56124)
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $enum = ApostropheBackedEnum::ValueWithApostrophe;
+                $table->tinyText('note')->default($enum);
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+    }
+
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
         $connection = m::mock(Connection::class)
@@ -651,4 +690,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         return new Blueprint($connection, $table, $callback);
     }
+}
+
+enum ApostropheBackedEnum: string
+{
+    case ValueWithoutApostrophe = 'this will work';
+    case ValueWithApostrophe = 'this\'ll work too';
 }
