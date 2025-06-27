@@ -668,6 +668,7 @@ class ContextTest extends TestCase
         $closureRunCount = 0;
         $closure = function () use (&$closureRunCount) {
             $closureRunCount++;
+
             return 'bar';
         };
 
@@ -683,6 +684,7 @@ class ContextTest extends TestCase
         $closureRunCount = 0;
         $closure = function () use (&$closureRunCount) {
             $closureRunCount++;
+
             return 'bar';
         };
 
