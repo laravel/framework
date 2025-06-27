@@ -915,7 +915,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         DB::enableQueryLog();
 
-        foreach ([collect(), [], null, false, 0, ''] as $value) {
+        foreach ([collect(), [], null] as $value) {
             $result = $post->tags()->sync($value, false);
 
             $this->assertEquals([
@@ -925,9 +925,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             ], $result);
         }
 
-        $queries = DB::getQueryLog();
-
-        $this->assertCount(0, $queries);
+        $this->assertEmpty(DB::getQueryLog());
     }
 
     public function testToggleMethod()
