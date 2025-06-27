@@ -33,10 +33,9 @@ class Reflector
         }
 
         if (! isset(self::$classesUsesRecursive[$class])) {
-            $results = [];
-
-            foreach (array_reverse(class_parents($class) ?: []) + [$class => $class] as $class) {
-                $results += trait_uses_recursive($class);
+            $results = trait_uses_recursive($class);
+            if ($parentClass = get_parent_class($class)) {
+                $results += self::classUsesRecursive($parentClass);
             }
 
             self::$classesUsesRecursive[$class] = array_unique($results);
