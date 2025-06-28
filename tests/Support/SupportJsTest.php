@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Js;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
@@ -126,6 +127,19 @@ class SupportJsTest extends TestCase
             "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
             (string) Js::from($data)
         );
+    }
+
+    public function testHtmlable()
+    {
+        $data = new class implements Htmlable
+        {
+            public function toHtml(): string
+            {
+                return '<p>Hello, World!</p>';
+            }
+        };
+
+        $this->assertEquals("'\u003Cp\u003EHello, World!\u003C\/p\u003E'", (string) Js::from($data));
     }
 
     public function testBackedEnums()

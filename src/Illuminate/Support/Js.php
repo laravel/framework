@@ -70,6 +70,10 @@ class Js implements Htmlable, Stringable
             return $data->toHtml();
         }
 
+        if ($data instanceof Htmlable) {
+            $data = $data->toHtml();
+        }
+
         if ($data instanceof UnitEnum) {
             $data = enum_value($data);
         }
