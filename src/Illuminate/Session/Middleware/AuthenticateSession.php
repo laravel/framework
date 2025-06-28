@@ -78,10 +78,6 @@ class AuthenticateSession implements AuthenticatesSessions
      */
     protected function storePasswordHashInSession($request)
     {
-        if (! $request->user()) {
-            return;
-        }
-
         $request->session()->put([
             'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
         ]);
