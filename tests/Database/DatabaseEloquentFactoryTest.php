@@ -44,6 +44,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
+        Factory::$defaultExpandRelationships = true;
     }
 
     /**
@@ -829,6 +830,18 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->make();
 
         $this->assertNull($post->user_id);
+    }
+
+    public function test_can_default_to_without_parents()
+    {
+        FactoryTestPostFactory::$defaultExpandRelationships = false;
+
+        $post = FactoryTestPostFactory::new()->make();
+        $this->assertNull($post->user_id);
+
+        FactoryTestPostFactory::$defaultExpandRelationships = true;
+        $postWithParents = FactoryTestPostFactory::new()->create();
+        $this->assertNotNull($postWithParents->user_id);
     }
 
     public function test_factory_model_names_correct()
