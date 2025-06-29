@@ -59,9 +59,9 @@ class IsInstanceOf implements Rule, ValidatorAwareRule
      *
      * @return $this
      */
-    public function strict()
+    public function strict(bool $strict = true)
     {
-        $this->strict = true;
+        $this->strict = $strict;
 
         return $this;
     }
