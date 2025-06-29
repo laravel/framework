@@ -23,6 +23,8 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -582,6 +584,8 @@ class Builder implements BuilderContract
      */
     public function findOrFail($id, $columns = ['*'])
     {
+        $id = enum_value($id);
+
         $result = $this->find($id, $columns);
 
         $id = $id instanceof Arrayable ? $id->toArray() : $id;
