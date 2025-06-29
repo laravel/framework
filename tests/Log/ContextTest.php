@@ -665,6 +665,8 @@ class ContextTest extends TestCase
 
     public function test_it_remembers_a_value()
     {
+        $this->assertSame(1, Context::remember('int', 1));
+
         $closureRunCount = 0;
         $closure = function () use (&$closureRunCount) {
             $closureRunCount++;
@@ -681,6 +683,8 @@ class ContextTest extends TestCase
 
     public function test_it_remembers_a_hidden_value()
     {
+        $this->assertSame(1, Context::rememberHidden('int', 1));
+
         $closureRunCount = 0;
         $closure = function () use (&$closureRunCount) {
             $closureRunCount++;
