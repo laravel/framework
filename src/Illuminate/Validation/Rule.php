@@ -17,6 +17,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\IsInstanceOf;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
@@ -273,6 +274,17 @@ class Rule
         }
 
         return new Rules\Contains(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get an "IsObject" rule builder instance.
+     *
+     * @param  class-string  $object
+     * @return \Illuminate\Validation\Rules\IsInstanceOf
+     */
+    public static function isInstanceOf($object)
+    {
+        return new IsInstanceOf($object);
     }
 
     /**
