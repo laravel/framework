@@ -268,6 +268,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntEndWith($needles)
+    {
+        return Str::doesntEndWith($this->value, $needles);
+    }
+
+    /**
      * Determine if the string is an exact match with the given value.
      *
      * @param  \Illuminate\Support\Stringable|string  $value
@@ -1141,6 +1152,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenEndsWith($needles, $callback, $default = null)
     {
         return $this->when($this->endsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntEndWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntEndWith($needles), $callback, $default);
     }
 
     /**
