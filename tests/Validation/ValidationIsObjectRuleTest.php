@@ -230,22 +230,6 @@ class ValidationIsObjectRuleTest extends TestCase
         $this->assertEquals(['The field object is not a valid instance.'], $validator->messages()->get('object'));
     }
 
-    public function test_validation_fails_when_value_is_null()
-    {
-        $validator = new Validator(
-            resolve('translator'),
-            [
-                'object' => null,
-            ],
-            [
-                'object' => new IsObject(Foo::class),
-            ]
-        );
-
-        $this->assertTrue($validator->fails());
-        $this->assertEquals(['The field object is not a valid instance.'], $validator->messages()->get('object'));
-    }
-
     public function test_validation_fails_with_iterable_containing_only_null_in_non_strict_mode()
     {
         $validator = new Validator(

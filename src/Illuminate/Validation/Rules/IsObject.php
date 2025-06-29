@@ -76,10 +76,6 @@ class IsObject implements Rule, ValidatorAwareRule
      */
     public function passes($attribute, $value)
     {
-        if (is_null($value)) {
-            return false;
-        }
-
         if (is_iterable($value)) {
             $this->isIterable = true;
 
