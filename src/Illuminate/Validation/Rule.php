@@ -17,7 +17,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
-use Illuminate\Validation\Rules\IsObject;
+use Illuminate\Validation\Rules\IsInstanceOf;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
@@ -280,11 +280,11 @@ class Rule
      * Get an "IsObject" rule builder instance.
      *
      * @param  class-string  $object
-     * @return \Illuminate\Validation\Rules\IsObject
+     * @return \Illuminate\Validation\Rules\IsInstanceOf
      */
-    public static function isObject($object)
+    public static function isInstanceOf($object)
     {
-        return new IsObject($object);
+        return new IsInstanceOf($object);
     }
 
     /**

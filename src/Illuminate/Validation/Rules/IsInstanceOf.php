@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Traits\Conditionable;
 use TypeError;
 
-class IsObject implements Rule, ValidatorAwareRule
+class IsInstanceOf implements Rule, ValidatorAwareRule
 {
     use Conditionable;
 

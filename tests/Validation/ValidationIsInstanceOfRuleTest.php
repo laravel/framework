@@ -7,14 +7,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
-use Illuminate\Validation\Rules\IsObject;
+use Illuminate\Validation\Rules\IsInstanceOf;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Classes.php';
 
-class ValidationIsObjectRuleTest extends TestCase
+class ValidationIsInstanceOfRuleTest extends TestCase
 {
     public function test_validation_passes_when_passing_correct_class()
     {
@@ -24,7 +24,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => new Foo,
             ],
             [
-                'object' => new IsObject(Foo::class),
+                'object' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -39,7 +39,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => new Bar,
             ],
             [
-                'object' => new IsObject(Foo::class),
+                'object' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -54,7 +54,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => new FooImplementation,
             ],
             [
-                'object' => new IsObject(FooInterface::class),
+                'object' => new IsInstanceOf(FooInterface::class),
             ]
         );
 
@@ -69,7 +69,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Foo, new Foo, new Foo],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -84,7 +84,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Bar, new Bar, new Foo],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -99,7 +99,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Bar, null, new Foo],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -114,7 +114,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => new Collection([new Foo, new Foo, new Foo]),
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -129,7 +129,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => new Collection([new Bar, new Bar, new Foo]),
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -144,7 +144,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => new Collection([new Bar, null, new Foo]),
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -159,7 +159,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -174,7 +174,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => new Collection([]),
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -189,7 +189,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => new Foo,
             ],
             [
-                'object' => new IsObject('Illuminate\Tests\Validation\Baz'),
+                'object' => new IsInstanceOf('Illuminate\Tests\Validation\Baz'),
             ]
         );
 
@@ -206,7 +206,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => new Foo,
             ],
             [
-                'object' => new IsObject(Bar::class),
+                'object' => new IsInstanceOf(Bar::class),
             ]
         );
 
@@ -222,7 +222,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'object' => 'object',
             ],
             [
-                'object' => new IsObject(Foo::class),
+                'object' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -238,7 +238,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [null],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -254,7 +254,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [null],
             ],
             [
-                'objects' => (new IsObject(Foo::class))->strict(),
+                'objects' => (new IsInstanceOf(Foo::class))->strict(),
             ]
         );
 
@@ -270,7 +270,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Bar, null, new Foo],
             ],
             [
-                'objects' => (new IsObject(Foo::class))->strict(),
+                'objects' => (new IsInstanceOf(Foo::class))->strict(),
             ]
         );
 
@@ -285,7 +285,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Foo, new FooImplementation, new Foo],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -301,7 +301,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Foo, 'string', 123],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -317,7 +317,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => new Collection([null]),
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -333,7 +333,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [null],
             ],
             [
-                'objects' => (new IsObject(Foo::class))->strict(),
+                'objects' => (new IsInstanceOf(Foo::class))->strict(),
             ]
         );
 
@@ -349,7 +349,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Bar, null, new Foo],
             ],
             [
-                'objects' => (new IsObject(Foo::class))->strict(),
+                'objects' => (new IsInstanceOf(Foo::class))->strict(),
             ]
         );
 
@@ -364,7 +364,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Foo, new FooImplementation, new Foo],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
@@ -380,7 +380,7 @@ class ValidationIsObjectRuleTest extends TestCase
                 'objects' => [new Foo, 'string', 123],
             ],
             [
-                'objects' => new IsObject(Foo::class),
+                'objects' => new IsInstanceOf(Foo::class),
             ]
         );
 
