@@ -665,7 +665,7 @@ class Repository
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed $value
+     * @return mixed
      */
     public function remember($key, $value)
     {
@@ -683,7 +683,7 @@ class Repository
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed $value
+     * @return mixed
      */
     public function rememberHidden($key, $value)
     {
