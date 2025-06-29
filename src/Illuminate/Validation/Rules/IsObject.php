@@ -43,7 +43,7 @@ class IsObject implements Rule, ValidatorAwareRule
     /**
      * Create a new rule instance.
      *
-     * @param class-string $object
+     * @param  class-string  $object
      */
     public function __construct($object)
     {
@@ -55,7 +55,7 @@ class IsObject implements Rule, ValidatorAwareRule
     }
 
     /**
-     * Set the rule to strictly check the
+     * Set the rule to strictly check the object type.
      *
      * @return $this
      */
@@ -69,9 +69,8 @@ class IsObject implements Rule, ValidatorAwareRule
     /**
      * Determine if the validation rule passes.
      *
-     * @param string $attribute
-     * @param mixed  $value
-     *
+     * @param  string  $attribute
+     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)
@@ -128,8 +127,7 @@ class IsObject implements Rule, ValidatorAwareRule
     /**
      * Set the current validator.
      *
-     * @param \Illuminate\Validation\Validator $validator
-     *
+     * @param  \Illuminate\Validation\Validator  $validator
      * @return $this
      */
     public function setValidator($validator)
