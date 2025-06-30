@@ -123,7 +123,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('hasFailed')->once()->andReturn(true);
         $job->shouldReceive('fail')->once();
         $job->shouldReceive('isDeleted')->andReturn(true);
-        $job->shouldReceive('isReleased')->twice()->andReturn(false);
+        $job->shouldReceive('isReleased')->once()->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
 
