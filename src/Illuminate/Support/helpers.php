@@ -538,7 +538,9 @@ if (! function_exists('transaction')) {
      * @param Closure|null $onFailure
      *
      * @return mixed
+     * @throws \Throwable
      */
+
     function transaction(\Closure $callback, int $attempts = 1, \Closure $onSuccess = null, \Closure $onFailure = null, string $connection = null): mixed
     {
         try {
