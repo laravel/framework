@@ -1672,6 +1672,18 @@ class Str
     }
 
     /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function doesntStartWith($haystack, $needles)
+    {
+        return ! static::startsWith($haystack, $needles);
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @param  string  $value

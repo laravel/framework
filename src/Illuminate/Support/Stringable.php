@@ -944,6 +944,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntStartWith($needles)
+    {
+        return Str::doesntStartWith($this->value, $needles);
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @return static
@@ -1253,6 +1264,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenStartsWith($needles, $callback, $default = null)
     {
         return $this->when($this->startsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntStartWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntStartWith($needles), $callback, $default);
     }
 
     /**

@@ -291,8 +291,8 @@ class SupportStringableTest extends TestCase
             return $stringable->title();
         }));
 
-        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenDoesntEndWith(['ark'], function ($stringable) {
-            return $stringable->title();
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenDoesntEndWith(['xxx'], function ($stringable) {
+            return $stringable;
         }));
 
         $this->assertSame('TonyStark', (string) $this->stringable('tony stark')->whenDoesntEndWith(['tony', 'xxx'], function ($stringable) {
@@ -462,6 +462,31 @@ class SupportStringableTest extends TestCase
         }));
     }
 
+    public function testWhenDoesntStartWith()
+    {
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenDoesntStartWith('ton', function ($stringable) {
+            return $stringable->studly();
+        }, function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenDoesntStartWith(['ton', 'not'], function ($stringable) {
+            return $stringable->studly();
+        }, function ($stringable) {
+            return $stringable->title();
+        }));
+
+        $this->assertSame('tony stark', (string) $this->stringable('tony stark')->whenDoesntStartWith(['xxx'], function ($stringable) {
+            return $stringable;
+        }));
+
+        $this->assertSame('Tony Stark', (string) $this->stringable('tony stark')->whenDoesntStartWith(['tony', 'xxx'], function ($stringable) {
+            return $stringable->studly();
+        }, function ($stringable) {
+            return $stringable->title();
+        }));
+    }
+
     public function testWhenEmpty()
     {
         tap($this->stringable(), function ($stringable) {
@@ -621,6 +646,36 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('Malmö')->startsWith('Malmö'));
         $this->assertFalse($this->stringable('Jönköping')->startsWith('Jonko'));
         $this->assertFalse($this->stringable('Malmö')->startsWith('Malmo'));
+    }
+
+    public function testDoesntStartWith()
+    {
+        $this->assertFalse($this->stringable('jason')->doesntStartWith('jas'));
+        $this->assertFalse($this->stringable('jason')->doesntStartWith('jason'));
+        $this->assertFalse($this->stringable('jason')->doesntStartWith(['jas']));
+        $this->assertFalse($this->stringable('jason')->doesntStartWith(['day', 'jas']));
+        $this->assertFalse($this->stringable('jason')->doesntStartWith(collect(['day', 'jas'])));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith('day'));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith(['day']));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith(null));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith([null]));
+        $this->assertTrue($this->stringable('0123')->doesntStartWith([null]));
+        $this->assertFalse($this->stringable('0123')->doesntStartWith(0));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith('J'));
+        $this->assertTrue($this->stringable('jason')->doesntStartWith(''));
+        $this->assertTrue($this->stringable('7')->doesntStartWith(' 7'));
+        $this->assertFalse($this->stringable('7a')->doesntStartWith('7'));
+        $this->assertFalse($this->stringable('7a')->doesntStartWith(7));
+        $this->assertFalse($this->stringable('7.12a')->doesntStartWith(7.12));
+        $this->assertTrue($this->stringable('7.12a')->doesntStartWith(7.13));
+        $this->assertFalse($this->stringable(7.123)->doesntStartWith('7'));
+        $this->assertFalse($this->stringable(7.123)->doesntStartWith('7.12'));
+        $this->assertTrue($this->stringable(7.123)->doesntStartWith('7.13'));
+        // Test for multibyte string support
+        $this->assertFalse($this->stringable('Jönköping')->doesntStartWith('Jö'));
+        $this->assertFalse($this->stringable('Malmö')->doesntStartWith('Malmö'));
+        $this->assertTrue($this->stringable('Jönköping')->doesntStartWith('Jonko'));
+        $this->assertTrue($this->stringable('Malmö')->doesntStartWith('Malmo'));
     }
 
     public function testEndsWith()
