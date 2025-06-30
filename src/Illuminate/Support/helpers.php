@@ -539,10 +539,15 @@ if (! function_exists('transaction')) {
      *
      * @return mixed
      */
-    function transaction(\Closure $callback, int $attempts = 1, \Closure $onSuccess = null, \Closure $onFailure = null): mixed
+    function transaction(\Closure $callback, int $attempts = 1, \Closure $onSuccess = null, \Closure $onFailure = null, string $connection = null): mixed
     {
         try {
-            $result = DB::transaction($callback, $attempts);
+
+            $resolver = $connection
+                ? DB::connection($connection)
+                : DB::connection();
+
+            $result = $resolver->transaction($callback, $attempts);
 
             if ($onSuccess)
                 $onSuccess($result);

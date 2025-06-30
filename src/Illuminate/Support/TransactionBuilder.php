@@ -13,10 +13,17 @@ class TransactionBuilder
      * @var int
      */
     protected int $attempts = 1;
+
     /**
-     * @var Closure|null
+     * @var string|null
+     */
+    protected ?string $connection = null;
+
+    /**
+     * @var \Closure|null
      */
     protected ?Closure $onSuccess = null;
+
     /**
      * @var \Closure|null
      */
@@ -25,9 +32,9 @@ class TransactionBuilder
     /**
      * @return static
      */
-    public static function start(): self
+    public static function start(): static
     {
-        return new self();
+        return new static();
     }
 
     /**
@@ -35,9 +42,10 @@ class TransactionBuilder
      *
      * @return $this
      */
-    public function attempts(int $times): self
+    public function attempts(int $times): static
     {
         $this->attempts = $times;
+
         return $this;
     }
 
@@ -46,9 +54,10 @@ class TransactionBuilder
      *
      * @return $this
      */
-    public function onSuccess(Closure $callback): self
+    public function onSuccess(Closure $callback): static
     {
         $this->onSuccess = $callback;
+
         return $this;
     }
 
@@ -57,34 +66,48 @@ class TransactionBuilder
      *
      * @return $this
      */
-    public function onFailure(Closure $callback): self
+    public function onFailure(Closure $callback): static
     {
         $this->onFailure = $callback;
+
         return $this;
     }
 
     /**
-     * @param \Closure $callback
-     *
-     * @return mixed
      * @throws \Throwable
      */
     public function run(Closure $callback): mixed
     {
-        try {
-            $result = DB::transaction($callback, $this->attempts);
+        $resolver = $this->connection
+            ? DB::connection($this->connection)
+            : DB::connection();
 
-            if ($this->onSuccess)
+        try {
+            $result = $resolver->transaction($callback, $this->attempts);
+
+            if ($this->onSuccess) {
                 ($this->onSuccess)($result);
+            }
 
             return $result;
-
         } catch (Throwable $e) {
-
-            if ($this->onFailure)
+            if ($this->onFailure) {
                 ($this->onFailure)($e);
+            }
 
             throw $e;
         }
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function connection(string $name): static
+    {
+        $this->connection = $name;
+
+        return $this;
     }
 }
