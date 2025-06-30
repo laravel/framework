@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
@@ -526,3 +527,43 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('transaction')) {
+    /**
+     * Execute a callback within a database transaction with optional success and failure hooks.
+     *
+     * @param Closure      $callback
+     * @param int          $attempts
+     * @param Closure|null $onSuccess
+     * @param Closure|null $onFailure
+     * @param string|null  $connection
+     *
+     * @return mixed
+     * @throws \Throwable
+     */
+
+    function transaction(\Closure $callback, int $attempts = 1, \Closure $onSuccess = null, \Closure $onFailure = null, string $connection = null): mixed
+    {
+        try {
+
+            $resolver = $connection
+                ? DB::connection($connection)
+                : DB::connection();
+
+            $result = $resolver->transaction($callback, $attempts);
+
+            if ($onSuccess)
+                $onSuccess($result);
+
+            return $result;
+
+        } catch (\Throwable $e) {
+
+            if ($onFailure)
+                $onFailure($e);
+
+            throw $e; // rethrow to maintain native behavior
+        }
+    }
+}
+
