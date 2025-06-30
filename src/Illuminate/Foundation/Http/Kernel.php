@@ -171,7 +171,7 @@ class Kernel implements KernelContract
         $this->bootstrap();
 
         $this->app['events']->dispatch(
-            new RequestStarted($request, $this->requestStartedAt())
+            new RequestStarted($request, $this->requestStartedAt)
         );
 
         return (new Pipeline($this->app))
