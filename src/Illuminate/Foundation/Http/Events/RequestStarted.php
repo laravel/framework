@@ -11,7 +11,6 @@ class RequestStarted
      */
     public $request;
 
-
     /**
      * When the request started.
      *
