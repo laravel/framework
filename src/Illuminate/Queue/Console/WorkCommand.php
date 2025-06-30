@@ -245,10 +245,10 @@ class WorkCommand extends Command
             $this->now()->format('Y-m-d H:i:s'),
             $job->resolveName(),
             $isVerbose
-                ? sprintf('<fg=gray>%s</>  <fg=magenta>%s</> <fg=blue>%s</> <fg=blue>%s</>', 
-                    $job->getJobId(), 
+                ? sprintf('<fg=gray>%s</>  <fg=magenta>%s</> <fg=blue>%s</> <fg=blue>%s</>',
+                    $job->getJobId(),
                     $this->getWorkerName(),
-                    $job->getConnectionName(), 
+                    $job->getConnectionName(),
                     $job->getQueue()
                 )
                 : ''
