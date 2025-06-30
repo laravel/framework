@@ -14,7 +14,7 @@ class RequestStarted
     /**
      * When the request started.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var \Illuminate\Support\Carbon|null
      */
     public $startedAt;
 
@@ -22,7 +22,7 @@ class RequestStarted
      * Create a new event instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Carbon\CarbonImmutable  $startedAt
+     * @param  \Illuminate\Support\Carbon|null  $startedAt
      */
     public function __construct($request, $startedAt)
     {
