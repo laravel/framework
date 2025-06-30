@@ -164,7 +164,7 @@ return [
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
-    'is_object' => [
+    'is_instance_of' => [
         'single' => 'The field :attribute is not a valid instance.',
         'iterable' => 'The field :attribute contains invalid instances.',
     ],

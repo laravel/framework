@@ -110,16 +110,16 @@ class IsInstanceOf implements Rule, ValidatorAwareRule
     public function message()
     {
         if ($this->isIterable) {
-            $message = $this->validator->getTranslator()->get('validation.is_object.iterable');
+            $message = $this->validator->getTranslator()->get('validation.is_instance_of.iterable');
 
-            return $message === 'validation.is_object.iterable'
+            return $message === 'validation.is_instance_of.iterable'
                 ? ['The field :attribute contains invalid instances.']
                 : $message;
         }
 
-        $message = $this->validator->getTranslator()->get('validation.is_object.single');
+        $message = $this->validator->getTranslator()->get('validation.is_instance_of.single');
 
-        return $message === 'validation.is_object.single'
+        return $message === 'validation.is_instance_of.single'
             ? ['The field :attribute is not a valid instance.']
             : $message;
     }
