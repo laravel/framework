@@ -116,6 +116,11 @@ trait HasAttributes
         'encrypted:collection',
         'encrypted:json',
         'encrypted:object',
+        'encrypted:deterministic',
+        'encrypted:deterministic,array',
+        'encrypted:deterministic,collection',
+        'encrypted:deterministic,json',
+        'encrypted:deterministic,object',
         'float',
         'hashed',
         'immutable_date',
@@ -428,7 +433,6 @@ trait HasAttributes
     /**
      * Get an attribute array of all arrayable values.
      *
-     * @param  array  $values
      * @return array
      */
     protected function getArrayableItems(array $values)
@@ -827,7 +831,7 @@ trait HasAttributes
         if ($this->isEncryptedCastable($key)) {
             $value = $this->fromEncryptedString($value);
 
-            $castType = Str::after($castType, 'encrypted:');
+            $castType = Str::replace(['encrypted:deterministic,', 'encrypted:deterministic', 'encrypted:'], ['', 'encrypted', ''], $castType);
         }
 
         switch ($castType) {
@@ -1410,14 +1414,10 @@ trait HasAttributes
 
     /**
      * Cast the given attribute to an encrypted string.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return string
      */
-    protected function castAttributeAsEncryptedString($key, #[\SensitiveParameter] $value)
+    protected function castAttributeAsEncryptedString(string $key, #[\SensitiveParameter] mixed $value): string
     {
-        return static::currentEncrypter()->encrypt($value, false);
+        return static::currentEncrypter()->encrypt($value, false, $this->isDeterministicCastable($key));
     }
 
     /**
@@ -1599,7 +1599,6 @@ trait HasAttributes
     /**
      * Prepare a date for array / JSON serialization.
      *
-     * @param  \DateTimeInterface  $date
      * @return string
      */
     protected function serializeDate(DateTimeInterface $date)
@@ -1709,24 +1708,57 @@ trait HasAttributes
 
     /**
      * Determine whether a value is JSON castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
      */
-    protected function isJsonCastable($key)
+    protected function isJsonCastable(string $key): bool
     {
-        return $this->hasCast($key, ['array', 'json', 'json:unicode', 'object', 'collection', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, [
+            'array',
+            'json',
+            'json:unicode',
+            'object',
+            'collection',
+            'encrypted:array',
+            'encrypted:collection',
+            'encrypted:json',
+            'encrypted:object',
+            'encrypted:deterministic,array',
+            'encrypted:deterministic,collection',
+            'encrypted:deterministic,json',
+            'encrypted:deterministic,object',
+        ]);
     }
 
     /**
      * Determine whether a value is an encrypted castable for inbound manipulation.
-     *
-     * @param  string  $key
-     * @return bool
      */
-    protected function isEncryptedCastable($key)
+    protected function isEncryptedCastable(string $key): bool
     {
-        return $this->hasCast($key, ['encrypted', 'encrypted:array', 'encrypted:collection', 'encrypted:json', 'encrypted:object']);
+        return $this->hasCast($key, [
+            'encrypted',
+            'encrypted:array',
+            'encrypted:collection',
+            'encrypted:json',
+            'encrypted:object',
+            'encrypted:deterministic',
+            'encrypted:deterministic,array',
+            'encrypted:deterministic,collection',
+            'encrypted:deterministic,json',
+            'encrypted:deterministic,object',
+        ]);
+    }
+
+    /**
+     * Determine whether a value is a deterministic encrypted castable for inbound manipulation.
+     */
+    protected function isDeterministicCastable(string $key): bool
+    {
+        return $this->hasCast($key, [
+            'encrypted:deterministic',
+            'encrypted:deterministic,array',
+            'encrypted:deterministic,collection',
+            'encrypted:deterministic,json',
+            'encrypted:deterministic,object',
+        ]);
     }
 
     /**
@@ -1965,7 +1997,6 @@ trait HasAttributes
     /**
      * Set the array of model attributes. No checking is done.
      *
-     * @param  array  $attributes
      * @param  bool  $sync
      * @return $this
      */
@@ -2375,7 +2406,6 @@ trait HasAttributes
     /**
      * Set the accessors to append to model arrays.
      *
-     * @param  array  $appends
      * @return $this
      */
     public function setAppends(array $appends)
