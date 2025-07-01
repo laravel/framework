@@ -94,6 +94,20 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1, 2, 3, 'foo', 'bar', 'baz', 'boom'], Arr::collapse($mixedArray));
     }
 
+    public function testContains()
+    {
+        $this->assertTrue(Arr::contains(['foo', 'bar'], 'foo'));
+        $this->assertTrue(Arr::contains(['foo', 'bar'], 'bar'));
+        $this->assertFalse(Arr::contains(['foo', 'bar'], 'baz'));
+
+        $this->assertTrue(Arr::contains(['foo' => 'bar'], 'bar'));
+        $this->assertFalse(Arr::contains(['foo' => 'bar'], 'baz'));
+
+        $this->assertTrue(Arr::contains(new Collection(['foo', 'bar']), 'foo'));
+        $this->assertTrue(Arr::contains(new Collection(['foo', 'bar']), 'bar'));
+        $this->assertFalse(Arr::contains(new Collection(['foo', 'bar']), 'baz'));
+    }
+
     public function testCrossJoin()
     {
         // Single dimension
@@ -175,6 +189,20 @@ class SupportArrTest extends TestCase
         [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
+    }
+
+    public function testDoestContains()
+    {
+        $this->assertTrue(Arr::doestContains(['foo', 'bar'], 'baz'));
+        $this->assertFalse(Arr::doestContains(['foo', 'bar'], 'foo'));
+        $this->assertFalse(Arr::doestContains(['foo', 'bar'], 'bar'));
+
+        $this->assertTrue(Arr::doestContains(['foo' => 'bar'], 'baz'));
+        $this->assertFalse(Arr::doestContains(['foo' => 'bar'], 'bar'));
+
+        $this->assertTrue(Arr::doestContains(new Collection(['foo', 'bar']), 'baz'));
+        $this->assertFalse(Arr::doestContains(new Collection(['foo', 'bar']), 'foo'));
+        $this->assertFalse(Arr::doestContains(new Collection(['foo', 'bar']), 'bar'));
     }
 
     public function testDot()

@@ -117,6 +117,23 @@ class Arr
     }
 
     /**
+     * Determine if the given array contains a given value.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  mixed  $value
+     * @param  bool  $strict
+     * @return bool
+     */
+    public static function contains($array, $value, bool $strict = false): bool
+    {
+        if ($array instanceof Enumerable) {
+            return $array->contains($value, $strict);
+        }
+
+        return in_array($value, $array, $strict);
+    }
+
+    /**
      * Cross join the given arrays, returning all possible permutations.
      *
      * @param  iterable  ...$arrays
@@ -152,6 +169,19 @@ class Arr
     public static function divide($array)
     {
         return [array_keys($array), array_values($array)];
+    }
+
+    /**
+     * Determine if the given array does not contain a given value.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  mixed  $value
+     * @param  bool  $strict
+     * @return bool
+     */
+    public static function doestContains($array, $value, bool $strict = false): bool
+    {
+        return ! static::contains($array, $value, $strict);
     }
 
     /**
