@@ -1396,13 +1396,10 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Encrypt the string.
-     *
-     * @param  bool  $serialize
-     * @return static
      */
-    public function encrypt(bool $serialize = false)
+    public function encrypt(bool $serialize = false, bool $deterministic = false)
     {
-        return new static(encrypt($this->value, $serialize));
+        return new static(encrypt($this->value, $serialize, $deterministic));
     }
 
     /**

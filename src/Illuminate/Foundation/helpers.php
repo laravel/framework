@@ -481,14 +481,10 @@ if (! function_exists('dispatch_sync')) {
 if (! function_exists('encrypt')) {
     /**
      * Encrypt the given value.
-     *
-     * @param  mixed  $value
-     * @param  bool  $serialize
-     * @return string
      */
-    function encrypt($value, $serialize = true)
+    function encrypt($value, bool $serialize = true, bool $deterministic = false)
     {
-        return app('encrypter')->encrypt($value, $serialize);
+        return app('encrypter')->encrypt($value, $serialize, $deterministic);
     }
 }
 
