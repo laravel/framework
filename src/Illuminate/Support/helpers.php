@@ -362,8 +362,7 @@ if (! function_exists('str')) {
     function str($string = null)
     {
         if (func_num_args() === 0) {
-            return new class
-            {
+            return new class () {
                 public function __call($method, $parameters)
                 {
                     return Str::$method(...$parameters);
@@ -524,5 +523,19 @@ if (! function_exists('with')) {
     function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (! function_exists('filter_and_reindex')) {
+    /**
+     * Filter an array using the given callback and reindex the result.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    function filter_and_reindex(array $array, callable $callback): array
+    {
+        return array_values(array_filter($array, $callback));
     }
 }
