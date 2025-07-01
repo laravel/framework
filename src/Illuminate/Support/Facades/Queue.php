@@ -120,9 +120,11 @@ class Queue extends Facade
 
         static::fake($jobsToFake);
 
-        return tap($callable(), function () use ($originalQueueManager) {
+        try {
+            return $callable();
+        } finally {
             static::swap($originalQueueManager);
-        });
+        }
     }
 
     /**
@@ -138,9 +140,11 @@ class Queue extends Facade
 
         static::fakeExcept($jobsToAllow);
 
-        return tap($callable(), function () use ($originalQueueManager) {
+        try {
+            return $callable();
+        } finally {
             static::swap($originalQueueManager);
-        });
+        }
     }
 
     /**
