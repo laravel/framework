@@ -1706,7 +1706,9 @@ class Blueprint
 
         $index = strtolower($table.'_'.implode('_', $columns).'_'.$type);
 
-        return str_replace(['-', '.'], '_', $index);
+        $index = str_replace(['-', '.'], '_', $index);
+        
+        return substr($index, 0, 64);
     }
 
     /**
