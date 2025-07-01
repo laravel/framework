@@ -2341,8 +2341,8 @@ class SupportCollectionTest extends TestCase
             ],
         ]);
 
-        $this->assertEquals(["amir (verified)", "taylor (verified)"], $data->pluck(fn (array $row) => "{$row['name']} (verified)")->all());
-        $this->assertEquals(["php/python" => "amir", "php/asp/java" => "taylor"], $data->pluck('name', fn (array $row) => implode('/', $row['skill']['backend']))->all());
+        $this->assertEquals(['amir (verified)', 'taylor (verified)'], $data->pluck(fn (array $row) => "{$row['name']} (verified)")->all());
+        $this->assertEquals(['php/python' => 'amir', 'php/asp/java' => 'taylor'], $data->pluck('name', fn (array $row) => implode('/', $row['skill']['backend']))->all());
     }
 
     #[DataProvider('collectionClassProvider')]
