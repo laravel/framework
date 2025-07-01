@@ -44,6 +44,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static \Illuminate\Database\Eloquent\Model restoreModel(\Illuminate\Contracts\Database\ModelIdentifier $value)
+ * @method static mixed remember(string $key, mixed $value)
+ * @method static mixed rememberHidden(string $key, mixed $value)
  *
  * @see \Illuminate\Log\Context\Repository
  */
