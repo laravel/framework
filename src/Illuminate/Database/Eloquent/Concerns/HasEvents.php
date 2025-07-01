@@ -208,6 +208,12 @@ trait HasEvents
             return true;
         }
 
+        // If we have automatic eager loading enabled for the creating event unset any null relations
+        // as it can cause issues and set the relations to null even if they exist.
+        if (static::isAutomaticallyEagerLoadingRelationships() && $event == 'creating') {
+            $this->setRelations(array_filter($this->getRelations()));
+        }
+
         // First, we will get the proper method to call on the event dispatcher, and then we
         // will attempt to fire a custom, object based event for the given event. If that
         // returns a result we can return that result, or we'll call the string events.

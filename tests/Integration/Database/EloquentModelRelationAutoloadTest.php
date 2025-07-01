@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelRelationAutoloadTest;
 
 use DB;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +14,14 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('status')->nullable();
+            $table->unsignedInteger('post_id')->nullable();
+            $table->unsignedInteger('video_id')->nullable();
+        });
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
         });
@@ -214,6 +224,95 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 
         DB::disableQueryLog();
     }
+
+    public function testDoesntCauseNQueryIssueUsingGet()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        DB::enableQueryLog();
+
+        $post = Post::create();
+
+        $video = Video::create();
+        $video2 = Video::create();
+        $video3 = Video::create();
+
+        Tag::create(['post_id' => $post->id, 'video_id' => $video->id]);
+        Tag::create(['post_id' => $post->id, 'video_id' => $video2->id]);
+        Tag::create(['post_id' => $post->id, 'video_id' => $video3->id]);
+
+        $videos = [];
+        foreach ($post->tags()->get() as $tag) {
+            $videos[] = $tag->video;
+        }
+
+        $this->assertCount(12, DB::getQueryLog());
+        $this->assertCount(3, $videos);
+
+        Model::automaticallyEagerLoadRelationships(false);
+    }
+
+    public function testRelationAutoloadWorksOnCreatingEvent()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        DB::enableQueryLog();
+
+        $tags = Tag::factory()->times(3)->make();
+
+        $post = Post::factory()->create();
+
+        $post->tags()->saveMany($tags);
+
+        $this->assertCount(7, DB::getQueryLog());
+
+        Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
+    }
+}
+
+class TagFactory extends Factory
+{
+    protected $model = Tag::class;
+
+    public function definition()
+    {
+        return [];
+    }
+}
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if ($model->post->shouldApplyStatus()) {
+                $model->status = 'Todo';
+            }
+        });
+    }
+
+    protected static function newFactory()
+    {
+        return TagFactory::new();
+    }
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function video()
+    {
+        return $this->belongsTo(Video::class);
+    }
 }
 
 class Comment extends Model
@@ -238,9 +337,25 @@ class Comment extends Model
     }
 }
 
+class PostFactory extends Factory
+{
+    protected $model = Post::class;
+
+    public function definition()
+    {
+        return [];
+    }
+}
 class Post extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
+
+    public function shouldApplyStatus()
+    {
+        return false;
+    }
 
     public function comments()
     {
@@ -255,6 +370,16 @@ class Post extends Model
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    protected static function newFactory()
+    {
+        return PostFactory::new();
+    }
+
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
     }
 }
 
