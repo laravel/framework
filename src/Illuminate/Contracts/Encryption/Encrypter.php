@@ -7,44 +7,29 @@ interface Encrypter
     /**
      * Encrypt the given value.
      *
-     * @param  mixed  $value
-     * @param  bool  $serialize
-     * @param  bool  $deterministic
-     * @return string
-     *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt(#[\SensitiveParameter] $value, bool $serialize = true, bool $deterministic = false);
+    public function encrypt(#[\SensitiveParameter] $value, bool $serialize = true, bool $deterministic = false): string;
 
     /**
      * Decrypt the given value.
      *
-     * @param  string  $payload
-     * @param  bool  $unserialize
-     * @return mixed
-     *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
-    public function decrypt($payload, $unserialize = true);
+    public function decrypt(string $payload, bool $unserialize = true): mixed;
 
     /**
      * Get the encryption key that the encrypter is currently using.
-     *
-     * @return string
      */
-    public function getKey();
+    public function getKey(): string;
 
     /**
      * Get the current encryption key and all previous encryption keys.
-     *
-     * @return array
      */
-    public function getAllKeys();
+    public function getAllKeys(): array;
 
     /**
      * Get the previous encryption keys.
-     *
-     * @return array
      */
-    public function getPreviousKeys();
+    public function getPreviousKeys(): array;
 }
