@@ -103,9 +103,15 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::contains(['foo' => 'bar'], 'bar'));
         $this->assertFalse(Arr::contains(['foo' => 'bar'], 'baz'));
 
+        $this->assertTrue(Arr::contains(['Foo', 'Bar'], 'Foo', true));
+        $this->assertFalse(Arr::contains(['Foo', 'Bar'], 'foo', true));
+
         $this->assertTrue(Arr::contains(new Collection(['foo', 'bar']), 'foo'));
         $this->assertTrue(Arr::contains(new Collection(['foo', 'bar']), 'bar'));
         $this->assertFalse(Arr::contains(new Collection(['foo', 'bar']), 'baz'));
+
+        $this->assertTrue(Arr::contains(new Collection(['Foo', 'Bar']), 'Foo', true));
+        $this->assertFalse(Arr::contains(new Collection(['Foo', 'Bar']), 'foo', true));
     }
 
     public function testCrossJoin()
@@ -200,9 +206,15 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::doestContains(['foo' => 'bar'], 'baz'));
         $this->assertFalse(Arr::doestContains(['foo' => 'bar'], 'bar'));
 
+        $this->assertTrue(Arr::doestContains(['Foo', 'Bar'], 'foo', true));
+        $this->assertFalse(Arr::doestContains(['Foo', 'Bar'], 'Foo', true));
+
         $this->assertTrue(Arr::doestContains(new Collection(['foo', 'bar']), 'baz'));
         $this->assertFalse(Arr::doestContains(new Collection(['foo', 'bar']), 'foo'));
         $this->assertFalse(Arr::doestContains(new Collection(['foo', 'bar']), 'bar'));
+
+        $this->assertTrue(Arr::doestContains(new Collection(['Foo', 'Bar']), 'foo', true));
+        $this->assertFalse(Arr::doestContains(new Collection(['Foo', 'Bar']), 'Foo', true));
     }
 
     public function testDot()

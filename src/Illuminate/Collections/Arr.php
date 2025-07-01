@@ -127,7 +127,7 @@ class Arr
     public static function contains($array, $value, bool $strict = false): bool
     {
         if ($array instanceof Enumerable) {
-            return $array->contains($value, $strict);
+            return $strict ? $array->containsStrict($value) : $array->contains($value);
         }
 
         return in_array($value, $array, $strict);
