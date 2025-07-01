@@ -777,12 +777,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             [$value, $key] = $this->explodePluckParameters($value, $key);
 
             foreach ($this as $item) {
-                $itemValue = data_get($item, $value);
+                $itemValue = $value instanceof Closure
+                    ? $value($item)
+                    : data_get($item, $value);
 
                 if (is_null($key)) {
                     yield $itemValue;
                 } else {
-                    $itemKey = data_get($item, $key);
+                    $itemKey = $key instanceof Closure
+                        ? $key($item)
+                        : data_get($item, $key);
 
                     if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                         $itemKey = (string) $itemKey;
@@ -1869,7 +1873,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = is_null($key) || is_array($key) || $key instanceof Closure ? $key : explode('.', $key);
 
         return [$value, $key];
     }

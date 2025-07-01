@@ -732,6 +732,26 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertSame($bar, $collection->except($fooKey)->first());
     }
 
+    public function testPluck()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1, 'name' => 'John', 'country' => 'US']);
+        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2, 'name' => 'Jane', 'country' => 'NL']);
+        $model3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3, 'name' => 'Taylor', 'country' => 'US']);
+
+        $c = new Collection;
+
+        $c->push($model1)->push($model2)->push($model3);
+
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('id'));
+        $this->assertEquals([1, 2, 3], $c->pluck('id')->all());
+
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('id', 'id'));
+        $this->assertEquals([1 => 1, 2 => 2, 3 => 3], $c->pluck('id', 'id')->all());
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('test'));
+
+        $this->assertEquals(['John (US)', 'Jane (NL)', 'Taylor (US)'], $c->pluck(fn (TestEloquentCollectionModel $model) => "{$model->name} ({$model->country})")->all());
+    }
+
     /**
      * Helpers...
      */
