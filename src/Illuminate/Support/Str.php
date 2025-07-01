@@ -406,6 +406,18 @@ class Str
     }
 
     /**
+     * Determine if a given string doesn't end with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function doesntEndWith($haystack, $needles)
+    {
+        return ! static::endsWith($haystack, $needles);
+    }
+
+    /**
      * Extracts an excerpt from text that matches the first instance of a phrase.
      *
      * @param  string  $text
@@ -1657,6 +1669,18 @@ class Str
         }
 
         return false;
+    }
+
+    /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function doesntStartWith($haystack, $needles)
+    {
+        return ! static::startsWith($haystack, $needles);
     }
 
     /**
