@@ -19,6 +19,8 @@ namespace Illuminate\Support\Facades;
  * @method static array exceptHidden(array $keys)
  * @method static \Illuminate\Log\Context\Repository add(string|array $key, mixed $value = null)
  * @method static \Illuminate\Log\Context\Repository addHidden(string|array $key, mixed $value = null)
+ * @method static mixed remember(string $key, mixed $value)
+ * @method static mixed rememberHidden(string $key, mixed $value)
  * @method static \Illuminate\Log\Context\Repository forget(string|array $key)
  * @method static \Illuminate\Log\Context\Repository forgetHidden(string|array $key)
  * @method static \Illuminate\Log\Context\Repository addIf(string $key, mixed $value)
@@ -44,8 +46,6 @@ namespace Illuminate\Support\Facades;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static \Illuminate\Database\Eloquent\Model restoreModel(\Illuminate\Contracts\Database\ModelIdentifier $value)
- * @method static mixed remember(string $key, mixed $value)
- * @method static mixed rememberHidden(string $key, mixed $value)
  *
  * @see \Illuminate\Log\Context\Repository
  */
