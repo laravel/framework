@@ -97,13 +97,17 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  mixed  $value
      * @param  bool  $serialize
+     * @param  bool  $deterministic
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt(#[\SensitiveParameter] $value, $serialize = true)
+    public function encrypt(#[\SensitiveParameter] $value, bool $serialize = true, bool $deterministic = false)
     {
-        $iv = random_bytes(openssl_cipher_iv_length(strtolower($this->cipher)));
+        $data = $serialize ? serialize($value) : $value;
+        $cipher_algo = strtolower($this->cipher);
+        $ivLength = openssl_cipher_iv_length($cipher_algo);
+        $iv = $deterministic ? substr(hash('sha256', $data . $this->key, true), 0, $ivLength) : random_bytes($ivLength);
 
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
@@ -134,13 +138,14 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * Encrypt a string without serialization.
      *
      * @param  string  $value
+     * @param  bool  $deterministic
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encryptString(#[\SensitiveParameter] $value)
+    public function encryptString(#[\SensitiveParameter] $value, bool $deterministic = false)
     {
-        return $this->encrypt($value, false);
+        return $this->encrypt($value, false, $deterministic);
     }
 
     /**

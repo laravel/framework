@@ -9,11 +9,12 @@ interface Encrypter
      *
      * @param  mixed  $value
      * @param  bool  $serialize
+     * @param  bool  $deterministic
      * @return string
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
      */
-    public function encrypt(#[\SensitiveParameter] $value, $serialize = true);
+    public function encrypt(#[\SensitiveParameter] $value, bool $serialize = true, bool $deterministic = false);
 
     /**
      * Decrypt the given value.
