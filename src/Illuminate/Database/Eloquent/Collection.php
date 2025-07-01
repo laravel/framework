@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
@@ -717,8 +718,8 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get an array with the values of a given key.
      *
-     * @param  string|array<array-key, string>|null  $value
-     * @param  string|null  $key
+     * @param  string|array<array-key, string>|Closure|null  $value
+     * @param  string|Closure|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
     public function pluck($value, $key = null)
