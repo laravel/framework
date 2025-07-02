@@ -187,7 +187,7 @@ class Repository implements ArrayAccess, ConfigContract
      */
     public function collection(string $key, $default = null): Collection
     {
-        return collect($this->array($key, $default));
+        return new Collection($this->array($key, $default));
     }
 
     /**
