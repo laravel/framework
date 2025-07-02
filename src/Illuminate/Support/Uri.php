@@ -238,7 +238,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     {
         $paths = implode('',
             Arr::map(
-                Arr::flatten(func_get_args()),
+                Arr::flatten($paths),
                 fn (Stringable|string $segment) => Str::start((string) $segment, '/')
             )
         );
