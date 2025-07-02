@@ -111,7 +111,7 @@ trait DatabaseRule
      * Set a "where not" constraint on the query.
      *
      * @param  string  $column
-     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string  $value
+     * @param  \Illuminate\Contracts\Support\Arrayable|\UnitEnum|array|string|int  $value
      * @return $this
      */
     public function whereNot($column, $value)
