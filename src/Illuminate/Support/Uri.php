@@ -230,11 +230,20 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
-     * Specify the path of the URI.
+     * Specify the paths of the URI.
+     *
+     * @param  Stringable|string|array<int, Stringable|string>  ...$paths
      */
-    public function withPath(Stringable|string $path): static
+    public function withPath(Stringable|string|array ...$paths): static
     {
-        return new static($this->uri->withPath(Str::start((string) $path, '/')));
+        $paths = implode('',
+            Arr::map(
+                Arr::flatten(func_get_args()),
+                fn (Stringable|string $segment) => Str::start((string) $segment, '/')
+            )
+        );
+
+        return new static($this->uri->withPath($paths));
     }
 
     /**
