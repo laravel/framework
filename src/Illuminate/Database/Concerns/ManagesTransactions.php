@@ -158,20 +158,6 @@ trait ManagesTransactions
     }
 
     /**
-     * Create a save point within the database.
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    protected function createSavepoint()
-    {
-        $this->getPdo()->exec(
-            $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
-        );
-    }
-
-    /**
      * Handle an exception from a transaction beginning.
      *
      * @param  \Throwable  $e
@@ -214,6 +200,22 @@ trait ManagesTransactions
         );
 
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Create a save point within the database.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function createSavepoint()
+    {
+        // we do not use ManagesSavepoint::savepoint() here because this is an internally created savepoint
+        // used as part of nested transaction emulation and therefore not stored in the savepoints array
+        $this->getPdo()->exec(
+            $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
+        );
     }
 
     /**
@@ -298,7 +300,9 @@ trait ManagesTransactions
             }
         } elseif ($this->queryGrammar->supportsSavepoints()) {
             $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
+                // we do not use ManagesSavepoints::rollbackToSavepoint() here because this is an internally created
+                // savepoint used as part of nested transaction emulation and therefore not stored in the savepoints array
+                $this->queryGrammar->compileRollbackToSavepoint('trans'.($toLevel + 1))
             );
         }
     }
