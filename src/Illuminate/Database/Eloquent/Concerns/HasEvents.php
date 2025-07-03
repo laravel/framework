@@ -208,8 +208,6 @@ trait HasEvents
             return true;
         }
 
-        // If we have automatic eager loading enabled for the creating event unset any null relations
-        // as it can cause issues and set the relations to null even if they exist.
         if (static::isAutomaticallyEagerLoadingRelationships() && $event == 'creating') {
             $this->setRelations(array_filter($this->getRelations()));
         }
