@@ -80,8 +80,8 @@ class Number
     /**
      * Parse a string into a float according to the specified locale.
      *
-     * @param  string  $string  The string to parse
-     * @param  string|null  $locale  The locale to use
+     * @param  string  $string
+     * @param  string|null  $locale
      * @return float|false
      */
     public static function parseFloat(string $string, ?string $locale = null): float
