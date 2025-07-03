@@ -225,7 +225,7 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
         DB::disableQueryLog();
     }
 
-    public function testDoesntCauseNQueryIssueUsingGet()
+    public function testDoesntCauseNQueryIssueUsingGetMethod()
     {
         Model::automaticallyEagerLoadRelationships();
 
