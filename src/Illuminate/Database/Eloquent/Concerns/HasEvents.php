@@ -210,6 +210,7 @@ trait HasEvents
 
         if (static::isAutomaticallyEagerLoadingRelationships() && $event == 'creating') {
             $this->setRelations(array_filter($this->getRelations()));
+            $this->withRelationshipAutoloading();
         }
 
         // First, we will get the proper method to call on the event dispatcher, and then we
