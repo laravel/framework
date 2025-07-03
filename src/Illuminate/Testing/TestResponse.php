@@ -616,6 +616,17 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response has the given Content-Type header value.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertContentType($value)
+    {
+        return $this->assertHeader('Content-Type', $value);
+    }
+
+    /**
      * Assert that the response was streamed.
      *
      * @return $this

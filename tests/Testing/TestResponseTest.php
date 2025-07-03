@@ -1239,6 +1239,17 @@ class TestResponseTest extends TestCase
         $response->assertHeaderMissing('Location');
     }
 
+    public function testAssertContentType()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Content-Type', 'application/json');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertContentType('application/json');
+    }
+
     public function testAssertPrecognitionSuccessfulWithMissingHeader()
     {
         $this->expectException(AssertionFailedError::class);
