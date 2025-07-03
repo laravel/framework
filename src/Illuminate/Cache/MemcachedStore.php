@@ -203,6 +203,14 @@ class MemcachedStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Set the expiration time of a cached item.
+     */
+    public function touch(string $key, int $ttl): bool
+    {
+        return $this->memcached->touch($this->getPrefix().$key, $this->calculateExpiration($ttl));
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
