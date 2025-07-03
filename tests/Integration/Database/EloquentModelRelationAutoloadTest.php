@@ -19,7 +19,6 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
             $table->string('name')->nullable();
             $table->string('status')->nullable();
             $table->unsignedInteger('post_id')->nullable();
-            $table->unsignedInteger('video_id')->nullable();
         });
 
         Schema::create('posts', function (Blueprint $table) {
@@ -281,11 +280,6 @@ class Tag extends Model
     {
         return $this->belongsTo(Post::class);
     }
-
-    public function video()
-    {
-        return $this->belongsTo(Video::class);
-    }
 }
 
 class Comment extends Model
@@ -312,8 +306,6 @@ class Comment extends Model
 
 class Post extends Model
 {
-    use HasFactory;
-
     public $timestamps = false;
 
     public function shouldApplyStatus()
