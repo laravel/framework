@@ -394,27 +394,37 @@ abstract class Factory
      */
     public function make($attributes = [], ?Model $parent = null)
     {
-        if (! empty($attributes)) {
-            return $this->state($attributes)->make([], $parent);
+        $autoEagerLoadingEnabled = Model::isAutomaticallyEagerLoadingRelationships();
+
+        if ($autoEagerLoadingEnabled) {
+            Model::automaticallyEagerLoadRelationships(false);
         }
 
-        if ($this->count === null) {
-            return tap($this->makeInstance($parent), function ($instance) {
-                $this->callAfterMaking(new Collection([$instance]));
-            });
+        try {
+            if (! empty($attributes)) {
+                return $this->state($attributes)->make([], $parent);
+            }
+
+            if ($this->count === null) {
+                return tap($this->makeInstance($parent), function ($instance) {
+                    $this->callAfterMaking(new Collection([$instance]));
+                });
+            }
+
+            if ($this->count < 1) {
+                return $this->newModel()->newCollection();
+            }
+
+            $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
+                return $this->makeInstance($parent);
+            }, range(1, $this->count)));
+
+            $this->callAfterMaking($instances);
+
+            return $instances;
+        } finally {
+            Model::automaticallyEagerLoadRelationships($autoEagerLoadingEnabled);
         }
-
-        if ($this->count < 1) {
-            return $this->newModel()->newCollection();
-        }
-
-        $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
-            return $this->makeInstance($parent);
-        }, range(1, $this->count)));
-
-        $this->callAfterMaking($instances);
-
-        return $instances;
     }
 
     /**
