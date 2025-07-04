@@ -19,6 +19,7 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Laravel\Prompts\Prompt;
 
 class PendingCommand
 {
@@ -405,9 +406,14 @@ class PendingCommand
      */
     protected function mockConsoleOutput()
     {
+        $bufferedOutputMock = $this->createABufferedOutputMock();
         $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
-            new ArrayInput($this->parameters), $this->createABufferedOutputMock(),
+            new ArrayInput($this->parameters), $bufferedOutputMock,
         ]);
+
+        if (class_exists(Prompt::class)) {
+            Prompt::setOutput($bufferedOutputMock);
+        }
 
         foreach ($this->test->expectedQuestions as $i => $question) {
             $mock->shouldReceive('askQuestion')
