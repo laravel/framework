@@ -396,7 +396,7 @@ abstract class Factory
     {
         $autoEagerLoadingEnabled = Model::isAutomaticallyEagerLoadingRelationships();
 
-        if($autoEagerLoadingEnabled) {
+        if ($autoEagerLoadingEnabled) {
             Model::automaticallyEagerLoadRelationships(false);
         }
 
