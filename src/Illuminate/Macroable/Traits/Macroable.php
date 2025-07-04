@@ -17,6 +17,13 @@ trait Macroable
     protected static $macros = [];
 
     /**
+     * The registered scoped macros.
+     *
+     * @var array
+     */
+    protected static $scopedMacros = [];
+
+    /**
      * Register a custom macro.
      *
      * @param  string  $name
@@ -29,6 +36,19 @@ trait Macroable
     public static function macro($name, $macro)
     {
         static::$macros[$name] = $macro;
+    }
+
+    /**
+     * Register a custom scoped macro, scoped macros are only
+     * available to the class in which they are registered.
+     *
+     * @param  string  $name
+     * @param  object|callable  $macro
+     * @return void
+     */
+    public static function scopedMacro($name, $macro)
+    {
+        static::$scopedMacros[static::class][$name] = $macro;
     }
 
     /**
@@ -61,6 +81,22 @@ trait Macroable
      */
     public static function hasMacro($name)
     {
+        return static::hasGlobalMacro($name) || static::hasScopedMacro($name);
+    }
+
+    /**
+     * Checks if scoped macro is registered.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public static function hasScopedMacro($name): bool
+    {
+        return isset(static::$scopedMacros[static::class][$name]);
+    }
+
+    public static function hasGlobalMacro($name): bool
+    {
         return isset(static::$macros[$name]);
     }
 
@@ -72,10 +108,12 @@ trait Macroable
     public static function flushMacros()
     {
         static::$macros = [];
+        static::$scopedMacros = [];
     }
 
     /**
-     * Dynamically handle calls to the class.
+     * Dynamically handle static method calls to the class.
+     * Scoped macros take priority over global macros.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -91,7 +129,11 @@ trait Macroable
             ));
         }
 
-        $macro = static::$macros[$method];
+        if (static::hasScopedMacro($method)) {
+            $macro = static::$scopedMacros[static::class][$method];
+        } else {
+            $macro = static::$macros[$method];
+        }
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo(null, static::class);
@@ -101,7 +143,8 @@ trait Macroable
     }
 
     /**
-     * Dynamically handle calls to the class.
+     * Dynamically handle method calls to the class instance.
+     * Scoped macros take priority over global macros.
      *
      * @param  string  $method
      * @param  array  $parameters
@@ -117,7 +160,11 @@ trait Macroable
             ));
         }
 
-        $macro = static::$macros[$method];
+        if (static::hasScopedMacro($method)) {
+            $macro = static::$scopedMacros[static::class][$method];
+        } else {
+            $macro = static::$macros[$method];
+        }
 
         if ($macro instanceof Closure) {
             $macro = $macro->bindTo($this, static::class);
