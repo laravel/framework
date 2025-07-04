@@ -12,7 +12,7 @@ class LoadConfigurationTest extends TestCase
     {
         $app = new Application();
 
-        (new LoadConfiguration())->bootstrap($app);
+        (new LoadConfiguration)->bootstrap($app);
 
         $this->assertSame('Laravel', $app['config']['app.name']);
     }
@@ -22,7 +22,7 @@ class LoadConfigurationTest extends TestCase
         $app = new Application();
         $app->dontMergeFrameworkConfiguration();
 
-        (new LoadConfiguration())->bootstrap($app);
+        (new LoadConfiguration)->bootstrap($app);
 
         $this->assertNull($app['config']['app.name']);
     }
@@ -32,7 +32,7 @@ class LoadConfigurationTest extends TestCase
         $app = new Application(__DIR__.'/../fixtures');
         $app->useConfigPath(__DIR__.'/../fixtures/config');
 
-        (new LoadConfiguration())->bootstrap($app);
+        (new LoadConfiguration)->bootstrap($app);
 
         $this->assertNull($app['config']['bar.foo']);
         $this->assertSame('bar', $app['config']['custom.foo']);
