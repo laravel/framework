@@ -41,22 +41,23 @@ trait ResolvesRouteDependencies
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
-        $instanceCount = 0;
-
+        $keys = array_keys($parameters);
         $values = array_values($parameters);
 
         $skippableValue = new stdClass;
 
         foreach ($reflector->getParameters() as $key => $parameter) {
-            $instance = $this->transformDependency($parameter, $parameters, $skippableValue);
-
-            if ($instance !== $skippableValue) {
-                $instanceCount++;
-
+            if (false !== ($position = array_search($parameter->name, $keys, true))) {
+                $instance = $parameters[$parameter->name];
+                unset($keys[$position], $values[$position], $parameters[$parameter->name]);
+                $this->spliceIntoParameters($parameters, $key, $instance, $parameter->name);
+            } elseif ($skippableValue !== ($instance = $this->transformDependency($parameter, $values, $skippableValue))) {
                 $this->spliceIntoParameters($parameters, $key, $instance);
-            } elseif (! isset($values[$key - $instanceCount]) &&
-                      $parameter->isDefaultValueAvailable()) {
+            } elseif (empty($values) && $parameter->isDefaultValueAvailable()) {
                 $this->spliceIntoParameters($parameters, $key, $parameter->getDefaultValue());
+            } else {
+                array_shift($keys);
+                array_shift($values);
             }
 
             $this->container->fireAfterResolvingAttributeCallbacks($parameter->getAttributes(), $instance);
@@ -113,12 +114,17 @@ trait ResolvesRouteDependencies
      * @param  array  $parameters
      * @param  string  $offset
      * @param  mixed  $value
+     * @param  string|null  $key
      * @return void
      */
-    protected function spliceIntoParameters(array &$parameters, $offset, $value)
+    protected function spliceIntoParameters(array &$parameters, $offset, $value, ?string $key = null)
     {
-        array_splice(
-            $parameters, $offset, 0, [$value]
-        );
+        if (null === $key) {
+            array_splice($parameters, $offset, 0, [$value]);
+        } else {
+            $parameters = array_slice($parameters, 0, $offset, true)
+                + [$key => $value]
+                + array_slice($parameters, $offset, null, true);
+        }
     }
 }
