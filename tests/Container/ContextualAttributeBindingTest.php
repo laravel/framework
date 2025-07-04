@@ -620,7 +620,8 @@ final readonly class TestGetData
         #[Get('name')] public string $name,
         #[Get('age', 24)] public int $age,
         #[Get('hobbies', [])] public array $hobbies,
-    ) {}
+    ) {
+    }
 }
 
 final readonly class TestPostData
@@ -629,5 +630,6 @@ final readonly class TestPostData
         #[Post('name')] public string $name,
         #[Post('age', 24)] public int $age,
         #[Post('hobbies', [])] public array $hobbies,
-    ) {}
+    ) {
+    }
 }
