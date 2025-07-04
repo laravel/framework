@@ -14,8 +14,10 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Get;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
+use Illuminate\Container\Attributes\Post;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
@@ -354,6 +356,42 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
+
+    public function testGetAttribute()
+    {
+        $container = new Container;
+        $container->bind('request', function () {
+            return Request::create('/', 'GET', [
+                'name' => 'Joe Bloggs',
+                'age' => '32',
+                'hobbies' => ['Sports'],
+            ]);
+        });
+
+        $data = $container->make(TestGetData::class);
+
+        $this->assertEquals('Joe Bloggs', $data->name);
+        $this->assertEquals(32, $data->age);
+        $this->assertEquals(['Sports'], $data->hobbies);
+    }
+
+    public function testPostAttribute()
+    {
+        $container = new Container;
+        $container->bind('request', function () {
+            return Request::create('/', 'POST', [
+                'name' => 'Joe Bloggs',
+                'age' => '32',
+                'hobbies' => ['Sports'],
+            ]);
+        });
+
+        $data = $container->make(TestGetData::class);
+
+        $this->assertEquals('Joe Bloggs', $data->name);
+        $this->assertEquals(32, $data->age);
+        $this->assertEquals(['Sports'], $data->hobbies);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -574,4 +612,22 @@ final class LocaleObject
     ) {
         //
     }
+}
+
+final readonly class TestGetData
+{
+    public function __construct(
+        #[Get('name')] public string $name,
+        #[Get('age', 24)] public int $age,
+        #[Get('hobbies', [])] public array $hobbies,
+    ) {}
+}
+
+final readonly class TestPostData
+{
+    public function __construct(
+        #[Post('name')] public string $name,
+        #[Post('age', 24)] public int $age,
+        #[Post('hobbies', [])] public array $hobbies,
+    ) {}
 }
