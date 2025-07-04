@@ -39,6 +39,60 @@ class SupportMacroableTest extends TestCase
         $this->assertFalse($macroable::hasMacro('bar'));
     }
 
+    public function testRegisterScopedMacro()
+    {
+        $macroable = $this->macroable;
+        $macroable::scopedMacro(__METHOD__, function () {
+            return 'Scoped Macro';
+        });
+
+        $this->assertSame('Scoped Macro', $macroable::{__METHOD__}());
+    }
+
+    public function testHasScopedMacro()
+    {
+        $macroable = $this->macroable;
+
+        $macroable::scopedMacro(__METHOD__, function () {
+            return 'Scoped Macro';
+        });
+
+        $this->assertTrue($macroable::hasScopedMacro(__METHOD__));
+        $this->assertFalse($macroable::hasGlobalMacro(__METHOD__));
+        $this->assertFalse($macroable::hasScopedMacro(__METHOD__.'_NoneExistent'));
+    }
+
+    public function testExtendedClassDoesNotHaveScopedMacro()
+    {
+        $macroable = $this->macroable;
+        $otherMacroable = new class extends EmptyMacroable
+        {
+        };
+        $macroable::scopedMacro(__METHOD__, function () {
+            return 'Scoped Macro';
+        });
+
+        $this->assertSame('Scoped Macro', $macroable::{__METHOD__}());
+        $this->assertFalse($otherMacroable::hasScopedMacro(__METHOD__));
+        $this->expectException(BadMethodCallException::class);
+        $otherMacroable::{__METHOD__}();
+    }
+    public function testParentClassDoesNotHaveScopedMacro()
+    {
+        $macroable = $this->macroable;
+        $otherMacroable = new class extends EmptyMacroable
+        {
+        };
+        $otherMacroable::scopedMacro(__METHOD__, function () {
+            return 'Scoped Macro';
+        });
+
+        $this->assertSame('Scoped Macro', $otherMacroable::{__METHOD__}());
+        $this->assertFalse($macroable::hasScopedMacro(__METHOD__));
+        $this->expectException(BadMethodCallException::class);
+        $macroable::{__METHOD__}();
+    }
+
     public function testRegisterMacroAndCallWithoutStatic()
     {
         $macroable = $this->macroable;
