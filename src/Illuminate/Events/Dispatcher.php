@@ -25,7 +25,7 @@ use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReflectsClosures;
+    use EventHooks, Macroable, ReflectsClosures;
 
     /**
      * The IoC container instance.
@@ -216,7 +216,7 @@ class Dispatcher implements DispatcherContract
     protected function resolveSubscriber($subscriber)
     {
         if (is_string($subscriber)) {
-            return $this->container->make($subscriber);
+            return $this->container()->make($subscriber);
         }
 
         return $subscriber;
@@ -278,30 +278,59 @@ class Dispatcher implements DispatcherContract
      */
     protected function invokeListeners($event, $payload, $halt = false)
     {
+        // If a callback throws an EventPropagationException, no further
+        // callbacks are run and the event is not dispatched to listeners.
+        try {
+                if ($this->hasCallbacks(static::HOOK_BEFORE, $event, $payload)) {
+                $this->invokeCallbacks(static::HOOK_BEFORE, $event, $payload);
+            }
+        } catch (EventPropagationException) {
+            return null;
+        }
+
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
 
         $responses = [];
+        $failure = false;
 
         foreach ($this->getListeners($event) as $listener) {
             $response = $listener($event, $payload);
 
-            // If a response is returned from the listener and event halting is enabled
-            // we will just return this response, and not call the rest of the event
-            // listeners. Otherwise we will add the response on the response list.
+            // If a response is returned from the listener and event halting is enabled, we
+            // will fire the after callbacks (or the failure callbacks when boolean false is
+            // returned, indicating failure), return this response, and not call the rest of
+            // the event listeners, otherwise we will add the response to the response list.
             if ($halt && ! is_null($response)) {
+                $hook = $response === false ? static::HOOK_FAILURE : static::HOOK_AFTER;
+                if ($this->hasCallbacks($hook, $event, $payload)) {
+                    $this->invokeCallbacks($hook, $event, $payload);
+                }
+
                 return $response;
             }
 
-            // If a boolean false is returned from a listener, we will stop propagating
-            // the event to any further listeners down in the chain, else we keep on
-            // looping through the listeners and firing every one in our sequence.
+            // If a boolean false is returned from a listener (indicating failure), we will
+            // fire the failure callbacks and stop propagating the event to any further
+            // listeners down the chain, otherwise we keep on looping through the listeners
+            // and firing each one in our sequence.
             if ($response === false) {
+                if ($this->hasCallbacks(static::HOOK_FAILURE, $event, $payload)) {
+                    $this->invokeCallbacks(static::HOOK_FAILURE, $event, $payload);
+                }
+
+                $failure = true;
+
                 break;
             }
 
             $responses[] = $response;
+        }
+
+        // If we've fired all listeners without failure, we will fire the after callbacks.
+        if (! $failure && $this->hasCallbacks(static::HOOK_AFTER, $event, $payload)) {
+            $this->invokeCallbacks(static::HOOK_AFTER, $event, $payload);
         }
 
         return $halt ? null : $responses;
@@ -357,7 +386,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function broadcastEvent($event)
     {
-        $this->container->make(BroadcastFactory::class)->queue($event);
+        $this->container()->make(BroadcastFactory::class)->queue($event);
     }
 
     /**
@@ -502,7 +531,7 @@ class Dispatcher implements DispatcherContract
             return $this->createQueuedHandlerCallable($class, $method);
         }
 
-        $listener = $this->container->make($class);
+        $listener = $this->container()->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
             ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
@@ -599,7 +628,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerWantsToBeQueued($class, $arguments)
     {
-        $instance = $this->container->make($class);
+        $instance = $this->container()->make($class);
 
         if (method_exists($instance, 'shouldQueue')) {
             return $instance->shouldQueue($arguments[0]);

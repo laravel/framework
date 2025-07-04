@@ -35,6 +35,10 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static \Illuminate\Support\Collection dispatched(string $event, callable|null $callback = null)
  * @method static bool hasDispatched(string $event)
  * @method static array dispatchedEvents()
+ * @method static array callbacks(?string $hook = null, ?string $event = null)
+ * @method static \Illuminate\Events\Dispatcher before(callable|string|array $events, callable|string|array|null $callbacks = null)
+ * @method static \Illuminate\Events\Dispatcher after(callable|string|array $events, callable|string|array|null $callbacks = null)
+ * @method static \Illuminate\Events\Dispatcher failure(callable|string|array $events, callable|string|array|null $callbacks = null)
  *
  * @see \Illuminate\Events\Dispatcher
  * @see \Illuminate\Support\Testing\Fakes\EventFake
