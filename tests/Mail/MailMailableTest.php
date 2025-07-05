@@ -1170,7 +1170,7 @@ class MailMailableTest extends TestCase
                 ->assertHasSubject('Test Subject!');
         });
     }
-    
+
     protected function stubMailer()
     {
         Container::getInstance()->instance('mailer', new class
