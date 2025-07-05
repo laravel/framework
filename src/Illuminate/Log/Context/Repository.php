@@ -250,6 +250,42 @@ class Repository
     }
 
     /**
+     * Add a context value if it does not exist yet, and return the value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function remember($key, $value)
+    {
+        if ($this->has($key)) {
+            return $this->get($key);
+        }
+
+        return tap(value($value), function ($value) use ($key) {
+            $this->add($key, $value);
+        });
+    }
+
+    /**
+     * Add a hidden context value if it does not exist yet, and return the value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public function rememberHidden($key, #[\SensitiveParameter] $value)
+    {
+        if ($this->hasHidden($key)) {
+            return $this->getHidden($key);
+        }
+
+        return tap(value($value), function ($value) use ($key) {
+            $this->addHidden($key, $value);
+        });
+    }
+
+    /**
      * Forget the given context key.
      *
      * @param  string|array<int, string>  $key

@@ -2324,6 +2324,28 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testPluckWithClosure($collection)
+    {
+        $data = new $collection([
+            [
+                'name' => 'amir',
+                'skill' => [
+                    'backend' => ['php', 'python'],
+                ],
+            ],
+            [
+                'name' => 'taylor',
+                'skill' => [
+                    'backend' => ['php', 'asp', 'java'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['amir (verified)', 'taylor (verified)'], $data->pluck(fn (array $row) => "{$row['name']} (verified)")->all());
+        $this->assertEquals(['php/python' => 'amir', 'php/asp/java' => 'taylor'], $data->pluck('name', fn (array $row) => implode('/', $row['skill']['backend']))->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testPluckDuplicateKeysExist($collection)
     {
         $data = new $collection([

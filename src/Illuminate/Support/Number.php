@@ -80,8 +80,8 @@ class Number
     /**
      * Parse a string into a float according to the specified locale.
      *
-     * @param  string  $string  The string to parse
-     * @param  string|null  $locale  The locale to use
+     * @param  string  $string
+     * @param  string|null  $locale
      * @return float|false
      */
     public static function parseFloat(string $string, ?string $locale = null): float
@@ -234,7 +234,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return false|string
+     * @return string|false
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
