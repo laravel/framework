@@ -1,1037 +1,1773 @@
 <?php
 
-namespace Illuminate\Foundation;
+namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\HtmlString;
+use Illuminate\Foundation\Vite;
+use Illuminate\Foundation\ViteException;
+use Illuminate\Foundation\ViteManifestNotFoundException;
+use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\Js;
 use Illuminate\Support\Str;
-use Illuminate\Support\Traits\Macroable;
+use Orchestra\Testbench\TestCase;
 
-class Vite implements Htmlable
+class FoundationViteTest extends TestCase
 {
-    use Macroable;
-
-    /**
-     * The Content Security Policy nonce to apply to all generated tags.
-     *
-     * @var string|null
-     */
-    protected $nonce;
-
-    /**
-     * The key to check for integrity hashes within the manifest.
-     *
-     * @var string|false
-     */
-    protected $integrityKey = 'integrity';
-
-    /**
-     * The configured entry points.
-     *
-     * @var array
-     */
-    protected $entryPoints = [];
-
-    /**
-     * The path to the "hot" file.
-     *
-     * @var string|null
-     */
-    protected $hotFile;
-
-    /**
-     * The path to the build directory.
-     *
-     * @var string
-     */
-    protected $buildDirectory = 'build';
-
-    /**
-     * The name of the manifest file.
-     *
-     * @var string
-     */
-    protected $manifestFilename = 'manifest.json';
-
-    /**
-     * The custom asset path resolver.
-     *
-     * @var callable|null
-     */
-    protected $assetPathResolver = null;
-
-    /**
-     * The script tag attributes resolvers.
-     *
-     * @var array
-     */
-    protected $scriptTagAttributesResolvers = [];
-
-    /**
-     * The style tag attributes resolvers.
-     *
-     * @var array
-     */
-    protected $styleTagAttributesResolvers = [];
-
-    /**
-     * The preload tag attributes resolvers.
-     *
-     * @var array
-     */
-    protected $preloadTagAttributesResolvers = [];
-
-    /**
-     * The preloaded assets.
-     *
-     * @var array
-     */
-    protected $preloadedAssets = [];
-
-    /**
-     * The cached manifest files.
-     *
-     * @var array
-     */
-    protected static $manifests = [];
-
-    /**
-     * The prefetching strategy to use.
-     *
-     * @var null|'waterfall'|'aggressive'
-     */
-    protected $prefetchStrategy = null;
-
-    /**
-     * The number of assets to load concurrently when using the "waterfall" strategy.
-     *
-     * @var int
-     */
-    protected $prefetchConcurrently = 3;
-
-    /**
-     * The name of the event that should trigger prefetching. The event must be dispatched on the `window`.
-     *
-     * @var string
-     */
-    protected $prefetchEvent = 'load';
-
-    /**
-     * Get the preloaded assets.
-     *
-     * @return array
-     */
-    public function preloadedAssets()
+    protected function setUp(): void
     {
-        return $this->preloadedAssets;
+        parent::setUp();
+
+        app('config')->set('app.asset_url', 'https://example.com');
     }
 
-    /**
-     * Get the Content Security Policy nonce applied to all generated tags.
-     *
-     * @return string|null
-     */
-    public function cspNonce()
+    protected function tearDown(): void
     {
-        return $this->nonce;
+        $this->cleanViteManifest();
+        $this->cleanViteHotFile();
+
+        parent::tearDown();
     }
 
-    /**
-     * Generate or set a Content Security Policy nonce to apply to all generated tags.
-     *
-     * @param  string|null  $nonce
-     * @return string
-     */
-    public function useCspNonce($nonce = null)
+    public function testViteWithJsOnly()
     {
-        return $this->nonce = $nonce ?? Str::random(40);
+        $this->makeViteManifest();
+
+        $result = app(Vite::class)('resources/js/app.js');
+
+        $this->assertStringEndsWith('<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>', $result->toHtml());
     }
 
-    /**
-     * Use the given key to detect integrity hashes in the manifest.
-     *
-     * @param  string|false  $key
-     * @return $this
-     */
-    public function useIntegrityKey($key)
+    public function testViteWithCssAndJs()
     {
-        $this->integrityKey = $key;
+        $this->makeViteManifest();
 
-        return $this;
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Set the Vite entry points.
-     *
-     * @param  array  $entryPoints
-     * @return $this
-     */
-    public function withEntryPoints($entryPoints)
+    public function testViteWithCssImport()
     {
-        $this->entryPoints = $entryPoints;
+        $this->makeViteManifest();
 
-        return $this;
+        $result = app(Vite::class)('resources/js/app-with-css-import.js');
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/imported-css.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app-with-css-import.versioned.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Merge additional Vite entry points with the current set.
-     *
-     * @param  array  $entryPoints
-     * @return $this
-     */
-    public function mergeEntryPoints($entryPoints)
+    public function testViteWithSharedCssImport()
     {
-        return $this->withEntryPoints(array_unique([
-            ...$this->entryPoints,
-            ...$entryPoints,
-        ]));
+        $this->makeViteManifest();
+
+        $result = app(Vite::class)(['resources/js/app-with-shared-css.js']);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/shared-css.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app-with-shared-css.versioned.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Set the filename for the manifest file.
-     *
-     * @param  string  $filename
-     * @return $this
-     */
-    public function useManifestFilename($filename)
+    public function testViteHotModuleReplacementWithJsOnly()
     {
-        $this->manifestFilename = $filename;
+        $this->makeViteHotFile();
 
-        return $this;
+        $result = app(Vite::class)('resources/js/app.js');
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Resolve asset paths using the provided resolver.
-     *
-     * @param  callable|null  $resolver
-     * @return $this
-     */
-    public function createAssetPathsUsing($resolver)
+    public function testViteHotModuleReplacementWithJsAndCss()
     {
-        $this->assetPathResolver = $resolver;
+        $this->makeViteHotFile();
 
-        return $this;
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Get the Vite "hot" file path.
-     *
-     * @return string
-     */
-    public function hotFile()
+    public function testItCanGenerateCspNonceWithHotFile()
     {
-        return $this->hotFile ?? public_path('/hot');
+        Str::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
+        $this->makeViteHotFile();
+
+        $nonce = ViteFacade::useCspNonce();
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame('random-string-with-length:40', $nonce);
+        $this->assertSame('random-string-with-length:40', ViteFacade::cspNonce());
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client" nonce="random-string-with-length:40"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" nonce="random-string-with-length:40" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js" nonce="random-string-with-length:40"></script>',
+            $result->toHtml()
+        );
+
+        Str::createRandomStringsNormally();
     }
 
-    /**
-     * Set the Vite "hot" file path.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useHotFile($path)
+    public function testItCanGenerateCspNonceWithManifest()
     {
-        $this->hotFile = $path;
+        Str::createRandomStringsUsing(fn ($length) => "random-string-with-length:{$length}");
+        $this->makeViteManifest();
 
-        return $this;
+        $nonce = ViteFacade::useCspNonce();
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame('random-string-with-length:40', $nonce);
+        $this->assertSame('random-string-with-length:40', ViteFacade::cspNonce());
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" nonce="random-string-with-length:40" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" nonce="random-string-with-length:40"></script>',
+            $result->toHtml()
+        );
+
+        Str::createRandomStringsNormally();
     }
 
-    /**
-     * Set the Vite build directory.
-     *
-     * @param  string  $path
-     * @return $this
-     */
-    public function useBuildDirectory($path)
+    public function testItCanSpecifyCspNonceWithHotFile()
     {
-        $this->buildDirectory = $path;
+        $this->makeViteHotFile();
 
-        return $this;
+        $nonce = ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame('expected-nonce', $nonce);
+        $this->assertSame('expected-nonce', ViteFacade::cspNonce());
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client" nonce="expected-nonce"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" nonce="expected-nonce" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js" nonce="expected-nonce"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Use the given callback to resolve attributes for script tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     * @return $this
-     */
-    public function useScriptTagAttributes($attributes)
+    public function testItCanSpecifyCspNonceWithManifest()
     {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
+        $this->makeViteManifest();
 
-        $this->scriptTagAttributesResolvers[] = $attributes;
+        $nonce = ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        return $this;
+        $this->assertSame('expected-nonce', $nonce);
+        $this->assertSame('expected-nonce', ViteFacade::cspNonce());
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" nonce="expected-nonce" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" nonce="expected-nonce"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Use the given callback to resolve attributes for style tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): array)|array  $attributes
-     * @return $this
-     */
-    public function useStyleTagAttributes($attributes)
+    public function testReactRefreshWithNoNonce()
     {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
+        $this->makeViteHotFile();
 
-        $this->styleTagAttributesResolvers[] = $attributes;
+        $result = app(Vite::class)->reactRefresh();
 
-        return $this;
+        $this->assertStringNotContainsString('nonce', $result);
     }
 
-    /**
-     * Use the given callback to resolve attributes for preload tags.
-     *
-     * @param  (callable(string, string, ?array, ?array): (array|false))|array|false  $attributes
-     * @return $this
-     */
-    public function usePreloadTagAttributes($attributes)
+    public function testReactRefreshNonce()
     {
-        if (! is_callable($attributes)) {
-            $attributes = fn () => $attributes;
-        }
+        $this->makeViteHotFile();
 
-        $this->preloadTagAttributesResolvers[] = $attributes;
+        $nonce = ViteFacade::useCspNonce('expected-nonce');
+        $result = app(Vite::class)->reactRefresh();
 
-        return $this;
+        $this->assertStringContainsString(sprintf('nonce="%s"', $nonce), $result);
     }
 
-    /**
-     * Eagerly prefetch assets.
-     *
-     * @param  int|null  $concurrency
-     * @param  string  $event
-     * @return $this
-     */
-    public function prefetch($concurrency = null, $event = 'load')
+    public function testItCanInjectIntegrityWhenPresentInManifest()
     {
-        $this->prefetchEvent = $event;
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'integrity' => 'expected-app.js-integrity',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+                'integrity' => 'expected-app.css-integrity',
+            ],
+        ], $buildDir);
 
-        return $concurrency === null
-            ? $this->usePrefetchStrategy('aggressive')
-            : $this->usePrefetchStrategy('waterfall', ['concurrency' => $concurrency]);
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js'], $buildDir);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" integrity="expected-app.css-integrity" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
+            $result->toHtml()
+        );
+
+        $this->cleanViteManifest($buildDir);
     }
 
-    /**
-     * Use the "waterfall" prefetching strategy.
-     *
-     * @return $this
-     */
-    public function useWaterfallPrefetching(?int $concurrency = null)
+    public function testItCanInjectIntegrityWhenPresentInManifestForCss()
     {
-        return $this->usePrefetchStrategy('waterfall', [
-            'concurrency' => $concurrency ?? $this->prefetchConcurrently,
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/direct-css-dependency.aabbcc.css',
+                ],
+                'integrity' => 'expected-app.js-integrity',
+            ],
+            '_import.versioned.js' => [
+                'file' => 'assets/import.versioned.js',
+                'css' => [
+                    'assets/imported-css.versioned.css',
+                ],
+                'integrity' => 'expected-import.js-integrity',
+            ],
+            'imported-css.css' => [
+                'file' => 'assets/direct-css-dependency.aabbcc.css',
+                'integrity' => 'expected-imported-css.css-integrity',
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)('resources/js/app.js', $buildDir);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/direct-css-dependency.aabbcc.css" integrity="expected-imported-css.css-integrity" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
+            $result->toHtml()
+        );
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanInjectIntegrityWhenPresentInManifestForImportedCss()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    '_import.versioned.js',
+                ],
+                'integrity' => 'expected-app.js-integrity',
+            ],
+            '_import.versioned.js' => [
+                'file' => 'assets/import.versioned.js',
+                'css' => [
+                    'assets/imported-css.versioned.css',
+                ],
+                'integrity' => 'expected-import.js-integrity',
+            ],
+            'imported-css.css' => [
+                'file' => 'assets/imported-css.versioned.css',
+                'integrity' => 'expected-imported-css.css-integrity',
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)('resources/js/app.js', $buildDir);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/imported-css.versioned.css" integrity="expected-imported-css.css-integrity" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
+            $result->toHtml()
+        );
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSpecifyIntegrityKey()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'different-integrity-key' => 'expected-app.js-integrity',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+                'different-integrity-key' => 'expected-app.css-integrity',
+            ],
+        ], $buildDir);
+        ViteFacade::useIntegrityKey('different-integrity-key');
+
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js'], $buildDir);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" integrity="expected-app.css-integrity" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" integrity="expected-app.js-integrity"></script>',
+            $result->toHtml()
+        );
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSpecifyArbitraryAttributesForScriptTagsWhenBuilt()
+    {
+        $this->makeViteManifest();
+        ViteFacade::useScriptTagAttributes([
+            'general' => 'attribute',
         ]);
-    }
+        ViteFacade::useScriptTagAttributes(function ($src, $url, $chunk, $manifest) {
+            $this->assertSame('resources/js/app.js', $src);
+            $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
+            $this->assertSame([
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+            ], $chunk);
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                ],
+                'resources/js/app-with-css-import.js' => [
+                    'src' => 'resources/js/app-with-css-import.js',
+                    'file' => 'assets/app-with-css-import.versioned.js',
+                    'css' => [
+                        'assets/imported-css.versioned.css',
+                    ],
+                ],
+                'resources/css/imported-css.css' => [
+                    'file' => 'assets/imported-css.versioned.css',
+                ],
+                'resources/js/app-with-shared-css.js' => [
+                    'src' => 'resources/js/app-with-shared-css.js',
+                    'file' => 'assets/app-with-shared-css.versioned.js',
+                    'imports' => [
+                        '_someFile.js',
+                    ],
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+                '_someFile.js' => [
+                    'file' => 'assets/someFile.versioned.js',
+                    'css' => [
+                        'assets/shared-css.versioned.css',
+                    ],
+                ],
+                'resources/css/shared-css' => [
+                    'src' => 'resources/css/shared-css',
+                    'file' => 'assets/shared-css.versioned.css',
+                ],
+            ], $manifest);
 
-    /**
-     * Use the "aggressive" prefetching strategy.
-     *
-     * @return $this
-     */
-    public function useAggressivePrefetching()
-    {
-        return $this->usePrefetchStrategy('aggressive');
-    }
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+                'null' => null,
+                'empty-string' => '',
+                'zero' => 0,
+            ];
+        });
 
-    /**
-     * Set the prefetching strategy.
-     *
-     * @param  'waterfall'|'aggressive'|null  $strategy
-     * @param  array  $config
-     * @return $this
-     */
-    public function usePrefetchStrategy($strategy, $config = [])
-    {
-        $this->prefetchStrategy = $strategy;
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        if ($strategy === 'waterfall') {
-            $this->prefetchConcurrently = $config['concurrency'] ?? $this->prefetchConcurrently;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Generate Vite tags for an entrypoint.
-     *
-     * @param  string|string[]  $entrypoints
-     * @param  string|null  $buildDirectory
-     * @return \Illuminate\Support\HtmlString
-     *
-     * @throws \Exception
-     */
-    public function __invoke($entrypoints, $buildDirectory = null)
-    {
-        $entrypoints = new Collection($entrypoints);
-        $buildDirectory ??= $this->buildDirectory;
-
-        if ($this->isRunningHot()) {
-            return new HtmlString(
-                $entrypoints
-                    ->prepend('@vite/client')
-                    ->map(fn ($entrypoint) => $this->makeTagForChunk($entrypoint, $this->hotAsset($entrypoint), null, null))
-                    ->join('')
-            );
-        }
-
-        $manifest = $this->manifest($buildDirectory);
-
-        $tags = new Collection;
-        $preloads = new Collection;
-
-        foreach ($entrypoints as $entrypoint) {
-            $chunk = $this->chunk($manifest, $entrypoint);
-
-            $preloads->push([
-                $chunk['src'],
-                $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
-                $chunk,
-                $manifest,
-            ]);
-
-            foreach ($chunk['imports'] ?? [] as $import) {
-                $preloads->push([
-                    $import,
-                    $this->assetPath("{$buildDirectory}/{$manifest[$import]['file']}"),
-                    $manifest[$import],
-                    $manifest,
-                ]);
-
-                foreach ($manifest[$import]['css'] ?? [] as $css) {
-                    $partialManifest = (new Collection($manifest))->where('file', $css);
-
-                    $preloads->push([
-                        $partialManifest->keys()->first(),
-                        $this->assetPath("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
-                        $manifest,
-                    ]);
-
-                    $tags->push($this->makeTagForChunk(
-                        $partialManifest->keys()->first(),
-                        $this->assetPath("{$buildDirectory}/{$css}"),
-                        $partialManifest->first(),
-                        $manifest
-                    ));
-                }
-            }
-
-            $tags->push($this->makeTagForChunk(
-                $entrypoint,
-                $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
-                $chunk,
-                $manifest
-            ));
-
-            foreach ($chunk['css'] ?? [] as $css) {
-                $partialManifest = (new Collection($manifest))->where('file', $css);
-
-                $preloads->push([
-                    $partialManifest->keys()->first(),
-                    $this->assetPath("{$buildDirectory}/{$css}"),
-                    $partialManifest->first(),
-                    $manifest,
-                ]);
-
-                $tags->push($this->makeTagForChunk(
-                    $partialManifest->keys()->first(),
-                    $this->assetPath("{$buildDirectory}/{$css}"),
-                    $partialManifest->first(),
-                    $manifest
-                ));
-            }
-        }
-
-        [$stylesheets, $scripts] = $tags->unique()->partition(fn ($tag) => str_starts_with($tag, '<link'));
-
-        $preloads = $preloads->unique()
-            ->sortByDesc(fn ($args) => $this->isCssPath($args[1]))
-            ->map(fn ($args) => $this->makePreloadTagForChunk(...$args));
-
-        $base = $preloads->join('').$stylesheets->join('').$scripts->join('');
-
-        if ($this->prefetchStrategy === null || $this->isRunningHot()) {
-            return new HtmlString($base);
-        }
-
-        $discoveredImports = [];
-
-        return (new Collection($entrypoints))
-            ->flatMap(fn ($entrypoint) => (new Collection($manifest[$entrypoint]['dynamicImports'] ?? []))
-                ->map(fn ($import) => $manifest[$import])
-                ->filter(fn ($chunk) => str_ends_with($chunk['file'], '.js') || str_ends_with($chunk['file'], '.css'))
-                ->flatMap($f = function ($chunk) use (&$f, $manifest, &$discoveredImports) {
-                    return (new Collection([...$chunk['imports'] ?? [], ...$chunk['dynamicImports'] ?? []]))
-                        ->reject(function ($import) use (&$discoveredImports) {
-                            if (isset($discoveredImports[$import])) {
-                                return true;
-                            }
-
-                            return ! $discoveredImports[$import] = true;
-                        })
-                        ->reduce(
-                            fn ($chunks, $import) => $chunks->merge(
-                                $f($manifest[$import])
-                            ), new Collection([$chunk]))
-                        ->merge((new Collection($chunk['css'] ?? []))->map(
-                            fn ($css) => (new Collection($manifest))->first(fn ($chunk) => $chunk['file'] === $css) ?? [
-                                'file' => $css,
-                            ],
-                        ));
-                })
-                ->map(function ($chunk) use ($buildDirectory, $manifest) {
-                    return (new Collection([
-                        ...$this->resolvePreloadTagAttributes(
-                            $chunk['src'] ?? null,
-                            $url = $this->assetPath("{$buildDirectory}/{$chunk['file']}"),
-                            $chunk,
-                            $manifest,
-                        ),
-                        'rel' => 'prefetch',
-                        'fetchpriority' => 'low',
-                        'href' => $url,
-                    ]))->reject(
-                        fn ($value) => in_array($value, [null, false], true)
-                    )->mapWithKeys(fn ($value, $key) => [
-                        $key = (is_int($key) ? $value : $key) => $value === true ? $key : $value,
-                    ])->all();
-                })
-                ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']])))
-            ->unique('href')
-            ->values()
-            ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
-                'waterfall' => new HtmlString($base.<<<HTML
-
-                    <script{$this->nonceAttribute()}>
-                         window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
-                            const makeLink = (asset) => {
-                                const link = document.createElement('link')
-
-                                Object.keys(asset).forEach((attribute) => {
-                                    link.setAttribute(attribute, asset[attribute])
-                                })
-
-                                return link
-                            }
-
-                            const loadNext = (assets, count) => window.setTimeout(() => {
-                                if (count > assets.length) {
-                                    count = assets.length
-
-                                    if (count === 0) {
-                                        return
-                                    }
-                                }
-
-                                const fragment = new DocumentFragment
-
-                                while (count > 0) {
-                                    const link = makeLink(assets.shift())
-                                    fragment.append(link)
-                                    count--
-
-                                    if (assets.length) {
-                                        link.onload = () => loadNext(assets, 1)
-                                        link.onerror = () => loadNext(assets, 1)
-                                    }
-                                }
-
-                                document.head.append(fragment)
-                            })
-
-                            loadNext({$assets}, {$this->prefetchConcurrently})
-                        }))
-                    </script>
-                    HTML),
-                'aggressive' => new HtmlString($base.<<<HTML
-
-                    <script{$this->nonceAttribute()}>
-                         window.addEventListener('{$this->prefetchEvent}', () => window.setTimeout(() => {
-                            const makeLink = (asset) => {
-                                const link = document.createElement('link')
-
-                                Object.keys(asset).forEach((attribute) => {
-                                    link.setAttribute(attribute, asset[attribute])
-                                })
-
-                                return link
-                            }
-
-                            const fragment = new DocumentFragment;
-                            {$assets}.forEach((asset) => fragment.append(makeLink(asset)))
-                            document.head.append(fragment)
-                         }))
-                    </script>
-                    HTML),
-            }));
-    }
-
-    /**
-     * Make tag for the given chunk.
-     *
-     * @param  string  $src
-     * @param  string  $url
-     * @param  array|null  $chunk
-     * @param  array|null  $manifest
-     * @return string
-     */
-    protected function makeTagForChunk($src, $url, $chunk, $manifest)
-    {
-        if (
-            $this->nonce === null
-            && $this->integrityKey !== false
-            && ! array_key_exists($this->integrityKey, $chunk ?? [])
-            && $this->scriptTagAttributesResolvers === []
-            && $this->styleTagAttributesResolvers === []) {
-            return $this->makeTag($url);
-        }
-
-        if ($this->isCssPath($url)) {
-            return $this->makeStylesheetTagWithAttributes(
-                $url,
-                $this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)
-            );
-        }
-
-        return $this->makeScriptTagWithAttributes(
-            $url,
-            $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0"></script>',
+            $result->toHtml()
         );
     }
 
-    /**
-     * Make a preload tag for the given chunk.
-     *
-     * @param  string  $src
-     * @param  string  $url
-     * @param  array  $chunk
-     * @param  array  $manifest
-     * @return string
-     */
-    protected function makePreloadTagForChunk($src, $url, $chunk, $manifest)
+    public function testItCanSpecifyArbitraryAttributesForStylesheetTagsWhenBuild()
     {
-        $attributes = $this->resolvePreloadTagAttributes($src, $url, $chunk, $manifest);
+        $this->makeViteManifest();
+        ViteFacade::useStyleTagAttributes([
+            'general' => 'attribute',
+        ]);
+        ViteFacade::useStyleTagAttributes(function ($src, $url, $chunk, $manifest) {
+            $this->assertSame('resources/css/app.css', $src);
+            $this->assertSame('https://example.com/build/assets/app.versioned.css', $url);
+            $this->assertSame([
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ], $chunk);
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                ],
+                'resources/js/app-with-css-import.js' => [
+                    'src' => 'resources/js/app-with-css-import.js',
+                    'file' => 'assets/app-with-css-import.versioned.js',
+                    'css' => [
+                        'assets/imported-css.versioned.css',
+                    ],
+                ],
+                'resources/css/imported-css.css' => [
+                    'file' => 'assets/imported-css.versioned.css',
+                ],
+                'resources/js/app-with-shared-css.js' => [
+                    'src' => 'resources/js/app-with-shared-css.js',
+                    'file' => 'assets/app-with-shared-css.versioned.js',
+                    'imports' => [
+                        '_someFile.js',
+                    ],
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+                '_someFile.js' => [
+                    'file' => 'assets/someFile.versioned.js',
+                    'css' => [
+                        'assets/shared-css.versioned.css',
+                    ],
+                ],
+                'resources/css/shared-css' => [
+                    'src' => 'resources/css/shared-css',
+                    'file' => 'assets/shared-css.versioned.css',
+                ],
+            ], $manifest);
 
-        if ($attributes === false) {
-            return '';
-        }
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+            ];
+        });
 
-        $this->preloadedAssets[$url] = $this->parseAttributes(
-            (new Collection($attributes))->forget('href')->all()
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertStringEndsWith(
+            '<link rel="stylesheet" href="https://example.com/build/assets/app.versioned.css" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me />'
+            .'<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $result->toHtml()
         );
-
-        return '<link '.implode(' ', $this->parseAttributes($attributes)).' />';
     }
 
-    /**
-     * Resolve the attributes for the chunks generated script tag.
-     *
-     * @param  string  $src
-     * @param  string  $url
-     * @param  array|null  $chunk
-     * @param  array|null  $manifest
-     * @return array
-     */
-    protected function resolveScriptTagAttributes($src, $url, $chunk, $manifest)
+    public function testItCanSpecifyArbitraryAttributesForScriptTagsWhenHotModuleReloading()
     {
-        $attributes = $this->integrityKey !== false
-            ? ['integrity' => $chunk[$this->integrityKey] ?? false]
-            : [];
-
-        foreach ($this->scriptTagAttributesResolvers as $resolver) {
-            $attributes = array_merge($attributes, $resolver($src, $url, $chunk, $manifest));
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * Resolve the attributes for the chunks generated stylesheet tag.
-     *
-     * @param  string  $src
-     * @param  string  $url
-     * @param  array|null  $chunk
-     * @param  array|null  $manifest
-     * @return array
-     */
-    protected function resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)
-    {
-        $attributes = $this->integrityKey !== false
-            ? ['integrity' => $chunk[$this->integrityKey] ?? false]
-            : [];
-
-        foreach ($this->styleTagAttributesResolvers as $resolver) {
-            $attributes = array_merge($attributes, $resolver($src, $url, $chunk, $manifest));
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * Resolve the attributes for the chunks generated preload tag.
-     *
-     * @param  string  $src
-     * @param  string  $url
-     * @param  array  $chunk
-     * @param  array  $manifest
-     * @return array|false
-     */
-    protected function resolvePreloadTagAttributes($src, $url, $chunk, $manifest)
-    {
-        $attributes = $this->isCssPath($url) ? [
-            'rel' => 'preload',
-            'as' => 'style',
-            'href' => $url,
-            'nonce' => $this->nonce ?? false,
-            'crossorigin' => $this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
-        ] : [
-            'rel' => 'modulepreload',
-            'as' => 'script',
-            'href' => $url,
-            'nonce' => $this->nonce ?? false,
-            'crossorigin' => $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
+        $this->makeViteHotFile();
+        ViteFacade::useScriptTagAttributes([
+            'general' => 'attribute',
+        ]);
+        $expectedArguments = [
+            ['src' => '@vite/client', 'url' => 'http://localhost:3000/@vite/client'],
+            ['src' => 'resources/js/app.js', 'url' => 'http://localhost:3000/resources/js/app.js'],
         ];
+        ViteFacade::useScriptTagAttributes(function ($src, $url, $chunk, $manifest) use (&$expectedArguments) {
+            $args = array_shift($expectedArguments);
 
-        $attributes = $this->integrityKey !== false
-            ? array_merge($attributes, ['integrity' => $chunk[$this->integrityKey] ?? false])
-            : $attributes;
+            $this->assertSame($args['src'], $src);
+            $this->assertSame($args['url'], $url);
+            $this->assertNull($chunk);
+            $this->assertNull($manifest);
 
-        foreach ($this->preloadTagAttributesResolvers as $resolver) {
-            if (false === ($resolvedAttributes = $resolver($src, $url, $chunk, $manifest))) {
-                return false;
-            }
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+            ];
+        });
 
-            $attributes = array_merge($attributes, $resolvedAttributes);
-        }
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
 
-        return $attributes;
-    }
-
-    /**
-     * Generate an appropriate tag for the given URL in HMR mode.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function makeTag($url)
-    {
-        if ($this->isCssPath($url)) {
-            return $this->makeStylesheetTag($url);
-        }
-
-        return $this->makeScriptTag($url);
-    }
-
-    /**
-     * Generate a script tag for the given URL.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function makeScriptTag($url)
-    {
-        return $this->makeScriptTagWithAttributes($url, []);
-    }
-
-    /**
-     * Generate a stylesheet tag for the given URL in HMR mode.
-     *
-     * @deprecated Will be removed in a future Laravel version.
-     *
-     * @param  string  $url
-     * @return string
-     */
-    protected function makeStylesheetTag($url)
-    {
-        return $this->makeStylesheetTagWithAttributes($url, []);
-    }
-
-    /**
-     * Generate a script tag with attributes for the given URL.
-     *
-     * @param  string  $url
-     * @param  array  $attributes
-     * @return string
-     */
-    protected function makeScriptTagWithAttributes($url, $attributes)
-    {
-        $attributes = $this->parseAttributes(array_merge([
-            'type' => 'module',
-            'src' => $url,
-            'nonce' => $this->nonce ?? false,
-        ], $attributes));
-
-        return '<script '.implode(' ', $attributes).'></script>';
-    }
-
-    /**
-     * Generate a link tag with attributes for the given URL.
-     *
-     * @param  string  $url
-     * @param  array  $attributes
-     * @return string
-     */
-    protected function makeStylesheetTagWithAttributes($url, $attributes)
-    {
-        $attributes = $this->parseAttributes(array_merge([
-            'rel' => 'stylesheet',
-            'href' => $url,
-            'nonce' => $this->nonce ?? false,
-        ], $attributes));
-
-        return '<link '.implode(' ', $attributes).' />';
-    }
-
-    /**
-     * Determine whether the given path is a CSS file.
-     *
-     * @param  string  $path
-     * @return bool
-     */
-    protected function isCssPath($path)
-    {
-        return preg_match('/\.(css|less|sass|scss|styl|stylus|pcss|postcss)(\?[^\.]*)?$/', $path) === 1;
-    }
-
-    /**
-     * Parse the attributes into key="value" strings.
-     *
-     * @param  array  $attributes
-     * @return array
-     */
-    protected function parseAttributes($attributes)
-    {
-        return (new Collection($attributes))
-            ->reject(fn ($value, $key) => in_array($value, [false, null], true))
-            ->flatMap(fn ($value, $key) => $value === true ? [$key] : [$key => $value])
-            ->map(fn ($value, $key) => is_int($key) ? $value : $key.'="'.$value.'"')
-            ->values()
-            ->all();
-    }
-
-    /**
-     * Generate React refresh runtime script.
-     *
-     * @return \Illuminate\Support\HtmlString|void
-     */
-    public function reactRefresh()
-    {
-        if (! $this->isRunningHot()) {
-            return;
-        }
-
-        $attributes = $this->parseAttributes([
-            'nonce' => $this->cspNonce(),
-        ]);
-
-        return new HtmlString(
-            sprintf(
-                <<<'HTML'
-                <script type="module" %s>
-                    import RefreshRuntime from '%s'
-                    RefreshRuntime.injectIntoGlobalHook(window)
-                    window.$RefreshReg$ = () => {}
-                    window.$RefreshSig$ = () => (type) => type
-                    window.__vite_plugin_react_preamble_installed__ = true
-                </script>
-                HTML,
-                implode(' ', $attributes),
-                $this->hotAsset('@react-refresh')
-            )
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me></script>',
+            $result->toHtml()
         );
     }
 
-    /**
-     * Get the path to a given asset when running in HMR mode.
-     *
-     * @return string
-     */
-    protected function hotAsset($asset)
+    public function testItCanSpecifyArbitraryAttributesForStylesheetTagsWhenHotModuleReloading()
     {
-        return rtrim(file_get_contents($this->hotFile())).'/'.$asset;
+        $this->makeViteHotFile();
+        ViteFacade::useStyleTagAttributes([
+            'general' => 'attribute',
+        ]);
+        ViteFacade::useStyleTagAttributes(function ($src, $url, $chunk, $manifest) {
+            $this->assertSame('resources/css/app.css', $src);
+            $this->assertSame('http://localhost:3000/resources/css/app.css', $url);
+            $this->assertNull($chunk);
+            $this->assertNull($manifest);
+
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+            ];
+        });
+
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<link rel="stylesheet" href="http://localhost:3000/resources/css/app.css" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me />'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $result->toHtml()
+        );
     }
 
-    /**
-     * Get the URL for an asset.
-     *
-     * @param  string  $asset
-     * @param  string|null  $buildDirectory
-     * @return string
-     */
-    public function asset($asset, $buildDirectory = null)
+    public function testItCanOverrideAllAttributes()
     {
-        $buildDirectory ??= $this->buildDirectory;
+        $this->makeViteManifest();
+        ViteFacade::useStyleTagAttributes([
+            'rel' => 'expected-rel',
+            'href' => 'expected-href',
+        ]);
+        ViteFacade::useScriptTagAttributes([
+            'type' => 'expected-type',
+            'src' => 'expected-src',
+        ]);
 
-        if ($this->isRunningHot()) {
-            return $this->hotAsset($asset);
+        $result = app(Vite::class)(['resources/css/app.css', 'resources/js/app.js']);
+
+        $this->assertStringEndsWith(
+            '<link rel="expected-rel" href="expected-href" />'
+            .'<script type="expected-type" src="expected-src"></script>',
+            $result->toHtml()
+        );
+    }
+
+    public function testItCanGenerateIndividualAssetUrlInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $url = ViteFacade::asset('resources/js/app.js');
+
+        $this->assertSame('https://example.com/build/assets/app.versioned.js', $url);
+    }
+
+    public function testItCanGenerateIndividualAssetUrlInHotMode()
+    {
+        $this->makeViteHotFile();
+
+        $url = ViteFacade::asset('resources/js/app.js');
+
+        $this->assertSame('http://localhost:3000/resources/js/app.js', $url);
+    }
+
+    public function testItThrowsWhenUnableToFindAssetManifestInBuildMode()
+    {
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+
+        ViteFacade::asset('resources/js/app.js');
+    }
+
+    public function testItThrowsDeprecatedExecptionWhenUnableToFindAssetManifestInBuildMode()
+    {
+        $this->expectException(ViteManifestNotFoundException::class);
+        $this->expectExceptionMessage('Vite manifest not found at: '.public_path('build/manifest.json'));
+
+        ViteFacade::asset('resources/js/app.js');
+    }
+
+    public function testItThrowsWhenUnableToFindAssetChunkInBuildMode()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('Unable to locate file in Vite manifest: resources/js/missing.js');
+
+        ViteFacade::asset('resources/js/missing.js');
+    }
+
+    public function testItDoesNotReturnHashInDevMode()
+    {
+        $this->makeViteHotFile();
+
+        $this->assertNull(ViteFacade::manifestHash());
+
+        $this->cleanViteHotFile();
+    }
+
+    public function testItGetsHashInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItGetsDifferentHashesForDifferentManifestsInBuildMode()
+    {
+        $this->makeViteManifest(['a.js' => ['src' => 'a.js']]);
+        $this->makeViteManifest(['b.js' => ['src' => 'b.js']], 'admin');
+
+        $this->assertSame('98ca5a789544599b562c9978f3147a0f', ViteFacade::manifestHash());
+        $this->assertSame('928a60835978bae84e5381fbb08a38b2', ViteFacade::manifestHash('admin'));
+
+        $this->cleanViteManifest();
+        $this->cleanViteManifest('admin');
+    }
+
+    public function testViteCanSetEntryPointsWithFluentBuilder()
+    {
+        $this->makeViteManifest();
+
+        $vite = app(Vite::class);
+
+        $this->assertSame('', $vite->toHtml());
+
+        $vite->withEntryPoints(['resources/js/app.js']);
+
+        $this->assertStringEndsWith(
+            '<script type="module" src="https://example.com/build/assets/app.versioned.js"></script>',
+            $vite->toHtml()
+        );
+    }
+
+    public function testViteCanOverrideBuildDirectory()
+    {
+        $this->makeViteManifest(null, 'custom-build');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js'])->useBuildDirectory('custom-build');
+
+        $this->assertStringEndsWith(
+            '<script type="module" src="https://example.com/custom-build/assets/app.versioned.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteManifest('custom-build');
+    }
+
+    public function testViteCanOverrideHotFilePath()
+    {
+        $this->makeViteHotFile('cold');
+
+        $vite = app(Vite::class);
+
+        $vite->withEntryPoints(['resources/js/app.js'])->useHotFile('cold');
+
+        $this->assertSame(
+            '<script type="module" src="http://localhost:3000/@vite/client"></script>'
+            .'<script type="module" src="http://localhost:3000/resources/js/app.js"></script>',
+            $vite->toHtml()
+        );
+
+        $this->cleanViteHotFile('cold');
+    }
+
+    public function testViteCanAssetPath()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        $vite = app(Vite::class)->useBuildDirectory($buildDir);
+        $this->app['config']->set('app.asset_url', 'https://cdn.app.com');
+
+        // default behaviour...
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // custom behaviour
+        $vite->createAssetPathsUsing(function ($path) {
+            return 'https://tenant-cdn.app.com/'.$path;
+        });
+        $this->assertSame("https://tenant-cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        // restore default behaviour...
+        $vite->createAssetPathsUsing(null);
+        $this->assertSame("https://cdn.app.com/{$buildDir}/assets/profile.versioned.png", $vite->asset('resources/images/profile.png'));
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testViteIsMacroable()
+    {
+        $this->makeViteManifest([
+            'resources/images/profile.png' => [
+                'src' => 'resources/images/profile.png',
+                'file' => 'assets/profile.versioned.png',
+            ],
+        ], $buildDir = Str::random());
+        Vite::macro('image', function ($asset, $buildDir = null) {
+            return $this->asset("resources/images/{$asset}", $buildDir);
+        });
+
+        $path = ViteFacade::image('profile.png', $buildDir);
+
+        $this->assertSame("https://example.com/{$buildDir}/assets/profile.versioned.png", $path);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItGeneratesPreloadDirectivesForJsAndCssImports()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/jetstream-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+
+        $result = app(Vite::class)(['resources/js/Pages/Auth/Login.vue'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.9842b564.css" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/Checkbox.33ba23f3.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/TextInput.e2f0248c.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/InputLabel.d245ec4e.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.9842b564.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js"></script>', $result->toHtml()
+        );
+        $this->assertSame([
+            'https://example.com/'.$buildDir.'/assets/app.9842b564.css' => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/Login.8c52c4a3.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/app.a26d8e4d.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/AuthenticationCard.47ef70cc.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/AuthenticationCardLogo.9999a373.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/Checkbox.33ba23f3.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/TextInput.e2f0248c.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/InputLabel.d245ec4e.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/PrimaryButton.931d2859.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            'https://example.com/'.$buildDir.'/assets/_plugin-vue_export-helper.cdc0426e.js' => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSpecifyAttributesForPreloadedAssets()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    'import.js',
+                ],
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'import.js' => [
+                'file' => 'assets/import.versioned.js',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::usePreloadTagAttributes([
+            'general' => 'attribute',
+        ]);
+        ViteFacade::usePreloadTagAttributes(function ($src, $url, $chunk, $manifest) use ($buildDir) {
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                    'imports' => [
+                        'import.js',
+                    ],
+                    'css' => [
+                        'assets/app.versioned.css',
+                    ],
+                ],
+                'import.js' => [
+                    'file' => 'assets/import.versioned.js',
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+            ], $manifest);
+
+            (match ($src) {
+                'resources/js/app.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app.js',
+                        'file' => 'assets/app.versioned.js',
+                        'imports' => [
+                            'import.js',
+                        ],
+                        'css' => [
+                            'assets/app.versioned.css',
+                        ],
+                    ], $chunk);
+                },
+                'import.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import.versioned.js',
+                    ], $chunk);
+                },
+                'resources/css/app.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app.css',
+                        'file' => 'assets/app.versioned.css',
+                    ], $chunk);
+                },
+            })();
+
+            return [
+                'crossorigin',
+                'data-persistent-across-pages' => 'YES',
+                'remove-me' => false,
+                'keep-me' => true,
+                'null' => null,
+                'empty-string' => '',
+                'zero' => 0,
+            ];
+        });
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" general="attribute" crossorigin data-persistent-across-pages="YES" keep-me empty-string="" zero="0" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+            "https://example.com/$buildDir/assets/import.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+                'general="attribute"',
+                'crossorigin',
+                'data-persistent-across-pages="YES"',
+                'keep-me',
+                'empty-string=""',
+                'zero="0"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSuppressPreloadTagGeneration()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'imports' => [
+                    'import.js',
+                    'import-nopreload.js',
+                ],
+                'css' => [
+                    'assets/app.versioned.css',
+                    'assets/app-nopreload.versioned.css',
+                ],
+            ],
+            'resources/js/app-nopreload.js' => [
+                'src' => 'resources/js/app-nopreload.js',
+                'file' => 'assets/app-nopreload.versioned.js',
+            ],
+            'import.js' => [
+                'file' => 'assets/import.versioned.js',
+            ],
+            'import-nopreload.js' => [
+                'file' => 'assets/import-nopreload.versioned.js',
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+            'resources/css/app-nopreload.css' => [
+                'src' => 'resources/css/app-nopreload.css',
+                'file' => 'assets/app-nopreload.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::usePreloadTagAttributes(function ($src, $url, $chunk, $manifest) use ($buildDir) {
+            $this->assertSame([
+                'resources/js/app.js' => [
+                    'src' => 'resources/js/app.js',
+                    'file' => 'assets/app.versioned.js',
+                    'imports' => [
+                        'import.js',
+                        'import-nopreload.js',
+                    ],
+                    'css' => [
+                        'assets/app.versioned.css',
+                        'assets/app-nopreload.versioned.css',
+                    ],
+                ],
+                'resources/js/app-nopreload.js' => [
+                    'src' => 'resources/js/app-nopreload.js',
+                    'file' => 'assets/app-nopreload.versioned.js',
+                ],
+                'import.js' => [
+                    'file' => 'assets/import.versioned.js',
+                ],
+                'import-nopreload.js' => [
+                    'file' => 'assets/import-nopreload.versioned.js',
+                ],
+                'resources/css/app.css' => [
+                    'src' => 'resources/css/app.css',
+                    'file' => 'assets/app.versioned.css',
+                ],
+                'resources/css/app-nopreload.css' => [
+                    'src' => 'resources/css/app-nopreload.css',
+                    'file' => 'assets/app-nopreload.versioned.css',
+                ],
+            ], $manifest);
+
+            (match ($src) {
+                'resources/js/app.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app.js',
+                        'file' => 'assets/app.versioned.js',
+                        'imports' => [
+                            'import.js',
+                            'import-nopreload.js',
+                        ],
+                        'css' => [
+                            'assets/app.versioned.css',
+                            'assets/app-nopreload.versioned.css',
+                        ],
+                    ], $chunk);
+                },
+                'resources/js/app-nopreload.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app-nopreload.versioned.js", $url);
+                    $this->assertSame([
+                        'src' => 'resources/js/app-nopreload.js',
+                        'file' => 'assets/app-nopreload.versioned.js',
+                    ], $chunk);
+                },
+                'import.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import.versioned.js',
+                    ], $chunk);
+                },
+                'import-nopreload.js' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/import-nopreload.versioned.js", $url);
+                    $this->assertSame([
+                        'file' => 'assets/import-nopreload.versioned.js',
+                    ], $chunk);
+                },
+                'resources/css/app.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app.css',
+                        'file' => 'assets/app.versioned.css',
+                    ], $chunk);
+                },
+                'resources/css/app-nopreload.css' => function () use ($url, $chunk, $buildDir) {
+                    $this->assertSame("https://example.com/{$buildDir}/assets/app-nopreload.versioned.css", $url);
+                    $this->assertSame([
+                        'src' => 'resources/css/app-nopreload.css',
+                        'file' => 'assets/app-nopreload.versioned.css',
+                    ], $chunk);
+                },
+            })();
+
+            return Str::contains($src, '-nopreload') ? false : [];
+        });
+
+        $result = app(Vite::class)(['resources/js/app.js', 'resources/js/app-nopreload.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/import.versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app-nopreload.versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js"></script>'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-nopreload.versioned.js"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            "https://example.com/$buildDir/assets/import.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testPreloadAssetsGetAssetNonce()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::useCspNonce('expected-nonce');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" nonce="expected-nonce" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" nonce="expected-nonce"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'nonce="expected-nonce"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+                'nonce="expected-nonce"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testCrossoriginAttributeIsInheritedByPreloadTags()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+                'css' => [
+                    'assets/app.versioned.css',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+        ], $buildDir);
+        ViteFacade::useScriptTagAttributes([
+            'crossorigin' => 'script-crossorigin',
+        ]);
+        ViteFacade::useStyleTagAttributes([
+            'crossorigin' => 'style-crossorigin',
+        ]);
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app.versioned.css" crossorigin="style-crossorigin" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app.versioned.js" crossorigin="script-crossorigin"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app.versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+                'crossorigin="style-crossorigin"',
+            ],
+            "https://example.com/$buildDir/assets/app.versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+                'crossorigin="script-crossorigin"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanConfigureTheManifestFilename()
+    {
+        $buildDir = Str::random();
+        app()->usePublicPath(__DIR__);
+        if (! file_exists(public_path($buildDir))) {
+            mkdir(public_path($buildDir));
+        }
+        $contents = json_encode([
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app-from-custom-manifest.js',
+                'file' => 'assets/app-from-custom-manifest.versioned.js',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        file_put_contents(public_path("{$buildDir}/custom-manifest.json"), $contents);
+
+        ViteFacade::useManifestFilename('custom-manifest.json');
+
+        $result = app(Vite::class)(['resources/js/app.js'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-from-custom-manifest.versioned.js"></script>',
+            $result->toHtml());
+
+        unlink(public_path("{$buildDir}/custom-manifest.json"));
+        rmdir(public_path($buildDir));
+    }
+
+    public function testItOnlyOutputsUniquePreloadTags()
+    {
+        $buildDir = Str::random();
+        $this->makeViteManifest([
+            'resources/js/app.css' => [
+                'file' => 'assets/app-versioned.css',
+                'src' => 'resources/js/app.css',
+            ],
+            'resources/js/Pages/Welcome.vue' => [
+                'file' => 'assets/Welcome-versioned.js',
+                'src' => 'resources/js/Pages/Welcome.vue',
+                'imports' => [
+                    'resources/js/app.js',
+                ],
+            ],
+            'resources/js/app.js' => [
+                'file' => 'assets/app-versioned.js',
+                'src' => 'resources/js/app.js',
+                'css' => [
+                    'assets/app-versioned.css',
+                ],
+            ],
+        ], $buildDir);
+
+        $result = app(Vite::class)(['resources/js/app.js', 'resources/js/Pages/Welcome.vue'], $buildDir);
+
+        $this->assertSame(
+            '<link rel="preload" as="style" href="https://example.com/'.$buildDir.'/assets/app-versioned.css" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/app-versioned.js" />'
+            .'<link rel="modulepreload" as="script" href="https://example.com/'.$buildDir.'/assets/Welcome-versioned.js" />'
+            .'<link rel="stylesheet" href="https://example.com/'.$buildDir.'/assets/app-versioned.css" />'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/app-versioned.js"></script>'
+            .'<script type="module" src="https://example.com/'.$buildDir.'/assets/Welcome-versioned.js"></script>',
+            $result->toHtml());
+
+        $this->assertSame([
+            "https://example.com/$buildDir/assets/app-versioned.css" => [
+                'rel="preload"',
+                'as="style"',
+            ],
+            "https://example.com/$buildDir/assets/app-versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+            "https://example.com/$buildDir/assets/Welcome-versioned.js" => [
+                'rel="modulepreload"',
+                'as="script"',
+            ],
+        ], ViteFacade::preloadedAssets());
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItRetrievesAssetContent()
+    {
+        $this->makeViteManifest();
+
+        $this->makeAsset('/app.versioned.js', 'some content');
+
+        $content = ViteFacade::content('resources/js/app.js');
+
+        $this->assertSame('some content', $content);
+
+        $this->cleanAsset('/app.versioned.js');
+
+        $this->cleanViteManifest();
+    }
+
+    public function testItThrowsWhenUnableToFindFileToRetrieveContent()
+    {
+        $this->makeViteManifest();
+
+        $this->expectException(ViteException::class);
+        $this->expectExceptionMessage('Unable to locate file from Vite manifest: '.public_path('build/assets/app.versioned.js'));
+
+        ViteFacade::content('resources/js/app.js');
+    }
+
+    protected function makeViteManifest($contents = null, $path = 'build')
+    {
+        app()->usePublicPath(__DIR__);
+
+        if (! file_exists(public_path($path))) {
+            mkdir(public_path($path));
         }
 
-        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+        $manifest = json_encode($contents ?? [
+            'resources/js/app.js' => [
+                'src' => 'resources/js/app.js',
+                'file' => 'assets/app.versioned.js',
+            ],
+            'resources/js/app-with-css-import.js' => [
+                'src' => 'resources/js/app-with-css-import.js',
+                'file' => 'assets/app-with-css-import.versioned.js',
+                'css' => [
+                    'assets/imported-css.versioned.css',
+                ],
+            ],
+            'resources/css/imported-css.css' => [
+                // 'src' => 'resources/css/imported-css.css',
+                'file' => 'assets/imported-css.versioned.css',
+            ],
+            'resources/js/app-with-shared-css.js' => [
+                'src' => 'resources/js/app-with-shared-css.js',
+                'file' => 'assets/app-with-shared-css.versioned.js',
+                'imports' => [
+                    '_someFile.js',
+                ],
+            ],
+            'resources/css/app.css' => [
+                'src' => 'resources/css/app.css',
+                'file' => 'assets/app.versioned.css',
+            ],
+            '_someFile.js' => [
+                'file' => 'assets/someFile.versioned.js',
+                'css' => [
+                    'assets/shared-css.versioned.css',
+                ],
+            ],
+            'resources/css/shared-css' => [
+                'src' => 'resources/css/shared-css',
+                'file' => 'assets/shared-css.versioned.css',
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-        return $this->assetPath($buildDirectory.'/'.$chunk['file']);
+        file_put_contents(public_path("{$path}/manifest.json"), $manifest);
     }
 
-    /**
-     * Get the content of a given asset.
-     *
-     * @param  string  $asset
-     * @param  string|null  $buildDirectory
-     * @return string
-     *
-     * @throws \Illuminate\Foundation\ViteException
-     */
-    public function content($asset, $buildDirectory = null)
+    public function testItCanPrefetchEntrypoint()
     {
-        $buildDirectory ??= $this->buildDirectory;
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
 
-        $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
 
-        $path = public_path($buildDirectory.'/'.$chunk['file']);
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'fetchpriority' => 'low'],
+        ]);
+        $this->assertSame(<<<HTML
+        <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/app-lliD09ip.js" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><script type="module" src="https://example.com/{$buildDir}/assets/app-lliD09ip.js"></script>
+        <script>
+             window.addEventListener('load', () => window.setTimeout(() => {
+                const makeLink = (asset) => {
+                    const link = document.createElement('link')
 
-        if (! is_file($path) || ! file_exists($path)) {
-            throw new ViteException("Unable to locate file from Vite manifest: {$path}.");
+                    Object.keys(asset).forEach((attribute) => {
+                        link.setAttribute(attribute, asset[attribute])
+                    })
+
+                    return link
+                }
+
+                const loadNext = (assets, count) => window.setTimeout(() => {
+                    if (count > assets.length) {
+                        count = assets.length
+
+                        if (count === 0) {
+                            return
+                        }
+                    }
+
+                    const fragment = new DocumentFragment
+
+                    while (count > 0) {
+                        const link = makeLink(assets.shift())
+                        fragment.append(link)
+                        count--
+
+                        if (assets.length) {
+                            link.onload = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
+                        }
+                    }
+
+                    document.head.append(fragment)
+                })
+
+                loadNext({$expectedAssets}, 3)
+            }))
+        </script>
+        HTML, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItHandlesSpecifyingPageWithAppJs()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js', 'resources/js/Pages/Auth/Login.vue'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'fetchpriority' => 'low'],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
+            JAVASCRIPT, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanSpecifyWaterfallChunks()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 10)->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'fetchpriority' => 'low'],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 10)
+            JAVASCRIPT, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanPrefetchAggressively()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch()->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'fetchpriority' => 'low'],
+        ]);
+
+        $this->assertSame(<<<HTML
+        <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/app-lliD09ip.js" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><script type="module" src="https://example.com/{$buildDir}/assets/app-lliD09ip.js"></script>
+        <script>
+             window.addEventListener('load', () => window.setTimeout(() => {
+                const makeLink = (asset) => {
+                    const link = document.createElement('link')
+
+                    Object.keys(asset).forEach((attribute) => {
+                        link.setAttribute(attribute, asset[attribute])
+                    })
+
+                    return link
+                }
+
+                const fragment = new DocumentFragment;
+                {$expectedAssets}.forEach((asset) => fragment.append(makeLink(asset)))
+                document.head.append(fragment)
+             }))
+        </script>
+        HTML, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testAddsAttributesToPrefetchTags()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3))->useCspNonce('abc123')->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'nonce' => 'abc123', 'fetchpriority' => 'low'],
+        ]);
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
+        JAVASCRIPT, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItNormalisesAttributes()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->usePreloadTagAttributes([
+            'key' => 'value',
+            'key-only',
+            'true-value' => true,
+            'false-value' => false,
+            'null-value' => null,
+        ])->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'key' => 'value', 'key-only' => 'key-only', 'true-value' => 'true-value', 'fetchpriority' => 'low'],
+        ]);
+
+        $this->assertStringContainsString(<<<JAVASCRIPT
+                loadNext({$expectedAssets}, 3)
+        JAVASCRIPT, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItPrefetchesCss()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) ViteFacade::withEntryPoints(['resources/js/admin.js'])->useBuildDirectory($buildDir)->prefetch(concurrency: 3)->toHtml();
+
+        $expectedAssets = Js::from([
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ConfirmPassword-CDwcgU8E.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/GuestLayout-BY3LC-73.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/TextInput-C8CCB_U_.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/PrimaryButton-DuXwr-9M.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ApplicationLogo-BhIZH06z.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/_plugin-vue_export-helper-DlAUqK2U.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ForgotPassword-B0WWE0BO.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Login-DAFSdGSW.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Register-CfYQbTlA.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/ResetPassword-BNl7a4X1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/VerifyEmail-CyukB_SZ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Dashboard-DM_LxQy2.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/AuthenticatedLayout-DfWF52N1.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Edit-CYV2sXpe.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/DeleteUserForm-B1oHFaVP.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdatePasswordForm-CaeWqGla.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/UpdateProfileInformationForm-CJwkYwQQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/Welcome-D_7l79PQ.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/admin-runtime-import-CRvLQy6v.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'script', 'href' => "https://example.com/{$buildDir}/assets/admin-runtime-import-import-DKMIaPXC.js", 'fetchpriority' => 'low'],
+            ['rel' => 'prefetch', 'as' => 'style', 'href' => "https://example.com/{$buildDir}/assets/admin-runtime-import-BlmN0T4U.css", 'fetchpriority' => 'low'],
+        ]);
+        $this->assertSame(<<<HTML
+        <link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="preload" as="style" href="https://example.com/{$buildDir}/assets/admin-BctAalm_.css" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/admin-Sefg0Q45.js" /><link rel="modulepreload" as="script" href="https://example.com/{$buildDir}/assets/index-BSdK3M0e.js" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/index-B3s1tYeC.css" /><link rel="stylesheet" href="https://example.com/{$buildDir}/assets/admin-BctAalm_.css" /><script type="module" src="https://example.com/{$buildDir}/assets/admin-Sefg0Q45.js"></script>
+        <script>
+             window.addEventListener('load', () => window.setTimeout(() => {
+                const makeLink = (asset) => {
+                    const link = document.createElement('link')
+
+                    Object.keys(asset).forEach((attribute) => {
+                        link.setAttribute(attribute, asset[attribute])
+                    })
+
+                    return link
+                }
+
+                const loadNext = (assets, count) => window.setTimeout(() => {
+                    if (count > assets.length) {
+                        count = assets.length
+
+                        if (count === 0) {
+                            return
+                        }
+                    }
+
+                    const fragment = new DocumentFragment
+
+                    while (count > 0) {
+                        const link = makeLink(assets.shift())
+                        fragment.append(link)
+                        count--
+
+                        if (assets.length) {
+                            link.onload = () => loadNext(assets, 1)
+                            link.onerror = () => loadNext(assets, 1)
+                        }
+                    }
+
+                    document.head.append(fragment)
+                })
+
+                loadNext({$expectedAssets}, 3)
+            }))
+        </script>
+        HTML, $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testSupportCspNonceInPrefetchScript()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useCspNonce('abc123')
+            ->useBuildDirectory($buildDir)
+            ->prefetch()
+            ->toHtml();
+        $this->assertStringContainsString('<script nonce="abc123">', $html);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useCspNonce('abc123')
+            ->useBuildDirectory($buildDir)
+            ->prefetch(concurrency: 3)
+            ->toHtml();
+        $this->assertStringContainsString('<script nonce="abc123">', $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanConfigureThePrefetchTriggerEvent()
+    {
+        $manifest = json_decode(file_get_contents(__DIR__.'/fixtures/prefetching-manifest.json'));
+        $buildDir = Str::random();
+        $this->makeViteManifest($manifest, $buildDir);
+        app()->usePublicPath(__DIR__);
+
+        $html = (string) tap(ViteFacade::withEntryPoints(['resources/js/app.js']))
+            ->useBuildDirectory($buildDir)
+            ->prefetch(event: 'vite:prefetch')
+            ->toHtml();
+        $this->assertStringNotContainsString("window.addEventListener('load', ", $html);
+        $this->assertStringContainsString("window.addEventListener('vite:prefetch', ", $html);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
+    public function testItCanFlushState()
+    {
+        $this->makeViteManifest();
+
+        app(Vite::class)('resources/js/app.js');
+        app()->forgetScopedInstances();
+        $this->assertCount(1, app(Vite::class)->preloadedAssets());
+
+        app(Vite::class)->flush();
+        $this->assertCount(0, app(Vite::class)->preloadedAssets());
+    }
+
+    protected function cleanViteManifest($path = 'build')
+    {
+        if (file_exists(public_path("{$path}/manifest.json"))) {
+            unlink(public_path("{$path}/manifest.json"));
         }
 
-        return file_get_contents($path);
+        if (file_exists(public_path($path))) {
+            rmdir(public_path($path));
+        }
     }
 
-    /**
-     * Generate an asset path for the application.
-     *
-     * @param  string  $path
-     * @param  bool|null  $secure
-     * @return string
-     */
-    protected function assetPath($path, $secure = null)
+    protected function makeAsset($asset, $content)
     {
-        return ($this->assetPathResolver ?? asset(...))($path, $secure);
-    }
+        $path = public_path('build/assets');
 
-    /**
-     * Get the manifest file for the given build directory.
-     *
-     * @param  string  $buildDirectory
-     * @return array
-     *
-     * @throws \Illuminate\Foundation\ViteManifestNotFoundException
-     */
-    protected function manifest($buildDirectory)
-    {
-        $path = $this->manifestPath($buildDirectory);
-
-        if (! isset(static::$manifests[$path])) {
-            if (! is_file($path)) {
-                throw new ViteManifestNotFoundException("Vite manifest not found at: $path");
-            }
-
-            static::$manifests[$path] = json_decode(file_get_contents($path), true);
+        if (! file_exists($path)) {
+            mkdir($path, recursive: true);
         }
 
-        return static::$manifests[$path];
+        file_put_contents($path.'/'.$asset, $content);
     }
 
-    /**
-     * Get the path to the manifest file for the given build directory.
-     *
-     * @param  string  $buildDirectory
-     * @return string
-     */
-    protected function manifestPath($buildDirectory)
+    protected function cleanAsset($asset)
     {
-        return public_path($buildDirectory.'/'.$this->manifestFilename);
+        $path = public_path('build/assets');
+
+        unlink($path.$asset);
+
+        rmdir($path);
     }
 
-    /**
-     * Get a unique hash representing the current manifest, or null if there is no manifest.
-     *
-     * @param  string|null  $buildDirectory
-     * @return string|null
-     */
-    public function manifestHash($buildDirectory = null)
+    protected function makeViteHotFile($path = null)
     {
-        $buildDirectory ??= $this->buildDirectory;
+        app()->usePublicPath(__DIR__);
 
-        if ($this->isRunningHot()) {
-            return null;
+        $path ??= public_path('hot');
+
+        file_put_contents($path, 'http://localhost:3000');
+    }
+
+    protected function cleanViteHotFile($path = null)
+    {
+        $path ??= public_path('hot');
+
+        if (file_exists($path)) {
+            unlink($path);
         }
-
-        if (! is_file($path = $this->manifestPath($buildDirectory))) {
-            return null;
-        }
-
-        return md5_file($path) ?: null;
-    }
-
-    /**
-     * Get the chunk for the given entry point / asset.
-     *
-     * @param  array  $manifest
-     * @param  string  $file
-     * @return array
-     *
-     * @throws \Illuminate\Foundation\ViteException
-     */
-    protected function chunk($manifest, $file)
-    {
-        if (! isset($manifest[$file])) {
-            throw new ViteException("Unable to locate file in Vite manifest: {$file}.");
-        }
-
-        return $manifest[$file];
-    }
-
-    /**
-     * Get the nonce attribute for the prefetch script tags.
-     *
-     * @return \Illuminate\Support\HtmlString
-     */
-    protected function nonceAttribute()
-    {
-        if ($this->cspNonce() === null) {
-            return new HtmlString('');
-        }
-
-        return new HtmlString(' nonce="'.$this->cspNonce().'"');
-    }
-
-    /**
-     * Determine if the HMR server is running.
-     *
-     * @return bool
-     */
-    public function isRunningHot()
-    {
-        return is_file($this->hotFile());
-    }
-
-    /**
-     * Get the Vite tag content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml()
-    {
-        return $this->__invoke($this->entryPoints)->toHtml();
-    }
-
-    /**
-     * Flush state.
-     *
-     * @return void
-     */
-    public function flush()
-    {
-        $this->preloadedAssets = [];
     }
 }
