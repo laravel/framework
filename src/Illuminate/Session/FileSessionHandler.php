@@ -2,12 +2,12 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Contracts\Session\LaravelSessionHandlerInterface;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
-use SessionHandlerInterface;
 use Symfony\Component\Finder\Finder;
 
-class FileSessionHandler implements SessionHandlerInterface
+class FileSessionHandler implements LaravelSessionHandlerInterface
 {
     /**
      * The filesystem instance.

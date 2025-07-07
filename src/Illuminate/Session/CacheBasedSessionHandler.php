@@ -3,9 +3,9 @@
 namespace Illuminate\Session;
 
 use Illuminate\Contracts\Cache\Repository as CacheContract;
-use SessionHandlerInterface;
+use Illuminate\Contracts\Session\LaravelSessionHandlerInterface;
 
-class CacheBasedSessionHandler implements SessionHandlerInterface
+class CacheBasedSessionHandler implements LaravelSessionHandlerInterface
 {
     /**
      * The cache repository instance.

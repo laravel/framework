@@ -2,10 +2,10 @@
 
 namespace Illuminate\Session;
 
+use Illuminate\Contracts\Session\LaravelSessionHandlerInterface;
 use Illuminate\Support\InteractsWithTime;
-use SessionHandlerInterface;
 
-class ArraySessionHandler implements SessionHandlerInterface
+class ArraySessionHandler implements LaravelSessionHandlerInterface
 {
     use InteractsWithTime;
 

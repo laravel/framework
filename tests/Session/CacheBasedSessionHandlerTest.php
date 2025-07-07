@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Session;
 
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Session\CacheBasedSessionHandler;
+use Illuminate\Support\Carbon;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 
@@ -85,5 +86,32 @@ class CacheBasedSessionHandlerTest extends TestCase
         $cacheInstance = $this->sessionHandler->getCache();
 
         $this->assertSame($this->cacheMock, $cacheInstance);
+    }
+
+    public function test_it_expires_correctly()
+    {
+        $this->cacheMock->shouldReceive('put')
+            ->once()
+            ->with('session_id', 'session_data', 120) // 2 minutes in seconds
+            ->andReturn(true)
+            ->shouldReceive('get')
+            ->once()
+            ->with('session_id', '')
+            ->andReturn('session_data');
+
+        $this->sessionHandler->setMinutes(2); // Set expiration time to 2 minutes
+        $this->sessionHandler->write(sessionId: 'session_id', data: 'session_data');
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+
+        $this->assertSame('session_data', $this->sessionHandler->read('session_id'));
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(3));
+
+        $this->cacheMock->shouldReceive('get')
+            ->once()
+            ->with('session_id', '')
+            ->andReturn('');
+        $this->assertSame('', $this->sessionHandler->read('session_id'));
     }
 }

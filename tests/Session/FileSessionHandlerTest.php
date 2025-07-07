@@ -135,4 +135,42 @@ class FileSessionHandlerTest extends TestCase
 
         rmdir(__DIR__.'/tmp');
     }
+
+    public function test_it_expires_correctly()
+    {
+        $sessionId = 'session_id';
+        $data = 'session_data';
+
+        $this->files
+            ->shouldReceive('put')
+            ->once()
+            ->with('/path/to/sessions/'.$sessionId, $data, true)
+            ->andReturn(null)
+            ->shouldReceive('isFile')
+            ->with('/path/to/sessions/'.$sessionId)
+            ->andReturn(true)
+            ->shouldReceive('lastModified')
+            ->with('/path/to/sessions/'.$sessionId)
+            ->andReturn(Carbon::now()->subMinutes(1)->getTimestamp())
+            ->shouldReceive('sharedGet')
+            ->with('/path/to/sessions/'.$sessionId)
+            ->andReturn($data)
+            ->shouldReceive('lastModified')
+            ->with('/path/to/sessions/'.$sessionId)
+            ->andReturn(Carbon::now()->subMinutes(3)->getTimestamp())
+            ->shouldReceive('sharedGet')
+            ->with('/path/to/sessions/'.$sessionId)
+            ->andReturn('');
+
+        $this->sessionHandler->setMinutes(2); // Set expiration time to 2 minutes
+        $this->sessionHandler->write($sessionId, $data);
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+
+        $this->assertSame($data, $this->sessionHandler->read($sessionId));
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(3));
+
+        $this->assertSame('', $this->sessionHandler->read($sessionId));
+    }
 }

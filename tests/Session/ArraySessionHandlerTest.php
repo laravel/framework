@@ -114,4 +114,21 @@ class ArraySessionHandlerTest extends TestCase
         $this->assertSame('', $handler->read('foo'));
         $this->assertSame('qux', $handler->read('baz'));
     }
+
+    public function test_it_expires_correctly()
+    {
+        $handler = new ArraySessionHandler(10);
+
+        $handler->setMinutes(2);
+        $handler->write('foo', 'bar');
+
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+
+        $this->assertSame('bar', $handler->read('foo'));
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(3));
+
+        $this->assertSame('', $handler->read('foo'));
+    }
 }

@@ -4,14 +4,14 @@ namespace Illuminate\Session;
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Session\LaravelSessionHandlerInterface;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
-use SessionHandlerInterface;
 
-class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerInterface
+class DatabaseSessionHandler implements ExistenceAwareInterface, LaravelSessionHandlerInterface
 {
     use InteractsWithTime;
 

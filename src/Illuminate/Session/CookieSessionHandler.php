@@ -3,11 +3,11 @@
 namespace Illuminate\Session;
 
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
+use Illuminate\Contracts\Session\LaravelSessionHandlerInterface;
 use Illuminate\Support\InteractsWithTime;
-use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class CookieSessionHandler implements SessionHandlerInterface
+class CookieSessionHandler implements LaravelSessionHandlerInterface
 {
     use InteractsWithTime;
 
