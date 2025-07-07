@@ -138,7 +138,7 @@ abstract class Factory
      *
      * @var bool
      */
-    public static $defaultExpandRelationships = true;
+    protected static $defaultExpandRelationships = true;
 
     /**
      * Create a new factory instance.
@@ -900,6 +900,17 @@ abstract class Factory
     public static function guessFactoryNamesUsing(callable $callback)
     {
         static::$factoryNameResolver = $callback;
+    }
+
+    /**
+     * Specify that relationships should not create parent relationships.
+     *
+     * @param  bool  $dontExpandRelationships
+     * @return void
+     */
+    public static function dontExpandRelationshipsByDefault(bool $dontExpandRelationships = true)
+    {
+        static::$defaultExpandRelationships = ! $dontExpandRelationships;
     }
 
     /**
