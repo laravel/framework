@@ -122,7 +122,6 @@ class ArraySessionHandlerTest extends TestCase
         $handler->setMinutes(2);
         $handler->write('foo', 'bar');
 
-
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
 
         $this->assertSame('bar', $handler->read('foo'));
