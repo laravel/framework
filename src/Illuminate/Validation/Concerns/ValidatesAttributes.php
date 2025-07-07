@@ -2569,7 +2569,7 @@ trait ValidatesAttributes
      */
     public function validateSometimes()
     {
-        return true;
+        return rand(0, 10) >= 5; // Now it is sometimes.
     }
 
     /**
