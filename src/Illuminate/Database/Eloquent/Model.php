@@ -1154,14 +1154,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        // check if all relationship keys (be it foreign or morph keys) are available
-        if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
-            throw new LogicException(sprintf(
-                "Attempting to save a `withDefault()` model [%s] before it has the foreign keys set properly. Ensure it is created properly before accessing in model events.",
-                static::class
-            ));
-        }
-
         // If the model already exists in the database we can just update our record
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
@@ -1314,6 +1306,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
+        // check if all foreign keys of the default instance are valid
+        $this->ensureDefaultInstanceHasValidKeys();
+
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
         }
@@ -1713,6 +1708,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         return true;
+    }
+
+    /**
+     * Ensure the default model instance has valid foreign keys.
+     *
+     * @return void
+     *
+     * @throws \LogicException
+     */
+    protected function ensureDefaultInstanceHasValidKeys()
+    {
+        if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
+            throw new LogicException(sprintf(
+                "Attempting to save a `withDefault()` model instance [%s] before it has the foreign keys set properly. Ensure it is created properly before accessing in model events.",
+                static::class
+            ));
+        }
     }
 
     /**
