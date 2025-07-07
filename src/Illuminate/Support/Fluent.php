@@ -320,4 +320,14 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     {
         $this->offsetUnset($key);
     }
+
+    /**
+     * Get the string representation of the fluent.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toJson();
+    }
 }
