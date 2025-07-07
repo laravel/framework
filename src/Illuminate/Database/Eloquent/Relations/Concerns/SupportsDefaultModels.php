@@ -58,6 +58,9 @@ trait SupportsDefaultModels
             $instance->forceFill($this->withDefault);
         }
 
+        // Mark the instance as a default.
+        $instance->setAttribute('_is_default', true);
+
         return $instance;
     }
 }
