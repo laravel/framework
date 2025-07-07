@@ -125,4 +125,15 @@ class FileSessionHandler implements SessionHandlerInterface
 
         return $deletedSessions;
     }
+
+    /**
+     * Set the expiration time of the session.
+     *
+     * @param  int  $minutes
+     * @return void
+     */
+    public function setMinutes(int $minutes): void
+    {
+        $this->minutes = $minutes;
+    }
 }

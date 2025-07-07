@@ -315,4 +315,15 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
 
         return $this;
     }
+
+    /**
+     * Set the expiration time of the session.
+     *
+     * @param  int  $minutes
+     * @return void
+     */
+    public function setMinutes(int $minutes): void
+    {
+        $this->minutes = $minutes;
+    }
 }

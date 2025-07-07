@@ -137,4 +137,15 @@ class CookieSessionHandler implements SessionHandlerInterface
     {
         $this->request = $request;
     }
+
+    /**
+     * Set the expiration time of the session.
+     *
+     * @param  int  $minutes
+     * @return void
+     */
+    public function setMinutes(int $minutes): void
+    {
+        $this->minutes = $minutes;
+    }
 }

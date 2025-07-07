@@ -135,4 +135,15 @@ class ArraySessionHandler implements SessionHandlerInterface
     {
         return $this->currentTime() - $seconds;
     }
+
+    /**
+     * Set the expiration time of the session.
+     *
+     * @param  int  $minutes
+     * @return void
+     */
+    public function setMinutes(int $minutes): void
+    {
+        $this->minutes = $minutes;
+    }
 }
