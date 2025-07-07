@@ -20,7 +20,7 @@ use Traversable;
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
  */
-class Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable, IteratorAggregate
+class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
 {
     use Conditionable, InteractsWithData, Macroable {
         __call as macroCall;
