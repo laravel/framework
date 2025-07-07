@@ -162,7 +162,7 @@ class FileSessionHandlerTest extends TestCase
             ->with('/path/to/sessions/'.$sessionId)
             ->andReturn('');
 
-        $this->sessionHandler->setMinutes(2); // Set expiration time to 2 minutes
+        $this->sessionHandler->setMinutes(2); // Set expiration time to 2 minutes.
         $this->sessionHandler->write($sessionId, $data);
 
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
