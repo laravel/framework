@@ -59,7 +59,7 @@ trait SupportsDefaultModels
         }
 
         // Mark the instance as a default.
-        $instance->setAttribute('_is_default', true);
+        $instance->setAttribute('_is_default_instance', true);
 
         return $instance;
     }

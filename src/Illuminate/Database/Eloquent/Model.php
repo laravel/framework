@@ -1642,6 +1642,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Check if the model instance is the default model.
+     *
+     * @return bool
+     */
+    protected function isDefaultModelInstance()
+    {
+        return $this->getAttribute('_is_default_instance') === true;
+    }
+
+    /**
      * Apply the given named scope if possible.
      *
      * @param  string  $scope
