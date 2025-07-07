@@ -1652,6 +1652,36 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Check if the model has all valid foreign keys.
+     *
+     * @return bool
+     */
+    protected function hasValidForeignKeys()
+    {
+        // check if the model is related via morphTo
+        foreach (get_class_methods($this) as $relation) {
+            if (method_exists($this, $relation)) {
+                try {
+                    $related = $this->getRelationValue($relation);
+
+                    if ($related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo) {
+                        $type = $related->getMorphType();
+                        $id = $related->getForeignKeyName();
+
+                        if (is_null($this->getAttribute($type)) || is_null($this->getAttribute($id))) {
+                            return false;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Skip non-relationship method or inaccessible call
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Apply the given named scope if possible.
      *
      * @param  string  $scope
