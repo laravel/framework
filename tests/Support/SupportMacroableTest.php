@@ -65,8 +65,7 @@ class SupportMacroableTest extends TestCase
     public function testExtendedClassDoesNotHaveScopedMacro()
     {
         $macroable = $this->macroable;
-        $otherMacroable = new class extends EmptyMacroable
-        {
+        $otherMacroable = new class extends EmptyMacroable {
         };
         $macroable::scopedMacro(__METHOD__, function () {
             return 'Scoped Macro';
@@ -80,8 +79,7 @@ class SupportMacroableTest extends TestCase
     public function testParentClassDoesNotHaveScopedMacro()
     {
         $macroable = $this->macroable;
-        $otherMacroable = new class extends EmptyMacroable
-        {
+        $otherMacroable = new class extends EmptyMacroable {
         };
         $otherMacroable::scopedMacro(__METHOD__, function () {
             return 'Scoped Macro';
