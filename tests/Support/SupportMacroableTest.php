@@ -76,6 +76,7 @@ class SupportMacroableTest extends TestCase
         $this->expectException(BadMethodCallException::class);
         $otherMacroable::{__METHOD__}();
     }
+
     public function testParentClassDoesNotHaveScopedMacro()
     {
         $macroable = $this->macroable;
