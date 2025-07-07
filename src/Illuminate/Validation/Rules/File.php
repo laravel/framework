@@ -13,19 +13,19 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
-class File implements Rule, DataAwareRule, ValidatorAwareRule
+class File implements DataAwareRule, Rule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
     /**
      * Binary units flag used for size validation.
      */
-    public const BINARY = 'binary';
+    protected const BINARY = 'binary';
 
     /**
      * International units flag used for size validation.
      */
-    public const INTERNATIONAL = 'international';
+    protected const INTERNATIONAL = 'international';
 
     /**
      * The MIME types that the given file should match. This array may also contain file extensions.
@@ -42,14 +42,14 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $allowedExtensions = [];
 
     /**
-     * The minimum size in kilobytes that the file can be.
+     * The minimum file size that the file can be.
      *
      * @var null|int
      */
     protected $minimumFileSize = null;
 
     /**
-     * The maximum size in kilobytes that the file can be.
+     * The maximum file size that the file can be.
      *
      * @var null|int
      */
@@ -127,7 +127,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $file instanceof Rule ? $file : new self();
+        return $file instanceof Rule ? $file : new self;
     }
 
     /**
@@ -149,7 +149,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        return tap(new static, fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
     }
 
     /**
@@ -166,79 +166,73 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Set the units for size validation to binary.
+     * Set the units for size validation to binary (1024-based).
      */
     public function binary(): static
     {
         $this->units = self::BINARY;
+
         return $this;
     }
 
     /**
-     * Set the units for size validation to international.
+     * Set the units for size validation to international (1000-based).
      */
     public function international(): static
     {
         $this->units = self::INTERNATIONAL;
+
         return $this;
     }
 
-
-
     /**
-     * Indicate that the uploaded file should be exactly a certain size in kilobytes.
+     * Indicate that the uploaded file should be exactly a certain size.
      */
-    public function size(string|int $size, ?string $units = null): static
+    public function size(string|int $size): static
     {
-        $this->minimumFileSize = $this->toKilobytes($size, $this->units($units));
+        $this->minimumFileSize = $this->toKilobytes($size);
         $this->maximumFileSize = $this->minimumFileSize;
 
         return $this;
     }
 
     /**
-     * Indicate that the uploaded file should be between a minimum and maximum size in kilobytes.
+     * Indicate that the uploaded file should be between a minimum and maximum size.
      */
-    public function between(string|int $minSize, string|int $maxSize, ?string $units = null): static
+    public function between(string|int $minSize, string|int $maxSize): static
     {
-        $this->minimumFileSize = $this->toKilobytes($minSize, $this->units($units));
-        $this->maximumFileSize = $this->toKilobytes($maxSize, $this->units($units));
+        $this->minimumFileSize = $this->toKilobytes($minSize);
+        $this->maximumFileSize = $this->toKilobytes($maxSize);
 
         return $this;
     }
 
     /**
-     * Indicate that the uploaded file should be no less than the given number of kilobytes.
+     * Indicate that the uploaded file should be no less than the given size.
      */
-    public function min(string|int $size, ?string $units = null): static
+    public function min(string|int $size): static
     {
-        $this->minimumFileSize = $this->toKilobytes($size, $this->units($units));
+        $this->minimumFileSize = $this->toKilobytes($size);
 
         return $this;
     }
 
     /**
-     * Indicate that the uploaded file should be no more than the given number of kilobytes.
+     * Indicate that the uploaded file should be no more than the given size.
      */
-    public function max(string|int $size, ?string $units = null): static
+    public function max(string|int $size): static
     {
-        $this->maximumFileSize = $this->toKilobytes($size, $this->units($units));
+        $this->maximumFileSize = $this->toKilobytes($size);
 
         return $this;
-    }
-
-    /**
-     * Resolve the units to use for size calculations.
-     */
-    protected function units(?string $units = null): string
-    {
-        return $units ?? $this->units;
     }
 
     /**
      * Convert a potentially human-friendly file size to kilobytes.
+     *
+     * Supports suffix detection with precedence over instance settings.
      */
-    protected function toKilobytes(string|int $size, string $units): float|int
+    protected function toKilobytes(string|int $size): float|int
     {
         if (! is_string($size)) {
             return $size;
@@ -246,9 +240,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         if (($value = $this->parseSize($size)) === false || $value < 0) {
             throw new InvalidArgumentException('Invalid numeric value in file size.');
-        }   
+        }
 
-        return $units === self::BINARY
+        return $this->detectUnits($size) === self::BINARY
             ? $this->toBinaryKilobytes($size, $value)
             : $this->toInternationalKilobytes($size, $value);
     }
@@ -267,6 +261,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Detect the suffix and determine appropriate units from a file size string.
+     */
+    protected function detectUnits(string $size): string
+    {
+        return match (true) {
+            is_numeric($size) => $this->units,
+            in_array(strtolower(substr(trim($size), -3)), ['kib', 'mib', 'gib', 'tib']) => self::BINARY,
+            in_array(strtolower(substr(trim($size), -2)), ['kb', 'mb', 'gb', 'tb']) => self::INTERNATIONAL,
+            default => $this->units,
+        };
+    }
+
+    /**
      * Convert a human-friendly file size to kilobytes using the International System.
      */
     protected function toInternationalKilobytes(string $size, float $value): float|int
@@ -275,17 +282,24 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             $this->protectValueFromOverflow(
                 $this->prepareValueForPrecision($value),
                 ! is_numeric($size)
-                    ? match (substr(strtolower(trim($size)), -2)) {
-                        'kb' => 1,
-                        'mb' => 1_000,
-                        'gb' => 1_000_000,
-                        'tb' => 1_000_000_000,
-                        default => throw new InvalidArgumentException(
-                            'Invalid file size suffix. Valid suffixes are: KB, MB, GB, TB (case insensitive).'
-                        ),
-                    } : 1
-                )
-            );
+                    ? $this->getInternationalMultiplier(strtolower(trim($size)))
+                    : 1
+            )
+        );
+    }
+
+    /**
+     * Get the international multiplier for a given size string.
+     */
+    protected function getInternationalMultiplier(string $size): int
+    {
+        return match (substr($size, -2)) {
+            'kb' => 1,
+            'mb' => 1_000,
+            'gb' => 1_000_000,
+            'tb' => 1_000_000_000,
+            default => throw new InvalidArgumentException('Invalid file size suffix.'),
+        };
     }
 
     /**
@@ -297,17 +311,24 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             $this->protectValueFromOverflow(
                 $this->prepareValueForPrecision($value),
                 ! is_numeric($size)
-                    ? match (substr(strtolower(trim($size)), -2)) {
-                        'kb' => 1,
-                        'mb' => 1_024,
-                        'gb' => 1_048_576,
-                        'tb' => 1_073_741_824,
-                        default => throw new InvalidArgumentException(
-                            'Invalid file size suffix. Valid suffixes are: KB, MB, GB, TB (case insensitive).'
-                        ),
-                    } : 1
-                )
-            );
+                    ? $this->getBinaryMultiplier(strtolower(trim($size)))
+                    : 1
+            )
+        );
+    }
+
+    /**
+     * Get the binary multiplier for a given size string.
+     */
+    protected function getBinaryMultiplier(string $size): int
+    {
+        return match (substr($size, -3)) {
+            'kib' => 1,
+            'mib' => 1_024,
+            'gib' => 1_048_576,
+            'tib' => 1_073_741_824,
+            default => throw new InvalidArgumentException('Invalid file size suffix.'),
+        };
     }
 
     /**
@@ -329,7 +350,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function protectValueFromOverflow(float|int $value, int $multiplier): float|int
     {
-        return $value > PHP_INT_MAX / $multiplier 
+        return $value > PHP_INT_MAX / $multiplier
             || $value < PHP_INT_MIN / $multiplier
             || is_float($value)
                 ? (float) $value * $multiplier
