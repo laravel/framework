@@ -1147,6 +1147,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
+        // check if all relationship keys (be it foreign or morph keys) are available
+        if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
+            throw new LogicException(sprintf(
+                "Attempting to save a `withDefault()` model [%s] before it has the foreign keys set properly. Ensure it is created properly before accessing in model events.",
+                static::class
+            ));
+        }
+
         // If the model already exists in the database we can just update our record
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
@@ -1652,7 +1660,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Check if the model has all valid foreign keys.
+     * Check if the model instance has all valid foreign keys.
      *
      * @return bool
      */
@@ -1664,12 +1672,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 try {
                     $related = $this->getRelationValue($relation);
 
-                    if ($related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo) {
-                        $type = $related->getMorphType();
-                        $id = $related->getForeignKeyName();
-
-                        if (is_null($this->getAttribute($type)) || is_null($this->getAttribute($id))) {
+                    if (
+                        $related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo ||
+                        $related instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo
+                    ) {
+                        $foreignKey = $related->getForeignKeyName();
+                        if (is_null($this->getAttribute($foreignKey))) {
                             return false;
+                        }
+
+                        if ($related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo) {
+                            $typeColumn = $related->getMorphType();
+
+                            if (is_null($this->getAttribute($typeColumn))) {
+                                return false;
+                            }
                         }
                     }
                 } catch (\Throwable $e) {
