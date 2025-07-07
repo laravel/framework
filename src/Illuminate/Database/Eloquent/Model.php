@@ -125,6 +125,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected $escapeWhenCastingToString = false;
 
     /**
+     * Indicates if the model is a default instance.
+     *
+     * @var bool
+     */
+    protected $isDefaultInstance = false;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -1650,13 +1657,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Mark the model instance as a default instance.
+     *
+     * @return void
+     */
+    protected function markAsDefaultInstance()
+    {
+        $this->isDefaultInstance = true;
+    }
+
+    /**
      * Check if the model instance is the default model.
      *
      * @return bool
      */
     protected function isDefaultModelInstance()
     {
-        return $this->getAttribute('_is_default_instance') === true;
+        return $this->isDefaultInstance === true;
     }
 
     /**
