@@ -469,12 +469,13 @@ class Factory
             return new Collection;
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $collect = new Collection($this->recorded);
 
-        return (new Collection($this->recorded))
-            ->filter(fn ($pair) => $callback($pair[0], $pair[1]));
+        if ($callback) {
+            return $collect->filter(fn ($pair) => $callback($pair[0], $pair[1]));
+        }
+
+        return $collect;
     }
 
     /**
