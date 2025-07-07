@@ -11,6 +11,7 @@ use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
 use IteratorAggregate;
 use JsonSerializable;
+use Stringable;
 use Traversable;
 
 /**
@@ -20,7 +21,7 @@ use Traversable;
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
  */
-class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
+class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable, Stringable
 {
     use Conditionable, InteractsWithData, Macroable {
         __call as macroCall;
