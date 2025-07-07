@@ -1306,8 +1306,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
-        // check if all foreign keys of the default instance are valid
-        $this->ensureDefaultInstanceHasValidKeys();
+        // prevent saving if all foreign keys of the default instance are not valid
+        $this->preventSavingDefaultInstanceWithInvalidKeys();
 
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
@@ -1717,11 +1717,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @throws \LogicException
      */
-    protected function ensureDefaultInstanceHasValidKeys()
+    protected function preventSavingDefaultInstanceWithInvalidKeys()
     {
         if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
             throw new LogicException(sprintf(
-                "Attempting to save a `withDefault()` model instance [%s] before it has the foreign keys set properly. Ensure it is created properly before accessing in model events.",
+                "Cannot save a `withDefault()` model instance [%s] because its required foreign keys are not set properly. Make sure the parent relationship is correctly assigned before using the instance, especially in model events.",
                 static::class
             ));
         }
