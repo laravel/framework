@@ -471,6 +471,18 @@ class SupportFluentTest extends TestCase
             'role' => 'admin',
         ], $result);
     }
+
+    public function testItCanBeCastToString()
+    {
+        $fluent = new Fluent([
+            'name' => 'Taylor',
+            'roles' => ['admin', 'editor'],
+        ]);
+
+        $expected = $fluent->toJson();
+
+        $this->assertSame($expected, (string) $fluent);
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate
