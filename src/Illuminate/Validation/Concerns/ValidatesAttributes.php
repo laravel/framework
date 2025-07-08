@@ -283,7 +283,7 @@ trait ValidatesAttributes
     {
         $date = is_null($value) ? null : $this->getDateTime($value);
 
-        return $date ? $date->getTimestamp() : null;
+        return $date?->getTimestamp();
     }
 
     /**
@@ -1118,7 +1118,7 @@ trait ValidatesAttributes
      *
      * @param  array<int, int|string>  $parameters
      * @param  string  $attribute
-     * @return bool
+     * @return string
      */
     public function getQueryColumn($parameters, $attribute)
     {
