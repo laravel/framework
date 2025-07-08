@@ -1656,7 +1656,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return void
      */
-    protected function markAsDefaultInstance()
+    public function markAsDefaultInstance()
     {
         $this->isDefaultInstance = true;
     }

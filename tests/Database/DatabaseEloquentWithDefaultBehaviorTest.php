@@ -177,7 +177,6 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
     public function testMorphOneWithoutWithDefaultReturnsNull()
     {
         $business = BusinessWithoutDefault::create(['name' => 'Legacy Ltd.']);
-//        dd(get_class($business));
 
         $this->assertNull($business->wallet);
         $this->assertNull(optional($business->wallet)->balance);
