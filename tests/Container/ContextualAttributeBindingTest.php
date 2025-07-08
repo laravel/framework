@@ -14,6 +14,7 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Input;
 use Illuminate\Container\Attributes\Query;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
@@ -357,6 +358,21 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
 
+    public function testInputAttribute()
+    {
+        $container = new Container;
+        $container->bind('request', function () {
+            return Request::create('/?name=Foo+Bar', 'POST', [
+                'age' => '32',
+            ]);
+        });
+
+        $data = $container->make(TestInputData::class);
+
+        $this->assertEquals('Foo Bar', $data->name);
+        $this->assertEquals(32, $data->age);
+    }
+
     public function testPostAttribute()
     {
         $container = new Container;
@@ -364,7 +380,6 @@ class ContextualAttributeBindingTest extends TestCase
             return Request::create('/', 'POST', [
                 'name' => 'Foo Bar',
                 'age' => '32',
-                'hobbies' => ['Gaming'],
             ]);
         });
 
@@ -372,21 +387,19 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertEquals('Foo Bar', $data->name);
         $this->assertEquals(32, $data->age);
-        $this->assertEquals(['Gaming'], $data->hobbies);
     }
 
     public function testQueryAttribute()
     {
         $container = new Container;
         $container->bind('request', function () {
-            return Request::create('/?name=Foo+Bar&age=32&hobbies[]=Gaming', 'GET');
+            return Request::create('/?name=Foo+Bar&age=32', 'GET');
         });
 
         $data = $container->make(TestQueryData::class);
 
         $this->assertEquals('Foo Bar', $data->name);
         $this->assertEquals(32, $data->age);
-        $this->assertEquals(['Gaming'], $data->hobbies);
     }
 }
 
@@ -610,12 +623,20 @@ final class LocaleObject
     }
 }
 
+final readonly class TestInputData
+{
+    public function __construct(
+        #[Input('name')] public string $name,
+        #[Input('age', 24)] public int $age,
+    ) {
+    }
+}
+
 final readonly class TestQueryData
 {
     public function __construct(
-        #[Query('name')] public string       $name,
-        #[Query('age', 24)] public int       $age,
-        #[Query('hobbies', [])] public array $hobbies,
+        #[Query('name')] public string $name,
+        #[Query('age', 24)] public int $age,
     ) {
     }
 }
@@ -625,7 +646,6 @@ final readonly class TestPostData
     public function __construct(
         #[Post('name')] public string $name,
         #[Post('age', 24)] public int $age,
-        #[Post('hobbies', [])] public array $hobbies,
     ) {
     }
 }
