@@ -14,7 +14,7 @@ use Illuminate\Container\Attributes\Config;
 use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
-use Illuminate\Container\Attributes\Get;
+use Illuminate\Container\Attributes\Query;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\Post;
@@ -357,40 +357,36 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertEquals([1, 2], iterator_to_array($value));
     }
 
-    public function testGetAttribute()
-    {
-        $container = new Container;
-        $container->bind('request', function () {
-            return Request::create('/', 'GET', [
-                'name' => 'Joe Bloggs',
-                'age' => '32',
-                'hobbies' => ['Sports'],
-            ]);
-        });
-
-        $data = $container->make(TestGetData::class);
-
-        $this->assertEquals('Joe Bloggs', $data->name);
-        $this->assertEquals(32, $data->age);
-        $this->assertEquals(['Sports'], $data->hobbies);
-    }
-
     public function testPostAttribute()
     {
         $container = new Container;
         $container->bind('request', function () {
             return Request::create('/', 'POST', [
-                'name' => 'Joe Bloggs',
+                'name' => 'Foo Bar',
                 'age' => '32',
-                'hobbies' => ['Sports'],
+                'hobbies' => ['Gaming'],
             ]);
         });
 
-        $data = $container->make(TestGetData::class);
+        $data = $container->make(TestPostData::class);
 
-        $this->assertEquals('Joe Bloggs', $data->name);
+        $this->assertEquals('Foo Bar', $data->name);
         $this->assertEquals(32, $data->age);
-        $this->assertEquals(['Sports'], $data->hobbies);
+        $this->assertEquals(['Gaming'], $data->hobbies);
+    }
+
+    public function testQueryAttribute()
+    {
+        $container = new Container;
+        $container->bind('request', function () {
+            return Request::create('/?name=Foo+Bar&age=32&hobbies[]=Gaming', 'GET');
+        });
+
+        $data = $container->make(TestQueryData::class);
+
+        $this->assertEquals('Foo Bar', $data->name);
+        $this->assertEquals(32, $data->age);
+        $this->assertEquals(['Gaming'], $data->hobbies);
     }
 }
 
@@ -614,12 +610,12 @@ final class LocaleObject
     }
 }
 
-final readonly class TestGetData
+final readonly class TestQueryData
 {
     public function __construct(
-        #[Get('name')] public string $name,
-        #[Get('age', 24)] public int $age,
-        #[Get('hobbies', [])] public array $hobbies,
+        #[Query('name')] public string       $name,
+        #[Query('age', 24)] public int       $age,
+        #[Query('hobbies', [])] public array $hobbies,
     ) {
     }
 }

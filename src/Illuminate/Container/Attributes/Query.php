@@ -7,7 +7,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class Get implements ContextualAttribute
+class Query implements ContextualAttribute
 {
     /**
      * Create a new class instance.
@@ -21,6 +21,6 @@ class Get implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container): mixed
     {
-        return $container->make('request')->get($attribute->key, $attribute->default);
+        return $container->make('request')->query($attribute->key, $attribute->default);
     }
 }
