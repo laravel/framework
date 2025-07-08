@@ -353,7 +353,11 @@ class Number
 
         static::useLocale($locale);
 
-        return tap($callback(), fn () => static::useLocale($previousLocale));
+        try {
+            return $callback();
+        } finally {
+            static::useLocale($previousLocale);
+        }
     }
 
     /**
@@ -369,7 +373,11 @@ class Number
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousCurrency));
+        try {
+            return $callback();
+        } finally {
+            static::useCurrency($previousCurrency);
+        }
     }
 
     /**
