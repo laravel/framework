@@ -1135,7 +1135,7 @@ trait ValidatesAttributes
      */
     public function guessColumnForQuery($attribute)
     {
-        if (in_array($attribute, Arr::collapse($this->implicitAttributes))
+        if (str_contains($attribute, '.')
                 && ! is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }
