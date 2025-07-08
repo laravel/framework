@@ -452,6 +452,25 @@ class SupportFluentTest extends TestCase
             'baz' => 'zal',
         ], $fluent->foo()->all());
     }
+
+    public function testFluentIsIterable()
+    {
+        $fluent = new Fluent([
+            'name' => 'Taylor',
+            'role' => 'admin',
+        ]);
+
+        $result = [];
+
+        foreach ($fluent as $key => $value) {
+            $result[$key] = $value;
+        }
+
+        $this->assertSame([
+            'name' => 'Taylor',
+            'role' => 'admin',
+        ], $result);
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate
