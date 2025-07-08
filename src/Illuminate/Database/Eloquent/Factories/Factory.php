@@ -138,7 +138,7 @@ abstract class Factory
      *
      * @var bool
      */
-    protected static $defaultExpandRelationships = true;
+    protected static $expandRelationshipsByDefault = true;
 
     /**
      * Create a new factory instance.
@@ -173,7 +173,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
-        $this->expandRelationships = $expandRelationships ?? self::$defaultExpandRelationships;
+        $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
     }
 
     /**
@@ -903,14 +903,23 @@ abstract class Factory
     }
 
     /**
-     * Specify that relationships should not create parent relationships.
+     * Specify that relationships should create parent relationships by default.
      *
-     * @param  bool  $dontExpandRelationships
      * @return void
      */
-    public static function dontExpandRelationshipsByDefault(bool $dontExpandRelationships = true)
+    public static function expandRelationshipsByDefault()
     {
-        static::$defaultExpandRelationships = ! $dontExpandRelationships;
+        static::$expandRelationshipsByDefault = true;
+    }
+
+    /**
+     * Specify that relationships should not create parent relationships by default.
+     *
+     * @return void
+     */
+    public static function dontExpandRelationshipsByDefault()
+    {
+        static::$expandRelationshipsByDefault = false;
     }
 
     /**
@@ -973,7 +982,7 @@ abstract class Factory
         static::$modelNameResolvers = [];
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
-        static::$defaultExpandRelationships = true;
+        static::$expandRelationshipsByDefault = true;
     }
 
     /**

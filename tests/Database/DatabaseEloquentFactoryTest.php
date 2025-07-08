@@ -44,7 +44,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
-        Factory::dontExpandRelationshipsByDefault(false);
+        Factory::expandRelationshipsByDefault();
     }
 
     /**
@@ -839,7 +839,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         $post = FactoryTestPostFactory::new()->make();
         $this->assertNull($post->user_id);
 
-        FactoryTestPostFactory::dontExpandRelationshipsByDefault(false);
+        FactoryTestPostFactory::expandRelationshipsByDefault();
         $postWithParents = FactoryTestPostFactory::new()->create();
         $this->assertNotNull($postWithParents->user_id);
     }
