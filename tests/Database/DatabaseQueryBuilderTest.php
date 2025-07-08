@@ -1189,6 +1189,94 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2], $builder->getBindings());
     }
 
+    public function testWhereValueBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where ? between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where ? between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueBetween('2020-01-01 19:30:00', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where ? between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueBetween(new Raw(1), ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where 1 between "created_at" and "updated_at"', $builder->toSql());
+    }
+
+    public function testOrWhereValueBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or ? between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or ? between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween('2020-01-01 19:30:00', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where "id" = ? or ? between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueBetween(new Raw(1), ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or 1 between "created_at" and "updated_at"', $builder->toSql());
+    }
+
+    public function testWhereValueNotBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueNotBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where ? not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueNotBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where ? not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueNotBetween('2020-01-01 19:30:00', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where ? not between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where 1 not between "created_at" and "updated_at"', $builder->toSql());
+    }
+
+    public function testOrWhereValueNotBetween()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or ? not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween('2020-01-01 19:30:00', ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or ? not between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween('2020-01-01 19:30:00', [new Raw(1), new Raw(2)]);
+        $this->assertSame('select * from "users" where "id" = ? or ? not between 1 and 2', $builder->toSql());
+        $this->assertEquals([0 => 2, 1 => '2020-01-01 19:30:00'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', 2)->orWhereValueNotBetween(new Raw(1), ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where "id" = ? or 1 not between "created_at" and "updated_at"', $builder->toSql());
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
