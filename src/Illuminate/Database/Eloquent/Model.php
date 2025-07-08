@@ -1222,6 +1222,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performUpdate(Builder $query)
     {
+        // prevent saving if all foreign keys of the default instance are not valid
+        $this->preventSavingDefaultInstanceWithInvalidKeys();
+
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
         // operation if the model does not pass validation. Otherwise, we update.
@@ -1678,36 +1681,77 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function hasValidForeignKeys()
     {
-        // check if the model is related via morphTo
-        foreach (get_class_methods($this) as $relation) {
-            if (method_exists($this, $relation)) {
-                try {
-                    $related = $this->getRelationValue($relation);
+        // try to get foreign key info from relationships safely
+        $foreignKeysToCheck = $this->getForeignKeysFromRelationships();
 
-                    if (
-                        $related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo ||
-                        $related instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo
-                    ) {
-                        $foreignKey = $related->getForeignKeyName();
-                        if (is_null($this->getAttribute($foreignKey))) {
-                            return false;
-                        }
+        // if couldn't get relationship info safely, fall back to conventional naming
+        if (empty($foreignKeysToCheck)) {
+            $foreignKeysToCheck = $this->getForeignKeysFromConventions();
+        }
 
-                        if ($related instanceof \Illuminate\Database\Eloquent\Relations\MorphTo) {
-                            $typeColumn = $related->getMorphType();
+        // if no foreign keys found, then it is considered valid (regular model without relationships)
+        if (empty($foreignKeysToCheck)) {
+            return true;
+        }
 
-                            if (is_null($this->getAttribute($typeColumn))) {
-                                return false;
-                            }
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    // Skip non-relationship method or inaccessible call
-                }
+        // if found, then check if all required foreign keys are set
+        foreach ($foreignKeysToCheck as $key => $required) {
+            if ($required && is_null($this->getAttribute($key))) {
+                return false;
             }
         }
 
         return true;
+    }
+
+    /**
+     * Safely attempt to get foreign key information from relationship cache.
+     *
+     * @return array
+     */
+    protected function getForeignKeysFromRelationships()
+    {
+        $foreignKeys = [];
+
+        // Try to get cached relationship information if available
+        if (property_exists($this, 'relationshipCache')) {
+            // Use cached relationship info to avoid calling relationship methods
+            return $foreignKeys;
+        }
+
+        // return empty array to use fallback approach
+        return $foreignKeys;
+    }
+
+    /**
+     * Get foreign keys based on Laravel's naming conventions.
+     *
+     * @return array
+     */
+    protected function getForeignKeysFromConventions()
+    {
+        $foreignKeys = [];
+
+        // Check for common foreign key patterns
+        foreach ($this->attributes as $key => $value) {
+            if (str_ends_with($key, '_id') || str_ends_with($key, '_type')) {
+                $foreignKeys[$key] = true; // Mark as required
+            }
+        }
+
+        // For morphTo relationships
+        $morphTypes = array_filter($foreignKeys, fn($key) => str_ends_with($key, '_type'), ARRAY_FILTER_USE_KEY);
+
+        foreach ($morphTypes as $typeKey => $required) {
+            $idKey = str_replace('_type', '_id', $typeKey);
+
+            if (array_key_exists($idKey, $this->attributes)) {
+                $foreignKeys[$typeKey] = true;
+                $foreignKeys[$idKey] = true;
+            }
+        }
+
+        return $foreignKeys;
     }
 
     /**

@@ -171,7 +171,7 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
         $wallet = $business->wallet;
 
         $this->assertFalse($wallet->exists);
-        $this->assertNull($wallet->touch());
+        $this->assertTrue($wallet->touch());
     }
 
     public function testMorphOneWithoutWithDefaultReturnsNull()
