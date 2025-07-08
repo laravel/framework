@@ -134,6 +134,13 @@ abstract class Factory
     protected static $factoryNameResolver;
 
     /**
+     * Whether to expand relationships by default.
+     *
+     * @var bool
+     */
+    protected static $expandRelationshipsByDefault = true;
+
+    /**
      * Create a new factory instance.
      *
      * @param  int|null  $count
@@ -144,7 +151,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
-     * @param  bool  $expandRelationships
+     * @param  bool|null  $expandRelationships
      */
     public function __construct(
         $count = null,
@@ -155,7 +162,7 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
-        bool $expandRelationships = true
+        ?bool $expandRelationships = null
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -166,7 +173,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
-        $this->expandRelationships = $expandRelationships;
+        $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
     }
 
     /**
@@ -906,6 +913,26 @@ abstract class Factory
     }
 
     /**
+     * Specify that relationships should create parent relationships by default.
+     *
+     * @return void
+     */
+    public static function expandRelationshipsByDefault()
+    {
+        static::$expandRelationshipsByDefault = true;
+    }
+
+    /**
+     * Specify that relationships should not create parent relationships by default.
+     *
+     * @return void
+     */
+    public static function dontExpandRelationshipsByDefault()
+    {
+        static::$expandRelationshipsByDefault = false;
+    }
+
+    /**
      * Get a new Faker instance.
      *
      * @return \Faker\Generator
@@ -965,6 +992,7 @@ abstract class Factory
         static::$modelNameResolvers = [];
         static::$factoryNameResolver = null;
         static::$namespace = 'Database\\Factories\\';
+        static::$expandRelationshipsByDefault = true;
     }
 
     /**
