@@ -277,7 +277,7 @@ trait ValidatesAttributes
      * Get the date timestamp.
      *
      * @param  mixed  $value
-     * @return int
+     * @return int|null
      */
     protected function getDateTimestamp($value)
     {
