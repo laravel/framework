@@ -2098,7 +2098,7 @@ class Builder implements BuilderContract
      */
     public function qualifyColumns($columns)
     {
-         $columns = Arr::map(Arr::wrap($columns), function ($column) {
+        $columns = Arr::map(Arr::wrap($columns), function ($column) {
             return $column instanceof Expression
                 ? $column->getValue($this->getGrammar())
                 : $column;
