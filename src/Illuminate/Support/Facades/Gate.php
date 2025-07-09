@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Support\Testing\Fakes\GateFake;
 
 /**
  * @method static bool has(string|array $ability)
@@ -31,11 +32,31 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static \Illuminate\Auth\Access\Gate setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Auth\Access\Response denyWithStatus(int $status, string|null $message = null, int|null $code = null)
  * @method static \Illuminate\Auth\Access\Response denyAsNotFound(string|null $message = null, int|null $code = null)
+ * @method static void assertChecked(string $ability, callable|int|null $callback = null)
+ * @method static void assertNotChecked(string $ability, callable|null $callback = null)
+ * @method static void assertNothingChecked()
+ * @method static void assertCheckedTimes(string $ability, int $times = 1)
+ * @method static void assertCheckedWith(string $ability, mixed...$arguments)
+ * @method static void assertCheckedInOrder(array $abilities)
+ * @method static void assertCheckedForUser(mixed $user, string|null $ability = null)
  *
  * @see \Illuminate\Auth\Access\Gate
  */
 class Gate extends Facade
 {
+    /**
+     * Replace the bound instance with a fake.
+     */
+    public static function fake(array $abilities = []): GateFake
+    {
+        return tap(
+            new GateFake(static::getFacadeRoot(), $abilities),
+            static function ($fake): void {
+                static::swap($fake);
+            }
+        );
+    }
+
     /**
      * Get the registered name of the component.
      *
