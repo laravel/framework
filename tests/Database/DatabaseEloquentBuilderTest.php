@@ -315,6 +315,57 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo_table.column', 'foo_table.name'], $builder->qualifyColumns(['column', 'name']));
     }
 
+
+    public function testQualifyColumnsWithRawExpression()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class));
+
+        $builder = new Builder($query);
+        $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
+
+        $expr = new Expression('id');
+
+        $this->assertEquals(['foo_table.id'], $builder->qualifyColumns([$expr]));
+    }
+
+
+    public function testQualifyColumnsWithMixedExpressionsAndStrings()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class));
+
+        $builder = new Builder($query);
+        $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
+
+        $expr = new Expression('id');
+
+        $this->assertEquals(
+            ['foo_table.id', 'foo_table.name'],
+            $builder->qualifyColumns([$expr, 'name'])
+        );
+    }
+
+
+    public function testQualifyColumnsKeepsAlreadyQualifiedExpressionIntact()
+    {
+        $query = m::mock(BaseBuilder::class);
+        $query->shouldReceive('from')->with('foo_table');
+        $query->shouldReceive('getGrammar')->andReturn(m::mock(Grammar::class));
+
+        $builder = new Builder($query);
+        $builder->setModel(new EloquentBuilderTestStubStringPrimaryKey);
+
+        $expr = new Expression('SUM(foo_table.balance)');
+
+        $this->assertEquals(
+            ['SUM(foo_table.balance)'],
+            $builder->qualifyColumns([$expr])
+        );
+    }
+
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
     {
         $builder = m::mock(Builder::class.'[getModels,eagerLoadRelations]', [$this->getMockQueryBuilder()]);
