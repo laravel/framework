@@ -167,6 +167,8 @@ class SupportFluentTest extends TestCase
             'str' => 'abc',
             'empty_str' => '',
             'null' => null,
+            'list' => ['value'],
+            'array' => ['key' => 'value'],
         ]);
         $this->assertTrue($fluent->string('int') instanceof Stringable);
         $this->assertTrue($fluent->string('unknown_key') instanceof Stringable);
@@ -179,6 +181,8 @@ class SupportFluentTest extends TestCase
         $this->assertSame('', $fluent->string('empty_str')->value());
         $this->assertSame('', $fluent->string('null')->value());
         $this->assertSame('', $fluent->string('unknown_key')->value());
+        $this->assertSame('["value"]', $fluent->string('list')->value());
+        $this->assertSame('{"key":"value"}', $fluent->string('array')->value());
     }
 
     public function testBooleanMethod()

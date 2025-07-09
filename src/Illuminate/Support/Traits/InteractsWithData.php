@@ -241,7 +241,9 @@ trait InteractsWithData
      */
     public function string($key, $default = null)
     {
-        return Str::of($this->data($key, $default));
+        $value = $this->data($key, $default);
+
+        return Str::of(is_array($value) ? json_encode($value) : $value);
     }
 
     /**

@@ -603,6 +603,8 @@ class HttpRequestTest extends TestCase
             'str' => 'abc',
             'empty_str' => '',
             'null' => null,
+            'list' => ['value'],
+            'array' => ['key' => 'value'],
         ]);
         $this->assertTrue($request->string('int') instanceof Stringable);
         $this->assertTrue($request->string('unknown_key') instanceof Stringable);
@@ -615,6 +617,8 @@ class HttpRequestTest extends TestCase
         $this->assertSame('', $request->string('empty_str')->value());
         $this->assertSame('', $request->string('null')->value());
         $this->assertSame('', $request->string('unknown_key')->value());
+        $this->assertSame('["value"]', $request->string('list')->value());
+        $this->assertSame('{"key":"value"}', $request->string('array')->value());
     }
 
     public function testBooleanMethod()
