@@ -6,6 +6,7 @@ use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\TestCase;
@@ -150,7 +151,7 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
         BusinessWithObserver::create(['name' => 'Danger Zone']);
     }
 
-    public function testBelongsToWithDefaultThrowsWhenSavingWithoutKeys()
+    public function testBelongsToWithDefaultThrowsExceptionWhenSavingWithoutKeys()
     {
         $profile = new Profile();
         $profile->save();
@@ -164,7 +165,7 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
         $user->save();
     }
 
-    public function testTouchingDefaultModelDoesNotThrow()
+    public function testTouchingDefaultModelDoesNotThrowException()
     {
         $business = Business::create(['name' => 'Touchables']);
 
@@ -281,4 +282,9 @@ class TestUserModel extends Model
 {
     protected $table = 'users';
     protected $guarded = [];
+
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class, 'user_id');
+    }
 }
