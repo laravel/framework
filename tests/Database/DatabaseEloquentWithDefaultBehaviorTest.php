@@ -51,7 +51,7 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
 
         $this->schema()->create('profiles', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->nullable();
+            $table->foreignId('user_id')->nullable();
             $table->timestamps();
         });
 
@@ -271,7 +271,7 @@ class Profile extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(TestUserModel::class)->withDefault([
+        return $this->belongsTo(TestUserModel::class, 'user_id')->withDefault([
             'name' => 'Guest',
         ]);
     }
