@@ -2098,14 +2098,13 @@ class Builder implements BuilderContract
      */
     public function qualifyColumns($columns)
     {
-        return collect(Arr::wrap($columns))->map(function ($column) {
-            $column = $column instanceof Expression
+         $columns = Arr::map(Arr::wrap($columns), function ($column) {
+            return $column instanceof Expression
                 ? $column->getValue($this->getGrammar())
                 : $column;
+        });
 
-            return $this->model->qualifyColumn($column);
-        })
-        ->all();
+        return $this->model->qualifyColumns($columns);
     }
 
     /**
