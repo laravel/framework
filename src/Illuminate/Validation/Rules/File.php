@@ -261,16 +261,38 @@ class File implements DataAwareRule, Rule, ValidatorAwareRule
     }
 
     /**
-     * Detect the suffix and determine appropriate units from a file size string.
+     * Detect the suffix and determine appropriate units from a file size string
+     *
+     * @throws InvalidArgumentException
      */
     protected function detectUnits(string $size): string
     {
         return match (true) {
             is_numeric($size) => $this->units,
-            in_array(strtolower(substr(trim($size), -3)), ['kib', 'mib', 'gib', 'tib']) => self::BINARY,
-            in_array(strtolower(substr(trim($size), -2)), ['kb', 'mb', 'gb', 'tb']) => self::INTERNATIONAL,
-            default => $this->units,
+            $this->isBinarySizeString($size) => self::BINARY,
+            $this->isInternationalSizeString($size) => self::INTERNATIONAL,
+            default => throw new InvalidArgumentException(
+                "Invalid file size; units must be one of [kib, mib, gib, tib, kb, mb, gb, tb]. Given: {$size}."
+            ),
         };
+    }
+
+    protected function isBinarySizeString(string $size): bool
+    {
+        return in_array(
+            strtolower(substr(trim($size), -3)),
+            ['kib', 'mib', 'gib', 'tib'],
+            true
+        );
+    }
+
+    protected function isInternationalSizeString(string $size): bool
+    {
+        return in_array(
+            strtolower(substr(trim($size), -2)),
+            ['kb', 'mb', 'gb', 'tb'],
+            true
+        );
     }
 
     /**
@@ -278,14 +300,10 @@ class File implements DataAwareRule, Rule, ValidatorAwareRule
      */
     protected function toInternationalKilobytes(string $size, float $value): float|int
     {
-        return round(
-            $this->protectValueFromOverflow(
-                $this->prepareValueForPrecision($value),
-                ! is_numeric($size)
-                    ? $this->getInternationalMultiplier(strtolower(trim($size)))
-                    : 1
-            )
-        );
+        return round($this->protectValueFromOverflow(
+            $this->prepareValueForPrecision($value),
+            ! is_numeric($size) ? $this->getInternationalMultiplier($size) : 1
+        ));
     }
 
     /**
@@ -293,12 +311,11 @@ class File implements DataAwareRule, Rule, ValidatorAwareRule
      */
     protected function getInternationalMultiplier(string $size): int
     {
-        return match (substr($size, -2)) {
+        return match (strtolower(substr(trim($size), -2))) {
             'kb' => 1,
             'mb' => 1_000,
             'gb' => 1_000_000,
             'tb' => 1_000_000_000,
-            default => throw new InvalidArgumentException('Invalid file size suffix.'),
         };
     }
 
@@ -307,14 +324,10 @@ class File implements DataAwareRule, Rule, ValidatorAwareRule
      */
     protected function toBinaryKilobytes(string $size, float $value): float|int
     {
-        return round(
-            $this->protectValueFromOverflow(
-                $this->prepareValueForPrecision($value),
-                ! is_numeric($size)
-                    ? $this->getBinaryMultiplier(strtolower(trim($size)))
-                    : 1
-            )
-        );
+        return round($this->protectValueFromOverflow(
+            $this->prepareValueForPrecision($value),
+            ! is_numeric($size) ? $this->getBinaryMultiplier($size) : 1
+        ));
     }
 
     /**
@@ -322,12 +335,11 @@ class File implements DataAwareRule, Rule, ValidatorAwareRule
      */
     protected function getBinaryMultiplier(string $size): int
     {
-        return match (substr($size, -3)) {
+        return match (strtolower(substr(trim($size), -3))) {
             'kib' => 1,
             'mib' => 1_024,
             'gib' => 1_048_576,
             'tib' => 1_073_741_824,
-            default => throw new InvalidArgumentException('Invalid file size suffix.'),
         };
     }
 

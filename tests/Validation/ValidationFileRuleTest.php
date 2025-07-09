@@ -671,7 +671,9 @@ class ValidationFileRuleTest extends TestCase
     public function test_invalid_size_suffix_throws_exception(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid file size suffix.');
+        $this->expectExceptionMessage(
+            'Invalid file size; units must be one of [kib, mib, gib, tib, kb, mb, gb, tb]. Given: 5xyz.'
+        );
 
         File::default()->max('5xyz');
     }
