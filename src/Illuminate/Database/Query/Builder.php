@@ -2675,7 +2675,7 @@ class Builder implements BuilderContract
      * Add an "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string|UnitEnum  $direction
+     * @param  string|\UnitEnum  $direction
      * @return $this
      *
      * @throws \InvalidArgumentException
