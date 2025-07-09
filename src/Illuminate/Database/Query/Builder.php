@@ -2675,7 +2675,7 @@ class Builder implements BuilderContract
      * Add an "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $direction
+     * @param  string|UnitEnum  $direction
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -2690,7 +2690,7 @@ class Builder implements BuilderContract
             $this->addBinding($bindings, $this->unions ? 'unionOrder' : 'order');
         }
 
-        $direction = strtolower($direction);
+        $direction = strtolower(enum_value($direction));
 
         if (! in_array($direction, ['asc', 'desc'], true)) {
             throw new InvalidArgumentException('Order direction must be "asc" or "desc".');
