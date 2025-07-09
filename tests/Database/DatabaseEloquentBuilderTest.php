@@ -315,7 +315,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['foo_table.column', 'foo_table.name'], $builder->qualifyColumns(['column', 'name']));
     }
 
-
     public function testQualifyColumnsWithRawExpression()
     {
         $query = m::mock(BaseBuilder::class);
@@ -329,7 +328,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertEquals(['foo_table.id'], $builder->qualifyColumns([$expr]));
     }
-
 
     public function testQualifyColumnsWithMixedExpressionsAndStrings()
     {
@@ -347,7 +345,6 @@ class DatabaseEloquentBuilderTest extends TestCase
             $builder->qualifyColumns([$expr, 'name'])
         );
     }
-
 
     public function testQualifyColumnsKeepsAlreadyQualifiedExpressionIntact()
     {
