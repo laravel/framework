@@ -13,7 +13,6 @@ class Validated
      *
      * @param  string  $guard  The authentication guard name.
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The user retrieved and validated from the User Provider.
-     * @return void
      */
     public function __construct(
         public $guard,

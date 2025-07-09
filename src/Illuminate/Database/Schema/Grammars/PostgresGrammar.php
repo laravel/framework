@@ -277,13 +277,7 @@ class PostgresGrammar extends Grammar
         }
     }
 
-    /**
-     * Compile a change column command into a series of SQL statements.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return array|string
-     */
+    /** @inheritDoc */
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         $column = $command->column;
@@ -333,9 +327,16 @@ class PostgresGrammar extends Grammar
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
-        $sql = sprintf('alter table %s add constraint %s unique (%s)',
+        $uniqueStatement = 'unique';
+
+        if (! is_null($command->nullsNotDistinct)) {
+            $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
+        }
+
+        $sql = sprintf('alter table %s add constraint %s %s (%s)',
             $this->wrapTable($blueprint),
             $this->wrap($command->index),
+            $uniqueStatement,
             $this->columnize($command->columns)
         );
 
@@ -458,45 +459,45 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  array  $tables
+     * @param  array<string>  $tables
      * @return string
      */
     public function compileDropAllTables($tables)
     {
-        return 'drop table '.implode(',', $this->escapeNames($tables)).' cascade';
+        return 'drop table '.implode(', ', $this->escapeNames($tables)).' cascade';
     }
 
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  array  $views
+     * @param  array<string>  $views
      * @return string
      */
     public function compileDropAllViews($views)
     {
-        return 'drop view '.implode(',', $this->escapeNames($views)).' cascade';
+        return 'drop view '.implode(', ', $this->escapeNames($views)).' cascade';
     }
 
     /**
      * Compile the SQL needed to drop all types.
      *
-     * @param  array  $types
+     * @param  array<string>  $types
      * @return string
      */
     public function compileDropAllTypes($types)
     {
-        return 'drop type '.implode(',', $this->escapeNames($types)).' cascade';
+        return 'drop type '.implode(', ', $this->escapeNames($types)).' cascade';
     }
 
     /**
      * Compile the SQL needed to drop all domains.
      *
-     * @param  array  $domains
+     * @param  array<string>  $domains
      * @return string
      */
     public function compileDropAllDomains($domains)
     {
-        return 'drop domain '.implode(',', $this->escapeNames($domains)).' cascade';
+        return 'drop domain '.implode(', ', $this->escapeNames($domains)).' cascade';
     }
 
     /**
@@ -677,16 +678,15 @@ class PostgresGrammar extends Grammar
     /**
      * Quote-escape the given tables, views, or types.
      *
-     * @param  array  $names
-     * @return array
+     * @param  array<string>  $names
+     * @return array<string>
      */
     public function escapeNames($names)
     {
-        return array_map(static function ($name) {
-            return '"'.(new Collection(explode('.', $name)))
-                ->map(fn ($segment) => trim($segment, '\'"'))
-                ->implode('"."').'"';
-        }, $names);
+        return array_map(
+            fn ($name) => (new Collection(explode('.', $name)))->map($this->wrapValue(...))->implode('.'),
+            $names
+        );
     }
 
     /**
@@ -922,6 +922,10 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression('CURRENT_DATE'));
+        }
+
         return 'date';
     }
 
@@ -1007,6 +1011,10 @@ class PostgresGrammar extends Grammar
      */
     protected function typeYear(Fluent $column)
     {
+        if ($column->useCurrent) {
+            $column->default(new Expression('EXTRACT(YEAR FROM CURRENT_DATE)'));
+        }
+
         return $this->typeInteger($column);
     }
 
@@ -1225,7 +1233,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $column
-     * @return string|array|null
+     * @return string|list<string>|null
      */
     protected function modifyGeneratedAs(Blueprint $blueprint, Fluent $column)
     {

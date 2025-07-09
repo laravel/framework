@@ -26,7 +26,6 @@ class Hub implements HubContract
      * Create a new Hub instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
     public function __construct(?Container $container = null)
     {

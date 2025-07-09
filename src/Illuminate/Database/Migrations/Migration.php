@@ -27,4 +27,14 @@ abstract class Migration
     {
         return $this->connection;
     }
+
+    /**
+     * Determine if this migration should run.
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return true;
+    }
 }

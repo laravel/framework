@@ -14,7 +14,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * All of the registered messages.
      *
-     * @var array
+     * @var array<string, array<string>>
      */
     protected $messages = [];
 
@@ -28,8 +28,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Create a new message bag instance.
      *
-     * @param  array  $messages
-     * @return void
+     * @param  array<string, Arrayable|string|array<string>>  $messages
      */
     public function __construct(array $messages = [])
     {
@@ -43,7 +42,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the keys present in the message bag.
      *
-     * @return array
+     * @return array<string>
      */
     public function keys()
     {
@@ -96,7 +95,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Merge a new array of messages into the message bag.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
+     * @param  \Illuminate\Contracts\Support\MessageProvider|array<string, array<string>>  $messages
      * @return $this
      */
     public function merge($messages)
@@ -194,7 +193,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @param  string  $key
      * @param  string|null  $format
-     * @return array
+     * @return array<string>|array<string, array<string>>
      */
     public function get($key, $format = null)
     {
@@ -219,7 +218,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @param  string  $key
      * @param  string|null  $format
-     * @return array
+     * @return array<string, array<string>>
      */
     protected function getMessagesForWildcardKey($key, $format)
     {
@@ -235,7 +234,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      * Get all of the messages for every key in the message bag.
      *
      * @param  string|null  $format
-     * @return array
+     * @return array<string>
      */
     public function all($format = null)
     {
@@ -277,10 +276,10 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Format an array of messages.
      *
-     * @param  array  $messages
+     * @param  array<string>  $messages
      * @param  string  $format
      * @param  string  $messageKey
-     * @return array
+     * @return array<string>
      */
     protected function transform($messages, $format, $messageKey)
     {
@@ -311,7 +310,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the raw messages in the message bag.
      *
-     * @return array
+     * @return array<string, array<string>>
      */
     public function messages()
     {
@@ -321,7 +320,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the raw messages in the message bag.
      *
-     * @return array
+     * @return array<string, array<string>>
      */
     public function getMessages()
     {

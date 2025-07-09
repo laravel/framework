@@ -14,7 +14,6 @@ class CommandFinished
      * @param  \Symfony\Component\Console\Input\InputInterface  $input  The console input implementation.
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output  The command output implementation.
      * @param  int  $exitCode  The command exit code.
-     * @return void
      */
     public function __construct(
         public string $command,

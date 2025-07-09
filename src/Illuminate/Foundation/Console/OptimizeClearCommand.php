@@ -59,9 +59,9 @@ class OptimizeClearCommand extends Command
     public function getOptimizeClearTasks()
     {
         return [
+            'config' => 'config:clear',
             'cache' => 'cache:clear',
             'compiled' => 'clear-compiled',
-            'config' => 'config:clear',
             'events' => 'event:clear',
             'routes' => 'route:clear',
             'views' => 'view:clear',

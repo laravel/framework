@@ -18,7 +18,6 @@ class FileEngine implements Engine
      * Create a new file engine instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {

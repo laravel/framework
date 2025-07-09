@@ -75,7 +75,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @param  int  $migrationBatchSize
-     * @return void
      */
     public function __construct(
         Redis $redis,
@@ -108,6 +107,58 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
         return $this->getConnection()->eval(
             LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved'
         );
+    }
+
+    /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null)
+    {
+        return $this->getConnection()->llen($this->getQueue($queue));
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':delayed');
+    }
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':reserved');
+    }
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null)
+    {
+        $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
+
+        if (! $payload) {
+            return null;
+        }
+
+        $data = json_decode($payload, true);
+
+        return $data['createdAt'] ?? null;
     }
 
     /**
@@ -193,7 +244,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $this->getQueue($queue), $data),
+            $this->createPayload($job, $this->getQueue($queue), $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

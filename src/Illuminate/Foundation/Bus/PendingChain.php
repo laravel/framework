@@ -61,7 +61,6 @@ class PendingChain
      *
      * @param  mixed  $job
      * @param  array  $chain
-     * @return void
      */
     public function __construct($job, $chain)
     {
@@ -117,8 +116,8 @@ class PendingChain
     public function catch($callback)
     {
         $this->catchCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }

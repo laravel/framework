@@ -61,7 +61,6 @@ class Renderer
      * @param  \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer  $htmlErrorRenderer
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper  $bladeMapper
      * @param  string  $basePath
-     * @return void
      */
     public function __construct(
         Factory $viewFactory,

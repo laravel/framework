@@ -37,7 +37,6 @@ class QueueManager implements FactoryContract, MonitorContract
      * Create a new queue manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -97,6 +96,17 @@ class QueueManager implements FactoryContract, MonitorContract
     public function failing($callback)
     {
         $this->app['events']->listen(Events\JobFailed::class, $callback);
+    }
+
+    /**
+     * Register an event listener for the daemon queue starting.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function starting($callback)
+    {
+        $this->app['events']->listen(Events\WorkerStarting::class, $callback);
     }
 
     /**

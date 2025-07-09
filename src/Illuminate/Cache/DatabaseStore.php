@@ -76,7 +76,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $prefix
      * @param  string  $lockTable
      * @param  array  $lockLottery
-     * @return void
+     * @param  int  $defaultLockTimeoutInSeconds
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -170,6 +170,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */

@@ -13,7 +13,6 @@ class Authenticated
      *
      * @param  string  $guard  The authentication guard name.
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
-     * @return void
      */
     public function __construct(
         public $guard,

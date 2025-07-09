@@ -10,7 +10,6 @@ class Failed
      * @param  string  $guard  The authentication guard name.
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user  The user the attempter was trying to authenticate as.
      * @param  array  $credentials  The credentials provided by the attempter.
-     * @return void
      */
     public function __construct(
         public $guard,

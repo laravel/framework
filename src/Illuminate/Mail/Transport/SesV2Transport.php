@@ -33,7 +33,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
      *
      * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
-     * @return void
      */
     public function __construct(SesV2Client $ses, $options = [])
     {

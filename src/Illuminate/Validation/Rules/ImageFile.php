@@ -8,7 +8,6 @@ class ImageFile extends File
      * Create a new image file rule instance.
      *
      * @param  bool  $allowSvg
-     * @return void
      */
     public function __construct($allowSvg = false)
     {

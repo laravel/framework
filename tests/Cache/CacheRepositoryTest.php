@@ -128,9 +128,7 @@ class CacheRepositoryTest extends TestCase
         });
         $this->assertSame('qux', $result);
 
-        /*
-         * Use a callable...
-         */
+        // Use a callable...
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);

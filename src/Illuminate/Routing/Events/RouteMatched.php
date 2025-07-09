@@ -9,7 +9,6 @@ class RouteMatched
      *
      * @param  \Illuminate\Routing\Route  $route  The route instance.
      * @param  \Illuminate\Http\Request  $request  The request instance.
-     * @return void
      */
     public function __construct(
         public $route,

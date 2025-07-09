@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -53,8 +54,8 @@ trait QueriesRelationships
         // the subquery to only run a "where exists" clause instead of this full "count"
         // clause. This will make these queries run much faster compared with a count.
         $method = $this->canUseExistsForExistenceCheck($operator, $count)
-                        ? 'getRelationExistenceQuery'
-                        : 'getRelationExistenceCountQuery';
+            ? 'getRelationExistenceQuery'
+            : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
             $relation->getRelated()->newQueryWithoutRelationships(), $this
@@ -281,7 +282,7 @@ trait QueriesRelationships
                 });
             }
         }, null, null, $boolean)
-        ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
+            ->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
     }
 
     /**
@@ -674,7 +675,7 @@ trait QueriesRelationships
             $models->groupBy(fn ($model) => $model->getMorphClass())->each(function ($models) use ($query, $relation) {
                 $query->orWhere(function ($query) use ($relation, $models) {
                     $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $models->first()->getMorphClass())
-                        ->whereNotIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
+                        ->whereIn($relation->qualifyColumn($relation->getForeignKeyName()), $models->map->getKey());
                 });
             });
         }, null, null, $boolean);
@@ -763,6 +764,63 @@ trait QueriesRelationships
     public function orWhereBelongsTo($related, $relationshipName = null)
     {
         return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Add a "belongs to many" relationship where clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $related
+     * @param  string|null  $relationshipName
+     * @param  string  $boolean
+     * @return $this
+     *
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    public function whereAttachedTo($related, $relationshipName = null, $boolean = 'and')
+    {
+        $relatedCollection = $related instanceof EloquentCollection ? $related : $related->newCollection([$related]);
+
+        $related = $relatedCollection->first();
+
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereAttachedTo method may not be empty.');
+        }
+
+        if ($relationshipName === null) {
+            $relationshipName = Str::plural(Str::camel(class_basename($related)));
+        }
+
+        try {
+            $relationship = $this->model->{$relationshipName}();
+        } catch (BadMethodCallException) {
+            throw RelationNotFoundException::make($this->model, $relationshipName);
+        }
+
+        if (! $relationship instanceof BelongsToMany) {
+            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsToMany::class);
+        }
+
+        $this->has(
+            $relationshipName,
+            boolean: $boolean,
+            callback: fn (Builder $query) => $query->whereKey($relatedCollection->pluck($related->getKeyName())),
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add a "belongs to many" relationship with an "or where" clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string|null  $relationshipName
+     * @return $this
+     *
+     * @throws \RuntimeException
+     */
+    public function orWhereAttachedTo($related, $relationshipName = null)
+    {
+        return $this->whereAttachedTo($related, $relationshipName, 'or');
     }
 
     /**
@@ -967,8 +1025,8 @@ trait QueriesRelationships
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
-                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
-                : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
+            ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
+            : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
 
     /**

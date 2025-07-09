@@ -95,7 +95,6 @@ class RouteRegistrar
      * Create a new route registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function __construct(Router $router)
     {

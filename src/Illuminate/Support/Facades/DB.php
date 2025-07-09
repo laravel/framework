@@ -122,7 +122,7 @@ class DB extends Facade
     /**
      * Indicate if destructive Artisan commands should be prohibited.
      *
-     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
+     * Prohibits: db:wipe, migrate:fresh, migrate:refresh, migrate:reset, and migrate:rollback
      *
      * @param  bool  $prohibit
      * @return void

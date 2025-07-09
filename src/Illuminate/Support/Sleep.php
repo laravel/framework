@@ -80,7 +80,6 @@ class Sleep
      * Create a new class instance.
      *
      * @param  int|float|\DateInterval  $duration
-     * @return void
      */
     public function __construct($duration)
     {

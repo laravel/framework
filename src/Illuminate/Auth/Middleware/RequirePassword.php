@@ -35,7 +35,6 @@ class RequirePassword
      * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
      * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
      * @param  int|null  $passwordTimeout
-     * @return void
      */
     public function __construct(ResponseFactory $responseFactory, UrlGenerator $urlGenerator, $passwordTimeout = null)
     {

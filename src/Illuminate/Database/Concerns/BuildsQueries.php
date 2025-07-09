@@ -363,7 +363,7 @@ trait BuildsQueries
      */
     public function first($columns = ['*'])
     {
-        return $this->take(1)->get($columns)->first();
+        return $this->limit(1)->get($columns)->first();
     }
 
     /**
@@ -395,7 +395,7 @@ trait BuildsQueries
      */
     public function sole($columns = ['*'])
     {
-        $result = $this->take(2)->get($columns);
+        $result = $this->limit(2)->get($columns);
 
         $count = $result->count();
 
@@ -587,7 +587,7 @@ trait BuildsQueries
     }
 
     /**
-     * Pass the query to a given callback.
+     * Pass the query to a given callback and then return it.
      *
      * @param  callable($this): mixed  $callback
      * @return $this
@@ -597,5 +597,18 @@ trait BuildsQueries
         $callback($this);
 
         return $this;
+    }
+
+    /**
+     * Pass the query to a given callback and return the result.
+     *
+     * @template TReturn
+     *
+     * @param  (callable($this): TReturn)  $callback
+     * @return (TReturn is null|void ? $this : TReturn)
+     */
+    public function pipe($callback)
+    {
+        return $callback($this) ?? $this;
     }
 }

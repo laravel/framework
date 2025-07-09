@@ -398,7 +398,7 @@ class ValidationRuleParserTest extends TestCase
         ]));
 
         $rules = [
-            'date' => Rule::date()->format('Y-m-d'),
+            'date' => Rule::date()->after('today'),
         ];
 
         $results = $parser->explode($rules);
@@ -406,7 +406,7 @@ class ValidationRuleParserTest extends TestCase
         $this->assertEquals([
             'date' => [
                 'date',
-                'date_format:Y-m-d',
+                'after:today',
             ],
         ], $results->rules);
     }

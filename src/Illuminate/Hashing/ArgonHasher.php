@@ -40,7 +40,6 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      * Create a new hasher instance.
      *
      * @param  array  $options
-     * @return void
      */
     public function __construct(array $options = [])
     {

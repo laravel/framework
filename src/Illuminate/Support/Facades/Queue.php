@@ -11,6 +11,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void exceptionOccurred(mixed $callback)
  * @method static void looping(mixed $callback)
  * @method static void failing(mixed $callback)
+ * @method static void starting(mixed $callback)
  * @method static void stopping(mixed $callback)
  * @method static bool connected(string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(string|null $name = null)
@@ -31,6 +32,10 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Contracts\Queue\Job|null pop(string|null $queue = null)
  * @method static string getConnectionName()
  * @method static \Illuminate\Contracts\Queue\Queue setConnectionName(string $name)
+ * @method static int pendingSize(string|null $queue = null)
+ * @method static int delayedSize(string|null $queue = null)
+ * @method static int reservedSize(string|null $queue = null)
+ * @method static int|null creationTimeOfOldestPendingJob(string|null $queue = null)
  * @method static mixed getJobTries(mixed $job)
  * @method static mixed getJobBackoff(mixed $job)
  * @method static mixed getJobExpiration(mixed $job)
@@ -49,6 +54,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void assertNothingPushed()
  * @method static \Illuminate\Support\Collection pushed(string $job, callable|null $callback = null)
  * @method static \Illuminate\Support\Collection pushedRaw(null|\Closure $callback = null)
+ * @method static \Illuminate\Support\Collection listenersPushed(string $listenerClass, \Closure|null $callback = null)
  * @method static bool hasPushed(string $job)
  * @method static bool shouldFakeJob(object $job)
  * @method static array pushedJobs()
@@ -82,12 +88,63 @@ class Queue extends Facade
     public static function fake($jobsToFake = [])
     {
         $actualQueueManager = static::isFake()
-                ? static::getFacadeRoot()->queue
-                : static::getFacadeRoot();
+            ? static::getFacadeRoot()->queue
+            : static::getFacadeRoot();
 
         return tap(new QueueFake(static::getFacadeApplication(), $jobsToFake, $actualQueueManager), function ($fake) {
             static::swap($fake);
         });
+    }
+
+    /**
+     * Replace the bound instance with a fake that fakes all jobs except the given jobs.
+     *
+     * @param  string[]|string  $jobsToAllow
+     * @return \Illuminate\Support\Testing\Fakes\QueueFake
+     */
+    public static function fakeExcept($jobsToAllow)
+    {
+        return static::fake()->except($jobsToAllow);
+    }
+
+    /**
+     * Replace the bound instance with a fake during the given callable's execution.
+     *
+     * @param  callable  $callable
+     * @param  array  $jobsToFake
+     * @return mixed
+     */
+    public static function fakeFor(callable $callable, array $jobsToFake = [])
+    {
+        $originalQueueManager = static::getFacadeRoot();
+
+        static::fake($jobsToFake);
+
+        try {
+            return $callable();
+        } finally {
+            static::swap($originalQueueManager);
+        }
+    }
+
+    /**
+     * Replace the bound instance with a fake during the given callable's execution.
+     *
+     * @param  callable  $callable
+     * @param  array  $jobsToAllow
+     * @return mixed
+     */
+    public static function fakeExceptFor(callable $callable, array $jobsToAllow = [])
+    {
+        $originalQueueManager = static::getFacadeRoot();
+
+        static::fakeExcept($jobsToAllow);
+
+        try {
+            return $callable();
+        } finally {
+            static::swap($originalQueueManager);
+        }
     }
 
     /**

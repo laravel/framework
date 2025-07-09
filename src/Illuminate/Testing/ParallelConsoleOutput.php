@@ -29,7 +29,6 @@ class ParallelConsoleOutput extends ConsoleOutput
      * Create a new Parallel ConsoleOutput instance.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
      */
     public function __construct($output)
     {

@@ -108,7 +108,7 @@ trait AuthorizesRequests
     /**
      * Get the map of resource methods to ability names.
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function resourceAbilityMap()
     {
@@ -126,7 +126,7 @@ trait AuthorizesRequests
     /**
      * Get the list of resource methods which do not have model parameters.
      *
-     * @return array
+     * @return list<string>
      */
     protected function resourceMethodsWithoutModels()
     {

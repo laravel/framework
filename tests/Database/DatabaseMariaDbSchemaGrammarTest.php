@@ -53,6 +53,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -872,7 +873,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingDate()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
         $statements = $blueprint->toSql();
 
@@ -880,13 +885,45 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` date not null default (CURDATE())', $statements[0]);
+    }
+
     public function testAddingYear()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `birth_year` year not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))', $statements[0]);
     }
 
     public function testAddingDateTime()
@@ -1118,7 +1155,10 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingUuid()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid('foo');
         $statements = $blueprint->toSql();
 
@@ -1126,9 +1166,25 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` uuid not null', $statements[0]);
     }
 
+    public function testAddingUuidOn106()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.6.21');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->uuid('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
     public function testAddingUuidDefaultsColumnName()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid();
         $statements = $blueprint->toSql();
 
@@ -1138,7 +1194,10 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingForeignUuid()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $foreignUuid = $blueprint->foreignUuid('foo');
         $blueprint->foreignUuid('company_id')->constrained();
         $blueprint->foreignUuid('laravel_idea_id')->constrained();
@@ -1471,14 +1530,14 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $connection = $this->getConnection();
         $statement = $this->getGrammar($connection)->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop table `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testDropAllViews()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop view `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testGrammarsAreMacroable()

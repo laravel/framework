@@ -199,6 +199,23 @@ class QueuedEventsTest extends TestCase
                 && $job->middleware[0]->b === 'bar';
         });
     }
+
+    public function testDispatchesOnQueueDefinedWithEnum()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherViaQueueSupportsEnum::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushedOn('enumerated-queue', CallQueuedListener::class);
+    }
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
@@ -365,5 +382,18 @@ class TestDispatcherGetDelayDynamically implements ShouldQueue
         }
 
         return 20;
+    }
+}
+
+enum TestQueueType: string
+{
+    case EnumeratedQueue = 'enumerated-queue';
+}
+
+class TestDispatcherViaQueueSupportsEnum implements ShouldQueue
+{
+    public function viaQueue()
+    {
+        return TestQueueType::EnumeratedQueue;
     }
 }

@@ -48,7 +48,7 @@ class ComponentMakeCommand extends GeneratorCommand
         }
 
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            return;
         }
 
         if (! $this->option('inline')) {
@@ -154,8 +154,8 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\View;
 
 use ArrayAccess;
 use ArrayIterator;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -16,7 +17,7 @@ use JsonSerializable;
 use Stringable;
 use Traversable;
 
-class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable
+class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate, JsonSerializable, Htmlable, Stringable
 {
     use Conditionable, Macroable;
 
@@ -31,7 +32,6 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
      * Create a new component attribute bag instance.
      *
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(array $attributes = [])
     {
@@ -39,7 +39,7 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     }
 
     /**
-     * Get all of the attribute values.
+     * Get all the attribute values.
      *
      * @return array
      */
@@ -269,8 +269,8 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     {
         $attributeDefaults = array_map(function ($value) use ($escape) {
             return $this->shouldEscapeAttributeValue($escape, $value)
-                        ? e($value)
-                        : $value;
+                ? e($value)
+                : $value;
         }, $attributeDefaults);
 
         [$appendableAttributes, $nonAppendableAttributes] = (new Collection($this->attributes))
@@ -283,8 +283,8 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
             $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue
-                        ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
-                        : ($attributeDefaults[$key] ?? '');
+                ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape)
+                : ($attributeDefaults[$key] ?? '');
 
             if ($key === 'style') {
                 $value = Str::finish($value, ';');
@@ -496,6 +496,16 @@ class ComponentAttributeBag implements ArrayAccess, IteratorAggregate, JsonSeria
     public function jsonSerialize(): mixed
     {
         return $this->attributes;
+    }
+
+    /**
+     * Get all the attribute values.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->all();
     }
 
     /**

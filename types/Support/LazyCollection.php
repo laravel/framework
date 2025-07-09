@@ -11,19 +11,21 @@ class Users implements Arrayable
 {
     public function toArray(): array
     {
-        return [new User()];
+        return [new User];
     }
 }
 
 $collection = new LazyCollection([new User]);
-$arrayable = new Users();
+$arrayable = new Users;
 /** @var iterable<int, int> $iterable */
 $iterable = [1];
 /** @var Traversable<int, string> $traversable */
 $traversable = new ArrayIterator(['string']);
 $generator = function () {
-    yield new User();
+    yield new User;
 };
+
+$associativeCollection = new LazyCollection(['Sam' => new User]);
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection);
 
@@ -665,6 +667,8 @@ assertType('User', $collection->firstOrFail(function ($user, $int) {
 
 assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, string>>', $collection::make(['string'])->chunk(1));
 assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunk(2));
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<string, User>>', $associativeCollection->chunk(2));
+assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $associativeCollection->chunk(2, false));
 
 assertType('Illuminate\Support\LazyCollection<int, Illuminate\Support\LazyCollection<int, User>>', $collection->chunkWhile(function ($user, $int, $collection) {
     assertType('User', $user);
@@ -728,10 +732,10 @@ assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])
 assertType('Illuminate\Support\LazyCollection<string, string>', $collection->make(['string' => 'string'])->sortKeysDesc(1));
 
 assertType('mixed', $collection->make([1])->sum('string'));
-assertType('mixed', $collection->make(['string'])->sum(function ($string) {
+assertType('int<1, 2>', $collection->make(['string'])->sum(function ($string) {
     assertType('string', $string);
 
-    return 1;
+    return rand(1, 2);
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->take(1));

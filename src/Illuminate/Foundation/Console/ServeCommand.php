@@ -335,7 +335,7 @@ class ServeCommand extends Command
                 } elseif ((new Stringable($line))->contains(' Closing')) {
                     $requestPort = static::getRequestPortFromLine($line);
 
-                    if (empty($this->requestsPool[$requestPort])) {
+                    if (empty($this->requestsPool[$requestPort]) || count($this->requestsPool[$requestPort] ?? []) !== 3) {
                         $this->requestsPool[$requestPort] = [
                             $this->getDateFromLine($line),
                             false,

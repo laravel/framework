@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[RequiresOperatingSystem('Linux|DAR')]
@@ -118,6 +119,42 @@ PHP);
                 'Invalid payload'
             ),
         ]);
+    }
+
+    public static function getConcurrencyDrivers(): array
+    {
+        return [
+            ['sync'],
+            ['process'],
+            // spatie/fork package is not included by default
+            // ['fork'],
+        ];
+    }
+
+    #[DataProvider('getConcurrencyDrivers')]
+    public function testRunPreservesCallbackOrder(string $driver)
+    {
+        [$first, $second, $third] = Concurrency::driver($driver)->run([
+            function () {
+                usleep(1000000);
+
+                return 'first';
+            },
+            function () {
+                usleep(500000);
+
+                return 'second';
+            },
+            function () {
+                usleep(200000);
+
+                return 'third';
+            },
+        ]);
+
+        $this->assertEquals('first', $first);
+        $this->assertEquals('second', $second);
+        $this->assertEquals('third', $third);
     }
 }
 

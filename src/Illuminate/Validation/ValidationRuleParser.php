@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Closure;
+use Illuminate\Contracts\Validation\CompilableRules;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -34,7 +35,6 @@ class ValidationRuleParser
      * Create a new validation rule parser.
      *
      * @param  array  $data
-     * @return void
      */
     public function __construct(array $data)
     {
@@ -138,7 +138,7 @@ class ValidationRuleParser
             return $rule;
         }
 
-        if ($rule instanceof NestedRules) {
+        if ($rule instanceof CompilableRules) {
             return $rule->compile(
                 $attribute, $this->data[$attribute] ?? null, Arr::dot($this->data), $this->data
             )->rules[$attribute];
@@ -164,7 +164,7 @@ class ValidationRuleParser
         foreach ($data as $key => $value) {
             if (Str::startsWith($key, $attribute) || (bool) preg_match('/^'.$pattern.'\z/', $key)) {
                 foreach ((array) $rules as $rule) {
-                    if ($rule instanceof NestedRules) {
+                    if ($rule instanceof CompilableRules) {
                         $context = Arr::get($this->data, Str::beforeLast($key, '.'));
 
                         $compiled = $rule->compile($key, $value, $data, $context);
@@ -238,7 +238,7 @@ class ValidationRuleParser
      */
     public static function parse($rule)
     {
-        if ($rule instanceof RuleContract || $rule instanceof NestedRules) {
+        if ($rule instanceof RuleContract || $rule instanceof CompilableRules) {
             return [$rule, []];
         }
 
@@ -341,8 +341,8 @@ class ValidationRuleParser
 
             if ($attributeRules instanceof ConditionalRules) {
                 return [$attribute => $attributeRules->passes($data)
-                                ? array_filter($attributeRules->rules($data))
-                                : array_filter($attributeRules->defaultRules($data)), ];
+                    ? array_filter($attributeRules->rules($data))
+                    : array_filter($attributeRules->defaultRules($data)), ];
             }
 
             return [$attribute => (new Collection($attributeRules))->map(function ($rule) use ($data) {

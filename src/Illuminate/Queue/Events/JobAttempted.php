@@ -10,7 +10,6 @@ class JobAttempted
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
      * @param  bool  $exceptionOccurred  Indicates if an exception occurred while processing the job.
-     * @return void
      */
     public function __construct(
         public $connectionName,

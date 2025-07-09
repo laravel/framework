@@ -44,7 +44,7 @@ class DatabaseLock extends Lock
      * @param  int  $seconds
      * @param  string|null  $owner
      * @param  array  $lottery
-     * @return void
+     * @param  int  $defaultTimeoutInSeconds
      */
     public function __construct(Connection $connection, $table, $name, $seconds, $owner = null, $lottery = [2, 100], $defaultTimeoutInSeconds = 86400)
     {

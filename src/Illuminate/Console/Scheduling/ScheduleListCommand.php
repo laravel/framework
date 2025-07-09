@@ -190,8 +190,8 @@ class ScheduleListCommand extends Command
     private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
     {
         return $this->option('next')
-                    ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
-                    : $events;
+            ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
+            : $events;
     }
 
     /**

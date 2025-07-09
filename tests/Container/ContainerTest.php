@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Container;
 
+use Attribute;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\ContextualAttribute;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -319,6 +321,17 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
     }
 
+    public function testResolutionOfClassWithDefaultParametersAndContextualBindings()
+    {
+        $container = new Container;
+
+        $container->when(ContainerClassWithDefaultValueStub::class)
+            ->needs(ContainerConcreteStub::class)
+            ->give(fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
     public function testBound()
     {
         $container = new Container;
@@ -509,6 +522,23 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->alias('ConcreteStub', 'foo');
         $this->assertSame('ConcreteStub', $container->getAlias('foo'));
+    }
+
+    public function testCurrentlyResolving()
+    {
+        $container = new Container;
+
+        $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
+            $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
+        });
+
+        $container->when(ContainerCurrentResolvingConcrete::class)
+            ->needs('$currentlyResolving')
+            ->give(fn ($container) => $container->currentlyResolving());
+
+        $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
+
+        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
     }
 
     public function testGetAliasRecursive()
@@ -847,5 +877,25 @@ class ContainerContextualBindingCallTarget
     public function work(IContainerContractStub $stub)
     {
         return $stub;
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class ContainerCurrentResolvingAttribute implements ContextualAttribute
+{
+    public function resolve()
+    {
+    }
+}
+
+class ContainerCurrentResolvingConcrete
+{
+    public $currentlyResolving;
+
+    public function __construct(
+        #[ContainerCurrentResolvingAttribute]
+        string $currentlyResolving
+    ) {
+        $this->currentlyResolving = $currentlyResolving;
     }
 }

@@ -26,7 +26,10 @@ use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
+use Illuminate\Database\Eloquent\Casts\AsFluent;
+use Illuminate\Database\Eloquent\Casts\AsHtmlString;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
+use Illuminate\Database\Eloquent\Casts\AsUri;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -45,8 +48,11 @@ use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Fluent;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -262,6 +268,66 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->asStringableAttribute = new Stringable('foo baz');
         $this->assertTrue($model->isDirty('asStringableAttribute'));
+    }
+
+    public function testDirtyOnCastedHtmlString()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asHtmlStringAttribute' => '<div>foo bar</div>',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(HtmlString::class, $model->asHtmlStringAttribute);
+        $this->assertFalse($model->isDirty('asHtmlStringAttribute'));
+
+        $model->asHtmlStringAttribute = new HtmlString('<div>foo bar</div>');
+        $this->assertFalse($model->isDirty('asHtmlStringAttribute'));
+
+        $model->asHtmlStringAttribute = new Stringable('<div>foo baz</div>');
+        $this->assertTrue($model->isDirty('asHtmlStringAttribute'));
+    }
+
+    public function testDirtyOnCastedUri()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes([
+            'asUriAttribute' => 'https://www.example.com:1234?query=param&another=value',
+        ]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Uri::class, $model->asUriAttribute);
+        $this->assertFalse($model->isDirty('asUriAttribute'));
+
+        $model->asUriAttribute = new Uri('https://www.example.com:1234?query=param&another=value');
+        $this->assertFalse($model->isDirty('asUriAttribute'));
+
+        $model->asUriAttribute = new Uri('https://www.updated.com:1234?query=param&another=value');
+        $this->assertTrue($model->isDirty('asUriAttribute'));
+    }
+
+    public function testDirtyOnCastedFluent()
+    {
+        $value = [
+            'address' => [
+                'street' => 'test_street',
+                'city' => 'test_city',
+            ],
+        ];
+
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes(['asFluentAttribute' => json_encode($value)]);
+        $model->syncOriginal();
+
+        $this->assertInstanceOf(Fluent::class, $model->asFluentAttribute);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $model->asFluentAttribute = new Fluent($value);
+        $this->assertFalse($model->isDirty('asFluentAttribute'));
+
+        $value['address']['street'] = 'updated_street';
+        $model->asFluentAttribute = new Fluent($value);
+        $this->assertTrue($model->isDirty('asFluentAttribute'));
     }
 
     // public function testDirtyOnCastedEncryptedCollection()
@@ -583,6 +649,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['project' => 'laravel'], $model->only('project'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only('first_name', 'last_name'));
         $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->only(['first_name', 'last_name']));
+    }
+
+    public function testExcept()
+    {
+        $model = new EloquentModelStub;
+        $model->first_name = 'taylor';
+        $model->last_name = 'otwell';
+        $model->project = 'laravel';
+
+        $this->assertEquals(['first_name' => 'taylor', 'last_name' => 'otwell'], $model->except('project'));
+        $this->assertEquals(['project' => 'laravel'], $model->except('first_name', 'last_name'));
+        $this->assertEquals(['project' => 'laravel'], $model->except(['first_name', 'last_name']));
     }
 
     public function testNewInstanceReturnsNewInstanceWithAttributesSet()
@@ -2261,6 +2339,35 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 
+    public function testCallbacksCanBeRunAfterBootingHasFinished()
+    {
+        $this->assertFalse(EloquentModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        EloquentModelBootingCallbackTestStub::unboot();
+    }
+
+    public function testBootedCallbacksAreSeparatedByClass()
+    {
+        $this->assertFalse(EloquentModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        $this->assertFalse(EloquentChildModelBootingCallbackTestStub::$bootHasFinished);
+
+        $model = new EloquentChildModelBootingCallbackTestStub();
+
+        $this->assertTrue($model::$bootHasFinished);
+
+        EloquentModelBootingCallbackTestStub::unboot();
+        EloquentChildModelBootingCallbackTestStub::unboot();
+    }
+
     public function testModelsTraitIsInitialized()
     {
         $model = new EloquentModelStubWithTrait;
@@ -2472,6 +2579,7 @@ class DatabaseEloquentModelTest extends TestCase
         $obj->foo = 'bar';
         $model->arrayAttribute = $obj;
         $model->jsonAttribute = ['foo' => 'bar'];
+        $model->jsonAttributeWithUnicode = ['こんにちは' => '世界'];
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
@@ -2486,12 +2594,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsObject($model->objectAttribute);
         $this->assertIsArray($model->arrayAttribute);
         $this->assertIsArray($model->jsonAttribute);
+        $this->assertIsArray($model->jsonAttributeWithUnicode);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
         $this->assertSame('{"foo":"bar"}', $model->jsonAttributeValue());
+        $this->assertEquals(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
+        $this->assertSame('{"こんにちは":"世界"}', $model->jsonAttributeWithUnicodeValue());
         $this->assertInstanceOf(Carbon::class, $model->dateAttribute);
         $this->assertInstanceOf(Carbon::class, $model->datetimeAttribute);
         $this->assertInstanceOf(BaseCollection::class, $model->collectionAttribute);
@@ -2510,12 +2621,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertIsObject($arr['objectAttribute']);
         $this->assertIsArray($arr['arrayAttribute']);
         $this->assertIsArray($arr['jsonAttribute']);
+        $this->assertIsArray($arr['jsonAttributeWithUnicode']);
         $this->assertIsArray($arr['collectionAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
+        $this->assertEquals(['こんにちは' => '世界'], $arr['jsonAttributeWithUnicode']);
         $this->assertSame('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertSame('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
@@ -2544,6 +2657,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->objectAttribute = null;
         $model->arrayAttribute = null;
         $model->jsonAttribute = null;
+        $model->jsonAttributeWithUnicode = null;
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
@@ -2559,6 +2673,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($attributes['objectAttribute']);
         $this->assertNull($attributes['arrayAttribute']);
         $this->assertNull($attributes['jsonAttribute']);
+        $this->assertNull($attributes['jsonAttributeWithUnicode']);
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
@@ -2572,6 +2687,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->objectAttribute);
         $this->assertNull($model->arrayAttribute);
         $this->assertNull($model->jsonAttribute);
+        $this->assertNull($model->jsonAttributeWithUnicode);
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
@@ -2587,6 +2703,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['objectAttribute']);
         $this->assertNull($array['arrayAttribute']);
         $this->assertNull($array['jsonAttribute']);
+        $this->assertNull($array['jsonAttributeWithUnicode']);
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
@@ -2603,9 +2720,43 @@ class DatabaseEloquentModelTest extends TestCase
         $obj = new stdClass;
         $obj->foo = "b\xF8r";
         $model->arrayAttribute = $obj;
+
+        $model->getAttributes();
+    }
+
+    public function testModelJsonCastingFailsOnUnencodableData()
+    {
+        $this->expectException(JsonEncodingException::class);
+        $this->expectExceptionMessage('Unable to encode attribute [jsonAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
+
+        $model = new EloquentModelCastingStub;
         $model->jsonAttribute = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
+    }
+
+    public function testModelAttributeCastingFailsOnUnencodableDataWithUnicode()
+    {
+        $this->expectException(JsonEncodingException::class);
+        $this->expectExceptionMessage('Unable to encode attribute [jsonAttributeWithUnicode] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
+
+        $model = new EloquentModelCastingStub;
+        $model->jsonAttributeWithUnicode = ['foo' => "b\xF8r"];
+
+        $model->getAttributes();
+    }
+
+    public function testJsonCastingRespectsUnicodeOption()
+    {
+        $data = ['こんにちは' => '世界'];
+        $model = new EloquentModelCastingStub;
+        $model->jsonAttribute = $data;
+        $model->jsonAttributeWithUnicode = $data;
+
+        $this->assertSame('{"\u3053\u3093\u306b\u3061\u306f":"\u4e16\u754c"}', $model->jsonAttributeValue());
+        $this->assertSame('{"こんにちは":"世界"}', $model->jsonAttributeWithUnicodeValue());
+        $this->assertSame(['こんにちは' => '世界'], $model->jsonAttribute);
+        $this->assertSame(['こんにちは' => '世界'], $model->jsonAttributeWithUnicode);
     }
 
     public function testModelAttributeCastingWithFloats()
@@ -3028,6 +3179,7 @@ class DatabaseEloquentModelTest extends TestCase
         $collection = collect($array);
         $model->arrayAttribute = $array;
         $model->jsonAttribute = $array;
+        $model->jsonAttributeWithUnicode = $array;
         $model->collectionAttribute = $collection;
 
         $model->syncOriginal();
@@ -3042,6 +3194,9 @@ class DatabaseEloquentModelTest extends TestCase
             'foo' => 'bar2',
         ];
         $model->jsonAttribute = [
+            'foo' => 'bar2',
+        ];
+        $model->jsonAttributeWithUnicode = [
             'foo' => 'bar2',
         ];
         $model->collectionAttribute = collect([
@@ -3080,6 +3235,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttribute'));
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttribute'));
 
+        $this->assertEquals($array, $model->getOriginal('jsonAttributeWithUnicode'));
+        $this->assertEquals(['foo' => 'bar'], $model->getOriginal('jsonAttributeWithUnicode'));
+        $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('jsonAttributeWithUnicode'));
+
         $this->assertEquals(['foo' => 'bar'], $model->getOriginal('collectionAttribute')->toArray());
         $this->assertEquals(['foo' => 'bar2'], $model->getAttribute('collectionAttribute')->toArray());
     }
@@ -3110,7 +3269,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
-    public function testsCastOnArrayFormatWithOneElement()
+    public function testCastOnArrayFormatWithOneElement()
     {
         $model = new EloquentModelCastingStub;
         $model->setRawAttributes([
@@ -3146,6 +3305,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEmpty($user->isDirty());
         $this->assertNull($user->getOriginal('name'));
         $this->assertNull($user->getAttribute('name'));
+    }
+
+    public function testDiscardChangesWithCasts()
+    {
+        $model = new EloquentModelWithPrimitiveCasts();
+
+        $model->address_line_one = '123 Main Street';
+
+        $this->assertEquals('123 Main Street', $model->address->lineOne);
+        $this->assertEquals('123 MAIN STREET', $model->address_in_caps);
+
+        $model->discardChanges();
+
+        $this->assertNull($model->address->lineOne);
+        $this->assertNull($model->address_in_caps);
     }
 
     public function testHasAttribute()
@@ -3217,6 +3391,39 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(EloquentModelWithUseFactoryAttribute::class, $factory->modelName());
         $this->assertEquals('test name', $instance->name); // Small smoke test to ensure the factory is working
     }
+
+    public function testUseCustomBuilderWithUseEloquentBuilderAttribute()
+    {
+        $model = new EloquentModelWithUseEloquentBuilderAttributeStub();
+
+        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $eloquentBuilder = $model->newEloquentBuilder($query);
+
+        $this->assertInstanceOf(CustomBuilder::class, $eloquentBuilder);
+    }
+
+    public function testDefaultBuilderIsUsedWhenUseEloquentBuilderAttributeIsNotPresent()
+    {
+        $model = new EloquentModelWithoutUseEloquentBuilderAttributeStub();
+
+        $query = $this->createMock(\Illuminate\Database\Query\Builder::class);
+        $eloquentBuilder = $model->newEloquentBuilder($query);
+
+        $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
+    }
+}
+
+class CustomBuilder extends Builder
+{
+}
+
+#[\Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder(CustomBuilder::class)]
+class EloquentModelWithUseEloquentBuilderAttributeStub extends Model
+{
+}
+
+class EloquentModelWithoutUseEloquentBuilderAttributeStub extends Model
+{
 }
 
 class EloquentTestObserverStub
@@ -3518,6 +3725,7 @@ class EloquentModelBootingTestStub extends Model
     public static function unboot()
     {
         unset(static::$booted[static::class]);
+        unset(static::$bootedCallbacks[static::class]);
     }
 
     public static function isBooted()
@@ -3596,6 +3804,7 @@ class EloquentModelCastingStub extends Model
         'boolAttribute' => 'bool',
         'objectAttribute' => 'object',
         'jsonAttribute' => 'json',
+        'jsonAttributeWithUnicode' => 'json:unicode',
         'dateAttribute' => 'date',
         'timestampAttribute' => 'timestamp',
         'ascollectionAttribute' => AsCollection::class,
@@ -3617,6 +3826,9 @@ class EloquentModelCastingStub extends Model
             'datetimeAttribute' => 'datetime',
             'asarrayobjectAttribute' => AsArrayObject::class,
             'asStringableAttribute' => AsStringable::class,
+            'asHtmlStringAttribute' => AsHtmlString::class,
+            'asUriAttribute' => AsUri::class,
+            'asFluentAttribute' => AsFluent::class,
             'asCustomCollectionAttribute' => AsCollection::using(CustomCollection::class),
             'asEncryptedArrayObjectAttribute' => AsEncryptedArrayObject::class,
             'asEncryptedCustomCollectionAttribute' => AsEncryptedCollection::using(CustomCollection::class),
@@ -3631,6 +3843,11 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function jsonAttributeWithUnicodeValue()
+    {
+        return $this->attributes['jsonAttributeWithUnicode'];
     }
 
     protected function serializeDate(DateTimeInterface $date)
@@ -3852,6 +4069,17 @@ class EloquentModelWithPrimitiveCasts extends Model
     {
         return Attribute::get(fn () => 'ok');
     }
+
+    public function addressInCaps(): Attribute
+    {
+        return Attribute::get(
+            function () {
+                $value = $this->getAttributes()['address_line_one'] ?? null;
+
+                return is_string($value) ? strtoupper($value) : $value;
+            }
+        )->shouldCache();
+    }
 }
 
 enum CastableBackedEnum: string
@@ -3861,6 +4089,12 @@ enum CastableBackedEnum: string
 
 class Address implements Castable
 {
+    public function __construct(
+        public ?string $lineOne = null,
+        public ?string $lineTwo = null
+    ) {
+    }
+
     public static function castUsing(array $arguments): CastsAttributes
     {
         return new class implements CastsAttributes
@@ -4029,4 +4263,31 @@ class EloquentModelWithUseFactoryAttributeFactory extends Factory
 class EloquentModelWithUseFactoryAttribute extends Model
 {
     use HasFactory;
+}
+
+trait EloquentTraitBootingCallbackTestStub
+{
+    public static function bootEloquentTraitBootingCallbackTestStub()
+    {
+        static::whenBooted(fn () => static::$bootHasFinished = true);
+    }
+}
+
+class EloquentModelBootingCallbackTestStub extends Model
+{
+    use EloquentTraitBootingCallbackTestStub;
+
+    public static bool $bootHasFinished = false;
+
+    public static function unboot()
+    {
+        unset(static::$booted[static::class]);
+        unset(static::$bootedCallbacks[static::class]);
+        static::$bootHasFinished = false;
+    }
+}
+
+class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
+{
+    public static bool $bootHasFinished = false;
 }

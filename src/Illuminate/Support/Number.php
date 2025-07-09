@@ -49,6 +49,47 @@ class Number
     }
 
     /**
+     * Parse the given string according to the specified format type.
+     *
+     * @param  string  $string
+     * @param  int|null  $type
+     * @param  string|null  $locale
+     * @return int|float|false
+     */
+    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float
+    {
+        static::ensureIntlExtensionIsInstalled();
+
+        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+
+        return $formatter->parse($string, $type);
+    }
+
+    /**
+     * Parse a string into an integer according to the specified locale.
+     *
+     * @param  string  $string
+     * @param  string|null  $locale
+     * @return int|false
+     */
+    public static function parseInt(string $string, ?string $locale = null): int
+    {
+        return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
+    }
+
+    /**
+     * Parse a string into a float according to the specified locale.
+     *
+     * @param  string  $string
+     * @param  string|null  $locale
+     * @return float|false
+     */
+    public static function parseFloat(string $string, ?string $locale = null): float
+    {
+        return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
+    }
+
+    /**
      * Spell out the given number in the given locale.
      *
      * @param  int|float  $number
@@ -193,7 +234,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return false|string
+     * @return string|false
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
@@ -377,6 +418,8 @@ class Number
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected static function ensureIntlExtensionIsInstalled()
     {

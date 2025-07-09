@@ -40,6 +40,20 @@ trait HasRelationships
     protected $touches = [];
 
     /**
+     * The relationship autoloader callback.
+     *
+     * @var \Closure|null
+     */
+    protected $relationAutoloadCallback = null;
+
+    /**
+     * The relationship autoloader callback context.
+     *
+     * @var mixed
+     */
+    protected $relationAutoloadContext = null;
+
+    /**
      * The many to many relationship methods.
      *
      * @var string[]
@@ -90,6 +104,99 @@ trait HasRelationships
             static::$relationResolvers,
             [static::class => [$name => $callback]]
         );
+    }
+
+    /**
+     * Determine if a relationship autoloader callback has been defined.
+     *
+     * @return bool
+     */
+    public function hasRelationAutoloadCallback()
+    {
+        return ! is_null($this->relationAutoloadCallback);
+    }
+
+    /**
+     * Define an automatic relationship autoloader callback for this model and its relations.
+     *
+     * @param  \Closure  $callback
+     * @param  mixed  $context
+     * @return $this
+     */
+    public function autoloadRelationsUsing(Closure $callback, $context = null)
+    {
+        // Prevent circular relation autoloading...
+        if ($context && $this->relationAutoloadContext === $context) {
+            return $this;
+        }
+
+        $this->relationAutoloadCallback = $callback;
+        $this->relationAutoloadContext = $context;
+
+        foreach ($this->relations as $key => $value) {
+            $this->propagateRelationAutoloadCallbackToRelation($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Attempt to autoload the given relationship using the autoload callback.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function attemptToAutoloadRelation($key)
+    {
+        if (! $this->hasRelationAutoloadCallback()) {
+            return false;
+        }
+
+        $this->invokeRelationAutoloadCallbackFor($key, []);
+
+        return $this->relationLoaded($key);
+    }
+
+    /**
+     * Invoke the relationship autoloader callback for the given relationships.
+     *
+     * @param  string  $key
+     * @param  array  $tuples
+     * @return void
+     */
+    protected function invokeRelationAutoloadCallbackFor($key, $tuples)
+    {
+        $tuples = array_merge([[$key, get_class($this)]], $tuples);
+
+        call_user_func($this->relationAutoloadCallback, $tuples);
+    }
+
+    /**
+     * Propagate the relationship autoloader callback to the given related models.
+     *
+     * @param  string  $key
+     * @param  mixed  $models
+     * @return void
+     */
+    protected function propagateRelationAutoloadCallbackToRelation($key, $models)
+    {
+        if (! $this->hasRelationAutoloadCallback() || ! $models) {
+            return;
+        }
+
+        if ($models instanceof Model) {
+            $models = [$models];
+        }
+
+        if (! is_iterable($models)) {
+            return;
+        }
+
+        $callback = fn (array $tuples) => $this->invokeRelationAutoloadCallbackFor($key, $tuples);
+
+        foreach ($models as $model) {
+            $model->autoloadRelationsUsing($callback, $this->relationAutoloadContext);
+        }
     }
 
     /**
@@ -153,9 +260,13 @@ trait HasRelationships
         $secondKey = $secondKey ?: $through->getForeignKey();
 
         return $this->newHasOneThrough(
-            $this->newRelatedInstance($related)->newQuery(), $this, $through,
-            $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
-            $secondLocalKey ?: $through->getKeyName()
+            $this->newRelatedInstance($related)->newQuery(),
+            $this,
+            $through,
+            $firstKey,
+            $secondKey,
+            $localKey ?: $this->getKeyName(),
+            $secondLocalKey ?: $through->getKeyName(),
         );
     }
 
@@ -302,8 +413,8 @@ trait HasRelationships
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return is_null($class = $this->getAttributeFromArray($type)) || $class === ''
-                    ? $this->morphEagerTo($name, $type, $id, $ownerKey)
-                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
+            ? $this->morphEagerTo($name, $type, $id, $ownerKey)
+            : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
     }
 
     /**
@@ -560,11 +671,17 @@ trait HasRelationships
      * @param  string|null  $parentKey
      * @param  string|null  $relatedKey
      * @param  string|null  $relation
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, $this, \Illuminate\Database\Eloquent\Relations\Pivot>
      */
-    public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
-                                  $parentKey = null, $relatedKey = null, $relation = null)
-    {
+    public function belongsToMany(
+        $related,
+        $table = null,
+        $foreignPivotKey = null,
+        $relatedPivotKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null,
+    ) {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -589,9 +706,14 @@ trait HasRelationships
         }
 
         return $this->newBelongsToMany(
-            $instance->newQuery(), $this, $table, $foreignPivotKey,
-            $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $relation
+            $instance->newQuery(),
+            $this,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $relation,
         );
     }
 
@@ -609,11 +731,18 @@ trait HasRelationships
      * @param  string  $parentKey
      * @param  string  $relatedKey
      * @param  string|null  $relationName
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel>
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TRelatedModel, TDeclaringModel, \Illuminate\Database\Eloquent\Relations\Pivot>
      */
-    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
-                                        $parentKey, $relatedKey, $relationName = null)
-    {
+    protected function newBelongsToMany(
+        Builder $query,
+        Model $parent,
+        $table,
+        $foreignPivotKey,
+        $relatedPivotKey,
+        $parentKey,
+        $relatedKey,
+        $relationName = null,
+    ) {
         return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
     }
 
@@ -633,10 +762,17 @@ trait HasRelationships
      * @param  bool  $inverse
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<TRelatedModel, $this>
      */
-    public function morphToMany($related, $name, $table = null, $foreignPivotKey = null,
-                                $relatedPivotKey = null, $parentKey = null,
-                                $relatedKey = null, $relation = null, $inverse = false)
-    {
+    public function morphToMany(
+        $related,
+        $name,
+        $table = null,
+        $foreignPivotKey = null,
+        $relatedPivotKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null,
+        $inverse = false,
+    ) {
         $relation = $relation ?: $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
@@ -660,9 +796,16 @@ trait HasRelationships
         }
 
         return $this->newMorphToMany(
-            $instance->newQuery(), $this, $name, $table,
-            $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
-            $relatedKey ?: $instance->getKeyName(), $relation, $inverse
+            $instance->newQuery(),
+            $this,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $relation,
+            $inverse,
         );
     }
 
@@ -684,12 +827,30 @@ trait HasRelationships
      * @param  bool  $inverse
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<TRelatedModel, TDeclaringModel>
      */
-    protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
-                                      $relatedPivotKey, $parentKey, $relatedKey,
-                                      $relationName = null, $inverse = false)
-    {
-        return new MorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
-            $relationName, $inverse);
+    protected function newMorphToMany(
+        Builder $query,
+        Model $parent,
+        $name,
+        $table,
+        $foreignPivotKey,
+        $relatedPivotKey,
+        $parentKey,
+        $relatedKey,
+        $relationName = null,
+        $inverse = false,
+    ) {
+        return new MorphToMany(
+            $query,
+            $parent,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey,
+            $relatedKey,
+            $relationName,
+            $inverse,
+        );
     }
 
     /**
@@ -707,9 +868,16 @@ trait HasRelationships
      * @param  string|null  $relation
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany<TRelatedModel, $this>
      */
-    public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null,
-                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null)
-    {
+    public function morphedByMany(
+        $related,
+        $name,
+        $table = null,
+        $foreignPivotKey = null,
+        $relatedPivotKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null,
+    ) {
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
         // For the inverse of the polymorphic many-to-many relations, we will change
@@ -718,8 +886,15 @@ trait HasRelationships
         $relatedPivotKey = $relatedPivotKey ?: $name.'_id';
 
         return $this->morphToMany(
-            $related, $name, $table, $foreignPivotKey,
-            $relatedPivotKey, $parentKey, $relatedKey, $relation, true
+            $related,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey,
+            $relatedKey,
+            $relation,
+            true,
         );
     }
 
@@ -753,8 +928,9 @@ trait HasRelationships
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $segments = [
-            $instance ? $instance->joiningTableSegment()
-                      : Str::snake(class_basename($related)),
+            $instance
+                ? $instance->joiningTableSegment()
+                : Str::snake(class_basename($related)),
             $this->joiningTableSegment(),
         ];
 
@@ -919,6 +1095,8 @@ trait HasRelationships
     {
         $this->relations[$relation] = $value;
 
+        $this->propagateRelationAutoloadCallbackToRelation($relation, $value);
+
         return $this;
     }
 
@@ -944,6 +1122,18 @@ trait HasRelationships
     public function setRelations(array $relations)
     {
         $this->relations = $relations;
+
+        return $this;
+    }
+
+    /**
+     * Enable relationship autoloading for this model.
+     *
+     * @return $this
+     */
+    public function withRelationshipAutoloading()
+    {
+        $this->newCollection([$this])->withRelationshipAutoloading();
 
         return $this;
     }

@@ -294,7 +294,7 @@ jobs:
           DB_PASSWORD: Forge123
 
   mssql_2017:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
 
     services:

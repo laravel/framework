@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -94,7 +95,6 @@ class Gate implements GateContract
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @return void
      */
     public function __construct(
         Container $container,
@@ -180,8 +180,8 @@ class Gate implements GateContract
 
         if ($condition instanceof Closure) {
             $response = $this->canBeCalledWithUser($user, $condition)
-                            ? $condition($user)
-                            : new Response(false, $message, $code);
+                ? $condition($user)
+                : new Response(false, $message, $code);
         } else {
             $response = $condition;
         }
@@ -277,8 +277,8 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                ? $policy->{$method}(...func_get_args())
+                : $policy(...func_get_args());
         };
     }
 
@@ -670,6 +670,12 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
+        $policy = $this->getPolicyFromAttribute($class);
+
+        if (! is_null($policy)) {
+            return $this->resolvePolicy($policy);
+        }
+
         foreach ($this->guessPolicyName($class) as $guessedPolicy) {
             if (class_exists($guessedPolicy)) {
                 return $this->resolvePolicy($guessedPolicy);
@@ -681,6 +687,25 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
+    }
+
+    /**
+     * Get the policy class from the class attribute.
+     *
+     * @param  class-string<*>  $class
+     * @return class-string<*>|null
+     */
+    protected function getPolicyFromAttribute(string $class): ?string
+    {
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        $attributes = (new ReflectionClass($class))->getAttributes(UsePolicy::class);
+
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->class
+            : null;
     }
 
     /**

@@ -288,8 +288,8 @@ abstract class Component
     protected function createVariableFromMethod(ReflectionMethod $method)
     {
         return $method->getNumberOfParameters() === 0
-                        ? $this->createInvokableVariable($method->getName())
-                        : Closure::fromCallable([$this, $method->getName()]);
+            ? $this->createInvokableVariable($method->getName())
+            : Closure::fromCallable([$this, $method->getName()]);
     }
 
     /**

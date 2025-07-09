@@ -24,7 +24,6 @@ class PusherBroadcaster extends Broadcaster
      * Create a new broadcaster instance.
      *
      * @param  \Pusher\Pusher  $pusher
-     * @return void
      */
     public function __construct(Pusher $pusher)
     {
@@ -110,8 +109,8 @@ class PusherBroadcaster extends Broadcaster
         $user = $this->retrieveUser($request, $channelName);
 
         $broadcastIdentifier = method_exists($user, 'getAuthIdentifierForBroadcasting')
-                        ? $user->getAuthIdentifierForBroadcasting()
-                        : $user->getAuthIdentifier();
+            ? $user->getAuthIdentifierForBroadcasting()
+            : $user->getAuthIdentifier();
 
         return $this->decodePusherResponse(
             $request,

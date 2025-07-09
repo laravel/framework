@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
@@ -21,6 +24,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Client\ResponseSequence;
+use Illuminate\Http\Client\StrayRequestException;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -33,6 +37,7 @@ use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -530,11 +535,12 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testCanSendArrayableFormData()
+    #[DataProvider('methodsReceivingArrayableDataProvider')]
+    public function testCanSendArrayableFormData(string $method)
     {
         $this->factory->fake();
 
-        $this->factory->asForm()->post('http://foo.com/form', new Fluent([
+        $this->factory->asForm()->{$method}('http://foo.com/form', new Fluent([
             'name' => 'Taylor',
             'title' => 'Laravel Developer',
         ]));
@@ -546,11 +552,12 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testCanSendJsonSerializableData()
+    #[DataProvider('methodsReceivingArrayableDataProvider')]
+    public function testCanSendJsonSerializableData(string $method)
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable
+        $this->factory->asJson()->{$method}('http://foo.com/form', new class implements JsonSerializable
         {
             public function jsonSerialize(): mixed
             {
@@ -568,11 +575,12 @@ class HttpClientTest extends TestCase
         });
     }
 
-    public function testPrefersJsonSerializableOverArrayableData()
+    #[DataProvider('methodsReceivingArrayableDataProvider')]
+    public function testPrefersJsonSerializableOverArrayableData(string $method)
     {
         $this->factory->fake();
 
-        $this->factory->asJson()->post('http://foo.com/form', new class implements JsonSerializable, Arrayable
+        $this->factory->asJson()->{$method}('http://foo.com/form', new class implements JsonSerializable, Arrayable
         {
             public function jsonSerialize(): mixed
             {
@@ -1297,6 +1305,81 @@ class HttpClientTest extends TestCase
         $response = new Psr7Response(403, [], json_encode($error));
 
         throw new RequestException(new Response($response));
+    }
+
+    public function testRequestLevelTruncationLevelOnRequestException()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testNoTruncationOnRequestLevel()
+    {
+        RequestException::truncateAt(60);
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->throw()->dontTruncateExceptions()->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
+
+        $this->assertEquals(60, RequestException::$truncateAt);
+    }
+
+    public function testRequestExceptionDoesNotTruncateButRequestDoes()
+    {
+        RequestException::dontTruncate();
+
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = null;
+        try {
+            $this->factory->throw()->truncateExceptionsAt(3)->get('http://foo.com/json');
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
+
+        $this->assertFalse(RequestException::$truncateAt);
+    }
+
+    public function testAsyncRequestExceptionsRespectRequestTruncation()
+    {
+        RequestException::dontTruncate();
+        $this->factory->fake([
+            '*' => $this->factory->response(['error'], 403),
+        ]);
+
+        $exception = $this->factory->async()->throw()->truncateExceptionsAt(4)->get('http://foo.com/json')->wait();
+
+        $this->assertInstanceOf(RequestException::class, $exception);
+        $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());
+        $this->assertFalse(RequestException::$truncateAt);
     }
 
     public function testRequestExceptionEmptyBody()
@@ -2330,6 +2413,22 @@ class HttpClientTest extends TestCase
         $this->factory->assertSentCount(1);
     }
 
+    public function testExceptionThrowInMiddlewareAllowsRetry()
+    {
+        $middleware = Middleware::mapRequest(function (RequestInterface $request) {
+            throw new RuntimeException;
+        });
+
+        $this->expectException(RuntimeException::class);
+
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        })->withMiddleware($middleware)
+            ->retry(3, 1, function (Exception $exception, PendingRequest $request) {
+                return true;
+            })->post('https://example.com');
+    }
+
     public function testRequestsWillBeWaitingSleepMillisecondsReceivedInBackoffArray()
     {
         Sleep::fake();
@@ -2356,6 +2455,16 @@ class HttpClientTest extends TestCase
             Sleep::usleep(100_000),
             Sleep::usleep(200_000),
         ]);
+    }
+
+    public function testFailedRequest()
+    {
+        $requestException = $this->factory->failedRequest(['code' => 'not_found'], 404, ['X-RateLimit-Remaining' => 199]);
+
+        $this->assertInstanceOf(RequestException::class, $requestException);
+        $this->assertEqualsCanonicalizing(['code' => 'not_found'], $requestException->response->json());
+        $this->assertEquals(404, $requestException->response->status());
+        $this->assertEquals(199, $requestException->response->header('X-RateLimit-Remaining'));
     }
 
     public function testFakeConnectionException()
@@ -2483,6 +2592,54 @@ class HttpClientTest extends TestCase
                 $request->url() === 'https://laravel.example' &&
                 $request->hasHeader('X-Test-Header', 'Test');
         });
+    }
+
+    public function testSslCertificateErrorsConvertedToConnectionException()
+    {
+        $this->factory->fake(function () {
+            $request = new GuzzleRequest('HEAD', 'https://ssl-error.laravel.example');
+            throw new GuzzleRequestException(
+                'cURL error 60: SSL certificate problem: unable to get local issuer certificate',
+                $request
+            );
+        });
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
+
+        $this->factory->head('https://ssl-error.laravel.example');
+    }
+
+    public function testTooManyRedirectsExceptionConvertedToConnectionException()
+    {
+        $this->factory->fake(function () {
+            $request = new GuzzleRequest('GET', 'https://redirect.laravel.example');
+            $response = new Psr7Response(301, ['Location' => 'https://redirect2.laravel.example']);
+
+            throw new TooManyRedirectsException(
+                'Maximum number of redirects (5) exceeded',
+                $request,
+                $response
+            );
+        });
+
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+
+        $this->factory->maxRedirects(5)->get('https://redirect.laravel.example');
+    }
+
+    public function testTooManyRedirectsWithFakedRedirectChain()
+    {
+        $this->factory->fake([
+            '1.example.com' => $this->factory->response(null, 301, ['Location' => 'https://2.example.com']),
+            '2.example.com' => $this->factory->response(null, 301, ['Location' => 'https://3.example.com']),
+            '3.example.com' => $this->factory->response('', 200),
+        ]);
+
+        $this->expectException(ConnectionException::class);
+
+        $this->factory->maxRedirects(1)->get('https://1.example.com');
     }
 
     public function testRequestExceptionIsNotThrownIfThePendingRequestIsSetToThrowOnFailureButTheResponseIsSuccessful()
@@ -3148,10 +3305,36 @@ class HttpClientTest extends TestCase
         $responses[] = $this->factory->get('https://forge.laravel.com')->body();
         $this->assertSame(['ok', 'ok'], $responses);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(StrayRequestException::class);
         $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
 
         $this->factory->get('https://laravel.com');
+    }
+
+    public function testItCanEnforceFakingInThePool()
+    {
+        $this->factory->preventStrayRequests();
+        $this->factory->fake(['https://vapor.laravel.com' => Factory::response('ok', 200)]);
+        $this->factory->fake(['https://forge.laravel.com' => Factory::response('ok', 200)]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://vapor.laravel.com'),
+                $pool->get('https://forge.laravel.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(200, $responses[1]->status());
+
+        $this->expectException(StrayRequestException::class);
+        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
+
+        $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('https://laravel.com'),
+            ];
+        });
     }
 
     public function testPreventingStrayRequests()
@@ -3471,6 +3654,16 @@ class HttpClientTest extends TestCase
         $factory = new Factory();
 
         $this->assertInstanceOf(PendingRequest::class, $factory->createPendingRequest());
+    }
+
+    public static function methodsReceivingArrayableDataProvider()
+    {
+        return [
+            'patch' => ['patch'],
+            'put' => ['put'],
+            'post' => ['post'],
+            'delete' => ['delete'],
+        ];
     }
 }
 

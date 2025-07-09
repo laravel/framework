@@ -20,7 +20,7 @@
         "illuminate/contracts": "^12.0",
         "illuminate/macroable": "^12.0",
         "illuminate/support": "^12.0",
-        "league/commonmark": "^2.6",
+        "league/commonmark": "^2.7",
         "psr/log": "^1.0|^2.0|^3.0",
         "symfony/mailer": "^7.2.0",
         "tijsverkoyen/css-to-inline-styles": "^2.2.5"
@@ -37,6 +37,7 @@
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SES mail driver (^3.322.9).",
+        "illuminate/http": "Required to create an attachment from an UploadedFile instance (^12.0).",
         "resend/resend-php": "Required to enable support for the Resend mail transport (^0.10.0).",
         "symfony/http-client": "Required to use the Symfony API mail transports (^7.2).",
         "symfony/mailgun-mailer": "Required to enable support for the Mailgun mail transport (^7.2).",

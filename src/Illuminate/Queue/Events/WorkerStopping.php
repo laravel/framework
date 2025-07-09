@@ -9,7 +9,6 @@ class WorkerStopping
      *
      * @param  int  $status  The worker exit status.
      * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions  The worker options.
-     * @return void
      */
     public function __construct(
         public $status = 0,

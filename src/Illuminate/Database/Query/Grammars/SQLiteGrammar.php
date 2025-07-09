@@ -161,8 +161,8 @@ class SQLiteGrammar extends Grammar
     protected function compileIndexHint(Builder $query, $indexHint)
     {
         return $indexHint->type === 'force'
-                ? "indexed by {$indexHint->index}"
-                : '';
+            ? "indexed by {$indexHint->index}"
+            : '';
     }
 
     /**

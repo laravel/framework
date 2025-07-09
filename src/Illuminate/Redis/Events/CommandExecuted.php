@@ -46,7 +46,6 @@ class CommandExecuted
      * @param  array  $parameters
      * @param  float|null  $time
      * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @return void
      */
     public function __construct($command, $parameters, $time, $connection)
     {

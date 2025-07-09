@@ -49,7 +49,6 @@ class ValidationException extends Exception
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @param  string  $errorBag
-     * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {

@@ -61,9 +61,7 @@ class BroadcasterTest extends TestCase
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
-        /*
-         * Test Explicit Binding...
-         */
+        // Test Explicit Binding...
         $container = new Container;
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);

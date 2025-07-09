@@ -131,7 +131,6 @@ class Kernel implements KernelContract
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
      */
     public function __construct(Application $app, Dispatcher $events)
     {

@@ -102,6 +102,31 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertSame('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
+    public function testDefaultCurrentDate()
+    {
+        $getSql = function ($grammar, $mysql57 = false) {
+            if ($grammar == 'MySql') {
+                $connection = $this->getConnection($grammar);
+                $mysql57 ? $connection->shouldReceive('getServerVersion')->andReturn('5.7') : $connection->shouldReceive('getServerVersion')->andReturn('8.0.13');
+                $connection->shouldReceive('isMaria')->andReturn(false);
+
+                return (new Blueprint($connection, 'users', function ($table) {
+                    $table->date('created')->useCurrent();
+                }))->toSql();
+            } else {
+                return $this->getBlueprint($grammar, 'users', function ($table) {
+                    $table->date('created')->useCurrent();
+                })->toSql();
+            }
+        };
+
+        $this->assertEquals(['alter table `users` add `created` date not null default (CURDATE())'], $getSql('MySql'));
+        $this->assertEquals(['alter table `users` add `created` date not null'], $getSql('MySql', mysql57: true));
+        $this->assertEquals(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('Postgres'));
+        $this->assertEquals(['alter table "users" add column "created" date not null default CURRENT_DATE'], $getSql('SQLite'));
+        $this->assertEquals(['alter table "users" add "created" date not null default CAST(GETDATE() AS DATE)'], $getSql('SqlServer'));
+    }
+
     public function testDefaultCurrentDateTime()
     {
         $getSql = function ($grammar) {
@@ -128,6 +153,31 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone not null default CURRENT_TIMESTAMP'], $getSql('Postgres'));
         $this->assertEquals(['alter table "users" add column "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SQLite'));
         $this->assertEquals(['alter table "users" add "created" datetime not null default CURRENT_TIMESTAMP'], $getSql('SqlServer'));
+    }
+
+    public function testDefaultCurrentYear()
+    {
+        $getSql = function ($grammar, $mysql57 = false) {
+            if ($grammar == 'MySql') {
+                $connection = $this->getConnection($grammar);
+                $mysql57 ? $connection->shouldReceive('getServerVersion')->andReturn('5.7') : $connection->shouldReceive('getServerVersion')->andReturn('8.0.13');
+                $connection->shouldReceive('isMaria')->andReturn(false);
+
+                return (new Blueprint($connection, 'users', function ($table) {
+                    $table->year('birth_year')->useCurrent();
+                }))->toSql();
+            } else {
+                return $this->getBlueprint($grammar, 'users', function ($table) {
+                    $table->year('birth_year')->useCurrent();
+                })->toSql();
+            }
+        };
+
+        $this->assertEquals(['alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))'], $getSql('MySql'));
+        $this->assertEquals(['alter table `users` add `birth_year` year not null'], $getSql('MySql', mysql57: true));
+        $this->assertEquals(['alter table "users" add column "birth_year" integer not null default EXTRACT(YEAR FROM CURRENT_DATE)'], $getSql('Postgres'));
+        $this->assertEquals(['alter table "users" add column "birth_year" integer not null default (CAST(strftime(\'%Y\', \'now\') AS INTEGER))'], $getSql('SQLite'));
+        $this->assertEquals(['alter table "users" add "birth_year" int not null default CAST(YEAR(GETDATE()) AS INTEGER)'], $getSql('SqlServer'));
     }
 
     public function testRemoveColumn()
@@ -566,6 +616,45 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql('Postgres'));
     }
 
+    public function testColumnDefault()
+    {
+        // Test a normal string literal column default.
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tinyText('note')->default('this will work');
+            })->toSql();
+        };
+
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+
+        // Test a string literal column default containing an apostrophe (#56124)
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tinyText('note')->default('this\'ll work too');
+            })->toSql();
+        };
+
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+
+        // Test a backed enumeration column default
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $enum = ApostropheBackedEnum::ValueWithoutApostrophe;
+                $table->tinyText('note')->default($enum);
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this will work\''], $getSql('MySql'));
+
+        // Test a backed enumeration column default containing an apostrophe (#56124)
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $enum = ApostropheBackedEnum::ValueWithApostrophe;
+                $table->tinyText('note')->default($enum);
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+    }
+
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
         $connection = m::mock(Connection::class)
@@ -601,4 +690,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         return new Blueprint($connection, $table, $callback);
     }
+}
+
+enum ApostropheBackedEnum: string
+{
+    case ValueWithoutApostrophe = 'this will work';
+    case ValueWithApostrophe = 'this\'ll work too';
 }

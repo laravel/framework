@@ -124,6 +124,29 @@ class PipelineTest extends TestCase
         $this->assertEquals(2, $object->value);
     }
 
+    public function testPipelineThroughMethodOverwritesPreviouslySetAndAppendedPipes()
+    {
+        $object = new stdClass();
+
+        $object->value = 0;
+
+        $function = function ($object, $next) {
+            $object->value++;
+
+            return $next($object);
+        };
+
+        $result = (new Pipeline(new Container))
+            ->send($object)
+            ->through([$function])
+            ->pipe([$function])
+            ->through([$function])
+            ->then(fn ($piped) => $piped);
+
+        $this->assertSame($object, $result);
+        $this->assertEquals(1, $object->value);
+    }
+
     public function testPipelineUsageWithInvokableClass()
     {
         $result = (new Pipeline(new Container))

@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 #[RequiresEnv('DYNAMODB_ENDPOINT')]
 class DynamoBatchTest extends TestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->afterApplicationCreated(function () {
             BatchRunRecorder::reset();

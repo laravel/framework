@@ -98,7 +98,7 @@ class DatabaseEloquentHasOneOrManyWithAttributesTest extends TestCase
         $this->assertSame($value, $relatedModel->$key);
     }
 
-    public function testWithAttributesCanBeOverriden(): void
+    public function testWithAttributesCanBeOverridden(): void
     {
         $key = 'a key';
         $defaultValue = 'a value';

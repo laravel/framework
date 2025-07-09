@@ -47,7 +47,6 @@ class Exception
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
      * @param  string  $basePath
-     * @return void
      */
     public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
     {

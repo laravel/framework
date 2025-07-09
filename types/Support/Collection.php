@@ -10,7 +10,7 @@ class Users implements Arrayable
 {
     public function toArray(): array
     {
-        return [new User()];
+        return [new User];
     }
 }
 
@@ -21,6 +21,8 @@ $iterable = [1];
 /** @var Traversable<int, string> $traversable */
 $traversable = new ArrayIterator(['string']);
 
+$associativeCollection = collect(['John' => new User]);
+
 class Invokable
 {
     public function __invoke(): string
@@ -28,7 +30,7 @@ class Invokable
         return 'Taylor';
     }
 }
-$invokable = new Invokable();
+$invokable = new Invokable;
 
 assertType('Illuminate\Support\Collection<int, User>', $collection);
 
@@ -806,6 +808,8 @@ assertType('User', $collection->firstOrFail(function ($user, $int) {
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string>>', $collection::make(['string'])->chunk(1));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunk(2));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<string, User>>', $associativeCollection->chunk(2));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $associativeCollection->chunk(2, false));
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->chunkWhile(function ($user, $int, $collection) {
     assertType('User', $user);
@@ -869,10 +873,10 @@ assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->so
 assertType('Illuminate\Support\Collection<string, string>', $collection->make(['string' => 'string'])->sortKeysDesc(1));
 
 assertType('mixed', $collection->make([1])->sum('string'));
-assertType('mixed', $collection->make(['string'])->sum(function ($string) {
+assertType('int<1, 2>', $collection->make(['string'])->sum(function ($string) {
     assertType('string', $string);
 
-    return 1;
+    return rand(1, 2);
 }));
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->take(1));
@@ -1045,11 +1049,18 @@ assertType(
 assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1));
 assertType('Illuminate\Support\Collection<int, User>', $collection->splice(1, 1, [new User]));
 
-assertType('Illuminate\Support\Collection<int, User>', $collection->transform(function ($user, $int) {
+assertType('mixed', $collection->transform(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return new User;
+}));
+
+assertType('mixed', $collection->transform(function ($user, $int): int {
+    assertType('User', $user);
+    assertType('int', $int);
+
+    return $int * 2;
 }));
 
 assertType('Illuminate\Support\Collection<int, User>', $collection->add(new User));

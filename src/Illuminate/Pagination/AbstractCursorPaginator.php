@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Tappable;
+use Illuminate\Support\Traits\TransformsToResourceCollection;
 use Stringable;
 use Traversable;
 
@@ -26,7 +27,7 @@ use Traversable;
  */
 abstract class AbstractCursorPaginator implements Htmlable, Stringable
 {
-    use ForwardsCalls, Tappable;
+    use ForwardsCalls, Tappable, TransformsToResourceCollection;
 
     /**
      * All of the items being paginated.
@@ -265,8 +266,8 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected function ensureParameterIsPrimitive($parameter)
     {
         return is_object($parameter) && method_exists($parameter, '__toString')
-                        ? (string) $parameter
-                        : $parameter;
+            ? (string) $parameter
+            : $parameter;
     }
 
     /**

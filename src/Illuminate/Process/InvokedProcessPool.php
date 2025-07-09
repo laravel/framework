@@ -18,7 +18,6 @@ class InvokedProcessPool implements Countable
      * Create a new invoked process pool.
      *
      * @param  array  $invokedProcesses
-     * @return void
      */
     public function __construct(array $invokedProcesses)
     {

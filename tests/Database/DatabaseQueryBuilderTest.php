@@ -301,6 +301,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
     }
 
+    public function testPipeCallback()
+    {
+        $query = $this->getBuilder();
+
+        $result = $query->pipe(fn (Builder $query) => 5);
+        $this->assertSame(5, $result);
+
+        $result = $query->pipe(fn (Builder $query) => null);
+        $this->assertSame($query, $result);
+
+        $result = $query->pipe(function (Builder $query) {
+            //
+        });
+        $this->assertSame($query, $result);
+
+        $this->assertCount(0, $query->wheres);
+        $result = $query->pipe(fn (Builder $query) => $query->where('foo', 'bar'));
+        $this->assertSame($query, $result);
+        $this->assertCount(1, $query->wheres);
+    }
+
     public function testBasicWheres()
     {
         $builder = $this->getBuilder();
@@ -593,6 +614,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
         $this->assertSame('select * from "users" where "created_at"::date = NOW()', $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate('result->created_at', new Raw('NOW()'));
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::date = NOW()', $builder->toSql());
     }
 
     public function testWhereDayPostgres()
@@ -624,6 +649,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
         $this->assertSame('select * from "users" where "created_at"::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('result->created_at', '>=', '22:00');
+        $this->assertSame('select * from "users" where ("result"->>\'created_at\')::time >= ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
@@ -1694,21 +1724,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users');
         $builder->union($this->getBuilder()->select('*')->from('dogs'));
-        $builder->skip(5)->take(10);
+        $builder->offset(5)->limit(10);
         $this->assertSame('(select * from "users") union (select * from "dogs") limit 10 offset 5', $builder->toSql());
 
         $expectedSql = '(select * from "users") union (select * from "dogs") limit 10 offset 5';
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users');
         $builder->union($this->getBuilder()->select('*')->from('dogs'));
-        $builder->skip(5)->take(10);
+        $builder->offset(5)->limit(10);
         $this->assertEquals($expectedSql, $builder->toSql());
 
         $expectedSql = '(select * from "users" limit 11) union (select * from "dogs" limit 22) limit 10 offset 5';
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->limit(11);
         $builder->union($this->getBuilder()->select('*')->from('dogs')->limit(22));
-        $builder->skip(5)->take(10);
+        $builder->offset(5)->limit(10);
         $this->assertEquals($expectedSql, $builder->toSql());
     }
 
@@ -1739,7 +1769,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users');
         $builder->union($this->getMySqlBuilder()->select('*')->from('dogs'));
-        $builder->skip(5)->take(10);
+        $builder->offset(5)->limit(10);
         $this->assertSame('(select * from `users`) union (select * from `dogs`) limit 10 offset 5', $builder->toSql());
     }
 
@@ -1796,14 +1826,14 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereIn('id', function ($q) {
-            $q->select('id')->from('users')->where('age', '>', 25)->take(3);
+            $q->select('id')->from('users')->where('age', '>', 25)->limit(3);
         });
         $this->assertSame('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
         $this->assertEquals([25], $builder->getBindings());
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNotIn('id', function ($q) {
-            $q->select('id')->from('users')->where('age', '>', 25)->take(3);
+            $q->select('id')->from('users')->where('age', '>', 25)->limit(3);
         });
         $this->assertSame('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
         $this->assertEquals([25], $builder->getBindings());
@@ -2040,7 +2070,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(25)->take(10)->orderByRaw('[email] desc');
+        $builder->select('*')->from('users')->offset(25)->limit(10)->orderByRaw('[email] desc');
         $this->assertSame('select * from [users] order by [email] desc offset 25 rows fetch next 10 rows only', $builder->toSql());
     }
 
@@ -2313,23 +2343,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" limit 0', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(5)->take(10);
+        $builder->select('*')->from('users')->offset(5)->limit(10);
         $this->assertSame('select * from "users" limit 10 offset 5', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(0)->take(0);
+        $builder->select('*')->from('users')->offset(0)->limit(0);
         $this->assertSame('select * from "users" limit 0 offset 0', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(-5)->take(-10);
+        $builder->select('*')->from('users')->offset(-5)->limit(-10);
         $this->assertSame('select * from "users" offset 0', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(null)->take(null);
+        $builder->select('*')->from('users')->offset(null)->limit(null);
         $this->assertSame('select * from "users" offset 0', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $builder->select('*')->from('users')->skip(5)->take(null);
+        $builder->select('*')->from('users')->offset(5)->limit(null);
         $this->assertSame('select * from "users" offset 5', $builder->toSql());
     }
 
@@ -2358,6 +2388,28 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(-2, 0);
         $this->assertSame('select * from "users" limit 0 offset 0', $builder->toSql());
+    }
+
+    public function testForPageBeforeId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(15, null);
+        $this->assertSame('select * from "users" where "id" is not null order by "id" desc limit 15', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageBeforeId(15, 0);
+        $this->assertSame('select * from "users" where "id" < ? order by "id" desc limit 15', $builder->toSql());
+    }
+
+    public function testForPageAfterId()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(15, null);
+        $this->assertSame('select * from "users" where "id" is not null order by "id" asc limit 15', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->forPageAfterId(15, 0);
+        $this->assertSame('select * from "users" where "id" > ? order by "id" asc limit 15', $builder->toSql());
     }
 
     public function testGetCountForPaginationWithBindings()
@@ -2423,7 +2475,7 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testGetCountForPaginationWithUnionLimitAndOffset()
     {
         $builder = $this->getBuilder();
-        $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'))->take(15)->skip(1);
+        $builder->from('posts')->select('id')->union($this->getBuilder()->from('videos')->select('id'))->limit(15)->offset(1);
 
         $builder->getConnection()->shouldReceive('select')->once()->with('select count(*) as aggregate from ((select "id" from "posts") union (select "id" from "videos")) as "temp_table"', [], true)->andReturn([['aggregate' => 1]]);
         $builder->getProcessor()->shouldReceive('processSelect')->once()->andReturnUsing(function ($builder, $results) {
@@ -2475,9 +2527,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereWithArrayConditions()
     {
-        /*
-         * where(key, value)
-         */
+        // where(key, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where([['foo', 1], ['bar', 2]]);
@@ -2509,9 +2559,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
-        /*
-         * where(key, <, value)
-         */
+        // where(key, <, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where([['foo', 1], ['bar', '<', 2]]);
@@ -2528,9 +2576,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
-        /*
-         * whereNot(key, value)
-         */
+        // whereNot(key, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', 2]]);
@@ -2562,9 +2608,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where not (("foo" = ? and "bar" = ?))', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
-        /*
-         * whereNot(key, <, value)
-         */
+        // whereNot(key, <, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNot([['foo', 1], ['bar', '<', 2]]);
@@ -2581,9 +2625,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where not (("foo" = ? and "bar" < ?))', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
 
-        /*
-         * whereColumn(col1, col2)
-         */
+        // whereColumn(col1, col2)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '_bar']]);
@@ -2615,9 +2657,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" = "_bar")', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
 
-        /*
-         * whereColumn(col1, <, col2)
-         */
+        // whereColumn(col1, <, col2)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereColumn([['foo', '_foo'], ['bar', '<', '_bar']]);
@@ -2634,9 +2674,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = "_foo" and "bar" < "_bar")', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
 
-        /*
-         * whereAll([...keys], value)
-         */
+        // whereAll([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereAll(['foo', 'bar'], 2);
@@ -2648,9 +2686,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
 
-        /*
-         * whereAny([...keys], value)
-         */
+        // whereAny([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereAny(['foo', 'bar'], 2);
@@ -2662,9 +2698,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where ("foo" = ? or "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
 
-        /*
-         * whereNone([...keys], value)
-         */
+        // whereNone([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereNone(['foo', 'bar'], 2);
@@ -2676,9 +2710,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where not ("foo" = ? or "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 2, 1 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhere(key, value)
-         */
+        // where()->orWhere(key, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', 2]]);
@@ -2690,18 +2722,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhere(key, <, value)
-         */
+        // where()->orWhere(key, <, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereColumn(col1, col2)
-         */
+        // where()->orWhereColumn(col1, col2)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereColumn([['foo', '_foo'], ['bar', '_bar']]);
@@ -2713,18 +2741,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = "_foo" or "bar" = "_bar")', $builder->toSql());
         $this->assertEquals([0 => 'xxxx'], $builder->getBindings());
 
-        /*
-         * where()->orWhere(key, <, value)
-         */
+        // where()->orWhere(key, <, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhere([['foo', 1], ['bar', '<', 2]]);
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" < ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereNot(key, value)
-         */
+        // where()->orWhereNot(key, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNot([['foo', 1], ['bar', 2]]);
@@ -2736,18 +2760,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "xxxx" = ? or not (("foo" = ? or "bar" = ?))', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereNot(key, <, value)
-         */
+        // where()->orWhereNot(key, <, value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNot([['foo', 1], ['bar', '<', 2]]);
         $this->assertSame('select * from "users" where "xxxx" = ? or not (("foo" = ? or "bar" < ?))', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 1, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereAll([...keys], value)
-         */
+        // where()->orWhereAll([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAll(['foo', 'bar'], 2);
@@ -2759,9 +2779,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? and "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereAny([...keys], value)
-         */
+        // where()->orWhereAny([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereAny(['foo', 'bar'], 2);
@@ -2773,9 +2791,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "xxxx" = ? or ("foo" = ? or "bar" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'xxxx', 1 => 2, 2 => 2], $builder->getBindings());
 
-        /*
-         * where()->orWhereNone([...keys], value)
-         */
+        // where()->orWhereNone([...keys], value)
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('xxxx', 'xxxx')->orWhereNone(['foo', 'bar'], 2);
@@ -4294,12 +4310,12 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqliteBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
 
         $builder = $this->getSqlServerBuilder();
@@ -4309,7 +4325,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getSqlServerBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete top (1) from [users] where [email] = ?', ['foo'])->andReturn(1);
-        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
         $this->assertEquals(1, $result);
     }
 
@@ -4337,7 +4353,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `users`.`id` = ?', [1])->andReturn(1);
-        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->limit(1)->delete(1);
         $this->assertEquals(1, $result);
 
         $builder = $this->getSqlServerBuilder();
@@ -4367,7 +4383,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "ctid" in (select "users"."ctid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."id" = ? order by "id" asc limit 1)', [1])->andReturn(1);
-        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->limit(1)->delete(1);
         $this->assertEquals(1, $result);
 
         $builder = $this->getPostgresBuilder();
@@ -4939,35 +4955,35 @@ SQL;
     public function testSqlServerLimitsAndOffsets()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->take(10);
+        $builder->select('*')->from('users')->limit(10);
         $this->assertSame('select top 10 * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10)->orderBy('email', 'desc');
+        $builder->select('*')->from('users')->offset(10)->orderBy('email', 'desc');
         $this->assertSame('select * from [users] order by [email] desc offset 10 rows', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(10)->take(10);
+        $builder->select('*')->from('users')->offset(10)->limit(10);
         $this->assertSame('select * from [users] order by (SELECT 0) offset 10 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->skip(11)->take(10)->orderBy('email', 'desc');
+        $builder->select('*')->from('users')->offset(11)->limit(10)->orderBy('email', 'desc');
         $this->assertSame('select * from [users] order by [email] desc offset 11 rows fetch next 10 rows only', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $subQuery = function ($query) {
             return $query->select('created_at')->from('logins')->where('users.name', 'nameBinding')->whereColumn('user_id', 'users.id')->limit(1);
         };
-        $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->skip(10)->take(10);
+        $builder->select('*')->from('users')->where('email', 'emailBinding')->orderBy($subQuery)->offset(10)->limit(10);
         $this->assertSame('select * from [users] where [email] = ? order by (select top 1 [created_at] from [logins] where [users].[name] = ? and [user_id] = [users].[id]) asc offset 10 rows fetch next 10 rows only', $builder->toSql());
         $this->assertEquals(['emailBinding', 'nameBinding'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->take('foo');
+        $builder->select('*')->from('users')->limit('foo');
         $this->assertSame('select * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->take('foo')->offset('bar');
+        $builder->select('*')->from('users')->limit('foo')->offset('bar');
         $this->assertSame('select * from [users]', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
@@ -5066,6 +5082,10 @@ SQL;
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->where('foo', '<>', null);
         $this->assertSame('select * from "users" where "foo" is not null', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '<=>', null);
+        $this->assertSame('select * from "users" where "foo" is null', $builder->toSql());
     }
 
     public function testDynamicWhere()
@@ -6150,7 +6170,7 @@ SQL;
                 '(select "id", "start_time" as "created_at", "type" from "videos" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "news" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) union (select "id", "created_at", "type" from "podcasts" where "extra" = ? and ("id" > ? or ("id" = ? and ("start_time" < ? or ("start_time" = ? and ("type" > ?)))))) order by "id" asc, "created_at" desc, "type" asc limit 17',
                 $builder->toSql());
             $this->assertEquals(['first', 1, 1, $ts, $ts, 'news'], $builder->bindings['where']);
-            $this->assertEquals(['second', 1, 1, $ts, $ts, 'news', 'third', 1, 1, $ts, $ts, 'news'], $builder->bindings ['union']);
+            $this->assertEquals(['second', 1, 1, $ts, $ts, 'news', 'third', 1, 1, $ts, $ts, 'news'], $builder->bindings['union']);
 
             return $results;
         });

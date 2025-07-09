@@ -34,7 +34,6 @@ class BelongsToManyRelationship
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $factory
      * @param  callable|array  $pivot
      * @param  string  $relationship
-     * @return void
      */
     public function __construct($factory, $pivot, $relationship)
     {
@@ -51,7 +50,13 @@ class BelongsToManyRelationship
      */
     public function createFor(Model $model)
     {
-        Collection::wrap($this->factory instanceof Factory ? $this->factory->create([], $model) : $this->factory)->each(function ($attachable) use ($model) {
+        $factoryInstance = $this->factory instanceof Factory;
+
+        if ($factoryInstance) {
+            $relationship = $model->{$this->relationship}();
+        }
+
+        Collection::wrap($factoryInstance ? $this->factory->prependState($relationship->getQuery()->pendingAttributes)->create([], $model) : $this->factory)->each(function ($attachable) use ($model) {
             $model->{$this->relationship}()->attach(
                 $attachable,
                 is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot

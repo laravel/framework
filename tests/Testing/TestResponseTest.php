@@ -27,6 +27,7 @@ use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -1086,6 +1087,18 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertClientError()
+    {
+        $statusCode = 400;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertClientError();
+    }
+
     public function testAssertServerError()
     {
         $statusCode = 500;
@@ -1435,6 +1448,27 @@ class TestResponseTest extends TestCase
         $this->expectExceptionMessage('Failed asserting that false is true.');
 
         $response->assertJsonPath('data.foo', fn ($value) => $value === null);
+    }
+
+    public function testAssertJsonPathWithEnum()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'booked'],
+        ]));
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
+    }
+
+    public function testAssertJsonPathWithEnumCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'failed'],
+        ]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
     }
 
     public function testAssertJsonPathCanonicalizing()
@@ -2631,6 +2665,27 @@ class TestResponseTest extends TestCase
         $response->assertRedirect();
     }
 
+    public function testAssertRedirectBack()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->setPreviousUrl('https://url.com');
+
+        app('url')->setSessionResolver(fn () => app('session.store'));
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+        );
+
+        $response->assertRedirectBack();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $store->setPreviousUrl('https://url.net');
+
+        $response->assertRedirectBack();
+    }
+
     public function testGetDecryptedCookie()
     {
         $response = TestResponse::fromBaseResponse(
@@ -2751,6 +2806,21 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response());
         $response->assertSessionMissing('foo');
+    }
+
+    #[TestWith(['foo', 'badvalue'])]
+    #[TestWith(['foo', null])]
+    #[TestWith([['foo', 'bar'], null])]
+    public function testAssertSessionMissingValue(array|string $key, mixed $value)
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
     }
 
     public function testAssertSessionHasInput()
@@ -2953,4 +3023,9 @@ class TestModel extends Model
 class AnotherTestModel extends Model
 {
     protected $guarded = [];
+}
+
+enum TestStatus: string
+{
+    case Booked = 'booked';
 }

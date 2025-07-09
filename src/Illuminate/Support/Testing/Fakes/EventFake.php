@@ -51,7 +51,6 @@ class EventFake implements Dispatcher, Fake
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @param  array|string  $eventsToFake
-     * @return void
      */
     public function __construct(Dispatcher $dispatcher, $eventsToFake = [])
     {
@@ -335,8 +334,8 @@ class EventFake implements Dispatcher, Fake
         return (new Collection($this->eventsToFake))
             ->filter(function ($event) use ($eventName, $payload) {
                 return $event instanceof Closure
-                            ? $event($eventName, $payload)
-                            : $event === $eventName;
+                    ? $event($eventName, $payload)
+                    : $event === $eventName;
             })
             ->isNotEmpty();
     }

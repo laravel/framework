@@ -13,16 +13,23 @@ class Date implements Stringable
     use Conditionable, Macroable;
 
     /**
+     * The format of the date.
+     */
+    protected ?string $format = null;
+
+    /**
      * The constraints for the date rule.
      */
-    protected array $constraints = ['date'];
+    protected array $constraints = [];
 
     /**
      * Ensure the date has the given format.
      */
     public function format(string $format): static
     {
-        return $this->addRule('date_format:'.$format);
+        $this->format = $format;
+
+        return $this;
     }
 
     /**
@@ -121,7 +128,7 @@ class Date implements Stringable
     protected function formatDate(DateTimeInterface|string $date): string
     {
         return $date instanceof DateTimeInterface
-            ? $date->format('Y-m-d')
+            ? $date->format($this->format ?? 'Y-m-d')
             : $date;
     }
 
@@ -130,6 +137,9 @@ class Date implements Stringable
      */
     public function __toString(): string
     {
-        return implode('|', $this->constraints);
+        return implode('|', [
+            $this->format === null ? 'date' : 'date_format:'.$this->format,
+            ...$this->constraints,
+        ]);
     }
 }

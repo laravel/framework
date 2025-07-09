@@ -13,7 +13,6 @@ class CommandStarting
      * @param  string  $command  The command name.
      * @param  \Symfony\Component\Console\Input\InputInterface  $input  The console input implementation.
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output  The command output implementation.
-     * @return void
      */
     public function __construct(
         public string $command,

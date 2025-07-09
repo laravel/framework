@@ -10,7 +10,6 @@ class JobExceptionOccurred
      * @param  string  $connectionName  The connection name.
      * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
      * @param  \Throwable  $exception  The exception instance.
-     * @return void
      */
     public function __construct(
         public $connectionName,

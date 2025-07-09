@@ -3,17 +3,25 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Exception;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
 #[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // flush lock from previous tests
+        Cache::lock('foo')->forceRelease();
+    }
+
     public function testLocksCanBeAcquiredAndReleased()
     {
-        Cache::lock('foo')->forceRelease();
-
         $lock = Cache::lock('foo', 10);
         $this->assertTrue($lock->get());
         $this->assertFalse(Cache::lock('foo', 10)->get());
@@ -27,7 +35,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBlockForSeconds()
     {
-        Cache::lock('foo')->forceRelease();
         $this->assertSame('taylor', Cache::lock('foo', 10)->block(1, function () {
             return 'taylor';
         }));
@@ -38,11 +45,11 @@ class FileCacheLockTest extends TestCase
 
     public function testConcurrentLocksAreReleasedSafely()
     {
-        Cache::lock('foo')->forceRelease();
+        Sleep::fake(syncWithCarbon: true);
 
         $firstLock = Cache::lock('foo', 1);
         $this->assertTrue($firstLock->get());
-        sleep(2);
+        Sleep::for(2)->seconds();
 
         $secondLock = Cache::lock('foo', 10);
         $this->assertTrue($secondLock->get());
@@ -54,8 +61,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksWithFailedBlockCallbackAreReleased()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
 
         try {
@@ -75,8 +80,6 @@ class FileCacheLockTest extends TestCase
 
     public function testLocksCanBeReleasedUsingOwnerToken()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
@@ -89,8 +92,6 @@ class FileCacheLockTest extends TestCase
 
     public function testOwnerStatusCanBeCheckedAfterRestoringLock()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->get());
         $owner = $firstLock->owner();
@@ -101,8 +102,6 @@ class FileCacheLockTest extends TestCase
 
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
-        Cache::lock('foo')->forceRelease();
-
         $firstLock = Cache::lock('foo', 10);
         $this->assertTrue($firstLock->isOwnedBy(null));
         $this->assertTrue($firstLock->get());
@@ -111,5 +110,17 @@ class FileCacheLockTest extends TestCase
         $secondLock = Cache::store('file')->restoreLock('foo', 'other_owner');
         $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
         $this->assertFalse($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testExceptionIfBlockCanNotAcquireLock()
+    {
+        Sleep::fake(syncWithCarbon: true);
+
+        // acquire and not release lock
+        Cache::lock('foo', 10)->get();
+
+        // try to get lock and hit block timeout
+        $this->expectException(LockTimeoutException::class);
+        Cache::lock('foo', 10)->block(5);
     }
 }

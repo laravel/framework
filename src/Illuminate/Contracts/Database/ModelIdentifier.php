@@ -48,7 +48,6 @@ class ModelIdentifier
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
-     * @return void
      */
     public function __construct($class, $id, array $relations, $connection)
     {

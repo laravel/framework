@@ -32,7 +32,6 @@ class TestComponent implements Stringable
      *
      * @param  \Illuminate\View\Component  $component
      * @param  \Illuminate\View\View  $view
-     * @return void
      */
     public function __construct($component, $view)
     {

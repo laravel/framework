@@ -312,15 +312,16 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
+     * @param  TEnum|null  $default
      * @return TEnum|null
      */
-    public function enum($key, $enumClass)
+    public function enum($key, $enumClass, $default = null)
     {
         if ($this->isNotFilled($key) || ! $this->isBackedEnum($enumClass)) {
-            return null;
+            return value($default);
         }
 
-        return $enumClass::tryFrom($this->data($key));
+        return $enumClass::tryFrom($this->data($key)) ?: value($default);
     }
 
     /**
@@ -338,9 +339,10 @@ trait InteractsWithData
             return [];
         }
 
-        return $this->collect($key)->map(function ($value) use ($enumClass) {
-            return $enumClass::tryFrom($value);
-        })->filter()->all();
+        return $this->collect($key)
+            ->map(fn ($value) => $enumClass::tryFrom($value))
+            ->filter()
+            ->all();
     }
 
     /**

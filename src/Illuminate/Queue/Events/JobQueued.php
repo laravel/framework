@@ -8,12 +8,11 @@ class JobQueued
      * Create a new event instance.
      *
      * @param  string  $connectionName  The connection name.
-     * @param  string  $queue  The queue name.
+     * @param  string|null  $queue  The queue name.
      * @param  string|int|null  $id  The job ID.
      * @param  \Closure|string|object  $job  The job instance.
      * @param  string  $payload  The job payload.
      * @param  int|null  $delay  The amount of time the job was delayed.
-     * @return void
      */
     public function __construct(
         public $connectionName,

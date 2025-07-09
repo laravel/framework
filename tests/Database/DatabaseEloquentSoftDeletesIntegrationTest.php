@@ -957,9 +957,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     public function testSelfReferencingRelationshipWithSoftDeletes()
     {
-        /*
-         * https://github.com/laravel/framework/issues/42075
-         */
+        // https://github.com/laravel/framework/issues/42075
         [$taylor, $abigail] = $this->createUsers();
 
         $this->assertCount(1, $abigail->self_referencing);

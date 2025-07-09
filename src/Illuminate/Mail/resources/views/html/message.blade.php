@@ -7,13 +7,13 @@
 </x-slot:header>
 
 {{-- Body --}}
-{{ $slot }}
+{!! $slot !!}
 
 {{-- Subcopy --}}
 @isset($subcopy)
 <x-slot:subcopy>
 <x-mail::subcopy>
-{{ $subcopy }}
+{!! $subcopy !!}
 </x-mail::subcopy>
 </x-slot:subcopy>
 @endisset

@@ -26,7 +26,6 @@ class KeyWritten extends CacheEvent
      * @param  mixed  $value
      * @param  int|null  $seconds
      * @param  array  $tags
-     * @return void
      */
     public function __construct($storeName, $key, $value, $seconds = null, $tags = [])
     {

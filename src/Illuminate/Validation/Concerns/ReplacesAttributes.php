@@ -326,6 +326,24 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the in_array_keys rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceInArrayKeys($message, $attribute, $rule, $parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            $parameter = $this->getDisplayableValue($attribute, $parameter);
+        }
+
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
+
+    /**
      * Replace all place-holders for the required_array_keys rule.
      *
      * @param  string  $message

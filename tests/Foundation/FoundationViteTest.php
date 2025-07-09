@@ -1693,6 +1693,18 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testItCanFlushState()
+    {
+        $this->makeViteManifest();
+
+        app(Vite::class)('resources/js/app.js');
+        app()->forgetScopedInstances();
+        $this->assertCount(1, app(Vite::class)->preloadedAssets());
+
+        app(Vite::class)->flush();
+        $this->assertCount(0, app(Vite::class)->preloadedAssets());
+    }
+
     protected function cleanViteManifest($path = 'build')
     {
         if (file_exists(public_path("{$path}/manifest.json"))) {
