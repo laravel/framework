@@ -34,8 +34,7 @@ use InvalidArgumentException;
  */
 class RouteRegistrar
 {
-    use Conditionable;
-    use CreatesRegularExpressionRouteConstraints;
+    use Conditionable, CreatesRegularExpressionRouteConstraints;
 
     /**
      * The router instance.
