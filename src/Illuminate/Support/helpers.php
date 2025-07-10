@@ -526,3 +526,16 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('chain')) {
+    /**
+     * @template TValue
+     *
+     * @param (callable(TValue): TValue)[] $callbacks
+     * @return TValue
+     */
+    function chain($value, array $callbacks)
+    {        
+        return array_reduce($callbacks, fn ($carry, callable $fn) => $fn($carry), $value);
+    }
+}
