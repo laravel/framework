@@ -2075,6 +2075,10 @@ class DatabaseQueryBuilderTest extends TestCase
             ->orderByRaw('field(category, ?, ?) asc', ['news', 'opinion']);
         $this->assertSame('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by field(category, ?, ?) asc', $builder->toSql());
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->orderBy('age', SortDirection::Ascending)->orderBy('email', SortDirection::Descending);
+        $this->assertSame('select * from "users" order by "age" asc, "email" desc', $builder->toSql());
     }
 
     public function testLatest()
@@ -7184,4 +7188,10 @@ SQL;
             m::mock(Processor::class),
         ])->makePartial();
     }
+}
+
+enum SortDirection: string
+{
+    case Ascending = 'asc';
+    case Descending = 'DESC';
 }
