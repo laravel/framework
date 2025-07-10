@@ -545,6 +545,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Calculate the similarity percentage between two strings.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @return float<0, 100>
+     */
+    public static function similarity($first, $second)
+    {
+        return Str::similarity($first, $second);
+    }
+
+    /**
      * Determine if the string matches the given pattern.
      *
      * @param  string  $pattern

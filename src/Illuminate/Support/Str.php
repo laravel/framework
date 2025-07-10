@@ -909,6 +909,20 @@ class Str
     }
 
     /**
+     * Calculate the similarity percentage between two strings.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @return float<0, 100>
+     */
+    public static function similarity($first, $second)
+    {
+        similar_text($first, $second, $percent);
+
+        return $percent;
+    }
+
+    /**
      * Remove all non-numeric characters from a string.
      *
      * @param  string  $value

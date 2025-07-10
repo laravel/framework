@@ -1172,6 +1172,15 @@ class SupportStrTest extends TestCase
         $this->assertEmpty(Str::matchAll('/pattern/', ''));
     }
 
+    public function testSimilarity(): void
+    {
+        $this->assertEquals(100.0, Str::similarity('Laravel', 'Laravel'));
+
+        $percent = Str::similarity('Laravel', 'Lravel');
+        $this->assertTrue($percent > 85.0 && $percent < 100.0);
+        $this->assertEquals(0.0, Str::similarity('foo', 'bar'));
+    }
+
     public function testCamel(): void
     {
         $this->assertSame('laravelPHPFramework', Str::camel('Laravel_p_h_p_framework'));

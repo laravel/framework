@@ -7,6 +7,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
@@ -136,6 +137,15 @@ class SupportStringableTest extends TestCase
 
         $this->assertEquals(['un', 'ly'], $stringable->matchAll('/f(\w*)/')->all());
         $this->assertTrue($stringable->matchAll('/nothing/')->isEmpty());
+    }
+
+    public function testSimilarity(): void
+    {
+        $this->assertEquals(100.0, Str::similarity('Laravel', 'Laravel'));
+
+        $percent = Str::similarity('Laravel', 'Lravel');
+        $this->assertTrue($percent > 85.0 && $percent < 100.0);
+        $this->assertEquals(0.0, Str::similarity('foo', 'bar'));
     }
 
     public function testTake()
