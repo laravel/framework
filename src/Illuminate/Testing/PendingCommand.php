@@ -338,9 +338,11 @@ class PendingCommand
     /**
      * Specify a Prompts table that should be printed when the command runs.
      *
-     * @param  string[]|Collection<string>  $headers
-     * @param  string[]|Collection<string>|null  $rows
+     * @param  array<int, string|array<int, string>>|Collection<int, string|array<int, string>>  $headers
+     * @param  array<int, array<int, string>>|Collection<int, array<int, string>>|null  $rows
      * @return $this
+     *
+     * @phpstan-param ($rows is null ? list<list<string>>|Collection<int, list<string>> : list<string|list<string>>|Collection<int, string|list<string>>) $headers
      */
     public function expectsPromptsTable(array|Collection $headers, array|Collection|null $rows)
     {
