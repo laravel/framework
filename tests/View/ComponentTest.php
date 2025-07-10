@@ -80,7 +80,7 @@ class ComponentTest extends TestCase
         $this->viewFactory->shouldReceive('exists')->once()->andReturn(false);
         $this->viewFactory->shouldReceive('addNamespace')->once()->with('__components', '/tmp');
 
-        $component = new class() extends Component
+        $component = new class extends Component
         {
             protected $title;
 

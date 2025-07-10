@@ -17,7 +17,7 @@ class AttachableTest extends TestCase
         });
         $mailable = new Mailable;
 
-        $mailable->attach(new class() implements Attachable
+        $mailable->attach(new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -41,7 +41,7 @@ class AttachableTest extends TestCase
         Attachment::macro('size', function () {
             return 99;
         });
-        $notification = new class()
+        $notification = new class
         {
             public $pathArgs;
 
@@ -50,7 +50,7 @@ class AttachableTest extends TestCase
                 $this->pathArgs = func_get_args();
             }
         };
-        $attachable = new class() implements Attachable
+        $attachable = new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -78,7 +78,7 @@ class AttachableTest extends TestCase
         Attachment::macro('size', function () {
             return 99;
         });
-        $notification = new class()
+        $notification = new class
         {
             public $pathArgs;
 
@@ -89,7 +89,7 @@ class AttachableTest extends TestCase
                 $this->dataArgs = func_get_args();
             }
         };
-        $attachable = new class() implements Attachable
+        $attachable = new class implements Attachable
         {
             public function toMailAttachment()
             {

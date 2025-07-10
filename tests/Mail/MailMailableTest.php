@@ -675,7 +675,7 @@ class MailMailableTest extends TestCase
         $mailable->attachMany([
             '/forge.svg',
             '/vapor.svg' => ['as' => 'Vapor Logo.svg', 'mime' => 'text/css'],
-            new class() implements Attachable
+            new class implements Attachable
             {
                 public function toMailAttachment()
                 {
@@ -709,7 +709,7 @@ class MailMailableTest extends TestCase
     {
         $mailable = new WelcomeMailableStub;
 
-        $mailable->attach(new class() implements Attachable
+        $mailable->attach(new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -730,7 +730,7 @@ class MailMailableTest extends TestCase
     {
         $mailable = new WelcomeMailableStub;
 
-        $mailable->attach(new class() implements Attachable
+        $mailable->attach(new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -750,7 +750,7 @@ class MailMailableTest extends TestCase
     public function testItCanJitNameAttachments()
     {
         $mailable = new WelcomeMailableStub;
-        $unnamedAttachable = new class() implements Attachable
+        $unnamedAttachable = new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -772,7 +772,7 @@ class MailMailableTest extends TestCase
     public function testHasAttachmentWithJitNamedAttachment()
     {
         $mailable = new WelcomeMailableStub;
-        $unnamedAttachable = new class() implements Attachable
+        $unnamedAttachable = new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -804,7 +804,7 @@ class MailMailableTest extends TestCase
                 ];
             }
         };
-        $unnamedAttachable = new class() implements Attachable
+        $unnamedAttachable = new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -988,7 +988,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1003,7 +1003,7 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1018,7 +1018,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1033,7 +1033,7 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1046,7 +1046,7 @@ class MailMailableTest extends TestCase
 
     public function testAssertHasAttachmentFromStorage()
     {
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1061,7 +1061,7 @@ class MailMailableTest extends TestCase
             $this->assertSame("Did not find the expected attachment.\nFailed asserting that false is true.", $e->getMessage());
         }
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1076,7 +1076,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1091,7 +1091,7 @@ class MailMailableTest extends TestCase
             $this->assertStringContainsString("Email subject does not match expected value.\nExpected: [Foo Subject]\nActual:", $e->getMessage());
         }
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {
@@ -1130,7 +1130,7 @@ class MailMailableTest extends TestCase
     {
         $this->stubMailer();
 
-        $mailable = new class() extends Mailable
+        $mailable = new class extends Mailable
         {
             public function build()
             {

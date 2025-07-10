@@ -54,7 +54,7 @@ class SupportJsTest extends TestCase
     {
         // JsonSerializable should take precedence over Arrayable, so we'll
         // implement both and make sure the correct data is used.
-        $data = new class() implements JsonSerializable, Arrayable
+        $data = new class implements JsonSerializable, Arrayable
         {
             public $foo = 'not hello';
 
@@ -81,7 +81,7 @@ class SupportJsTest extends TestCase
     {
         // Jsonable should take precedence over JsonSerializable and Arrayable, so we'll
         // implement all three and make sure the correct data is used.
-        $data = new class() implements Jsonable, JsonSerializable, Arrayable
+        $data = new class implements Jsonable, JsonSerializable, Arrayable
         {
             public $foo = 'not hello';
 
@@ -111,7 +111,7 @@ class SupportJsTest extends TestCase
 
     public function testArrayable()
     {
-        $data = new class() implements Arrayable
+        $data = new class implements Arrayable
         {
             public $foo = 'not hello';
 

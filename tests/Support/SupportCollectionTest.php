@@ -3286,7 +3286,7 @@ class SupportCollectionTest extends TestCase
         $data = new $collection($payload = [
             ['name' => new Stringable('Laravel'), 'url' => '1'],
             ['name' => new HtmlString('Laravel'), 'url' => '1'],
-            ['name' => new class()
+            ['name' => new class
             {
                 public function __toString()
                 {

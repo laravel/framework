@@ -307,7 +307,7 @@ class NotificationMailMessageTest extends TestCase
     {
         $message = new MailMessage;
 
-        $message->attach(new class() implements Attachable
+        $message->attach(new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -328,7 +328,7 @@ class NotificationMailMessageTest extends TestCase
     {
         $mailMessage = new MailMessage();
 
-        $mailMessage->attach(new class() implements Attachable
+        $mailMessage->attach(new class implements Attachable
         {
             public function toMailAttachment()
             {
@@ -348,7 +348,7 @@ class NotificationMailMessageTest extends TestCase
     public function testItAttachesManyFiles()
     {
         $mailMessage = new MailMessage();
-        $attachable = new class() implements Attachable
+        $attachable = new class implements Attachable
         {
             public function toMailAttachment()
             {

@@ -472,7 +472,7 @@ class LogManagerTest extends TestCase
             'driver' => 'single',
         ]);
 
-        $factory = new class()
+        $factory = new class
         {
             public function __invoke()
             {

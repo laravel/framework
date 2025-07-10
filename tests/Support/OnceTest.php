@@ -87,7 +87,7 @@ class OnceTest extends TestCase
 
     public function testIsNotMemoizedWhenCallableUsesChanges()
     {
-        $instance = new class()
+        $instance = new class
         {
             public function rand(string $letter)
             {
