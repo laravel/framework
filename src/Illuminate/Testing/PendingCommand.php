@@ -8,9 +8,13 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Laravel\Prompts\Note as PromptsNote;
+use Laravel\Prompts\Prompt as BasePrompt;
+use Laravel\Prompts\Table as PromptsTable;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -243,6 +247,106 @@ class PendingCommand
         foreach ($lines as $line) {
             $this->expectsOutput($line);
         }
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts info message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsInfo(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'info')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts warning message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsWarning(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'warning')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts error message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsError(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'error')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts alert message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsAlert(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'alert')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts intro message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsIntro(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'intro')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts outro message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsOutro(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'outro')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify a Prompts table that should be printed when the command runs.
+     *
+     * @param  string[]|Collection<string>  $headers
+     * @param  string[]|Collection<string>|null  $rows
+     * @return $this
+     */
+    public function expectsPromptsTable(array|Collection $headers, array|Collection|null $rows)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsTable($headers, $rows)
+        );
 
         return $this;
     }
@@ -517,6 +621,20 @@ class PendingCommand
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];
+    }
+
+    /**
+     * Render specific prompt to new output to add to expectation.
+     *
+     * @return void
+     */
+    protected function expectOutputToContainPrompt(BasePrompt $prompt)
+    {
+        $prompt->setOutput($output = new BufferedOutput);
+
+        $prompt->display();
+
+        $this->expectsOutputToContain(trim($output->fetch()));
     }
 
     /**
