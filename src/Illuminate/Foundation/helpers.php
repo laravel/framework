@@ -316,6 +316,19 @@ if (! function_exists('config')) {
     }
 }
 
+if (! function_exists('config_or_fail')) {
+    /**
+     * Get the specified configuration value.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    function config_or_fail(string $key)
+    {
+        return app('config')->getOrFail($key);
+    }
+}
+
 if (! function_exists('config_path')) {
     /**
      * Get the configuration path.
