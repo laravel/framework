@@ -6,6 +6,7 @@ use Illuminate\Config\Repository;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class RepositoryTest extends TestCase
 {
@@ -149,6 +150,19 @@ class RepositoryTest extends TestCase
     public function testGetWithDefault()
     {
         $this->assertSame('default', $this->repository->get('not-exist', 'default'));
+    }
+
+    public function testGetOrFailGets()
+    {
+        $this->assertSame('bar', $this->repository->getOrFail('foo'));
+    }
+
+    public function testGetOrFailFails()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('#^Configuration value for key \[not-exist\] is not set.#');
+
+        $this->repository->getOrFail('not-exist');
     }
 
     public function testSet()

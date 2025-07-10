@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use RuntimeException;
 
 class Repository implements ArrayAccess, ConfigContract
 {
@@ -55,6 +56,19 @@ class Repository implements ArrayAccess, ConfigContract
         }
 
         return Arr::get($this->items, $key, $default);
+    }
+
+    /**
+     * Get the specified configuration value.
+     *
+     * @param  string  $key
+     * @return mixed
+     *
+     * @throws \RuntimeException
+     */
+    public function getOrFail(string $key)
+    {
+        return $this->get($key) ?? throw new RuntimeException("Configuration value for key [$key] is not set.");
     }
 
     /**
