@@ -1596,6 +1596,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Begin querying the model with given connection.
+     *
+     * @return Builder
+     */
+    public static function queryWithConnection(string $connection)
+    {
+        return (new static)->setConnection($connection)->newQuery();
+    }
+
+    /**
      * Get a new query builder that doesn't have any global scopes or eager loading.
      *
      * @return \Illuminate\Database\Eloquent\Builder<static>
