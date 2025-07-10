@@ -7,6 +7,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 
 /**
@@ -33,6 +34,7 @@ use InvalidArgumentException;
  */
 class RouteRegistrar
 {
+    use Conditionable;
     use CreatesRegularExpressionRouteConstraints;
 
     /**
