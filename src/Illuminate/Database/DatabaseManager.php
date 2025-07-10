@@ -354,9 +354,11 @@ class DatabaseManager implements ConnectionResolverInterface
 
         $this->setDefaultConnection($name);
 
-        return tap($callback(), function () use ($previousName) {
+        try {
+            return $callback();
+        } finally {
             $this->setDefaultConnection($previousName);
-        });
+        }
     }
 
     /**
