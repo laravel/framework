@@ -5651,10 +5651,10 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testEnsureForObjectsClassStrings($collection)
     {
-        $data = $collection::make([new stdClass, stdClass::class, stdClass::class]);
+        $data = $collection::make([new stdClass, new stdClass, new stdClass, stdClass::class]);
         $data->ensure(stdClass::class, true);
 
-        $data = $collection::make([new stdClass, stdClass::class, stdClass::class]);
+        $data = $collection::make([new stdClass, new stdClass, new stdClass, stdClass::class]);
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage(sprintf('Collection should only include [%s] items, but \'%s\' found at position %d.', class_basename(new stdClass()), gettype(stdClass::class), 3));
         $data->ensure(stdClass::class);
