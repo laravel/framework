@@ -353,19 +353,20 @@ trait EnumeratesValues
      * @template TEnsureOfType
      *
      * @param  class-string<TEnsureOfType>|array<array-key, class-string<TEnsureOfType>>|'string'|'int'|'float'|'bool'|'array'|'null'  $type
+     * @param  bool  $allow_string
      * @return static<TKey, TEnsureOfType>
      *
      * @throws \UnexpectedValueException
      */
-    public function ensure($type)
+    public function ensure($type, $allow_string = false)
     {
         $allowedTypes = is_array($type) ? $type : [$type];
 
-        return $this->each(function ($item, $index) use ($allowedTypes) {
+        return $this->each(function ($item, $index) use ($allowedTypes, $allow_string) {
             $itemType = get_debug_type($item);
 
             foreach ($allowedTypes as $allowedType) {
-                if ($itemType === $allowedType || $item instanceof $allowedType) {
+                if ($itemType === $allowedType || is_a($item, $allowedType, $allow_string)) {
                     return true;
                 }
             }
