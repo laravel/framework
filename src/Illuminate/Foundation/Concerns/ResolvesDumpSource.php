@@ -158,6 +158,8 @@ trait ResolvesDumpSource
             return;
         }
 
+        $file = $this->mapToLocalPath($file);
+
         $href = is_array($editor) && isset($editor['href'])
             ? $editor['href']
             : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
@@ -171,6 +173,31 @@ trait ResolvesDumpSource
             [$file, is_null($line) ? 1 : $line],
             $href,
         );
+    }
+
+    /**
+     * Map a remote path to a local path.
+     *
+     * This method is used to convert paths from a remote server to the local environment.
+     * It uses configuration values for the remote and local site paths.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function mapToLocalPath($path)
+    {
+        $remoteRoot = config('app.remote_sites_path');
+        $hostRoot = config('app.local_sites_path');
+
+        if (! $remoteRoot || ! $hostRoot || ! $path) {
+            return $path; // Return original path if config is not set
+        }
+
+        if (str_starts_with($path, $remoteRoot)) {
+            return $hostRoot.substr($path, strlen($remoteRoot));
+        }
+
+        return $path;
     }
 
     /**
