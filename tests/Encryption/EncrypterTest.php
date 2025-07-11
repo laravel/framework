@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Encryption;
 
 use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Contracts\Encryption\InvalidPayloadException;
+use Illuminate\Contracts\Encryption\UnsupportedCipherException;
 use Illuminate\Encryption\Encrypter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -156,7 +158,7 @@ class EncrypterTest extends TestCase
 
     public function testDoNoAllowLongerKey()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnsupportedCipherException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('z', 32));
@@ -164,7 +166,7 @@ class EncrypterTest extends TestCase
 
     public function testWithBadKeyLength()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnsupportedCipherException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('a', 5));
@@ -172,7 +174,7 @@ class EncrypterTest extends TestCase
 
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnsupportedCipherException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('a', 16), 'AES-256-GCM');
@@ -180,7 +182,7 @@ class EncrypterTest extends TestCase
 
     public function testWithUnsupportedCipher()
     {
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnsupportedCipherException::class);
         $this->expectExceptionMessage('Unsupported cipher or incorrect key length. Supported ciphers are: aes-128-cbc, aes-256-cbc, aes-128-gcm, aes-256-gcm.');
 
         new Encrypter(str_repeat('c', 16), 'AES-256-CFB8');
@@ -188,7 +190,7 @@ class EncrypterTest extends TestCase
 
     public function testExceptionThrownWhenPayloadIsInvalid()
     {
-        $this->expectException(DecryptException::class);
+        $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage('The payload is invalid.');
 
         $e = new Encrypter(str_repeat('a', 16));
@@ -221,7 +223,7 @@ class EncrypterTest extends TestCase
 
     public function testExceptionThrownWhenIvIsTooLong()
     {
-        $this->expectException(DecryptException::class);
+        $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage('The payload is invalid.');
 
         $e = new Encrypter(str_repeat('a', 16));
@@ -263,7 +265,7 @@ class EncrypterTest extends TestCase
     #[DataProvider('provideTamperedData')]
     public function testTamperedPayloadWillGetRejected($payload)
     {
-        $this->expectException(DecryptException::class);
+        $this->expectException(InvalidPayloadException::class);
         $this->expectExceptionMessage('The payload is invalid.');
 
         $enc = new Encrypter(str_repeat('x', 16));
