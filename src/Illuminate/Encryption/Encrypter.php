@@ -5,7 +5,9 @@ namespace Illuminate\Encryption;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\Encryption\EncryptException;
+use Illuminate\Contracts\Encryption\InvalidPayloadException;
 use Illuminate\Contracts\Encryption\StringEncrypter;
+use Illuminate\Contracts\Encryption\UnsupportedCipherException;
 use RuntimeException;
 
 class Encrypter implements EncrypterContract, StringEncrypter
@@ -58,7 +60,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         if (! static::supported($key, $cipher)) {
             $ciphers = implode(', ', array_keys(self::$supportedCiphers));
 
-            throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
+            throw new UnsupportedCipherException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
         }
 
         $this->key = $key;
@@ -232,7 +234,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected function getJsonPayload($payload)
     {
         if (! is_string($payload)) {
-            throw new DecryptException('The payload is invalid.');
+            throw new InvalidPayloadException('The payload is invalid.');
         }
 
         $payload = json_decode(base64_decode($payload), true);
@@ -241,7 +243,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
         if (! $this->validPayload($payload)) {
-            throw new DecryptException('The payload is invalid.');
+            throw new InvalidPayloadException('The payload is invalid.');
         }
 
         return $payload;
@@ -366,7 +368,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
             if (! static::supported($key, $this->cipher)) {
                 $ciphers = implode(', ', array_keys(self::$supportedCiphers));
 
-                throw new RuntimeException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
+                throw new UnsupportedCipherException("Unsupported cipher or incorrect key length. Supported ciphers are: {$ciphers}.");
             }
         }
 
