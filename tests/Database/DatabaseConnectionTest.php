@@ -274,7 +274,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->expects($this->any())->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
-        $connection->commit();
+        $connection->commitTransaction();
     }
 
     public function testCommittingFiresEventsIfSet()
@@ -286,7 +286,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionCommitted::class));
-        $connection->commit();
+        $connection->commitTransaction();
     }
 
     public function testRollBackedFiresEventsIfSet()
@@ -297,7 +297,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->beginTransaction();
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(TransactionRolledBack::class));
-        $connection->rollBack();
+        $connection->rollbackTransaction();
     }
 
     public function testRedundantRollBackFiresNoEvent()
@@ -307,7 +307,7 @@ class DatabaseConnectionTest extends TestCase
         $connection->expects($this->any())->method('getName')->willReturn('name');
         $connection->setEventDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldNotReceive('dispatch');
-        $connection->rollBack();
+        $connection->rollbackTransaction();
     }
 
     public function testTransactionMethodRunsSuccessfully()

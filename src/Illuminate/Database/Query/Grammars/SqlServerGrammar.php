@@ -7,6 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -477,25 +478,45 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Compile the SQL statement to define a savepoint.
-     *
-     * @param  string  $name
-     * @return string
+     * Determine if the connection supports savepoints.
      */
-    public function compileSavepoint($name)
+    public function supportsSavepoints(): bool
     {
-        return 'SAVE TRANSACTION '.$name;
+        return true;
+    }
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepointRelease(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     */
+    public function compileSavepoint(string $name): string
+    {
+        return 'SAVE TRANSACTION '.$this->wrapValue($name);
     }
 
     /**
      * Compile the SQL statement to execute a savepoint rollback.
-     *
-     * @param  string  $name
-     * @return string
      */
-    public function compileSavepointRollBack($name)
+    public function compileRollbackToSavepoint(string $name): string
     {
-        return 'ROLLBACK TRANSACTION '.$name;
+        return 'ROLLBACK TRANSACTION '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint release.
+     */
+    public function compileReleaseSavepoint(string $name): string
+    {
+        throw new RuntimeException(
+            'SQL Server does not support releasing savepoints.'
+        );
     }
 
     /**

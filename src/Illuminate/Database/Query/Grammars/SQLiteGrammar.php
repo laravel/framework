@@ -450,6 +450,46 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Determine if the connection supports savepoints.
+     */
+    public function supportsSavepoints(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepointRelease(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     */
+    public function compileSavepoint(string $name): string
+    {
+        return 'SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile a rollback to savepoint statement into SQL.
+     */
+    public function compileRollbackToSavepoint(string $name): string
+    {
+        return 'ROLLBACK TO '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile a savepoint release statement into SQL.
+     */
+    public function compileReleaseSavepoint(string $name): string
+    {
+        return 'RELEASE SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
      * Wrap the given JSON selector.
      *
      * @param  string  $value

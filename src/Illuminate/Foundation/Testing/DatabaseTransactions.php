@@ -33,7 +33,7 @@ trait DatabaseTransactions
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
-                $connection->rollBack();
+                $connection->rollbackTransaction();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
             }

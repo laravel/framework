@@ -134,6 +134,26 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Release a savepoint.
+     *
+     * @throws Throwable
+     */
+    public function releaseSavepoint(string $name, ?int $level = null): void
+    {
+        $this->savepointReleaseUnsupportedError();
+    }
+
+    /**
+     * Purge all savepoints.
+     *
+     * @throws Throwable
+     */
+    public function purgeSavepoints(?int $level = null): void
+    {
+        $this->savepointReleaseUnsupportedError();
+    }
+
+    /**
      * Get the default post processor instance.
      *
      * @return \Illuminate\Database\Query\Processors\SqlServerProcessor
