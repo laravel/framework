@@ -8,7 +8,6 @@ use Illuminate\Contracts\Encryption\UnsupportedCipherException;
 use Illuminate\Encryption\Encrypter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class EncrypterTest extends TestCase
 {

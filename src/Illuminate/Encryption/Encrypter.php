@@ -8,7 +8,6 @@ use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\InvalidPayloadException;
 use Illuminate\Contracts\Encryption\StringEncrypter;
 use Illuminate\Contracts\Encryption\UnsupportedCipherException;
-use RuntimeException;
 
 class Encrypter implements EncrypterContract, StringEncrypter
 {
