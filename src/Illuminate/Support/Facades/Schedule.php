@@ -7,7 +7,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
 /**
  * @method static \Illuminate\Console\Scheduling\CallbackEvent call(string|callable $callback, array $parameters = [])
  * @method static \Illuminate\Console\Scheduling\Event command(string $command, array $parameters = [])
- * @method static \Illuminate\Console\Scheduling\CallbackEvent job(object|string $job, string|null $queue = null, string|null $connection = null)
+ * @method static \Illuminate\Console\Scheduling\CallbackEvent job(object|string $job, string|null|\UnitEnum $queue = null, string|null|\UnitEnum $connection = null)
  * @method static \Illuminate\Console\Scheduling\Event exec(string $command, array $parameters = [])
  * @method static void group(\Closure $events)
  * @method static string compileArrayInput(string|int $key, array $value)
