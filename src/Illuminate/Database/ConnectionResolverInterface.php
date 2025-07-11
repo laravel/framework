@@ -7,7 +7,7 @@ interface ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param  string|null|\UnitEnum  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function connection($name = null);
