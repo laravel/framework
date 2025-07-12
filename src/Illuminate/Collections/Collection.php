@@ -1732,7 +1732,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @template TMapValue
      *
      * @param  callable(TValue, TKey): TMapValue  $callback
-     * @return $this<TKey, TMapValue>
+     * @return $this
+     *
+     * @phpstan-this-out static<TKey, TMapValue>
      */
     public function transform(callable $callback)
     {
