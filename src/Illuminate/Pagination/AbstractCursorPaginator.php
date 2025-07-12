@@ -406,7 +406,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      * @template TThroughValue
      *
      * @param  callable(TValue, TKey): TThroughValue  $callback
-     * @return $this<TKey, TThroughValue>
+     * @return $this
      *
      * @phpstan-this-out static<TKey, TThroughValue>
      */
