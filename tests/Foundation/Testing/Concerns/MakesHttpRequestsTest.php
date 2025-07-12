@@ -239,6 +239,12 @@ class MakesHttpRequestsTest extends TestCase
             ->assertHeader('Precognition', 'true')
             ->assertHeader('Precognition-Success', 'true');
     }
+
+    public function testWithAjax()
+    {
+        $this->withAjax();
+        $this->assertSame('XMLHttpRequest', $this->defaultHeaders['X-Requested-With']);
+    }
 }
 
 class MyMiddleware

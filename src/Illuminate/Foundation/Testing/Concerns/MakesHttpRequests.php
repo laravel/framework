@@ -354,6 +354,16 @@ trait MakesHttpRequests
     }
 
     /**
+     * Set the X-Requested-With header to "XMLHttpRequest".
+     *
+     * @return $this
+     */
+    public function withAjax()
+    {
+        return $this->withHeader('X-Requested-With', 'XMLHttpRequest');
+    }
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  \Illuminate\Support\Uri|string  $uri
