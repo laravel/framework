@@ -72,5 +72,4 @@ class EnvironmentDiffCommandTest extends TestCase
         unlink($baseFile);
         unlink($compareFile);
     }
-
 }
