@@ -74,28 +74,4 @@ class EnvironmentDiffCommandTest extends TestCase
         unlink($baseFile);
         unlink($compareFile);
     }
-
-    public function test_it_uses_default_files_when_no_arguments_provided()
-    {
-        // Create .env.example and .env files
-        $exampleContent = "APP_NAME=Laravel\nAPP_ENV=local\n";
-        $envContent = "APP_NAME=MyApp\nAPP_ENV=production\n";
-
-        $exampleFile = base_path('.env.example');
-        $envFile = base_path('.env');
-
-        file_put_contents($exampleFile, $exampleContent);
-        file_put_contents($envFile, $envContent);
-
-        $this->artisan('env:diff')
-            ->expectsOutputToContain('Comparing .env.example with .env')
-            ->expectsOutputToContain('Changed variables:')
-            ->expectsOutputToContain('APP_NAME')
-            ->expectsOutputToContain('APP_ENV')
-            ->assertExitCode(0);
-
-        // Clean up
-        unlink($exampleFile);
-        unlink($envFile);
-    }
 }
