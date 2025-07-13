@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
-use Illuminate\Foundation\Console\EnvironmentDiffCommand;
-use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase;
 
 class EnvironmentDiffCommandTest extends TestCase
