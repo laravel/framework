@@ -19,7 +19,7 @@ class PostgresBuilder extends Builder
         $hypertables = [];
 
         $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
-        $hasTimescaleDB = !empty($this->connection->select("SELECT 1 FROM pg_extension WHERE extname = 'timescaledb'"));
+        $hasTimescaleDB = ! empty($this->connection->select("SELECT 1 FROM pg_extension WHERE extname = 'timescaledb'"));
         
         if ($hasTimescaleDB) {
             $hypertables = $this->connection->select(
@@ -29,7 +29,7 @@ class PostgresBuilder extends Builder
         }
 
         foreach ($this->getTables($this->getCurrentSchemaListing()) as $table) {
-            if (!in_array($table['name'], $excludedTables) && !in_array($table['schema_qualified_name'], $excludedTables)) {
+            if (! in_array($table['name'], $excludedTables) && ! in_array($table['schema_qualified_name'], $excludedTables)) {
                 if (in_array($table['schema_qualified_name'], $hypertables)) {
                     $this->connection->statement("DROP TABLE IF EXISTS {$table['schema_qualified_name']} CASCADE");
                 } else {
