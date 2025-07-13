@@ -161,4 +161,5 @@ class EnvironmentDiffCommand extends Command
             count($changed)
         ));
     }
+
 }
