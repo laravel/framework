@@ -376,6 +376,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[0]);
     }
 
+    public function testAddingSpatialIndexWithOperatorClass()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'geo');
+        $blueprint->spatialIndex('client_internet', 'geo_client_internet_idx', 'inet_ops');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "geo_client_internet_idx" on "geo" using gist ("client_internet" inet_ops)', $statements[0]);
+    }
+
     public function testAddingFluentSpatialIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'geo');

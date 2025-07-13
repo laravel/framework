@@ -141,7 +141,7 @@ class Blueprint
                 continue;
             }
 
-            $method = 'compile'.ucfirst($command->name);
+            $method = 'compile' . ucfirst($command->name);
 
             if (method_exists($this->grammar, $method) || $this->grammar::hasMacro($method)) {
                 if ($this->hasState()) {
@@ -196,7 +196,7 @@ class Blueprint
 
         if (! $this->creating()) {
             $this->commands = array_map(
-                fn ($command) => $command instanceof ColumnDefinition
+                fn($command) => $command instanceof ColumnDefinition
                     ? $this->createCommand($command->change ? 'change' : 'add', ['column' => $command])
                     : $command,
                 $this->commands
@@ -236,7 +236,7 @@ class Blueprint
                 // and the column is supposed to be changed, we will call the drop index
                 // method with an array of column to drop it by its conventional name.
                 elseif ($column->{$index} === false && $column->change) {
-                    $this->{'drop'.ucfirst($index)}([$column->name]);
+                    $this->{'drop' . ucfirst($index)}([$column->name]);
                     $column->{$index} = null;
 
                     continue 2;
@@ -283,7 +283,9 @@ class Blueprint
         $alterCommands = $this->grammar->getAlterCommands();
 
         [$commands, $lastCommandWasAlter, $hasAlterCommand] = [
-            [], false, false,
+            [],
+            false,
+            false,
         ];
 
         foreach ($this->commands as $command) {
@@ -686,11 +688,12 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string|null  $name
+     * @param  string|null  $operatorClass
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
-    public function spatialIndex($columns, $name = null)
+    public function spatialIndex($columns, $name = null, $operatorClass = null)
     {
-        return $this->indexCommand('spatialIndex', $columns, $name);
+        return $this->indexCommand('spatialIndex', $columns, $name)->operatorClass($operatorClass);
     }
 
     /**
@@ -1661,7 +1664,8 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type,
+            compact('index', 'columns', 'algorithm')
         );
     }
 
@@ -1700,11 +1704,11 @@ class Blueprint
 
         if ($this->connection->getConfig('prefix_indexes')) {
             $table = str_contains($this->table, '.')
-                ? substr_replace($this->table, '.'.$this->connection->getTablePrefix(), strrpos($this->table, '.'), 1)
-                : $this->connection->getTablePrefix().$this->table;
+                ? substr_replace($this->table, '.' . $this->connection->getTablePrefix(), strrpos($this->table, '.'), 1)
+                : $this->connection->getTablePrefix() . $this->table;
         }
 
-        $index = strtolower($table.'_'.implode('_', $columns).'_'.$type);
+        $index = strtolower($table . '_' . implode('_', $columns) . '_' . $type);
 
         return str_replace(['-', '.'], '_', $index);
     }
