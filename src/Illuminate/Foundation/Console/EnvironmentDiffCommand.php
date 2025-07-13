@@ -40,11 +40,13 @@ class EnvironmentDiffCommand extends Command
 
         if (!File::exists($basePath)) {
             $this->error("Base file '{$baseFile}' does not exist.");
+
             return 1;
         }
 
         if (!File::exists($comparePath)) {
             $this->error("Compare file '{$compareFile}' does not exist.");
+
             return 1;
         }
 
@@ -109,7 +111,7 @@ class EnvironmentDiffCommand extends Command
             if (isset($compareEnv[$key]) && $compareEnv[$key] !== $baseValue) {
                 $changed[$key] = [
                     'base' => $baseValue,
-                    'compare' => $compareEnv[$key]
+                    'compare' => $compareEnv[$key],
                 ];
             }
         }
@@ -118,6 +120,7 @@ class EnvironmentDiffCommand extends Command
 
         if (!$hasDifferences) {
             $this->info('No differences found between the environment files.');
+
             return;
         }
 
