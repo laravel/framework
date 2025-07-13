@@ -134,8 +134,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'Down' => DownCommand::class,
         'Environment' => EnvironmentCommand::class,
         'EnvironmentDecrypt' => EnvironmentDecryptCommand::class,
-        'EnvironmentEncrypt' => EnvironmentEncryptCommand::class,
         'EnvironmentDiff' => EnvironmentDiffCommand::class,
+        'EnvironmentEncrypt' => EnvironmentEncryptCommand::class,
         'EventCache' => EventCacheCommand::class,
         'EventClear' => EventClearCommand::class,
         'EventList' => EventListCommand::class,
@@ -244,7 +244,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
 
         Signals::resolveAvailabilityUsing(function () {
             return $this->app->runningInConsole()
-                && ! $this->app->runningUnitTests()
+                && !$this->app->runningUnitTests()
                 && extension_loaded('pcntl');
         });
     }
