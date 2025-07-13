@@ -6,7 +6,6 @@ use Illuminate\Console\Application;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Foundation\Console\EnvironmentDiffCommand;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
-use Illuminate\Support\Facades\File;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -31,15 +30,17 @@ class EnvironmentDiffCommandTest extends TestCase
         $baseFile = tempnam(sys_get_temp_dir(), 'env_base');
         $compareFile = tempnam(sys_get_temp_dir(), 'env_compare');
 
-        File::put($baseFile, $baseContent);
-        File::put($compareFile, $compareContent);
+        file_put_contents($baseFile, $baseContent);
+        file_put_contents($compareFile, $compareContent);
 
         $command = new EnvironmentDiffCommand;
-        $command->setLaravel(Mockery::mock('Illuminate\Contracts\Foundation\Application'));
+        $app = Mockery::mock('Illuminate\Contracts\Foundation\Application');
+        $app->shouldReceive('basePath')->andReturn(sys_get_temp_dir());
+        $command->setLaravel($app);
 
         $input = new ArrayInput([
-            'base' => $baseFile,
-            'compare' => $compareFile,
+            'base' => basename($baseFile),
+            'compare' => basename($compareFile),
         ]);
 
         $output = new BufferedOutput;
@@ -64,7 +65,9 @@ class EnvironmentDiffCommandTest extends TestCase
     public function test_it_handles_missing_files()
     {
         $command = new EnvironmentDiffCommand;
-        $command->setLaravel(Mockery::mock('Illuminate\Contracts\Foundation\Application'));
+        $app = Mockery::mock('Illuminate\Contracts\Foundation\Application');
+        $app->shouldReceive('basePath')->andReturn(sys_get_temp_dir());
+        $command->setLaravel($app);
 
         $input = new ArrayInput([
             'base' => 'nonexistent.env',
@@ -85,15 +88,17 @@ class EnvironmentDiffCommandTest extends TestCase
         $baseFile = tempnam(sys_get_temp_dir(), 'env_base');
         $compareFile = tempnam(sys_get_temp_dir(), 'env_compare');
 
-        File::put($baseFile, $content);
-        File::put($compareFile, $content);
+        file_put_contents($baseFile, $content);
+        file_put_contents($compareFile, $content);
 
         $command = new EnvironmentDiffCommand;
-        $command->setLaravel(Mockery::mock('Illuminate\Contracts\Foundation\Application'));
+        $app = Mockery::mock('Illuminate\Contracts\Foundation\Application');
+        $app->shouldReceive('basePath')->andReturn(sys_get_temp_dir());
+        $command->setLaravel($app);
 
         $input = new ArrayInput([
-            'base' => $baseFile,
-            'compare' => $compareFile,
+            'base' => basename($baseFile),
+            'compare' => basename($compareFile),
         ]);
 
         $output = new BufferedOutput;
