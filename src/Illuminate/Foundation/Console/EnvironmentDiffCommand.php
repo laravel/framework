@@ -38,13 +38,13 @@ class EnvironmentDiffCommand extends Command
         $basePath = base_path($baseFile);
         $comparePath = base_path($compareFile);
 
-        if (!File::exists($basePath)) {
+        if (! File::exists($basePath)) {
             $this->error("Base file '{$baseFile}' does not exist.");
 
             return 1;
         }
 
-        if (!File::exists($comparePath)) {
+        if (! File::exists($comparePath)) {
             $this->error("Compare file '{$compareFile}' does not exist.");
 
             return 1;
@@ -116,16 +116,16 @@ class EnvironmentDiffCommand extends Command
             }
         }
 
-        $hasDifferences = !empty($added) || !empty($removed) || !empty($changed);
+        $hasDifferences = ! empty($added) || ! empty($removed) || ! empty($changed);
 
-        if (!$hasDifferences) {
+        if (! $hasDifferences) {
             $this->info('No differences found between the environment files.');
 
             return;
         }
 
         // Display added variables
-        if (!empty($added)) {
+        if (! empty($added)) {
             $this->warn('Added variables:');
             foreach ($added as $key => $value) {
                 $this->line("  <fg=green>+ {$key}={$value}</>");
