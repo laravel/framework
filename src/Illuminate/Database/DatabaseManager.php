@@ -87,7 +87,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param  string|null|\UnitEnum  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function connection($name = null)

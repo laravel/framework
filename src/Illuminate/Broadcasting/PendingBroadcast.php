@@ -37,7 +37,7 @@ class PendingBroadcast
     /**
      * Broadcast the event using a specific broadcaster.
      *
-     * @param  string|null|\UnitEnum  $connection
+     * @param  \UnitEnum|string|null $connection
      * @return $this
      */
     public function via($connection = null)

@@ -18,7 +18,7 @@ trait InteractsWithBroadcasting
     /**
      * Broadcast the event using a specific broadcaster.
      *
-     * @param  array|string|null|\UnitEnum  $connection
+     * @param  \UnitEnum|array|string|null  $connection
      * @return $this
      */
     public function broadcastVia($connection = null)
