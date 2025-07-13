@@ -7,7 +7,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\PostStringyKey;
-use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentPatchTest extends DatabaseTestCase
 {

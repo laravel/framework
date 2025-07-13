@@ -1097,7 +1097,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $ids = $ids->all();
         }
 
-        $ids = is_array($ids) ? $ids : func_get_args();
+        if (! is_array($ids)) {
+            $ids = [$ids];
+        }
 
         if (count($ids) === 0) {
             return 0;
