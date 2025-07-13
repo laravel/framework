@@ -749,6 +749,31 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(0, $count);
     }
 
+    public function testPatchMethodCallsQueryBuilderCorrectly()
+    {
+        EloquentModelPatchStub::patch([1, 2, 3], ['name' => 'taylor']);
+    }
+
+    public function testPatchMethodCallsQueryBuildCorrectlyQithCollection()
+    {
+        EloquentModelPatchStub::patch(new BaseCollection([1, 2, 3]), ['name' => 'taylor']);
+    }
+
+    public function testPatchMethodCallsQueryBuilderCorrectlyWithEloquentCollection()
+    {
+        EloquentModelPatchStub::patch(new Collection([
+            new EloquentModelPatchStub(['id' => 1, 'name' => 't']),
+            new EloquentModelPatchStub(['id' => 2, 'name' => 't']),
+            new EloquentModelPatchStub(['id' => 3, 'name' => 't']),
+        ]), ['name' => 'taylor']);
+    }
+
+    public function testPatchMethodCallsQueryBuilderCorrectlyWithEmptyIds()
+    {
+        $count = EloquentModelEmptyPatchStub::patch([], ['name' => 'taylor']);
+        $this->assertSame(0, $count);
+    }
+
     public function testWithMethodCallsQueryBuilderCorrectly()
     {
         $result = EloquentModelWithStub::with('foo', 'bar');
@@ -3674,6 +3699,35 @@ class EloquentModelDestroyStub extends Model
 }
 
 class EloquentModelEmptyDestroyStub extends Model
+{
+    public function newQuery()
+    {
+        $mock = m::mock(Builder::class);
+        $mock->shouldReceive('whereIn')->never();
+
+        return $mock;
+    }
+}
+
+class EloquentModelPatchStub extends Model
+{
+    protected $fillable = [
+        'id',
+        'name',
+    ];
+
+    public function newQuery()
+    {
+        $mock = m::mock(Builder::class);
+        $mock->shouldReceive('whereIn')->once()->with('id', [1, 2, 3])->andReturn($mock);
+        $mock->shouldReceive('get')->once()->andReturn([$model = m::mock(stdClass::class)]);
+        $model->shouldReceive('update')->once();
+
+        return $mock;
+    }
+}
+
+class EloquentModelEmptyPatchStub extends Model
 {
     public function newQuery()
     {

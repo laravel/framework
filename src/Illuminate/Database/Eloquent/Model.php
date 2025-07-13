@@ -1082,6 +1082,44 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Updates the models for the given IDs.
+     *
+     * @param  \Illuminate\Support\Collection|array|int|string  $ids
+     * @return int
+     */
+    public static function patch($ids, array $attributes, array $options = [])
+    {
+        if ($ids instanceof EloquentCollection) {
+            $ids = $ids->modelKeys();
+        }
+
+        if ($ids instanceof BaseCollection) {
+            $ids = $ids->all();
+        }
+
+        $ids = is_array($ids) ? $ids : func_get_args();
+
+        if (count($ids) === 0) {
+            return 0;
+        }
+
+        // We will actually pull the models from the database table and call update on
+        // each of them individually so that their events get fired properly with a
+        // correct set of attributes in case the developers wants to check these.
+        $key = ($instance = new static)->getKeyName();
+
+        $count = 0;
+
+        foreach ($instance->whereIn($key, $ids)->get() as $model) {
+            if ($model->update($attributes, $options)) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
      * Update the model in the database within a transaction.
      *
      * @param  array<string, mixed>  $attributes
