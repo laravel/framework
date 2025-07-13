@@ -13,19 +13,19 @@ class EnvironmentDiffCommandTest extends TestCase
 
     public function test_it_compares_environment_files()
     {
-        // Create test environment files
+        // Create test environment files in the base path
         $baseContent = "APP_NAME=Laravel\nAPP_ENV=local\nDB_CONNECTION=mysql\n";
         $compareContent = "APP_NAME=MyApp\nAPP_ENV=production\nDB_CONNECTION=mysql\nCUSTOM_VAR=value\n";
 
-        $baseFile = tempnam(sys_get_temp_dir(), 'env_base');
-        $compareFile = tempnam(sys_get_temp_dir(), 'env_compare');
+        $baseFile = base_path('test_base.env');
+        $compareFile = base_path('test_compare.env');
 
         file_put_contents($baseFile, $baseContent);
         file_put_contents($compareFile, $compareContent);
 
         $this->artisan('env:diff', [
-            'base' => basename($baseFile),
-            'compare' => basename($compareFile),
+            'base' => 'test_base.env',
+            'compare' => 'test_compare.env',
         ])
             ->expectsOutputToContain('Comparing')
             ->expectsOutputToContain('Added variables:')
@@ -55,15 +55,15 @@ class EnvironmentDiffCommandTest extends TestCase
     {
         $content = "APP_NAME=Laravel\nAPP_ENV=local\n";
 
-        $baseFile = tempnam(sys_get_temp_dir(), 'env_base');
-        $compareFile = tempnam(sys_get_temp_dir(), 'env_compare');
+        $baseFile = base_path('test_identical_base.env');
+        $compareFile = base_path('test_identical_compare.env');
 
         file_put_contents($baseFile, $content);
         file_put_contents($compareFile, $content);
 
         $this->artisan('env:diff', [
-            'base' => basename($baseFile),
-            'compare' => basename($compareFile),
+            'base' => 'test_identical_base.env',
+            'compare' => 'test_identical_compare.env',
         ])
             ->expectsOutputToContain('No differences found')
             ->assertExitCode(0);
