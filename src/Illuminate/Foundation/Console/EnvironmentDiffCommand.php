@@ -134,7 +134,7 @@ class EnvironmentDiffCommand extends Command
         }
 
         // Display removed variables
-        if (!empty($removed)) {
+        if (! empty($removed)) {
             $this->warn('Removed variables:');
             foreach ($removed as $key => $value) {
                 $this->line("  <fg=red>- {$key}={$value}</>");
@@ -143,7 +143,7 @@ class EnvironmentDiffCommand extends Command
         }
 
         // Display changed variables
-        if (!empty($changed)) {
+        if (! empty($changed)) {
             $this->warn('Changed variables:');
             foreach ($changed as $key => $values) {
                 $this->line("  <fg=yellow>~ {$key}</>");
