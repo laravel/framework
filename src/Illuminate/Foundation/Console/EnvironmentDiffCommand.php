@@ -117,7 +117,7 @@ class EnvironmentDiffCommand extends Command
         $hasDifferences = ! empty($added) || ! empty($removed) || ! empty($changed);
 
         if (! $hasDifferences) {
-            $this->info('No differences found between the environment files.');
+            $this->info('No differences found between the env files.');
 
             return;
         }
