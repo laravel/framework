@@ -47,7 +47,7 @@ class ApiInstallCommand extends Command
             $this->installSanctum();
         }
 
-        if (file_exists($apiRoutesPath = $this->laravel->basePath('routes/api.php')) &&
+        if (file_exists($apiRoutesPath = $this->laravel->routePath('api.php')) &&
             ! $this->option('force')) {
             $this->components->error('API routes file already exists.');
         } else {

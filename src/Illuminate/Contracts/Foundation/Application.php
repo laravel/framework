@@ -70,6 +70,14 @@ interface Application extends Container
     public function resourcePath($path = '');
 
     /**
+     * Get the path to the routes directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function routePath($path = '');
+
+    /**
      * Get the path to the storage directory.
      *
      * @param  string  $path
