@@ -1572,8 +1572,10 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
+        $request = new Request($e->getRequest());
+
         $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
+            $request, null
         );
 
         $this->dispatchConnectionFailedEvent($request, $exception);
@@ -1591,8 +1593,10 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
+        $request = new Request($e->getRequest());
+
         $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
+            $request, null
         );
 
         $this->dispatchConnectionFailedEvent($request, $exception);
