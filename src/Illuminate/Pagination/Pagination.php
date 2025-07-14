@@ -15,9 +15,10 @@ class Pagination extends Component
      */
     public function __construct(
         protected LengthAwarePaginator|Paginator $paginator,
-        protected string|null                    $view = null,
-        protected array                          $data = [],
-    ) {}
+        protected ?string $view = null,
+        protected array $data = [],
+    ) {
+    }
 
     /**
      * Get the view / contents that represent the component.
