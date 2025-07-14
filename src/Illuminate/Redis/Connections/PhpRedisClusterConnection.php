@@ -72,10 +72,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
      */
     private function defaultNode()
     {
-        if (! isset($this->defaultNode)) {
-            $this->defaultNode = $this->client->_masters()[0] ?? throw new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.');
-        }
-
-        return $this->defaultNode;
+        return $this->defaultNode ??= $this->client->_masters()[0]
+            ?? throw new InvalidArgumentException('Unable to determine default node. No master nodes found in the cluster.');
     }
 }
