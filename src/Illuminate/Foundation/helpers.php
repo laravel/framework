@@ -670,6 +670,19 @@ if (! function_exists('public_path')) {
     }
 }
 
+if (! function_exists('route_path')) {
+    /**
+     * Get the path to the public folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function route_path($path = '')
+    {
+        return app()->routePath($path);
+    }
+}
+
 if (! function_exists('redirect')) {
     /**
      * Get an instance of the redirector.
