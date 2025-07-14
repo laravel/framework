@@ -70,7 +70,10 @@ class Js implements Htmlable, Stringable
             return $data->toHtml();
         }
 
-        if ($data instanceof Htmlable) {
+        if ($data instanceof Htmlable &&
+            ! $data instanceof Arrayable &&
+            ! $data instanceof Jsonable &&
+            ! $data instanceof JsonSerializable) {
             $data = $data->toHtml();
         }
 
