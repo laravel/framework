@@ -144,8 +144,8 @@ class EnvironmentDiffCommand extends Command
             $this->warn('Changed variables:');
             foreach ($changed as $key => $values) {
                 $this->line("  <fg=yellow>~ {$key}</>");
-                $this->line("    <fg=red>- ".$this->formatValue($values['base']).'</>');
-                $this->line("    <fg=green>+ ".$this->formatValue($values['compare']).'</>');
+                $this->line('    <fg=red>- '.$this->formatValue($values['base']).'</>');
+                $this->line('    <fg=green>+ '.$this->formatValue($values['compare']).'</>');
             }
             $this->newLine();
         }
@@ -188,5 +188,4 @@ class EnvironmentDiffCommand extends Command
 
         return $value;
     }
-
 }
