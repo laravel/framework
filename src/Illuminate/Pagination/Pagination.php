@@ -15,6 +15,8 @@ class Pagination extends Component
      */
     public function __construct(
         protected LengthAwarePaginator|Paginator $paginator,
+        protected string|null                    $view = null,
+        protected array                          $data = [],
     ) {}
 
     /**
@@ -38,13 +40,14 @@ class Pagination extends Component
         }
 
         //determine view
-        $view = $this->paginator instanceof LengthAwarePaginator
+        $view = $this->view ?? $this->paginator instanceof LengthAwarePaginator
             ? AbstractPaginator::$defaultView
             : AbstractPaginator::$defaultSimpleView;
 
         //load view
         return view($view)
             ->with([
+                ...$this->data,
                 'paginator' => $this->paginator,
                 'elements'  => $elements ?? [],
             ]);
