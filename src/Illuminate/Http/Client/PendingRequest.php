@@ -1612,9 +1612,11 @@ class PendingRequest
      */
     protected function marshalRequestExceptionWithResponse(RequestException $e)
     {
+        $response = $this->populateResponse($this->newResponse($e->getResponse()));
+
         $this->factory?->recordRequestResponsePair(
             new Request($e->getRequest()),
-            $response = $this->populateResponse($this->newResponse($e->getResponse()))
+            $response
         );
 
         throw $response->toException() ?? new ConnectionException($e->getMessage(), 0, $e);
