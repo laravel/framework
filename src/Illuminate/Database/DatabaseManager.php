@@ -116,9 +116,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function build(array $config)
     {
-        if (! isset($config['name'])) {
-            $config['name'] = static::calculateDynamicConnectionName($config);
-        }
+        $config['name'] ??= static::calculateDynamicConnectionName($config);
 
         $this->dynamicConnectionConfigurations[$config['name']] = $config;
 
