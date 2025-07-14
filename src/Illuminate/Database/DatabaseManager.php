@@ -116,9 +116,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function build(array $config)
     {
-        if (! isset($config['name'])) {
-            $config['name'] = static::calculateDynamicConnectionName($config);
-        }
+        $config['name'] ??= static::calculateDynamicConnectionName($config);
 
         $this->dynamicConnectionConfigurations[$config['name']] = $config;
 
@@ -354,9 +352,11 @@ class DatabaseManager implements ConnectionResolverInterface
 
         $this->setDefaultConnection($name);
 
-        return tap($callback(), function () use ($previousName) {
+        try {
+            return $callback();
+        } finally {
             $this->setDefaultConnection($previousName);
-        });
+        }
     }
 
     /**
