@@ -96,13 +96,13 @@ class ApiInstallCommand extends Command
 
         $content = file_get_contents($appBootstrapPath);
 
-        if (str_contains($content, '// api: ')) {
+        if (preg_match('/\/\/\s*api\s*:/i', $content)) {
             (new Filesystem)->replaceInFile(
                 '// api: ',
                 'api: ',
                 $appBootstrapPath,
             );
-        } elseif (str_contains($content, 'web: __DIR__.\'/../routes/web.php\',')) {
+        } elseif (preg_match('/web:\s*__DIR__\s*\.\s*[\'"]\/\.\.\/routes\/web\.php[\'"]\s*,/', $content)) {
             (new Filesystem)->replaceInFile(
                 'web: __DIR__.\'/../routes/web.php\',',
                 'web: __DIR__.\'/../routes/web.php\','.PHP_EOL.'        api: __DIR__.\'/../routes/api.php\',',
