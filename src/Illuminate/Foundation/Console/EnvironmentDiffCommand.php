@@ -118,6 +118,7 @@ class EnvironmentDiffCommand extends Command
 
         if (! $hasDifferences) {
             $this->info('No differences found between the environment files.');
+
             return;
         }
 
