@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Dotenv\Parser\Parser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Dotenv\Parser\Parser;
 
 #[AsCommand(name: 'env:diff')]
 class EnvironmentDiffCommand extends Command
@@ -125,7 +125,7 @@ class EnvironmentDiffCommand extends Command
         if (! empty($added)) {
             $this->warn('Added variables:');
             foreach ($added as $key => $value) {
-                $this->line("  <fg=green>+ {$key}=" . $this->formatValue($value) . "</>");
+                $this->line("  <fg=green>+ {$key}=".$this->formatValue($value)."</>");
             }
             $this->newLine();
         }
@@ -134,7 +134,7 @@ class EnvironmentDiffCommand extends Command
         if (! empty($removed)) {
             $this->warn('Removed variables:');
             foreach ($removed as $key => $value) {
-                $this->line("  <fg=red>- {$key}=" . $this->formatValue($value) . "</>");
+                $this->line("  <fg=red>- {$key}=".$this->formatValue($value)."</>");
             }
             $this->newLine();
         }
@@ -144,8 +144,8 @@ class EnvironmentDiffCommand extends Command
             $this->warn('Changed variables:');
             foreach ($changed as $key => $values) {
                 $this->line("  <fg=yellow>~ {$key}</>");
-                $this->line("    <fg=red>- " . $this->formatValue($values['base']) . "</>");
-                $this->line("    <fg=green>+ " . $this->formatValue($values['compare']) . "</>");
+                $this->line("    <fg=red>- ".$this->formatValue($values['base'])."</>");
+                $this->line("    <fg=green>+ ".$this->formatValue($values['compare'])."</>");
             }
             $this->newLine();
         }
@@ -183,7 +183,7 @@ class EnvironmentDiffCommand extends Command
 
         // Quote values containing spaces or special characters
         if (preg_match('/\s|[#=]/', $value) && $value !== '') {
-            $value = '"' . str_replace('"', '\"', $value) . '"';
+            $value = '"'.str_replace('"', '\"', $value).'"';
         }
 
         return $value;
