@@ -2,6 +2,7 @@
 
 namespace Illuminate\Pagination;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class PaginationServiceProvider extends ServiceProvider
@@ -14,6 +15,8 @@ class PaginationServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadViewsFrom(__DIR__.'/resources/views', 'pagination');
+
+        Blade::component('pagination', Pagination::class, 'laravel');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
