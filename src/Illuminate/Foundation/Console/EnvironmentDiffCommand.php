@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Dotenv\Parser\Parser;
 
 #[AsCommand(name: 'env:diff')]
 class EnvironmentDiffCommand extends Command
@@ -66,22 +67,19 @@ class EnvironmentDiffCommand extends Command
      */
     protected function parseEnvFile(string $filePath): array
     {
+        // Read the file content using Laravel's File facade
         $content = File::get($filePath);
-        $lines = explode("\n", $content);
+
+        // Use phpdotenv's Parser to parse the .env file content
+        $parser = new Parser();
+        $entries = $parser->parse($content);
+
         $env = [];
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-
-            // Skip empty lines and comments
-            if (empty($line) || str_starts_with($line, '#')) {
-                continue;
-            }
-
-            // Parse key=value pairs
-            if (str_contains($line, '=')) {
-                [$key, $value] = explode('=', $line, 2);
-                $env[trim($key)] = trim($value);
+        foreach ($entries as $entry) {
+            // Only include entries with a valid key and defined value
+            if ($entry->getName() && $entry->getValue()->isDefined()) {
+                $env[$entry->getName()] = $entry->getValue()->get();
             }
         }
 
@@ -108,10 +106,10 @@ class EnvironmentDiffCommand extends Command
 
         // Find changed values
         foreach ($baseEnv as $key => $baseValue) {
-            if (isset($compareEnv[$key]) && $compareEnv[$key] !== $baseValue) {
+            if (isset($compareEnv[$key]) && $this->formatValue($baseValue) !== $this->formatValue($compareEnv[$key])) {
                 $changed[$key] = [
-                    'base' => $baseValue,
-                    'compare' => $compareEnv[$key],
+                    'base' => $this->formatValue($baseValue),
+                    'compare' => $this->formatValue($compareEnv[$key]),
                 ];
             }
         }
@@ -120,7 +118,6 @@ class EnvironmentDiffCommand extends Command
 
         if (! $hasDifferences) {
             $this->info('No differences found between the environment files.');
-
             return;
         }
 
@@ -128,7 +125,7 @@ class EnvironmentDiffCommand extends Command
         if (! empty($added)) {
             $this->warn('Added variables:');
             foreach ($added as $key => $value) {
-                $this->line("  <fg=green>+ {$key}={$value}</>");
+                $this->line("  <fg=green>+ {$key}=" . $this->formatValue($value) . "</>");
             }
             $this->newLine();
         }
@@ -137,7 +134,7 @@ class EnvironmentDiffCommand extends Command
         if (! empty($removed)) {
             $this->warn('Removed variables:');
             foreach ($removed as $key => $value) {
-                $this->line("  <fg=red>- {$key}={$value}</>");
+                $this->line("  <fg=red>- {$key}=" . $this->formatValue($value) . "</>");
             }
             $this->newLine();
         }
@@ -147,8 +144,8 @@ class EnvironmentDiffCommand extends Command
             $this->warn('Changed variables:');
             foreach ($changed as $key => $values) {
                 $this->line("  <fg=yellow>~ {$key}</>");
-                $this->line("    <fg=red>- {$values['base']}</>");
-                $this->line("    <fg=green>+ {$values['compare']}</>");
+                $this->line("    <fg=red>- " . $this->formatValue($values['base']) . "</>");
+                $this->line("    <fg=green>+ " . $this->formatValue($values['compare']) . "</>");
             }
             $this->newLine();
         }
@@ -160,5 +157,35 @@ class EnvironmentDiffCommand extends Command
             count($removed),
             count($changed)
         ));
+    }
+
+    /**
+     * Format a value for display, handling special cases.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function formatValue($value): string
+    {
+        if (is_null($value)) {
+            return '';
+        }
+
+        // Handle Dotenv\Parser\Value objects
+        if ($value instanceof \Dotenv\Parser\Value) {
+            $value = $value->getChars();
+        }
+
+        $value = (string) $value;
+
+        // Escape special characters for display
+        $value = str_replace(["\n", "\r"], ['\n', '\r'], $value);
+
+        // Quote values containing spaces or special characters
+        if (preg_match('/\s|[#=]/', $value) && $value !== '') {
+            $value = '"' . str_replace('"', '\"', $value) . '"';
+        }
+
+        return $value;
     }
 }
