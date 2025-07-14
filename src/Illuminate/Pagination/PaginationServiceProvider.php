@@ -16,7 +16,7 @@ class PaginationServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/resources/views', 'pagination');
 
-        Blade::component('pagination', Pagination::class, 'laravel');
+        Blade::component('laravel::pagination', Pagination::class);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
