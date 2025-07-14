@@ -247,6 +247,19 @@ class Filesystem
     }
 
     /**
+     * Replace a given string within a given file with a regular expression.
+     * 
+     * @param  string|array  $pattern
+     * @param  string|array  $replace
+     * @param  string  $path
+     * @return void
+     */
+    public function regReplaceInFile($pattern, $replace, $path)
+    {
+        file_put_contents($path, preg_replace($pattern, $replace, file_get_contents($path)));
+    }
+
+    /**
      * Prepend to a file.
      *
      * @param  string  $path
