@@ -27,7 +27,6 @@ class Pagination extends Component
     {
         //length aware paginator
         if ($this->paginator instanceof LengthAwarePaginator) {
-
             //get elements
             $window = UrlWindow::make($this->paginator);
 
@@ -50,7 +49,7 @@ class Pagination extends Component
             ->with([
                 ...$this->data,
                 'paginator' => $this->paginator,
-                'elements'  => $elements ?? [],
+                'elements' => $elements ?? [],
             ]);
     }
 }
