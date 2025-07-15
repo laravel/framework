@@ -333,6 +333,7 @@ class Route
     /**
      * Determine if the route matches a given request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $includingMethod
      * @return bool
      */
@@ -370,6 +371,7 @@ class Route
     /**
      * Bind the route to a given request for execution.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
     public function bind(Request $request)
@@ -569,6 +571,7 @@ class Route
     /**
      * Set the binding fields for the route.
      *
+     * @param  array  $bindingFields
      * @return $this
      */
     public function setBindingFields(array $bindingFields)
@@ -635,6 +638,7 @@ class Route
     /**
      * Set the default values for the route.
      *
+     * @param  array  $defaults
      * @return $this
      */
     public function setDefaults(array $defaults)
@@ -675,6 +679,7 @@ class Route
     /**
      * Set a list of regular expression requirements on the route.
      *
+     * @param  array  $wheres
      * @return $this
      */
     public function setWheres(array $wheres)
@@ -991,6 +996,7 @@ class Route
     /**
      * Set the action array for the route.
      *
+     * @param  array  $action
      * @return $this
      */
     public function setAction(array $action)
@@ -1014,10 +1020,10 @@ class Route
         $missing = $this->action['missing'] ?? null;
 
         return is_string($missing) &&
-            Str::startsWith($missing, [
-                'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
-                'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
-            ]) ? unserialize($missing) : $missing;
+               Str::startsWith($missing, [
+                   'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
+                   'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
+               ]) ? unserialize($missing) : $missing;
     }
 
     /**
@@ -1178,6 +1184,8 @@ class Route
     /**
      * Get the statically provided controller middleware for the given class and method.
      *
+     * @param  string  $class
+     * @param  string  $method
      * @return array
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
@@ -1389,6 +1397,7 @@ class Route
     /**
      * Set the router instance on the route.
      *
+     * @param  \Illuminate\Routing\Router  $router
      * @return $this
      */
     public function setRouter(Router $router)
@@ -1401,6 +1410,7 @@ class Route
     /**
      * Set the container instance on the route.
      *
+     * @param  \Illuminate\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
