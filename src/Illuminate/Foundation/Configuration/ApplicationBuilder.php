@@ -203,16 +203,14 @@ class ApplicationBuilder
         ?callable $then)
     {
         return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
-            if (is_string($api) || is_array($api)) {
-                if (is_array($api)) {
-                    foreach ($api as $apiRoute) {
-                        if (realpath($apiRoute) !== false) {
-                            Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
-                        }
+            if (is_array($api)) {
+                foreach ($api as $apiRoute) {
+                    if (realpath($apiRoute) !== false) {
+                        Route::middleware('api')->prefix($apiPrefix)->group($apiRoute);
                     }
-                } else {
-                    Route::middleware('api')->prefix($apiPrefix)->group($api);
                 }
+            } elseif (is_string($api)) {
+                Route::middleware('api')->prefix($apiPrefix)->group($api);
             }
 
             if (is_string($health)) {
@@ -237,16 +235,14 @@ class ApplicationBuilder
                 });
             }
 
-            if (is_string($web) || is_array($web)) {
-                if (is_array($web)) {
-                    foreach ($web as $webRoute) {
-                        if (realpath($webRoute) !== false) {
-                            Route::middleware('web')->group($webRoute);
-                        }
+            if (is_array($web)) {
+                foreach ($web as $webRoute) {
+                    if (realpath($webRoute) !== false) {
+                        Route::middleware('web')->group($webRoute);
                     }
-                } else {
-                    Route::middleware('web')->group($web);
                 }
+            } elseif (is_string($web)) {
+                Route::middleware('web')->group($web);
             }
 
             foreach ($this->additionalRoutingCallbacks as $callback) {
