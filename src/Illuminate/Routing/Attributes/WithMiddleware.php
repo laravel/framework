@@ -1,6 +1,8 @@
 <?php
 
-namespace Illuminate\Routing;
+namespace Illuminate\Routing\Attributes;
+
+use Attribute;
 
 #[\Attribute(Attribute::TARGET_METHOD)]
 class WithMiddleware
