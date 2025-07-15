@@ -1124,8 +1124,8 @@ class Route
 
         if (
             method_exists($controllerClass, $controllerMethod) &&
-            $middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod
-        )) {
+            $middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod)
+        ) {
             return $middleware;
         }
 
