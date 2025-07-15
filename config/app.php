@@ -70,7 +70,7 @@ return [
     | even a remote VPS, it will be necessary to specify your path mapping.
     |
     | Leaving one, or both of these, empty or null will not trigger the remote
-    | URL changes and Ignition will treat your editor links as local files.
+    | URL changes and application will treat your editor links as local files.
     |
     | "remote_sites_path" is an absolute base path for your sites or projects
     | in Homestead, Vagrant, Docker, or another remote development server.
