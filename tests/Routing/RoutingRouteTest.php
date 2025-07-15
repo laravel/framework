@@ -37,6 +37,8 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Routing\WithMiddleware;
+use Illuminate\Routing\WithoutMiddleware;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -206,6 +208,26 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
+    public function testMiddlewareCanBeAddedWithWithMiddlewareAttribute(){
+
+        $router = $this->getRouter();
+        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->resource('foo', RouteTestControllerWithMiddlewareStub::class);
+
+        $this->assertSame('caught ', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
+
+    public function testMiddlewareCanBeSkippedWithWithoutMiddlewareAttribute(){
+
+        $router = $this->getRouter();
+        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+
+        $router->resource('foo', RouteTestControllerWithoutMiddlewareStub::class)
+           ->middleware('web');
+
+        $this->assertSame('Hello World', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+    }
     public function testMiddlewareCanBeSkipped()
     {
         $router = $this->getRouter();
@@ -2301,6 +2323,24 @@ class RouteTestControllerMiddlewareGroupStub extends Controller
         $this->middleware('web');
     }
 
+    public function index()
+    {
+        return 'Hello World';
+    }
+}
+
+class RouteTestControllerWithMiddlewareStub extends Controller
+{
+    #[WithMiddleware('web')]
+    public function index()
+    {
+        return 'Hello World';
+    }
+}
+
+class RouteTestControllerWithoutMiddlewareStub extends Controller
+{
+    #[WithoutMiddleware('web')]
     public function index()
     {
         return 'Hello World';
