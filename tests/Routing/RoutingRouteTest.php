@@ -21,11 +21,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Attributes\WithMiddleware;
+use Illuminate\Routing\Attributes\WithoutMiddleware;
 use Illuminate\Routing\CallableDispatcher;
 use Illuminate\Routing\Contracts\CallableDispatcher as CallableDispatcherContract;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\ControllerDispatcher;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Events\PreparingResponse;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\Events\Routing;
@@ -37,8 +40,6 @@ use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\WithMiddleware;
-use Illuminate\Routing\WithoutMiddleware;
 use Illuminate\Support\Str;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -211,11 +212,14 @@ class RoutingRouteTest extends TestCase
     public function testMiddlewareCanBeAddedWithWithMiddlewareAttribute()
     {
         $router = $this->getRouter();
-        $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
+        $router->aliasMiddleware('web1', RoutingTestMiddlewareGroupThree::class);
+        $router->aliasMiddleware('web2', RoutingTestMiddlewareGroupFour::class);
 
         $router->resource('foo', RouteTestControllerWithMiddlewareStub::class);
+        $response = $router->dispatch(Request::create('foo', 'GET'));
 
-        $this->assertSame('caught ', $router->dispatch(Request::create('foo', 'GET'))->getContent());
+        $this->assertStringContainsString('caught', $response->getContent());
+        $this->assertStringContainsString('world', $response->getContent());
     }
 
     public function testMiddlewareCanBeSkippedWithWithoutMiddlewareAttribute()
@@ -2330,12 +2334,19 @@ class RouteTestControllerMiddlewareGroupStub extends Controller
     }
 }
 
-class RouteTestControllerWithMiddlewareStub extends Controller
+class RouteTestControllerWithMiddlewareStub implements HasMiddleware
 {
-    #[WithMiddleware('web')]
+    #[WithMiddleware('web1')]
     public function index()
     {
         return 'Hello World';
+    }
+
+    public static function middleware()
+    {
+        return [
+            'web2'
+        ];
     }
 }
 
@@ -2558,6 +2569,23 @@ class RoutingTestMiddlewareGroupTwo
     }
 }
 
+class RoutingTestMiddlewareGroupThree
+{
+    public function handle($request, $next)
+    {
+        $request->request->set('hello', 'world');
+
+        return $next($request);
+    }
+}
+
+class RoutingTestMiddlewareGroupFour
+{
+    public function handle($request, $next)
+    {
+        return new Response('caught ' . $request->request->get('hello', ''));
+    }
+}
 class RoutingTestUserModel extends Model
 {
     public function posts()

@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Attributes\WithMiddleware;
+use Illuminate\Routing\Attributes\WithoutMiddleware;
 use Illuminate\Routing\Contracts\CallableDispatcher;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -1116,17 +1118,17 @@ class Route
             $this->getControllerMethod(),
         ];
 
-        if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
-                $controllerClass, $controllerMethod
-            );
-        }
-
         if (
             method_exists($controllerClass, $controllerMethod) &&
             $middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod)
         ) {
             return $middleware;
+        }
+
+        if (is_a($controllerClass, HasMiddleware::class, true)) {
+            return $this->staticallyProvidedControllerMiddleware(
+                $controllerClass, $controllerMethod
+            );
         }
 
         if (method_exists($controllerClass, 'getMiddleware')) {
@@ -1166,19 +1168,12 @@ class Route
         }
 
         if (! empty($withMiddlewareAttribute)) {
-            $middleware = $withMiddlewareAttribute[0]->getArguments();
-
-            if (is_array($middleware[0])) {
-                return collect($middleware)->each(function ($middleware) {
+            return collect(Arr::wrap($withMiddlewareAttribute[0]->getArguments()))
+                ->merge($this->staticallyProvidedControllerMiddleware($controllerClass, $controllerMethod))
+                ->each(function ($middleware) {
                     $this->middleware($middleware);
-                })->all();
-            }
-
-            if (is_string($middleware[0])) {
-                $this->middleware($middleware);
-
-                return $middleware;
-            }
+                })
+                ->all();
         }
 
         return [];
