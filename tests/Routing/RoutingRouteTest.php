@@ -208,7 +208,8 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('caught', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
-    public function testMiddlewareCanBeAddedWithWithMiddlewareAttribute(){
+    public function testMiddlewareCanBeAddedWithWithMiddlewareAttribute()
+    {
 
         $router = $this->getRouter();
         $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);
@@ -218,7 +219,8 @@ class RoutingRouteTest extends TestCase
         $this->assertSame('caught ', $router->dispatch(Request::create('foo', 'GET'))->getContent());
     }
 
-    public function testMiddlewareCanBeSkippedWithWithoutMiddlewareAttribute(){
+    public function testMiddlewareCanBeSkippedWithWithoutMiddlewareAttribute()
+    {
 
         $router = $this->getRouter();
         $router->aliasMiddleware('web', RoutingTestMiddlewareGroupTwo::class);

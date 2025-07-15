@@ -1116,7 +1116,7 @@ class Route
             );
         }
 
-        if ( $middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod) ){
+        if ($middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod)) {
             return $middleware;
         }
 
