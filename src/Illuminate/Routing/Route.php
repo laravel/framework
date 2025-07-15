@@ -1150,19 +1150,22 @@ class Route
         $methodReflection = (new \ReflectionClass($controllerClass))
             ->getMethod($controllerMethod);
 
-        $withoutMiddlewareAttribute = $methodReflection->getAttributes(WithoutMiddleware::class);
-        $withMiddlewareAttribute = $methodReflection->getAttributes(WithMiddleware::class);
+        $withoutMiddlewareAttribute = collect(Arr::wrap($methodReflection->getAttributes(WithoutMiddleware::class)));
+        $withMiddlewareAttribute = collect(Arr::wrap($methodReflection->getAttributes(WithMiddleware::class)));
 
-        if (! empty($withoutMiddlewareAttribute)) {
-            $middleware = Arr::wrap($withoutMiddlewareAttribute[0]->getArguments());
+        if ($withoutMiddlewareAttribute->isNotEmpty()) {
+            $middleware = Arr::wrap($withoutMiddlewareAttribute->first()->getArguments());
 
-            return collect($middleware)->each(function ($middleware) {
+            collect($middleware)->each(function ($middleware) {
                 $this->withoutMiddleware($middleware);
             })->all();
         }
 
-        if (! empty($withMiddlewareAttribute)) {
-            return collect(Arr::wrap($withMiddlewareAttribute[0]->getArguments()))
+        if ($withMiddlewareAttribute->isNotEmpty()) {
+            return collect(Arr::wrap($withMiddlewareAttribute->first()->getArguments()))
+                ->filter(function ($middleware) use ($withoutMiddlewareAttribute) {
+                    return $withoutMiddlewareAttribute->doesntContain($middleware);
+                })
                 ->merge($this->staticallyProvidedControllerMiddleware($controllerClass, $controllerMethod))
                 ->each(function ($middleware) {
                     $this->middleware($middleware);
