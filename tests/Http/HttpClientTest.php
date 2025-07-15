@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use Exception;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException as GuzzleRequestException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
 use GuzzleHttp\Middleware;
@@ -2379,7 +2380,7 @@ class HttpClientTest extends TestCase
 
     public function testHandleRequestExeptionWithNoResponseInPoolConsideredConnectionException()
     {
-        $requestException = new \GuzzleHttp\Exception\RequestException('Error', new \GuzzleHttp\Psr7\Request('GET', '/'));
+        $requestException = new GuzzleRequestException('Error', new \GuzzleHttp\Psr7\Request('GET', '/'));
         $this->factory->fake([
             'noresponse.com' => new RejectedPromise($requestException),
         ]);
@@ -2608,6 +2609,76 @@ class HttpClientTest extends TestCase
         $this->expectExceptionMessage('cURL error 60: SSL certificate problem: unable to get local issuer certificate');
 
         $this->factory->head('https://ssl-error.laravel.example');
+    }
+
+    public function testConnectExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
+    {
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 60: SSL certificate problem');
+
+        $pendingRequest = new PendingRequest();
+
+        $pendingRequest->setHandler(function () {
+            throw new ConnectException(
+                'cURL error 60: SSL certificate problem: unable to get local issuer certificate',
+                new GuzzleRequest('HEAD', 'https://ssl-error.laravel.example')
+            );
+        });
+
+        $pendingRequest->head('https://ssl-error.laravel.example');
+    }
+
+    public function testRequestExceptionWithoutResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
+    {
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+
+        $pendingRequest = new PendingRequest();
+
+        $pendingRequest->setHandler(function () {
+            throw new GuzzleRequestException(
+                'cURL error 28: Operation timed out',
+                new GuzzleRequest('GET', 'https://timeout-laravel.example')
+            );
+        });
+
+        $pendingRequest->get('https://timeout-laravel.example');
+    }
+
+    public function testRequestExceptionWithResponseIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
+    {
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('cURL error 28: Operation timed out');
+
+        $pendingRequest = new PendingRequest();
+
+        $pendingRequest->setHandler(function () {
+            throw new GuzzleRequestException(
+                'cURL error 28: Operation timed out',
+                new GuzzleRequest('GET', 'https://timeout-laravel.example'),
+                new Psr7Response(301)
+            );
+        });
+
+        $pendingRequest->get('https://timeout-laravel.example');
+    }
+
+    public function testTooManyRedirectsExceptionIsConvertedToConnectionExceptionEvenWhenWithoutFactory()
+    {
+        $this->expectException(ConnectionException::class);
+        $this->expectExceptionMessage('Maximum number of redirects (5) exceeded');
+
+        $pendingRequest = new PendingRequest();
+
+        $pendingRequest->setHandler(function () {
+            throw new TooManyRedirectsException(
+                'Maximum number of redirects (5) exceeded',
+                new GuzzleRequest('GET', 'https://redirect.laravel.example'),
+                new Psr7Response(301)
+            );
+        });
+
+        $pendingRequest->maxRedirects(5)->get('https://redirect.laravel.example');
     }
 
     public function testTooManyRedirectsExceptionConvertedToConnectionException()
