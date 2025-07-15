@@ -2345,7 +2345,7 @@ class RouteTestControllerWithMiddlewareStub implements HasMiddleware
     public static function middleware()
     {
         return [
-            'web2'
+            'web2',
         ];
     }
 }
@@ -2583,7 +2583,7 @@ class RoutingTestMiddlewareGroupFour
 {
     public function handle($request, $next)
     {
-        return new Response('caught ' . $request->request->get('hello', ''));
+        return new Response('caught '.$request->request->get('hello', ''));
     }
 }
 class RoutingTestUserModel extends Model
