@@ -231,8 +231,8 @@ trait DatabaseRule
      */
     protected function formatWheres()
     {
-        return (new Collection($this->wheres))->map(function ($where) {
-            return $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"';
-        })->implode(',');
+        return (new Collection($this->wheres))
+            ->map(fn ($where) => $where['column'].','.'"'.str_replace('"', '""', $where['value']).'"')
+            ->implode(',');
     }
 }
