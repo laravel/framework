@@ -1122,7 +1122,10 @@ class Route
             );
         }
 
-        if ($middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod)) {
+        if (
+            method_exists($controllerClass, $controllerMethod) &&
+            $middleware = $this->applyRouteMiddlewareFromAttribute($controllerClass, $controllerMethod
+        )) {
             return $middleware;
         }
 
