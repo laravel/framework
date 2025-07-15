@@ -1154,17 +1154,11 @@ class Route
         $withMiddlewareAttribute = $methodReflection->getAttributes(WithMiddleware::class);
 
         if (! empty($withoutMiddlewareAttribute)) {
-            $middleware = $withoutMiddlewareAttribute[0]->getArguments();
+            $middleware = Arr::wrap($withoutMiddlewareAttribute[0]->getArguments());
 
-            if (is_array($middleware[0])) {
-                return collect($middleware)->each(function ($middleware) {
-                    $this->withoutMiddleware($middleware);
-                })->all();
-            }
-
-            if (is_string($middleware[0])) {
+            return collect($middleware)->each(function ($middleware) {
                 $this->withoutMiddleware($middleware);
-            }
+            })->all();
         }
 
         if (! empty($withMiddlewareAttribute)) {
