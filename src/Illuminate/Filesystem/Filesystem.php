@@ -248,7 +248,7 @@ class Filesystem
 
     /**
      * Replace a given string within a given file with a regular expression.
-     * 
+     *
      * @param  string|array  $pattern
      * @param  string|array  $replace
      * @param  string  $path
