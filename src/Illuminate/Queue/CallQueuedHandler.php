@@ -120,7 +120,7 @@ class CallQueuedHandler
         return (new Pipeline($this->container))->send($command)
             ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
             ->finally(function ($command) use (&$lockReleased) {
-                if (! $lockReleased && $command instanceof ShouldBeUniqueUntilProcessing) {
+                if (! $lockReleased && $command instanceof ShouldBeUniqueUntilProcessing && ! $command->job->isReleased()) {
                     $this->ensureUniqueJobLockIsReleased($command);
                 }
             })
