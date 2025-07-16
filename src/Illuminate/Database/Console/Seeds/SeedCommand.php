@@ -68,8 +68,12 @@ class SeedCommand extends Command
         $this->resolver->setDefaultConnection($this->getDatabase());
 
         Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+            $seeder = $this->getSeeder();
+
+            $this->components->task(get_class($seeder), $seeder);
         });
+
+        $this->output?->writeln('');
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
