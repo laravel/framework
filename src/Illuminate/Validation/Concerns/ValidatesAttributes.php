@@ -482,11 +482,16 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
-    public function validateBoolean($attribute, $value)
+    public function validateBoolean($attribute, $value, $parameters)
     {
         $acceptable = [true, false, 0, 1, '0', '1'];
+
+        if (($parameters[0] ?? null) === 'strict') {
+            $acceptable = [true, false];
+        }
 
         return in_array($value, $acceptable, true);
     }
