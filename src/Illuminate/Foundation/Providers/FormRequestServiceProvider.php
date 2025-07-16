@@ -34,6 +34,8 @@ class FormRequestServiceProvider extends ServiceProvider
             $request = FormRequest::createFrom($app['request'], $request);
 
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
+
+            $app['request.validated'] = $request;
         });
     }
 }

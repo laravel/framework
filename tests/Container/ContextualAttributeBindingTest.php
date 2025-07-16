@@ -407,7 +407,7 @@ class ContextualAttributeBindingTest extends TestCase
     public function testValidatedAttribute()
     {
         $container = new Container;
-        $container->bind(FormRequest::class, function () {
+        $container->bind('request.validated', function () {
             $request = m::mock(FormRequest::class);
             $request->shouldReceive('validated')->with('name', null)->andReturn('Foo Bar');
             $request->shouldReceive('validated')->with('age', 24)->andReturn(32);

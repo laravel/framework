@@ -6,6 +6,7 @@ use Attribute;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class Validated implements ContextualAttribute
@@ -22,6 +23,6 @@ class Validated implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container): mixed
     {
-        return $container->make(FormRequest::class)->validated($attribute->key, $attribute->default);
+        return $container->make('request.validated')->validated($attribute->key, $attribute->default);
     }
 }
