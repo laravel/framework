@@ -22,6 +22,7 @@ use Illuminate\Container\Attributes\Query;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
+use Illuminate\Container\Attributes\Validated;
 use Illuminate\Container\Container;
 use Illuminate\Container\RewindableGenerator;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -32,6 +33,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
@@ -401,6 +403,24 @@ class ContextualAttributeBindingTest extends TestCase
         $this->assertEquals('Foo Bar', $data->name);
         $this->assertEquals(32, $data->age);
     }
+
+    public function testValidatedAttribute()
+    {
+        $container = new Container;
+        $container->bind(FormRequest::class, function () {
+            $request = m::mock(FormRequest::class);
+            $request->shouldReceive('validated')->with('name', null)->andReturn('Foo Bar');
+            $request->shouldReceive('validated')->with('age', 24)->andReturn(32);
+
+            return $request;
+
+        });
+
+        $data = $container->make(TestValidatedData::class);
+
+        $this->assertEquals('Foo Bar', $data->name);
+        $this->assertEquals(32, $data->age);
+    }
 }
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -647,5 +667,25 @@ final readonly class TestPostData
         #[Post('name')] public string $name,
         #[Post('age', 24)] public int $age,
     ) {
+    }
+}
+
+final readonly class TestValidatedData
+{
+    public function __construct(
+        #[Validated('name')] public string $name,
+        #[Validated('age', 24)] public int $age,
+    ) {
+    }
+}
+
+class TestValidatedFormRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string'],
+            'age' => ['sometimes', 'int', 'between:0,100'],
+        ];
     }
 }
