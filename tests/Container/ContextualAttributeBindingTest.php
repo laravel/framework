@@ -413,7 +413,6 @@ class ContextualAttributeBindingTest extends TestCase
             $request->shouldReceive('validated')->with('age', 24)->andReturn(32);
 
             return $request;
-
         });
 
         $data = $container->make(TestValidatedData::class);
