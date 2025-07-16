@@ -70,9 +70,11 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
+        $seeder = $this->getSeeder();
+
         $startTime = microtime(true);
 
-        $name = get_class($this->getSeeder());
+        $name = get_class($seeder);
 
         with(new TwoColumnDetail($this->output))->render(
             $isVerbose
@@ -83,8 +85,8 @@ class SeedCommand extends Command
 
         $this->output?->writeln('');
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
+        Model::unguarded(function () use ($seeder) {
+            $seeder->__invoke();
         });
 
         $runTime = number_format((microtime(true) - $startTime) * 1000);
