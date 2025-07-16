@@ -39,6 +39,12 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         $table ??= $this->table;
         $column ??= $this->referencesModelColumn ?? 'id';
 
+        // Ensure an index is created for the foreign key column
+        // This is important for query performance, especially on PostgreSQL
+        if (! isset($this->index)) {
+            $this->index = true;
+        }
+
         return $this->references($column, $indexName)->on($table ?? (new Stringable($this->name))->beforeLast('_'.$column)->plural());
     }
 
