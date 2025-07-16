@@ -1,4 +1,5 @@
 <?php
+
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
