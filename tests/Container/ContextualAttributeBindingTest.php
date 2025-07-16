@@ -677,14 +677,3 @@ final readonly class TestValidatedData
     ) {
     }
 }
-
-class TestValidatedFormRequest extends FormRequest
-{
-    public function rules(): array
-    {
-        return [
-            'name' => ['required', 'string'],
-            'age' => ['sometimes', 'int', 'between:0,100'],
-        ];
-    }
-}
