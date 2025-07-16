@@ -69,8 +69,11 @@ class SeedCommand extends Command
 
         Model::unguarded(function () {
             $seeder = $this->getSeeder();
+
             $this->components->task(get_class($seeder), $seeder);
         });
+
+        $this->output?->writeln('');
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
