@@ -117,27 +117,23 @@ class CallQueuedHandler
 
         $lockReleased = false;
 
-        $then = function ($command) use ($job, &$lockReleased) {
-            if ($command instanceof ShouldBeUniqueUntilProcessing) {
-                $this->ensureUniqueJobLockIsReleased($command);
-                $lockReleased = true;
-            }
-
-            return $this->dispatcher->dispatchNow(
-                $command, $this->resolveHandler($job, $command)
-            );
-        };
-
-        $finally = function ($command) use (&$lockReleased) {
-            if (! $lockReleased && $command instanceof ShouldBeUniqueUntilProcessing) {
-                $this->ensureUniqueJobLockIsReleased($command);
-            }
-        };
-
         return (new Pipeline($this->container))->send($command)
             ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
-            ->finally($finally)
-            ->then($then);
+            ->finally(function ($command) use (&$lockReleased) {
+                if (! $lockReleased && $command instanceof ShouldBeUniqueUntilProcessing) {
+                    $this->ensureUniqueJobLockIsReleased($command);
+                }
+            })
+            ->then(function ($command) use ($job, &$lockReleased) {
+                if ($command instanceof ShouldBeUniqueUntilProcessing) {
+                    $this->ensureUniqueJobLockIsReleased($command);
+                    $lockReleased = true;
+                }
+
+                return $this->dispatcher->dispatchNow(
+                    $command, $this->resolveHandler($job, $command)
+                );
+            });
     }
 
     /**
