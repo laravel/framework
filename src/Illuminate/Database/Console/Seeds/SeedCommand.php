@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console\Seeds;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
+use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -56,6 +57,8 @@ class SeedCommand extends Command
      */
     public function handle()
     {
+        $isVerbose = $this->output->isVerbose();
+
         if ($this->isProhibited() ||
             ! $this->confirmToProceed()) {
             return Command::FAILURE;
@@ -67,11 +70,31 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $seeder = $this->getSeeder();
+        $startTime = microtime(true);
 
-            $this->components->task(get_class($seeder), $seeder);
+        $name = get_class($this->getSeeder());
+
+        with(new TwoColumnDetail($this->output))->render(
+            $isVerbose
+                ? sprintf('%s <fg=blue>%s</>', $name, $this->resolver->getDefaultConnection())
+                : $name,
+            '<fg=yellow;options=bold>RUNNING</>'
+        );
+
+        $this->output?->writeln('');
+
+        Model::unguarded(function () {
+            $this->getSeeder()->__invoke();
         });
+
+        $runTime = number_format((microtime(true) - $startTime) * 1000);
+
+        with(new TwoColumnDetail($this->output))->render(
+            $isVerbose
+                ? sprintf('%s <fg=blue>%s</>', $name, $this->resolver->getDefaultConnection())
+                : $name,
+            "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>"
+        );
 
         $this->output?->writeln('');
 
