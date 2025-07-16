@@ -85,9 +85,7 @@ class SeedCommand extends Command
 
         $this->output?->writeln('');
 
-        Model::unguarded(function () use ($seeder) {
-            $seeder->__invoke();
-        });
+        Model::unguarded(fn() => $seeder->__invoke());
 
         $runTime = number_format((microtime(true) - $startTime) * 1000);
 
