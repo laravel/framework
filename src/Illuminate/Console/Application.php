@@ -208,6 +208,18 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add a command to the console.
      *
+     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param  \Symfony\Component\Console\Command\Command|callable  $command
+     * @return \Symfony\Component\Console\Command\Command|null
+     */
+    public function add(SymfonyCommand $command): ?SymfonyCommand
+    {
+        return $this->addCommand($command);
+    }
+
+    /**
+     * Add a command to the console.
+     *
      * @param  \Symfony\Component\Console\Command\Command|callable  $command
      * @return \Symfony\Component\Console\Command\Command|null
      */
