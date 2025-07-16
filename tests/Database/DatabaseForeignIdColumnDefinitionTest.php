@@ -1,5 +1,5 @@
 <?php
-namespace Illuminate\Tests\Database\Schema;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -7,7 +7,7 @@ use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class DatabaseTest extends TestCase
+class DatabaseForeignIdColumnDefinitionTest extends TestCase
 {
     protected function tearDown(): void
     {
