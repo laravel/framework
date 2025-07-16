@@ -13,6 +13,8 @@ use InvalidArgumentException;
 use PDO;
 use RuntimeException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Database\Connection
  */
@@ -85,12 +87,12 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function connection($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = enum_value($name) ?: $this->getDefaultConnection();
 
         [$database, $type] = $this->parseConnectionName($name);
 
