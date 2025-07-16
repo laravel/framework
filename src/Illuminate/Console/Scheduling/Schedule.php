@@ -19,6 +19,8 @@ use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Console\Scheduling\PendingEventAttributes
  */
@@ -170,13 +172,16 @@ class Schedule
      * Add a new job callback event to the schedule.
      *
      * @param  object|string  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function job($job, $queue = null, $connection = null)
     {
         $jobName = $job;
+
+        $queue = enum_value($queue);
+        $connection = enum_value($connection);
 
         if (! is_string($job)) {
             $jobName = method_exists($job, 'displayName')
