@@ -5,8 +5,6 @@ namespace Illuminate\Container\Attributes;
 use Attribute;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class Validated implements ContextualAttribute
