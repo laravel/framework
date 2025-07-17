@@ -221,6 +221,51 @@ class SupportUriTest extends TestCase
         $this->assertEquals(3, $uri->pathSegments()->count());
     }
 
+    public function test_subdomain_extraction()
+    {
+        $uri = Uri::of('https://api.laravel.com');
+        $this->assertEquals('api', $uri->subdomain());
+
+        $uri = Uri::of('https://www.laravel.com');
+        $this->assertEquals('www', $uri->subdomain());
+
+        $uri = Uri::of('https://admin.dashboard.laravel.com');
+        $this->assertEquals('admin', $uri->subdomain());
+
+        $uri = Uri::of('https://laravel.com');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('https://example.org');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('https://192.168.1.1');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('http://127.0.0.1:8080');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('http://localhost');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('http://localhost:3000');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('/path/only');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('');
+        $this->assertNull($uri->subdomain());
+
+        $uri = Uri::of('https://staging.api.laravel.com');
+        $this->assertEquals('staging', $uri->subdomain());
+
+        $uri = Uri::of('https://test-env.laravel.com');
+        $this->assertEquals('test-env', $uri->subdomain());
+
+        $uri = Uri::of('https://example.co.uk');
+        $this->assertEquals('example', $uri->subdomain());
+    }
+
     public function test_macroable()
     {
         Uri::macro('myMacro', function () {

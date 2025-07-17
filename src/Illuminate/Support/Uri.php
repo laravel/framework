@@ -150,6 +150,26 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Get the subdomain from the URI.
+     */
+    public function subdomain(): ?string
+    {
+        if (! $host = $this->host()) {
+            return null;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return null;
+        }
+
+        if (count($parts = explode('.', $host)) < 3) {
+            return null;
+        }
+
+        return $parts[0];
+    }
+
+    /**
      * Get the URI's port.
      */
     public function port(): ?int
