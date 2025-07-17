@@ -1916,10 +1916,7 @@ class Blueprint
     protected function addAutoForeignKeyIndexes()
     {
         foreach ($this->commands as $command) {
-            if ($command->name === 'foreign' &&
-                isset($command->autoCreateIndex) &&
-                $command->autoCreateIndex === true &&
-                ! isset($command->withoutIndex)) {
+            if ($command->name === 'foreign' && isset($command->autoCreateIndex) && $command->autoCreateIndex === true && ! isset($command->withoutIndex)) {
                 $this->index($command->columns);
             }
         }
