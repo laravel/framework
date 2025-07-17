@@ -493,7 +493,7 @@ trait ValidatesAttributes
     {
         $acceptable = [true, false, 0, 1, '0', '1'];
 
-        if (strtolower($parameters[0] ?? null) === 'strict') {
+        if (isset($parameters[0]) && strtolower($parameters[0]) === 'strict') {
             $acceptable = [true, false];
         }
 
