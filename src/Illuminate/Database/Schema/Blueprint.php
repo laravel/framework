@@ -193,6 +193,7 @@ class Blueprint
     {
         $this->addFluentIndexes();
         $this->addFluentCommands();
+        $this->addAutoForeignKeyIndexes();
 
         if (! $this->creating()) {
             $this->commands = array_map(
@@ -719,6 +720,9 @@ class Blueprint
         );
 
         $this->commands[count($this->commands) - 1] = $command;
+
+        // Mark the command for potential auto-index creation
+        $command->autoCreateIndex = $this->shouldAutoCreateForeignKeyIndex($columns);
 
         return $command;
     }
@@ -1902,5 +1906,60 @@ class Blueprint
     protected function defaultTimePrecision(): ?int
     {
         return $this->connection->getSchemaBuilder()::$defaultTimePrecision;
+    }
+
+    /**
+     * Add indexes for foreign keys that should have automatic index creation.
+     *
+     * @return void
+     */
+    protected function addAutoForeignKeyIndexes()
+    {
+        foreach ($this->commands as $command) {
+            if ($command->name === 'foreign' &&
+                isset($command->autoCreateIndex) &&
+                $command->autoCreateIndex === true &&
+                ! isset($command->withoutIndex)) {
+                $this->index($command->columns);
+            }
+        }
+    }
+
+    /**
+     * Determine if automatic foreign key index creation is enabled.
+     *
+     * @param  string|array  $columns
+     * @return bool
+     */
+    protected function shouldAutoCreateForeignKeyIndex($columns): bool
+    {
+        $driver = $this->connection->getDriverName();
+
+        // @TODO
+        if ($driver !== 'pgsql') {
+            return false;
+        }
+
+        if (! $this->connection->getConfig('foreign_key_implicit_index_creation', false)) {
+            return false;
+        }
+
+        $columns = (array) $columns;
+
+        // Check if an index already exists for these columns
+        foreach ($this->commands as $command) {
+            if ($command->name === 'index' && $command->columns === $columns) {
+                return false;
+            }
+        }
+
+        // Check if any column has an index attribute set (from fluent calls like ->index())
+        foreach ($this->columns as $column) {
+            if (in_array($column->name, $columns) && (isset($column->index) || isset($column->unique) || isset($column->primary))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

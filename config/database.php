@@ -96,6 +96,7 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+            // 'foreign_key_implicit_index_creation' => true,
         ],
 
         'sqlsrv' => [
