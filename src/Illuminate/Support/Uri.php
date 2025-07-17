@@ -170,6 +170,30 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Get the domain from the URI.
+     */
+    public function domain(): ?string
+    {
+        if (! $host = $this->host()) {
+            return null;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return null;
+        }
+
+        if (count($parts = explode('.', $host)) < 2) {
+            return null;
+        }
+
+        if (count($parts) >= 3) {
+            return implode('.', array_slice($parts, 1));
+        }
+
+        return $host;
+    }
+
+    /**
      * Get the URI's port.
      */
     public function port(): ?int
