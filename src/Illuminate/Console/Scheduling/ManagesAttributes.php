@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
 
 trait ManagesAttributes
@@ -98,6 +99,13 @@ trait ManagesAttributes
     public $description;
 
     /**
+     * The allowed exit codes additional to 0.
+     *
+     * @var array|true
+     */
+    public array|true $allowExitCodes = [];
+
+    /**
      * Set which user the command should run as.
      *
      * @param  string  $user
@@ -106,6 +114,31 @@ trait ManagesAttributes
     public function user($user)
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Set which exit codes should be accepted additional to 0.
+     *
+     * @param  int|array  $exitCode
+     * @return $this
+     */
+    public function allowExitCode(int|array $exitCode): static
+    {
+        $this->allowExitCodes = Arr::wrap($exitCode);
+
+        return $this;
+    }
+
+    /**
+     * Accept all exit codes as successful.
+     *
+     * @return $this
+     */
+    public function allowFailure(): static
+    {
+        $this->allowExitCodes = true;
 
         return $this;
     }

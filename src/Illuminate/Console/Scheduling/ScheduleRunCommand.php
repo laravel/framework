@@ -203,7 +203,7 @@ class ScheduleRunCommand extends Command
 
                 $this->eventsRan = true;
 
-                if ($event->exitCode != 0 && ! $event->runInBackground) {
+                if ($this->shouldFailOnExitCode($event) && ! $event->runInBackground) {
                     throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
                 }
             } catch (Throwable $e) {
@@ -285,5 +285,18 @@ class ScheduleRunCommand extends Command
     protected function clearInterruptSignal()
     {
         $this->cache->forget('illuminate:schedule:interrupt');
+    }
+
+    /**
+     * Determine if the scheduled command should be considered failed based on its exit code.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return bool
+     */
+    protected function shouldFailOnExitCode(Event $event): bool
+    {
+        return $event->allowExitCodes !== true &&
+               $event->exitCode != 0 &&
+               ! in_array($event->exitCode, $event->allowExitCodes);
     }
 }
