@@ -61,6 +61,68 @@ class ScheduleRunCommandTest extends TestCase
     /**
      * @throws BindingResolutionException
      */
+    public function test_failing_command_with_expected_exit_code_in_foreground_does_not_trigger_event()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        // Create a schedule and add the command
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->exec('exit 1')
+            ->everyMinute()
+            ->allowExitCode(1);
+
+        // Make sure it will run regardless of schedule
+        $task->when(function () {
+            return true;
+        });
+
+        // Execute the scheduler
+        $this->artisan('schedule:run');
+
+        // Verify the event sequence
+        Event::assertDispatched(ScheduledTaskStarting::class);
+        Event::assertDispatched(ScheduledTaskFinished::class);
+        Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
+    public function test_failing_command_with_allowed_failures_in_foreground_does_not_trigger_event()
+    {
+        Event::fake([
+            ScheduledTaskStarting::class,
+            ScheduledTaskFinished::class,
+            ScheduledTaskFailed::class,
+        ]);
+
+        // Create a schedule and add the command
+        $schedule = $this->app->make(Schedule::class);
+        $task = $schedule->exec('exit 1')
+            ->everyMinute()
+            ->allowFailure();
+
+        // Make sure it will run regardless of schedule
+        $task->when(function () {
+            return true;
+        });
+
+        // Execute the scheduler
+        $this->artisan('schedule:run');
+
+        // Verify the event sequence
+        Event::assertDispatched(ScheduledTaskStarting::class);
+        Event::assertDispatched(ScheduledTaskFinished::class);
+        Event::assertNotDispatched(ScheduledTaskFailed::class);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     */
     public function test_failing_command_in_background_does_not_trigger_event()
     {
         Event::fake([
