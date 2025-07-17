@@ -17,7 +17,7 @@ class Validated implements ContextualAttribute
     }
 
     /**
-     * Resolve the POST data from the request.
+     * Resolve the validated POST data from the request.
      */
     public static function resolve(self $attribute, Container $container): mixed
     {
