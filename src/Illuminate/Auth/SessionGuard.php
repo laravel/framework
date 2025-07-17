@@ -200,7 +200,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Pull a user from the repository by its "remember me" cookie token.
      *
      * @param  \Illuminate\Auth\Recaller  $recaller
-     * @return mixed
+     * @return mixed|void
      */
     protected function userFromRecaller($recaller)
     {

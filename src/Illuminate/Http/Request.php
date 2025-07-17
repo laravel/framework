@@ -530,7 +530,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Filter the given array of files, removing any empty values.
      *
      * @param  mixed  $files
-     * @return mixed
+     * @return mixed|void
      */
     protected function filterFiles($files)
     {

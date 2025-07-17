@@ -654,7 +654,7 @@ class Gate implements GateContract
      * Get a policy instance for a given class.
      *
      * @param  object|string  $class
-     * @return mixed
+     * @return mixed|void
      */
     public function getPolicyFor($class)
     {
@@ -805,7 +805,7 @@ class Gate implements GateContract
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @return mixed
+     * @return mixed|void
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
@@ -825,7 +825,7 @@ class Gate implements GateContract
      * @param  string  $method
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $arguments
-     * @return mixed
+     * @return mixed|void
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
     {
