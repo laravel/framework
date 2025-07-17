@@ -386,6 +386,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[1]);
     }
 
+    public function testAddingSpatialIndexWithOperatorClass()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'geo');
+        $blueprint->spatialIndex('coordinates', 'my_index', 'point_ops');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "my_index" on "geo" using gist ("coordinates" point_ops)', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexWithOperatorClassMultipleColumns()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'geo');
+        $blueprint->spatialIndex(['coordinates', 'location'], 'my_index', 'point_ops');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "my_index" on "geo" using gist ("coordinates" point_ops, "location" point_ops)', $statements[0]);
+    }
+
     public function testAddingRawIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

@@ -684,11 +684,12 @@ class Blueprint
      *
      * @param  string|array  $columns
      * @param  string|null  $name
+     * @param  string|null  $operatorClass
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
-    public function spatialIndex($columns, $name = null)
+    public function spatialIndex($columns, $name = null, $operatorClass = null)
     {
-        return $this->indexCommand('spatialIndex', $columns, $name);
+        return $this->indexCommand('spatialIndex', $columns, $name, null, $operatorClass);
     }
 
     /**
@@ -1641,15 +1642,16 @@ class Blueprint
     }
 
     /**
-     * Add a new index command to the blueprint.
+     * Create a new index command on the blueprint.
      *
      * @param  string  $type
      * @param  string|array  $columns
      * @param  string  $index
      * @param  string|null  $algorithm
+     * @param  string|null  $operatorClass
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null)
+    protected function indexCommand($type, $columns, $index, $algorithm = null, $operatorClass = null)
     {
         $columns = (array) $columns;
 
@@ -1659,7 +1661,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type, compact('index', 'columns', 'algorithm', 'operatorClass')
         );
     }
 
