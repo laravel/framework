@@ -250,7 +250,7 @@ class Rule
     /**
      * Get an "any of" rule builder instance.
      *
-     * @param  array
+     * @param  array  $rules
      * @return \Illuminate\Validation\Rules\AnyOf
      *
      * @throws \InvalidArgumentException

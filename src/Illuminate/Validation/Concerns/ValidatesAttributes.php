@@ -1123,7 +1123,7 @@ trait ValidatesAttributes
      *
      * @param  array<int, int|string>  $parameters
      * @param  string  $attribute
-     * @return bool
+     * @return int|string
      */
     public function getQueryColumn($parameters, $attribute)
     {
