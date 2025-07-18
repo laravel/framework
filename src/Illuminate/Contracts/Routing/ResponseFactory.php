@@ -58,6 +58,16 @@ interface ResponseFactory
     public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0);
 
     /**
+     * Create a new event stream response.
+     *
+     * @param  \Closure  $callback
+     * @param  array  $headers
+     * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function eventStream($callback, array $headers = [], $endStreamWith = '</stream>');
+
+    /**
      * Create a new streamed response instance.
      *
      * @param  callable  $callback
