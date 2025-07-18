@@ -786,6 +786,53 @@ class HttpClientTest extends TestCase
         });
     }
 
+    public function testCanSendMultipartDataWithArrayValues()
+    {
+        $this->factory->fake();
+
+        $this->factory->asMultipart()->post('http://foo.com/multipart', [
+            'name' => 'Steve',
+            'roles' => ['Network Administrator', 'Janitor'],
+        ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'name' &&
+                $request[0]['contents'] === 'Steve' &&
+                $request[1]['name'] === 'roles[]' &&
+                $request[1]['contents'] === 'Network Administrator' &&
+                $request[2]['name'] === 'roles[]' &&
+                $request[2]['contents'] === 'Janitor';
+        });
+    }
+
+    public function testCanSendMultipartDataWithFileAndArrayValues()
+    {
+        $this->factory->fake();
+
+        $this->factory
+            ->attach('attachment', 'photo_content', 'photo.jpg', ['Content-Type' => 'image/jpeg'])
+            ->post('http://foo.com/multipart', [
+                'name' => 'Steve',
+                'roles' => ['Network Administrator', 'Janitor'],
+            ]);
+
+        $this->factory->assertSent(function (Request $request) {
+            return $request->url() === 'http://foo.com/multipart' &&
+                Str::startsWith($request->header('Content-Type')[0], 'multipart') &&
+                $request[0]['name'] === 'name' &&
+                $request[0]['contents'] === 'Steve' &&
+                $request[1]['name'] === 'roles[]' &&
+                $request[1]['contents'] === 'Network Administrator' &&
+                $request[2]['name'] === 'roles[]' &&
+                $request[2]['contents'] === 'Janitor' &&
+                $request[3]['name'] === 'attachment' &&
+                $request[3]['contents'] === 'photo_content' &&
+                $request[3]['filename'] === 'photo.jpg';
+        });
+    }
+
     public function testItCanSendToken()
     {
         $this->factory->fake();
