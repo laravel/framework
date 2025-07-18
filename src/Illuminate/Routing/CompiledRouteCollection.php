@@ -74,6 +74,17 @@ class CompiledRouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Remove the given route from the collection.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function remove(Route $route)
+    {
+        $this->routes->remove($route);
+    }
+
+    /**
      * Refresh the name look-up table.
      *
      * This is done in case any names are fluently defined or if routes are overwritten.
