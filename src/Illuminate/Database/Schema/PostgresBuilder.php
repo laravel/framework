@@ -19,13 +19,13 @@ class PostgresBuilder extends Builder
         $hypertables = [];
 
         $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
-        $hasTimescaleDB = ! empty($this->connection->select("SELECT 1 FROM pg_extension WHERE extname = 'timescaledb'"));
 
-        if ($hasTimescaleDB) {
-            $hypertables = $this->connection->select(
+        $hasTimescaleDb = ! empty($this->connection->select("SELECT 1 FROM pg_extension WHERE extname = 'timescaledb'"));
+
+        if ($hasTimescaleDb) {
+            $hypertables = array_column($this->connection->select(
                 "SELECT hypertable_schema || '.' || hypertable_name as name FROM timescaledb_information.hypertables"
-            );
-            $hypertables = array_column($hypertables, 'name');
+            ), 'name');
         }
 
         foreach ($this->getTables($this->getCurrentSchemaListing()) as $table) {
