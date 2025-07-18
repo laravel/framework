@@ -403,7 +403,44 @@ class PostgresGrammar extends Grammar
     {
         $command->algorithm = 'gist';
 
+        if (! is_null($command->operatorClass)) {
+            return $this->compileIndexWithOperatorClass($blueprint, $command);
+        }
+
         return $this->compileIndex($blueprint, $command);
+    }
+
+    /**
+     * Compile a spatial index with operator class key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    protected function compileIndexWithOperatorClass(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = $this->columnizeWithOperatorClass($command->columns, $command->operatorClass);
+
+        return sprintf('create index %s on %s%s (%s)',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $command->algorithm ? ' using '.$command->algorithm : '',
+            $columns
+        );
+    }
+
+    /**
+     * Convert an array of column names to a delimited string with operator class.
+     *
+     * @param  array  $columns
+     * @param  string  $operatorClass
+     * @return string
+     */
+    protected function columnizeWithOperatorClass(array $columns, $operatorClass)
+    {
+        return implode(', ', array_map(function ($column) use ($operatorClass) {
+            return $this->wrap($column).' '.$operatorClass;
+        }, $columns));
     }
 
     /**
