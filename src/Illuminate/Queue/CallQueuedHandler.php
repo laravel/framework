@@ -127,6 +127,7 @@ class CallQueuedHandler
             ->then(function ($command) use ($job, &$lockReleased) {
                 if ($command instanceof ShouldBeUniqueUntilProcessing) {
                     $this->ensureUniqueJobLockIsReleased($command);
+
                     $lockReleased = true;
                 }
 
