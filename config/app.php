@@ -112,6 +112,31 @@ return [
     */
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Skip Transliteration for Specific Languages
+    |--------------------------------------------------------------------------
+    |
+    | This option lets you specify a comma-separated list of language codes
+    | (ISO 639-1 or 639-2) for which Str::slug will skip ASCII transliteration.
+    | For these languages, the slug will preserve native (Unicode) characters.
+    |
+    | This is useful for applications that require slugs to retain
+    | characters in scripts like Arabic, Persian, Urdu, etc.
+    |
+    | To configure, set APP_SLUG_SKIP_TRANSLITERATION in your .env file.
+    |
+    | Example .env:
+    | APP_SLUG_SKIP_TRANSLITERATION=ar,fa,ur,ps
+    |
+    */
+
+    'slug_skip_transliteration' => [
+        ...array_filter(
+            explode(',', (string) env('APP_SLUG_SKIP_TRANSLITERATION', ''))
+        ),
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -1533,6 +1533,13 @@ class Str
      */
     public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
     {
+        // Get the list of languages to skip transliteration from config
+        $skipLanguages = config('app.slug_skip_transliteration', []);
+
+        // If the current language is in the skip list, keep native characters
+        if (in_array($language, $skipLanguages)) {
+            $language = ''; // Disable transliteration for this language
+        }
         $title = $language ? static::ascii($title, $language) : $title;
 
         // Convert all dashes/underscores into separator
