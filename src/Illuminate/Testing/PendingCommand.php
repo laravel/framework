@@ -354,6 +354,20 @@ class PendingCommand
     }
 
     /**
+     * Render the given prompt and add the output to the expectations.
+     *
+     * @return void
+     */
+    protected function expectOutputToContainPrompt(BasePrompt $prompt)
+    {
+        $prompt->setOutput($output = new BufferedOutput);
+
+        $prompt->display();
+
+        $this->expectsOutputToContain(trim($output->fetch()));
+    }
+
+    /**
      * Assert that the command has the given exit code.
      *
      * @param  int  $exitCode
@@ -623,20 +637,6 @@ class PendingCommand
         $this->test->expectedTables = [];
         $this->test->expectedQuestions = [];
         $this->test->expectedChoices = [];
-    }
-
-    /**
-     * Render specific prompt to new output to add to expectation.
-     *
-     * @return void
-     */
-    protected function expectOutputToContainPrompt(BasePrompt $prompt)
-    {
-        $prompt->setOutput($output = new BufferedOutput);
-
-        $prompt->display();
-
-        $this->expectsOutputToContain(trim($output->fetch()));
     }
 
     /**
