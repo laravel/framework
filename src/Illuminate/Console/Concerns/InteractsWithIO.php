@@ -458,4 +458,17 @@ trait InteractsWithIO
     {
         return $this->components;
     }
+
+    /**
+     * Delete the last written lines.
+     *
+     * @param  positive-int  $count
+     * @return void
+     */
+    public function deleteLastLines($count = 1)
+    {
+        for ($i = 0; $i < $count; $i++) {
+            $this->output->write("\x1b[1A\x1b[1G\x1b[2K");
+        }
+    }
 }
