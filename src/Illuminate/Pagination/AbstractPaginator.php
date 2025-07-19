@@ -185,19 +185,25 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
             $page = 1;
         }
 
+        // Only add the page parameter if it's greater than 1.
+        // This prevents unnecessary ?page=1 in the URL and improves SEO by avoiding duplicate content.
+        $parameters = $page > 1 ? [$this->pageName => $page] : [];
+
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
         // to the URL. This allows for extra information like sortings storage.
-        $parameters = [$this->pageName => $page];
-
         if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
         }
 
+        // Build the query string and attach it to the path
+        $query = Arr::query($parameters);
+
         return $this->path()
-                        .(str_contains($this->path(), '?') ? '&' : '?')
-                        .Arr::query($parameters)
-                        .$this->buildFragment();
+            . ($query === ''
+                ? ''
+                : (str_contains($this->path(), '?') ? '&' : '?') . $query)
+            . $this->buildFragment();
     }
 
     /**
