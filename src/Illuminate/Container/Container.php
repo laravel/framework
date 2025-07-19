@@ -269,6 +269,10 @@ class Container implements ArrayAccess, ContainerContract
         $reflection = new ReflectionClass($abstract);
 
         if (! empty($reflection->getAttributes(Singleton::class))) {
+            if (! in_array($abstract, $this->instances, true)) {
+                $this->instances[] = $abstract;
+            }
+
             return true;
         }
 
