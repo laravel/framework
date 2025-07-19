@@ -1563,7 +1563,7 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foo', $encrypted->decrypt()->value());
     }
 
-    public function testAcronym() : void
+    public function testAcronym()
     {
         $this->assertSame('ASAP', $this->stringable('As soon as possible')->acronym()->toString());
         $this->assertSame('A.S.A.P', $this->stringable('As soon as possible')->acronym('.')->toString());
@@ -1577,9 +1577,9 @@ class SupportStringableTest extends TestCase
 
         $this->assertSame('L', $this->stringable('laravel')->acronym()->toString());
         $this->assertSame('L', $this->stringable('laravel')->acronym('.')->toString());
-        
+
         $this->assertSame('L', $this->stringable('l')->acronym('.')->toString());
-        
+
         $this->assertSame('', $this->stringable('')->acronym()->toString());
         $this->assertSame('', $this->stringable(null)->acronym()->toString());
     }

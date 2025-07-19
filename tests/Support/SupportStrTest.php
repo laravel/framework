@@ -1883,7 +1883,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
 
-    public function testAcronym() : void
+    public function testAcronym()
     {
         $this->assertSame('ASAP', Str::acronym('As soon as possible'));
         $this->assertSame('A.S.A.P', Str::acronym('As soon as possible', '.'));
@@ -1897,9 +1897,9 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('L', Str::acronym('laravel'));
         $this->assertSame('L', Str::acronym('laravel', '.'));
-        
+
         $this->assertSame('L', Str::acronym('l', '.'));
-        
+
         $this->assertSame('', Str::acronym(''));
         $this->assertSame('', Str::acronym(null));
     }
