@@ -1449,7 +1449,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = explode(' ', $value);
+        $parts = mb_split('/\s+/', $value);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1482,7 +1482,7 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
+        $words = mb_split('/\s+/', $value);
 
         for ($i = 0; $i < count($words); $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
@@ -1697,7 +1697,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $words = explode(' ', static::replace(['-', '_'], ' ', $value));
+        $words = mb_split('/\s+/', static::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
