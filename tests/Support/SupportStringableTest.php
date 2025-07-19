@@ -1562,4 +1562,25 @@ class SupportStringableTest extends TestCase
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
     }
+
+    public function testAcronym() : void
+    {
+        $this->assertSame('ASAP', $this->stringable('As soon as possible')->acronym()->toString());
+        $this->assertSame('A.S.A.P', $this->stringable('As soon as possible')->acronym('.')->toString());
+        $this->assertSame('A-S-A-P', $this->stringable('As soon as possible')->acronym('-')->toString());
+        $this->assertSame('A_S_A_P', $this->stringable('As soon as possible')->acronym('_')->toString());
+        $this->assertSame('A/S/A/P', $this->stringable('As soon as possible')->acronym('/')->toString());
+        $this->assertSame('A S A P', $this->stringable('As soon as possible')->acronym(' ')->toString());
+
+        // Unaccepted separator
+        $this->assertSame('ASAP', $this->stringable('As soon as possible')->acronym('*')->toString());
+
+        $this->assertSame('L', $this->stringable('laravel')->acronym()->toString());
+        $this->assertSame('L', $this->stringable('laravel')->acronym('.')->toString());
+        
+        $this->assertSame('L', $this->stringable('l')->acronym('.')->toString());
+        
+        $this->assertSame('', $this->stringable('')->acronym()->toString());
+        $this->assertSame('', $this->stringable(null)->acronym()->toString());
+    }
 }

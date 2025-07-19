@@ -1305,6 +1305,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Converts the given string into an acronym.
+     *
+     * @param  string  $separator
+     * @return static
+     */
+    public function acronym($separator = '')
+    {
+        return new static(Str::acronym($this->value, $separator));
+    }
+
+    /**
      * Get the number of words a string contains.
      *
      * @param  string|null  $characters

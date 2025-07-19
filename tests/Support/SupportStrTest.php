@@ -1882,6 +1882,27 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testAcronym() : void
+    {
+        $this->assertSame('ASAP', Str::acronym('As soon as possible'));
+        $this->assertSame('A.S.A.P', Str::acronym('As soon as possible', '.'));
+        $this->assertSame('A-S-A-P', Str::acronym('As soon as possible', '-'));
+        $this->assertSame('A_S_A_P', Str::acronym('As soon as possible', '_'));
+        $this->assertSame('A/S/A/P', Str::acronym('As soon as possible', '/'));
+        $this->assertSame('A S A P', Str::acronym('As soon as possible', ' '));
+
+        // Unaccepted separator
+        $this->assertSame('ASAP', Str::acronym('As soon as possible', '*'));
+
+        $this->assertSame('L', Str::acronym('laravel'));
+        $this->assertSame('L', Str::acronym('laravel', '.'));
+        
+        $this->assertSame('L', Str::acronym('l', '.'));
+        
+        $this->assertSame('', Str::acronym(''));
+        $this->assertSame('', Str::acronym(null));
+    }
 }
 
 class StringableObjectStub

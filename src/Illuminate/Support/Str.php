@@ -766,6 +766,28 @@ class Str
     }
 
     /**
+     * Converts the given string into an acronym.
+     *
+     * @param  string  $string
+     * @param  string  $separator
+     * @return string
+     */
+    public static function acronym($string, $separator = '')
+    {
+        if (empty($string)) {
+            return '';
+        }
+
+        $separator = in_array($separator, ['.', '-', '_', '/', ' ']) ? $separator : '';
+
+        preg_match_all('/\b[a-zA-Z]/', $string, $matches);
+
+        $acronym = implode($separator, $matches[0]);
+
+        return static::upper($acronym);
+    }
+
+    /**
      * Converts GitHub flavored Markdown into HTML.
      *
      * @param  string  $string
