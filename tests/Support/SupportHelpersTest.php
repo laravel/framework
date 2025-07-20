@@ -1506,6 +1506,18 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testChain()
+    {
+        $result = chain('first  last', [
+            fn (string $input) => explode(' ', $input),
+            fn (array $parts) => array_filter($parts, trim(...)),
+            fn (array $words) => array_map(ucfirst(...), $words),
+            fn (array $words) => implode('-'),
+            Str::toBase64(...),
+        ]);
+        $this->assertSame('Rmlyc3QtTGFzdA==', $result);
+    }
 }
 
 trait SupportTestTraitOne
