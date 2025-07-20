@@ -1256,7 +1256,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         if ($count === 1) {
-            return array_shift($this->items);
+            return new static(array_shift($this->items));
         }
 
         $results = [];
