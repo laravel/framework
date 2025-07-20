@@ -55,6 +55,7 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     public function __construct(MailManager $manager)
     {
         $this->manager = $manager;
+        $this->currentMailer = $manager->getDefaultDriver();
     }
 
     /**
