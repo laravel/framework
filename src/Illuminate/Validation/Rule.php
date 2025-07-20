@@ -142,6 +142,38 @@ class Rule
     }
 
     /**
+     * Get a max rule builder instance.
+     *
+     * @param  callable|int  $value
+     * @return \Illuminate\Validation\Rules\Max
+     */
+    public static function max($value)
+    {
+        return new Rules\Max($value);
+    }
+
+    /**
+     * Get a min rule builder instance.
+     *
+     * @param  callable|int  $value
+     * @return \Illuminate\Validation\Rules\Min
+     */
+    public static function min($value)
+    {
+        return new Rules\Min($value);
+    }
+
+    /**
+     * Get a required rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Required
+     */
+    public static function required()
+    {
+        return new Rules\Required;
+    }
+
+    /**
      * Get a required_if rule builder instance.
      *
      * @param  callable|bool  $callback
