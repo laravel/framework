@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use stdClass;
 
+use function Illuminate\Support\enum_value;
+
 trait InteractsWithData
 {
     /**
@@ -287,13 +289,15 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  string|null  $format
-     * @param  string|null  $tz
+     * @param  \UnitEnum|string|null  $tz
      * @return \Illuminate\Support\Carbon|null
      *
      * @throws \Carbon\Exceptions\InvalidFormatException
      */
     public function date($key, $format = null, $tz = null)
     {
+        $tz = enum_value($tz);
+
         if ($this->isNotFilled($key)) {
             return null;
         }
