@@ -3778,7 +3778,7 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake([
             '*' => $this->factory::response(headers: [
-                'Link' => '<https:://example.com/posts/1>; rel="first", <https:://example.com/posts/2>; rel="prev", <https:://example.com/posts/3>; rel="current", <https:://example.com/posts/4>; rel="next", <https:://example.com/posts/42>; rel="last", <https:://example.com/posts/3/edit>; rel="edit"',
+                'Link' => '<https://example.com/posts/1>; rel="first", <https://example.com/posts/2>; rel="prev", <https://example.com/posts/3>; rel="current", <https://example.com/posts/4>; rel="next", <https://example.com/posts/42>; rel="last", <https://example.com/posts/3/edit>; rel="edit"',
             ]),
         ]);
 
@@ -3791,7 +3791,7 @@ class HttpClientTest extends TestCase
             'next' => Uri::of('https:://example.com/posts/4'),
             'last' => Uri::of('https:://example.com/posts/42'),
             'edit' => Uri::of('https:://example.com/posts/3/edit'),
-        )]);
+        ]);
     }
 
     public static function methodsReceivingArrayableDataProvider()
