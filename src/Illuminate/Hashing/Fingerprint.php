@@ -14,7 +14,7 @@ class Fingerprint implements Stringable
      *
      * @var string
      */
-    public static $with = 'xxh3';
+    public static $use = 'xxh3';
 
     /**
      * Create a new Fingerprint instance.
@@ -61,10 +61,32 @@ class Fingerprint implements Stringable
 
     /**
      * Returns the fingerprint hash as a binary string.
+     *
+     * @return string
      */
     public function raw()
     {
         return $this->hash ??= $this->generate();
+    }
+
+    /**
+     * Returns the fingerprint hash as a hexadecimal string.
+     *
+     * @return string
+     */
+    public function hex()
+    {
+        return bin2hex($this->raw());
+    }
+
+    /**
+     * Returns the fingerprint hash encoded as Base64 with URL-safe characters.
+     *
+     * @return string
+     */
+    public function base64Url()
+    {
+        return Str::of($this->raw())->toBase64()->dump()->swap(['+' => '-', '/' => '_'])->rtrim('=')->toString();
     }
 
     /**
@@ -136,7 +158,11 @@ class Fingerprint implements Stringable
      */
     public function is($hash, $fromBase64 = true)
     {
-        return hash_equals($this->raw(), $fromBase64 || $hash instanceof self ? Str::fromBase64($hash) : $hash);
+        $userHash = $hash instanceof self
+            ? $hash->raw()
+            : ($fromBase64 ? Str::fromBase64($hash) : $hash);
+
+        return hash_equals($this->raw(), $userHash);
     }
 
     /**
@@ -171,6 +197,6 @@ class Fingerprint implements Stringable
      */
     public static function of($value, $algorithm = null, $options = [])
     {
-        return new static($value, $algorithm ?? static::$with, $options);
+        return new static($value, $algorithm ?? static::$use, $options);
     }
 }

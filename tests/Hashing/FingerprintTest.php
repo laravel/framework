@@ -12,7 +12,27 @@ class FingerprintTest extends TestCase
 {
     protected function setUp(): void
     {
-        Fingerprint::$with = 'xxh3';
+        Fingerprint::$use = 'xxh3';
+    }
+
+    public function test_returns_value(): void
+    {
+        $object = (object)[];
+
+        $fingerprint = Fingerprint::of($object);
+
+        $this->assertSame($object, $fingerprint->value());
+    }
+
+    public function test_returns_algorithm(): void
+    {
+        $fingerprint = Fingerprint::of('test');
+
+        $this->assertSame(Fingerprint::$use, $fingerprint->uses());
+
+        $fingerprint = Fingerprint::of('test', 'algo');
+
+        $this->assertSame('algo', $fingerprint->uses());
     }
 
     public function test_hashes_string(): void
@@ -79,6 +99,20 @@ class FingerprintTest extends TestCase
         $this->assertSame(Str::fromBase64($fingerprint->hash()), $fingerprint->raw());
     }
 
+    public function test_hex_hash(): void
+    {
+        $fingerprint = Fingerprint::of('test');
+
+        $this->assertSame(bin2hex($fingerprint->raw()), $fingerprint->hex());
+    }
+
+    public function test_base64_url_safe_hash(): void
+    {
+        $fingerprint = new Fingerprint(null, 'test', [], Str::fromBase64('QCN+xb/igqw='));
+
+        $this->assertSame('QCN-xb_igqw', $fingerprint->base64Url());
+    }
+
     public function test_serializes_into_string_as_hash(): void
     {
         $fingerprint = Fingerprint::of('test');
@@ -117,7 +151,7 @@ class FingerprintTest extends TestCase
 
     public function test_changes_default_algorithm(): void
     {
-        Fingerprint::$with = 'sha256';
+        Fingerprint::$use = 'sha256';
 
         $fingerprint = Fingerprint::of('test');
 
