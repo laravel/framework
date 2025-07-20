@@ -531,11 +531,11 @@ if (! function_exists('chain')) {
     /**
      * @template TValue
      *
-     * @param (callable(TValue): TValue)[] $callbacks
+     * @param  (callable(TValue): TValue)[]  $callbacks
      * @return TValue
      */
     function chain($value, array $callbacks)
-    {        
+    {
         return array_reduce($callbacks, fn ($carry, callable $fn) => $fn($carry), $value);
     }
 }
