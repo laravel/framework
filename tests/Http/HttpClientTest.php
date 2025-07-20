@@ -3791,7 +3791,7 @@ class HttpClientTest extends TestCase
             'next' => Uri::of('https:://example.com/posts/4'),
             'last' => Uri::of('https:://example.com/posts/42'),
             'edit' => Uri::of('https:://example.com/posts/3/edit'),
-        ]);
+        ], $response->linkHeader());
     }
 
     public static function methodsReceivingArrayableDataProvider()
