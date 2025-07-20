@@ -164,9 +164,9 @@ class Response implements ArrayAccess, Stringable
 
     /**
      * Get the Link header fully parsed into an associative array with
-     * the `rel` as key and the URL as an Uri instance.
+     * the `rel` as key and the URL(s) as a list of Uri instances.
      *
-     * @return array<string, \Illuminate\Support\Uri>
+     * @return array<string, \Illuminate\Support\Uri[]>
      */
     public function linkHeader(string $headerName = 'Link'): array
     {
