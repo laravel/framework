@@ -1514,7 +1514,7 @@ class SupportHelpersTest extends TestCase
             fn (string $input) => explode(' ', $input),
             fn (array $parts) => array_filter($parts, trim(...)),
             fn (array $words) => array_map(ucfirst(...), $words),
-            fn (array $words) => implode('-'),
+            fn (array $words) => implode('-', $words),
             Str::toBase64(...),
         ]);
         $this->assertSame('Rmlyc3QtTGFzdA==', $result);
