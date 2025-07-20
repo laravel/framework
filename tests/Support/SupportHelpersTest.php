@@ -13,6 +13,7 @@ use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
 use Illuminate\Tests\Support\Fixtures\StringBackedEnum;
 use IteratorAggregate;
