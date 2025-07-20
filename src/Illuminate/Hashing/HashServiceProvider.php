@@ -21,6 +21,10 @@ class HashServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->singleton('hash.driver', function ($app) {
             return $app['hash']->driver();
         });
+
+        $this->app->bind('fingerprint', function ($app) {
+            return new Fingerprinter($app->make('config')->get('hashing.fingerprint', 'xxh3'));
+        });
     }
 
     /**
@@ -30,6 +34,6 @@ class HashServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     public function provides()
     {
-        return ['hash', 'hash.driver'];
+        return ['hash', 'hash.driver', 'fingerprint'];
     }
 }

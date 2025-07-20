@@ -65,4 +65,17 @@ return [
 
     'rehash_on_login' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Fingerprint
+    |--------------------------------------------------------------------------
+    |
+    | The Fingerprinter tool allows you to create non-secure hashes for data
+    | integrity checks. This value set the default hashing algorithm to use
+    | with the Fingerprinter tool but you may also use another at runtime.
+    |
+    */
+
+    'fingerprint' => 'xxh3',
+
 ];
