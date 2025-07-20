@@ -75,11 +75,13 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function supported($key, $cipher)
     {
-        if (! isset(self::$supportedCiphers[strtolower($cipher)])) {
+        $cipher = strtolower($cipher);
+
+        if (! isset(self::$supportedCiphers[$cipher])) {
             return false;
         }
 
-        return mb_strlen($key, '8bit') === self::$supportedCiphers[strtolower($cipher)]['size'];
+        return mb_strlen($key, '8bit') === self::$supportedCiphers[$cipher]['size'];
     }
 
     /**
