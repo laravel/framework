@@ -3792,7 +3792,7 @@ class HttpClientTest extends TestCase
             'next' => [Uri::of('https://example.com/posts/4')],
             'last' => [Uri::of('https://example.com/posts/42')],
             'edit' => [Uri::of('https://example.com/posts/3/edit')],
-            'author' => [Uri::of('https://example.com/authors/jane-doe'), Uri::of('https://example.com/authors/jane-doe')],
+            'author' => [Uri::of('https://example.com/authors/jane-doe'), Uri::of('https://example.com/authors/john-doe')],
         ], $response->linkHeader());
     }
 
