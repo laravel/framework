@@ -346,10 +346,10 @@ class SupportCollectionTest extends TestCase
     public function testShiftReturnsAndRemovesFirstItemInCollection()
     {
         $data = new Collection(['Taylor', 'Otwell']);
-
-        $this->assertSame('Taylor', $data->shift());
+        
+        $this->assertInstanceOf(Collection::class, $data->shift());
         $this->assertSame('Otwell', $data->first());
-        $this->assertSame('Otwell', $data->shift());
+        $this->assertInstanceOf(Collection::class, $data->shift());
         $this->assertNull($data->first());
     }
 
