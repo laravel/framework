@@ -53,6 +53,8 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Database\stubs\TestCast;
+use Illuminate\Tests\Database\stubs\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -2823,6 +2825,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($model->getCasts()['bar'], 'MyClass:myArgumentA,myArgumentB');
     }
 
+    public function testUnsetCastAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->asToObjectCast = TestValueObject::make([
+            'myPropertyA' => 'A',
+            'myPropertyB' => 'B',
+        ]);
+        unset($model->asToObjectCast);
+        $this->assertArrayNotHasKey('asToObjectCast', $model->getAttributes());
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
@@ -3837,6 +3850,7 @@ class EloquentModelCastingStub extends Model
             'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::of(StringStatus::class),
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
+            'asToObjectCast' => TestCast::class,
         ];
     }
 
