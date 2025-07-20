@@ -91,7 +91,7 @@ trait ManagesAttributes
     protected $rejects = [];
 
     /**
-     * The human readable description of the event.
+     * The human-readable description of the event.
      *
      * @var string|null
      */

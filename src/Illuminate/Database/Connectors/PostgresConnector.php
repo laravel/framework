@@ -58,7 +58,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
      */
     protected function getDsn(array $config)
     {
-        // First we will create the basic DSN setup as well as the port if it is in
+        // First we will create the basic DSN setup as well as the port if it is
         // in the configuration options. This will give us the basic DSN we will
         // need to establish the PDO connections and return them back for use.
         extract($config, EXTR_SKIP);

@@ -648,7 +648,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if a "Attribute" return type marked mutator exists for an attribute.
+     * Determine if an "Attribute" return type marked mutator exists for an attribute.
      *
      * @param  string  $key
      * @return bool
@@ -1151,7 +1151,7 @@ trait HasAttributes
     }
 
     /**
-     * Set the value of a "Attribute" return type marked attribute using its mutator.
+     * Set the value of an "Attribute" return type marked attribute using its mutator.
      *
      * @param  string  $key
      * @param  mixed  $value

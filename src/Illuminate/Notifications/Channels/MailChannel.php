@@ -25,7 +25,7 @@ class MailChannel
     protected $mailer;
 
     /**
-     * The markdown implementation.
+     * The Markdown implementation.
      *
      * @var \Illuminate\Mail\Markdown
      */

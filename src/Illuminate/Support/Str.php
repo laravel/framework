@@ -547,7 +547,7 @@ class Str
     }
 
     /**
-     * Determine if a given string is 7 bit ASCII.
+     * Determine if a given string is 7-bit ASCII.
      *
      * @param  string  $value
      * @return bool

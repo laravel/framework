@@ -21,7 +21,7 @@ class HtmlDumper extends BaseHtmlDumper
     const EXPANDED_SEPARATOR = 'class=sf-dump-expanded>';
 
     /**
-     * Where the source should be placed on "non expanded" kind of dumps.
+     * Where the source should be placed on "non-expanded" kind of dumps.
      *
      * @var string
      */

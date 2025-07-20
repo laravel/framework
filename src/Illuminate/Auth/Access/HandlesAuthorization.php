@@ -29,7 +29,7 @@ trait HandlesAuthorization
     }
 
     /**
-     * Deny with a HTTP status code.
+     * Deny with an HTTP status code.
      *
      * @param  int  $status
      * @param  string|null  $message

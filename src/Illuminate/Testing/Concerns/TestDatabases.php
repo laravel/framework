@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Schema;
 trait TestDatabases
 {
     /**
-     * Indicates if the test database schema is up to date.
+     * Indicates if the test database schema is up-to-date.
      *
      * @var bool
      */
@@ -101,7 +101,7 @@ trait TestDatabases
     }
 
     /**
-     * Ensure the current database test schema is up to date.
+     * Ensure the current database test schema is up-to-date.
      *
      * @return void
      */

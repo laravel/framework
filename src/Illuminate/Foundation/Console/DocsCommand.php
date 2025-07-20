@@ -364,7 +364,7 @@ class DocsCommand extends Command
     }
 
     /**
-     * Open the URL via the built in strategy.
+     * Open the URL via the built-in strategy.
      *
      * @param  string  $url
      * @return void

@@ -96,7 +96,7 @@ trait BuildsWhereDateClauses
     }
 
     /**
-     * Add an "where" clause to determine if a "date" column is in the past or future.
+     * Add a "where" clause to determine if a "date" column is in the past or future.
      *
      * @param  array|string  $columns
      * @param  string  $operator

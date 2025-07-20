@@ -360,7 +360,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Determine if a given string is 7 bit ASCII.
+     * Determine if a given string is 7-bit ASCII.
      *
      * @return bool
      */
@@ -1218,7 +1218,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
-     * Execute the given callback if the string is 7 bit ASCII.
+     * Execute the given callback if the string is 7-bit ASCII.
      *
      * @param  callable  $callback
      * @param  callable|null  $default

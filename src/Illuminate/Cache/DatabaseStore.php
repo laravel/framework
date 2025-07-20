@@ -266,7 +266,7 @@ class DatabaseStore implements LockProvider, Store
             $cache = $this->table()->where('key', $prefixed)
                 ->lockForUpdate()->first();
 
-            // If there is no value in the cache, we will return false here. Otherwise the
+            // If there is no value in the cache, we will return false here. Otherwise, the
             // value will be decrypted and we will proceed with this function to either
             // increment or decrement this value based on the given action callbacks.
             if (is_null($cache)) {

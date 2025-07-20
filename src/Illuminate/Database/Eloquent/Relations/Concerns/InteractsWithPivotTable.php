@@ -13,7 +13,7 @@ trait InteractsWithPivotTable
     /**
      * Toggles a model (or models) from the parent.
      *
-     * Each existing model is detached, and non existing ones are attached.
+     * Each existing model is detached, and non-existing ones are attached.
      *
      * @param  mixed  $ids
      * @param  bool  $touch

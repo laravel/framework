@@ -151,7 +151,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is 7 bit ASCII.
+     * Validate that an attribute is 7-bit ASCII.
      *
      * @param  string  $attribute
      * @param  mixed  $value

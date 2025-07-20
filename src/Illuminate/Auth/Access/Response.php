@@ -74,7 +74,7 @@ class Response implements Arrayable, Stringable
     }
 
     /**
-     * Create a new "deny" Response with a HTTP status code.
+     * Create a new "deny" Response with an HTTP status code.
      *
      * @param  int  $status
      * @param  string|null  $message

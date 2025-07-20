@@ -337,7 +337,7 @@ trait ManagesFrequencies
     }
 
     /**
-     * Schedule the event to run daily at a given time (10:00, 19:30, etc).
+     * Schedule the event to run daily at a given time (10:00, 19:30, etc.).
      *
      * @param  string  $time
      * @return $this

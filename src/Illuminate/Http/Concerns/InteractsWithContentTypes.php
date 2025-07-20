@@ -39,7 +39,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Determines whether the current requests accepts a given content type.
+     * Determines whether the current requests accept a given content type.
      *
      * @param  string|array  $contentTypes
      * @return bool
