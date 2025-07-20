@@ -6,7 +6,9 @@ use ArrayAccess;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use LogicException;
 use Stringable;
 
@@ -157,6 +159,23 @@ class Response implements ArrayAccess, Stringable
     public function headers()
     {
         return $this->response->getHeaders();
+    }
+
+    /**
+     * Get the Link header fully parsed into an associative array with
+     * the `rel` as key and the URL as an Uri instance
+     *
+     * @return array<string, \Illuminate\Support\Uri>
+     */
+    public function linkHeader(string $headerName = 'Link'): array
+    {
+        $parsed = Header::parse($this->header($headerName));
+        $links = array_combine(
+            array_column($parsed, 'rel'),
+            array_column($parsed, '0'),
+        );
+
+        return array_map(fn (string $value) => Uri::of(Str::unwrap($value, '<', '>')), $links);
     }
 
     /**
