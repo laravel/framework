@@ -389,25 +389,25 @@ class SupportTestingMailFakeTest extends TestCase
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class, function ($mail) {
-            return $mail->hasMailer('smtp');
+            return $mail->usesMailer('smtp');
         });
 
         $this->fake->mailer('ses')->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class, function ($mail) {
-            return $mail->hasMailer('ses');
+            return $mail->usesMailer('ses');
         });
 
         $this->fake->mailer('sendgrid')->to('taylor@laravel.com')->queue($this->mailable);
 
         $this->fake->assertQueued(MailableStub::class, function ($mail) {
-            return $mail->hasMailer('sendgrid');
+            return $mail->usesMailer('sendgrid');
         });
 
         $this->fake->mailer('mailjet')->to('taylor@laravel.com')->queue($this->mailable);
 
         $this->fake->assertQueued(MailableStub::class, function ($mail) {
-            return $mail->hasMailer('mailjet');
+            return $mail->usesMailer('mailjet');
         });
     }
 }
