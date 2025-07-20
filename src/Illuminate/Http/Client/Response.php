@@ -173,6 +173,7 @@ class Response implements ArrayAccess, Stringable
         $parsed = Header::parse($this->header($headerName));
         $links = array_reduce($parsed, function (array $carry, array $link) {
             $carry[$link['rel']][] = Uri::of(Str::unwrap($link['0'], '<', '>'));
+
             return $carry;
         }, []);
     }
