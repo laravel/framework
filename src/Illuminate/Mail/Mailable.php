@@ -1812,6 +1812,17 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable will be sent by the given mailer.
+     *
+     * @param  string  $mailer
+     * @return bool
+     */
+    public function usesMailer($mailer)
+    {
+        return $this->mailer === $mailer;
+    }
+
+    /**
      * Set the name of the mailer that should send the message.
      *
      * @param  string  $mailer
