@@ -2825,7 +2825,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals($model->getCasts()['bar'], 'MyClass:myArgumentA,myArgumentB');
     }
 
-    public function testUnsetAttributes()
+    public function testUnsetCastAttributes()
     {
         $model = new EloquentModelCastingStub;
         $model->asToObjectCast = TestValueObject::make([
