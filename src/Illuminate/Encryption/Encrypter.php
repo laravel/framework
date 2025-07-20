@@ -75,11 +75,11 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function supported($key, $cipher)
     {
-        if (! isset(self::$supportedCiphers[$cipher])) {
+        if (! isset(self::$supportedCiphers[strtolower($cipher)])) {
             return false;
         }
 
-        return mb_strlen($key, '8bit') === self::$supportedCiphers[$cipher]['size'];
+        return mb_strlen($key, '8bit') === self::$supportedCiphers[strtolower($cipher)]['size'];
     }
 
     /**
@@ -90,7 +90,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public static function generateKey($cipher)
     {
-        return random_bytes(self::$supportedCiphers[$cipher]['size'] ?? 32);
+        return random_bytes(self::$supportedCiphers[strtolower($cipher)]['size'] ?? 32);
     }
 
     /**
@@ -322,7 +322,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     protected function shouldValidateMac()
     {
-        return ! self::$supportedCiphers[strtolower($this->cipher)]['aead'];
+        return ! self::$supportedCiphers[$this->cipher]['aead'];
     }
 
     /**
