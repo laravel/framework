@@ -34,6 +34,7 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use JsonSerializable;
 use Mockery as m;
 use OutOfBoundsException;
