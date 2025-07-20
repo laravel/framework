@@ -573,10 +573,11 @@ class MailMailableTest extends TestCase
         $mailable = new WelcomeMailableStub;
 
         $mailable->mailer('array');
+        $this->assertTrue($mailable->hasMailer('array'));
 
-        $mailable = unserialize(serialize($mailable));
-
-        $this->assertSame('array', $mailable->mailer);
+        $mailable->mailer('smtp');
+        $this->assertTrue($mailable->hasMailer('smtp'));
+        $this->assertFalse($mailable->hasMailer('ses'));
     }
 
     public function testMailablePriorityGetsSent()

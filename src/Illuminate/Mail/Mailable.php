@@ -1825,6 +1825,17 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the mailable will be sent by the given mailer or driver.
+     *
+     * @param  string  $mailer
+     * @return bool
+     */
+    public function hasMailer($mailer)
+    {
+        return $this->mailer === $mailer;
+    }
+
+    /**
      * Register a callback to be called with the Symfony message instance.
      *
      * @param  callable  $callback
