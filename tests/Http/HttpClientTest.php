@@ -3785,7 +3785,7 @@ class HttpClientTest extends TestCase
 
         $response = $this->factory->get('https://example.com/posts/3');
 
-        $this->assertSame([
+        $this->assertEquals([
             'first' => Uri::of('https://example.com/posts/1'),
             'prev' => Uri::of('https://example.com/posts/2'),
             'current' => Uri::of('https://example.com/posts/3'),
