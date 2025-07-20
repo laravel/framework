@@ -3786,12 +3786,12 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('https://example.com/posts/3');
 
         $this->assertSame([
-            'first' => Uri::of('https:://example.com/posts/1'),
-            'prev' => Uri::of('https:://example.com/posts/2'),
-            'current' => Uri::of('https:://example.com/posts/3'),
-            'next' => Uri::of('https:://example.com/posts/4'),
-            'last' => Uri::of('https:://example.com/posts/42'),
-            'edit' => Uri::of('https:://example.com/posts/3/edit'),
+            'first' => Uri::of('https://example.com/posts/1'),
+            'prev' => Uri::of('https://example.com/posts/2'),
+            'current' => Uri::of('https://example.com/posts/3'),
+            'next' => Uri::of('https://example.com/posts/4'),
+            'last' => Uri::of('https://example.com/posts/42'),
+            'edit' => Uri::of('https://example.com/posts/3/edit'),
         ], $response->linkHeader());
     }
 
