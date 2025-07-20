@@ -5,6 +5,8 @@ namespace Illuminate\Container;
 use ArrayAccess;
 use Closure;
 use Exception;
+use Illuminate\Container\Attributes\Scoped;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -252,9 +254,33 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function isShared($abstract)
     {
-        return isset($this->instances[$abstract]) ||
-               (isset($this->bindings[$abstract]['shared']) &&
-               $this->bindings[$abstract]['shared'] === true);
+        if (isset($this->instances[$abstract])) {
+            return true;
+        }
+
+        if (isset($this->bindings[$abstract]['shared']) && $this->bindings[$abstract]['shared'] === true) {
+            return true;
+        }
+
+        if (! class_exists($abstract)) {
+            return false;
+        }
+
+        $reflection = new ReflectionClass($abstract);
+
+        if (! empty($reflection->getAttributes(Singleton::class))) {
+            return true;
+        }
+
+        if (! empty($reflection->getAttributes(Scoped::class))) {
+            if (! in_array($abstract, $this->scopedInstances, true)) {
+                $this->scopedInstances[] = $abstract;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

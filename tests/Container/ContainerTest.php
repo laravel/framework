@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Container\Attributes\Scoped;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -740,6 +742,30 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
     }
 
+    public function testContainerSingletonAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $secondInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testContainerScopedAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerScopedAttribute::class);
+        $secondInstantiation = $container->get(ContainerScopedAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerScopedAttribute::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -898,4 +924,14 @@ class ContainerCurrentResolvingConcrete
     ) {
         $this->currentlyResolving = $currentlyResolving;
     }
+}
+
+#[Singleton]
+class ContainerSingletonAttribute
+{
+}
+
+#[Scoped]
+class ContainerScopedAttribute
+{
 }
