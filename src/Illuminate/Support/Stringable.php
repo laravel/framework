@@ -873,7 +873,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  string  $value
      * @return string[]
      */
-    public static function splitWords($value): array
+    public function splitWords($value): array
     {
         return Str::splitWords($this->value);
     }
