@@ -1775,6 +1775,18 @@ class SupportStrTest extends TestCase
         );
     }
 
+    public function testPasswordFactoryCanBeSet()
+    {
+        Str::createPasswordUsing(fn () => 'custom-password');
+
+        $this->assertSame('custom-password', Str::password());
+        $this->assertSame('custom-password', Str::password(length: 7));
+
+        Str::createPasswordNormally();
+
+        $this->assertNotSame('custom-password', Str::password());
+    }
+
     public function testToBase64()
     {
         $this->assertSame(base64_encode('foo'), Str::toBase64('foo'));
