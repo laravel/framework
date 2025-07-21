@@ -866,7 +866,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return new static(Str::title($this->value));
     }
 
-
     /**
      * Splits the given string into an array of words.
      *
