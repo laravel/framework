@@ -224,7 +224,7 @@ class RouteListCommandTest extends TestCase
                 'name' => null,
                 'action' => 'Closure',
                 'middleware' => ['web', 'auth'],
-            ]
+            ],
         ];
 
         $this->assertJsonStringEqualsJsonString(json_encode($expected), $output);
