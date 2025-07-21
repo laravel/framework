@@ -263,6 +263,14 @@ class RouteListCommand extends Command
      */
     protected function filterRoute(array $route)
     {
+        if ($this->option('middleware')) {
+            $middlewareFilter = $this->option('middleware');
+
+            if (!in_array($middlewareFilter, $route['middleware'] ?? [])) {
+                return;
+            }
+        }
+
         if (($this->option('name') && ! Str::contains((string) $route['name'], $this->option('name'))) ||
             ($this->option('action') && isset($route['action']) && is_string($route['action']) && ! Str::contains($route['action'], $this->option('action'))) ||
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
@@ -500,6 +508,7 @@ class RouteListCommand extends Command
             ['action', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by action'],
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
             ['domain', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by domain'],
+            ['middleware', null, InputOption::VALUE_OPTIONAL, 'Filter routes by middleware'],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Only show routes matching the given path pattern'],
             ['except-path', null, InputOption::VALUE_OPTIONAL, 'Do not display the routes matching the given path pattern'],
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
