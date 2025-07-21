@@ -354,6 +354,16 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Get content as a Stringable class.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public function toStr()
+    {
+        return Str::of($this->value());
+    }
+
+    /**
      * Get the decoded string representation of the URI.
      */
     public function decode(): string
