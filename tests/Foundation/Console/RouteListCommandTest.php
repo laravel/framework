@@ -210,20 +210,20 @@ class RouteListCommandTest extends TestCase
 
         $expected = [
             [
-                "domain" => null,
-                "method" => "GET|HEAD",
-                "uri" => "test1",
-                "name" => null,
-                "action" => "Closure",
-                "middleware" => ["auth"]
+                'domain' => null,
+                'method' => 'GET|HEAD',
+                'uri' => 'test1',
+                'name' => null,
+                'action' => 'Closure',
+                'middleware' => ['auth'],
             ],
             [
-                "domain" => null,
-                "method" => "GET|HEAD",
-                "uri" => "test3",
-                "name" => null,
-                "action" => "Closure",
-                "middleware" => ["web", "auth"]
+                'domain' => null,
+                'method' => 'GET|HEAD',
+                'uri' => 'test3',
+                'name' => null,
+                'action' => 'Closure',
+                'middleware' => ['web', 'auth'],
             ]
         ];
 
