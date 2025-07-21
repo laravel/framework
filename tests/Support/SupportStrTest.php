@@ -1882,6 +1882,11 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testSplitWords(): void
+    {
+        $this->assertSame(['foo', 'bar'], Str::splitWords('foo  bar'));
+    }
 }
 
 class StringableObjectStub
