@@ -202,6 +202,7 @@ class RouteListCommandTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
+
     public function testFilterRoutesByMiddleware()
     {
         $this->app->call('route:list', ['--middleware' => 'auth', '--json' => true]);
