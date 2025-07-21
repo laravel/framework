@@ -63,6 +63,18 @@ class RouteListCommandTest extends TestCase
             return 'Hello Group';
         })->middleware(['web', 'auth']);
 
+        $router->get('/test1', function () {
+            return 'Test 1';
+        })->middleware('auth');
+
+        $router->get('/test2', function () {
+            return 'Test 2';
+        })->middleware('web');
+
+        $router->get('/test3', function () {
+            return 'Test 3';
+        })->middleware(['web', 'auth']);
+
         $command = new RouteListCommand($router);
         $command->setLaravel($laravel);
 
@@ -217,5 +229,4 @@ class RouteListCommandTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString(json_encode($expected), $output);
     }
-
 }

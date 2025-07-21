@@ -266,9 +266,10 @@ class RouteListCommand extends Command
         if ($this->option('middleware')) {
             $middlewareFilter = $this->option('middleware');
 
-            if (!in_array($middlewareFilter, $route['middleware'] ?? [])) {
+            if (!in_array($middlewareFilter, (array) ($route['middleware'] ?? []))) {
                 return;
             }
+
         }
 
         if (($this->option('name') && ! Str::contains((string) $route['name'], $this->option('name'))) ||
