@@ -151,6 +151,19 @@ class Exceptions
     }
 
     /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param callable $using
+     * @return Exceptions
+     */
+    public function dontReportUsing(Closure $dontReportUsing)
+    {
+        $this->handler->dontReportUsing($dontReportUsing);
+
+        return $this;
+    }
+
+    /**
      * Do not report duplicate exceptions.
      *
      * @return $this

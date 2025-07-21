@@ -72,6 +72,14 @@ class Handler implements ExceptionHandlerContract
      */
     protected $dontReport = [];
 
+
+    /**
+     * A callback that inspects exceptions to determine if they should be reported.
+     *
+     * @var callable|null
+     */
+    protected $dontReportCallback = null;
+
     /**
      * The callbacks that should be used during reporting.
      *
@@ -280,6 +288,17 @@ class Handler implements ExceptionHandlerContract
     }
 
     /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param  array|string  $class
+     * @return $this
+     */
+    public function dontReportUsing(callable $dontReportUsing)
+    {
+        $this->dontReportCallback = $dontReportUsing;
+    }
+
+    /**
      * Indicate that the given exception type should not be reported.
      *
      * @param  array|string  $exceptions
@@ -410,6 +429,10 @@ class Handler implements ExceptionHandlerContract
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         if (! is_null(Arr::first($dontReport, fn ($type) => $e instanceof $type))) {
+            return true;
+        }
+
+        if ($this->dontReportCallback && $this->container->call($this->dontReportCallback, [$e])) {
             return true;
         }
 
