@@ -354,7 +354,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
-     * Get content as a Stringable class.
+     * Get content as a Stringable instance.
      *
      * @return \Illuminate\Support\Stringable
      */
