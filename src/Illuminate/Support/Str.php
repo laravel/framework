@@ -75,6 +75,13 @@ class Str
     protected static $randomStringFactory;
 
     /**
+     * The callback that should be used to generate passwords.
+     *
+     * @var callable|null
+     */
+    protected static $passwordFactory;
+
+    /**
      * Get a new stringable object from the given string.
      *
      * @param  string  $string
@@ -1055,6 +1062,10 @@ class Str
      */
     public static function password($length = 32, $letters = true, $numbers = true, $symbols = true, $spaces = false)
     {
+        if (static::$passwordFactory) {
+            return (static::$passwordFactory)($length, $letters, $numbers, $symbols, $spaces);
+        }
+
         $password = new Collection();
 
         $options = (new Collection([
@@ -1084,6 +1095,27 @@ class Str
         return $password->merge($options->pipe(
             fn ($c) => Collection::times($length, fn () => $c[random_int(0, $c->count() - 1)])
         ))->shuffle()->implode('');
+    }
+
+    /**
+     * Set the callable that will be used to generate passwords.
+     *
+     * @param  callable|null  $factory
+     * @return void
+     */
+    public static function createPasswordUsing(?callable $factory = null)
+    {
+        static::$passwordFactory = $factory;
+    }
+
+    /**
+     * Indicate that passwords should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createPasswordNormally()
+    {
+        static::$passwordFactory = null;
     }
 
     /**
