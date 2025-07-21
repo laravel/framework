@@ -221,7 +221,7 @@ class RouteListCommandTest extends TestCase
             [
                 'domain' => null,
                 'method' => 'GET|HEAD',
-                'uri' => 'test3',
+                'uri' => 'test2',
                 'name' => null,
                 'action' => 'Closure',
                 'middleware' => ['web', 'auth'],
