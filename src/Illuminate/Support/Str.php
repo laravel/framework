@@ -1708,7 +1708,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $words = static::splitWords('\s+', static::replace(['-', '_'], ' ', $value));
+        $words = static::splitWords(static::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
