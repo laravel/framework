@@ -1777,12 +1777,12 @@ class SupportStrTest extends TestCase
 
     public function testPasswordFactoryCanBeSet()
     {
-        Str::createPasswordUsing(fn () => 'custom-password');
+        Str::createPasswordsUsing(fn () => 'custom-password');
 
         $this->assertSame('custom-password', Str::password());
         $this->assertSame('custom-password', Str::password(length: 7));
 
-        Str::createPasswordNormally();
+        Str::createPasswordsNormally();
 
         $this->assertNotSame('custom-password', Str::password());
     }

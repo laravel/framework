@@ -1103,7 +1103,7 @@ class Str
      * @param  callable|null  $factory
      * @return void
      */
-    public static function createPasswordUsing(?callable $factory = null)
+    public static function createPasswordsUsing(?callable $factory = null)
     {
         static::$passwordFactory = $factory;
     }
@@ -1113,7 +1113,7 @@ class Str
      *
      * @return void
      */
-    public static function createPasswordNormally()
+    public static function createPasswordsNormally()
     {
         static::$passwordFactory = null;
     }
