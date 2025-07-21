@@ -1442,6 +1442,17 @@ class Str
     }
 
     /**
+     * Splits the given string into an array of words.
+     *
+     * @param  string  $value
+     * @return string[]
+     */
+    public static function splitWords($value): array
+    {
+        return mb_split('\s+', $value);
+    }
+
+    /**
      * Convert the given string to proper case for each word.
      *
      * @param  string  $value
@@ -1449,7 +1460,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = mb_split('\s+', $value);
+        $parts = static::splitWords($value);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1482,7 +1493,7 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = mb_split('\s+', $value);
+        $words = static::splitWords($value);
 
         for ($i = 0; $i < count($words); $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
@@ -1697,7 +1708,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
+        $words = static::splitWords('\s+', static::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
