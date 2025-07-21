@@ -866,6 +866,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return new static(Str::title($this->value));
     }
 
+
+    /**
+     * Splits the given string into an array of words.
+     *
+     * @param  string  $value
+     * @return string[]
+     */
+    public static function splitWords($value): array
+    {
+        return Str::splitWords($this->value);
+    }
+
     /**
      * Convert the given string to proper case for each word.
      *
