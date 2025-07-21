@@ -206,28 +206,10 @@ class RouteListCommandTest extends TestCase
     public function testFilterRoutesByMiddleware()
     {
         $this->app->call('route:list', ['--middleware' => 'auth', '--json' => true]);
-
         $output = $this->app->output();
 
-        $expected = [
-            [
-                'domain' => null,
-                'method' => 'GET|HEAD',
-                'uri' => 'test1',
-                'name' => null,
-                'action' => 'Closure',
-                'middleware' => ['auth'],
-            ],
-            [
-                'domain' => null,
-                'method' => 'GET|HEAD',
-                'uri' => 'test2',
-                'name' => null,
-                'action' => 'Closure',
-                'middleware' => ['web', 'auth'],
-            ],
-        ];
+        $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"test1","name":null,"action":"Closure","middleware":["auth"]},{"domain":null,"method":"GET|HEAD","uri":"test2","name":null,"action":"Closure","middleware":["web","auth"]}]';
 
-        $this->assertJsonStringEqualsJsonString(json_encode($expected), $output);
+        $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
 }
