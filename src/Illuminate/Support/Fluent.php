@@ -204,6 +204,26 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     }
 
     /**
+     * Determine if the fluent instance is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return empty($this->attributes);
+    }
+
+    /**
+     * Determine if the fluent instance is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty(): bool
+    {
+        return ! $this->isEmpty();
+    }
+
+    /**
      * Determine if the given offset exists.
      *
      * @param  TKey  $offset
