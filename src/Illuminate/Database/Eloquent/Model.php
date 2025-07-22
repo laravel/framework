@@ -1679,55 +1679,53 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function hasValidForeignKeys()
     {
-        // First, try to get foreign key info from relationships safely
         $foreignKeysToCheck = $this->getForeignKeysFromRelationships();
 
-        // If we couldn't get relationship info safely, fall back to conventional naming
+        // fall back to conventional naming
         if (empty($foreignKeysToCheck)) {
             $foreignKeysToCheck = $this->getForeignKeysFromConventions();
         }
-        // If still no foreign keys found, consider it valid (might be a regular model without relationships)
+
         if (empty($foreignKeysToCheck)) {
             return true;
         }
-        // Check if all required foreign keys are set
+
         foreach ($foreignKeysToCheck as $key => $required) {
             if ($required && is_null($this->getAttribute($key))) {
                 return false;
             }
         }
+
         return true;
     }
 
     /**
-     * Safely attempt to get foreign key information from relationships.
+     * safely attempt to get foreign key information from relationships.
      *
      * @return array
      */
     protected function getForeignKeysFromRelationships()
     {
         $foreignKeys = [];
-        // Check if relationshipCache exists and use it
+
         if (property_exists($this, 'relationshipCache') && ! empty($this->relationshipCache)) {
             return $this->extractForeignKeysFromCache();
         }
-        // Use reflection to dynamically inspect relationships
+
         $reflectionClass = new ReflectionClass($this);
         $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+
         foreach ($methods as $method) {
-            // Skip methods that might cause recursion or are not relationship methods
             if ($this->isSkippableMethod($method)) {
                 continue;
             }
             try {
-                // Check if the method returns a relationship
                 $returnType = $method->getReturnType();
                 if ($returnType && $this->{$method->getName()}() instanceof \Illuminate\Database\Eloquent\Relations\Relation) {
                     $foreignKeys = $this->extractForeignKeysFromRelation($method->getName(), $foreignKeys);
                 }
             } catch (\Exception $e) {
-                // Log or handle any exceptions during reflection
-                // This prevents breaking the entire method if one relationship check fails
+                // preventing breaking the entire method if one relationship check fails
                 continue;
             }
         }
@@ -1745,21 +1743,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         foreach ($this->relationshipCache as $relationName => $relationInstance) {
             $foreignKeys = $this->extractForeignKeysFromRelation($relationName, $foreignKeys);
         }
+
         return $foreignKeys;
     }
 
     /**
      * Extract foreign keys from a specific relation.
      *
-     * @param string $relationName
-     * @param array $existingForeignKeys
+     * @param  string  $relationName
+     * @param  array  $existingForeignKeys
      * @return array
      */
     protected function extractForeignKeysFromRelation($relationName, $existingForeignKeys = [])
     {
         try {
             $relation = $this->{$relationName}();
-            // Handle different types of relationships
+
             switch (true) {
                 case $relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo:
                     $foreignKey = $relation->getForeignKeyName();
@@ -1773,22 +1772,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                     break;
                 case $relation instanceof \Illuminate\Database\Eloquent\Relations\HasOne:
                 case $relation instanceof \Illuminate\Database\Eloquent\Relations\HasMany:
-                    // For these, the foreign key is on the related model
                     $foreignKey = $relation->getForeignKeyName();
                     $existingForeignKeys[$foreignKey] = true;
                     break;
-                // Add more relationship types as needed
             }
         } catch (\Exception $e) {
-            // Silently handle any errors during foreign key extraction
+            //
         }
+
         return $existingForeignKeys;
     }
 
     /**
-     * Determine if a method should be skipped during relationship inspection.
+     * Determine whether a method should be skipped or not during relationship inspection.
      *
-     * @param ReflectionMethod $method
+     * @param  ReflectionMethod  $method
      * @return bool
      */
     protected function isSkippableMethod($method)
@@ -1796,8 +1794,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $skippableMethods = [
             'hasValidForeignKeys',
             'getForeignKeysFromRelationships',
-            'preventSavingDefaultInstanceWithInvalidKeys'
+            'preventSavingDefaultInstanceWithInvalidKeys',
+            'isDefaultModelInstance',
+            'getForeignKeysFromConventions',
+            'extractForeignKeysFromRelation',
+            'extractForeignKeysFromCache',
+            'isSkippableMethod',
         ];
+
         return in_array($method->getName(), $skippableMethods) ||
             $method->getNumberOfRequiredParameters() > 0;
     }
@@ -1810,22 +1814,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected function getForeignKeysFromConventions()
     {
         $foreignKeys = [];
-        // Check for common foreign key patterns
+
         foreach ($this->attributes as $key => $value) {
             if (str_ends_with($key, '_id') || str_ends_with($key, '_type')) {
-                $foreignKeys[$key] = true; // Mark as required
+                $foreignKeys[$key] = true;
             }
         }
-        // For morphTo relationships, both *id and *type must be set
+
         $morphTypes = array_filter($foreignKeys, fn ($key) => str_ends_with($key, '_type'), ARRAY_FILTER_USE_KEY);
         foreach ($morphTypes as $typeKey => $required) {
             $idKey = str_replace('_type', '_id', $typeKey);
-            // Both type and id must be set for morphTo relationships
+
             if (array_key_exists($idKey, $this->attributes)) {
                 $foreignKeys[$typeKey] = true;
                 $foreignKeys[$idKey] = true;
             }
         }
+
         return $foreignKeys;
     }
 
@@ -1835,13 +1840,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return void
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function preventSavingDefaultInstanceWithInvalidKeys()
     {
         if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
             throw new LogicException(sprintf(
-                "Cannot save a withDefault() model instance [%s] because its required foreign keys are not set properly. Make sure the parent relationship is correctly assigned before using the instance, especially in model events.",
+                "Can not save a withDefault() model instance [%s] because its required foreign keys are not set properly. Make sure the parent relationship is correctly assigned before using the instance, especially in model events.",
                 static::class
             ));
         }
