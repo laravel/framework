@@ -648,10 +648,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         });
 
         $this->handler->dontReportUsing(function (\Throwable $e) {
-            if ($e->getMessage() === 'foo') {
-                return true;
-            }
-            return false;
+            return $e->getMessage() === 'foo';
         });
 
         $this->handler->report($e1);
