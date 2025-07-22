@@ -72,7 +72,6 @@ class Handler implements ExceptionHandlerContract
      */
     protected $dontReport = [];
 
-
     /**
      * The callbacks that inspect exceptions to determine if they should be reported.
      *
