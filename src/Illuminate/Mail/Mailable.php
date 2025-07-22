@@ -1184,13 +1184,17 @@ class Mailable implements MailableContract, Renderable
     /**
      * Add a metadata header to the message when supported by the underlying transport.
      *
-     * @param  string  $key
-     * @param  string  $value
+     * @param  array|string  $key
+     * @param  string|null  $value
      * @return $this
      */
-    public function metadata($key, $value)
+    public function metadata($key, $value = null)
     {
-        $this->metadata[$key] = $value;
+        if (is_array($key)) {
+            $this->metadata = array_merge($this->metadata, $key);
+        } else {
+            $this->metadata[$key] = $value;
+        }
 
         return $this;
     }
