@@ -642,7 +642,7 @@ class MailMailableTest extends TestCase
         $mailable->html('test content');
 
         $mailable->mergeMetadata([
-            'origin' => 'test-suite',
+            'template_id' => 'external-template-id',
             'customer_id' => 101,
             'order_id' => 1000,
             'subtotal' => 1500,
@@ -651,7 +651,7 @@ class MailMailableTest extends TestCase
             'total' => 1670,
         ]);
 
-        $this->assertTrue($mailable->hasMetadata('origin', 'test-suite'));
+        $this->assertTrue($mailable->hasMetadata('template_id', 'external-template-id'));
         $this->assertTrue($mailable->hasMetadata('customer_id', 101));
         $this->assertTrue($mailable->hasMetadata('order_id', 1000));
         $this->assertTrue($mailable->hasMetadata('subtotal', 1500));
@@ -664,7 +664,7 @@ class MailMailableTest extends TestCase
         $mailer = new Mailer('array', $view, new ArrayTransport);
 
         $sentMessage = $mailer->send($mailable);
-        $this->assertStringContainsString('X-Metadata-origin: test-suite', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-template_id: external-template-id', $sentMessage->toString());
         $this->assertStringContainsString('X-Metadata-customer_id: 101', $sentMessage->toString());
         $this->assertStringContainsString('X-Metadata-order_id: 1000', $sentMessage->toString());
         $this->assertStringContainsString('X-Metadata-subtotal: 1500', $sentMessage->toString());
