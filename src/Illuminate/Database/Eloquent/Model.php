@@ -1786,7 +1786,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Determine whether a method should be skipped or not during relationship inspection.
      *
-     * @param  ReflectionMethod  $method
+     * @param  \ReflectionMethod  $method
      * @return bool
      */
     protected function isSkippableMethod($method)
