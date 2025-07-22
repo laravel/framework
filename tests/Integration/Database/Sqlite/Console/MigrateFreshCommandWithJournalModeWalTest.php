@@ -4,12 +4,14 @@ namespace Illuminate\Tests\Integration\Database\Sqlite\Console;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
 use function Illuminate\Filesystem\join_paths;
 use function Orchestra\Testbench\default_migration_path;
 
+#[RequiresDatabase('sqlite')]
 #[WithConfig('database.default', 'sqlite')]
 #[WithConfig('database.connections.sqlite.journal_mode', 'wal')]
 class MigrateFreshCommandWithJournalModeWalTest extends TestCase
