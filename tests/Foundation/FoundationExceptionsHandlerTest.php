@@ -635,6 +635,32 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame($reported, [$one, $two]);
     }
 
+    public function testItCanSkipExceptionReportingUsingCallback()
+    {
+        $reported = [];
+        $e1 = new RuntimeException('foo');
+        $e2 = new RuntimeException('bar');
+
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->dontReportUsing(function (\Throwable $e) {
+            if ($e->getMessage() === 'foo') {
+                return true;
+            }
+            return false;
+        });
+
+        $this->handler->report($e1);
+        $this->handler->report($e2);
+        $this->handler->report($e1);
+
+        $this->assertSame($reported, [$e2]);
+    }
+
     public function testItDoesNotThrottleExceptionsByDefault()
     {
         $reported = [];
