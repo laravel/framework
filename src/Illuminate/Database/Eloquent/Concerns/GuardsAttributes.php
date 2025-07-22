@@ -75,7 +75,7 @@ trait GuardsAttributes
      */
     public function getGuarded()
     {
-        return $this->guarded === false
+        return self::$unguarded === true
             ? []
             : $this->guarded;
     }
