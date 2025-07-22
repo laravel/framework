@@ -16,6 +16,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Middleware\HttpClientCurlGenerator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -761,6 +762,27 @@ class PendingRequest
 
             exit(1);
         });
+    }
+
+    /**
+     * Dump the curl before sending and end the script.
+     *
+     * @param  bool  $pretty
+     * @return $this
+     */
+    public function ddCurl(bool $pretty = false)
+    {
+        return $this->withMiddleware((new HttpClientCurlGenerator)->handle($pretty));
+    }
+
+    /**
+     * Dump the pretty curl before sending and end the script.
+     *
+     * @return $this
+     */
+    public function ddPrettyCurl()
+    {
+        return $this->ddCurl(true);
     }
 
     /**
