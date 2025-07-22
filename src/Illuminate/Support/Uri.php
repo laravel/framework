@@ -206,6 +206,14 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Specify the scheme of the URI as HTTPS.
+     */
+    public function withHttps(): static
+    {
+        return $this->withScheme('https');
+    }
+
+    /**
      * Specify the user and password for the URI.
      */
     public function withUser(Stringable|string|null $user, #[SensitiveParameter] Stringable|string|null $password = null): static
