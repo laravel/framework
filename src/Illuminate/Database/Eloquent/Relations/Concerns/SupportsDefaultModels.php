@@ -50,6 +50,9 @@ trait SupportsDefaultModels
 
         $instance = $this->newRelatedInstanceFor($parent);
 
+        // Mark the instance as a default.
+        $instance->markAsDefaultInstance();
+
         if (is_callable($this->withDefault)) {
             return call_user_func($this->withDefault, $instance, $parent) ?: $instance;
         }
@@ -57,9 +60,6 @@ trait SupportsDefaultModels
         if (is_array($this->withDefault)) {
             $instance->forceFill($this->withDefault);
         }
-
-        // Mark the instance as a default.
-        $instance->markAsDefaultInstance();
 
         return $instance;
     }

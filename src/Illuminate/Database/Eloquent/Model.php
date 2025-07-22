@@ -26,7 +26,6 @@ use LogicException;
 use Stringable;
 use ReflectionClass;
 use ReflectionMethod;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
@@ -1227,9 +1226,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performUpdate(Builder $query)
     {
-        // prevent saving if all foreign keys of the default instance are not valid
-//        $this->preventSavingDefaultInstanceWithInvalidKeys();
-
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
         // operation if the model does not pass validation. Otherwise, we update.
@@ -1314,9 +1310,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function performInsert(Builder $query)
     {
-        // prevent saving if all foreign keys of the default instance are not valid
-//        $this->preventSavingDefaultInstanceWithInvalidKeys();
-
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
         }
