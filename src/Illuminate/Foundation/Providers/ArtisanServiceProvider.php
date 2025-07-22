@@ -88,6 +88,7 @@ use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Foundation\Console\ViewMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
+use Illuminate\Foundation\Console\EnvCopyCommand;
 use Illuminate\Queue\Console\BatchesTableCommand;
 use Illuminate\Queue\Console\ClearCommand as QueueClearCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
@@ -226,6 +227,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'TraitMake' => TraitMakeCommand::class,
         'VendorPublish' => VendorPublishCommand::class,
         'ViewMake' => ViewMakeCommand::class,
+        'EnvCopy' => EnvCopyCommand::class,
     ];
 
     /**
