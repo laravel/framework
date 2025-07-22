@@ -1,6 +1,44 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.20.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.21.0...12.x)
+
+## [v12.21.0](https://github.com/laravel/framework/compare/v12.20.0...v12.21.0) - 2025-07-22
+
+* fix(vite): #55793 add explicit as-script to link tag for script modul… by [@midsonlajeanty](https://github.com/midsonlajeanty) in https://github.com/laravel/framework/pull/55794
+* [12.x] Allow globally disabling Factory parent relationships via `Factory::dontExpandRelationshipsByDefault()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56154
+* [12.x] Adds checking if a value is between two columns by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/56119
+* [12.x] Ensure database connection is always restored by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/56258
+* [12.x] Fix handling of `Htmlable` objects in `Js::convertDataToJavaScriptExpression()` by [@jj15asmr](https://github.com/jj15asmr) in https://github.com/laravel/framework/pull/56253
+* Reduce meaningless intermediate variables. by [@LjjGit](https://github.com/LjjGit) in https://github.com/laravel/framework/pull/56265
+* [12.x] Improve typehints for `AbstractCursorPaginator@through()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56267
+* Use `Date` facade instead of `time()` for `password_confirmed_at` check by [@dylanbr](https://github.com/dylanbr) in https://github.com/laravel/framework/pull/56270
+* [12.x] fix: Collection::transform() and Paginator::through() return types by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56273
+* [12.x] Merge 11.x into 12.x by [@u01jmg3](https://github.com/u01jmg3) in https://github.com/laravel/framework/pull/56289
+* [12.x] Reduce meaningless intermediate variables by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56288
+* [12.x] Refactor build Method to Use Null Coalescing Assignment for Default C… by [@Ashot1995](https://github.com/Ashot1995) in https://github.com/laravel/framework/pull/56283
+* [12.x] minor code formatting improvements by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56296
+* [12.x] Use more specific route binding exception message for child routes by [@jessekoerhuis](https://github.com/jessekoerhuis) in https://github.com/laravel/framework/pull/56298
+* [12.x] Fix Possible Undefined Variables by [@calfc](https://github.com/calfc) in https://github.com/laravel/framework/pull/56292
+* [12.x] Fix: Ensure scheduler `dailyAt()` method parses minutes and ignores seconds when seconds are provided by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56308
+* [12.x] Allows for strict boolean validation by [@peterfox](https://github.com/peterfox) in https://github.com/laravel/framework/pull/56313
+* Improve `SeedCommand` console output by [@Jehong-Ahn](https://github.com/Jehong-Ahn) in https://github.com/laravel/framework/pull/56310
+* [12.x] Add unified enum support across framework docs by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56271
+* [12.x] Allows for strict numeric validation by [@peterfox](https://github.com/peterfox) in https://github.com/laravel/framework/pull/56328
+* [12.x] Update PHPDoc annotations in `Validation` by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/56321
+* [12.x] Add operator class support for PostgreSQL GiST spatial indexes by [@joteejotee](https://github.com/joteejotee) in https://github.com/laravel/framework/pull/56324
+* Fix multipart array value parsing in HTTP client (#55732) by [@joteejotee](https://github.com/joteejotee) in https://github.com/laravel/framework/pull/56302
+* Fixes bug with ShouldBeUniqueUntilProcessing locks getting stuck due to Middleware by [@TWithers](https://github.com/TWithers) in https://github.com/laravel/framework/pull/56318
+* [12.x] add prompts based expectations to PendingCommand by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/56260
+* [12.x] Add Singleton and Scoped attributes to Container by [@riasvdv](https://github.com/riasvdv) in https://github.com/laravel/framework/pull/56334
+* Fix unsetting model castable attribute when cast to object (#56335) by [@guram-vashakidze](https://github.com/guram-vashakidze) in https://github.com/laravel/framework/pull/56343
+* [12.x]  Fix/memory improvement by [@CharrafiMed](https://github.com/CharrafiMed) in https://github.com/laravel/framework/pull/56345
+* [12.x] Add hasMailer method to the mailable class by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/56340
+* [12.x] Consistent use of `mb_split()` to split strings into words by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/56338
+* [12.x] Add toStringable to Uri by [@Kyrch](https://github.com/Kyrch) in https://github.com/laravel/framework/pull/56359
+* [12.x] Fix PHPStan Integrations by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56369
+* Add 'isEmpty' and 'isNotEmpty' to Fluent by [@cworreschk](https://github.com/cworreschk) in https://github.com/laravel/framework/pull/56370
+* [12.x] Add mergeMetadata method to the Mailable class by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/56376
+* Add 'dontReportUsing' to filter exceptions to be reported by [@pelmered](https://github.com/pelmered) in https://github.com/laravel/framework/pull/56361
 
 ## [v12.20.0](https://github.com/laravel/framework/compare/v12.19.3...v12.20.0) - 2025-07-08
 
