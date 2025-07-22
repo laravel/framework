@@ -642,7 +642,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'decimal');
 
-        if (! $this->validateNumeric($attribute, $value)) {
+        if (! $this->validateNumeric($attribute, $value, [])) {
             return false;
         }
 
@@ -1123,7 +1123,7 @@ trait ValidatesAttributes
      *
      * @param  array<int, int|string>  $parameters
      * @param  string  $attribute
-     * @return bool
+     * @return int|string
      */
     public function getQueryColumn($parameters, $attribute)
     {
@@ -1857,7 +1857,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'multiple_of');
 
-        if (! $this->validateNumeric($attribute, $value) || ! $this->validateNumeric($attribute, $parameters[0])) {
+        if (! $this->validateNumeric($attribute, $value, []) || ! $this->validateNumeric($attribute, $parameters[0], [])) {
             return false;
         }
 
@@ -1913,10 +1913,15 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
-    public function validateNumeric($attribute, $value)
+    public function validateNumeric($attribute, $value, array $parameters)
     {
+        if (($parameters[0] ?? null) === 'strict' && is_string($value)) {
+            return false;
+        }
+
         return is_numeric($value);
     }
 

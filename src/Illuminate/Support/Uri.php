@@ -333,7 +333,17 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
-     * Create an HTTP response that represents the object.
+     * Get the URI as a Stringable instance.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public function toStringable()
+    {
+        return Str::of($this->value());
+    }
+
+    /**
+     * Create an HTTP response that represents the URI object.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -344,7 +354,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
-     * Get content as a string of HTML.
+     * Get the URI as a string of HTML.
      *
      * @return string
      */
