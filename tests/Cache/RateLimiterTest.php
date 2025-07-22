@@ -27,7 +27,6 @@ class RateLimiterTest extends TestCase
     public function testRegisterNamedRateLimiter(mixed $name, string $expected): void
     {
         $reflectedLimitersProperty = new ReflectionProperty(RateLimiter::class, 'limiters');
-        $reflectedLimitersProperty->setAccessible(true);
 
         $rateLimiter = new RateLimiter($this->createMock(Cache::class));
         $rateLimiter->for($name, fn () => Limit::perMinute(100));
