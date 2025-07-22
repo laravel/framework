@@ -78,7 +78,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @var callable|null
      */
-    protected $dontReportCallback = null;
+    protected $dontReportCallback = [];
 
     /**
      * The callbacks that should be used during reporting.
@@ -299,7 +299,7 @@ class Handler implements ExceptionHandlerContract
             $dontReportUsing = Closure::fromCallable($dontReportUsing);
         }
 
-        $this->dontReportCallback = $dontReportUsing;
+        $this->dontReportCallback[] = $dontReportUsing;
 
         return $this;
     }
@@ -438,8 +438,10 @@ class Handler implements ExceptionHandlerContract
             return true;
         }
 
-        if ($this->dontReportCallback && $this->container->call($this->dontReportCallback, [$e])) {
-            return true;
+        foreach ($this->dontReportCallback as $dontReportCallback) {
+            if ($dontReportCallback($e) === true) {
+                return true;
+            }
         }
 
         return rescue(fn () => with($this->throttle($e), function ($throttle) use ($e) {
