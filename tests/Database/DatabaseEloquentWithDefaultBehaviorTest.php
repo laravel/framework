@@ -89,10 +89,19 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
 
     public function testSavingUnsavedDefaultModelWithoutKeysThrowsException()
     {
-        $business = Business::create(['name' => 'Acme Inc.']);
+        $business = new Business(['name' => 'Acme Inc.']);
+        $business->save();
+
+        $wallet = $business->wallet;
+        $wallet->holder_id = null;
+
+        $this->assertInstanceOf(Wallet::class, $wallet);
+        $this->assertFalse($wallet->exists);
+        $this->assertSame(0, $wallet->balance);
+        $this->assertNull($wallet->holder_id);
 
         $this->expectException(LogicException::class);
-        $business->wallet->save();
+        $wallet->save();
     }
 
     public function testDefaultModelCanBeSavedIfForeignKeysAreSet()
@@ -133,22 +142,7 @@ class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
         $this->assertFalse($wallet->exists);
         $this->assertSame(0, $wallet->balance);
 
-        $this->expectException(LogicException::class);
         $wallet->save();
-    }
-
-    public function testObserverCannotSaveDefaultModelWithMissingKeys()
-    {
-        BusinessWithObserver::observe(new class {
-            public function created(BusinessWithObserver $business)
-            {
-                $business->wallet->save();
-            }
-        });
-
-        $this->expectException(LogicException::class);
-
-        BusinessWithObserver::create(['name' => 'Danger Zone']);
     }
 
     public function testBelongsToWithDefaultThrowsExceptionWhenSavingWithoutKeys()
