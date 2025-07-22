@@ -634,6 +634,45 @@ class MailMailableTest extends TestCase
         }
     }
 
+    public function testMailableMergeMetadata()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->mergeMetadata([
+            'origin' => 'test-suite',
+            'customer_id' => 101,
+            'order_id' => 1000,
+            'subtotal' => 1500,
+            'gst' => 150,
+            'shipping_fee' => 20,
+            'total' => 1670,
+        ]);
+
+        $this->assertTrue($mailable->hasMetadata('origin', 'test-suite'));
+        $this->assertTrue($mailable->hasMetadata('customer_id', 101));
+        $this->assertTrue($mailable->hasMetadata('order_id', 1000));
+        $this->assertTrue($mailable->hasMetadata('subtotal', 1500));
+        $this->assertTrue($mailable->hasMetadata('gst', 150));
+        $this->assertTrue($mailable->hasMetadata('shipping_fee', 20));
+        $this->assertTrue($mailable->hasMetadata('total', 1670));
+
+        $this->stubMailer();
+        $view = m::mock(Factory::class);
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $sentMessage = $mailer->send($mailable);
+        $this->assertStringContainsString('X-Metadata-origin: test-suite', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-customer_id: 101', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-order_id: 1000', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-subtotal: 1500', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-gst: 150', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-shipping_fee: 20', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-total: 1670', $sentMessage->toString());
+    }
+
     public function testMailableTagGetsSent()
     {
         $this->stubMailer();
