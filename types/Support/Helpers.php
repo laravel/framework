@@ -43,7 +43,7 @@ assertType('Illuminate\Support\HigherOrderTapProxy', tap(new User()));
 
 function testThrowIf(float|int $foo, ?DateTime $bar = null): void
 {
-    assertType('never', throw_if(true, Exception::class));
+    rescue(fn () => assertType('never', throw_if(true, Exception::class)));
     assertType('false', throw_if(false, Exception::class));
     assertType('false', throw_if(empty($foo)));
     throw_if(is_float($foo));
@@ -56,7 +56,7 @@ function testThrowIf(float|int $foo, ?DateTime $bar = null): void
     assertType('null', $bar);
     assertType('null', throw_if(null, Exception::class));
     assertType("''", throw_if('', Exception::class));
-    assertType('never', throw_if('foo', Exception::class));
+    rescue(fn () => assertType('never', throw_if('foo', Exception::class)));
 }
 
 function testThrowUnless(float|int $foo, ?DateTime $bar = null): void
