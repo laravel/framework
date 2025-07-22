@@ -224,19 +224,6 @@ class BusinessWithoutAutoLoad extends Model
     }
 }
 
-class BusinessWithObserver extends Model
-{
-    protected $table = 'businesses';
-    protected $guarded = [];
-
-    public function wallet(): MorphOne
-    {
-        return $this->morphOne(Wallet::class, 'holder')->withDefault([
-            'balance' => 0,
-        ]);
-    }
-}
-
 class BusinessWithoutDefault extends Model
 {
     protected $table = 'businesses';
