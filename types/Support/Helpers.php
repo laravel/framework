@@ -62,7 +62,7 @@ function testThrowIf(float|int $foo, ?DateTime $bar = null): void
 function testThrowUnless(float|int $foo, ?DateTime $bar = null): void
 {
     assertType('true', throw_unless(true, Exception::class));
-    assertType('never', throw_unless(false, Exception::class));
+    rescue(fn () => assertType('never', throw_unless(false, Exception::class)));
     assertType('true', throw_unless(empty($foo)));
     throw_unless(is_int($foo));
     assertType('int', $foo);
@@ -72,8 +72,8 @@ function testThrowUnless(float|int $foo, ?DateTime $bar = null): void
     assertType('DateTime', $bar);
 
     // Truthy/falsey argument
-    assertType('never', throw_unless(null, Exception::class));
-    assertType('never', throw_unless('', Exception::class));
+    rescue(fn () => assertType('never', throw_unless(null, Exception::class)));
+    rescue(fn () => assertType('never', throw_unless('', Exception::class)));
     assertType("'foo'", throw_unless('foo', Exception::class));
 }
 
