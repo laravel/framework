@@ -24,7 +24,6 @@ use JsonException;
 use JsonSerializable;
 use LogicException;
 use Stringable;
-use ReflectionClass;
 use ReflectionMethod;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
@@ -1712,7 +1711,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return $this->extractForeignKeysFromCache();
         }
 
-        $reflectionClass = new ReflectionClass($this);
+        $reflectionClass = new \ReflectionClass($this);
         $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
         foreach ($methods as $method) {
