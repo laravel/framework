@@ -14,7 +14,7 @@ trait GuardsAttributes
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var array<string>|bool
+     * @var array<string>
      */
     protected $guarded = ['*'];
 
@@ -28,7 +28,7 @@ trait GuardsAttributes
     /**
      * The actual columns that exist on the database and can be guarded.
      *
-     * @var array<string>
+     * @var array<class-string,list<string>>
      */
     protected static $guardableColumns = [];
 
