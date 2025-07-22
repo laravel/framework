@@ -698,6 +698,72 @@ class ContextTest extends TestCase
         Context::rememberHidden('foo', $closure);
         $this->assertSame(1, $closureRunCount);
     }
+
+    public function test_it_can_restore_scope_context_for_throwable()
+    {
+        Context::add('foo', 'bar');
+        Context::addHidden('hello', 'world');
+
+        try {
+            Context::scope(function () {
+                Context::add('foo', 'bar2');
+                Context::addHidden('hello', 'world3');
+
+                throw new RuntimeException('Test exception');
+            });
+        } catch (RuntimeException $e) {
+            $context = Context::for($e);
+            $this->assertSame('bar2', $context->get('foo'));
+            $this->assertSame('world3', $context->getHidden('hello'));
+        }
+    }
+
+    public function test_it_can_fallback_to_global_context_for_none_scoped_throwable()
+    {
+        Context::add('foo', 'bar');
+        Context::addHidden('hello', 'world');
+
+        try {
+            Context::scope(function () {
+                Context::add('foo', 'bar2');
+                Context::addHidden('hello', 'world3');
+            });
+
+            throw new RuntimeException('Test exception');
+        } catch (RuntimeException $e) {
+            $context = Context::for($e);
+            $this->assertSame('bar', $context->get('foo'));
+            $this->assertSame('world', $context->getHidden('hello'));
+        }
+    }
+
+    public function test_it_can_restore_innermost_scope_context_for_nested_throwable()
+    {
+        Context::add('foo', 'bar');
+        Context::addHidden('hello', 'world');
+
+        try {
+            Context::scope(function () {
+                Context::add('foo', 'bar2');
+                Context::addHidden('hello', 'world2');
+
+                Context::scope(function () {
+                    Context::add('foo', 'bar3');
+                    Context::addHidden('hello', 'world3');
+
+                    throw new RuntimeException('Nested exception');
+                });
+            });
+        } catch (RuntimeException $e) {
+            $context = Context::for($e);
+            $this->assertSame('bar3', $context->get('foo'));
+            $this->assertSame('world3', $context->getHidden('hello'));
+        }
+
+        // Verify global context is restored
+        $this->assertSame('bar', Context::get('foo'));
+        $this->assertSame('world', Context::getHidden('hello'));
+    }
 }
 
 enum Suit

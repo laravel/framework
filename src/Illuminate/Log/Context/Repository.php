@@ -14,6 +14,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
+use WeakMap;
 
 class Repository
 {
@@ -48,11 +49,17 @@ class Repository
     protected static $handleUnserializeExceptionsUsing;
 
     /**
+     * @var WeakMap<Throwable, static>
+     */
+    protected static $forThrowable;
+
+    /**
      * Create a new Context instance.
      */
     public function __construct(Dispatcher $events)
     {
         $this->events = $events;
+        self::$forThrowable ??= new WeakMap();
     }
 
     /**
@@ -557,10 +564,25 @@ class Repository
 
         try {
             return $callback();
+        } catch (Throwable $e) {
+            self::$forThrowable[$e] ??= (new static($this->events))
+                ->add($this->all())
+                ->addHidden($this->allHidden());
+
+            throw $e;
         } finally {
             $this->data = $dataBefore;
             $this->hidden = $hiddenBefore;
         }
+    }
+
+    /**
+     * @param Throwable $e
+     * @return static
+     */
+    public function for(Throwable $e)
+    {
+        return self::$forThrowable[$e] ?? $this;
     }
 
     /**
