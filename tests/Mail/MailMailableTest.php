@@ -641,7 +641,7 @@ class MailMailableTest extends TestCase
         $mailable->from('taylor@laravel.com');
         $mailable->html('test content');
 
-        $mailable->mergeMetadata([
+        $mailable->metadata([
             'template_id' => 'external-template-id',
             'customer_id' => 101,
             'order_id' => 1000,
