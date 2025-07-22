@@ -290,12 +290,18 @@ class Handler implements ExceptionHandlerContract
     /**
      * Register a callback to determine if an exception should not be reported.
      *
-     * @param  array|string  $class
+     * @param  callable $dontReportUsing
      * @return $this
      */
     public function dontReportUsing(callable $dontReportUsing)
     {
+        if (! $dontReportUsing instanceof Closure) {
+            $dontReportUsing = Closure::fromCallable($dontReportUsing);
+        }
+
         $this->dontReportCallback = $dontReportUsing;
+
+        return $this;
     }
 
     /**
