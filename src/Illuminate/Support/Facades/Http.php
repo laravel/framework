@@ -70,6 +70,8 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest throwUnless(callable|bool $condition)
  * @method static \Illuminate\Http\Client\PendingRequest dump()
  * @method static \Illuminate\Http\Client\PendingRequest dd()
+ * @method static \Illuminate\Http\Client\PendingRequest ddCurl(bool $pretty = false)
+ * @method static \Illuminate\Http\Client\PendingRequest ddPrettyCurl()
  * @method static \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
  * @method static \Illuminate\Http\Client\Response head(string $url, array|string|null $query = null)
  * @method static \Illuminate\Http\Client\Response post(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
