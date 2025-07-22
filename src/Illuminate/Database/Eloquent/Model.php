@@ -24,7 +24,6 @@ use JsonException;
 use JsonSerializable;
 use LogicException;
 use Stringable;
-use ReflectionMethod;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
@@ -1712,7 +1711,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         }
 
         $reflectionClass = new \ReflectionClass($this);
-        $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
+        $methods = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
 
         foreach ($methods as $method) {
             if ($this->isSkippableMethod($method)) {
