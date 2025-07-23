@@ -24,7 +24,7 @@ class Bind
 
     /**
      * @param  class-string  $concrete
-     * @param  non-empty-array<int, string>|non-empty-string  $environments
+     * @param  non-empty-array<int, non-empty-string>|non-empty-string  $environments
      *
      * @throws \InvalidArgumentException
      */
@@ -32,7 +32,7 @@ class Bind
         string $concrete,
         string|array $environments = ['*'],
     ) {
-        $environments = is_array($environments) ? $environments : [$environments];
+        $environments = array_filter(is_array($environments) ? $environments : [$environments]);
 
         if ($environments === []) {
             throw new InvalidArgumentException('The environment property must be set and cannot be empty.');
