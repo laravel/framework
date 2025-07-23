@@ -5,6 +5,7 @@ namespace Illuminate\Container;
 use ArrayAccess;
 use Closure;
 use Exception;
+use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -961,7 +962,19 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        return $abstract;
+        $attributes = [];
+        try {
+            $attributes = (new ReflectionClass($abstract))->getAttributes(Bind::class);
+        } catch (ReflectionException) {
+        }
+
+        if ($attributes === []) {
+            return $abstract;
+        }
+
+        $this->bind($abstract, $attributes[0]->newInstance()->concrete);
+
+        return $this->bindings[$abstract]['concrete'];
     }
 
     /**

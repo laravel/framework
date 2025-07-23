@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Container\Attributes\Bind;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
@@ -766,6 +767,29 @@ class ContainerTest extends TestCase
         $this->assertNotSame($firstInstantiation, $thirdInstantiation);
     }
 
+    public function testBindInterfaceToSingleton()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testBindInterfaceToScoped()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -933,5 +957,15 @@ class ContainerSingletonAttribute
 
 #[Scoped]
 class ContainerScopedAttribute
+{
+}
+
+#[Bind(ContainerSingletonAttribute::class)]
+interface ContainerBindSingletonTestInterface
+{
+}
+
+#[Bind(ContainerScopedAttribute::class)]
+interface ContainerBindScopedTestInterface
 {
 }
