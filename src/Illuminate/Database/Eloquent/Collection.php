@@ -261,7 +261,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $this->filter(function ($model) use ($relation, $class) {
             return ! is_null($model) &&
-                ! $model->relationLoaded($relation) &&
+                $model->relationNotLoaded($relation) &&
                 $model::class === $class;
         })->load($relation);
 
