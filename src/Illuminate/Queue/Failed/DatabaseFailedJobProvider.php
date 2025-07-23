@@ -164,7 +164,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function getTable()
+    public function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
     }
