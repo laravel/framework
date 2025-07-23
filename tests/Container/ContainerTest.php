@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Container\Attributes\Concrete;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
@@ -766,6 +767,14 @@ class ContainerTest extends TestCase
         $this->assertNotSame($firstInstantiation, $thirdInstantiation);
     }
 
+    public function testContainerConcreteAttribute()
+    {
+        $container = new Container;
+        $instantiation = $container->get(ContractWithConcreteAttribute::class);
+
+        $this->assertInstanceOf(ConcreteStub::class, $instantiation);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -935,3 +944,8 @@ class ContainerSingletonAttribute
 class ContainerScopedAttribute
 {
 }
+
+#[Concrete(ConcreteStub::class)]
+interface ContractWithConcreteAttribute {}
+
+class ConcreteStub implements ContractWithConcreteAttribute {}

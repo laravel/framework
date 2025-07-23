@@ -5,12 +5,14 @@ namespace Illuminate\Container;
 use ArrayAccess;
 use Closure;
 use Exception;
+use Illuminate\Container\Attributes\Concrete;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -961,7 +963,38 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
+        // If the abstract uses the Concrete attribute we want to resolve that instead
+        if ($concrete = $this->getAttributedConcrete($abstract)) {
+            return $concrete;
+        }
+
         return $abstract;
+    }
+
+    /**
+     * Get the concrete based on the abstract using the Concrete attribute.
+     *
+     * @param  string|callable  $abstract
+     * @return string
+     */
+    protected function getAttributedConcrete($abstract)
+    {
+        $reflection = new ReflectionClass($abstract);
+
+        if (! $reflection->isInterface()) {
+            return null;
+        }
+
+        if (empty($reflection->getAttributes(Concrete::class))) {
+            return null;
+        }
+
+        $concrete = Arr::first(
+            $reflection->getAttributes(Concrete::class),
+        )
+            ->newInstance();
+
+        return $concrete->class;
     }
 
     /**
