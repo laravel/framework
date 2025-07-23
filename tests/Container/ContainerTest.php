@@ -1045,9 +1045,14 @@ class ContainerScopedAttribute
 {
 }
 
-#[Bind(ContainerSingletonAttribute::class, environments: ['foo', 'bar'])]
+#[Bind(ContainerSingletonAttribute::class, environments: ['foo', ContainerTestEnvironments::Bar])]
 interface ContainerBindSingletonTestInterface
 {
+}
+
+enum ContainerTestEnvironments: string
+{
+    case Bar = 'bar';
 }
 
 #[Bind(ContainerScopedAttribute::class, environments: ['test'])]
