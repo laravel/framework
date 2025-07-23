@@ -124,6 +124,13 @@ class Container implements ArrayAccess, ContainerContract
     public $contextualAttributes = [];
 
     /**
+     * Whether an abstract class has already had its attributes checked for bindings.
+     *
+     * @var array<class-string, true>
+     */
+    protected $checkedForAttributeBindings = [];
+
+    /**
      * All of the registered rebound callbacks.
      *
      * @var array[]
@@ -180,14 +187,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingAttributeCallbacks = [];
 
     /**
-     * Whether an abstract class has already had its attributes checked for bindings.
-     *
-     * @var array<class-string, true>
-     */
-    protected $checkedForBindings = [];
-
-    /**
-     * The callback used to determine the Container's environment.
+     * The callback used to determine the container's environment.
      *
      * @var (callable(array<int, string>|string): bool|string)|null
      */
@@ -976,7 +976,8 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        if ($this->environmentResolver === null || ($this->checkedForBindings[$abstract] ?? false) || ! is_string($abstract)) {
+        if ($this->environmentResolver === null ||
+            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
             return $abstract;
         }
 
@@ -987,7 +988,7 @@ class Container implements ArrayAccess, ContainerContract
         } catch (ReflectionException) {
         }
 
-        $this->checkedForBindings[$abstract] = true;
+        $this->checkedForAttributeBindings[$abstract] = true;
 
         if ($attributes === []) {
             return $abstract;
@@ -1010,16 +1011,13 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($reflectedAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
 
-            // If the attribute indicates it is for all environments, then we keep
-            // this as the potential concrete, but check the rest of
-            // attributes to see if there is a more specific match.
             if ($instance->environments === ['*']) {
                 $maybeConcrete = $instance->concrete;
 
                 continue;
             }
 
-            if ($this->getEnvironment($instance->environments)) {
+            if ($this->currentEnvironmentIs($instance->environments)) {
                 $concrete = $instance->concrete;
 
                 break;
@@ -1642,30 +1640,6 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Set the callback which determines the current Container environment.
-     *
-     * @param  (callable(array<int, string>|string): bool|string)|null  $callback
-     * @return void
-     */
-    public function resolveEnvironmentUsing(?callable $callback)
-    {
-        $this->environmentResolver = $callback;
-    }
-
-    /**
-     * Get the environment for the Container.
-     *
-     * @param  array<int, string>|string  $environments
-     * @return ($environments is array ? bool : string)
-     */
-    public function getEnvironment($environments)
-    {
-        return $this->environmentResolver === null
-            ? false
-            : call_user_func($this->environmentResolver, $environments);
-    }
-
-    /**
      * Remove all of the extender callbacks for a given type.
      *
      * @param  string  $abstract
@@ -1721,6 +1695,30 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Set the callback which determines the current container environment.
+     *
+     * @param  (callable(array<int, string>|string): bool|string)|null  $callback
+     * @return void
+     */
+    public function resolveEnvironmentUsing(?callable $callback)
+    {
+        $this->environmentResolver = $callback;
+    }
+
+    /**
+     * Determine the environment for the container.
+     *
+     * @param  array<int, string>|string  $environments
+     * @return bool
+     */
+    public function currentEnvironmentIs($environments)
+    {
+        return $this->environmentResolver === null
+            ? false
+            : call_user_func($this->environmentResolver, $environments);
+    }
+
+    /**
      * Flush the container of all bindings and resolved instances.
      *
      * @return void
@@ -1733,8 +1731,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->instances = [];
         $this->abstractAliases = [];
         $this->scopedInstances = [];
-        $this->checkedForBindings = [];
-        $this->environmentResolver = null;
+        $this->checkedForAttributeBindings = [];
     }
 
     /**
