@@ -946,6 +946,10 @@ class ContainerScopedAttribute
 }
 
 #[Concrete(ConcreteStub::class)]
-interface ContractWithConcreteAttribute {}
+interface ContractWithConcreteAttribute
+{
+}
 
-class ConcreteStub implements ContractWithConcreteAttribute {}
+class ConcreteStub implements ContractWithConcreteAttribute
+{
+}
