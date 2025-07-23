@@ -101,7 +101,7 @@ class DatabaseEloquentInverseRelationTest extends TestCase
 
         foreach ($results as $model) {
             $this->assertEmpty($model->getRelations());
-            $this->assertFalse($model->relationLoaded('test'));
+            $this->assertTrue($model->relationNotLoaded('test'));
         }
 
         $results = $afterQuery($results);

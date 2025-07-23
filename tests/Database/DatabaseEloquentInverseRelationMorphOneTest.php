@@ -63,7 +63,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
         $posts = MorphOneInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('image'));
+            $this->assertTrue($post->relationNotLoaded('image'));
             $image = $post->image;
             $this->assertTrue($image->relationLoaded('imageable'));
             $this->assertSame($post, $image->imageable);
@@ -89,7 +89,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
         $posts = MorphOneInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('guessedImage'));
+            $this->assertTrue($post->relationNotLoaded('guessedImage'));
             $image = $post->guessedImage;
             $this->assertTrue($image->relationLoaded('imageable'));
             $this->assertSame($post, $image->imageable);
@@ -154,7 +154,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
         $post = MorphOneInversePostModel::create();
         $image = MorphOneInverseImageModel::make();
 
-        $this->assertFalse($image->relationLoaded('imageable'));
+        $this->assertTrue($image->relationNotLoaded('imageable'));
         $post->image()->save($image);
 
         $this->assertTrue($image->relationLoaded('imageable'));
@@ -166,7 +166,7 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
         $post = MorphOneInversePostModel::create();
         $image = MorphOneInverseImageModel::make();
 
-        $this->assertFalse($image->relationLoaded('imageable'));
+        $this->assertTrue($image->relationNotLoaded('imageable'));
         $post->image()->saveQuietly($image);
 
         $this->assertTrue($image->relationLoaded('imageable'));

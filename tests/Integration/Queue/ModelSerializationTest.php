@@ -383,7 +383,7 @@ class ModelSerializationTest extends TestCase
         /** @var ModelSerializationAttributeTargetsClassTestClass $unserialized */
         $unserialized = unserialize($serialized);
 
-        $this->assertFalse($unserialized->user->relationLoaded('roles'));
+        $this->assertTrue($unserialized->user->relationNotLoaded('roles'));
         $this->assertEquals('hello', $unserialized->value->value);
     }
 

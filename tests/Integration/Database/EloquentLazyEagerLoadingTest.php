@@ -36,7 +36,7 @@ class EloquentLazyEagerLoadingTest extends DatabaseTestCase
         $model = Model1::find($one->id);
 
         $this->assertTrue($model->relationLoaded('twos'));
-        $this->assertFalse($model->relationLoaded('threes'));
+        $this->assertTrue($model->relationNotLoaded('threes'));
 
         DB::enableQueryLog();
 

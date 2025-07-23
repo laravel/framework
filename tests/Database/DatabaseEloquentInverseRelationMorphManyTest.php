@@ -64,7 +64,7 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         $posts = MorphManyInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('comments'));
+            $this->assertTrue($post->relationNotLoaded('comments'));
             $comments = $post->comments;
             foreach ($comments as $comment) {
                 $this->assertTrue($comment->relationLoaded('commentable'));
@@ -94,7 +94,7 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         $posts = MorphManyInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('guessedComments'));
+            $this->assertTrue($post->relationNotLoaded('guessedComments'));
             $comments = $post->guessedComments;
             foreach ($comments as $comment) {
                 $this->assertTrue($comment->relationLoaded('commentable'));
@@ -124,7 +124,7 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         $posts = MorphManyInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('lastComment'));
+            $this->assertTrue($post->relationNotLoaded('lastComment'));
             $comment = $post->lastComment;
 
             $this->assertTrue($comment->relationLoaded('commentable'));
@@ -151,7 +151,7 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         $posts = MorphManyInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('guessedLastComment'));
+            $this->assertTrue($post->relationNotLoaded('guessedLastComment'));
             $comment = $post->guessedLastComment;
 
             $this->assertTrue($comment->relationLoaded('commentable'));
@@ -178,7 +178,7 @@ class DatabaseEloquentInverseRelationMorphManyTest extends TestCase
         $posts = MorphManyInversePostModel::all();
 
         foreach ($posts as $post) {
-            $this->assertFalse($post->relationLoaded('firstComment'));
+            $this->assertTrue($post->relationNotLoaded('firstComment'));
             $comment = $post->firstComment;
 
             $this->assertTrue($comment->relationLoaded('commentable'));

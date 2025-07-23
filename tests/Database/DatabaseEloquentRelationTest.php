@@ -35,7 +35,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new EloquentRelationResetModelStub;
         $parent->setRelation('foo', $relation);
         $parent->unsetRelation('foo');
-        $this->assertFalse($parent->relationLoaded('foo'));
+        $this->assertTrue($parent->relationNotLoaded('foo'));
     }
 
     public function testTouchMethodUpdatesRelatedTimestamps()
@@ -255,13 +255,13 @@ class DatabaseEloquentRelationTest extends TestCase
 
         $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
         $this->assertTrue($original->relationLoaded('foo'));
-        $this->assertFalse($model->relationLoaded('foo'));
+        $this->assertTrue($model->relationNotLoaded('foo'));
 
         $model = $original->unsetRelations();
 
         $this->assertInstanceOf(EloquentNoTouchingModelStub::class, $model);
-        $this->assertFalse($original->relationLoaded('foo'));
-        $this->assertFalse($model->relationLoaded('foo'));
+        $this->assertTrue($original->relationNotLoaded('foo'));
+        $this->assertTrue($model->relationNotLoaded('foo'));
     }
 
     public function testMacroable()

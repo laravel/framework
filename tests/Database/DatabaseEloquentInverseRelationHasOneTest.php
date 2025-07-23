@@ -63,7 +63,7 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
         $models = HasOneInverseParentModel::all();
 
         foreach ($models as $parent) {
-            $this->assertFalse($parent->relationLoaded('child'));
+            $this->assertTrue($parent->relationNotLoaded('child'));
             $child = $parent->child;
             $this->assertTrue($child->relationLoaded('parent'));
             $this->assertSame($parent, $child->parent);
@@ -129,7 +129,7 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
         $parent = HasOneInverseParentModel::create();
         $child = HasOneInverseChildModel::make();
 
-        $this->assertFalse($child->relationLoaded('parent'));
+        $this->assertTrue($child->relationNotLoaded('parent'));
         $parent->child()->save($child);
 
         $this->assertTrue($child->relationLoaded('parent'));
@@ -141,7 +141,7 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
         $parent = HasOneInverseParentModel::create();
         $child = HasOneInverseChildModel::make();
 
-        $this->assertFalse($child->relationLoaded('parent'));
+        $this->assertTrue($child->relationNotLoaded('parent'));
         $parent->child()->saveQuietly($child);
 
         $this->assertTrue($child->relationLoaded('parent'));
