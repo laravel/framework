@@ -989,7 +989,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->checkedForBindings[$abstract] = true;
 
-        if ($attributes === []) {
+        if ($attributes === [] || $this->environmentResolver === null) {
             return $abstract;
         }
 
@@ -1005,15 +1005,24 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcreteBindingFromAttributes($abstract, $reflectedAttributes)
     {
-        $concrete = null;
+        $concrete = $maybeConcrete = null;
 
         foreach($reflectedAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
-            if ($instance->environments === ['*'] || $this->getEnvironment($instance->environments)) {
+            if ($instance->environments === ['*']) {
+                $maybeConcrete = $instance->concrete;
+                continue;
+            }
+
+            if ($this->getEnvironment($instance->environments)) {
                 $concrete = $instance->concrete;
 
                 break;
             }
+        }
+
+        if ($maybeConcrete !== null && $concrete === null) {
+            $concrete = $maybeConcrete;
         }
 
         if ($concrete === null) {
@@ -1629,6 +1638,7 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * @param  (callable(array<int, string>): bool)|null  $callback
+     * @return void
      */
     public function resolveEnvironmentUsing(?callable $callback)
     {

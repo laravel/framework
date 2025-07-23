@@ -797,6 +797,84 @@ class ContainerTest extends TestCase
         $this->assertNotSame($firstInstantiation, $thirdInstantiation);
     }
 
+    public function testWildcardBindingButNoEnvironmentResolveSetThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+        $container = new Container;
+
+        $instance = $container->make(WildcardOnlyInterface::class);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $instance);
+    }
+
+    public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('prod', $env));
+
+        $instance = $container->make(WildcardAndProdInterface::class);
+
+        $this->assertInstanceOf(ProdConcrete::class, $instance);
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('some_string', $env));
+        $instance = $container->make(WildcardAndProdInterface::class);
+        $this->assertInstanceOf(FallbackConcrete::class, $instance);
+    }
+
+    public function testCanPassAStringForEnvironmentEnvironment(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('cli', $env));
+
+        $instance = $container->make(CliOnlyInterface::class);
+
+        $this->assertInstanceOf(CliConcrete::class, $instance);
+    }
+
+    public function testAnEmptyEnvironmentListThrowsAnException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+        $container->make(EmptyEnvInterface::class);
+    }
+
+    public function testContainerBindingsTakePrecedence(): void
+    {
+        $container = new Container;
+        $container->bind(OverrideInterface::class, AltConcrete::class);
+
+        $instance = $container->make(OverrideInterface::class);
+
+        $this->assertInstanceOf(AltConcrete::class, $instance);
+    }
+
+    public function testFlushResetsEnvironmentResolverAndCheckedBindings(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', $environments));
+
+        $first = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(ProdConcrete::class, $first);
+
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn (array $environments) => in_array('dev', $environments));
+
+        $second = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(DevConcrete::class, $second);
+    }
+
+    public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => false);
+
+        $container->make(ProdEnvOnlyInterface::class);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -975,5 +1053,77 @@ interface ContainerBindSingletonTestInterface
 #[Bind(ContainerScopedAttribute::class, environments: ['test'])]
 #[Bind(ContainerScopedAttribute::class, environments: ['test2'])]
 interface ContainerBindScopedTestInterface
+{
+}
+
+#[Bind(WildcardConcrete::class)]
+interface WildcardOnlyInterface
+{
+}
+
+class WildcardConcrete implements WildcardOnlyInterface
+{
+}
+
+/*
+ * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
+ */
+#[Bind(FallbackConcrete::class)]
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface WildcardAndProdInterface
+{
+}
+
+class FallbackConcrete implements WildcardAndProdInterface
+{
+}
+class ProdConcrete implements WildcardAndProdInterface
+{
+}
+
+#[Bind(CliConcrete::class, environments: 'cli')]
+interface CliOnlyInterface
+{
+}
+
+class CliConcrete implements CliOnlyInterface
+{
+}
+
+#[Bind(BadConcrete::class, environments: [])]
+interface EmptyEnvInterface
+{
+}
+
+class BadConcrete implements EmptyEnvInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface ProdEnvOnlyInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+#[Bind(DevConcrete::class,  environments: 'dev')]
+interface MultiEnvInterface
+{
+}
+
+class DevConcrete implements MultiEnvInterface
+{
+}
+
+
+#[Bind(OriginalConcrete::class)]
+interface OverrideInterface
+{
+}
+
+class OriginalConcrete implements OverrideInterface
+{
+}
+
+class AltConcrete implements OverrideInterface
 {
 }
