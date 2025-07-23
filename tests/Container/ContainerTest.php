@@ -1105,7 +1105,7 @@ interface ProdEnvOnlyInterface
 }
 
 #[Bind(ProdConcrete::class, environments: 'prod')]
-#[Bind(DevConcrete::class,  environments: 'dev')]
+#[Bind(DevConcrete::class, environments: 'dev')]
 interface MultiEnvInterface
 {
 }
@@ -1113,7 +1113,6 @@ interface MultiEnvInterface
 class DevConcrete implements MultiEnvInterface
 {
 }
-
 
 #[Bind(OriginalConcrete::class)]
 interface OverrideInterface

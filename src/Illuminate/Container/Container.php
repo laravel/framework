@@ -1007,7 +1007,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         $concrete = $maybeConcrete = null;
 
-        foreach($reflectedAttributes as $reflectedAttribute) {
+        foreach ($reflectedAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
             if ($instance->environments === ['*']) {
                 $maybeConcrete = $instance->concrete;
