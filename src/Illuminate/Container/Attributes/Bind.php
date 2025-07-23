@@ -18,13 +18,13 @@ class Bind
     /**
      * Only use the bindings in this environment.
      *
-     * @var array<int, string>
+     * @var non-empty-array<int, string>
      */
     public array $environments = [];
 
     /**
      * @param  class-string  $concrete
-     * @param  array<int, string>|string  $environments
+     * @param  non-empty-array<int, string>|non-empty-string  $environments
      *
      * @throws \InvalidArgumentException
      */

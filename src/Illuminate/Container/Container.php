@@ -980,6 +980,10 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
+        if ($this->environmentResolver === null) {
+            return $abstract;
+        }
+
         $attributes = [];
 
         try {
@@ -989,7 +993,7 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->checkedForBindings[$abstract] = true;
 
-        if ($attributes === [] || $this->environmentResolver === null) {
+        if ($attributes === []) {
             return $abstract;
         }
 
@@ -1009,8 +1013,13 @@ class Container implements ArrayAccess, ContainerContract
 
         foreach ($reflectedAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
+
+            // If the attribute indicates it is for all environments, then we keep
+            // this as the potential concrete, but check the rest of
+            // attributes to see if there is a more specific match.
             if ($instance->environments === ['*']) {
                 $maybeConcrete = $instance->concrete;
+
                 continue;
             }
 
