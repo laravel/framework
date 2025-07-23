@@ -8,7 +8,7 @@ use Attribute;
 class Bind
 {
     /**
-     * @param  class-string  $concrete
+     * @param  class-string  $concrete  The concrete class to bind to.
      */
     public function __construct(
         public string $concrete,

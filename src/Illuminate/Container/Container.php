@@ -180,6 +180,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingAttributeCallbacks = [];
 
     /**
+     * Whether an abstract class has already had its attributes checked for binding.
+     *
+     * @var array<class-string, true>
+     */
+    protected $checkedForBindings = [];
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -962,17 +969,35 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
+        if (($this->checkedForBindings[$abstract] ?? false) || ! is_string($abstract)) {
+            return $abstract;
+        }
+
         $attributes = [];
         try {
             $attributes = (new ReflectionClass($abstract))->getAttributes(Bind::class);
         } catch (ReflectionException) {
         }
 
+        $this->checkedForBindings[$abstract] = true;
+
         if ($attributes === []) {
             return $abstract;
         }
 
-        $this->bind($abstract, $attributes[0]->newInstance()->concrete);
+        return $this->getConcreteBindingFromAttributes($abstract, $attributes);
+    }
+
+    /**
+     * Get the concrete binding for an abstract from the Bind attribute.
+     *
+     * @param  string  $abstract
+     * @param  array<int, \ReflectionAttribute<Bind>>  $reflectedAttributes
+     * @return mixed
+     */
+    protected function getConcreteBindingFromAttributes($abstract, $reflectedAttributes)
+    {
+        $this->bind($abstract, $reflectedAttributes[0]->newInstance()->concrete);
 
         return $this->bindings[$abstract]['concrete'];
     }
@@ -1647,6 +1672,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->instances = [];
         $this->abstractAliases = [];
         $this->scopedInstances = [];
+        $this->checkedForBindings = [];
     }
 
     /**
