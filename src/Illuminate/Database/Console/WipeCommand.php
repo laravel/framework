@@ -102,7 +102,7 @@ class WipeCommand extends Command
     }
 
     /**
-     * Flush database connection.
+     * Flush the given database connection.
      *
      * @param  string  $database
      * @return void
