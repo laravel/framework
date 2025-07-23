@@ -706,8 +706,8 @@ class Collection extends BaseCollection implements QueueableCollection
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TModel, TKey): bool)|TModel|string  $key
-     * @param  TModel|string|null  $operator
-     * @param  TModel|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
      */
     public function partition($key, $operator = null, $value = null)
