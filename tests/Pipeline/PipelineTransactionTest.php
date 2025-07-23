@@ -16,7 +16,7 @@ class PipelineTransactionTest extends TestCase
     {
         Event::fake();
 
-        $result = Pipeline::inTransaction()
+        $result = Pipeline::withinTransactions()
             ->send('some string')
             ->through([function ($value, $next) {
                 return $next($value);
@@ -34,7 +34,7 @@ class PipelineTransactionTest extends TestCase
 
         $finallyRan = false;
         try {
-            Pipeline::inTransaction()
+            Pipeline::withinTransactions()
                 ->send('some string')
                 ->through([
                     function ($value, $next) {
