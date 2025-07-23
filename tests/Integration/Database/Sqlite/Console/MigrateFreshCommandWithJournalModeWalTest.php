@@ -12,7 +12,7 @@ use function Illuminate\Filesystem\join_paths;
 use function Orchestra\Testbench\default_migration_path;
 use function Orchestra\Testbench\default_skeleton_path;
 
-#[RequiresDatabase('sqlite')]
+#[RequiresDatabase('sqlite', default: true)]
 #[WithConfig('database.default', 'sqlite')]
 #[WithConfig('database.connections.sqlite.journal_mode', 'wal')]
 class MigrateFreshCommandWithJournalModeWalTest extends DatabaseTestCase
