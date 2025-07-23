@@ -10,7 +10,6 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -47,7 +46,6 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
@@ -1702,6 +1700,27 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['Foo' => 'bar']);
 
         Model::preventSilentlyDiscardingAttributes(false);
+    }
+
+    public function testGuardedWithFillableConfig(): void
+    {
+        $model = new EloquentModelStub;
+        $model::unguard();
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        $model->guard([]);
+        $model->fillable(['name']);
+        $model->fill(['name' => 'Leto Atreides', 'age' => 51]);
+
+        self::assertSame(
+            ['name' => 'Leto Atreides', 'age' => 51],
+            $model->getAttributes(),
+        );
+
+        $model::reguard();
     }
 
     public function testUsesOverriddenHandlerWhenDiscardingAttributes()
