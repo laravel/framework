@@ -180,7 +180,7 @@ class Container implements ArrayAccess, ContainerContract
     protected $afterResolvingAttributeCallbacks = [];
 
     /**
-     * Whether an abstract class has already had its attributes checked for binding.
+     * Whether an abstract class has already had its attributes checked for bindings.
      *
      * @var array<class-string, true>
      */
@@ -974,6 +974,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         $attributes = [];
+
         try {
             $attributes = (new ReflectionClass($abstract))->getAttributes(Bind::class);
         } catch (ReflectionException) {
