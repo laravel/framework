@@ -31,7 +31,6 @@ class Builder
      * The Blueprint resolver callback.
      *
      * @var \Closure(\Illuminate\Database\Connection, string, \Closure): \Illuminate\Database\Schema\Blueprint
-     *
      */
     protected $resolver;
 
