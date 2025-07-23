@@ -770,6 +770,7 @@ class ContainerTest extends TestCase
     public function testBindInterfaceToSingleton()
     {
         $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => true);
         $firstInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
         $secondInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
 
@@ -779,10 +780,16 @@ class ContainerTest extends TestCase
     public function testBindInterfaceToScoped()
     {
         $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test']);
         $firstInstantiation = $container->get(ContainerBindScopedTestInterface::class);
         $secondInstantiation = $container->get(ContainerBindScopedTestInterface::class);
 
         $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        // With a different environment
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test2']);
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertSame($firstInstantiation, $thirdInstantiation);
 
         $container->forgetScopedInstances();
 
@@ -960,12 +967,13 @@ class ContainerScopedAttribute
 {
 }
 
-#[Bind(ContainerSingletonAttribute::class)]
+#[Bind(ContainerSingletonAttribute::class, environments: ['foo', 'bar'])]
 interface ContainerBindSingletonTestInterface
 {
 }
 
-#[Bind(ContainerScopedAttribute::class)]
+#[Bind(ContainerScopedAttribute::class, environments: ['test'])]
+#[Bind(ContainerScopedAttribute::class, environments: ['test2'])]
 interface ContainerBindScopedTestInterface
 {
 }

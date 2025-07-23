@@ -187,6 +187,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $checkedForBindings = [];
 
     /**
+     * The callback used to determine the Container's environment.
+     *
+     * @var (callable(array<int, string>|string): bool|string)|null
+     */
+    protected $environmentResolver = null;
+
+    /**
      * Define a contextual binding.
      *
      * @param  array|string  $concrete
@@ -998,7 +1005,22 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcreteBindingFromAttributes($abstract, $reflectedAttributes)
     {
-        $this->bind($abstract, $reflectedAttributes[0]->newInstance()->concrete);
+        $concrete = null;
+
+        foreach($reflectedAttributes as $reflectedAttribute) {
+            $instance = $reflectedAttribute->newInstance();
+            if ($instance->environments === ['*'] || $this->getEnvironment($instance->environments)) {
+                $concrete = $instance->concrete;
+
+                break;
+            }
+        }
+
+        if ($concrete === null) {
+            return $abstract;
+        }
+
+        $this->bind($abstract, $concrete);
 
         return $this->bindings[$abstract]['concrete'];
     }
@@ -1606,6 +1628,27 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * @param  (callable(array<int, string>): bool)|null  $callback
+     */
+    public function resolveEnvironmentUsing(?callable $callback)
+    {
+        $this->environmentResolver = $callback;
+    }
+
+    /**
+     * Get the environment for the Container.
+     *
+     * @param  array<int, string>|string  $environments
+     * @return ($environments is array ? bool : string)
+     */
+    public function getEnvironment($environments)
+    {
+        return $this->environmentResolver === null
+            ? false
+            : call_user_func($this->environmentResolver, $environments);
+    }
+
+    /**
      * Remove all of the extender callbacks for a given type.
      *
      * @param  string  $abstract
@@ -1674,6 +1717,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->abstractAliases = [];
         $this->scopedInstances = [];
         $this->checkedForBindings = [];
+        $this->environmentResolver = null;
     }
 
     /**
