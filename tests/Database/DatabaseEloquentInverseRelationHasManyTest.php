@@ -64,7 +64,7 @@ class DatabaseEloquentInverseRelationHasManyTest extends TestCase
         $users = HasManyInverseUserModel::all();
 
         foreach ($users as $user) {
-            $this->assertTrue($user->relationLoaded('posts'));
+            $this->assertTrue($user->relationNotLoaded('posts'));
             foreach ($user->posts as $post) {
                 $this->assertTrue($post->relationLoaded('user'));
                 $this->assertSame($user, $post->user);
