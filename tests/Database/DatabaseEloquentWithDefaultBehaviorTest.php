@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Schema\Blueprint;
-use PHPUnit\Framework\TestCase;
 use LogicException;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentWithDefaultBehaviorTest extends TestCase
 {

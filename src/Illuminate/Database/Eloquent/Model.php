@@ -1820,6 +1820,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
                 continue;
             }
         }
+
         return $foreignKeys;
     }
 
@@ -1925,7 +1926,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $foreignKeys;
     }
 
-
     /**
      * Ensure the default model instance has valid foreign keys.
      *
@@ -1937,7 +1937,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         if ($this->isDefaultModelInstance() && ! $this->hasValidForeignKeys()) {
             throw new LogicException(sprintf(
-                "Can not save a withDefault() model instance [%s] because its required foreign keys are not set properly. Make sure the parent relationship is correctly assigned before using the instance, especially in model events.",
+                'Can not save a withDefault() model instance [%s] because its required foreign keys are not set properly. Make sure the parent relationship is correctly assigned before using the instance, especially in model events.',
                 static::class
             ));
         }
