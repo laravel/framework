@@ -976,11 +976,7 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        if (($this->checkedForBindings[$abstract] ?? false) || ! is_string($abstract)) {
-            return $abstract;
-        }
-
-        if ($this->environmentResolver === null) {
+        if ($this->environmentResolver === null || ($this->checkedForBindings[$abstract] ?? false) || ! is_string($abstract)) {
             return $abstract;
         }
 
@@ -1646,7 +1642,9 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * @param  (callable(array<int, string>): bool)|null  $callback
+     * Set the callback which determines the current Container environment.
+     *
+     * @param  (callable(array<int, string>|string): bool|string)|null  $callback
      * @return void
      */
     public function resolveEnvironmentUsing(?callable $callback)
