@@ -106,6 +106,28 @@ trait AuthorizesRequests
     }
 
     /**
+     * Authorize a singleton resource action based on the incoming request.
+     *
+     * @param  string|array  $model
+     * @param  array  $options
+     * @return void
+     */
+    public function authorizeSingletonResource($model, array $options = [])
+    {
+        $model = is_array($model) ? implode(',', $model) : $model;
+
+        $middleware = [];
+
+        foreach ($this->resourceAbilityMap() as $method => $ability) {
+            $middleware["can:{$ability},{$model}"][] = $method;
+        }
+
+        foreach ($middleware as $middlewareName => $methods) {
+            $this->middleware($middlewareName, $options)->only($methods);
+        }
+    }
+
+    /**
      * Get the map of resource methods to ability names.
      *
      * @return array<string, string>

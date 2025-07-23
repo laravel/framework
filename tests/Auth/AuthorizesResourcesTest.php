@@ -23,6 +23,17 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User,App\Post');
     }
 
+    public function testSingletonCreateMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'create', 'can:create,App\Profile,App\Settings');
+    }
+
     public function testStoreMethod()
     {
         $controller = new AuthorizesResourcesController;
@@ -32,6 +43,17 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User,App\Post');
+    }
+
+    public function testSingletonStoreMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'store', 'can:create,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'store', 'can:create,App\Profile,App\Settings');
     }
 
     public function testShowMethod()
@@ -45,6 +67,17 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'show', 'can:view,user,post');
     }
 
+    public function testSingletonShowMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'show', 'can:view,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'show', 'can:view,App\Profile,App\Settings');
+    }
+
     public function testEditMethod()
     {
         $controller = new AuthorizesResourcesController;
@@ -54,6 +87,17 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user,post');
+    }
+
+    public function testSingletonEditMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'edit', 'can:update,App\Profile,App\Settings');
     }
 
     public function testUpdateMethod()
@@ -67,6 +111,17 @@ class AuthorizesResourcesTest extends TestCase
         $this->assertHasMiddleware($controller, 'update', 'can:update,user,post');
     }
 
+    public function testSingletonUpdateMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'update', 'can:update,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'update', 'can:update,App\Profile,App\Settings');
+    }
+
     public function testDestroyMethod()
     {
         $controller = new AuthorizesResourcesController;
@@ -76,6 +131,17 @@ class AuthorizesResourcesTest extends TestCase
         $controller = new AuthorizesResourcesWithArrayController;
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user,post');
+    }
+
+    public function testSingletonDestroyMethod()
+    {
+        $controller = new AuthorizesSingletonResourcesController;
+
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,App\Profile');
+
+        $controller = new AuthorizesSingletonResourcesWithArrayController;
+
+        $this->assertHasMiddleware($controller, 'destroy', 'can:delete,App\Profile,App\Settings');
     }
 
     /**
@@ -153,6 +219,96 @@ class AuthorizesResourcesWithArrayController extends Controller
     public function __construct()
     {
         $this->authorizeResource(['App\User', 'App\Post'], ['user', 'post']);
+    }
+
+    public function index()
+    {
+        //
+    }
+
+    public function create()
+    {
+        //
+    }
+
+    public function store()
+    {
+        //
+    }
+
+    public function show()
+    {
+        //
+    }
+
+    public function edit()
+    {
+        //
+    }
+
+    public function update()
+    {
+        //
+    }
+
+    public function destroy()
+    {
+        //
+    }
+}
+
+class AuthorizesSingletonResourcesController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeSingletonResource('App\Profile');
+    }
+
+    public function index()
+    {
+        //
+    }
+
+    public function create()
+    {
+        //
+    }
+
+    public function store()
+    {
+        //
+    }
+
+    public function show()
+    {
+        //
+    }
+
+    public function edit()
+    {
+        //
+    }
+
+    public function update()
+    {
+        //
+    }
+
+    public function destroy()
+    {
+        //
+    }
+}
+
+class AuthorizesSingletonResourcesWithArrayController extends Controller
+{
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeSingletonResource(['App\Profile', 'App\Settings']);
     }
 
     public function index()
