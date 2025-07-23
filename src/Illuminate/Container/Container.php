@@ -981,7 +981,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         $reflection = new ReflectionClass($abstract);
 
-        if (! $reflection->isInterface()) {
+        if (! $reflection->isInterface() && ! $reflection->isAbstract()) {
             return null;
         }
 

@@ -770,9 +770,11 @@ class ContainerTest extends TestCase
     public function testContainerConcreteAttribute()
     {
         $container = new Container;
-        $instantiation = $container->get(ContractWithConcreteAttribute::class);
+        $instantiation1 = $container->get(ContractWithConcreteAttribute::class);
+        $instantiation2 = $container->get(AbstractStub::class);
 
-        $this->assertInstanceOf(ConcreteStub::class, $instantiation);
+        $this->assertInstanceOf(ConcreteStub::class, $instantiation1);
+        $this->assertInstanceOf(ConcreteStub::class, $instantiation2);
     }
 
     // public function testContainerCanCatchCircularDependency()
@@ -950,6 +952,11 @@ interface ContractWithConcreteAttribute
 {
 }
 
-class ConcreteStub implements ContractWithConcreteAttribute
+#[Concrete(ConcreteStub::class)]
+abstract class AbstractStub
+{
+}
+
+class ConcreteStub extends AbstractStub implements ContractWithConcreteAttribute
 {
 }
