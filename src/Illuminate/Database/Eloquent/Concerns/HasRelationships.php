@@ -1085,6 +1085,17 @@ trait HasRelationships
     }
 
     /**
+     * Determine if the given relation is not loaded.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function relationNotLoaded($key)
+    {
+        return ! $this->relationLoaded($key);
+    }
+
+    /**
      * Set the given relationship on the model.
      *
      * @param  string  $relation
