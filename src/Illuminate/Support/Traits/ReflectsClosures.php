@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Traits;
 
 use Closure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Reflector;
 use ReflectionFunction;
 use RuntimeException;
@@ -46,13 +47,17 @@ trait ReflectsClosures
     {
         $reflection = new ReflectionFunction($closure);
 
-        $types = collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
-            if ($parameter->isVariadic()) {
-                return [$parameter->getName() => null];
-            }
+        $types = (new Collection($reflection->getParameters()))
+            ->mapWithKeys(function ($parameter) {
+                if ($parameter->isVariadic()) {
+                    return [$parameter->getName() => null];
+                }
 
-            return [$parameter->getName() => Reflector::getParameterClassNames($parameter)];
-        })->filter()->values()->all();
+                return [$parameter->getName() => Reflector::getParameterClassNames($parameter)];
+            })
+            ->filter()
+            ->values()
+            ->all();
 
         if (empty($types)) {
             throw new RuntimeException('The given Closure has no parameters.');
@@ -77,12 +82,14 @@ trait ReflectsClosures
     {
         $reflection = new ReflectionFunction($closure);
 
-        return collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
-            if ($parameter->isVariadic()) {
-                return [$parameter->getName() => null];
-            }
+        return (new Collection($reflection->getParameters()))
+            ->mapWithKeys(function ($parameter) {
+                if ($parameter->isVariadic()) {
+                    return [$parameter->getName() => null];
+                }
 
-            return [$parameter->getName() => Reflector::getParameterClassName($parameter)];
-        })->all();
+                return [$parameter->getName() => Reflector::getParameterClassName($parameter)];
+            })
+            ->all();
     }
 }

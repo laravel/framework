@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Console;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\CacheSchedulingMutex;
@@ -92,32 +93,28 @@ class ConsoleEventSchedulerTest extends TestCase
 
     public function testCommandCreatesNewArtisanCommand()
     {
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
-
         $schedule = $this->schedule;
         $schedule->command('queue:listen');
         $schedule->command('queue:listen --tries=3');
         $schedule->command('queue:listen', ['--tries' => 3]);
 
         $events = $schedule->events();
-        $binary = $escape.PHP_BINARY.$escape;
-        $artisan = $escape.'artisan'.$escape;
-        $this->assertEquals($binary.' '.$artisan.' queue:listen', $events[0]->command);
-        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[1]->command);
-        $this->assertEquals($binary.' '.$artisan.' queue:listen --tries=3', $events[2]->command);
+        $phpBinary = Application::phpBinary();
+        $artisanBinary = Application::artisanBinary();
+        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen', $events[0]->command);
+        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[1]->command);
+        $this->assertEquals($phpBinary.' '.$artisanBinary.' queue:listen --tries=3', $events[2]->command);
     }
 
     public function testCreateNewArtisanCommandUsingCommandClass()
     {
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
-
         $schedule = $this->schedule;
         $schedule->command(ConsoleCommandStub::class, ['--force']);
 
         $events = $schedule->events();
-        $binary = $escape.PHP_BINARY.$escape;
-        $artisan = $escape.'artisan'.$escape;
-        $this->assertEquals($binary.' '.$artisan.' foo:bar --force', $events[0]->command);
+        $phpBinary = Application::phpBinary();
+        $artisanBinary = Application::artisanBinary();
+        $this->assertEquals($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
     }
 
     public function testItUsesCommandDescriptionAsEventDescription()

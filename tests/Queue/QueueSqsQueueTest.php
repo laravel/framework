@@ -148,9 +148,25 @@ class QueueSqsQueueTest extends TestCase
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => [
+                'ApproximateNumberOfMessages',
+                'ApproximateNumberOfMessagesDelayed',
+                'ApproximateNumberOfMessagesNotVisible',
+            ],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+                'ApproximateNumberOfMessagesDelayed' => 2,
+                'ApproximateNumberOfMessagesNotVisible' => 3,
+            ],
+        ]));
+
         $size = $queue->size($this->queueName);
-        $this->assertEquals(1, $size);
+
+        $this->assertEquals(6, $size); // 1 + 2 + 3
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()

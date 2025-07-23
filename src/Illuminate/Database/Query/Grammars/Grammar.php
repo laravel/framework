@@ -9,6 +9,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use RuntimeException;
 
 class Grammar extends BaseGrammar
@@ -122,7 +123,7 @@ class Grammar extends BaseGrammar
      * Compile an aggregated select clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $aggregate
+     * @param  array{function: string, columns: array<\Illuminate\Contracts\Database\Query\Expression|string>}  $aggregate
      * @return string
      */
     protected function compileAggregate(Builder $query, $aggregate)
@@ -187,7 +188,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        return collect($joins)->map(function ($join) use ($query) {
+        return (new Collection($joins))->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
@@ -249,9 +250,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileWheresToArray($query)
     {
-        return collect($query->wheres)->map(function ($where) use ($query) {
-            return $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where);
-        })->all();
+        return (new Collection($query->wheres))
+            ->map(fn ($where) => $where['boolean'].' '.$this->{"where{$where['type']}"}($query, $where))
+            ->all();
     }
 
     /**
@@ -452,6 +453,24 @@ class Grammar extends BaseGrammar
         $max = $this->wrap(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a "value between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereValueBetween(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(is_array($where['columns']) ? reset($where['columns']) : $where['columns'][0]);
+
+        $max = $this->wrap(is_array($where['columns']) ? end($where['columns']) : $where['columns'][1]);
+
+        return $this->parameter($where['value']).' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -818,7 +837,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileHavings(Builder $query)
     {
-        return 'having '.$this->removeLeadingBoolean(collect($query->havings)->map(function ($having) {
+        return 'having '.$this->removeLeadingBoolean((new Collection($query->havings))->map(function ($having) {
             return $having['boolean'].' '.$this->compileHaving($having);
         })->implode(' '));
     }
@@ -1176,9 +1195,9 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same number of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = collect($values)->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = (new Collection($values))
+            ->map(fn ($record) => '('.$this->parameterize($record).')')
+            ->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -1202,7 +1221,7 @@ class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return string
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
@@ -1275,9 +1294,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileUpdateColumns(Builder $query, array $values)
     {
-        return collect($values)->map(function ($value, $key) {
-            return $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+        return (new Collection($values))
+            ->map(fn ($value, $key) => $this->wrap($key).' = '.$this->parameter($value))
+            ->implode(', ');
     }
 
     /**

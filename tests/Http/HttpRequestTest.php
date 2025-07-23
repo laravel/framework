@@ -679,6 +679,31 @@ class HttpRequestTest extends TestCase
         $this->assertSame(0.0, $request->float('null', 123.456));
     }
 
+    public function testArrayMethod()
+    {
+        $request = Request::create('/', 'GET', []);
+        $this->assertIsArray($request->array());
+        $this->assertEmpty($request->array());
+
+        $request = Request::create('/', 'GET', [
+            'users' => [1, 2, 3],
+            'roles' => [4, 5, 6],
+            'email' => 'test@example.com',
+        ]);
+
+        $this->assertEmpty($request->array('missing'));
+        $this->assertEmpty($request->array(['missing']));
+        $this->assertEquals([1, 2, 3], $request->array('users'));
+        $this->assertEquals(['users' => [1, 2, 3]], $request->array(['users']));
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->array(['users', 'email']));
+
+        $this->assertEquals([
+            'users' => [1, 2, 3],
+            'roles' => [4, 5, 6],
+            'email' => 'test@example.com',
+        ], $request->array());
+    }
+
     public function testCollectMethod()
     {
         $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
@@ -778,6 +803,9 @@ class HttpRequestTest extends TestCase
         ]);
 
         $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
+
+        $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
 
         $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
@@ -1042,6 +1070,16 @@ class HttpRequestTest extends TestCase
         $request->mergeIfMissing($merge);
         $this->assertSame('Taylor', $request->input('name'));
         $this->assertSame(1, $request->input('boolean_setting'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.last_name' => 'Otwell'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Otwell', $request->input('user.last_name'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.first_name' => 'John'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('user.first_name'));
     }
 
     public function testReplaceMethod()
@@ -1074,10 +1112,16 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
         $this->assertSame('fooBearerbar', $request->bearerToken());
 
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
+
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
         $this->assertSame('bar', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer foo,bar']);
+        $this->assertSame('foo', $request->bearerToken());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer foo,bar']);
         $this->assertSame('foo', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'foo,bar']);

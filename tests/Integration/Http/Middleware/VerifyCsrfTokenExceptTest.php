@@ -64,6 +64,6 @@ class VerifyCsrfTokenExceptTest extends TestCase
 
     private function assertNonMatchingExcept(array $except)
     {
-        return $this->assertMatchingExcept($except, false);
+        $this->assertMatchingExcept($except, false);
     }
 }

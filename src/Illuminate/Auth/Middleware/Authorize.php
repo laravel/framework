@@ -22,7 +22,6 @@ class Authorize
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
      */
     public function __construct(Gate $gate)
     {
@@ -32,7 +31,7 @@ class Authorize
     /**
      * Specify the ability and models for the middleware.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  string  ...$models
      * @return string
      */
@@ -73,9 +72,9 @@ class Authorize
             return [];
         }
 
-        return (new Collection($models))->map(function ($model) use ($request) {
-            return $model instanceof Model ? $model : $this->getModel($request, $model);
-        })->all();
+        return (new Collection($models))
+            ->map(fn ($model) => $model instanceof Model ? $model : $this->getModel($request, $model))
+            ->all();
     }
 
     /**

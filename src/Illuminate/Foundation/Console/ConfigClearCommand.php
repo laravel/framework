@@ -34,7 +34,6 @@ class ConfigClearCommand extends Command
      * Create a new config clear command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(Filesystem $files)
     {

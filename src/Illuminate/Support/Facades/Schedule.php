@@ -7,7 +7,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
 /**
  * @method static \Illuminate\Console\Scheduling\CallbackEvent call(string|callable $callback, array $parameters = [])
  * @method static \Illuminate\Console\Scheduling\Event command(string $command, array $parameters = [])
- * @method static \Illuminate\Console\Scheduling\CallbackEvent job(object|string $job, string|null $queue = null, string|null $connection = null)
+ * @method static \Illuminate\Console\Scheduling\CallbackEvent job(object|string $job, \UnitEnum|string|null $queue = null, \UnitEnum|string|null $connection = null)
  * @method static \Illuminate\Console\Scheduling\Event exec(string $command, array $parameters = [])
  * @method static void group(\Closure $events)
  * @method static string compileArrayInput(string|int $key, array $value)
@@ -29,6 +29,8 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes runInBackground()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes when(\Closure|bool $callback)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes skip(\Closure|bool $callback)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes name(string $description)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes description(string $description)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes cron(string $expression)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes between(string $startTime, string $endTime)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes unlessBetween(string $startTime, string $endTime)
@@ -48,7 +50,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everyFifteenMinutes()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everyThirtyMinutes()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes hourly()
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes hourlyAt(array|string|int $offset)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes hourlyAt(array|string|int|int[] $offset)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everyOddHour(array|string|int $offset = 0)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everyTwoHours(array|string|int $offset = 0)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes everyThreeHours(array|string|int $offset = 0)
@@ -79,7 +81,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearly()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes yearlyOn(int $month = 1, int|string $dayOfMonth = 1, string $time = '0:0')
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes days(array|mixed $days)
- * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\DateTimeZone|string $timezone)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes timezone(\UnitEnum|\DateTimeZone|string $timezone)
  *
  * @see \Illuminate\Console\Scheduling\Schedule
  */

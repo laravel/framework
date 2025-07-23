@@ -1583,7 +1583,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $data = $this->make(['a' => 0])->concat(
             $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]])
-                 ->mapInto(stdClass::class)
+                ->mapInto(stdClass::class)
         );
 
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {

@@ -35,7 +35,6 @@ class CacheBasedMaintenanceMode implements MaintenanceMode
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @param  string  $store
      * @param  string  $key
-     * @return void
      */
     public function __construct(Factory $cache, string $store, string $key)
     {

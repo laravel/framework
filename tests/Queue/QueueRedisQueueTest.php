@@ -27,16 +27,20 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
+        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         $id = $queue->push('foo', ['data']);
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -48,11 +52,14 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0]));
+        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             return ['custom' => 'taylor'];
@@ -64,6 +71,7 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -75,11 +83,14 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
         $queue->setContainer($container = m::spy(Container::class));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0]));
+        $redis->shouldReceive('eval')->once()->with(LuaScripts::push(), 2, 'queues:default', 'queues:default:notify', json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0, 'delay' => null]));
 
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             return ['custom' => 'taylor'];
@@ -95,6 +106,7 @@ class QueueRedisQueueTest extends TestCase
 
         Queue::createPayloadUsing(null);
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -106,6 +118,9 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
@@ -115,13 +130,14 @@ class QueueRedisQueueTest extends TestCase
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
             2,
-            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
+            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 1])
         );
 
         $id = $queue->later(1, 'foo', ['data']);
         $this->assertSame('foo', $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -133,22 +149,24 @@ class QueueRedisQueueTest extends TestCase
             return $uuid;
         });
 
-        $date = Carbon::now();
+        $time = $date = Carbon::now();
+        Carbon::setTestNow($time);
         $queue = $this->getMockBuilder(RedisQueue::class)->onlyMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('getRandomId')->willReturn('foo');
-        $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(2);
+        $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
         $redis->shouldReceive('zadd')->once()->with(
             'queues:default:delayed',
-            2,
-            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0])
+            5,
+            json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 5])
         );
 
-        $queue->later($date, 'foo', ['data']);
+        $queue->later($date->addSeconds(5), 'foo', ['data']);
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 }

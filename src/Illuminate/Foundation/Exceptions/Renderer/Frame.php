@@ -44,7 +44,6 @@ class Frame
      * @param  array<string, string>  $classMap
      * @param  array{file: string, line: int, class?: string, type?: string, function?: string}  $frame
      * @param  string  $basePath
-     * @return void
      */
     public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath)
     {

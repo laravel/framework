@@ -181,7 +181,7 @@ class ProcessTest extends TestCase
         $factory->preventStrayProcesses();
 
         $factory->fake([
-            '*' => 'The output',
+            '*' => $expectedOutput = 'The output',
         ]);
 
         $result = $factory->run(<<<'COMMAND'
@@ -192,6 +192,29 @@ class ProcessTest extends TestCase
         COMMAND);
 
         $this->assertSame(0, $result->exitCode());
+        $this->assertSame("$expectedOutput\n", $result->output());
+    }
+
+    public function testProcessFakeWithMultiLineCommand()
+    {
+        $factory = new Factory;
+
+        $factory->preventStrayProcesses();
+
+        $factory->fake([
+            '*--branch main*' => 'not this one',
+            '*--branch develop*' => $expectedOutput = 'yes thank you',
+        ]);
+
+        $result = $factory->run(<<<'COMMAND'
+        git clone --depth 1 \
+              --single-branch \
+              --branch develop \
+              git://some-url .
+        COMMAND);
+
+        $this->assertSame(0, $result->exitCode());
+        $this->assertSame("$expectedOutput\n", $result->output());
     }
 
     public function testProcessFakeExitCodes()
@@ -319,8 +342,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
             'cat *' => 'cat command',
         ]);
 
@@ -340,9 +363,9 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2')
-                        ->dontFailWhenEmpty(),
+                ->push('ls command 1')
+                ->push('ls command 2')
+                ->dontFailWhenEmpty(),
         ]);
 
         $result = $factory->run('ls -la');
@@ -363,8 +386,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
         ]);
 
         $result = $factory->run('ls -la');
@@ -716,10 +739,10 @@ class ProcessTest extends TestCase
 
         $factory->fake(function () use ($factory) {
             return $factory->describe()
-                    ->output('ONE')
-                    ->output('TWO')
-                    ->output('THREE')
-                    ->runsFor(iterations: 3);
+                ->output('ONE')
+                ->output('TWO')
+                ->output('THREE')
+                ->runsFor(iterations: 3);
         });
 
         $process = $factory->start('echo "ONE"; sleep 1; echo "TWO"; sleep 1; echo "THREE"; sleep 1;');
@@ -770,6 +793,37 @@ class ProcessTest extends TestCase
         $factory->fake();
 
         $factory->assertNothingRan();
+    }
+
+    public function testProcessWithMultipleEnvironmentVariablesAndSequences()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            'printenv TEST_VAR OTHER_VAR' => $factory->sequence()
+                ->push("test_value\nother_value")
+                ->push("new_test_value\nnew_other_value"),
+        ]);
+
+        $result = $factory->env([
+            'TEST_VAR' => 'test_value',
+            'OTHER_VAR' => 'other_value',
+        ])->run('printenv TEST_VAR OTHER_VAR');
+
+        $this->assertTrue($result->successful());
+        $this->assertEquals("test_value\nother_value\n", $result->output());
+
+        $result = $factory->env([
+            'TEST_VAR' => 'new_test_value',
+            'OTHER_VAR' => 'new_other_value',
+        ])->run('printenv TEST_VAR OTHER_VAR');
+
+        $this->assertTrue($result->successful());
+        $this->assertEquals("new_test_value\nnew_other_value\n", $result->output());
+
+        $factory->assertRanTimes(function ($process) {
+            return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
+        }, 2);
     }
 
     protected function ls()

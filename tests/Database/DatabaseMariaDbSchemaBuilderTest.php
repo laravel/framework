@@ -38,7 +38,7 @@ class DatabaseMariaDbSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileColumns')->with('db', 'prefix_table')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'prefix_table')->once()->andReturn('sql');
         $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'column']]);
         $builder = new MariaDbBuilder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');

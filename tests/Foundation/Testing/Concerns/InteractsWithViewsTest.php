@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithViews;
+use Illuminate\Testing\TestComponent;
 use Illuminate\View\Component;
 use Orchestra\Testbench\TestCase;
 
@@ -39,5 +40,22 @@ class InteractsWithViewsTest extends TestCase
         $this->assertSame('bar', $component->foo);
         $this->assertSame('hello', $component->speak());
         $component->assertSee('content');
+    }
+
+    public function testComponentMacroable()
+    {
+        TestComponent::macro('foo', fn (): string => 'bar');
+
+        $exampleComponent = new class extends Component
+        {
+            public function render()
+            {
+                return 'rendered content';
+            }
+        };
+
+        $component = $this->component(get_class($exampleComponent));
+
+        $this->assertSame('bar', $component->foo());
     }
 }

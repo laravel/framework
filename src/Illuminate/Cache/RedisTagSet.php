@@ -43,7 +43,7 @@ class RedisTagSet extends TagSet
             default => '0',
         };
 
-        return LazyCollection::make(function () use ($connection, $defaultCursorValue) {
+        return new LazyCollection(function () use ($connection, $defaultCursorValue) {
             foreach ($this->tagIds() as $tagKey) {
                 $cursor = $defaultCursorValue;
 
@@ -90,6 +90,7 @@ class RedisTagSet extends TagSet
      * Flush the tag from the cache.
      *
      * @param  string  $name
+     * @return string
      */
     public function flushTag($name)
     {

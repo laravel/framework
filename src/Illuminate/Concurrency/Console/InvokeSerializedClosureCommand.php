@@ -3,6 +3,7 @@
 namespace Illuminate\Concurrency\Console;
 
 use Illuminate\Console\Command;
+use ReflectionClass;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
@@ -51,12 +52,27 @@ class InvokeSerializedClosureCommand extends Command
         } catch (Throwable $e) {
             report($e);
 
+            $reflection = new ReflectionClass($e);
+            $constructor = $reflection->getConstructor();
+            $parameters = [];
+
+            if ($constructor) {
+                $declaringClass = $constructor->getDeclaringClass()->getName();
+
+                if ($declaringClass === $reflection->getName()) {
+                    foreach ($constructor->getParameters() as $parameter) {
+                        $parameters[$parameter->name] = $e->{$parameter->name} ?? null;
+                    }
+                }
+            }
+
             $this->output->write(json_encode([
                 'successful' => false,
                 'exception' => get_class($e),
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
+                'parameters' => $parameters,
             ]));
         }
     }

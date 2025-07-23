@@ -75,19 +75,14 @@ class ScheduleGroupTest extends TestCase
             ->timezone('UTC')
             ->group(function () {
                 Schedule::command('inspire');
-                Schedule::timezone('Asia/Dhaka')
-                    ->everyMinute()
-                    ->group(function () {
-                        Schedule::command('inspire');
-                    });
+                Schedule::timezone('Asia/Dhaka')->group(function () {
+                    Schedule::command('inspire');
+                });
             });
 
         $events = Schedule::events();
         $this->assertSame('UTC', $events[0]->timezone);
-        $this->assertSame('0 0 * * *', $events[0]->expression);
-
         $this->assertSame('Asia/Dhaka', $events[1]->timezone);
-        $this->assertSame('* * * * *', $events[1]->expression);
     }
 
     #[DataProvider('groupAttributes')]

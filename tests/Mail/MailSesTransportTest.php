@@ -76,7 +76,7 @@ class MailSesTransportTest extends TestCase
                     $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
                     $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
                     $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
-                    strpos($arg['RawMessage']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>') !== false;
+                    str_contains($arg['RawMessage']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
             }))
             ->andReturn($sesResult);
 

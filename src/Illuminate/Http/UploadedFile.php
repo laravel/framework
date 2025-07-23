@@ -133,7 +133,7 @@ class UploadedFile extends SymfonyUploadedFile
     {
         return $file instanceof static ? $file : new static(
             $file->getPathname(),
-            $file->getClientOriginalName(),
+            $file->getClientOriginalPath(),
             $file->getClientMimeType(),
             $file->getError(),
             $test

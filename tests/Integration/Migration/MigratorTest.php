@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Migration;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Stringable;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,6 +30,13 @@ class MigratorTest extends TestCase
         $this->subject->getRepository()->createRepository();
     }
 
+    protected function tearDown(): void
+    {
+        Migrator::withoutMigrations([]);
+
+        parent::tearDown();
+    }
+
     public function testMigrate()
     {
         $this->expectInfo('Running migrations.');
@@ -35,6 +44,7 @@ class MigratorTest extends TestCase
         $this->expectTask('2014_10_12_000000_create_people_table', 'DONE');
         $this->expectTask('2015_10_04_000000_modify_people_table', 'DONE');
         $this->expectTask('2016_10_04_000000_modify_people_table', 'DONE');
+        $this->expectTask('2017_10_04_000000_add_age_to_people', 'SKIPPED');
 
         $this->output->shouldReceive('writeln')->once();
 
@@ -43,6 +53,7 @@ class MigratorTest extends TestCase
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
     }
 
     public function testMigrateWithoutOutput()
@@ -53,6 +64,25 @@ class MigratorTest extends TestCase
         $this->subject->run([__DIR__.'/fixtures']);
 
         $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'age'));
+    }
+
+    public function testWithSkippedMigrations()
+    {
+        $this->app->forgetInstance('migrator');
+        $this->subject = $this->app->make('migrator');
+
+        Migrator::withoutMigrations(['2015_10_04_000000_modify_people_table.php', '2016_10_04_000000_modify_people_table']);
+
+        $this->subject->run([__DIR__.'/fixtures']);
+        $this->assertTrue(DB::getSchemaBuilder()->hasTable('people'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
+        $this->assertFalse(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
+
+        Migrator::withoutMigrations([]);
+        $this->subject->run([__DIR__.'/fixtures']);
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'first_name'));
         $this->assertTrue(DB::getSchemaBuilder()->hasColumn('people', 'last_name'));
     }
@@ -93,7 +123,7 @@ class MigratorTest extends TestCase
         $this->expectTwoColumnDetail('2016_10_04_000000_modify_people_table');
         $this->expectBulletList(['alter table "people" add column "last_name" varchar']);
 
-        $this->output->shouldReceive('writeln')->once();
+        $this->output->shouldReceive('writeln')->times(3);
 
         $this->subject->run([__DIR__.'/fixtures'], ['pretend' => true]);
 
@@ -234,17 +264,17 @@ class MigratorTest extends TestCase
     protected function expectInfo($message): void
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($message),
+            fn ($argument) => (new Stringable($argument))->contains($message),
         ), m::any());
     }
 
     protected function expectTwoColumnDetail($first, $second = null)
     {
         $this->output->shouldReceive('writeln')->with(m::on(function ($argument) use ($first, $second) {
-            $result = str($argument)->contains($first);
+            $result = (new Stringable($argument))->contains($first);
 
             if ($result && $second) {
-                $result = str($argument)->contains($second);
+                $result = (new Stringable($argument))->contains($second);
             }
 
             return $result;
@@ -255,7 +285,7 @@ class MigratorTest extends TestCase
     {
         $this->output->shouldReceive('writeln')->once()->with(m::on(function ($argument) use ($elements) {
             foreach ($elements as $element) {
-                if (! str($argument)->contains("⇂ $element")) {
+                if (! (new Stringable($argument))->contains("⇂ $element")) {
                     return false;
                 }
             }
@@ -268,20 +298,20 @@ class MigratorTest extends TestCase
     {
         // Ignore dots...
         $this->output->shouldReceive('write')->with(m::on(
-            fn ($argument) => str($argument)->contains(['<fg=gray></>', '<fg=gray>.</>']),
+            fn ($argument) => (new Stringable($argument))->contains(['<fg=gray></>', '<fg=gray>.</>']),
         ), m::any(), m::any());
 
         // Ignore duration...
         $this->output->shouldReceive('write')->with(m::on(
-            fn ($argument) => str($argument)->contains(['ms</>']),
+            fn ($argument) => (new Stringable($argument))->contains(['ms</>']),
         ), m::any(), m::any());
 
         $this->output->shouldReceive('write')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($description),
+            fn ($argument) => (new Stringable($argument))->contains($description),
         ), m::any(), m::any());
 
         $this->output->shouldReceive('writeln')->once()->with(m::on(
-            fn ($argument) => str($argument)->contains($result),
+            fn ($argument) => (new Stringable($argument))->contains($result),
         ), m::any());
     }
 }

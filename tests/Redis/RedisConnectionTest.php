@@ -709,7 +709,7 @@ class RedisConnectionTest extends TestCase
 
                 foreach ($returnedMembers as $member) {
                     $this->assertContains($member, $members);
-                    array_push($result, $member);
+                    $result[] = $member;
                 }
             } while ($iterator > 0);
 

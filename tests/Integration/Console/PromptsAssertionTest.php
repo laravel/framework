@@ -10,6 +10,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multisearch;
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\password;
+use function Laravel\Prompts\pause;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\suggest;
@@ -38,6 +39,32 @@ class PromptsAssertionTest extends TestCase
             ->artisan('test:text')
             ->expectsQuestion('What is your name?', 'Jane')
             ->expectsOutput('Jane');
+    }
+
+    public function testAssertionForPausePrompt()
+    {
+        $self = $this;
+        $this->app[Kernel::class]->registerCommand(
+            new class($this) extends Command
+            {
+                protected $signature = 'test:pause';
+
+                public function __construct(public PromptsAssertionTest $test)
+                {
+                    parent::__construct();
+                }
+
+                public function handle()
+                {
+                    $value = pause('Press any key to continue...');
+                    $this->test->assertEquals(true, $value);
+                }
+            }
+        );
+
+        $this
+            ->artisan('test:pause')
+            ->expectsQuestion('Press any key to continue...', '');
     }
 
     public function testAssertionForTextareaPrompt()

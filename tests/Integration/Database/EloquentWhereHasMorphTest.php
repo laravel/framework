@@ -255,6 +255,13 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
+
+    public function testWhereDoesntHaveMorphWithNullableMorph()
+    {
+        $comments = Comment::whereDoesntHaveMorph('commentable', '*')->orderBy('id')->get();
+
+        $this->assertEquals([3, 7, 8], $comments->pluck('id')->all());
+    }
 }
 
 class Comment extends Model

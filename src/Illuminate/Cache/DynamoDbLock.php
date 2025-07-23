@@ -18,7 +18,6 @@ class DynamoDbLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @return void
      */
     public function __construct(DynamoDbStore $dynamo, $name, $seconds, $owner = null)
     {

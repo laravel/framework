@@ -18,9 +18,9 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $grammar = new PostgresGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new PostgresGrammar($connection);
+
         $connection->shouldReceive('getConfig')->once()->with('charset')->andReturn('utf8');
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
@@ -33,9 +33,9 @@ class DatabasePostgresBuilderTest extends TestCase
 
     public function testDropDatabaseIfExists()
     {
-        $grammar = new PostgresGrammar;
-
         $connection = m::mock(Connection::class);
+        $grammar = new PostgresGrammar($connection);
+
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('statement')->once()->with(
             'drop database if exists "my_database_a"'
@@ -142,7 +142,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('schema')->andReturn(null);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('public', 'foo')->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'foo')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
         $processor = m::mock(PostgresProcessor::class);
@@ -159,7 +159,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('myapp,public');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('myapp', 'foo')->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'foo')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
         $processor = m::mock(PostgresProcessor::class);
@@ -177,7 +177,7 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getConfig')->with('search_path')->andReturn('$user');
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
-        $grammar->shouldReceive('compileColumns')->with('foouser', 'foo')->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'foo')->andReturn('sql');
         $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'some_column']]);
         $connection->shouldReceive('getTablePrefix');
         $processor = m::mock(PostgresProcessor::class);
@@ -228,11 +228,8 @@ class DatabasePostgresBuilderTest extends TestCase
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'public']]);
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'public']]);
-        $grammar->shouldReceive('escapeNames')->with(['public'])->andReturn(['"public"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'public.users'])->andReturn(['"users"', '"public"."users"']);
+        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'public', 'schema_qualified_name' => 'public.users']]);
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'public', 'schema_qualified_name' => 'public.users']]);
         $grammar->shouldReceive('compileDropAllTables')->with(['public.users'])->andReturn('drop table "public"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "public"."users" cascade');
         $builder = $this->getBuilder($connection);
@@ -250,13 +247,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser']]);
+        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser', 'schema_qualified_name' => 'foouser.users']]);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser']]);
-        $grammar->shouldReceive('escapeNames')->with(['foouser', 'public', 'foo_bar-Baz.Áüõß'])->andReturn(['"foouser"', '"public"', '"foo_bar-Baz"."Áüõß"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['foouser'])->andReturn(['"foouser"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'foouser.users'])->andReturn(['"users"', '"foouser"."users"']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser', 'schema_qualified_name' => 'foouser.users']]);
         $grammar->shouldReceive('compileDropAllTables')->with(['foouser.users'])->andReturn('drop table "foouser"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);
@@ -279,13 +272,9 @@ class DatabasePostgresBuilderTest extends TestCase
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->once()->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser']]);
+        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'users', 'schema' => 'foouser', 'schema_qualified_name' => 'foouser.users']]);
         $grammar->shouldReceive('compileTables')->andReturn('sql');
-        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser']]);
-        $grammar->shouldReceive('escapeNames')->with(['foouser', 'dev', 'test', 'spaced schema'])->andReturn(['"foouser"', '"dev"', '"test"', '"spaced schema"']);
-        $grammar->shouldReceive('escapeNames')->with(['foo'])->andReturn(['"foo"']);
-        $grammar->shouldReceive('escapeNames')->with(['users', 'foouser.users'])->andReturn(['"users"', '"foouser"."users"']);
-        $grammar->shouldReceive('escapeNames')->with(['foouser'])->andReturn(['"foouser"']);
+        $connection->shouldReceive('selectFromWriteConnection')->with('sql')->andReturn([['name' => 'users', 'schema' => 'foouser', 'schema_qualified_name' => 'foouser.users']]);
         $grammar->shouldReceive('compileDropAllTables')->with(['foouser.users'])->andReturn('drop table "foouser"."users" cascade');
         $connection->shouldReceive('statement')->with('drop table "foouser"."users" cascade');
         $builder = $this->getBuilder($connection);

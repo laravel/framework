@@ -19,8 +19,6 @@ trait InteractsWithIO
      * The console components factory.
      *
      * @var \Illuminate\Console\View\Components\Factory
-     *
-     * @internal This property is not meant to be used or overwritten outside the framework.
      */
     protected $components;
 
@@ -95,7 +93,7 @@ trait InteractsWithIO
     }
 
     /**
-     * Determine if the given option is present.
+     * Determine whether the option is defined in the command signature.
      *
      * @param  string  $name
      * @return bool

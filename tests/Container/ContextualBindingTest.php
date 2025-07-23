@@ -23,9 +23,7 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
 
-        /*
-         * Test With Closures
-         */
+        // Test With Closures
         $container = new Container;
 
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
@@ -41,9 +39,7 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
 
-        /*
-         * Test nesting to make the same 'abstract' in different context
-         */
+        // Test nesting to make the same 'abstract' in different context
         $container = new Container;
 
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);

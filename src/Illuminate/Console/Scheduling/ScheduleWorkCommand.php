@@ -30,13 +30,13 @@ class ScheduleWorkCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return never
      */
     public function handle()
     {
         $this->components->info(
-            'Running scheduled tasks every minute.',
-            $this->getLaravel()->isLocal() ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
+            'Running scheduled tasks.',
+            $this->getLaravel()->environment('local') ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
         );
 
         [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];

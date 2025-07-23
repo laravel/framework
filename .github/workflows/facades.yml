@@ -7,6 +7,9 @@ on:
       - '*.x'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-24.04
@@ -29,7 +32,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

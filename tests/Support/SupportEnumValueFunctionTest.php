@@ -11,25 +11,25 @@ include_once 'Enums.php';
 
 class SupportEnumValueFunctionTest extends TestCase
 {
-    public function test_it_can_handle_enums_value()
-    {
-        $this->assertSame('A', enum_value(TestEnum::A));
-
-        $this->assertSame(1, enum_value(TestBackedEnum::A));
-        $this->assertSame(2, enum_value(TestBackedEnum::B));
-
-        $this->assertSame('A', enum_value(TestStringBackedEnum::A));
-        $this->assertSame('B', enum_value(TestStringBackedEnum::B));
-    }
-
     #[DataProvider('scalarDataProvider')]
     public function test_it_can_handle_enum_value($given, $expected)
     {
         $this->assertSame($expected, enum_value($given));
     }
 
+    public function test_it_can_fallback_to_use_default_if_value_is_null()
+    {
+        $this->assertSame('laravel', enum_value(null, 'laravel'));
+        $this->assertSame('laravel', enum_value(null, fn () => 'laravel'));
+    }
+
     public static function scalarDataProvider()
     {
+        yield [TestEnum::A, 'A'];
+        yield [TestBackedEnum::A, 1];
+        yield [TestBackedEnum::B, 2];
+        yield [TestStringBackedEnum::A, 'A'];
+        yield [TestStringBackedEnum::B, 'B'];
         yield [null, null];
         yield [0, 0];
         yield ['0', '0'];

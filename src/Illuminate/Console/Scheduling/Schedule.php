@@ -14,9 +14,12 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Console\Scheduling\PendingEventAttributes
@@ -86,7 +89,7 @@ class Schedule
     /**
      * The attributes to pass to the event.
      *
-     * @var \Illuminate\Console\Scheduling\PendingEventAttributes
+     * @var \Illuminate\Console\Scheduling\PendingEventAttributes|null
      */
     protected $attributes;
 
@@ -101,7 +104,6 @@ class Schedule
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
-     * @return void
      *
      * @throws \RuntimeException
      */
@@ -118,12 +120,12 @@ class Schedule
         $container = Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
-                                ? $container->make(EventMutex::class)
-                                : $container->make(CacheEventMutex::class);
+            ? $container->make(EventMutex::class)
+            : $container->make(CacheEventMutex::class);
 
         $this->schedulingMutex = $container->bound(SchedulingMutex::class)
-                                ? $container->make(SchedulingMutex::class)
-                                : $container->make(CacheSchedulingMutex::class);
+            ? $container->make(SchedulingMutex::class)
+            : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -170,13 +172,16 @@ class Schedule
      * Add a new job callback event to the schedule.
      *
      * @param  object|string  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $connection
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function job($job, $queue = null, $connection = null)
     {
         $jobName = $job;
+
+        $queue = enum_value($queue);
+        $connection = enum_value($connection);
 
         if (! is_string($job)) {
             $jobName = method_exists($job, 'displayName')
@@ -184,7 +189,7 @@ class Schedule
                 : $job::class;
         }
 
-        return $this->call(function () use ($job, $queue, $connection) {
+        return $this->name($jobName)->call(function () use ($job, $queue, $connection) {
             $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
             if ($job instanceof ShouldQueue) {
@@ -192,7 +197,7 @@ class Schedule
             } else {
                 $this->dispatchNow($job);
             }
-        })->name($jobName);
+        });
     }
 
     /**
@@ -287,9 +292,15 @@ class Schedule
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
+     *
+     * @throws \RuntimeException
      */
     public function group(Closure $events)
     {
+        if ($this->attributes === null) {
+            throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
+        }
+
         $this->groupStack[] = $this->attributes;
 
         $events($this);
@@ -308,7 +319,7 @@ class Schedule
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
 
-            unset($this->attributes);
+            $this->attributes = null;
         }
 
         if (! empty($this->groupStack)) {
@@ -326,7 +337,7 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
+        return (new Collection($parameters))->map(function ($value, $key) {
             if (is_array($value)) {
                 return $this->compileArrayInput($key, $value);
             }
@@ -348,7 +359,7 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = collect($value)->map(function ($value) {
+        $value = (new Collection($value))->map(function ($value) {
             return ProcessUtils::escapeArgument($value);
         });
 
@@ -385,7 +396,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return collect($this->events)->filter->isDue($app);
+        return (new Collection($this->events))->filter->isDue($app);
     }
 
     /**
@@ -454,7 +465,7 @@ class Schedule
         }
 
         if (method_exists(PendingEventAttributes::class, $method)) {
-            $this->attributes ??= new PendingEventAttributes($this);
+            $this->attributes ??= end($this->groupStack) ?: new PendingEventAttributes($this);
 
             return $this->attributes->$method(...$parameters);
         }

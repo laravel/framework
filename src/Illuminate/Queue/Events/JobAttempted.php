@@ -5,39 +5,17 @@ namespace Illuminate\Queue\Events;
 class JobAttempted
 {
     /**
-     * The connection name.
-     *
-     * @var string
-     */
-    public $connectionName;
-
-    /**
-     * The job instance.
-     *
-     * @var \Illuminate\Contracts\Queue\Job
-     */
-    public $job;
-
-    /**
-     * Indicates if an exception occurred while processing the job.
-     *
-     * @var bool
-     */
-    public $exceptionOccurred;
-
-    /**
      * Create a new event instance.
      *
-     * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  bool  $exceptionOccurred
-     * @return void
+     * @param  string  $connectionName  The connection name.
+     * @param  \Illuminate\Contracts\Queue\Job  $job  The job instance.
+     * @param  bool  $exceptionOccurred  Indicates if an exception occurred while processing the job.
      */
-    public function __construct($connectionName, $job, $exceptionOccurred = false)
-    {
-        $this->job = $job;
-        $this->connectionName = $connectionName;
-        $this->exceptionOccurred = $exceptionOccurred;
+    public function __construct(
+        public $connectionName,
+        public $job,
+        public $exceptionOccurred = false,
+    ) {
     }
 
     /**

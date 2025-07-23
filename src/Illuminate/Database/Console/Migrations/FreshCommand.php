@@ -41,7 +41,6 @@ class FreshCommand extends Command
      * Create a new fresh command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @return void
      */
     public function __construct(Migrator $migrator)
     {

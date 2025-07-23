@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 use function Illuminate\Support\enum_value;
@@ -90,8 +89,8 @@ trait CreatesRegularExpressionRouteConstraints
      */
     protected function assignExpressionToParameters($parameters, $expression)
     {
-        return $this->where((new Collection(Arr::wrap($parameters)))
-                    ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
-                    ->all());
+        return $this->where(Collection::wrap($parameters)
+            ->mapWithKeys(fn ($parameter) => [$parameter => $expression])
+            ->all());
     }
 }

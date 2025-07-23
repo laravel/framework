@@ -20,8 +20,6 @@ class ArrayTransport implements Stringable, TransportInterface
 
     /**
      * Create a new array transport instance.
-     *
-     * @return void
      */
     public function __construct()
     {

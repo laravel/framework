@@ -261,6 +261,8 @@ trait InteractsWithContainer
                 $value();
             }
         });
+
+        return $this;
     }
 
     /**

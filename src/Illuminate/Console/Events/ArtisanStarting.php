@@ -2,23 +2,17 @@
 
 namespace Illuminate\Console\Events;
 
+use Illuminate\Console\Application;
+
 class ArtisanStarting
 {
     /**
-     * The Artisan application instance.
-     *
-     * @var \Illuminate\Console\Application
-     */
-    public $artisan;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Application  $artisan
-     * @return void
+     * @param  \Illuminate\Console\Application  $artisan  The Artisan application instance.
      */
-    public function __construct($artisan)
-    {
-        $this->artisan = $artisan;
+    public function __construct(
+        public Application $artisan,
+    ) {
     }
 }

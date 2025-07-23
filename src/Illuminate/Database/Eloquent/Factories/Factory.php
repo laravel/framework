@@ -8,7 +8,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -114,11 +113,18 @@ abstract class Factory
     public static $namespace = 'Database\\Factories\\';
 
     /**
-     * The default model name resolver.
+     * @deprecated use $modelNameResolvers
      *
      * @var callable(self): class-string<TModel>
      */
     protected static $modelNameResolver;
+
+    /**
+     * The default model name resolvers.
+     *
+     * @var array<class-string, callable(self): class-string<TModel>>
+     */
+    protected static $modelNameResolvers = [];
 
     /**
      * The factory name resolver.
@@ -126,6 +132,13 @@ abstract class Factory
      * @var callable
      */
     protected static $factoryNameResolver;
+
+    /**
+     * Whether to expand relationships by default.
+     *
+     * @var bool
+     */
+    protected static $expandRelationshipsByDefault = true;
 
     /**
      * Create a new factory instance.
@@ -138,8 +151,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $afterCreating
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
-     * @param  bool  $expandRelationships
-     * @return void
+     * @param  bool|null  $expandRelationships
      */
     public function __construct(
         $count = null,
@@ -150,7 +162,7 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
-        bool $expandRelationships = true
+        ?bool $expandRelationships = null
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -161,7 +173,7 @@ abstract class Factory
         $this->connection = $connection;
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
-        $this->expandRelationships = $expandRelationships;
+        $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
     }
 
     /**
@@ -260,7 +272,7 @@ abstract class Factory
         }
 
         return new EloquentCollection(
-            collect($records)->map(function ($record) {
+            (new Collection($records))->map(function ($record) {
                 return $this->state($record)->create();
             })
         );
@@ -274,9 +286,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(function () use ($records) {
-            return $this->createMany($records);
-        });
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -295,9 +305,9 @@ abstract class Factory
         $results = $this->make($attributes, $parent);
 
         if ($results instanceof Model) {
-            $this->store(collect([$results]));
+            $this->store(new Collection([$results]));
 
-            $this->callAfterCreating(collect([$results]), $parent);
+            $this->callAfterCreating(new Collection([$results]), $parent);
         } else {
             $this->store($results);
 
@@ -316,9 +326,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(function () use ($attributes, $parent) {
-            return $this->create($attributes, $parent);
-        });
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -393,27 +401,37 @@ abstract class Factory
      */
     public function make($attributes = [], ?Model $parent = null)
     {
-        if (! empty($attributes)) {
-            return $this->state($attributes)->make([], $parent);
+        $autoEagerLoadingEnabled = Model::isAutomaticallyEagerLoadingRelationships();
+
+        if ($autoEagerLoadingEnabled) {
+            Model::automaticallyEagerLoadRelationships(false);
         }
 
-        if ($this->count === null) {
-            return tap($this->makeInstance($parent), function ($instance) {
-                $this->callAfterMaking(collect([$instance]));
-            });
+        try {
+            if (! empty($attributes)) {
+                return $this->state($attributes)->make([], $parent);
+            }
+
+            if ($this->count === null) {
+                return tap($this->makeInstance($parent), function ($instance) {
+                    $this->callAfterMaking(new Collection([$instance]));
+                });
+            }
+
+            if ($this->count < 1) {
+                return $this->newModel()->newCollection();
+            }
+
+            $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
+                return $this->makeInstance($parent);
+            }, range(1, $this->count)));
+
+            $this->callAfterMaking($instances);
+
+            return $instances;
+        } finally {
+            Model::automaticallyEagerLoadRelationships($autoEagerLoadingEnabled);
         }
-
-        if ($this->count < 1) {
-            return $this->newModel()->newCollection();
-        }
-
-        $instances = $this->newModel()->newCollection(array_map(function () use ($parent) {
-            return $this->makeInstance($parent);
-        }, range(1, $this->count)));
-
-        $this->callAfterMaking($instances);
-
-        return $instances;
     }
 
     /**
@@ -472,11 +490,10 @@ abstract class Factory
      */
     protected function parentResolvers()
     {
-        $model = $this->newModel();
-
-        return $this->for->map(function (BelongsToRelationship $for) use ($model) {
-            return $for->recycle($this->recycle)->attributesFor($model);
-        })->collapse()->all();
+        return $this->for
+            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->collapse()
+            ->all();
     }
 
     /**
@@ -487,7 +504,7 @@ abstract class Factory
      */
     protected function expandAttributes(array $definition)
     {
-        return collect($definition)
+        return (new Collection($definition))
             ->map($evaluateRelations = function ($attribute) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
@@ -517,17 +534,30 @@ abstract class Factory
     /**
      * Add a new state transformation to the model definition.
      *
-     * @param  (callable(array<string, mixed>, TModel|null): array<string, mixed>)|array<string, mixed>  $state
+     * @param  (callable(array<string, mixed>, Model|null): array<string, mixed>)|array<string, mixed>  $state
      * @return static
      */
     public function state($state)
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : function () use ($state) {
-                    return $state;
-                },
+                is_callable($state) ? $state : fn () => $state,
             ]),
+        ]);
+    }
+
+    /**
+     * Prepend a new state transformation to the model definition.
+     *
+     * @param  (callable(array<string, mixed>, Model|null): array<string, mixed>)|array<string, mixed>  $state
+     * @return static
+     */
+    public function prependState($state)
+    {
+        return $this->newInstance([
+            'states' => $this->states->prepend(
+                is_callable($state) ? $state : fn () => $state,
+            ),
         ]);
     }
 
@@ -813,9 +843,13 @@ abstract class Factory
      */
     public function modelName()
     {
-        $resolver = static::$modelNameResolver ?? function (self $factory) {
+        if ($this->model !== null) {
+            return $this->model;
+        }
+
+        $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', get_class($factory))
+                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
@@ -823,11 +857,11 @@ abstract class Factory
             $appNamespace = static::appNamespace();
 
             return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
-                        ? $appNamespace.'Models\\'.$namespacedFactoryBasename
-                        : $appNamespace.$factoryBasename;
+                ? $appNamespace.'Models\\'.$namespacedFactoryBasename
+                : $appNamespace.$factoryBasename;
         };
 
-        return $this->model ?? $resolver($this);
+        return $resolver($this);
     }
 
     /**
@@ -838,7 +872,7 @@ abstract class Factory
      */
     public static function guessModelNamesUsing(callable $callback)
     {
-        static::$modelNameResolver = $callback;
+        static::$modelNameResolvers[static::class] = $callback;
     }
 
     /**
@@ -876,6 +910,26 @@ abstract class Factory
     public static function guessFactoryNamesUsing(callable $callback)
     {
         static::$factoryNameResolver = $callback;
+    }
+
+    /**
+     * Specify that relationships should create parent relationships by default.
+     *
+     * @return void
+     */
+    public static function expandRelationshipsByDefault()
+    {
+        static::$expandRelationshipsByDefault = true;
+    }
+
+    /**
+     * Specify that relationships should not create parent relationships by default.
+     *
+     * @return void
+     */
+    public static function dontExpandRelationshipsByDefault()
+    {
+        static::$expandRelationshipsByDefault = false;
     }
 
     /**
@@ -928,6 +982,20 @@ abstract class Factory
     }
 
     /**
+     * Flush the factory's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$modelNameResolver = null;
+        static::$modelNameResolvers = [];
+        static::$factoryNameResolver = null;
+        static::$namespace = 'Database\\Factories\\';
+        static::$expandRelationshipsByDefault = true;
+    }
+
+    /**
      * Proxy dynamic factory methods onto their proper methods.
      *
      * @param  string  $method
@@ -940,7 +1008,7 @@ abstract class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        if ($method === 'trashed' && in_array(SoftDeletes::class, class_uses_recursive($this->modelName()))) {
+        if ($method === 'trashed' && $this->modelName()::isSoftDeletable()) {
             return $this->state([
                 $this->newModel()->getDeletedAtColumn() => $parameters[0] ?? Carbon::now()->subDay(),
             ]);

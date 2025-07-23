@@ -164,7 +164,7 @@ class PivotSerializationTestProject extends Model
     public function tags()
     {
         return $this->morphToMany(PivotSerializationTestTag::class, 'taggable', 'taggables', 'taggable_id', 'tag_id')
-                ->using(PivotSerializationTestTagAttachment::class);
+            ->using(PivotSerializationTestTagAttachment::class);
     }
 }
 
@@ -175,7 +175,7 @@ class PivotSerializationTestTag extends Model
     public function projects()
     {
         return $this->morphedByMany(PivotSerializationTestProject::class, 'taggable', 'taggables', 'tag_id', 'taggable_id')
-                    ->using(PivotSerializationTestTagAttachment::class);
+            ->using(PivotSerializationTestTagAttachment::class);
     }
 }
 

@@ -24,7 +24,7 @@ class MailMailableDataTest extends TestCase
         $mailable = new MailableStub;
         $mailable->build(function ($m) use ($testData) {
             $m->view('view', $testData)
-              ->text('text-view');
+                ->text('text-view');
         });
         $this->assertSame($testData, $mailable->buildViewData());
     }

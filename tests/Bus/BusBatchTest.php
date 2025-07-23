@@ -101,8 +101,8 @@ class BusBatchTest extends TestCase
         };
 
         $queue->shouldReceive('connection')->once()
-                        ->with('test-connection')
-                        ->andReturn($connection = m::mock(stdClass::class));
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
 
         $connection->shouldReceive('bulk')->once()->with(m::on(function ($args) use ($job, $secondJob) {
             return
@@ -191,8 +191,8 @@ class BusBatchTest extends TestCase
         };
 
         $queue->shouldReceive('connection')->once()
-                        ->with('test-connection')
-                        ->andReturn($connection = m::mock(stdClass::class));
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
 
         $connection->shouldReceive('bulk')->once();
 
@@ -231,8 +231,8 @@ class BusBatchTest extends TestCase
         };
 
         $queue->shouldReceive('connection')->once()
-                        ->with('test-connection')
-                        ->andReturn($connection = m::mock(stdClass::class));
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
 
         $connection->shouldReceive('bulk')->once();
 
@@ -273,8 +273,8 @@ class BusBatchTest extends TestCase
         };
 
         $queue->shouldReceive('connection')->once()
-                        ->with('test-connection')
-                        ->andReturn($connection = m::mock(stdClass::class));
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
 
         $connection->shouldReceive('bulk')->once();
 
@@ -472,26 +472,26 @@ class BusBatchTest extends TestCase
         $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
 
         $pendingBatch = (new PendingBatch(new Container, collect()))
-                            ->progress(function (Batch $batch) {
-                                $_SERVER['__progress.batch'] = $batch;
-                                $_SERVER['__progress.count']++;
-                            })
-                            ->then(function (Batch $batch) {
-                                $_SERVER['__then.batch'] = $batch;
-                                $_SERVER['__then.count']++;
-                            })
-                            ->catch(function (Batch $batch, $e) {
-                                $_SERVER['__catch.batch'] = $batch;
-                                $_SERVER['__catch.exception'] = $e;
-                                $_SERVER['__catch.count']++;
-                            })
-                            ->finally(function (Batch $batch) {
-                                $_SERVER['__finally.batch'] = $batch;
-                                $_SERVER['__finally.count']++;
-                            })
-                            ->allowFailures($allowFailures)
-                            ->onConnection('test-connection')
-                            ->onQueue('test-queue');
+            ->progress(function (Batch $batch) {
+                $_SERVER['__progress.batch'] = $batch;
+                $_SERVER['__progress.count']++;
+            })
+            ->then(function (Batch $batch) {
+                $_SERVER['__then.batch'] = $batch;
+                $_SERVER['__then.count']++;
+            })
+            ->catch(function (Batch $batch, $e) {
+                $_SERVER['__catch.batch'] = $batch;
+                $_SERVER['__catch.exception'] = $e;
+                $_SERVER['__catch.count']++;
+            })
+            ->finally(function (Batch $batch) {
+                $_SERVER['__finally.batch'] = $batch;
+                $_SERVER['__finally.count']++;
+            })
+            ->allowFailures($allowFailures)
+            ->onConnection('test-connection')
+            ->onQueue('test-queue');
 
         return $repository->store($pendingBatch);
     }

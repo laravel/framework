@@ -40,7 +40,6 @@ class RedisBroadcaster extends Broadcaster
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string|null  $connection
      * @param  string  $prefix
-     * @return void
      */
     public function __construct(Redis $redis, $connection = null, $prefix = '')
     {
@@ -92,8 +91,8 @@ class RedisBroadcaster extends Broadcaster
         $user = $this->retrieveUser($request, $channelName);
 
         $broadcastIdentifier = method_exists($user, 'getAuthIdentifierForBroadcasting')
-                        ? $user->getAuthIdentifierForBroadcasting()
-                        : $user->getAuthIdentifier();
+            ? $user->getAuthIdentifierForBroadcasting()
+            : $user->getAuthIdentifier();
 
         return json_encode(['channel_data' => [
             'user_id' => $broadcastIdentifier,

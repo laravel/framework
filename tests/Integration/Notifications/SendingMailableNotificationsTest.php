@@ -9,6 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Stringable;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailableNotificationsTest extends TestCase
@@ -50,7 +51,7 @@ class SendingMailableNotificationsTest extends TestCase
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
-        $cid = explode(' cid:', str($email)->explode("\r\n")
+        $cid = explode(' cid:', (new Stringable($email))->explode("\r\n")
             ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
             ->first())[1];
 

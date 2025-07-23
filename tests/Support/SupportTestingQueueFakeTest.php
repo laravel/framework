@@ -487,6 +487,44 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->assertStringContainsString('The job has chained jobs.', $e->getMessage());
         }
     }
+
+    public function testGetRawPushes()
+    {
+        $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
+        $this->fake->pushRaw('some-other-payload', 'my-queue', ['options' => 'also yeah']);
+
+        $actualPushedRaw = $this->fake->rawPushes();
+
+        $this->assertEqualsCanonicalizing([
+            ['payload' => 'some-payload', 'queue' => null, 'options' => ['options' => 'yeah']],
+            ['payload' => 'some-other-payload', 'queue' => 'my-queue', 'options' => ['options' => 'also yeah']],
+        ], $actualPushedRaw);
+    }
+
+    public function testPushedRaw()
+    {
+        $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
+        $this->fake->pushRaw('some-other-payload', 'my-queue', ['options' => 'also yeah']);
+
+        $this->assertCount(2, $this->fake->pushedRaw());
+
+        $pushedRaw = $this->fake->pushedRaw(fn ($payload) => $payload === 'some-payload');
+        $this->assertCount(1, $pushedRaw);
+        $this->assertEqualsCanonicalizing(
+            ['payload' => 'some-payload', 'queue' => null, 'options' => ['options' => 'yeah']],
+            $pushedRaw[0]
+        );
+
+        $pushedRaw = $this->fake->pushedRaw(
+            fn ($payload, $queue, $options) => $payload === 'some-other-payload'
+                && $queue === 'my-queue'
+                && $options['options'] === 'also yeah'
+        );
+        $this->assertCount(1, $pushedRaw);
+
+        $pushedRaw = $this->fake->pushedRaw(fn ($payload, $queue, $options) => $options === []);
+        $this->assertCount(0, $pushedRaw);
+    }
 }
 
 class JobStub

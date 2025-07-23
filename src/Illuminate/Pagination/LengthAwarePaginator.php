@@ -47,7 +47,6 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @param  int  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
-     * @return void
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
     {
@@ -62,7 +61,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof Collection ? $items : new Collection($items);
     }
 
     /**
@@ -113,12 +112,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function linkCollection()
     {
-        return collect($this->elements())->flatMap(function ($item) {
+        return (new Collection($this->elements()))->flatMap(function ($item) {
             if (! is_array($item)) {
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
-            return collect($item)->map(function ($url, $page) {
+            return (new Collection($item))->map(function ($url, $page) {
                 return [
                     'url' => $url,
                     'label' => (string) $page,

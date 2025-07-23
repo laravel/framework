@@ -25,6 +25,6 @@ class Authenticated implements ContextualAttribute
      */
     public static function resolve(self $attribute, Container $container)
     {
-        return $container->make('auth')->guard($attribute->guard)->user();
+        return call_user_func($container->make('auth')->userResolver(), $attribute->guard);
     }
 }

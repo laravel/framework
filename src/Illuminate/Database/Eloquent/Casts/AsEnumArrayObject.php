@@ -14,7 +14,7 @@ class AsEnumArrayObject implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @template TEnum
+     * @template TEnum of \UnitEnum
      *
      * @param  array{class-string<TEnum>}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Database\Eloquent\Casts\ArrayObject<array-key, TEnum>, iterable<TEnum>>
@@ -68,9 +68,9 @@ class AsEnumArrayObject implements Castable
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return (new Collection($value->getArrayCopy()))->map(function ($enum) {
-                    return $this->getStorableEnumValue($enum);
-                })->toArray();
+                return (new Collection($value->getArrayCopy()))
+                    ->map(fn ($enum) => $this->getStorableEnumValue($enum))
+                    ->toArray();
             }
 
             protected function getStorableEnumValue($enum)

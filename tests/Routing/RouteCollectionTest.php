@@ -66,6 +66,24 @@ class RouteCollectionTest extends TestCase
         $this->assertSame($action, $routeIndex->getAction());
     }
 
+    public function testRouteCollectionCanRetrieveByMethod()
+    {
+        $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', $action = [
+            'uses' => 'FooController@index',
+            'as' => 'route_name',
+        ]));
+
+        $this->assertCount(1, $this->routeCollection->get('GET'));
+        $this->assertCount(0, $this->routeCollection->get('GET.foo/index'));
+        $this->assertSame($routeIndex, $this->routeCollection->get('GET')['foo/index']);
+
+        $this->routeCollection->add($routeShow = new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+        $this->assertCount(2, $this->routeCollection->get('GET'));
+    }
+
     public function testRouteCollectionCanGetIterator()
     {
         $this->routeCollection->add(new Route('GET', 'foo/index', [
@@ -324,5 +342,21 @@ class RouteCollectionTest extends TestCase
         );
 
         $this->assertInstanceOf("\Symfony\Component\Routing\RouteCollection", $this->routeCollection->toSymfonyRouteCollection());
+    }
+
+    public function testOverlappingRoutesMatchesFirstRoute()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/{other}', ['uses' => 'UsersController@other', 'as' => 'first'])
+        );
+
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/show', ['uses' => 'UsersController@show', 'as' => 'second'])
+        );
+
+        $request = Request::create('users/1/show', 'GET');
+
+        $this->assertCount(2, $this->routeCollection->getRoutes());
+        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
     }
 }

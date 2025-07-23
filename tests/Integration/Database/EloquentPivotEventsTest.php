@@ -74,6 +74,34 @@ class EloquentPivotEventsTest extends DatabaseTestCase
         $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
     }
 
+    public function testPivotWithPivotValueWillTriggerEventsToBeFired()
+    {
+        $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $user2 = PivotEventsTestUser::forceCreate(['email' => 'ralph@ralphschindler.com']);
+        $project = PivotEventsTestProject::forceCreate(['name' => 'Test Project']);
+
+        $project->managers()->attach($user);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $project->managers()->attach($user2);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->managers()->updateExistingPivot($user->id, ['permissions' => ['foo', 'bar']]);
+        $this->assertEquals(['saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+        $project->managers()->detach($user2);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->managers()->sync([$user2->id]);
+        $this->assertEquals(['deleting', 'deleted', 'saving', 'creating', 'created', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->managers()->sync([$user->id => ['permissions' => ['foo']], $user2->id => ['permissions' => ['bar']]]);
+        $this->assertEquals(['saving', 'creating', 'created', 'saved', 'saving', 'updating', 'updated', 'saved'], PivotEventsTestCollaborator::$eventsCalled);
+
+        PivotEventsTestCollaborator::$eventsCalled = [];
+        $project->managers()->detach($user);
+        $this->assertEquals(['deleting', 'deleted'], PivotEventsTestCollaborator::$eventsCalled);
+    }
+
     public function testPivotWithPivotCriteriaTriggerEventsToBeFiredOnCreateUpdateNoneOnDetach()
     {
         $user = PivotEventsTestUser::forceCreate(['email' => 'taylor@laravel.com']);
@@ -151,6 +179,16 @@ class EloquentPivotEventsTest extends DatabaseTestCase
 
         $project->equipments()->save($equipment);
         $equipment->projects()->sync([]);
+
+        $this->assertEquals(
+            [PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class, PivotEventsTestProject::class],
+            PivotEventsTestModelEquipment::$eventsMorphClasses
+        );
+
+        $this->assertEquals(
+            ['equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type', 'equipmentable_type'],
+            PivotEventsTestModelEquipment::$eventsMorphTypes
+        );
     }
 }
 
@@ -192,6 +230,13 @@ class PivotEventsTestProject extends Model
             ->wherePivot('role', 'contributor');
     }
 
+    public function managers()
+    {
+        return $this->belongsToMany(PivotEventsTestUser::class, 'project_users', 'project_id', 'user_id')
+            ->using(PivotEventsTestCollaborator::class)
+            ->withPivotValue('role', 'manager');
+    }
+
     public function equipments()
     {
         return $this->morphToMany(PivotEventsTestEquipment::class, 'equipmentable')->using(PivotEventsTestModelEquipment::class);
@@ -201,6 +246,55 @@ class PivotEventsTestProject extends Model
 class PivotEventsTestModelEquipment extends MorphPivot
 {
     public $table = 'equipmentables';
+
+    public static $eventsMorphClasses = [];
+
+    public static $eventsMorphTypes = [];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::created(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::updating(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::updated(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::saving(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::saved(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::deleting(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+
+        static::deleted(function ($model) {
+            static::$eventsMorphClasses[] = $model->morphClass;
+            static::$eventsMorphTypes[] = $model->morphType;
+        });
+    }
 
     public function equipment()
     {

@@ -31,9 +31,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('https://www.foo.com/foo/bar/baz/boom', $url->to('foo/bar', ['baz', 'boom'], true));
         $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar', $url->to('foo/bar?foo=bar', ['baz'], true));
 
-        /*
-         * Test HTTPS request URL generation...
-         */
+        // Test HTTPS request URL generation...
         $url = new UrlGenerator(
             new RouteCollection,
             Request::create('https://www.foo.com/')
@@ -204,78 +202,54 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Empty Named Route
-         */
+        // Empty Named Route
         $route = new Route(['GET'], '/', ['as' => 'plain']);
         $routes->add($route);
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
-        /*
-         * Parameters...
-         */
+        // Parameters...
         $route = new Route(['GET'], 'foo/bar/{baz}/breeze/{boom}', ['as' => 'bar']);
         $routes->add($route);
 
-        /*
-         * Single Parameter...
-         */
+        // Single Parameter...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'foobar']);
         $routes->add($route);
 
-        /*
-         * Optional parameter
-         */
+        // Optional parameter
         $route = new Route(['GET'], 'foo/bar/{baz?}', ['as' => 'optional']);
         $routes->add($route);
 
-        /*
-         * HTTPS...
-         */
+        // HTTPS...
         $route = new Route(['GET'], 'foo/baz', ['as' => 'baz', 'https']);
         $routes->add($route);
 
-        /*
-         * Controller Route Route
-         */
+        // Controller Route Route
         $route = new Route(['GET'], 'foo/bam', ['controller' => 'foo@bar']);
         $routes->add($route);
 
-        /*
-         * Non ASCII routes
-         */
+        // Non ASCII routes
         $route = new Route(['GET'], 'foo/bar/åαф/{baz}', ['as' => 'foobarbaz']);
         $routes->add($route);
 
-        /*
-         * Fragments
-         */
+        // Fragments
         $route = new Route(['GET'], 'foo/bar#derp', ['as' => 'fragment']);
         $routes->add($route);
 
-        /*
-         * Invoke action
-         */
+        // Invoke action
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'InvokableActionStub']);
         $routes->add($route);
 
-        /*
-         * With Default Parameter
-         */
+        // With Default Parameter
         $url->defaults(['locale' => 'en']);
         $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
             //
         }]);
         $routes->add($route);
 
-        /*
-         * With backed enum name and domain
-         */
+        // With backed enum name and domain
         $route = (new Route(['GET'], 'backed-enum', ['as' => 'prefixed.']))->name(RouteNameEnum::UserIndex)->domain(RouteDomainEnum::DashboardDomain);
         $routes->add($route);
 
@@ -321,9 +295,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', []);
         $route->name('foo');
         $routes->add($route);
@@ -341,9 +313,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->setRootControllerNamespace('namespace');
 
-        /*
-         * Controller Route Route
-         */
+        // Controller Route Route
         $route = new Route(['GET'], 'foo/bar', ['controller' => 'namespace\foo@bar']);
         $routes->add($route);
 
@@ -428,15 +398,8 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('/foo?foo=routable', $url->route('query-string', ['foo' => $model], false));
     }
 
-    /**
-     * @todo Fix bug related to route keys
-     *
-     * @link https://github.com/laravel/framework/pull/42425
-     */
     public function testRoutableInterfaceRoutingWithSeparateBindingFieldOnlyForSecondParameter()
     {
-        $this->markTestSkipped('See https://github.com/laravel/framework/pull/43255');
-
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
@@ -478,9 +441,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo']);
         $routes->add($route);
 
@@ -494,9 +455,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://www.foo.com/')
         );
 
-        /*
-         * Named Routes
-         */
+        // Named Routes
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'http']);
         $routes->add($route);
 
@@ -513,9 +472,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        /*
-         * Wildcards & Domains...
-         */
+        // Wildcards & Domains...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
@@ -534,9 +491,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/bar', ['as' => 'foo', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
-        /*
-         * Wildcards & Domains...
-         */
+        // Wildcards & Domains...
         $route = new Route(['GET'], 'foo/bar/{baz}', ['as' => 'bar', 'domain' => 'sub.{foo}.com']);
         $routes->add($route);
 
@@ -546,9 +501,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRoutesWithDomainsStripsProtocols()
     {
-        /*
-         * http:// Route
-         */
+        // http:// Route
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
@@ -559,9 +512,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('http://sub.foo.com/foo/bar', $url->route('foo'));
 
-        /*
-         * https:// Route
-         */
+        // https:// Route
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('https://www.foo.com/')
@@ -580,9 +531,7 @@ class RoutingUrlGeneratorTest extends TestCase
             Request::create('https://foo.com/')
         );
 
-        /*
-         * When on HTTPS, no need to specify 443
-         */
+        // When on HTTPS, no need to specify 443
         $route = new Route(['GET'], 'foo/bar', ['as' => 'baz', 'domain' => 'sub.foo.com']);
         $routes->add($route);
 
@@ -684,23 +633,39 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->route('foo', $parameters);
     }
 
-    public function testForceRootUrl()
+    public function testSetAssetUrl()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
         );
 
-        $url->forceRootUrl('https://www.bar.com');
+        $url->useOrigin('https://www.bar.com');
+        $this->assertSame('http://www.bar.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('http://www.bar.com/foo/bar', $url->asset('foo/bar'));
+
+        $url->useAssetOrigin('https://www.foo.com');
+        $this->assertNotSame('https://www.foo.com/foo/bar', $url->to('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar'));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+        $this->assertSame('https://www.foo.com/foo/bar', $url->asset('foo/bar', false));
+    }
+
+    public function testUseRootUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+
+        $url->useOrigin('https://www.bar.com');
         $this->assertSame('http://www.bar.com/foo/bar', $url->to('foo/bar'));
 
         // Ensure trailing slash is trimmed from root URL as UrlGenerator already handles this
-        $url->forceRootUrl('http://www.foo.com/');
+        $url->useOrigin('http://www.foo.com/');
         $this->assertSame('http://www.foo.com/bar', $url->to('/bar'));
 
-        /*
-         * Route Based...
-         */
+        // Route Based...
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             Request::create('http://www.foo.com/')
@@ -712,7 +677,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertSame('https://www.foo.com/foo', $url->route('plain'));
 
-        $url->forceRootUrl('https://www.bar.com');
+        $url->useOrigin('https://www.bar.com');
         $this->assertSame('https://www.bar.com/foo', $url->route('plain'));
     }
 
@@ -803,6 +768,12 @@ class RoutingUrlGeneratorTest extends TestCase
         $request = Request::create($url->signedRoute('foo').'?tampered=true');
 
         $this->assertFalse($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRoute('foo').'&tampered=true');
+
+        $this->assertTrue($url->hasValidSignature($request, ignoreQuery: ['tampered']));
+
+        $this->assertTrue($url->hasValidSignature($request, ignoreQuery: fn ($parameter) => $parameter === 'tampered'));
     }
 
     public function testSignedUrlImplicitModelBinding()
@@ -977,6 +948,1057 @@ class RoutingUrlGeneratorTest extends TestCase
         $url->resolveMissingNamedRoutesUsing(fn ($name, $parameters, $absolute) => 'test-url');
 
         $this->assertSame('test-url', $url->route('foo'));
+    }
+
+    public function testPassedParametersHavePrecedenceOverDefaults()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+        ]);
+
+        $route = new Route(['GET'], 'bar/{tenant}/{post}', ['as' => 'bar', fn () => '']);
+        $routes->add($route);
+
+        // Named parameters
+        $this->assertSame(
+            'https://www.foo.com/bar/concreteTenant/concretePost',
+            $url->route('bar', [
+                'tenant' => tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concreteTenant'),
+                'post' => tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concretePost'),
+            ]),
+        );
+
+        // Positional parameters
+        $this->assertSame(
+            'https://www.foo.com/bar/concreteTenant/concretePost',
+            $url->route('bar', [
+                tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concreteTenant'),
+                tap(new RoutableInterfaceStub, fn ($x) => $x->key = 'concretePost'),
+            ]),
+        );
+    }
+
+    public function testComplexRouteGenerationWithDefaultsAndBindingFields()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+            'tenant:slug' => 'defaultTenantSlug',
+            'team' => 'defaultTeam',
+            'team:slug' => 'defaultTeamSlug',
+            'user' => 'defaultUser',
+            'user:slug' => 'defaultUserSlug',
+        ]);
+
+        $keyParam = fn ($value) => tap(new RoutableInterfaceStub, fn ($routable) => $routable->key = $value);
+        $slugParam = fn ($value) => tap(new RoutableInterfaceStub, fn ($routable) => $routable->slug = $value);
+
+        /**
+         * One parameter with a default value, one without a default value.
+         *
+         * No binding fields.
+         */
+        $route = new Route(['GET'], 'tenantPost/{tenant}/{post}', ['as' => 'tenantPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantPost: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/concreteTenant/concretePost',
+            $url->route('tenantPost', [$keyParam('concreteTenant'), $keyParam('concretePost')]),
+        );
+
+        // tenantPost: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/concreteTenant/concretePost',
+            $url->route('tenantPost', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost')]),
+        );
+
+        // tenantPost: Tenant (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/defaultTenant/concretePost',
+            $url->route('tenantPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantPost: Tenant (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/defaultTenant/concretePost',
+            $url->route('tenantPost', ['post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * One parameter with a default value, one without a default value.
+         *
+         * Binding field for the first {tenant} parameter with a default value.
+         */
+        $route = new Route(['GET'], 'tenantSlugPost/{tenant:slug}/{post}', ['as' => 'tenantSlugPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugPost: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/concreteTenantSlug/concretePost',
+            $url->route('tenantSlugPost', [$slugParam('concreteTenantSlug'), $keyParam('concretePost')]),
+        );
+
+        // tenantSlugPost: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/concreteTenantSlug/concretePost',
+            $url->route('tenantSlugPost', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost')]),
+        );
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', ['post' => $keyParam('concretePost')]),
+        );
+
+        // Repeat the two assertions above without the 'tenant' default (without slug)
+        $url->defaults(['tenant' => null]);
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed positionally, with the default value for 'tenant' (without slug) removed
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPost: Tenant (with default) omitted, post passed using key, with the default value for 'tenant' (without slug) removed
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost',
+            $url->route('tenantSlugPost', ['post' => $keyParam('concretePost')]),
+        );
+
+        // Revert the default value for the tenant parameter back
+        $url->defaults(['tenant' => 'defaultTenant']);
+
+        /**
+         * One parameter with a default value, one without a default value.
+         *
+         * Binding field for the second parameter without a default value.
+         *
+         * This is the only route in this test where we use a binding field
+         * for a parameter that does not have a default value and is not
+         * the first parameter. This is the simplest scenario so it doesn't
+         * need to be tested as repetitively as the other scenarios which are
+         * all special in some way.
+         */
+        $route = new Route(['GET'], 'tenantPostSlug/{tenant}/{post:slug}', ['as' => 'tenantPostSlug', fn () => '']);
+        $routes->add($route);
+
+        // tenantPostSlug: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostSlug/concreteTenant/concretePostSlug',
+            $url->route('tenantPostSlug', [$keyParam('concreteTenant'), $slugParam('concretePostSlug')]),
+        );
+
+        // tenantPostSlug: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantPostSlug/concreteTenant/concretePostSlug',
+            $url->route('tenantPostSlug', ['tenant' => $keyParam('concreteTenant'), 'post' => $slugParam('concretePostSlug')]),
+        );
+
+        // tenantPostSlug: Tenant (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostSlug/defaultTenant/concretePostSlug',
+            $url->route('tenantPostSlug', [$slugParam('concretePostSlug')]),
+        );
+
+        // tenantPostSlug: Tenant (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostSlug/defaultTenant/concretePostSlug',
+            $url->route('tenantPostSlug', ['post' => $slugParam('concretePostSlug')]),
+        );
+
+        /**
+         * Two parameters with a default value, one without.
+         *
+         * Having established that passing parameters by key works fine above,
+         * we mainly test positional parameters in variations of this route.
+         */
+        $route = new Route(['GET'], 'tenantTeamPost/{tenant}/{team}/{post}', ['as' => 'tenantTeamPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantTeamPost: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamPost/concreteTenant/concreteTeam/concretePost',
+            $url->route('tenantTeamPost', [$keyParam('concreteTenant'), $keyParam('concreteTeam'), $keyParam('concretePost')]),
+        );
+
+        // tenantTeamPost: Tenant (with default) omitted, team and post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamPost/defaultTenant/concreteTeam/concretePost',
+            $url->route('tenantTeamPost', [$keyParam('concreteTeam'), $keyParam('concretePost')]),
+        );
+
+        // tenantTeamPost: Tenant and team (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamPost/defaultTenant/defaultTeam/concretePost',
+            $url->route('tenantTeamPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantTeamPost: Tenant passed by key, team (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamPost/concreteTenant/defaultTeam/concretePost',
+            $url->route('tenantTeamPost', ['tenant' => $keyParam('concreteTenant'), $keyParam('concretePost')]),
+        );
+
+        /**
+         * Two parameters with a default value, one without.
+         *
+         * The first {tenant} parameter also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantSlugTeamPost/{tenant:slug}/{team}/{post}', ['as' => 'tenantSlugTeamPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugTeamPost: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamPost/concreteTenantSlug/concreteTeam/concretePost',
+            $url->route('tenantSlugTeamPost', [$slugParam('concreteTenantSlug'), $keyParam('concreteTeam'), $keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamPost: Tenant (with default) omitted, team and post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamPost/defaultTenantSlug/concreteTeam/concretePost',
+            $url->route('tenantSlugTeamPost', [$keyParam('concreteTeam'), $keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamPost: Tenant and team (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamPost/defaultTenantSlug/defaultTeam/concretePost',
+            $url->route('tenantSlugTeamPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamPost: Tenant passed by key, team (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamPost/concreteTenantSlug/defaultTeam/concretePost',
+            $url->route('tenantSlugTeamPost', ['tenant' => $slugParam('concreteTenantSlug'), $keyParam('concretePost')]),
+        );
+
+        /**
+         * Two parameters with a default value, one without.
+         *
+         * The second {team} parameter also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantTeamSlugPost/{tenant}/{team:slug}/{post}', ['as' => 'tenantTeamSlugPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantTeamSlugPost: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamSlugPost/concreteTenant/concreteTeamSlug/concretePost',
+            $url->route('tenantTeamSlugPost', [$keyParam('concreteTenant'), $slugParam('concreteTeamSlug'), $keyParam('concretePost')]),
+        );
+
+        // tenantTeamSlugPost: Tenant (with default) omitted, team and post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamSlugPost/defaultTenant/concreteTeamSlug/concretePost',
+            $url->route('tenantTeamSlugPost', [$slugParam('concreteTeamSlug'), $keyParam('concretePost')]),
+        );
+
+        // tenantTeamSlugPost: Tenant and team (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamSlugPost/defaultTenant/defaultTeamSlug/concretePost',
+            $url->route('tenantTeamSlugPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantTeamSlugPost: Tenant passed by key, team (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantTeamSlugPost/concreteTenantSlug/defaultTeamSlug/concretePost',
+            $url->route('tenantTeamSlugPost', ['tenant' => $keyParam('concreteTenantSlug'), $keyParam('concretePost')]),
+        );
+
+        /**
+         * Two parameters with a default value, one without.
+         *
+         * Both parameters with default values, {tenant} and {team}, also have binding fields.
+         */
+        $route = new Route(['GET'], 'tenantSlugTeamSlugPost/{tenant:slug}/{team:slug}/{post}', ['as' => 'tenantSlugTeamSlugPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugTeamSlugPost: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamSlugPost/concreteTenantSlug/concreteTeamSlug/concretePost',
+            $url->route('tenantSlugTeamSlugPost', [$slugParam('concreteTenantSlug'), $slugParam('concreteTeamSlug'), $keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamSlugPost: Tenant (with default) omitted, team and post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenantSlug/concreteTeamSlug/concretePost',
+            $url->route('tenantSlugTeamSlugPost', [$slugParam('concreteTeamSlug'), $keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamSlugPost: Tenant and team (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamSlugPost/defaultTenantSlug/defaultTeamSlug/concretePost',
+            $url->route('tenantSlugTeamSlugPost', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugTeamSlugPost: Tenant passed by key, team (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugTeamSlugPost/concreteTenantSlug/defaultTeamSlug/concretePost',
+            $url->route('tenantSlugTeamSlugPost', ['tenant' => $slugParam('concreteTenantSlug'), $keyParam('concretePost')]),
+        );
+
+        /**
+         * One parameter without a default value, one with a default value.
+         *
+         * Importantly, the parameter with the default value comes second.
+         */
+        $route = new Route(['GET'], 'postUser/{post}/{user}', ['as' => 'postUser', fn () => '']);
+        $routes->add($route);
+
+        // postUser: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postUser/concretePost/concreteUser',
+            $url->route('postUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // postUser: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/postUser/concretePost/concreteUser',
+            // Reversed order just to check it doesn't matter with named parameters
+            $url->route('postUser', ['user' => $keyParam('concreteUser'), 'post' => $keyParam('concretePost')]),
+        );
+
+        // postUser: User (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postUser/concretePost/defaultUser',
+            $url->route('postUser', [$keyParam('concretePost')]),
+        );
+
+        // postUser: User (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/postUser/concretePost/defaultUser',
+            $url->route('postUser', ['post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * One parameter without a default value, one with a default value.
+         *
+         * Importantly, the parameter with the default value comes second.
+         *
+         * In this variation the first parameter, without a default value,
+         * also has a binding field.
+         */
+        $route = new Route(['GET'], 'postSlugUser/{post:slug}/{user}', ['as' => 'postSlugUser', fn () => '']);
+        $routes->add($route);
+
+        // postSlugUser: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postSlugUser/concretePostSlug/concreteUser',
+            $url->route('postSlugUser', [$slugParam('concretePostSlug'), $keyParam('concreteUser')]),
+        );
+
+        // postSlugUser: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/postSlugUser/concretePostSlug/concreteUser',
+            $url->route('postSlugUser', ['post' => $slugParam('concretePostSlug'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // postSlugUser: User (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postSlugUser/concretePostSlug/defaultUser',
+            $url->route('postSlugUser', [$slugParam('concretePostSlug')]),
+        );
+
+        // postSlugUser: User (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/postSlugUser/concretePostSlug/defaultUser',
+            $url->route('postSlugUser', ['post' => $slugParam('concretePostSlug')]),
+        );
+
+        /**
+         * One parameter without a default value, one with a default value.
+         *
+         * Importantly, the parameter with the default value comes second.
+         *
+         * In this variation the second parameter, with a default value,
+         * also has a binding field.
+         */
+        $route = new Route(['GET'], 'postUserSlug/{post}/{user:slug}', ['as' => 'postUserSlug', fn () => '']);
+        $routes->add($route);
+
+        // postUserSlug: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postUserSlug/concretePost/concreteUserSlug',
+            $url->route('postUserSlug', [$keyParam('concretePost'), $slugParam('concreteUserSlug')]),
+        );
+
+        // postUserSlug: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/postUserSlug/concretePost/concreteUserSlug',
+            $url->route('postUserSlug', ['post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // postUserSlug: User (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postUserSlug/concretePost/defaultUserSlug',
+            $url->route('postUserSlug', [$keyParam('concretePost')]),
+        );
+
+        // postUserSlug: User (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/postUserSlug/concretePost/defaultUserSlug',
+            $url->route('postUserSlug', ['post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * One parameter without a default value, one with a default value.
+         *
+         * Importantly, the parameter with the default value comes second.
+         *
+         * In this variation, both parameters have binding fields.
+         */
+        $route = new Route(['GET'], 'postSlugUserSlug/{post:slug}/{user:slug}', ['as' => 'postSlugUserSlug', fn () => '']);
+        $routes->add($route);
+
+        // postSlugUserSlug: Both parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/concreteUserSlug',
+            $url->route('postSlugUserSlug', [$slugParam('concretePostSlug'), $slugParam('concreteUserSlug')]),
+        );
+
+        // postSlugUserSlug: Both parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/concreteUserSlug',
+            $url->route('postSlugUserSlug', ['post' => $slugParam('concretePostSlug'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // postSlugUserSlug: User (with default) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUserSlug',
+            $url->route('postSlugUserSlug', [$slugParam('concretePostSlug')]),
+        );
+
+        // postSlugUserSlug: User (with default) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/postSlugUserSlug/concretePostSlug/defaultUserSlug',
+            $url->route('postSlugUserSlug', ['post' => $slugParam('concretePostSlug')]),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with default values.
+         */
+        $route = new Route(['GET'], 'tenantPostUser/{tenant}/{post}/{user}', ['as' => 'tenantPostUser', fn () => '']);
+        $routes->add($route);
+
+        // tenantPostUser: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/concreteTenant/concretePost/concreteUser',
+            $url->route('tenantPostUser', [$keyParam('concreteTenant'), $keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantPostUser: Tenant parameter omitted, post and user passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/concreteUser',
+            $url->route('tenantPostUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantPostUser: Both tenant and user (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/defaultUser',
+            $url->route('tenantPostUser', [$keyParam('concretePost')]),
+        );
+
+        // tenantPostUser: All parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/concreteTenant/concretePost/concreteUser',
+            $url->route('tenantPostUser', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantPostUser: Both tenant and user (with defaults) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/defaultUser',
+            $url->route('tenantPostUser', ['post' => $keyParam('concretePost')]),
+        );
+
+        // tenantPostUser: Tenant parameter (with default) omitted, post and user passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/concreteUser',
+            $url->route('tenantPostUser', ['post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantPostUser: User parameter (with default) omitted, tenant and post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/concreteTenant/concretePost/defaultUser',
+            $url->route('tenantPostUser', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with a default value.
+         *
+         * In this variation of this route, the first {tenant} parameter, with a default value,
+         * also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantSlugPostUser/{tenant:slug}/{post}/{user}', ['as' => 'tenantSlugPostUser', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugPostUser: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', [$slugParam('concreteTenantSlug'), $keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Tenant parameter omitted, post and user passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUser: All parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUser: Tenant parameter (with default) omitted, post and user passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: User parameter (with default) omitted, tenant and post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with a default value.
+         *
+         * In this variation of this route, the last {user} parameter, with a default value,
+         * also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantPostUserSlug/{tenant}/{post}/{user:slug}', ['as' => 'tenantPostUserSlug', fn () => '']);
+        $routes->add($route);
+
+        // tenantPostUserSlug: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/concreteTenant/concretePost/concreteUserSlug',
+            $url->route('tenantPostUserSlug', [$keyParam('concreteTenant'), $keyParam('concretePost'), $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantPostUserSlug: Tenant parameter omitted, post and user passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/concreteUserSlug',
+            $url->route('tenantPostUserSlug', [$keyParam('concretePost'), $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantPostUserSlug: Both tenant and user (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUserSlug',
+            $url->route('tenantPostUserSlug', [$keyParam('concretePost')]),
+        );
+
+        // tenantPostUserSlug: All parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/concreteTenant/concretePost/concreteUserSlug',
+            $url->route('tenantPostUserSlug', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantPostUserSlug: Both tenant and user (with defaults) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/defaultUserSlug',
+            $url->route('tenantPostUserSlug', ['post' => $keyParam('concretePost')]),
+        );
+
+        // tenantPostUserSlug: Tenant parameter (with default) omitted, post and user passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/defaultTenant/concretePost/concreteUserSlug',
+            $url->route('tenantPostUserSlug', ['post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantPostUserSlug: User parameter (with default) omitted, tenant and post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserSlug/concreteTenant/concretePost/defaultUserSlug',
+            $url->route('tenantPostUserSlug', ['tenant' => $keyParam('concreteTenant'), 'post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with a default value.
+         *
+         * In this variation of this route, the first {tenant} parameter, with a default value,
+         * also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantSlugPostUser/{tenant:slug}/{post}/{user}', ['as' => 'tenantSlugPostUser', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugPostUser: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', [$slugParam('concreteTenantSlug'), $keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Tenant parameter omitted, post and user passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', [$keyParam('concretePost'), $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUser: All parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: Both tenant and user (with defaults) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUser: Tenant parameter (with default) omitted, post and user passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/defaultTenantSlug/concretePost/concreteUser',
+            $url->route('tenantSlugPostUser', ['post' => $keyParam('concretePost'), 'user' => $keyParam('concreteUser')]),
+        );
+
+        // tenantSlugPostUser: User parameter (with default) omitted, tenant and post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUser/concreteTenantSlug/concretePost/defaultUser',
+            $url->route('tenantSlugPostUser', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost')]),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with a default value.
+         *
+         * In this variation of this route, both fields with a default value, {tenant} and
+         * {user}, also have binding fields.
+         */
+        $route = new Route(['GET'], 'tenantSlugPostUserSlug/{tenant:slug}/{post}/{user:slug}', ['as' => 'tenantSlugPostUserSlug', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugPostUserSlug: All parameters passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/concreteTenantSlug/concretePost/concreteUserSlug',
+            $url->route('tenantSlugPostUserSlug', [$slugParam('concreteTenantSlug'), $keyParam('concretePost'), $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantSlugPostUserSlug: Tenant parameter omitted, post and user passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/concreteUserSlug',
+            $url->route('tenantSlugPostUserSlug', [$keyParam('concretePost'), $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantSlugPostUserSlug: Both tenant and user (with defaults) omitted, post passed positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/defaultUserSlug',
+            $url->route('tenantSlugPostUserSlug', [$keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUserSlug: All parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/concreteTenantSlug/concretePost/concreteUserSlug',
+            $url->route('tenantSlugPostUserSlug', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantSlugPostUserSlug: Both tenant and user (with defaults) omitted, post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/defaultUserSlug',
+            $url->route('tenantSlugPostUserSlug', ['post' => $keyParam('concretePost')]),
+        );
+
+        // tenantSlugPostUserSlug: Tenant parameter (with default) omitted, post and user passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/defaultTenantSlug/concretePost/concreteUserSlug',
+            $url->route('tenantSlugPostUserSlug', ['post' => $keyParam('concretePost'), 'user' => $slugParam('concreteUserSlug')]),
+        );
+
+        // tenantSlugPostUserSlug: User parameter (with default) omitted, tenant and post passed using key
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPostUserSlug/concreteTenantSlug/concretePost/defaultUserSlug',
+            $url->route('tenantSlugPostUserSlug', ['tenant' => $slugParam('concreteTenantSlug'), 'post' => $keyParam('concretePost')]),
+        );
+    }
+
+    public function testComplexRouteGenerationWithDefaultsAndMixedParameterSyntax()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+            'user' => 'defaultUser',
+        ]);
+
+        /**
+         * Parameter without a default value in between two parameters with default values.
+         */
+        $route = new Route(['GET'], 'tenantPostUser/{tenant}/{post}/{user}', ['as' => 'tenantPostUser', fn () => '']);
+        $routes->add($route);
+
+        // If the required post parameter is specified using a key,
+        // the positional parameter is used for the user parameter.
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/concreteUser',
+            $url->route('tenantPostUser', ['post' => 'concretePost', 'concreteUser']),
+        );
+
+        /**
+         * Two parameters without default values in between two parameters with default values.
+         */
+        $route = new Route(['GET'], 'tenantPostCommentUser/{tenant}/{post}/{comment}/{user}', ['as' => 'tenantPostCommentUser', fn () => '']);
+        $routes->add($route);
+
+        // Pass first required parameter using a key, second positionally
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/defaultUser',
+            $url->route('tenantPostCommentUser', ['post' => 'concretePost', 'concreteComment']),
+        );
+
+        // Pass first required parameter positionally, second using a key
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/defaultUser',
+            $url->route('tenantPostCommentUser', ['concretePost', 'comment' => 'concreteComment']),
+        );
+
+        // Verify that this is order-independent
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/defaultUser',
+            $url->route('tenantPostCommentUser', ['comment' => 'concreteComment', 'concretePost']),
+        );
+
+        // Both required params passed with keys, positional parameter goes to the user param
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['post' => 'concretePost', 'comment' => 'concreteComment', 'concreteUser']),
+        );
+
+        // First required param passed with a key, remaining params go to the last two route params
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['post' => 'concretePost', 'concreteComment', 'concreteUser']),
+        );
+
+        // Comment parameter passed with a key, remaining params filled (last to last)
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['concretePost', 'comment' => 'concreteComment', 'concreteUser']),
+        );
+
+        // Verify that this is order-independent
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/defaultTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['comment' => 'concreteComment', 'concretePost', 'concreteUser']),
+        );
+
+        // Both default parameters passed positionally, required parameters passed with keys
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/concreteTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['concreteTenant', 'post' => 'concretePost', 'comment' => 'concreteComment', 'concreteUser']),
+        );
+
+        // Verify that the positional parameters may come anywhere in the array
+        $this->assertSame(
+            'https://www.foo.com/tenantPostCommentUser/concreteTenant/concretePost/concreteComment/concreteUser',
+            $url->route('tenantPostCommentUser', ['post' => 'concretePost', 'comment' => 'concreteComment', 'concreteTenant', 'concreteUser']),
+        );
+    }
+
+    public function testDefaultsCanBeCombinedWithExtraQueryParameters()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+            'tenant:slug' => 'defaultTenantSlug',
+            'user' => 'defaultUser',
+        ]);
+
+        $slugParam = fn ($value) => tap(new RoutableInterfaceStub, fn ($routable) => $routable->slug = $value);
+
+        /**
+         * One parameter with a default value, one parameter without a default value.
+         */
+        $route = new Route(['GET'], 'tenantPost/{tenant}/{post}', ['as' => 'tenantPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantPost: Extra positional parameters without values are interpreted as query strings
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/concreteTenant/concretePost?extraQuery',
+            $url->route('tenantPost', ['concreteTenant', 'concretePost', 'extraQuery']),
+        );
+
+        // tenantPost: Query parameters without values go at the end
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/concreteTenant/concretePost?extra=query&extraQuery',
+            $url->route('tenantPost', ['concreteTenant', 'concretePost', 'extraQuery', 'extra' => 'query']),
+        );
+
+        // tenantPost: Defaults can be used with *named* query parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/defaultTenant/concretePost?extra=query',
+            $url->route('tenantPost', ['concretePost', 'extra' => 'query']),
+        );
+
+        // tenantPost: Named query parameters can be placed anywhere in the parameters array
+        $this->assertSame(
+            'https://www.foo.com/tenantPost/concreteTenant/concretePost?extra=query',
+            $url->route('tenantPost', ['concreteTenant', 'extra' => 'query', 'concretePost']),
+        );
+
+        /**
+         * One parameter with a default value, one parameter without a default value.
+         *
+         * The first parameter with a default value, {tenant}, also has a binding field.
+         */
+        $route = new Route(['GET'], 'tenantSlugPost/{tenant:slug}/{post}', ['as' => 'tenantSlugPost', fn () => '']);
+        $routes->add($route);
+
+        // tenantSlugPost: Extra positional parameters without values are interpreted as query strings
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/concreteTenantSlug/concretePost?extraQuery',
+            $url->route('tenantSlugPost', [$slugParam('concreteTenantSlug'), 'concretePost', 'extraQuery']),
+        );
+
+        // tenantSlugPost: Query parameters without values go at the end
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/concreteTenantSlug/concretePost?extra=query&extraQuery',
+            $url->route('tenantSlugPost', [$slugParam('concreteTenantSlug'), 'concretePost', 'extraQuery', 'extra' => 'query']),
+        );
+
+        // tenantSlugPost: Defaults can be used with *named* query parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/defaultTenantSlug/concretePost?extra=query',
+            $url->route('tenantSlugPost', ['concretePost', 'extra' => 'query']),
+        );
+
+        // tenantSlugPost: Named query parameters can be placed anywhere in the parameters array
+        $this->assertSame(
+            'https://www.foo.com/tenantSlugPost/concreteTenantSlug/concretePost?extra=query',
+            $url->route('tenantSlugPost', [$slugParam('concreteTenantSlug'), 'extra' => 'query', 'concretePost']),
+        );
+
+        /**
+         * Parameter without a default value in between two parameters with default values.
+         */
+        $route = new Route(['GET'], 'tenantPostUser/{tenant}/{post}/{user}', ['as' => 'tenantPostUser', fn () => '']);
+        $routes->add($route);
+
+        // tenantPostUser: Query string parameters may be passed positionally if
+        // all route parameters are passed as well, i.e. defaults are not used.
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/concreteTenant/concretePost/concreteUser?extraQuery',
+            $url->route('tenantPostUser', ['concreteTenant', 'concretePost', 'concreteUser', 'extraQuery']),
+        );
+
+        // tenantPostUser: Query string parameters can be passed as key-value
+        // pairs if all route params are passed as well, i.e. no defaults.
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/concreteTenant/concretePost/concreteUser?extraQuery',
+            $url->route('tenantPostUser', ['concreteTenant', 'concretePost', 'concreteUser', 'extraQuery']),
+        );
+
+        // tenantPostUser: With omitted default parameters, query string parameters
+        // can only be specified using key-value pairs. Positional query string
+        // parameters would be interpreted as route parameters instead.
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/concreteUser?extra=query',
+            $url->route('tenantPostUser', ['concretePost', 'concreteUser', 'extra' => 'query']),
+        );
+
+        // tenantPostUser: Use defaults for tenant and user, pass post positionally
+        // and add an extra query string parameter as a key-value pair.
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUser/defaultTenant/concretePost/defaultUser?extra=query',
+            $url->route('tenantPostUser', ['concretePost', 'extra' => 'query']),
+        );
+    }
+
+    public function testUrlGenerationWithOptionalParameters(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $url->defaults([
+            'tenant' => 'defaultTenant',
+            'user' => 'defaultUser',
+        ]);
+
+        /**
+         * Route with one required parameter and one optional parameter.
+         */
+        $route = new Route(['GET'], 'postOptionalMethod/{post}/{method?}', ['as' => 'postOptionalMethod', fn () => '']);
+        $routes->add($route);
+
+        $this->assertSame(
+            'https://www.foo.com/postOptionalMethod/1',
+            $url->route('postOptionalMethod', 1),
+        );
+
+        $this->assertSame(
+            'https://www.foo.com/postOptionalMethod/1/2',
+            $url->route('postOptionalMethod', [1, 2]),
+        );
+
+        /**
+         * Route with two optional parameters.
+         */
+        $route = new Route(['GET'], 'optionalPostOptionalMethod/{post}/{method?}', ['as' => 'optionalPostOptionalMethod', fn () => '']);
+        $routes->add($route);
+
+        $this->assertSame(
+            'https://www.foo.com/optionalPostOptionalMethod/1',
+            $url->route('optionalPostOptionalMethod', 1),
+        );
+
+        $this->assertSame(
+            'https://www.foo.com/optionalPostOptionalMethod/1/2',
+            $url->route('optionalPostOptionalMethod', [1, 2]),
+        );
+
+        /**
+         * Route with one default parameter, one required parameter, and one optional parameter.
+         */
+        $route = new Route(['GET'], 'tenantPostOptionalMethod/{tenant}/{post}/{method?}', ['as' => 'tenantPostOptionalMethod', fn () => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/defaultTenant/concretePost',
+            $url->route('tenantPostOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameter with a default value
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/defaultTenant/concretePost/concreteMethod',
+            $url->route('tenantPostOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Passing all three parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostOptionalMethod/concreteTenant/concretePost/concreteMethod',
+            $url->route('tenantPostOptionalMethod', ['concreteTenant', 'concretePost', 'concreteMethod']),
+        );
+
+        /**
+         * Route with two default parameters, one required parameter, and one optional parameter.
+         */
+        $route = new Route(['GET'], 'tenantUserPostOptionalMethod/{tenant}/{user}/{post}/{method?}', ['as' => 'tenantUserPostOptionalMethod', fn () => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/defaultUser/concretePost',
+            $url->route('tenantUserPostOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameters with default values
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/defaultUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Passing three parameters: only the leftmost parameter with a default value uses its default value
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        // Same as the assertion above, but using some named parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['user' => 'concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the post parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'post' => 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the optional method parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/defaultTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteUser', 'concretePost', 'method' => 'concreteMethod']),
+        );
+
+        // Passing all four parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantUserPostOptionalMethod/concreteTenant/concreteUser/concretePost/concreteMethod',
+            $url->route('tenantUserPostOptionalMethod', ['concreteTenant', 'concreteUser', 'concretePost', 'concreteMethod']),
+        );
+
+        /**
+         * Route with a default parameter, a required parameter, another default parameter, and finally an optional parameter.
+         *
+         * This tests interleaved default parameters when combined with optional parameters.
+         */
+        $route = new Route(['GET'], 'tenantPostUserOptionalMethod/{tenant}/{post}/{user}/{method?}', ['as' => 'tenantPostUserOptionalMethod', fn () => '']);
+        $routes->add($route);
+
+        // Passing one parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost']),
+        );
+
+        // Passing two parameters: optional parameter is prioritized over parameters with default values
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'concreteMethod']),
+        );
+
+        // Same as the assertion above, but using some named parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['post' => 'concretePost', 'concreteMethod']),
+        );
+
+        // Also using a named parameter, but this time for the optional parameter
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/defaultUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'method' => 'concreteMethod']),
+        );
+
+        // Passing three parameters: only the leftmost parameter with a default value uses its default value
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/defaultTenant/concretePost/concreteUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concretePost', 'concreteUser', 'concreteMethod']),
+        );
+
+        // Passing all four parameters
+        $this->assertSame(
+            'https://www.foo.com/tenantPostUserOptionalMethod/concreteTenant/concretePost/concreteUser/concreteMethod',
+            $url->route('tenantPostUserOptionalMethod', ['concreteTenant', 'concretePost', 'concreteUser', 'concreteMethod']),
+        );
     }
 }
 

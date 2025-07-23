@@ -27,7 +27,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Create a new instance of the class.
      *
      * @param  string  $value
-     * @return void
      */
     public function __construct($value = '')
     {
@@ -269,6 +268,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntEndWith($needles)
+    {
+        return Str::doesntEndWith($this->value, $needles);
+    }
+
+    /**
      * Determine if the string is an exact match with the given value.
      *
      * @param  \Illuminate\Support\Stringable|string  $value
@@ -304,7 +314,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function explode($delimiter, $limit = PHP_INT_MAX)
     {
-        return collect(explode($delimiter, $this->value, $limit));
+        return new Collection(explode($delimiter, $this->value, $limit));
     }
 
     /**
@@ -318,12 +328,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function split($pattern, $limit = -1, $flags = 0)
     {
         if (filter_var($pattern, FILTER_VALIDATE_INT) !== false) {
-            return collect(mb_str_split($this->value, $pattern));
+            return new Collection(mb_str_split($this->value, $pattern));
         }
 
         $segments = preg_split($pattern, $this->value, $limit, $flags);
 
-        return ! empty($segments) ? collect($segments) : collect();
+        return ! empty($segments) ? new Collection($segments) : new Collection;
     }
 
     /**
@@ -341,11 +351,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Determine if a given string matches a given pattern.
      *
      * @param  string|iterable<string>  $pattern
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public function is($pattern)
+    public function is($pattern, $ignoreCase = false)
     {
-        return Str::is($pattern, $this->value);
+        return Str::is($pattern, $this->value, $ignoreCase);
     }
 
     /**
@@ -635,6 +646,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Pluralize the last word of an English, Pascal caps case string.
+     *
+     * @param  int|array|\Countable  $count
+     * @return static
+     */
+    public function pluralPascal($count = 2)
+    {
+        return new static(Str::pluralStudly($this->value, $count));
+    }
+
+    /**
      * Find the multi-byte safe position of the first occurrence of the given substring.
      *
      * @param  string  $needle
@@ -789,7 +811,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function scan($format)
     {
-        return collect(sscanf($this->value, $format));
+        return new Collection(sscanf($this->value, $format));
     }
 
     /**
@@ -922,6 +944,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntStartWith($needles)
+    {
+        return Str::doesntStartWith($this->value, $needles);
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @return static
@@ -929,6 +962,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function studly()
     {
         return new static(Str::studly($this->value));
+    }
+
+    /**
+     * Convert the string to Pascal case.
+     *
+     * @return static
+     */
+    public function pascal()
+    {
+        return new static(Str::pascal($this->value));
     }
 
     /**
@@ -1056,7 +1099,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function ucsplit()
     {
-        return collect(Str::ucsplit($this->value));
+        return new Collection(Str::ucsplit($this->value));
     }
 
     /**
@@ -1120,6 +1163,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenEndsWith($needles, $callback, $default = null)
     {
         return $this->when($this->endsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntEndWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntEndWith($needles), $callback, $default);
     }
 
     /**
@@ -1208,6 +1264,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenStartsWith($needles, $callback, $default = null)
     {
         return $this->when($this->startsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntStartWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntStartWith($needles), $callback, $default);
     }
 
     /**
@@ -1315,6 +1384,39 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Hash the string using the given algorithm.
+     *
+     * @param  string  $algorithm
+     * @return static
+     */
+    public function hash(string $algorithm)
+    {
+        return new static(hash($algorithm, $this->value));
+    }
+
+    /**
+     * Encrypt the string.
+     *
+     * @param  bool  $serialize
+     * @return static
+     */
+    public function encrypt(bool $serialize = false)
+    {
+        return new static(encrypt($this->value, $serialize));
+    }
+
+    /**
+     * Decrypt the string.
+     *
+     * @param  bool  $serialize
+     * @return static
+     */
+    public function decrypt(bool $serialize = false)
+    {
+        return new static(decrypt($this->value, $serialize));
+    }
+
+    /**
      * Dump the string.
      *
      * @param  mixed  ...$args
@@ -1396,6 +1498,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         }
 
         return Date::createFromFormat($format, $this->value, $tz);
+    }
+
+    /**
+     * Get the underlying string value as a Uri instance.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function toUri()
+    {
+        return Uri::of($this->value);
     }
 
     /**

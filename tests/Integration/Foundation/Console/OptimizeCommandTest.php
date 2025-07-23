@@ -14,6 +14,7 @@ class OptimizeCommandTest extends TestCase
     protected $files = [
         'bootstrap/cache/config.php',
         'bootstrap/cache/events.php',
+        'bootstrap/cache/routes-v7.php',
     ];
 
     protected function getPackageProviders($app): array
@@ -23,9 +24,25 @@ class OptimizeCommandTest extends TestCase
 
     public function testCanListenToOptimizingEvent(): void
     {
+        $this->withoutDeprecationHandling();
+
         $this->artisan('optimize')
             ->assertSuccessful()
             ->expectsOutputToContain('my package');
+    }
+
+    public function testCanExcludeCommandsByKey(): void
+    {
+        $this->artisan('optimize', ['--except' => 'my package'])
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('my package');
+    }
+
+    public function testCanExcludeCommandsByCommand(): void
+    {
+        $this->artisan('optimize', ['--except' => 'my_package:cache'])
+            ->assertSuccessful()
+            ->doesntExpectOutputToContain('my_package:cache');
     }
 }
 

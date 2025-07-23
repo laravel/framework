@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -94,7 +95,6 @@ class Gate implements GateContract
      * @param  array  $beforeCallbacks
      * @param  array  $afterCallbacks
      * @param  callable|null  $guessPolicyNamesUsingCallback
-     * @return void
      */
     public function __construct(
         Container $container,
@@ -180,8 +180,8 @@ class Gate implements GateContract
 
         if ($condition instanceof Closure) {
             $response = $this->canBeCalledWithUser($user, $condition)
-                            ? $condition($user)
-                            : new Response(false, $message, $code);
+                ? $condition($user)
+                : new Response(false, $message, $code);
         } else {
             $response = $condition;
         }
@@ -194,7 +194,7 @@ class Gate implements GateContract
     /**
      * Define a new ability.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  callable|array|string  $callback
      * @return $this
      *
@@ -277,8 +277,8 @@ class Gate implements GateContract
             }
 
             return isset($method)
-                    ? $policy->{$method}(...func_get_args())
-                    : $policy(...func_get_args());
+                ? $policy->{$method}(...func_get_args())
+                : $policy(...func_get_args());
         };
     }
 
@@ -325,7 +325,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -337,7 +337,7 @@ class Gate implements GateContract
     /**
      * Determine if any of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $ability
+     * @param  iterable|\UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -349,7 +349,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -363,7 +363,7 @@ class Gate implements GateContract
     /**
      * Determine if any one of the given abilities should be granted for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -375,7 +375,7 @@ class Gate implements GateContract
     /**
      * Determine if all of the given abilities should be denied for the current user.
      *
-     * @param  iterable|\BackedEnum|string  $abilities
+     * @param  iterable|\UnitEnum|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
@@ -387,7 +387,7 @@ class Gate implements GateContract
     /**
      * Determine if the given ability should be granted for the current user.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
@@ -401,7 +401,7 @@ class Gate implements GateContract
     /**
      * Inspect the user for the given ability.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  array|mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
@@ -670,6 +670,12 @@ class Gate implements GateContract
             return $this->resolvePolicy($this->policies[$class]);
         }
 
+        $policy = $this->getPolicyFromAttribute($class);
+
+        if (! is_null($policy)) {
+            return $this->resolvePolicy($policy);
+        }
+
         foreach ($this->guessPolicyName($class) as $guessedPolicy) {
             if (class_exists($guessedPolicy)) {
                 return $this->resolvePolicy($guessedPolicy);
@@ -681,6 +687,25 @@ class Gate implements GateContract
                 return $this->resolvePolicy($policy);
             }
         }
+    }
+
+    /**
+     * Get the policy class from the class attribute.
+     *
+     * @param  class-string<*>  $class
+     * @return class-string<*>|null
+     */
+    protected function getPolicyFromAttribute(string $class): ?string
+    {
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        $attributes = (new ReflectionClass($class))->getAttributes(UsePolicy::class);
+
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->class
+            : null;
     }
 
     /**
@@ -703,6 +728,9 @@ class Gate implements GateContract
             $classDirname = implode('\\', array_slice($classDirnameSegments, 0, $index));
 
             return $classDirname.'\\Policies\\'.class_basename($class).'Policy';
+        })->when(str_contains($classDirname, '\\Models\\'), function ($collection) use ($class, $classDirname) {
+            return $collection->concat([str_replace('\\Models\\', '\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy'])
+                ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
@@ -836,12 +864,14 @@ class Gate implements GateContract
      */
     public function forUser($user)
     {
-        $callback = fn () => $user;
-
         return new static(
-            $this->container, $callback, $this->abilities,
-            $this->policies, $this->beforeCallbacks, $this->afterCallbacks,
-            $this->guessPolicyNamesUsingCallback
+            $this->container,
+            fn () => $user,
+            $this->abilities,
+            $this->policies,
+            $this->beforeCallbacks,
+            $this->afterCallbacks,
+            $this->guessPolicyNamesUsingCallback,
         );
     }
 

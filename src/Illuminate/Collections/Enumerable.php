@@ -45,9 +45,10 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  int  $from
      * @param  int  $to
+     * @param  int  $step
      * @return static
      */
-    public static function range($from, $to);
+    public static function range($from, $to, $step = 1);
 
     /**
      * Wrap the given value in a collection if applicable.
@@ -522,7 +523,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  (callable(TValue, TKey): TGroupKey)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), TValue>>
+     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), ($groupBy is array ? mixed : TValue)>>
      */
     public function groupBy($groupBy, $preserveKeys = false);
 
@@ -846,7 +847,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      *
      * @param  callable(TReduceInitial|TReduceReturnType, TValue, TKey): TReduceReturnType  $callback
      * @param  TReduceInitial  $initial
-     * @return TReduceReturnType
+     * @return TReduceInitial|TReduceReturnType
      */
     public function reduce(callable $callback, $initial = null);
 

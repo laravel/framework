@@ -34,13 +34,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -81,13 +81,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -127,13 +127,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -174,13 +174,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -223,13 +223,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_pgsql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -270,13 +270,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -294,7 +294,7 @@ jobs:
           DB_PASSWORD: Forge123
 
   mssql_2017:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 5
 
     services:
@@ -318,13 +318,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -357,13 +357,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, sqlsrv, pdo, pdo_sqlsrv, odbc, pdo_odbc, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

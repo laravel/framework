@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 /**
  * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
@@ -106,7 +107,7 @@ class PendingHasThroughRelationship
     public function __call($method, $parameters)
     {
         if (Str::startsWith($method, 'has')) {
-            return $this->has(Str::of($method)->after('has')->lcfirst()->toString());
+            return $this->has((new Stringable($method))->after('has')->lcfirst()->toString());
         }
 
         throw new BadMethodCallException(sprintf(

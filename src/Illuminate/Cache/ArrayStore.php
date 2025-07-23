@@ -35,7 +35,6 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Create a new Array store.
      *
      * @param  bool  $serializesValues
-     * @return void
      */
     public function __construct($serializesValues = false)
     {

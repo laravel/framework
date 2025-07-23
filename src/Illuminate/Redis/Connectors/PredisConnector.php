@@ -6,6 +6,7 @@ use Illuminate\Contracts\Redis\Connector;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Predis\Client;
 
 class PredisConnector implements Connector
@@ -25,6 +26,11 @@ class PredisConnector implements Connector
 
         if (isset($config['prefix'])) {
             $formattedOptions['prefix'] = $config['prefix'];
+        }
+
+        if (isset($config['host']) && str_starts_with($config['host'], 'tls://')) {
+            $config['scheme'] = 'tls';
+            $config['host'] = Str::after($config['host'], 'tls://');
         }
 
         return new PredisConnection(new Client($config, $formattedOptions));

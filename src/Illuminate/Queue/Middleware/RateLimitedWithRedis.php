@@ -29,7 +29,6 @@ class RateLimitedWithRedis extends RateLimited
      * Create a new middleware instance.
      *
      * @param  string  $limiterName
-     * @return void
      */
     public function __construct($limiterName)
     {
@@ -51,7 +50,7 @@ class RateLimitedWithRedis extends RateLimited
         foreach ($limits as $limit) {
             if ($this->tooManyAttempts($limit->key, $limit->maxAttempts, $limit->decaySeconds)) {
                 return $this->shouldRelease
-                    ? $job->release($this->getTimeUntilNextRetry($limit->key))
+                    ? $job->release($this->releaseAfter ?: $this->getTimeUntilNextRetry($limit->key))
                     : false;
             }
         }

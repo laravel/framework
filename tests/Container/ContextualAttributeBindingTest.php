@@ -11,8 +11,10 @@ use Illuminate\Container\Attributes\Auth;
 use Illuminate\Container\Attributes\Authenticated;
 use Illuminate\Container\Attributes\Cache;
 use Illuminate\Container\Attributes\Config;
+use Illuminate\Container\Attributes\Context;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
+use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
@@ -28,6 +30,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Http\Request;
+use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +47,7 @@ class ContextualAttributeBindingTest extends TestCase
     {
         $container = new Container;
 
-        $container->bind(ContainerTestContract::class, fn () => new ContainerTestImplB);
+        $container->bind(ContainerTestContract::class, fn (): ContainerTestImplB => new ContainerTestImplB);
         $container->whenHasAttribute(ContainerTestAttributeThatResolvesContractImpl::class, function (ContainerTestAttributeThatResolvesContractImpl $attribute) {
             return match ($attribute->name) {
                 'A' => new ContainerTestImplA,
@@ -61,6 +64,29 @@ class ContextualAttributeBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerTestHasAttributeThatResolvesToImplB::class, $classB);
         $this->assertInstanceOf(ContainerTestImplB::class, $classB->property);
+    }
+
+    public function testSimpleDependencyCanBeResolvedCorrectlyFromGiveAttributeBinding()
+    {
+        $container = new Container;
+
+        $container->bind(ContainerTestContract::class, concrete: ContainerTestImplA::class);
+
+        $resolution = $container->make(GiveTestSimple::class);
+
+        $this->assertInstanceOf(SimpleDependency::class, $resolution->dependency);
+    }
+
+    public function testComplexDependencyCanBeResolvedCorrectlyFromGiveAttributeBinding()
+    {
+        $container = new Container;
+
+        $container->bind(ContainerTestContract::class, concrete: ContainerTestImplA::class);
+
+        $resolution = $container->make(GiveTestComplex::class);
+
+        $this->assertInstanceOf(ComplexDependency::class, $resolution->dependency);
+        $this->assertTrue($resolution->dependency->param);
     }
 
     public function testScalarDependencyCanBeResolvedFromAttributeBinding()
@@ -111,6 +137,7 @@ class ContextualAttributeBindingTest extends TestCase
         $container = new Container;
         $container->singleton('auth', function () {
             $manager = m::mock(AuthManager::class);
+            $manager->shouldReceive('userResolver')->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
             $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
                 $guard = m::mock(GuardContract::class);
                 $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
@@ -212,6 +239,35 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(RouteParameterTest::class);
+    }
+
+    public function testContextAttribute(): void
+    {
+        $container = new Container;
+
+        $container->singleton(ContextRepository::class, function () {
+            $context = m::mock(ContextRepository::class);
+            $context->shouldReceive('get')->once()->with('foo', null)->andReturn('foo');
+
+            return $context;
+        });
+
+        $container->make(ContextTest::class);
+    }
+
+    public function testContextAttributeInteractingWithHidden(): void
+    {
+        $container = new Container;
+
+        $container->singleton(ContextRepository::class, function () {
+            $context = m::mock(ContextRepository::class);
+            $context->shouldReceive('getHidden')->once()->with('bar', null)->andReturn('bar');
+            $context->shouldNotReceive('get');
+
+            return $context;
+        });
+
+        $container->make(ContextHiddenTest::class);
     }
 
     public function testStorageAttribute()
@@ -403,6 +459,17 @@ final class ContainerTestHasConfigValueWithResolvePropertyAndAfterCallback
     }
 }
 
+final class SimpleDependency implements ContainerTestContract
+{
+}
+
+final class ComplexDependency implements ContainerTestContract
+{
+    public function __construct(public bool $param)
+    {
+    }
+}
+
 final class AuthedTest
 {
     public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
@@ -420,6 +487,20 @@ final class CacheTest
 final class ConfigTest
 {
     public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
+    }
+}
+
+final class ContextTest
+{
+    public function __construct(#[Context('foo')] string $foo)
+    {
+    }
+}
+
+final class ContextHiddenTest
+{
+    public function __construct(#[Context('bar', hidden: true)] string $foo)
     {
     }
 }
@@ -456,6 +537,24 @@ final class StorageTest
 {
     public function __construct(#[Storage('foo')] Filesystem $foo, #[Storage('bar')] Filesystem $bar)
     {
+    }
+}
+
+final class GiveTestSimple
+{
+    public function __construct(
+        #[Give(SimpleDependency::class)]
+        public readonly ContainerTestContract $dependency
+    ) {
+    }
+}
+
+final class GiveTestComplex
+{
+    public function __construct(
+        #[Give(ComplexDependency::class, ['param' => true])]
+        public readonly ContainerTestContract $dependency
+    ) {
     }
 }
 

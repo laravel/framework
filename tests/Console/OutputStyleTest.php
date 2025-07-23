@@ -54,4 +54,21 @@ class OutputStyleTest extends TestCase
         $style->writeln('Foo');
         $this->assertTrue($style->newLineWritten());
     }
+
+    public function testDetectsNewLineOnlyOnOutput()
+    {
+        $bufferedOutput = new BufferedOutput();
+
+        $style = new OutputStyle(new ArrayInput([]), $bufferedOutput);
+
+        $style->setVerbosity(OutputStyle::VERBOSITY_NORMAL);
+
+        $style->writeln('Foo', OutputStyle::VERBOSITY_VERBOSE);
+        $this->assertFalse($style->newLineWritten());
+
+        $style->setVerbosity(OutputStyle::VERBOSITY_VERBOSE);
+
+        $style->writeln('Foo', OutputStyle::VERBOSITY_VERBOSE);
+        $this->assertTrue($style->newLineWritten());
+    }
 }

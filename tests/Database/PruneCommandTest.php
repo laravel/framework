@@ -6,10 +6,6 @@ use Closure;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Console\PruneCommand;
-use Illuminate\Database\Eloquent\MassPrunable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Prunable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelPruningFinished;
 use Illuminate\Database\Events\ModelPruningStarting;
 use Illuminate\Database\Events\ModelsPruned;
@@ -26,7 +22,15 @@ class PruneCommandTest extends TestCase
     {
         parent::setUp();
 
-        Application::setInstance($container = new Application);
+        Application::setInstance($container = new Application(__DIR__.'/Pruning'));
+
+        Closure::bind(
+            fn () => $this->namespace = 'Illuminate\\Tests\\Database\\Pruning\\',
+            $container,
+            Application::class,
+        )();
+
+        $container->useAppPath(__DIR__.'/Pruning');
 
         $container->singleton(DispatcherContract::class, function () {
             return new Dispatcher();
@@ -35,14 +39,25 @@ class PruneCommandTest extends TestCase
         $container->alias(DispatcherContract::class, 'events');
     }
 
+    public function testPrunableModelAndExceptWithEachOther(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The --models and --except options cannot be combined.');
+
+        $this->artisan([
+            '--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,
+            '--except' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,
+        ]);
+    }
+
     public function testPrunableModelWithPrunableRecords()
     {
-        $output = $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
+        $output = $this->artisan(['--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class]);
 
         $output = $output->fetch();
 
         $this->assertStringContainsString(
-            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            'Illuminate\Tests\Database\Pruning\Models\PrunableTestModelWithPrunableRecords',
             $output,
         );
 
@@ -52,7 +67,7 @@ class PruneCommandTest extends TestCase
         );
 
         $this->assertStringContainsString(
-            'Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords',
+            'Illuminate\Tests\Database\Pruning\Models\PrunableTestModelWithPrunableRecords',
             $output,
         );
 
@@ -64,10 +79,10 @@ class PruneCommandTest extends TestCase
 
     public function testPrunableTestModelWithoutPrunableRecords()
     {
-        $output = $this->artisan(['--model' => PrunableTestModelWithoutPrunableRecords::class]);
+        $output = $this->artisan(['--model' => Pruning\Models\PrunableTestModelWithoutPrunableRecords::class]);
 
         $this->assertStringContainsString(
-            'No prunable [Illuminate\Tests\Database\PrunableTestModelWithoutPrunableRecords] records found.',
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\PrunableTestModelWithoutPrunableRecords] records found.',
             $output->fetch()
         );
     }
@@ -92,12 +107,12 @@ class PruneCommandTest extends TestCase
             ['value' => 4, 'deleted_at' => '2021-12-02 00:00:00'],
         ]);
 
-        $output = $this->artisan(['--model' => PrunableTestSoftDeletedModelWithPrunableRecords::class]);
+        $output = $this->artisan(['--model' => Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::class]);
 
         $output = $output->fetch();
 
         $this->assertStringContainsString(
-            'Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords',
+            'Illuminate\Tests\Database\Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords',
             $output,
         );
 
@@ -106,26 +121,48 @@ class PruneCommandTest extends TestCase
             $output,
         );
 
-        $this->assertEquals(2, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertEquals(2, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
     public function testNonPrunableTest()
     {
-        $output = $this->artisan(['--model' => NonPrunableTestModel::class]);
+        $output = $this->artisan(['--model' => Pruning\Models\NonPrunableTestModel::class]);
 
         $this->assertStringContainsString(
-            'No prunable [Illuminate\Tests\Database\NonPrunableTestModel] records found.',
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\NonPrunableTestModel] records found.',
             $output->fetch(),
         );
     }
 
     public function testNonPrunableTestWithATrait()
     {
-        $output = $this->artisan(['--model' => NonPrunableTrait::class]);
+        $output = $this->artisan(['--model' => Pruning\Models\NonPrunableTrait::class]);
 
         $this->assertStringContainsString(
             'No prunable models found.',
             $output->fetch(),
+        );
+    }
+
+    public function testNonModelFilesAreIgnoredTest()
+    {
+        $output = $this->artisan(['--path' => 'Models']);
+
+        $output = $output->fetch();
+
+        $this->assertStringNotContainsString(
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\AbstractPrunableModel] records found.',
+            $output,
+        );
+
+        $this->assertStringNotContainsString(
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\SomeClass] records found.',
+            $output,
+        );
+
+        $this->assertStringNotContainsString(
+            'No prunable [Illuminate\Tests\Database\Pruning\Models\SomeEnum] records found.',
+            $output,
         );
     }
 
@@ -151,16 +188,16 @@ class PruneCommandTest extends TestCase
         ]);
 
         $output = $this->artisan([
-            '--model' => PrunableTestModelWithPrunableRecords::class,
+            '--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class,
             '--pretend' => true,
         ]);
 
         $this->assertStringContainsString(
-            '3 [Illuminate\Tests\Database\PrunableTestModelWithPrunableRecords] records will be pruned.',
+            '3 [Illuminate\Tests\Database\Pruning\Models\PrunableTestModelWithPrunableRecords] records will be pruned.',
             $output->fetch(),
         );
 
-        $this->assertEquals(5, PrunableTestModelWithPrunableRecords::count());
+        $this->assertEquals(5, Pruning\Models\PrunableTestModelWithPrunableRecords::count());
     }
 
     public function testTheCommandMayBePretendedOnSoftDeletedModel()
@@ -184,16 +221,16 @@ class PruneCommandTest extends TestCase
         ]);
 
         $output = $this->artisan([
-            '--model' => PrunableTestSoftDeletedModelWithPrunableRecords::class,
+            '--model' => Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::class,
             '--pretend' => true,
         ]);
 
         $this->assertStringContainsString(
-            '2 [Illuminate\Tests\Database\PrunableTestSoftDeletedModelWithPrunableRecords] records will be pruned.',
+            '2 [Illuminate\Tests\Database\Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords] records will be pruned.',
             $output->fetch(),
         );
 
-        $this->assertEquals(4, PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
+        $this->assertEquals(4, Pruning\Models\PrunableTestSoftDeletedModelWithPrunableRecords::withTrashed()->count());
     }
 
     public function testTheCommandDispatchesEvents()
@@ -202,19 +239,19 @@ class PruneCommandTest extends TestCase
 
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
             return get_class($event) === ModelPruningStarting::class &&
-                $event->models === [PrunableTestModelWithPrunableRecords::class];
+                $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('listen')->once()->with(ModelsPruned::class, m::type(Closure::class));
         $dispatcher->shouldReceive('dispatch')->twice()->with(m::type(ModelsPruned::class));
         $dispatcher->shouldReceive('dispatch')->once()->withArgs(function ($event) {
             return get_class($event) === ModelPruningFinished::class &&
-                $event->models === [PrunableTestModelWithPrunableRecords::class];
+                $event->models === [Pruning\Models\PrunableTestModelWithPrunableRecords::class];
         });
         $dispatcher->shouldReceive('forget')->once()->with(ModelsPruned::class);
 
         Application::getInstance()->instance(DispatcherContract::class, $dispatcher);
 
-        $this->artisan(['--model' => PrunableTestModelWithPrunableRecords::class]);
+        $this->artisan(['--model' => Pruning\Models\PrunableTestModelWithPrunableRecords::class]);
     }
 
     protected function artisan($arguments)
@@ -237,58 +274,4 @@ class PruneCommandTest extends TestCase
 
         m::close();
     }
-}
-
-class PrunableTestModelWithPrunableRecords extends Model
-{
-    use MassPrunable;
-
-    protected $table = 'prunables';
-    protected $connection = 'default';
-
-    public function pruneAll()
-    {
-        event(new ModelsPruned(static::class, 10));
-        event(new ModelsPruned(static::class, 20));
-
-        return 20;
-    }
-
-    public function prunable()
-    {
-        return static::where('value', '>=', 3);
-    }
-}
-
-class PrunableTestSoftDeletedModelWithPrunableRecords extends Model
-{
-    use MassPrunable, SoftDeletes;
-
-    protected $table = 'prunables';
-    protected $connection = 'default';
-
-    public function prunable()
-    {
-        return static::where('value', '>=', 3);
-    }
-}
-
-class PrunableTestModelWithoutPrunableRecords extends Model
-{
-    use Prunable;
-
-    public function pruneAll()
-    {
-        return 0;
-    }
-}
-
-class NonPrunableTestModel extends Model
-{
-    // ..
-}
-
-trait NonPrunableTrait
-{
-    use Prunable;
 }

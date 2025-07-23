@@ -164,7 +164,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(
             1,
             $anotherQuery->cursorPaginate(5, ['*'], 'cursor', new Cursor(['id' => 3]))
-                        ->items()
+                ->items()
         );
     }
 
@@ -239,7 +239,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertCount(
             4,
             $anotherQuery->cursorPaginate(10, ['*'], 'cursor', new Cursor(['user_id' => 2]))
-                        ->items()
+                ->items()
         );
     }
 

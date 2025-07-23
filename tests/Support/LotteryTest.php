@@ -154,6 +154,13 @@ class LotteryTest extends TestCase
         new Lottery(1.1);
     }
 
+    public function testItThrowsForOutOfLessThanOne()
+    {
+        $this->expectException(RuntimeException::class);
+
+        new Lottery(1, 0);
+    }
+
     public function testItCanWinWithFloat()
     {
         $wins = false;

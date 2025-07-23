@@ -249,6 +249,22 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
+    public function testValidationFailsWhenUsingDifferentCase()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'DONE',
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+    }
+
     public static function conditionalCasesDataProvider(): array
     {
         return [

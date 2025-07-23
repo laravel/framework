@@ -18,7 +18,7 @@ trait Matching
      * @param  mixed|\Closure  $expected
      * @return $this
      */
-    public function where(string $key, $expected): self
+    public function where(string $key, $expected): static
     {
         $this->has($key);
 
@@ -26,7 +26,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertTrue(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -56,7 +56,7 @@ trait Matching
      * @param  mixed|\Closure  $expected
      * @return $this
      */
-    public function whereNot(string $key, $expected): self
+    public function whereNot(string $key, $expected): static
     {
         $this->has($key);
 
@@ -64,7 +64,7 @@ trait Matching
 
         if ($expected instanceof Closure) {
             PHPUnit::assertFalse(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
+                $expected(is_array($actual) ? new Collection($actual) : $actual),
                 sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
             );
 
@@ -93,12 +93,58 @@ trait Matching
     }
 
     /**
+     * Asserts that the property is null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNull(string $key): static
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNull(
+            $actual,
+            sprintf(
+                'Property [%s] should be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the property is not null.
+     *
+     * @param  string  $key
+     * @return $this
+     */
+    public function whereNotNull(string $key): static
+    {
+        $this->has($key);
+
+        $actual = $this->prop($key);
+
+        PHPUnit::assertNotNull(
+            $actual,
+            sprintf(
+                'Property [%s] should not be null.',
+                $this->dotPath($key),
+            )
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that all properties match their expected values.
      *
      * @param  array  $bindings
      * @return $this
      */
-    public function whereAll(array $bindings): self
+    public function whereAll(array $bindings): static
     {
         foreach ($bindings as $key => $value) {
             $this->where($key, $value);
@@ -114,7 +160,7 @@ trait Matching
      * @param  string|array  $expected
      * @return $this
      */
-    public function whereType(string $key, $expected): self
+    public function whereType(string $key, $expected): static
     {
         $this->has($key);
 
@@ -139,7 +185,7 @@ trait Matching
      * @param  array  $bindings
      * @return $this
      */
-    public function whereAllType(array $bindings): self
+    public function whereAllType(array $bindings): static
     {
         foreach ($bindings as $key => $value) {
             $this->whereType($key, $value);
@@ -157,11 +203,11 @@ trait Matching
      */
     public function whereContains(string $key, $expected)
     {
-        $actual = Collection::make(
+        $actual = new Collection(
             $this->prop($key) ?? $this->prop()
         );
 
-        $missing = Collection::make($expected)
+        $missing = (new Collection($expected))
             ->map(fn ($search) => enum_value($search))
             ->reject(function ($search) use ($key, $actual) {
                 if ($actual->containsStrict($key, $search)) {

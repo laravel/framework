@@ -31,6 +31,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getCustomDirectives()
  * @method static \Illuminate\View\Compilers\BladeCompiler prepareStringsForCompilationUsing(callable $callback)
  * @method static void precompiler(callable $precompiler)
+ * @method static string usingEchoFormat(string $format, callable $callback)
  * @method static void setEchoFormat(string $format)
  * @method static void withDoubleEncoding()
  * @method static void withoutDoubleEncoding()

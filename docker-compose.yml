@@ -51,3 +51,29 @@ services:
     ports:
       - "6379:6379"
     restart: always
+  # redis-cluster-0:
+  #   image: redis:7.0-alpine
+  #   ports:
+  #     - "7000:7000"
+  #   restart: always
+  #   command: redis-server --port 7000 --appendonly yes --cluster-enabled yes
+  # redis-cluster-1:
+  #   image: redis:7.0-alpine
+  #   ports:
+  #     - "7001:7001"
+  #   restart: always
+  #   command: redis-server --port 7001 --appendonly yes --cluster-enabled yes
+  # redis-cluster-2:
+  #   image: redis:7.0-alpine
+  #   ports:
+  #     - "7002:7002"
+  #   restart: always
+  #   command: redis-server --port 7002 --appendonly yes --cluster-enabled yes
+  # redis-cluster-creator:
+  #   image: redis:7.0-alpine
+  #   depends_on:
+  #     - redis-cluster-0
+  #     - redis-cluster-1
+  #     - redis-cluster-2
+  #   command: sh -c 'redis-cli --cluster create redis-cluster-0:7000 redis-cluster-1:7001 redis-cluster-2:7002 --cluster-replicas 0 --cluster-yes || true'
+  #   restart: no

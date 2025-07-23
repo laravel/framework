@@ -3,6 +3,7 @@
 namespace Illuminate\Process;
 
 use Countable;
+use Illuminate\Support\Collection;
 
 class InvokedProcessPool implements Countable
 {
@@ -17,7 +18,6 @@ class InvokedProcessPool implements Countable
      * Create a new invoked process pool.
      *
      * @param  array  $invokedProcesses
-     * @return void
      */
     public function __construct(array $invokedProcesses)
     {
@@ -54,7 +54,7 @@ class InvokedProcessPool implements Countable
      */
     public function running()
     {
-        return collect($this->invokedProcesses)->filter->running()->values();
+        return (new Collection($this->invokedProcesses))->filter->running()->values();
     }
 
     /**
@@ -64,7 +64,7 @@ class InvokedProcessPool implements Countable
      */
     public function wait()
     {
-        return new ProcessPoolResults(collect($this->invokedProcesses)->map->wait()->all());
+        return new ProcessPoolResults((new Collection($this->invokedProcesses))->map->wait()->all());
     }
 
     /**
