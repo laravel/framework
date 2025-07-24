@@ -113,7 +113,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]| \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
