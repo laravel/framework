@@ -832,6 +832,7 @@ abstract class Factory
             'connection' => $this->connection,
             'recycle' => $this->recycle,
             'expandRelationships' => $this->expandRelationships,
+            'excludeRelationships' => $this->excludeRelationships,
         ], $arguments)));
     }
 
