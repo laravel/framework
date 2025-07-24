@@ -92,7 +92,7 @@ abstract class Factory
     protected $expandRelationships = true;
 
     /**
-     * Relationships that should not be automatically created.
+     * The relationships that should not be automatically created.
      *
      * @var array
      */
