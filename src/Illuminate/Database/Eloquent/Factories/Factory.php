@@ -519,7 +519,7 @@ abstract class Factory
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
                 } elseif ($attribute instanceof self && in_array($attribute->modelName(), $this->excludeRelationships)) {
-                   $attribute = null;
+                    $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
