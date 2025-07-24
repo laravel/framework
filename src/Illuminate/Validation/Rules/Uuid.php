@@ -6,7 +6,7 @@ use Stringable;
 
 class Uuid implements Stringable
 {
-    protected int|null $version = null;
+    protected ?int $version = null;
 
     public function version(int $version): static
     {
