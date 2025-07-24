@@ -6,7 +6,9 @@ use Stringable;
 
 class ExcludeWithout implements Stringable
 {
-    public function __construct(protected string $anotherField) {}
+    public function __construct(protected string $anotherField)
+    {
+    }
 
     public function __toString(): string
     {

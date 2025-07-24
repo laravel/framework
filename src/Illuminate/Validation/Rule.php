@@ -72,7 +72,7 @@ class Rule
      * Get a "accepted_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\AcceptedIf
      */
     public static function acceptedIf($anotherField, $value)
@@ -144,7 +144,7 @@ class Rule
      * Get a "declined_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\DeclinedIf
      */
     public static function declinedIf($anotherField, $value)
@@ -156,7 +156,7 @@ class Rule
      * Get a "present_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\PresentIf
      */
     public static function presentIf($anotherField, $value)
@@ -458,7 +458,7 @@ class Rule
      * Get a "decimal" rule builder instance.
      *
      * @param  int  $minPlaces
-     * @param  int|null $maxPlaces
+     * @param  int|null  $maxPlaces
      * @return \Illuminate\Validation\Rules\Decimal
      */
     public static function decimal($minPlaces, $maxPlaces = null)
@@ -470,7 +470,7 @@ class Rule
      * Get a "between" rule builder instance.
      *
      * @param  int|float  $min
-     * @param  int|float $max
+     * @param  int|float  $max
      * @return \Illuminate\Validation\Rules\Between
      */
     public static function between($min, $max)
@@ -482,7 +482,7 @@ class Rule
      * Get a "exclude_unless" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\ExcludeUnless
      */
     public static function excludeUnless($anotherField, $value)
@@ -494,7 +494,7 @@ class Rule
      * Get a "missing_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\MissingIf
      */
     public static function missingIf($anotherField, $value)
@@ -506,7 +506,7 @@ class Rule
      * Get a "missing_unless" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\MissingUnless
      */
     public static function missingUnless($anotherField, $value)
@@ -901,7 +901,7 @@ class Rule
      * Get a "required_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
     public static function requiredIf($anotherField, $value)
@@ -1076,7 +1076,7 @@ class Rule
      * Get a "prohibited_if" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
     public static function prohibitedIf($anotherField, $value)
@@ -1088,7 +1088,7 @@ class Rule
      * Get a "prohibited_unless" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\ProhibitedUnless
      */
     public static function prohibitedUnless($anotherField, $value)
@@ -1100,7 +1100,7 @@ class Rule
      * Get a "present_unless" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\PresentUnless
      */
     public static function presentUnless($anotherField, $value)
@@ -1112,7 +1112,7 @@ class Rule
      * Get a "required_unless" rule builder instance.
      *
      * @param  string  $anotherField
-     * @param  string|null|int|float $value
+     * @param  string|null|int|float  $value
      * @return \Illuminate\Validation\Rules\RequiredUnless
      */
     public static function requiredUnless($anotherField, $value)

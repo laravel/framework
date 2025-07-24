@@ -6,7 +6,9 @@ use Stringable;
 
 class MaxDigits implements Stringable
 {
-    public function __construct(protected int $value) {}
+    public function __construct(protected int $value)
+    {
+    }
 
     public function __toString(): string
     {

@@ -6,7 +6,9 @@ use Stringable;
 
 class Different implements Stringable
 {
-    public function __construct(protected string $field) {}
+    public function __construct(protected string $field)
+    {
+    }
 
     public function __toString(): string
     {

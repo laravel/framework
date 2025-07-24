@@ -6,7 +6,9 @@ use Stringable;
 
 class Digits implements Stringable
 {
-    public function __construct(protected int $length) {}
+    public function __construct(protected int $length)
+    {
+    }
 
     public function __toString(): string
     {

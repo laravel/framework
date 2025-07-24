@@ -17,6 +17,6 @@ class Uuid implements Stringable
 
     public function __toString(): string
     {
-        return 'uuid' . ($this->version ? ':' . $this->version : '');
+        return 'uuid'.($this->version ? ':'.$this->version : '');
     }
 }

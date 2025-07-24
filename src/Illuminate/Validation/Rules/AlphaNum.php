@@ -17,6 +17,6 @@ class AlphaNum implements Stringable
 
     public function __toString(): string
     {
-        return 'alpha_num' . ($this->isAscii ? ':ascii' : '');
+        return 'alpha_num'.($this->isAscii ? ':ascii' : '');
     }
 }

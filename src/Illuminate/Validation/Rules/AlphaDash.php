@@ -17,6 +17,6 @@ class AlphaDash implements Stringable
 
     public function __toString(): string
     {
-        return 'alpha_dash' . ($this->isAscii ? ':ascii' : '');
+        return 'alpha_dash'.($this->isAscii ? ':ascii' : '');
     }
 }

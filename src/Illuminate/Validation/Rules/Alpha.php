@@ -17,6 +17,6 @@ class Alpha implements Stringable
 
     public function __toString(): string
     {
-        return 'alpha' . ($this->isAscii ? ':ascii' : '');
+        return 'alpha'.($this->isAscii ? ':ascii' : '');
     }
 }

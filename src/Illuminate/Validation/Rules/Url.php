@@ -17,6 +17,6 @@ class Url implements Stringable
 
     public function __toString(): string
     {
-        return 'url' . ($this->protocols ? ':' . implode(',', $this->protocols) : '');
+        return 'url'.($this->protocols ? ':'.implode(',', $this->protocols) : '');
     }
 }

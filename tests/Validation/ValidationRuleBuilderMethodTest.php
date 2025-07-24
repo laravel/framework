@@ -218,13 +218,13 @@ class ValidationRuleBuilderMethodTest extends TestCase
     public function testMinRule()
     {
         $this->assertSame(Rule::min(12)->__toString(), 'min:12');
-        $this->assertSame(Rule::min(fn(): int => 12)->__toString(), 'min:12');
+        $this->assertSame(Rule::min(fn (): int => 12)->__toString(), 'min:12');
     }
 
     public function testMaxRule()
     {
         $this->assertSame(Rule::max(12)->__toString(), 'max:12');
-        $this->assertSame(Rule::max(fn(): int => 12)->__toString(), 'max:12');
+        $this->assertSame(Rule::max(fn (): int => 12)->__toString(), 'max:12');
     }
 
     public function testBetweenRule()
@@ -349,8 +349,8 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
         $this->assertSame(Rule::date()->equals('now')->__toString(), 'date|date_equals:now');
         $this->assertSame(Rule::date()->equals('tomorrow')->__toString(), 'date|date_equals:tomorrow');
-        $this->assertSame(Rule::date()->equals($now)->__toString(), 'date|date_equals:' . $now->format('Y-m-d'));
-        $this->assertSame(Rule::date()->equals($now->format('H:i'))->__toString(), 'date|date_equals:' . $now->format('H:i'));
+        $this->assertSame(Rule::date()->equals($now)->__toString(), 'date|date_equals:'.$now->format('Y-m-d'));
+        $this->assertSame(Rule::date()->equals($now->format('H:i'))->__toString(), 'date|date_equals:'.$now->format('H:i'));
     }
 
     public function testTimezoneRule()

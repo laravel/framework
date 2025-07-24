@@ -17,6 +17,6 @@ class Confirmed implements Stringable
 
     public function __toString(): string
     {
-        return 'confirmed' . ($this->confirmationField ? ":{$this->confirmationField}" : '');
+        return 'confirmed'.($this->confirmationField ? ":{$this->confirmationField}" : '');
     }
 }

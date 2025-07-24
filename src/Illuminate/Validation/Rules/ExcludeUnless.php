@@ -9,10 +9,11 @@ class ExcludeUnless implements Stringable
     public function __construct(
         protected string $anotherField,
         protected string|null|int|float $value,
-    ) {}
+    ) {
+    }
 
     public function __toString(): string
     {
-        return 'exclude_unless:' . $this->anotherField . ',' . ($this->value ?? 'null');
+        return 'exclude_unless:'.$this->anotherField.','.($this->value ?? 'null');
     }
 }

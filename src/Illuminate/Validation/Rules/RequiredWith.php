@@ -6,10 +6,12 @@ use Stringable;
 
 class RequiredWith implements Stringable
 {
-    public function __construct(protected array $fields) {}
+    public function __construct(protected array $fields)
+    {
+    }
 
     public function __toString(): string
     {
-        return 'required_with:' . implode(',', $this->fields);
+        return 'required_with:'.implode(',', $this->fields);
     }
 }

@@ -6,10 +6,12 @@ use Stringable;
 
 class RequiredIfAccepted implements Stringable
 {
-    public function __construct(protected array $fields) {}
+    public function __construct(protected array $fields)
+    {
+    }
 
     public function __toString(): string
     {
-        return 'required_if_accepted:' . implode(',', $this->fields);
+        return 'required_if_accepted:'.implode(',', $this->fields);
     }
 }

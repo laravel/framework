@@ -13,8 +13,9 @@ class Between implements Stringable
     /**
      * Create a new rule instance.
      *
-     * @param int|float $min
-     * @param int|float $max
+     * @param  int|float  $min
+     * @param  int|float  $max
+     *
      * @throws InvalidArgumentException
      */
     public function __construct(int|float $min, int|float $max)

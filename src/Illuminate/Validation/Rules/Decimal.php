@@ -9,7 +9,8 @@ class Decimal implements Stringable
     public function __construct(
         protected int $minPlaces,
         protected ?int $maxPlaces,
-    ) {}
+    ) {
+    }
 
     public function __toString(): string
     {

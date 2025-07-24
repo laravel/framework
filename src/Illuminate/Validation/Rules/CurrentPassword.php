@@ -17,6 +17,6 @@ class CurrentPassword implements Stringable
 
     public function __toString(): string
     {
-        return 'current_password' . ($this->guard ? ":{$this->guard}" : '');
+        return 'current_password'.($this->guard ? ":{$this->guard}" : '');
     }
 }

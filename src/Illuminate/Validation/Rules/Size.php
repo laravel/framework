@@ -6,7 +6,9 @@ use Stringable;
 
 class Size implements Stringable
 {
-    public function __construct(protected int|float $value) {}
+    public function __construct(protected int|float $value)
+    {
+    }
 
     public function __toString(): string
     {
