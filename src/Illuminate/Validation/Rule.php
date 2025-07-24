@@ -5,23 +5,6 @@ namespace Illuminate\Validation;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\Rules\AnyOf;
-use Illuminate\Validation\Rules\ArrayRule;
-use Illuminate\Validation\Rules\Can;
-use Illuminate\Validation\Rules\Date;
-use Illuminate\Validation\Rules\Dimensions;
-use Illuminate\Validation\Rules\Email;
-use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\Rules\ExcludeIf;
-use Illuminate\Validation\Rules\Exists;
-use Illuminate\Validation\Rules\File;
-use Illuminate\Validation\Rules\ImageFile;
-use Illuminate\Validation\Rules\In;
-use Illuminate\Validation\Rules\NotIn;
-use Illuminate\Validation\Rules\Numeric;
-use Illuminate\Validation\Rules\ProhibitedIf;
-use Illuminate\Validation\Rules\RequiredIf;
-use Illuminate\Validation\Rules\Unique;
 
 class Rule
 {
@@ -36,7 +19,7 @@ class Rule
      */
     public static function can($ability, ...$arguments)
     {
-        return new Can($ability, $arguments);
+        return new Rules\Can($ability, $arguments);
     }
 
     /**
@@ -66,14 +49,248 @@ class Rule
     }
 
     /**
-     * Get an array rule builder instance.
+     * Get an "active_url" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\ActiveUrl
+     */
+    public static function activeUrl()
+    {
+        return new Rules\ActiveUrl;
+    }
+
+    /**
+     * Get an "accepted" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Accepted
+     */
+    public static function accepted()
+    {
+        return new Rules\Accepted;
+    }
+
+    /**
+     * Get a "accepted_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\AcceptedIf
+     */
+    public static function acceptedIf($anotherField, $value)
+    {
+        return new Rules\AcceptedIf($anotherField, $value);
+    }
+
+    /**
+     * Get an "alpha" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Alpha
+     */
+    public static function alpha()
+    {
+        return new Rules\Alpha;
+    }
+
+    /**
+     * Get a "mac_address" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\MacAddress
+     */
+    public static function macAddress()
+    {
+        return new Rules\MacAddress;
+    }
+
+    /**
+     * Get an "alpha_dash" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\AlphaDash
+     */
+    public static function alphaDash()
+    {
+        return new Rules\AlphaDash;
+    }
+
+    /**
+     * Get an "alpha_num" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\AlphaNum
+     */
+    public static function alphaNum()
+    {
+        return new Rules\AlphaNum;
+    }
+
+    /**
+     * Get an "ascii" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Ascii
+     */
+    public static function ascii()
+    {
+        return new Rules\Ascii;
+    }
+
+    /**
+     * Get a "boolean" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Boolean
+     */
+    public static function boolean()
+    {
+        return new Rules\Boolean;
+    }
+
+    /**
+     * Get a "declined_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\DeclinedIf
+     */
+    public static function declinedIf($anotherField, $value)
+    {
+        return new Rules\DeclinedIf($anotherField, $value);
+    }
+
+    /**
+     * Get a "present_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\PresentIf
+     */
+    public static function presentIf($anotherField, $value)
+    {
+        return new Rules\PresentIf($anotherField, $value);
+    }
+
+    /**
+     * Get a "declined" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Declined
+     */
+    public static function declined()
+    {
+        return new Rules\Declined;
+    }
+
+    /**
+     * Get a "confirmed" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Confirmed
+     */
+    public static function confirmed()
+    {
+        return new Rules\Confirmed;
+    }
+
+    /**
+     * Get a "current_password" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\CurrentPassword
+     */
+    public static function currentPassword()
+    {
+        return new Rules\CurrentPassword;
+    }
+
+    /**
+     * Get a "doesnt_start_with" rule builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\DoesntStartWith
+     */
+    public static function doesntStartWith($values)
+    {
+        return new Rules\DoesntStartWith($values);
+    }
+
+    /**
+     * Get a "timezone" rule builder instance.
+     *
+     * @param  array|null  $values
+     * @return \Illuminate\Validation\Rules\Timezone
+     */
+    public static function timezone($values = null)
+    {
+        return new Rules\Timezone($values);
+    }
+
+    /**
+     * Get an "starts_with" rule builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\StartsWith
+     */
+    public static function startsWith($values)
+    {
+        return new Rules\StartsWith($values);
+    }
+
+    /**
+     * Get a "doesnt_end_with" rule builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\DoesntEndWith
+     */
+    public static function doesntEndWith($values)
+    {
+        return new Rules\DoesntEndWith($values);
+    }
+
+    /**
+     * Get an "ends_with" rule builder instance.
+     *
+     * @param  array  $values
+     * @return \Illuminate\Validation\Rules\EndsWith
+     */
+    public static function endsWith($values)
+    {
+        return new Rules\EndsWith($values);
+    }
+
+    /**
+     * Get a "different" rule builder instance.
+     *
+     * @param  string  $field
+     * @return \Illuminate\Validation\Rules\Different
+     */
+    public static function different($field)
+    {
+        return new Rules\Different($field);
+    }
+
+    /**
+     * Get a "size" rule builder instance.
+     *
+     * @param  int|float  $value
+     * @return \Illuminate\Validation\Rules\Size
+     */
+    public static function size($value)
+    {
+        return new Rules\Size($value);
+    }
+
+    /**
+     * Get a "same" rule builder instance.
+     *
+     * @param  string  $field
+     * @return \Illuminate\Validation\Rules\Same
+     */
+    public static function same($field)
+    {
+        return new Rules\Same($field);
+    }
+
+    /**
+     * Get an "array" rule builder instance.
      *
      * @param  array|null  $keys
-     * @return \Illuminate\Validation\Rules\ArrayRule
+     * @return \Illuminate\Validation\Rules\Arr
      */
     public static function array($keys = null)
     {
-        return new ArrayRule(...func_get_args());
+        return new Rules\Arr(...func_get_args());
     }
 
     /**
@@ -96,11 +313,11 @@ class Rule
      */
     public static function unique($table, $column = 'NULL')
     {
-        return new Unique($table, $column);
+        return new Rules\Unique($table, $column);
     }
 
     /**
-     * Get an exists constraint builder instance.
+     * Get an "exists" constraint builder instance.
      *
      * @param  string  $table
      * @param  string  $column
@@ -108,11 +325,11 @@ class Rule
      */
     public static function exists($table, $column = 'NULL')
     {
-        return new Exists($table, $column);
+        return new Rules\Exists($table, $column);
     }
 
     /**
-     * Get an in rule builder instance.
+     * Get an "in" rule builder instance.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\In
@@ -123,11 +340,11 @@ class Rule
             $values = $values->toArray();
         }
 
-        return new In(is_array($values) ? $values : func_get_args());
+        return new Rules\In(is_array($values) ? $values : func_get_args());
     }
 
     /**
-     * Get a not_in rule builder instance.
+     * Get a "not_in" rule builder instance.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\NotIn
@@ -138,117 +355,846 @@ class Rule
             $values = $values->toArray();
         }
 
-        return new NotIn(is_array($values) ? $values : func_get_args());
+        return new Rules\NotIn(is_array($values) ? $values : func_get_args());
     }
 
     /**
-     * Get a required_if rule builder instance.
+     * Get a "max" rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  callable|int  $value
+     * @return \Illuminate\Validation\Rules\Max
+     */
+    public static function max($value)
+    {
+        return new Rules\Max($value);
+    }
+
+    /**
+     * Get a "regex" rule builder instance.
+     *
+     * @param  string  $value
+     * @return \Illuminate\Validation\Rules\Regex
+     */
+    public static function regex($value)
+    {
+        return new Rules\Regex($value);
+    }
+
+    /**
+     * Get a "not_regex" rule builder instance.
+     *
+     * @param  string  $value
+     * @return \Illuminate\Validation\Rules\NotRegex
+     */
+    public static function notRegex($value)
+    {
+        return new Rules\NotRegex($value);
+    }
+
+    /**
+     * Get an "ip" rule builder instance.
+     *
+     * @param  string|null  $version
+     * @return \Illuminate\Validation\Rules\IpAddress
+     */
+    public static function ip($version = null)
+    {
+        return new Rules\IpAddress($version);
+    }
+
+    /**
+     * Get an "uuid" rule builder instance.
+     *
+     * @param  int|null  $version
+     * @return \Illuminate\Validation\Rules\Uuid
+     */
+    public static function uuid($version = null)
+    {
+        return new Rules\Uuid($version);
+    }
+
+    /**
+     * Get a "json" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Json
+     */
+    public static function json()
+    {
+        return new Rules\Json();
+    }
+
+    /**
+     * Get a "sometimes" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Sometimes
+     */
+    public static function sometimes()
+    {
+        return new Rules\Sometimes();
+    }
+
+    /**
+     * Get a "nullable" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Nullable
+     */
+    public static function nullable()
+    {
+        return new Rules\Nullable();
+    }
+
+    /**
+     * Get a "min" rule builder instance.
+     *
+     * @param  callable|int  $value
+     * @return \Illuminate\Validation\Rules\Min
+     */
+    public static function min($value)
+    {
+        return new Rules\Min($value);
+    }
+
+    /**
+     * Get a "decimal" rule builder instance.
+     *
+     * @param  int  $minPlaces
+     * @param  int|null $maxPlaces
+     * @return \Illuminate\Validation\Rules\Decimal
+     */
+    public static function decimal($minPlaces, $maxPlaces = null)
+    {
+        return new Rules\Decimal($minPlaces, $maxPlaces);
+    }
+
+    /**
+     * Get a "between" rule builder instance.
+     *
+     * @param  int|float  $min
+     * @param  int|float $max
+     * @return \Illuminate\Validation\Rules\Between
+     */
+    public static function between($min, $max)
+    {
+        return new Rules\Between($min, $max);
+    }
+
+    /**
+     * Get a "exclude_unless" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\ExcludeUnless
+     */
+    public static function excludeUnless($anotherField, $value)
+    {
+        return new Rules\ExcludeUnless($anotherField, $value);
+    }
+
+    /**
+     * Get a "missing_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\MissingIf
+     */
+    public static function missingIf($anotherField, $value)
+    {
+        return new Rules\MissingIf($anotherField, $value);
+    }
+
+    /**
+     * Get a "missing_unless" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\MissingUnless
+     */
+    public static function missingUnless($anotherField, $value)
+    {
+        return new Rules\MissingUnless($anotherField, $value);
+    }
+
+    /**
+     * Get a "exclude_with" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @return \Illuminate\Validation\Rules\ExcludeWith
+     */
+    public static function excludeWith($anotherField)
+    {
+        return new Rules\ExcludeWith($anotherField);
+    }
+
+    /**
+     * Get a "exclude_without" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @return \Illuminate\Validation\Rules\ExcludeWithout
+     */
+    public static function excludeWithout($anotherField)
+    {
+        return new Rules\ExcludeWithout($anotherField);
+    }
+
+    /**
+     * Get a "mimetypes" rule builder instance.
+     *
+     * @param  array  $types
+     * @return \Illuminate\Validation\Rules\MimeTypes
+     */
+    public static function mimeTypes($types)
+    {
+        return new Rules\MimeTypes($types);
+    }
+
+    /**
+     * Get a "mimes" rule builder instance.
+     *
+     * @param  array  $types
+     * @return \Illuminate\Validation\Rules\Mimes
+     */
+    public static function mimes($types)
+    {
+        return new Rules\Mimes($types);
+    }
+
+    /**
+     * Get a "prohibits" rule builder instance.
+     *
+     * @param  array  $types
+     * @return \Illuminate\Validation\Rules\Prohibits
+     */
+    public static function prohibits($types)
+    {
+        return new Rules\Prohibits($types);
+    }
+
+    /**
+     * Get a "required_array_keys" rule builder instance.
+     *
+     * @param  array  $keys
+     * @return \Illuminate\Validation\Rules\RequiredArrayKeys
+     */
+    public static function requiredArrayKeys($keys)
+    {
+        return new Rules\RequiredArrayKeys($keys);
+    }
+
+    /**
+     * Get a "required" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Required
+     */
+    public static function required()
+    {
+        return new Rules\Required;
+    }
+
+    /**
+     * Get a "prohibited" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Prohibited
+     */
+    public static function prohibited()
+    {
+        return new Rules\Prohibited;
+    }
+
+    /**
+     * Get a "present" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Present
+     */
+    public static function present()
+    {
+        return new Rules\Present;
+    }
+
+    /**
+     * Get a "exclude" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Exclude
+     */
+    public static function exclude()
+    {
+        return new Rules\Exclude;
+    }
+
+    /**
+     * Get a "missing" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Missing
+     */
+    public static function missing()
+    {
+        return new Rules\Missing;
+    }
+
+    /**
+     * Get a "list" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\ListRule
+     */
+    public static function list()
+    {
+        return new Rules\ListRule;
+    }
+
+    /**
+     * Get a "bail" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Bail
+     */
+    public static function bail()
+    {
+        return new Rules\Bail;
+    }
+
+    /**
+     * Get a "filled" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Filled
+     */
+    public static function filled()
+    {
+        return new Rules\Filled;
+    }
+
+    /**
+     * Get an "integer" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Integer
+     */
+    public static function integer()
+    {
+        return new Rules\Integer;
+    }
+
+    /**
+     * Get a "url" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Url
+     */
+    public static function url()
+    {
+        return new Rules\Url;
+    }
+
+    /**
+     * Get a "digits" rule builder instance.
+     *
+     * @param  int  $digits
+     * @return \Illuminate\Validation\Rules\Digits
+     */
+    public static function digits($digits)
+    {
+        return new Rules\Digits($digits);
+    }
+
+    /**
+     * Get a "max_digits" rule builder instance.
+     *
+     * @param  int  $value
+     * @return \Illuminate\Validation\Rules\MaxDigits
+     */
+    public static function maxDigits($value)
+    {
+        return new Rules\MaxDigits($value);
+    }
+
+    /**
+     * Get a "gt" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\GreaterThan
+     */
+    public static function greaterThan($value)
+    {
+        return new Rules\GreaterThan($value);
+    }
+
+    /**
+     * Get a "gt" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\GreaterThan
+     */
+    public static function gt($value)
+    {
+        return new Rules\GreaterThan($value);
+    }
+
+    /**
+     * Get a "gte" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\GreaterThanOrEqual
+     */
+    public static function greaterThanOrEqual($value)
+    {
+        return new Rules\GreaterThanOrEqual($value);
+    }
+
+    /**
+     * Get a "gte" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\GreaterThanOrEqual
+     */
+    public static function gte($value)
+    {
+        return new Rules\GreaterThanOrEqual($value);
+    }
+
+    /**
+     * Get a "lt" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\LessThan
+     */
+    public static function lessThan($value)
+    {
+        return new Rules\LessThan($value);
+    }
+
+    /**
+     * Get a "lt" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\LessThan
+     */
+    public static function lt($value)
+    {
+        return new Rules\LessThan($value);
+    }
+
+    /**
+     * Get a "lte" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\LessThanOrEqual
+     */
+    public static function lessThanOrEqual($value)
+    {
+        return new Rules\LessThanOrEqual($value);
+    }
+
+    /**
+     * Get a "lte" rule builder instance.
+     *
+     * @param  string|int  $value
+     * @return \Illuminate\Validation\Rules\LessThanOrEqual
+     */
+    public static function lte($value)
+    {
+        return new Rules\LessThanOrEqual($value);
+    }
+
+    /**
+     * Get a "multiple_of" rule builder instance.
+     *
+     * @param  int|float  $value
+     * @return \Illuminate\Validation\Rules\MultipleOf
+     */
+    public static function multipleOf($value)
+    {
+        return new Rules\MultipleOf($value);
+    }
+
+    /**
+     * Get an "in_array" rule builder instance.
+     *
+     * @param  string  $value
+     * @return \Illuminate\Validation\Rules\InArray
+     */
+    public static function inArray($value)
+    {
+        return new Rules\InArray($value);
+    }
+
+    /**
+     * Get an "in_array_keys" rule builder instance.
+     *
+     * @param  array  $value
+     * @return \Illuminate\Validation\Rules\InArrayKeys
+     */
+    public static function inArrayKeys($value)
+    {
+        return new Rules\InArrayKeys($value);
+    }
+
+    /**
+     * Get a "distinct" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Distinct
+     */
+    public static function distinct()
+    {
+        return new Rules\Distinct();
+    }
+
+    /**
+     * Get a "max_digits" rule builder instance.
+     *
+     * @param  int  $value
+     * @return \Illuminate\Validation\Rules\MinDigits
+     */
+    public static function minDigits($value)
+    {
+        return new Rules\MinDigits($value);
+    }
+
+    /**
+     * Get a "digits_between" rule builder instance.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return \Illuminate\Validation\Rules\DigitsBetween
+     */
+    public static function digitsBetween($min, $max)
+    {
+        return new Rules\DigitsBetween($min, $max);
+    }
+
+    /**
+     * Get an "extensions" rule builder instance.
+     *
+     * @param  array  $extensions
+     * @return \Illuminate\Validation\Rules\Extensions
+     */
+    public static function extensions($extensions = [])
+    {
+        return new Rules\Extensions($extensions);
+    }
+
+    /**
+     * Get a "lowercase" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Lowercase
+     */
+    public static function lowercase()
+    {
+        return new Rules\Lowercase;
+    }
+
+    /**
+     * Get a "uppercase" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Uppercase
+     */
+    public static function uppercase()
+    {
+        return new Rules\Uppercase;
+    }
+
+    /**
+     * Get a "ulid" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Ulid
+     */
+    public static function ulid()
+    {
+        return new Rules\Ulid;
+    }
+
+    /**
+     * Get a "required_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
-    public static function requiredIf($callback)
+    public static function requiredIf($anotherField, $value)
     {
-        return new RequiredIf($callback);
+        return new Rules\RequiredIf($anotherField, $value);
     }
 
     /**
-     * Get a exclude_if rule builder instance.
+     * Get a "string" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\Str
+     */
+    public static function string()
+    {
+        return new Rules\Str;
+    }
+
+    /**
+     * Get a "hex_color" rule builder instance.
+     *
+     * @return \Illuminate\Validation\Rules\HexColor
+     */
+    public static function hexColor()
+    {
+        return new Rules\HexColor;
+    }
+
+    /**
+     * Get an "exclude_if" rule builder instance.
      *
      * @param  callable|bool  $callback
      * @return \Illuminate\Validation\Rules\ExcludeIf
      */
     public static function excludeIf($callback)
     {
-        return new ExcludeIf($callback);
+        return new Rules\ExcludeIf($callback);
     }
 
     /**
-     * Get a prohibited_if rule builder instance.
+     * Get a "missing_with" rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\MissingWith
+     */
+    public static function missingWith($fields)
+    {
+        return new Rules\MissingWith($fields);
+    }
+
+    /**
+     * Get a "missing_with_all" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\MissingWithAll
+     */
+    public static function missingWithAll($fields)
+    {
+        return new Rules\MissingWithAll($fields);
+    }
+
+    /**
+     * Get a "present_with" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\PresentWith
+     */
+    public static function presentWith($fields)
+    {
+        return new Rules\PresentWith($fields);
+    }
+
+    /**
+     * Get a "present_with_all" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\PresentWithAll
+     */
+    public static function presentWithAll($fields)
+    {
+        return new Rules\PresentWithAll($fields);
+    }
+
+    /**
+     * Get a "required_with" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredWith
+     */
+    public static function requiredWith($fields)
+    {
+        return new Rules\RequiredWith($fields);
+    }
+
+    /**
+     * Get a "prohibited_if_accepted" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\ProhibitedIfAccepted
+     */
+    public static function prohibitedIfAccepted($fields)
+    {
+        return new Rules\ProhibitedIfAccepted($fields);
+    }
+
+    /**
+     * Get a "prohibited_if_declined" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\ProhibitedIfDeclined
+     */
+    public static function prohibitedIfDeclined($fields)
+    {
+        return new Rules\ProhibitedIfDeclined($fields);
+    }
+
+    /**
+     * Get a "required_if_accepted" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredIfAccepted
+     */
+    public static function requiredIfAccepted($fields)
+    {
+        return new Rules\RequiredIfAccepted($fields);
+    }
+
+    /**
+     * Get a "required_if_declined" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredIfDeclined
+     */
+    public static function requiredIfDeclined($fields)
+    {
+        return new Rules\RequiredIfDeclined($fields);
+    }
+
+    /**
+     * Get a "required_with_all" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredWithAll
+     */
+    public static function requiredWithAll($fields)
+    {
+        return new Rules\RequiredWithAll($fields);
+    }
+
+    /**
+     * Get a "required_without" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredWithout
+     */
+    public static function requiredWithout($fields)
+    {
+        return new Rules\RequiredWithout($fields);
+    }
+
+    /**
+     * Get a "required_without_all" rule builder instance.
+     *
+     * @param  array  $fields
+     * @return \Illuminate\Validation\Rules\RequiredWithoutAll
+     */
+    public static function requiredWithoutAll($fields)
+    {
+        return new Rules\RequiredWithoutAll($fields);
+    }
+
+    /**
+     * Get a "prohibited_if" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
-    public static function prohibitedIf($callback)
+    public static function prohibitedIf($anotherField, $value)
     {
-        return new ProhibitedIf($callback);
+        return new Rules\ProhibitedIf($anotherField, $value);
     }
 
     /**
-     * Get a date rule builder instance.
+     * Get a "prohibited_unless" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\ProhibitedUnless
+     */
+    public static function prohibitedUnless($anotherField, $value)
+    {
+        return new Rules\ProhibitedUnless($anotherField, $value);
+    }
+
+    /**
+     * Get a "present_unless" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\PresentUnless
+     */
+    public static function presentUnless($anotherField, $value)
+    {
+        return new Rules\PresentUnless($anotherField, $value);
+    }
+
+    /**
+     * Get a "required_unless" rule builder instance.
+     *
+     * @param  string  $anotherField
+     * @param  string|null|int|float $value
+     * @return \Illuminate\Validation\Rules\RequiredUnless
+     */
+    public static function requiredUnless($anotherField, $value)
+    {
+        return new Rules\RequiredUnless($anotherField, $value);
+    }
+
+    /**
+     * Get a "date" rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\Date
      */
     public static function date()
     {
-        return new Date;
+        return new Rules\Date;
     }
 
     /**
-     * Get an email rule builder instance.
+     * Get an "email" rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\Email
      */
     public static function email()
     {
-        return new Email;
+        return new Rules\Email;
     }
 
     /**
-     * Get an enum rule builder instance.
+     * Get an "enum" rule builder instance.
      *
      * @param  class-string  $type
      * @return \Illuminate\Validation\Rules\Enum
      */
     public static function enum($type)
     {
-        return new Enum($type);
+        return new Rules\Enum($type);
     }
 
     /**
-     * Get a file rule builder instance.
+     * Get a "file" rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\File
      */
     public static function file()
     {
-        return new File;
+        return new Rules\File;
     }
 
     /**
-     * Get an image file rule builder instance.
+     * Get an "image" file rule builder instance.
      *
      * @param  bool  $allowSvg
      * @return \Illuminate\Validation\Rules\ImageFile
      */
     public static function imageFile($allowSvg = false)
     {
-        return new ImageFile($allowSvg);
+        return new Rules\ImageFile($allowSvg);
     }
 
     /**
-     * Get a dimensions rule builder instance.
+     * Get a "dimensions" rule builder instance.
      *
      * @param  array  $constraints
      * @return \Illuminate\Validation\Rules\Dimensions
      */
     public static function dimensions(array $constraints = [])
     {
-        return new Dimensions($constraints);
+        return new Rules\Dimensions($constraints);
     }
 
     /**
-     * Get a numeric rule builder instance.
+     * Get a "numeric" rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\Numeric
      */
     public static function numeric()
     {
-        return new Numeric;
+        return new Rules\Numeric;
     }
 
     /**
-     * Get an "any of" rule builder instance.
+     * Get an "any_of" rule builder instance.
      *
      * @param  array  $rules
      * @return \Illuminate\Validation\Rules\AnyOf
@@ -257,11 +1203,11 @@ class Rule
      */
     public static function anyOf($rules)
     {
-        return new AnyOf($rules);
+        return new Rules\AnyOf($rules);
     }
 
     /**
-     * Get a contains rule builder instance.
+     * Get a "contains" rule builder instance.
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      * @return \Illuminate\Validation\Rules\Contains

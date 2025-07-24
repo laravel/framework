@@ -112,6 +112,11 @@ class Date implements Stringable
         return $this->afterOrEqual($from)->beforeOrEqual($to);
     }
 
+    public function equals(DateTimeInterface|string $date): static
+    {
+        return $this->addRule('date_equals:'.$this->formatDate($date));
+    }
+
     /**
      * Add custom rules to the validation rules array.
      */

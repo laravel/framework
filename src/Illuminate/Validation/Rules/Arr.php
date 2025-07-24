@@ -7,7 +7,7 @@ use Stringable;
 
 use function Illuminate\Support\enum_value;
 
-class ArrayRule implements Stringable
+class Arr implements Stringable
 {
     /**
      * The accepted keys.
