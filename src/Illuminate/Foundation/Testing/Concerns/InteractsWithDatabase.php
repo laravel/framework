@@ -18,13 +18,19 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseHas($table, array $data = [], $connection = null)
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertDatabaseHas($item, $data, $connection);
+            }
+        }
+
         if ($table instanceof Model) {
             $data = [
                 $table->getKeyName() => $table->getKey(),
@@ -42,13 +48,19 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
      */
     protected function assertDatabaseMissing($table, array $data = [], $connection = null)
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertDatabaseMissing($item, $data, $connection);
+            }
+        }
+
         if ($table instanceof Model) {
             $data = [
                 $table->getKeyName() => $table->getKey(),
@@ -101,7 +113,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model[]| \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
@@ -109,6 +121,12 @@ trait InteractsWithDatabase
      */
     protected function assertSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertSoftDeleted($item, $data, $connection);
+            }
+        }
+
         if ($this->isSoftDeletableModel($table)) {
             return $this->assertSoftDeleted(
                 $table->getTable(),
@@ -133,7 +151,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has not been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
@@ -141,6 +159,12 @@ trait InteractsWithDatabase
      */
     protected function assertNotSoftDeleted($table, array $data = [], $connection = null, $deletedAtColumn = 'deleted_at')
     {
+        if (is_iterable($table)) {
+            foreach ($table as $item) {
+                $this->assertNotSoftDeleted($item, $data, $connection);
+            }
+        }
+
         if ($this->isSoftDeletableModel($table)) {
             return $this->assertNotSoftDeleted(
                 $table->getTable(),
@@ -165,7 +189,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given model exists in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     protected function assertModelExists($model)
@@ -176,7 +200,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given model does not exist in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     protected function assertModelMissing($model)
