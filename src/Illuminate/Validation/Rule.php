@@ -394,23 +394,21 @@ class Rule
     /**
      * Get an "ip" rule builder instance.
      *
-     * @param  string|null  $version
      * @return \Illuminate\Validation\Rules\IpAddress
      */
-    public static function ip($version = null)
+    public static function ip()
     {
-        return new Rules\IpAddress($version);
+        return new Rules\IpAddress;
     }
 
     /**
      * Get an "uuid" rule builder instance.
      *
-     * @param  int|null  $version
      * @return \Illuminate\Validation\Rules\Uuid
      */
-    public static function uuid($version = null)
+    public static function uuid()
     {
-        return new Rules\Uuid($version);
+        return new Rules\Uuid;
     }
 
     /**
@@ -898,15 +896,14 @@ class Rule
     }
 
     /**
-     * Get a "required_if" rule builder instance.
+     * Get a required_if rule builder instance.
      *
-     * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  callable|bool  $callback
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
-    public static function requiredIf($anotherField, $value)
+    public static function requiredIf($callback)
     {
-        return new Rules\RequiredIf($anotherField, $value);
+        return new Rules\RequiredIf($callback);
     }
 
     /**
@@ -1073,15 +1070,14 @@ class Rule
     }
 
     /**
-     * Get a "prohibited_if" rule builder instance.
+     * Get a prohibited_if rule builder instance.
      *
-     * @param  string  $anotherField
-     * @param  string|null|int|float  $value
+     * @param  callable|bool  $callback
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
-    public static function prohibitedIf($anotherField, $value)
+    public static function prohibitedIf($callback)
     {
-        return new Rules\ProhibitedIf($anotherField, $value);
+        return new Rules\ProhibitedIf($callback);
     }
 
     /**

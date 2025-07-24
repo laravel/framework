@@ -4,7 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Stringable;
 
-class prohibitedIfAccepted implements Stringable
+class ProhibitedIfAccepted implements Stringable
 {
     public function __construct(protected array $fields)
     {
