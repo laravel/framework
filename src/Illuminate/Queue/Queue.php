@@ -17,6 +17,8 @@ use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 abstract class Queue
 {
@@ -171,8 +173,8 @@ abstract class Queue
             $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
                 ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
                 : serialize(clone $job);
-        } catch (\Throwable $e) {
-            throw new \RuntimeException(
+        } catch (Throwable $e) {
+            throw new RuntimeException(
                 sprintf('Failed to serialize job of type [%s]: %s', get_class($job), $e->getMessage()),
                 0,
                 $e
