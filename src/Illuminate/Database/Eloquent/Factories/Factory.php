@@ -92,6 +92,13 @@ abstract class Factory
     protected $expandRelationships = true;
 
     /**
+     * Relationships that should not be automatically created.
+     *
+     * @var array
+     */
+    protected $excludeRelationships = [];
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var string|null
@@ -152,6 +159,7 @@ abstract class Factory
      * @param  string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool|null  $expandRelationships
+     * @param  array  $excludeRelationships
      */
     public function __construct(
         $count = null,
@@ -162,7 +170,8 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
-        ?bool $expandRelationships = null
+        ?bool $expandRelationships = null,
+        array $excludeRelationships = [],
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -174,6 +183,7 @@ abstract class Factory
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
         $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
+        $this->excludeRelationships = $excludeRelationships;
     }
 
     /**
@@ -508,6 +518,8 @@ abstract class Factory
             ->map($evaluateRelations = function ($attribute) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
+                } elseif ($attribute instanceof self && in_array($attribute->modelName(), $this->excludeRelationships)) {
+                   $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
@@ -776,9 +788,9 @@ abstract class Factory
      *
      * @return static
      */
-    public function withoutParents()
+    public function withoutParents($parents = [])
     {
-        return $this->newInstance(['expandRelationships' => false]);
+        return $this->newInstance(! $parents ? ['expandRelationships' => false] : ['excludeRelationships' => $parents]);
     }
 
     /**
