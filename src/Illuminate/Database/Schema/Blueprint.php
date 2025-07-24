@@ -416,6 +416,21 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given columns should be dropped.
+     *
+     * Alias for self::dropColumn().
+     *
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropColumns($columns)
+    {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        return $this->addCommand('dropColumn', compact('columns'));
+    }
+
+    /**
      * Indicate that the given columns should be renamed.
      *
      * @param  string  $from
