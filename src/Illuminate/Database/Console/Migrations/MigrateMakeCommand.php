@@ -21,7 +21,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration (Deprecated)}
+        {--before= : Generate this migration to run before another existing migration}';
 
     /**
      * The console command description.
@@ -108,6 +109,19 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      */
     protected function writeMigration($name, $table, $create)
     {
+        $path = $this->getMigrationPath();
+        $before = $this->option('before');
+        $timestamp = null;
+
+        if ($before) {
+            $timestamp = $this->calculateTimestampBefore($path, $before);
+
+            if (! $timestamp) {
+                $this->components->error("Could not find a migration containing [{$before}].");
+                return;
+            }
+        }
+
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
@@ -141,5 +155,56 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         return [
             'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
         ];
+    }
+
+    /**
+     * Calculate timestamp to place migration before another migration.
+     *
+     * @param  string  $path
+     * @param  string  $beforeName
+     * @return string|null
+     */
+    protected function calculateTimestampBefore($path, $beforeName)
+    {
+        $files = glob($path.'/*.php');
+
+        if (empty($files)) {
+            return null;
+        }
+
+        // Sort files to ensure consistent ordering
+        sort($files);
+
+        foreach ($files as $file) {
+            $filename = basename($file);
+
+            if (Str::contains($filename, $beforeName)) {
+                // Extract timestamp from filename
+                if (preg_match('/^(\d{4}_\d{2}_\d{2}_\d{6})_/', $filename, $matches)) {
+                    $targetTimestamp = $matches[1];
+
+                    // Convert to DateTime and subtract 1 second
+                    $year = substr($targetTimestamp, 0, 4);
+                    $month = substr($targetTimestamp, 5, 2);
+                    $day = substr($targetTimestamp, 8, 2);
+                    $time = substr($targetTimestamp, 11, 6);
+                    $hour = substr($time, 0, 2);
+                    $minute = substr($time, 2, 2);
+                    $second = substr($time, 4, 2);
+
+                    try {
+                        $datetime = new \DateTime("{$year}-{$month}-{$day} {$hour}:{$minute}:{$second}");
+                        $datetime->modify('-1 second');
+
+                        return $datetime->format('Y_m_d_His');
+                    } catch (\Exception $e) {
+                        // If datetime parsing fails, fallback to null
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }
