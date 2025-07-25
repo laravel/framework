@@ -125,7 +125,7 @@ trait HasRelationships
 
             $this::resolveRelationUsing(
                 $relation->relationName(),
-                function (Model $model) use ($relation, $relationArguments, &$relationObject): Relation {
+                function (Model $model) use ($relation, $relationArguments): Relation {
                     $method = lcfirst(class_basename(get_class($relation)));
 
                     return $model->{$method}(...$relationArguments);
