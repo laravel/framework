@@ -1682,7 +1682,7 @@ class PendingRequest
     /**
      * Listen to specific statusCode.
      *
-     * @return Closure
+     * @return $this
      */
     public function onStatus(int $statusCode, Closure $callback)
     {
