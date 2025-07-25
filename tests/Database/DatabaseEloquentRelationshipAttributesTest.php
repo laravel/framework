@@ -536,75 +536,89 @@ class DatabaseEloquentRelationshipAttributesTest extends TestCase
 
 #[BelongsTo(BookCase::class)]
 #[HasMany(Price::class, null, 'custom_id', 'id')]
-class Book extends Model {
+class Book extends Model
+{
     protected $guarded = [];
 }
 
 #[HasMany(Book::class)]
-class BookCase extends Model {
+class BookCase extends Model
+{
     protected $guarded = [];
 }
 
 #[HasOne(Manufacturer::class)]
-class Computer extends Model {
+class Computer extends Model
+{
     protected $guarded = [];
 }
 
 #[HasMany(User::class)]
 #[HasManyThrough(Post::class, User::class)]
-class Country extends Model {
+class Country extends Model
+{
     protected $guarded = [];
 }
 
 #[MorphTo('imageable')]
-class Image extends Model {
+class Image extends Model
+{
     protected $guarded = [];
 }
 
 #[HasMany(LibraryBook::class)]
-class Library extends Model {
+class Library extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsTo(Library::class)]
-class LibraryBook extends Book {
+class LibraryBook extends Book
+{
     protected $guarded = [];
 }
 
-class Manufacturer extends Model {
+class Manufacturer extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsTo(User::class)]
-class Phone extends Model {
+class Phone extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsTo(related: User::class, name: 'author')]
 #[MorphMany(Image::class, 'imageable')]
 #[MorphToMany(Tag::class, 'taggable')]
-class Post extends Model {
+class Post extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsTo(Book::class, null, 'custom_id', 'id')]
-class Price extends Model {
+class Price extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsToMany(User::class)]
-class Role extends Model {
+class Role extends Model
+{
     protected $guarded = [];
 }
 
 #[HasOneThrough(Manufacturer::class, Computer::class)]
 #[HasOne(Computer::class)]
-class Seller extends Model {
+class Seller extends Model
+{
     protected $guarded = [];
 }
 
 #[MorphedByMany(Post::class, 'taggable')]
-class Tag extends Model {
+class Tag extends Model
+{
     protected $guarded = [];
 }
 
@@ -613,13 +627,13 @@ class Tag extends Model {
 #[HasMany(WorkBook::class)]
 #[HasOne(Phone::class)]
 #[MorphOne(Image::class, 'imageable')]
-class User extends Model {
-    protected $table = 'users';
-
+class User extends Model
+{
     protected $guarded = [];
 }
 
 #[BelongsTo(User::class)]
-final class WorkBook extends Book {
+final class WorkBook extends Book
+{
     protected $guarded = [];
 }

@@ -73,7 +73,7 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
-     * The relations attributes configuration
+     * The relations attributes configuration.
      *
      * @var array<class-string, RelationAttribute>
      */
@@ -140,7 +140,7 @@ trait HasRelationships
         foreach (self::$relationsAttributes[$class] as $relatedClass => $relationConfig) {
             $related = new $relatedClass();
 
-            $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();
+            $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()).'_'.$related->getKeyName();
             if (! isset($this->{$foreignKey}) || blank($this->{$foreignKey})) {
                 $this->{$foreignKey} = $this->getAttribute($foreignKey);
             }

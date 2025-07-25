@@ -35,7 +35,7 @@ final class BelongsTo implements RelationAttribute
         $this->arguments = array_pad($this->arguments, 4, null);
 
         if ($this->arguments[1] === null) {
-            $this->arguments[1] = Str::snake(class_basename($this->related)) . '_id';
+            $this->arguments[1] = Str::snake(class_basename($this->related)).'_id';
         }
 
         if ($this->arguments[2] === null) {

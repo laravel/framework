@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace Illuminate\Database\Eloquent\Attributes\Relations;
 
 /**
