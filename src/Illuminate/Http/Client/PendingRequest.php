@@ -1698,7 +1698,7 @@ class PendingRequest
      */
     public function dispatchStatusCodeListener(Response $response)
     {
-        if(isset($this->listeners[$response->status()])) {
+        if (isset($this->listeners[$response->status()])) {
             return $this->listeners[$response->status()]($response);
         }
         return $response;
