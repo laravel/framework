@@ -123,7 +123,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         }
 
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $timestamp
         );
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
