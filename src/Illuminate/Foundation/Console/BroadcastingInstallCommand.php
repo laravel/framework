@@ -312,9 +312,7 @@ class BroadcastingInstallCommand extends Command
             ];
         }
 
-        $filePath = array_filter($filePaths, function ($path) {
-            return file_exists($path);
-        })[0] ?? null;
+        $filePath = collect($filePaths)->filter(fn ($path) => file_exists($path))->first();
 
         if (! $filePath) {
             $this->components->warn("Could not find file [{$filePaths[0]}]. Skipping automatic Echo configuration.");
