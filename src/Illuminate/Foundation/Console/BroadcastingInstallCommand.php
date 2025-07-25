@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -322,36 +323,125 @@ class BroadcastingInstallCommand extends Command
 
         $contents = file_get_contents($filePath);
 
-        $echoCode = <<<JS
-        import { configureEcho } from '{$importPath}';
+        $echoLines = [
+            "import { configureEcho, echo } from '{$importPath}';",
+            <<<JS
 
-        configureEcho({
-            broadcaster: '{$this->driver}',
-        });
-        JS;
+            configureEcho({
+                broadcaster: '{$this->driver}',
+            });
+            JS
+        ];
 
-        preg_match_all('/^import .+;$/m', $contents, $matches);
+        $lines = explode(PHP_EOL, $contents);
 
-        if (empty($matches[0])) {
-            // Add the Echo configuration to the top of the file if no import statements are found...
-            $newContents = $echoCode.PHP_EOL.$contents;
+        $lastImportLine = 0;
+        $importOpen = false;
+        $configureEchoExists = false;
+        $currentImport = '';
+        $imports = [];
 
-            file_put_contents($filePath, $newContents);
-        } else {
-            // Add Echo configuration after the last import...
-            $lastImport = end($matches[0]);
+        foreach ($lines as $index => $line) {
+            if (str_contains($line, 'configureEcho')) {
+                // If the Echo configuration already exists, skip...
+                $this->components->warn('Echo configuration already exists in ['.basename($filePath).']. Skipping.');
+                $configureEchoExists = true;
+            }
 
-            $positionOfLastImport = strrpos($contents, $lastImport);
+            if (str_starts_with($line, 'import ')) {
+                $lastImportLine = $index;
+                $currentImport = $line;
+                $importOpen = true;
+            }
 
-            if ($positionOfLastImport !== false) {
-                $insertPosition = $positionOfLastImport + strlen($lastImport);
-                $newContents = substr($contents, 0, $insertPosition).PHP_EOL.$echoCode.substr($contents, $insertPosition);
+            if ($importOpen) {
+                if ($line !== $currentImport) {
+                    // If the current import line is different from the last one, add it to the imports array...
+                    $currentImport .= ' '.$line;
+                }
+            }
 
-                file_put_contents($filePath, $newContents);
+            if ($importOpen && str_contains($line, ' from ')) {
+                $importOpen = false;
+                $lastImportLine = $index;
+
+                $imports[] = $currentImport;
             }
         }
 
+        $imports = collect($imports)->map(
+            fn ($import) => str($import)->replace(PHP_EOL, ' ')->trim()->replace('"', "'")->rtrim(';')->toString()
+        )->mapWithKeys(function ($import) {
+            $imported = str($import)
+                ->before(' from ')
+                ->after('import')
+                ->trim('{} ')
+                ->explode(',')
+                ->map(fn ($part) => trim($part))
+                ->filter();
+            $from = str($import)->after(' from ')->trim("' ")->toString();
+
+            return [$from => $imported];
+        });
+
+        $added = $this->addInertiaRouterBefore($lines, $imports, $lastImportLine);
+
+        if ($added) {
+            $lastImportLine++;
+        }
+
+        if (! $configureEchoExists) {
+            array_splice($lines, $lastImportLine + 1, 0, $echoLines);
+            $lastImportLine++;
+        }
+
+        file_put_contents($filePath, implode(PHP_EOL, $lines));
+
         $this->components->info('Echo configuration added to ['.basename($filePath).'].');
+    }
+
+    /**
+     * Add Inertia router import if Inertia is used.
+     *
+     * @param  array  $lines
+     * @param  \Illuminate\Support\Collection  $imports
+     * @return bool
+     */
+    protected function addInertiaRouterBefore(array &$lines, Collection $imports, int $lastImportLine): bool
+    {
+        $inertiaImport = $this->inertiaImport();
+
+        if (! $inertiaImport) {
+            return false;
+        }
+
+        $routerImport = "import { router } from '{$inertiaImport}';";
+
+        $content = <<<'JS'
+
+        router.on('before', (event) => {
+            const id = echo().socketId();
+
+            if (id) {
+                event.detail.visit.headers['X-Socket-ID'] = id;
+            }
+        });
+        JS;
+
+        if (! $imports->has($inertiaImport) || ! in_array('router', $imports->get($inertiaImport)->all())) {
+            array_splice($lines, $lastImportLine + 1, 0, [
+                $routerImport,
+                $content,
+            ]);
+
+            return true;
+        }
+
+        array_splice($lines, $lastImportLine + 1, 0, [
+            $content,
+        ]);
+
+        return true;
     }
 
     /**
@@ -491,6 +581,24 @@ class BroadcastingInstallCommand extends Command
     protected function appUsesVue(): bool
     {
         return $this->packageDependenciesInclude('vue');
+    }
+
+    /**
+     * Detect if the user is using Vue.
+     *
+     * @return bool
+     */
+    protected function inertiaImport(): ?string
+    {
+        $packages = ['@inertiajs/vue3', '@inertiajs/react', '@inertiajs/svelte'];
+
+        foreach ($packages as $package) {
+            if ($this->packageDependenciesInclude($package)) {
+                return $package;
+            }
+        }
+
+        return null;
     }
 
     /**
