@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Attributes\Relations\RelationAttribute;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use ReflectionAttribute;
+use ReflectionClass;
 
 trait HasRelationships
 {
@@ -70,6 +73,13 @@ trait HasRelationships
     protected static $relationResolvers = [];
 
     /**
+     * The relations attributes configuration
+     *
+     * @var array<class-string, RelationAttribute>
+     */
+    private static $relationsAttributes = [];
+
+    /**
      * Get the dynamic relation resolver if defined or inherited, or return null.
      *
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -77,9 +87,16 @@ trait HasRelationships
      * @param  class-string<TRelatedModel>  $class
      * @param  string  $key
      * @return Closure|null
+     *
+     * @throws \ReflectionException
      */
     public function relationResolver($class, $key)
     {
+        if (! isset(self::$relationsAttributes[$class])) {
+            self::$relationsAttributes[$class] = [];
+            $this->resolveRelationshipAttributes($class);
+        }
+
         if ($resolver = static::$relationResolvers[$class][$key] ?? null) {
             return $resolver;
         }
@@ -89,6 +106,45 @@ trait HasRelationships
         }
 
         return null;
+    }
+
+    /**
+     * @param  class-string  $class
+     *
+     * @throws \ReflectionException
+     */
+    private function resolveRelationshipAttributes(string $class): void
+    {
+        $classReflection = new ReflectionClass($class);
+        $attributes = $classReflection->getAttributes(RelationAttribute::class, ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($attributes as $attribute) {
+            /** @var RelationAttribute $relation */
+            $relation = $attribute->newInstance();
+            $relationArguments = $relation->relationArguments();
+
+            $this::resolveRelationUsing(
+                $relation->relationName(),
+                function (Model $model) use ($relation, $relationArguments, &$relationObject): Relation {
+                    $method = lcfirst(class_basename(get_class($relation)));
+
+                    return $model->{$method}(...$relationArguments);
+                }
+            );
+
+            if ($relation instanceof BelongsTo) {
+                self::$relationsAttributes[$class][$relation->related ?? $relation->morphName] = $relation;
+            }
+        }
+
+        foreach (self::$relationsAttributes[$class] as $relatedClass => $relationConfig) {
+            $related = new $relatedClass();
+
+            $foreignKey = $relationConfig->relationArguments()[1] ?? Str::snake($relationConfig->relationName()) . '_' . $related->getKeyName();
+            if (! isset($this->{$foreignKey}) || blank($this->{$foreignKey})) {
+                $this->{$foreignKey} = $this->getAttribute($foreignKey);
+            }
+        }
     }
 
     /**
