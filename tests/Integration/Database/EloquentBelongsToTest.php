@@ -67,7 +67,7 @@ class EloquentBelongsToTest extends DatabaseTestCase
         $child->parent()->associate($child->id);
 
         $this->assertEquals($child->id, $child->parent_id);
-        $this->assertTrue($child->relationNotLoaded('parent'));
+        $this->assertTrue($child->not()->relationLoaded('parent'));
     }
 
     public function testParentIsNotNull()

@@ -262,7 +262,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        if ($this->resource->relationNotLoaded($relationship)) {
+        if (! $this->resource->relationLoaded($relationship)) {
             return value($default);
         }
 

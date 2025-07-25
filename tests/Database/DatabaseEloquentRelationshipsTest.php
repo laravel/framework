@@ -77,7 +77,7 @@ class DatabaseEloquentRelationshipsTest extends TestCase
         $this->assertTrue($post->isClean());
 
         // we must unset relation even if attributes are clean
-        $this->assertTrue($post->relationNotLoaded('author'));
+        $this->assertTrue($post->not()->relationLoaded('author'));
     }
 
     public function testPendingHasThroughRelationship()

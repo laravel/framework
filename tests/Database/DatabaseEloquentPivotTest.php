@@ -179,13 +179,13 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertSame('foo', $original->pivotParent);
         $this->assertNull($pivot->pivotParent);
         $this->assertTrue($original->relationLoaded('bar'));
-        $this->assertTrue($pivot->relationNotLoaded('bar'));
+        $this->assertTrue($pivot->not()->relationLoaded('bar'));
 
         $pivot = $original->unsetRelations();
 
         $this->assertSame($pivot, $original);
         $this->assertNull($pivot->pivotParent);
-        $this->assertTrue($pivot->relationNotLoaded('bar'));
+        $this->assertTrue($pivot->not()->relationLoaded('bar'));
     }
 }
 
