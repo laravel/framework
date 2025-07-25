@@ -201,9 +201,9 @@ class PendingRequest
     protected $request;
 
     /**
-     * all status code listeners
+     * all status code listeners.
      *
-     * @var array 
+     * @var array
      */
     public $listeners = [];
 
@@ -1681,23 +1681,25 @@ class PendingRequest
     }
 
     /**
-     * Listen to specific statusCode
+     * Listen to specific statusCode.
      * 
      * @return Closure
      */
-    public function onStatus(int $statusCode, Closure $callback){
+    public function onStatus(int $statusCode, Closure $callback)
+    {
         $this->listeners[$statusCode] = $callback;
         return $this;
     }
 
     /**
-     * Dispatch the status code listener if exists
+     * Dispatch the status code listener if exists.
      * 
      * @param Response $response
      * 
      */
-    public function dispatchStatusCodeListener(Response $response){
-        if(isset($this->listeners[$response->status()])){
+    public function dispatchStatusCodeListener(Response $response)
+    {
+        if(isset($this->listeners[$response->status()])) {
             return $this->listeners[$response->status()]($response);
         }
         return $response;
