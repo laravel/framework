@@ -14,7 +14,9 @@ class HigherOrderNotProxy
     /**
      * @param  TModel  $origin
      */
-    public function __construct(private $origin) {}
+    public function __construct(private $origin)
+    {
+    }
 
     public function __call($method, $parameters)
     {

@@ -59,4 +59,6 @@ class TestNegatableModel extends Model
     }
 }
 
-class Foo extends Model {}
+class Foo extends Model
+{
+}

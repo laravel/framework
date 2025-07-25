@@ -6,6 +6,7 @@ use Illuminate\Negatable\HigherOrderNotProxy;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
  * @mixin TModel
  */
 trait Negatable
