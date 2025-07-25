@@ -150,7 +150,7 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Create a new batch of queueable jobs.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $jobs
+     * @param  \Illuminate\Support\Collection|mixed  $jobs
      * @return \Illuminate\Bus\PendingBatch
      */
     public function batch($jobs)
@@ -187,7 +187,7 @@ class Dispatcher implements QueueingDispatcher
      * Retrieve the handler for a command.
      *
      * @param  mixed  $command
-     * @return bool|mixed
+     * @return mixed
      */
     public function getCommandHandler($command)
     {
