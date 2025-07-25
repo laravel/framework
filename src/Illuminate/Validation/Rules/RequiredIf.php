@@ -18,7 +18,7 @@ class RequiredIf implements Stringable
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  (\Closure(): bool)|bool $condition
+     * @param  (\Closure(): bool)|bool  $condition
      */
     public function __construct($condition)
     {
