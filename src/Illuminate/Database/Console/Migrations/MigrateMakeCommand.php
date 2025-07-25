@@ -21,7 +21,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration (Deprecated)}
+        {--before= : Generate this migration to run before another existing migration}';
 
     /**
      * The console command description.
@@ -104,10 +105,25 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
+     * @throws \Exception
      * @return void
      */
     protected function writeMigration($name, $table, $create)
     {
+        $path = $this->getMigrationPath();
+
+        $before = $this->option('before');
+        $timestamp = null;
+
+        if ($before) {
+            $timestamp = $this->calculateTimestampBeofre($path,$before);
+
+            if (! $timestamp) {
+                $this->components->error("Could not find a migration containing [$before].");
+                return;
+            }
+        }
+
         $file = $this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
         );
@@ -141,5 +157,33 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         return [
             'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
         ];
+    }
+
+    protected function calculateTimestampBeofre($path,$beforeName): ?string
+    {
+        $files = glob($path.'/*.php');
+
+        // Sort for safety
+        sort($files);
+
+        foreach ($files as $file) {
+            $filename = basename($file);
+
+            if (Str::contains($filename, $beforeName)) {
+                $parts=explode('_', $filename, 5);
+
+                if (count($parts) < 4) {
+                    return null;
+                }
+
+                $timestamp = implode('_', array_slice($parts, 0, 4));
+                $numeric = (int) str_replace('_', '', $timestamp);
+
+                $newNumeric = max($numeric - 1, 0);
+                return now()->format('Y_m_d_').str_pad($newNumeric % 1000000, 6, '0', STR_PAD_LEFT);
+            }
+        }
+
+        return null;
     }
 }
