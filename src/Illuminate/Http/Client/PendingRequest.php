@@ -1063,6 +1063,7 @@ class PendingRequest
                 return tap($this->newResponse($message), function ($response) {
                     $this->populateResponse($response);
                     $this->dispatchResponseReceivedEvent($response);
+                    $this->dispatchStatusCodeListener($response);
                 });
             })
             ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
