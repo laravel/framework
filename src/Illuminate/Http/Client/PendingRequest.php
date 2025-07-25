@@ -201,6 +201,14 @@ class PendingRequest
     protected $request;
 
     /**
+     * all status code listeners
+     *
+     * @var array 
+     */
+    public $listeners = [];
+
+
+    /**
      * The Guzzle request options that are mergeable via array_merge_recursive.
      *
      * @var array
@@ -909,7 +917,7 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
+                return $this->dispatchStatsCodeListener(tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
@@ -941,7 +949,7 @@ class PendingRequest
                             $response->throw();
                         }
                     }
-                });
+                }));
             } catch (TransferException $e) {
                 if ($e instanceof ConnectException) {
                     $this->marshalConnectionException($e);
@@ -1670,5 +1678,28 @@ class PendingRequest
     public function getOptions()
     {
         return $this->options;
+    }
+
+    /**
+     * Listen to specific statusCode
+     * 
+     * @return Closure
+     */
+    public function onStatus(int $statusCode, Closure $callback){
+        $this->listeners[$statusCode] = $callback;
+        return $this;
+    }
+
+    /**
+     * Dispatch the status code listener if exists
+     * 
+     * @param Response $response
+     * 
+     */
+    public function dispatchStatsCodeListener(Response $response){
+        if(isset($this->listeners[$response->status()])){
+            return $this->listeners[$response->status()]($response);
+        }
+        return $response;
     }
 }
