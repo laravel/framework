@@ -207,7 +207,6 @@ class PendingRequest
      */
     public $listeners = [];
 
-
     /**
      * The Guzzle request options that are mergeable via array_merge_recursive.
      *
@@ -1688,14 +1687,14 @@ class PendingRequest
     public function onStatus(int $statusCode, Closure $callback)
     {
         $this->listeners[$statusCode] = $callback;
+
         return $this;
     }
 
     /**
      * Dispatch the status code listener if exists.
      * 
-     * @param Response $response
-     * 
+     * @param  Response  $response
      */
     public function dispatchStatusCodeListener(Response $response)
     {
