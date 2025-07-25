@@ -49,6 +49,13 @@ class Pipeline implements PipelineContract
     protected $finally;
 
     /**
+     * Indicates whether to wrap the pipeline in a database transaction.
+     *
+     * @var bool
+     */
+    protected $withinTransactions = false;
+
+    /**
      * Create a new class instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -123,7 +130,9 @@ class Pipeline implements PipelineContract
         );
 
         try {
-            return $pipeline($this->passable);
+            return $this->withinTransactions
+                ? $this->container->make('db')->transaction(fn () => $pipeline($this->passable))
+                : $pipeline($this->passable);
         } finally {
             if ($this->finally) {
                 ($this->finally)($this->passable);
@@ -243,6 +252,19 @@ class Pipeline implements PipelineContract
     protected function pipes()
     {
         return $this->pipes;
+    }
+
+    /**
+     * Execute each pipeline step within a database transaction.
+     *
+     * @param  bool  $withinTransactions
+     * @return $this
+     */
+    public function withinTransactions(bool $withinTransactions = true)
+    {
+        $this->withinTransactions = $withinTransactions;
+
+        return $this;
     }
 
     /**

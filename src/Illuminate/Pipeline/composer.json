@@ -23,6 +23,9 @@
             "Illuminate\\Pipeline\\": ""
         }
     },
+    "suggest": {
+        "illuminate/database": "Required to use database transactions (^12.0)."
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "12.x-dev"

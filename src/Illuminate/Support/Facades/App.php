@@ -137,6 +137,8 @@ namespace Illuminate\Support\Facades;
  * @method static void forgetInstance(string $abstract)
  * @method static void forgetInstances()
  * @method static void forgetScopedInstances()
+ * @method static void resolveEnvironmentUsing(callable|string|null $callback)
+ * @method static bool currentEnvironmentIs(array|string $environments)
  * @method static \Illuminate\Foundation\Application getInstance()
  * @method static \Illuminate\Contracts\Container\Container|\Illuminate\Foundation\Application setInstance(\Illuminate\Contracts\Container\Container|null $container = null)
  * @method static void macro(string $name, object|callable $macro)
