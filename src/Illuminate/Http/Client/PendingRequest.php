@@ -1681,7 +1681,7 @@ class PendingRequest
 
     /**
      * Listen to specific statusCode.
-     * 
+     *
      * @return Closure
      */
     public function onStatus(int $statusCode, Closure $callback)
@@ -1693,7 +1693,7 @@ class PendingRequest
 
     /**
      * Dispatch the status code listener if exists.
-     * 
+     *
      * @param  Response  $response
      */
     public function dispatchStatusCodeListener(Response $response)
@@ -1701,6 +1701,7 @@ class PendingRequest
         if (isset($this->listeners[$response->status()])) {
             return $this->listeners[$response->status()]($response);
         }
+
         return $response;
     }
 }
