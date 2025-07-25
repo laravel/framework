@@ -29,6 +29,8 @@ trait InteractsWithDatabase
             foreach ($table as $item) {
                 $this->assertDatabaseHas($item, $data, $connection);
             }
+
+            return $this;
         }
 
         if ($table instanceof Model) {
@@ -59,6 +61,8 @@ trait InteractsWithDatabase
             foreach ($table as $item) {
                 $this->assertDatabaseMissing($item, $data, $connection);
             }
+
+            return $this;
         }
 
         if ($table instanceof Model) {
@@ -125,6 +129,8 @@ trait InteractsWithDatabase
             foreach ($table as $item) {
                 $this->assertSoftDeleted($item, $data, $connection);
             }
+
+            return $this;
         }
 
         if ($this->isSoftDeletableModel($table)) {
@@ -163,6 +169,8 @@ trait InteractsWithDatabase
             foreach ($table as $item) {
                 $this->assertNotSoftDeleted($item, $data, $connection);
             }
+
+            return $this;
         }
 
         if ($this->isSoftDeletableModel($table)) {
