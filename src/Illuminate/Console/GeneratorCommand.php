@@ -158,8 +158,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             return false;
         }
 
-        $name = $this->qualifyClass($this->getNameInput());
-        $name = Str::studly($name);
+        $name = Str::studly($this->getNameInput());
+        $name = $this->qualifyClass($name);
 
         $path = $this->getPath($name);
 
@@ -168,7 +168,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
-             $this->alreadyExists($this->getNameInput())) {
+             $this->alreadyExists($name)) {
             $this->components->error($this->type.' already exists.');
 
             return false;
