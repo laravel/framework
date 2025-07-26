@@ -50,7 +50,7 @@ fi
 CONVENTIONAL_REGEX='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-zA-Z0-9_-]+\))?: .{1,}'
 
 # Log the commit message for debugging (safely quoted)
-printf "${YELLOW}Checking message: %q${NC}\n" "$COMMIT_MSG"
+printf "${YELLOW}Checking message: %s${NC}\n" "$COMMIT_MSG"
 
 if printf "%s" "$COMMIT_MSG" | grep -Eq "$CONVENTIONAL_REGEX"; then
     echo "${GREEN}✅ Commit message format is valid${NC}"
