@@ -120,21 +120,15 @@ class AttributeRouteRegistrar
             return null;
         }
 
-        try {
-            /** @var Group $group */
-            $group = $attributes[0]->newInstance();
+        /** @var Group $group */
+        $group = $attributes[0]->newInstance();
 
-            return array_filter([
-                'prefix' => $group->prefix,
-                'middleware' => $group->middleware,
-                'as' => $group->name,
-                'where' => $group->where,
-            ]);
-        } catch (\Throwable $e) {
-            report($e);
-
-            return null;
-        }
+        return array_filter([
+            'prefix' => $group->prefix,
+            'middleware' => $group->middleware,
+            'as' => $group->name,
+            'where' => $group->where,
+        ]);
     }
 
     /**
