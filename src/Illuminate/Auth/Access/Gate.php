@@ -402,7 +402,7 @@ class Gate implements GateContract
      * Inspect the user for the given ability.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  array{class-string|object, ...} $arguments
+     * @param  array{class-string|object, ...}  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = [])
