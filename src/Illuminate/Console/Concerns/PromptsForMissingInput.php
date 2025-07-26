@@ -62,11 +62,15 @@ trait PromptsForMissingInput
                     placeholder: $placeholder ?? '',
                     validate: fn ($value) => empty(trim($value)) ? "The {$argument->getName()} is required." : null,
                 );
-
                 $words = preg_split('/\s+/', trim($answer));
-                $formattedAnswer = array_shift($words).implode('', array_map('ucfirst', $words));
+                $isMakeCommand = $this->getName() && str_starts_with($this->getName(), 'make:');
 
-                $input->setArgument($argument->getName(), $argument->isArray() ? [$formattedAnswer] : $formattedAnswer);
+                if ($isMakeCommand) {
+                    $firstWord = array_shift($words);
+                    $answer = $firstWord.implode('', array_map('ucfirst', $words));
+                }
+
+                $input->setArgument($argument->getName(), $argument->isArray() ? [$answer] : $answer);
             })
             ->isNotEmpty();
 
