@@ -289,7 +289,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Register a callback to determine if an exception should not be reported.
      *
-     * @param  callable  $dontReportWhen
+     * @param  (callable(\Throwable): bool)  $dontReportWhen
      * @return $this
      */
     public function dontReportWhen(callable $dontReportWhen)
