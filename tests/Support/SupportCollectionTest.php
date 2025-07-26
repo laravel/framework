@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\InvalidCollectionException;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
@@ -2876,6 +2877,49 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEmpty($instance->toArray());
         $this->assertSame(JSON_ERROR_DEPTH, json_last_error());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFrom($collection)
+    {
+        $data = [1, 2, 3];
+
+        $instance = $collection::from($data);
+
+        $this->assertSame([1, 2, 3], $instance->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testFromThrowsIfDataNotEnumerable($collection)
+    {
+        $data = 1;
+
+        $this->expectException(InvalidCollectionException::class);
+        $this->expectExceptionMessage('Trying to create a collection from an invalid list of items.');
+
+        $collection::from($data);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testTryFrom($collection)
+    {
+        $this->assertSame([1, 2, 3], $collection::tryFrom([1, 2, 3])->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testTryFromReturnsEmptyCollectionWhenItemsNotEnumerable($collection)
+    {
+        $this->assertEmpty($collection::tryFrom(1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testTryFromReturnsEmptyCollectionWhenInvalid($collection)
+    {
+        $data = [];
+
+        $collection::tryFrom($data);
+
+        $this->assertSame([], $collection->all());
     }
 
     #[DataProvider('collectionClassProvider')]

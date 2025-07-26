@@ -6,6 +6,7 @@ use BackedEnum;
 use CachingIterator;
 use Closure;
 use Exception;
+use Illuminate\Support\InvalidCollectionException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
@@ -187,6 +188,46 @@ trait EnumeratesValues
     public static function fromJson($json, $depth = 512, $flags = 0)
     {
         return new static(json_decode($json, true, $depth, $flags));
+    }
+
+    /**
+     * Attempt to create a new collection from a list of items, or throw an exception.
+     *
+     * @template TMakeKey of array-key
+     * @template TMakeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return static<TMakeKey, TMakeValue>
+     *
+     * @throws \Illuminate\Support\InvalidCollectionException
+     */
+    public static function from($items)
+    {
+        $collection = new static($items);
+
+        if ($collection->first() === $items) {
+            throw new InvalidCollectionException('Trying to create a collection from an not enumerable list of items.');
+        }
+
+        return $collection;
+    }
+
+    /**
+     * Attempt to create a new collection with items, or create a new empty instance when if fails.
+     *
+     * @template TMakeKey of array-key
+     * @template TMakeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
+     * @return static<TMakeKey, TMakeValue>
+     */
+    public static function tryFrom($items)
+    {
+        try {
+            return static::from($items);
+        } catch (InvalidCollectionException) {
+            return static::empty();
+        }
     }
 
     /**
