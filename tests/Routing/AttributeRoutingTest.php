@@ -26,6 +26,7 @@ class BasicController implements AttributeRouteController
     {
         return 'get success';
     }
+
     #[Post('/post')]
     public function post()
     {
