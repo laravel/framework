@@ -60,7 +60,7 @@ trait PromptsForMissingInput
                 $answer = text(
                     label: $label,
                     placeholder: $placeholder ?? '',
-                    validate: fn ($value) => empty(trim($value)) ? "The {$argument->getName()} is required." : null,
+                    validate: fn ($value) => empty($value) ? "The {$argument->getName()} is required." : null,
                 );
 
                 $input->setArgument($argument->getName(), $argument->isArray() ? [$answer] : $answer);
