@@ -561,6 +561,8 @@ class AssertTest extends TestCase
 
         $assert->where('bar', BackedEnum::test);
 
+        BackedEnum::fr
+
         $assert = AssertableJson::fromArray([
             'bar' => BackedEnum::test_empty->value,
         ]);
