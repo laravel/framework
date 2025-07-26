@@ -219,14 +219,14 @@ trait EnumeratesValues
      * @template TMakeValue
      *
      * @param  \Illuminate\Contracts\Support\Arrayable<TMakeKey, TMakeValue>|iterable<TMakeKey, TMakeValue>|null  $items
-     * @return static<TMakeKey, TMakeValue>
+     * @return static<TMakeKey, TMakeValue>|null
      */
     public static function tryFrom($items)
     {
         try {
             return static::from($items);
         } catch (InvalidCollectionException) {
-            return static::empty();
+            return null;
         }
     }
 

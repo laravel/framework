@@ -2895,7 +2895,7 @@ class SupportCollectionTest extends TestCase
         $data = 1;
 
         $this->expectException(InvalidCollectionException::class);
-        $this->expectExceptionMessage('Trying to create a collection from an invalid list of items.');
+        $this->expectExceptionMessage('Trying to create a collection from an not enumerable list of items.');
 
         $collection::from($data);
     }
@@ -2907,19 +2907,9 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testTryFromReturnsEmptyCollectionWhenItemsNotEnumerable($collection)
+    public function testTryFromReturnsNullWhenItemsNotEnumerable($collection)
     {
-        $this->assertEmpty($collection::tryFrom(1));
-    }
-
-    #[DataProvider('collectionClassProvider')]
-    public function testTryFromReturnsEmptyCollectionWhenInvalid($collection)
-    {
-        $data = [];
-
-        $collection::tryFrom($data);
-
-        $this->assertSame([], $collection->all());
+        $this->assertNull($collection::tryFrom(1));
     }
 
     #[DataProvider('collectionClassProvider')]
