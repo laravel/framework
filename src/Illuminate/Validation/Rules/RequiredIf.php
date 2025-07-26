@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use InvalidArgumentException;
 use Stringable;
 
@@ -10,18 +11,18 @@ class RequiredIf implements Stringable
     /**
      * The condition that validates the attribute.
      *
-     * @var callable|bool
+     * @var (\Closure(): bool)|bool
      */
     public $condition;
 
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  callable|bool  $condition
+     * @param  (\Closure(): bool)|bool  $condition
      */
     public function __construct($condition)
     {
-        if (! is_string($condition)) {
+        if ($condition instanceof Closure || is_bool($condition)) {
             $this->condition = $condition;
         } else {
             throw new InvalidArgumentException('The provided condition must be a callable or boolean.');

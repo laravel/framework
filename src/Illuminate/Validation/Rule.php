@@ -144,7 +144,7 @@ class Rule
     /**
      * Get a required_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
     public static function requiredIf($callback)
@@ -155,7 +155,7 @@ class Rule
     /**
      * Get a exclude_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\ExcludeIf
      */
     public static function excludeIf($callback)
@@ -166,7 +166,7 @@ class Rule
     /**
      * Get a prohibited_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
     public static function prohibitedIf($callback)
