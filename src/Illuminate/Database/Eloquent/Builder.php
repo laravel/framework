@@ -393,6 +393,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Exclude the given models from the query results.
+     *
+     * @param  iterable|mixed  $models
+     * @return static
+     */
+    public function except($models): static
+    {
+        $keys = $models instanceof Model
+            ? $models->getKey()
+            : Collection::wrap($models)->modelKeys();
+
+        return $this->whereKeyNot($keys);
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
