@@ -166,7 +166,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
-             $this->alreadyExists(Str::studly($name))) {
+             $this->alreadyExists(Str::studly($this->getNameInput()))) {
             $this->components->error($this->type.' already exists.');
 
             return false;
