@@ -21,6 +21,7 @@ class Exceptions
     /**
      * Register a reportable callback.
      *
+     * @param  callable  $using
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
     public function report(callable $using)
@@ -31,6 +32,7 @@ class Exceptions
     /**
      * Register a reportable callback.
      *
+     * @param  callable  $reportUsing
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
     public function reportable(callable $reportUsing)
@@ -41,6 +43,7 @@ class Exceptions
     /**
      * Register a renderable callback.
      *
+     * @param  callable  $using
      * @return $this
      */
     public function render(callable $using)
@@ -53,6 +56,7 @@ class Exceptions
     /**
      * Register a renderable callback.
      *
+     * @param  callable  $renderUsing
      * @return $this
      */
     public function renderable(callable $renderUsing)
@@ -65,6 +69,7 @@ class Exceptions
     /**
      * Register a callback to prepare the final, rendered exception response.
      *
+     * @param  callable  $using
      * @return $this
      */
     public function respond(callable $using)
@@ -77,6 +82,7 @@ class Exceptions
     /**
      * Specify the callback that should be used to throttle reportable exceptions.
      *
+     * @param  callable  $throttleUsing
      * @return $this
      */
     public function throttle(callable $throttleUsing)
@@ -119,6 +125,7 @@ class Exceptions
     /**
      * Register a closure that should be used to build exception context data.
      *
+     * @param  \Closure  $contextCallback
      * @return $this
      */
     public function context(Closure $contextCallback)
@@ -131,6 +138,7 @@ class Exceptions
     /**
      * Indicate that the given exception type should not be reported.
      *
+     * @param  array|string  $class
      * @return $this
      */
     public function dontReport(array|string $class)
@@ -145,6 +153,7 @@ class Exceptions
     /**
      * Register a callback to determine if an exception should not be reported.
      *
+     * @param  callable  $dontReportWhen
      * @return $this
      */
     public function dontReportWhen(Closure $dontReportWhen)
@@ -169,6 +178,7 @@ class Exceptions
     /**
      * Indicate that the given attributes should never be flashed to the session on validation errors.
      *
+     * @param  array|string  $attributes
      * @return $this
      */
     public function dontFlash(array|string $attributes)
@@ -207,6 +217,7 @@ class Exceptions
     /**
      * Set the truncation length for request exception messages.
      *
+     * @param  int  $length
      * @return $this
      */
     public function truncateRequestExceptionsAt(int $length)
