@@ -65,6 +65,8 @@ class Env
         } else {
             static::$customAdapters[] = $callback;
         }
+
+        static::$repository = null;
     }
 
     /**
