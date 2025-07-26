@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
 
-class ValidationArrayRuleTest extends TestCase
+class ValidationArrRuleTest extends TestCase
 {
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {
