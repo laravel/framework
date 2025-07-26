@@ -28,7 +28,7 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
 
             $builder = m::mock(Builder::class);
             $builder->shouldReceive('join');
-            $parent = m::mock(User::class);
+            $parent = m::mock(DummyUser::class);
 
             $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
             $builder->shouldReceive('getModel')->andReturn($related);
@@ -46,7 +46,7 @@ class DatabaseEloquentBelongsToManyWithoutTouchingTest extends TestCase
     }
 }
 
-class User extends Model
+class DummyUser extends Model
 {
     protected $table = 'users';
     protected $fillable = ['id', 'email'];
@@ -65,6 +65,6 @@ class Article extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'article_user', 'article_id', 'user_id');
+        return $this->belongsToMany(DummyUser::class, 'article_user', 'article_id', 'user_id');
     }
 }
