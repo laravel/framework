@@ -1,0 +1,214 @@
+name: commitlint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - '12.x'    # Current main development branch
+      - '*.x'     # Version branches (10.x, 11.x, etc.)
+      - master    # Legacy main branch support
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    name: Validate Commit Messages (using Shell Script)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Make commitlint script executable
+        run: chmod +x bin/commitlint.sh
+
+      - name: Validate commit messages (Pull Request)
+        if: github.event_name == 'pull_request'
+        run: |
+          set -e
+          echo "🔍 Validating commit messages in pull request using shell script..."
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+          # Create a temporary directory for commit message files
+          mkdir -p /tmp/commit-msgs
+
+          # Get commit count and check if any commits exist (using rev-list for performance)
+          COMMIT_COUNT=$(git rev-list --count ${BASE_SHA}..${HEAD_SHA})
+          if [ "$COMMIT_COUNT" -eq 0 ]; then
+            echo "::warning::No commits found in pull request"
+            exit 0
+          fi
+
+          echo "Found $COMMIT_COUNT commits to validate"
+
+          # Use a temporary file to track validation status across subshell
+          VALIDATION_STATUS_FILE="/tmp/validation-status"
+          echo "success" > "$VALIDATION_STATUS_FILE"
+
+          # Set up cleanup trap
+          trap 'rm -f "$VALIDATION_STATUS_FILE" /tmp/commit-msgs/msg-* 2>/dev/null || true' EXIT
+
+          # Get all commits in the PR and validate each one
+          git log --format="%H|%s" ${BASE_SHA}..${HEAD_SHA} --reverse | while IFS='|' read -r commit_sha commit_msg; do
+            # Handle malformed commit entries gracefully
+            if [ -z "$commit_sha" ] || [ -z "$commit_msg" ]; then
+              echo "::warning::Skipping malformed commit entry"
+              continue
+            fi
+
+            # Skip special commits that don't need conventional format validation
+            if printf "%s" "$commit_msg" | grep -Eq "^(Merge|WIP|Revert|[0-9]+\.x|\[[0-9]+\.x\])"; then
+              echo "Skipping special commit: $commit_sha - $commit_msg"
+              continue
+            fi
+
+            echo "Validating commit: $commit_sha"
+            printf "Message: %q\n" "$commit_msg"
+
+            # Create a temporary file with the commit message (properly quoted)
+            TEMP_MSG_FILE="/tmp/commit-msgs/msg-${commit_sha}"
+            printf "%s" "$commit_msg" > "$TEMP_MSG_FILE"
+
+            # Run the commitlint script
+            if ! ./bin/commitlint.sh "$TEMP_MSG_FILE"; then
+              printf "::error::Commit %s failed validation: %q\n" "$commit_sha" "$commit_msg"
+              echo "failed" > "$VALIDATION_STATUS_FILE"
+            fi
+
+            rm -f "$TEMP_MSG_FILE"
+          done
+
+          # Check if any validation failed
+          VALIDATION_STATUS=$(cat "$VALIDATION_STATUS_FILE")
+          if [ "$VALIDATION_STATUS" = "failed" ]; then
+            echo "::error::One or more commit messages failed validation"
+            exit 1
+          fi
+
+      - name: Validate commit message (Push)
+        if: github.event_name == 'push'
+        run: |
+          set -e
+          echo "🔍 Validating latest commit message using shell script..."
+
+          # Set up cleanup trap
+          TEMP_MSG_FILE="/tmp/latest-commit-msg"
+          trap 'rm -f "$TEMP_MSG_FILE" 2>/dev/null || true' EXIT
+
+          # Get the latest commit message
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s")
+          printf "Validating: %q\n" "$COMMIT_MSG"
+
+          # Check if commit message is empty
+          if [ -z "$COMMIT_MSG" ]; then
+            echo "::error::Empty commit message found"
+            exit 1
+          fi
+
+          # Skip special commits that don't need conventional format validation
+          if printf "%s" "$COMMIT_MSG" | grep -Eq "^(Merge|WIP|Revert)"; then
+            echo "Skipping special commit: $COMMIT_MSG"
+            exit 0
+          fi
+
+          # Create a temporary file with the commit message (properly quoted)
+          printf "%s" "$COMMIT_MSG" > "$TEMP_MSG_FILE"
+
+          # Run the commitlint script
+          if ! ./bin/commitlint.sh "$TEMP_MSG_FILE"; then
+            printf "::error::Latest commit message failed validation: %q\n" "$COMMIT_MSG"
+            exit 1
+          fi
+
+      - name: Comment on PR (Failure)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comment = `## ❌ Commit Message Validation Failed
+
+            One or more commit messages in this pull request do not follow the [Conventional Commits](https://www.conventionalcommits.org/) format.
+
+            ### Expected format:
+            \`\`\`
+            type(scope): description
+            \`\`\`
+
+            ### Valid types:
+            - **feat**: A new feature
+            - **fix**: A bug fix
+            - **docs**: Documentation only changes
+            - **style**: Changes that do not affect the meaning of the code
+            - **refactor**: A code change that neither fixes a bug nor adds a feature
+            - **test**: Adding missing tests or correcting existing tests
+            - **chore**: Changes to the build process or auxiliary tools
+            - **perf**: A code change that improves performance
+            - **ci**: Changes to CI configuration files and scripts
+            - **build**: Changes that affect the build system
+            - **revert**: Reverts a previous commit
+
+            ### Special commits (automatically allowed):
+            - Commits starting with **Merge**, **WIP**, or **Revert** are automatically skipped
+
+            ### Examples:
+            - \`feat(auth): add user authentication\`
+            - \`fix(api): resolve validation error in user endpoint\`
+            - \`docs: update API documentation\`
+
+            Please update your commit messages to follow this format. You can use \`git commit --amend\` for the latest commit or \`git rebase -i\` for multiple commits.
+
+            For more information, see: [Laravel Contributions Guide](https://laravel.com/docs/12.x/contributions#semantic-commits)
+
+            ---
+            *This validation uses the same shell script as your local git hook (\`bin/commitlint.sh\`) to ensure consistency.*`;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: comment
+            });
+
+      - name: Comment on PR (Success)
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comment = `## ✅ Commit Message Validation Passed
+
+            All commit messages in this pull request follow the [Conventional Commits](https://www.conventionalcommits.org/) format. Great work! 🎉
+
+            *Validated using the shell script (\`bin/commitlint.sh\`) for consistency with local git hooks.*`;
+
+            // Check if we already commented on this PR to avoid spam
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number
+            });
+
+            const existingComment = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Commit Message Validation')
+            );
+
+            if (!existingComment) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: comment
+              });
+            }
