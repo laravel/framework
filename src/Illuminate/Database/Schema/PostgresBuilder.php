@@ -16,12 +16,25 @@ class PostgresBuilder extends Builder
     public function dropAllTables()
     {
         $tables = [];
+        $hypertables = [];
 
         $excludedTables = $this->connection->getConfig('dont_drop') ?? ['spatial_ref_sys'];
 
+        $hasTimescaleDb = ! empty($this->connection->select("SELECT 1 FROM pg_extension WHERE extname = 'timescaledb'"));
+
+        if ($hasTimescaleDb) {
+            $hypertables = array_column($this->connection->select(
+                "SELECT hypertable_schema || '.' || hypertable_name as name FROM timescaledb_information.hypertables"
+            ), 'name');
+        }
+
         foreach ($this->getTables($this->getCurrentSchemaListing()) as $table) {
-            if (empty(array_intersect([$table['name'], $table['schema_qualified_name']], $excludedTables))) {
-                $tables[] = $table['schema_qualified_name'];
+            if (! in_array($table['name'], $excludedTables) && ! in_array($table['schema_qualified_name'], $excludedTables)) {
+                if (in_array($table['schema_qualified_name'], $hypertables)) {
+                    $this->connection->statement("DROP TABLE IF EXISTS {$table['schema_qualified_name']} CASCADE");
+                } else {
+                    $tables[] = $table['schema_qualified_name'];
+                }
             }
         }
 
