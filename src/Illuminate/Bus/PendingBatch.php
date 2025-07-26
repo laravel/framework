@@ -237,14 +237,23 @@ class PendingBatch
     }
 
     /**
-     * Indicate that the batch should not be cancelled when a job within the batch fails.
-     *
-     * @param  bool  $allowFailures
-     * @return $this
+     * Indicate that the batch should not be cancelled when a job within the batch fails;
+     * optionally add callbacks to be executed upon each job failure (this may be useful for
+     * running other jobs when a job fails).
      */
-    public function allowFailures($allowFailures = true)
+    public function allowFailures(bool|callable|Closure|array $param = true): self
     {
-        $this->options['allowFailures'] = $allowFailures;
+        if (! is_bool($param)) {
+            $param = Arr::wrap($param);
+
+            foreach ($param as $callback) {
+                $this->options['failure'][] = $callback instanceof Closure
+                    ? new SerializableClosure($callback)
+                    : $callback;
+            }
+        }
+
+        $this->options['allowFailures'] = (bool) $param;
 
         return $this;
     }
@@ -257,6 +266,14 @@ class PendingBatch
     public function allowsFailures()
     {
         return Arr::get($this->options, 'allowFailures', false) === true;
+    }
+
+    /**
+     * Get the "failure" callbacks that have been registered with the pending batch.
+     */
+    public function failureCallbacks(): array
+    {
+        return $this->options['failure'] ?? [];
     }
 
     /**
