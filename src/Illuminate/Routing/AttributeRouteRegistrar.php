@@ -71,17 +71,13 @@ class AttributeRouteRegistrar
                 $attributes = $method->getAttributes(RouteAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
 
                 foreach ($attributes as $attribute) {
-                    try {
-                        $instance = $attribute->newInstance();
-                        $route = $router->addRoute(
-                            $instance->methods,
-                            $instance->path,
-                            [$reflectionClass->getName(), $method->getName()]
-                        );
-                        $this->applyRouteOptions($route, $instance);
-                    } catch (\Throwable $e) {
-                        report($e);
-                    }
+                    $instance = $attribute->newInstance();
+                    $route = $router->addRoute(
+                        $instance->methods,
+                        $instance->path,
+                        [$reflectionClass->getName(), $method->getName()]
+                    );
+                    $this->applyRouteOptions($route, $instance);
                 }
             }
         });
