@@ -64,7 +64,7 @@ trait PromptsForMissingInput
                 );
 
                 $words = preg_split('/\s+/', trim($answer));
-                $formattedAnswer = array_shift($words) . implode('', array_map('ucfirst', $words));
+                $formattedAnswer = array_shift($words).implode('', array_map('ucfirst', $words));
 
                 $input->setArgument($argument->getName(), $argument->isArray() ? [$formattedAnswer] : $formattedAnswer);
             })
