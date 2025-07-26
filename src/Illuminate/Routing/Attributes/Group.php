@@ -18,5 +18,6 @@ class Group
         public ?string $name = null,
         public array|string $middleware = [],
         public array $where = []
-    ) {}
+    ) {
+    }
 }

@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\AttributeRouteController;
 use Illuminate\Routing\Attributes\Group;
+use Illuminate\Routing\Attributes\Patch;
 use Illuminate\Routing\Attributes\RouteAttribute;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -57,7 +58,7 @@ class AttributeRouteRegistrar
     /**
      * Registers all routes for a given controller class.
      *
-     * @param  string  $controllerClassName The fully qualified class name of the controller.
+     * @param  string  $controllerClassName
      * @return void
      */
     public function registerControllerRoutes($controllerClassName)
@@ -89,7 +90,6 @@ class AttributeRouteRegistrar
 
     /**
      * Applies all options from a RouteAttribute instance to a route.
-     * (MVP Version: Does not include complex options)
      *
      * @param  \Illuminate\Routing\Route  $route
      * @param  \Illuminate\Routing\Attributes\RouteAttribute  $instance
@@ -97,9 +97,15 @@ class AttributeRouteRegistrar
      */
     protected function applyRouteOptions(Route $route, RouteAttribute $instance): void
     {
-        if ($instance->name) $route->name($instance->name);
-        if ($instance->middleware) $route->middleware($instance->middleware);
-        if ($instance->where) $route->where($instance->where);
+        if ($instance->name) {
+            $route->name($instance->name);
+        }
+        if ($instance->middleware) {
+            $route->middleware($instance->middleware);
+        }
+        if ($instance->where) {
+            $route->where($instance->where);
+        }
 
         // Mark the route for the route:list command
         $route->setAction(array_merge($route->getAction(), ['is_attribute_route' => true]));
@@ -107,7 +113,6 @@ class AttributeRouteRegistrar
 
     /**
      * Gets the properties from a single #[Group] attribute on a class.
-     * (MVP Version: Does not support repeatable groups)
      *
      * @param  \ReflectionClass  $reflectionClass
      * @return array|null
@@ -156,7 +161,7 @@ class AttributeRouteRegistrar
                         ->replace(['/', '.php'], ['\\', ''])
                         ->toString();
 
-                    return $namespace . $relativePath;
+                    return $namespace.$relativePath;
                 }
             }
         }

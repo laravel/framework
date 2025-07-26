@@ -20,5 +20,6 @@ abstract class RouteAttribute
         public ?string $name = null,
         public array|string $middleware = [],
         public array $where = []
-    ) { }
+    ) {
+    }
 }

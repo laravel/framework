@@ -7,12 +7,12 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\AttributeRouteController;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\AttributeRouteRegistrar;
 use Illuminate\Routing\Attributes\Get;
 use Illuminate\Routing\Attributes\Group;
 use Illuminate\Routing\Attributes\Post;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\AttributeRouteRegistrar;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Route;
 use Mockery as m;
@@ -22,15 +22,21 @@ use PHPUnit\Framework\TestCase;
 class BasicController implements AttributeRouteController
 {
     #[Get('/get', name: 'get')]
-    public function get() { return 'get success'; }
+    public function get() {
+        return 'get success';
+    }
     #[Post('/post')]
-    public function post() { return 'post success'; }
+    public function post() {
+        return 'post success';
+    }
 }
 #[Group(prefix: 'group', name: 'group.')]
 class GroupController implements AttributeRouteController
 {
     #[Get('/route', name: 'route')]
-    public function route() { return 'grouped route'; }
+    public function route() {
+        return 'grouped route';
+    }
 }
 
 // --- Test Class ---
