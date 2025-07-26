@@ -13,6 +13,8 @@ use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as AppEventServiceProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as AppRouteServiceProvider;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Event;
@@ -42,6 +44,13 @@ class ApplicationBuilder
      * @var array
      */
     protected array $pageMiddleware = [];
+
+    /**
+     * The attribute routing configurations.
+     *
+     * @var array
+     */
+    protected array $attributeRoutingConfigurations = [];
 
     /**
      * Create a new application builder instance.
@@ -202,7 +211,9 @@ class ApplicationBuilder
         string $apiPrefix,
         ?callable $then)
     {
-        return function () use ($web, $api, $pages, $health, $apiPrefix, $then) {
+        return function (Router $router) use ($web, $api, $pages, $health, $apiPrefix, $then) {
+            $this->registerAttributeRoutes($router);
+
             if (is_string($api) || is_array($api)) {
                 if (is_array($api)) {
                     foreach ($api as $apiRoute) {
@@ -263,6 +274,66 @@ class ApplicationBuilder
                 $then($this->app);
             }
         };
+    }
+
+    /**
+     * Configure attribute-based routing.
+     *
+     * @param  array|string|null  $web
+     * @param  array|string|null  $api
+     * @return $this
+     */
+    public function withAttributeRouting(
+        array|string|null $web = null,
+        array|string|null $api = null
+    ) {
+        $groups = [];
+
+        if (is_null($web) && is_null($api)) {
+            $groups['web'] = [app_path('Http/Controllers')];
+        } else {
+            if (! is_null($web)) {
+                $groups['web'] = Arr::wrap($web);
+            }
+            if (! is_null($api)) {
+                $groups['api'] = Arr::wrap($api);
+            }
+        }
+
+        $this->attributeRoutingConfigurations = $groups;
+
+        return $this;
+    }
+
+    /**
+     * Register all the configured attribute-based routes.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @return void
+     */
+    protected function registerAttributeRoutes(Router $router): void
+    {
+        if (empty($this->attributeRoutingConfigurations)) {
+            return;
+        }
+
+        $registrar = $this->app->make(\Illuminate\Routing\AttributeRouteRegistrar::class);
+
+        foreach ($this->attributeRoutingConfigurations as $groupName => $paths) {
+            if (empty($paths)) {
+                continue;
+            }
+
+            $groupOptions = ['middleware' => $groupName];
+
+            if ($groupName === 'api') {
+                $groupOptions['prefix'] = 'api';
+            }
+
+            $router->group($groupOptions, function () use ($registrar, $paths) {
+                $registrar->register(...$paths);
+            });
+        }
     }
 
     /**
