@@ -400,7 +400,9 @@ class Builder implements BuilderContract
      */
     public function except($models): static
     {
-        $keys = is_iterable($models) ? array_values($models->modelKeys()) : $models->getKey();
+        $keys = $models instanceof Model
+            ? $models->getKey()
+            : Collection::wrap($models)->modelKeys();
         return $this->whereKeyNot($keys);
     }
 
