@@ -1,5 +1,9 @@
 #!/bin/sh
 # commitlint.sh - Enforce Conventional Commits in commit messages
+set -e
+
+# Set up cleanup trap for any temporary files
+trap 'rm -f /tmp/commitlint-* 2>/dev/null || true' EXIT
 
 # Colors for output
 RED='\033[0;31m'
@@ -21,6 +25,12 @@ if [ -z "$COMMIT_MSG_FILE" ]; then
     echo "Usage: $0 <commit-msg-file>"
     exit 1
 fi
+
+if [ ! -f "$COMMIT_MSG_FILE" ]; then
+    echo "${RED}❌ Commit message file not found: $COMMIT_MSG_FILE${NC}"
+    exit 1
+fi
+
 COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
 
 # Skip empty commits
@@ -29,10 +39,20 @@ if [ -z "$COMMIT_MSG" ] || [ "$COMMIT_MSG" = "" ]; then
     exit 1
 fi
 
+# Skip special commits that don't need conventional format validation
+# Also skip versioned commits like 10.x or [10.x] (to match workflow logic)
+if printf "%s" "$COMMIT_MSG" | grep -Eq "^(Merge|WIP|Revert|[0-9]+\\.x|\\[[0-9]+\\.x\\])"; then
+    echo "${GREEN}✅ Special commit type detected, skipping conventional format validation${NC}"
+    exit 0
+fi
+
 # Conventional Commits regex (type[optional scope]: subject)
 CONVENTIONAL_REGEX='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-zA-Z0-9_-]+\))?: .{1,}'
 
-if echo "$COMMIT_MSG" | grep -Eq "$CONVENTIONAL_REGEX"; then
+# Log the commit message for debugging (safely quoted)
+printf "${YELLOW}Checking message: %q${NC}\n" "$COMMIT_MSG"
+
+if printf "%s" "$COMMIT_MSG" | grep -Eq "$CONVENTIONAL_REGEX"; then
     echo "${GREEN}✅ Commit message format is valid${NC}"
     exit 0
 else
