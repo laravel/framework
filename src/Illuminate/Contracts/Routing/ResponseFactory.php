@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Routing;
 
+use Closure;
+use Illuminate\Http\StreamedEvent;
+
 interface ResponseFactory
 {
     /**
@@ -65,7 +68,7 @@ interface ResponseFactory
      * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function eventStream($callback, array $headers = [], $endStreamWith = '</stream>');
+    public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>');
 
     /**
      * Create a new streamed response instance.
