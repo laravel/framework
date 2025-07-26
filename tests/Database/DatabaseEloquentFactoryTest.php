@@ -832,6 +832,16 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertNull($post->user_id);
     }
 
+    public function test_can_disable_relationships_explicitly()
+    {
+        $comment = FactoryTestCommentFactory::new()
+            ->withoutParents([FactoryTestUser::class])
+            ->make();
+
+        $this->assertNull($comment->user_id);
+        $this->assertNotNull($comment->commentable->id);
+    }
+
     public function test_can_default_to_without_parents()
     {
         FactoryTestPostFactory::dontExpandRelationshipsByDefault();
