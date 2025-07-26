@@ -11,6 +11,7 @@ use Illuminate\Support\Fluent;
  * @method ForeignKeyDefinition onDelete(string $action) Add an ON DELETE action
  * @method ForeignKeyDefinition onUpdate(string $action) Add an ON UPDATE action
  * @method ForeignKeyDefinition references(string|array $columns) Specify the referenced column(s)
+ * @method ForeignKeyDefinition withoutIndex() Disable automatic index creation for this foreign key
  */
 class ForeignKeyDefinition extends Fluent
 {
