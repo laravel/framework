@@ -2316,7 +2316,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             new class extends Model
             {
                 protected $attributes = ['id' => 2];
-            }
+            },
         ]);
 
         $builder->except($models);
@@ -2340,7 +2340,7 @@ class DatabaseEloquentBuilderTest extends TestCase
             new class extends Model
             {
                 protected $attributes = ['id' => 2];
-            }
+            },
         ];
 
         $builder->except($models);

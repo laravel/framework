@@ -403,6 +403,7 @@ class Builder implements BuilderContract
         $keys = $models instanceof Model
             ? $models->getKey()
             : Collection::wrap($models)->modelKeys();
+
         return $this->whereKeyNot($keys);
     }
 
