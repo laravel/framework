@@ -153,7 +153,7 @@ class Exceptions
     /**
      * Register a callback to determine if an exception should not be reported.
      *
-     * @param  callable  $using
+     * @param  callable  $dontReportWhen
      * @return $this
      */
     public function dontReportWhen(Closure $dontReportWhen)
