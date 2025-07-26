@@ -5,7 +5,6 @@ namespace Illuminate\Routing;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\AttributeRouteController;
 use Illuminate\Routing\Attributes\Group;
-use Illuminate\Routing\Attributes\Patch;
 use Illuminate\Routing\Attributes\RouteAttribute;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -137,6 +136,7 @@ class AttributeRouteRegistrar
             ]);
         } catch (\Throwable $e) {
             report($e);
+
             return null;
         }
     }

@@ -22,11 +22,13 @@ use PHPUnit\Framework\TestCase;
 class BasicController implements AttributeRouteController
 {
     #[Get('/get', name: 'get')]
-    public function get() {
+    public function get()
+    {
         return 'get success';
     }
     #[Post('/post')]
-    public function post() {
+    public function post()
+    {
         return 'post success';
     }
 }
@@ -34,7 +36,8 @@ class BasicController implements AttributeRouteController
 class GroupController implements AttributeRouteController
 {
     #[Get('/route', name: 'route')]
-    public function route() {
+    public function route()
+    {
         return 'grouped route';
     }
 }
