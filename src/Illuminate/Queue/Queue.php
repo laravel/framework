@@ -319,6 +319,7 @@ abstract class Queue
      * Create the given payload using any registered payload hooks.
      *
      * @param  string  $queue
+     * @param  array  $payload
      * @return array
      */
     protected function withCreatePayloadHooks($queue, array $payload)
@@ -464,6 +465,7 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
+     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)
