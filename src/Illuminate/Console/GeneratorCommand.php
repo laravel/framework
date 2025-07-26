@@ -159,6 +159,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         $name = $this->qualifyClass($this->getNameInput());
+        $name = Str::studly($name);
 
         $path = $this->getPath($name);
 
@@ -418,11 +419,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     protected function getNameInput()
     {
         $name = trim($this->argument('name'));
+
         if (Str::endsWith($name, '.php')) {
-            $name = Str::substr($name, 0, -4);
+            return Str::substr($name, 0, -4);
         }
 
-        return Str::studly($name);
+        return $name;
     }
 
     /**
