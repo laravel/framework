@@ -41,8 +41,8 @@ class ScheduleWorkCommand extends Command
 
         [$lastExecutionStartedAt, $executions] = [Carbon::now()->subMinutes(10), []];
 
-         $command = Application::phpBinary().' '.ProcessUtils::escapeArgument($this->laravel->basePath('artisan')).' schedule:run';
-    $command = Application::phpBinary().' '.ProcessUtils::escapeArgument($this->laravel->basePath('artisan')).' schedule:run';
+        $command = Application::phpBinary().' '.ProcessUtils::escapeArgument($this->laravel->basePath('artisan')).' schedule:run';
+
         if ($this->option('run-output-file')) {
             $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';
         }
