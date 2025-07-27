@@ -1145,6 +1145,25 @@ class Str
     }
 
     /**
+     * Generate a more truly "random" alpha-numeric string given characters.
+     *
+     * @param  int  $length
+     * @param  string  $characters
+     * @return string
+     */
+    public static function randomFromSet($length = 16, $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
+    {
+        $charactersLength = strlen($characters);
+        $randomString = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+
+        return $randomString;
+    }
+
+    /**
      * Set the callable that will be used to generate random strings.
      *
      * @param  callable|null  $factory
