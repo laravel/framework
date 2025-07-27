@@ -329,7 +329,7 @@ class Router implements BindingRegistrar, RegistrarContract
      * @param  array  $options
      * @return void
      */
-    public function softDeleteResources(array $resources, array $options = [])
+    public function softDeletableResources(array $resources, array $options = [])
     {
         foreach ($resources as $name => $controller) {
             $this->resource($name, $controller, $options)->withTrashed();
