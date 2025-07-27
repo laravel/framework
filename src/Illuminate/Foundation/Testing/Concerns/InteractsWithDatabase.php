@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
@@ -11,6 +12,8 @@ use Illuminate\Testing\Constraints\CountInDatabase;
 use Illuminate\Testing\Constraints\HasInDatabase;
 use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
+use PHPUnit\Framework\Constraint\IsEqual;
+use PHPUnit\Framework\Constraint\IsIdentical;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase
@@ -182,6 +185,84 @@ trait InteractsWithDatabase
     protected function assertModelMissing($model)
     {
         return $this->assertDatabaseMissing($model);
+    }
+
+    /**
+     * Assert that a given models are equal to another.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $expected
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $result
+     * @return $this
+     */
+    public function assertModelIs($expected, $result)
+    {
+        $expected = Collection::wrap($expected)->sort()->map->getKey()->values()->all();
+        $result = Collection::wrap($result)->sort()->map->getKey()->values()->all();
+
+        $this->assertThat($expected, new IsEqual($result), 'Failed asserting that the models are equal.');
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given model is not equal to another.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $expected
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $result
+     * @return $this
+     */
+    public function assertModelIsNot($expected, $result)
+    {
+        $expected = Collection::wrap($expected)->sort()->map->getKey()->values()->all();
+        $result = Collection::wrap($result)->sort()->map->getKey()->values()->all();
+
+        $this->assertThat(
+            $expected, new ReverseConstraint(new IsEqual($result)), 'Failed asserting that the models are not equal.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given model is equal to another.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $expected
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $result
+     * @return $this
+     */
+    public function assertModelSame($expected, $result)
+    {
+        $normalize = fn ($model) => $model->withoutRelations()->getAttributes();
+
+        $expected = Collection::wrap($expected)->sort()->map($normalize)->values()->all();
+        $result = Collection::wrap($result)->sort()->map($normalize)->values()->all();
+
+        $this->assertThat($expected, new IsIdentical($result), 'Failed asserting that the models are the same.');
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given model is equal to another.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $expected
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Model[]  $result
+     * @return $this
+     */
+    public function assertModelNotSame($expected, $result)
+    {
+        $normalize = fn ($model) => $model->withoutRelations()->getAttributes();
+
+        $expected = Collection::wrap($expected)->sort()->map($normalize)->values()->all();
+        $result = Collection::wrap($result)->sort()->map($normalize)->values()->all();
+
+        $this->assertThat(
+            $expected,
+            new ReverseConstraint(new IsIdentical($result)),
+            'Failed asserting that the models are not the same.'
+        );
+
+        return $this;
     }
 
     /**

@@ -372,6 +372,167 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertModelExists(new ProductStub($this->data));
     }
 
+    public function testAssertModelIsOnlyUsesId()
+    {
+        $this->assertModelIs(
+            new ProductStub(['id' => 3, 'name' => 'foo']),
+            new ProductStub(['id' => 3, 'name' => 'bar'])
+        );
+
+        $this->assertModelIs(
+            [new ProductStub(['id' => 2, 'name' => 'foo']), new ProductStub(['id' => 1, 'name' => 'bar'])],
+            [new ProductStub(['id' => 1, 'name' => 'baz']), new ProductStub(['id' => 2, 'name' => 'quz'])]
+        );
+    }
+
+    public function testAssertModelIsFailsWithDifferentSingleModel()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are equal.');
+
+        $this->assertModelIs(
+            new ProductStub(['id' => 3, 'name' => 'foo']),
+            new ProductStub(['id' => 2, 'name' => 'foo'])
+        );
+    }
+
+    public function testAssertModelIsFailsWithOneDifferentModelFromIterable()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are equal.');
+
+        $this->assertModelIs(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'bar'])],
+            [new ProductStub(['id' => 1, 'name' => 'baz']), new ProductStub(['id' => 3, 'name' => 'quz'])]
+        );
+    }
+
+    public function testAssertModelIsFailsWithDifferentCount()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are equal.');
+
+        $this->assertModelIs(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'bar'])],
+            [new ProductStub(['id' => 1, 'name' => 'baz'])]
+        );
+    }
+
+    public function testAssertModelIsNotOnlyUsesId()
+    {
+        $this->assertModelIsNot(
+            new ProductStub(['id' => 3, 'name' => 'foo']),
+            new ProductStub(['id' => 2, 'name' => 'foo'])
+        );
+
+        $this->assertModelIsNot(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 3, 'name' => 'foo'])]
+        );
+
+        $this->assertModelIsNot(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 1, 'name' => 'foo'])]
+        );
+    }
+
+    public function testAssertModelIsNotFailsWithEqualSingleModel()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are not equal.');
+
+        $this->assertModelIsNot(
+            new ProductStub(['id' => 3, 'name' => 'foo']),
+            new ProductStub(['id' => 3, 'name' => 'foo'])
+        );
+    }
+
+    public function testAssertModelIsNotFailsWithAllEqualModelFromIterable()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are not equal.');
+
+        $this->assertModelIsNot(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 2, 'name' => 'foo']), new ProductStub(['id' => 1, 'name' => 'foo'])]
+        );
+    }
+
+    public function testAssertModelSameWithSameAttributes()
+    {
+        $this->assertModelSame(
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+        );
+
+        $this->assertModelSame(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])]
+        );
+    }
+
+    public function testAssertModelSameFailsWithDifferentSingleModel()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are the same.');
+
+        $this->assertModelSame(
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+            new ProductStub(['id' => 1, 'name' => 'bar']),
+        );
+    }
+
+    public function testAssertModelSameFailsWithDifferentModelsFromIterable()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are the same.');
+
+        $this->assertModelSame(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 1, 'name' => 'different'])]
+        );
+    }
+
+    public function testAssertModelNotSameUsesAttributes()
+    {
+        $this->assertModelNotSame(
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+            new ProductStub(['id' => 1, 'name' => 'different']),
+        );
+
+        $this->assertModelNotSame(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 2, 'name' => 'foo']), new ProductStub(['id' => 1, 'name' => 'different'])]
+        );
+
+        $this->assertModelNotSame(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 2, 'name' => 'foo'])]
+        );
+    }
+
+    public function testAssertModelNotSameFailsWithSameSingleModel()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are not the same.');
+
+        $this->assertModelNotSame(
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+            new ProductStub(['id' => 1, 'name' => 'foo']),
+        );
+    }
+
+    public function testAssertModelNotSameFailsWithDifferentModelsFromIterable()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the models are not the same.');
+
+        $this->assertModelNotSame(
+            [new ProductStub(['id' => 1, 'name' => 'foo']), new ProductStub(['id' => 2, 'name' => 'foo'])],
+            [new ProductStub(['id' => 2, 'name' => 'foo']), new ProductStub(['id' => 1, 'name' => 'foo'])],
+        );
+    }
+
     public function testGetTableNameFromModel()
     {
         $this->assertEquals($this->table, $this->getTable(ProductStub::class));
