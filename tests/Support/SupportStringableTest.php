@@ -43,13 +43,19 @@ class SupportStringableTest extends TestCase
     public function testIsUrl()
     {
         $this->assertTrue($this->stringable('https://laravel.com')->isUrl());
+        $this->assertTrue($this->stringable('https://laravel.com')->isUrl(['https']));
+
         $this->assertFalse($this->stringable('invalid url')->isUrl());
+        $this->assertFalse($this->stringable('https://laravel.com')->isUrl(['http']));
     }
 
     public function testIsUuid()
     {
         $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
+        $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid(4));
+
         $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
+        $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid(7));
     }
 
     public function testIsUlid()
