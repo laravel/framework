@@ -586,7 +586,7 @@ class BroadcastingInstallCommand extends Command
     /**
      * Detect if the user is using Inertia and return the import path if so.
      *
-     * @return string
+     * @return string|null
      */
     protected function inertiaImport(): ?string
     {
