@@ -490,6 +490,22 @@ class SupportFluentTest extends TestCase
         $this->assertTrue($fluent->isNotEmpty());
         $this->assertFalse($fluent->isEmpty());
     }
+
+    public function testCountable()
+    {
+        $fluent = new Fluent([
+            'name' => 'Taylor',
+            'role' => 'admin',
+        ]);
+
+        $this->assertCount(2, $fluent);
+
+        $fluent->set('company', 'Laravel');
+        $this->assertCount(3, $fluent);
+
+        $fluent->offsetUnset('role');
+        $this->assertCount(2, $fluent);
+    }
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate
