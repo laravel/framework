@@ -131,7 +131,7 @@ class Pipeline implements PipelineContract
 
         try {
             return $this->withinTransactions
-                ? $this->container->make('db')->transaction(fn () => $pipeline($this->passable))
+                ? $this->getContainer()->make('db')->transaction(fn () => $pipeline($this->passable))
                 : $pipeline($this->passable);
         } finally {
             if ($this->finally) {
