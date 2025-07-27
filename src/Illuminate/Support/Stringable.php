@@ -382,21 +382,23 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Determine if a given value is a valid URL.
      *
+     * @param  array  $protocols
      * @return bool
      */
-    public function isUrl()
+    public function isUrl(array $protocols = [])
     {
-        return Str::isUrl($this->value);
+        return Str::isUrl($this->value, $protocols);
     }
 
     /**
      * Determine if a given string is a valid UUID.
      *
+     * @param  int<0, 8>|'max'|null  $version
      * @return bool
      */
-    public function isUuid()
+    public function isUuid($version = null)
     {
-        return Str::isUuid($this->value);
+        return Str::isUuid($this->value, $version);
     }
 
     /**
