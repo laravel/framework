@@ -741,6 +741,7 @@ class Worker
 
         pcntl_signal(SIGQUIT, fn () => $this->shouldQuit = true);
         pcntl_signal(SIGTERM, fn () => $this->shouldQuit = true);
+        pcntl_signal(SIGINT, fn () => $this->shouldQuit = true);
         pcntl_signal(SIGUSR2, fn () => $this->paused = true);
         pcntl_signal(SIGCONT, fn () => $this->paused = false);
     }
