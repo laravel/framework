@@ -2237,7 +2237,7 @@ trait HasAttributes
      * @param  mixed  $default
      * @return ($key is null ? array<string, mixed> : mixed)
      */
-    public function getChanges(string|null $key = null, mixed $default = null)
+    public function getChanges($key = null, $default = null)
     {
         if ($key) {
             return $this->transformModelValue(
@@ -2255,7 +2255,7 @@ trait HasAttributes
      * @param  mixed  $default
      * @return ($key is null ? array<string, mixed> : mixed)
      */
-    public function getPrevious(string|null $key = null, mixed $default = null)
+    public function getPrevious($key = null, $default = null)
     {
         if ($key) {
             return $this->transformModelValue(
