@@ -28,4 +28,12 @@ abstract class MinimizedResource extends JsonResource
     {
         return empty($this->onlyFields) || in_array($key, $this->onlyFields);
     }
+
+    /**
+     * Create a collection of resources with only selected fields.
+     */
+    public static function collectionWithOnly($resources, array $only = [])
+    {
+        return collect($resources)->map(fn($item) => new static($item, $only));
+    }
 }

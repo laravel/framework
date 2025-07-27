@@ -39,6 +39,52 @@ class MinimizedResourceTest extends TestCase
         $this->assertFalse($this->callProtected($resource, 'show', ['name']));
     }
 
+    public function testCollectionWithOnlyReturnsLimitedFields()
+    {
+        $data = [
+            (object) ['id' => 1, 'name' => 'Mahmoued', 'email' => 'mahmoued@example.com'],
+            (object) ['id' => 2, 'name' => 'Mohamed', 'email' => 'mohamed@example.com']
+        ];
+
+        $collection = DummyResource::collectionWithOnly($data, ['id']);
+
+
+        $request = Request::create('/fake', 'GET');
+        $transformed = DummyResource::collection($collection)->toArray($request);
+
+        $transformed = array_map(function ($item) {
+            return array_filter($item, fn($value) => !($value instanceof MissingValue));
+        }, $transformed);
+
+        $this->assertEquals([
+            ['id' => 1],
+            ['id' => 2],
+        ], $transformed);
+    }
+
+    public function testCollectionWithOnlyEmptyReturnsAllFields()
+    {
+        $data = [
+            (object) ['id' => 1, 'name' => 'Mahmoued', 'email' => 'mahmoued@example.com'],
+            (object) ['id' => 2, 'name' => 'Mohamed', 'email' => 'mohamed@example.com']
+        ];
+
+        $collection = DummyResource::collectionWithOnly($data);
+
+
+        $request = Request::create('/fake', 'GET');
+        $transformed = DummyResource::collection($collection)->toArray($request);
+
+        $transformed = array_map(function ($item) {
+            return array_filter($item, fn($value) => !($value instanceof MissingValue));
+        }, $transformed);
+
+        $this->assertEquals([
+            ['id' => 1, 'name' => 'Mahmoued', 'email' => 'mahmoued@example.com'],
+            ['id' => 2, 'name' => 'Mohamed', 'email' => 'mohamed@example.com'],
+        ], $transformed);
+    }
+
     /**
      * Helper to call protected method
      */
