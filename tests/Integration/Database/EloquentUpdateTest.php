@@ -149,7 +149,9 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame('Dr.', $model->title);
         $this->assertSame('Dr.', $model->getOriginal('title'));
         $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame('Dr.', $model->getChanges('title'));
         $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
+        $this->assertSame('Ms.', $model->getPrevious('title'));
     }
 
     public function testSaveSyncsPrevious()
@@ -165,7 +167,9 @@ class EloquentUpdateTest extends DatabaseTestCase
         $this->assertSame('Dr.', $model->title);
         $this->assertSame('Dr.', $model->getOriginal('title'));
         $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame('Dr.', $model->getChanges('title'));
         $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
+        $this->assertSame('Ms.', $model->getPrevious('title'));
     }
 
     public function testIncrementSyncsPrevious()
@@ -178,7 +182,9 @@ class EloquentUpdateTest extends DatabaseTestCase
 
         $this->assertEquals(1, $model->counter);
         $this->assertSame(['counter' => 1], $model->getChanges());
+        $this->assertSame(1, $model->getChanges('counter'));
         $this->assertSame(['counter' => 0], $model->getPrevious());
+        $this->assertSame(0, $model->getPrevious('counter'));
     }
 }
 

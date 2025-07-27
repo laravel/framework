@@ -34,9 +34,21 @@ class EloquentModelTest extends DatabaseTestCase
             'nullable_date' => $now = Carbon::now(),
         ]);
         $this->assertTrue($user->isDirty('nullable_date'));
+        $this->assertInstanceOf(Carbon::class, $user->nullable_date);
+        $this->assertEmpty($user->getChanges('nullable_date'));
+        $this->assertEmpty($user->getPrevious('nullable_date'));
 
         $user->save();
         $this->assertEquals($now->toDateString(), $user->nullable_date->toDateString());
+        $this->assertEquals($now->toDateString(), $user->getChanges('nullable_date')->toDateString());
+        $this->assertInstanceOf(Carbon::class, $user->getChanges('nullable_date'));
+        $this->assertEmpty($user->getPrevious('nullable_date'));
+
+        $user->update(['nullable_date' => null]);
+        $this->assertEquals(null, $user->nullable_date);
+        $this->assertEquals(null, $user->getChanges('nullable_date'));
+        $this->assertEquals($now->toDateString(), $user->getPrevious('nullable_date')->toDateString());
+        $this->assertInstanceOf(Carbon::class, $user->getPrevious('nullable_date'));
     }
 
     public function testAttributeChanges()
@@ -63,7 +75,9 @@ class EloquentModelTest extends DatabaseTestCase
 
         $this->assertEmpty($user->getDirty());
         $this->assertEquals(['name' => $overrideName], $user->getChanges());
+        $this->assertEquals($overrideName, $user->getChanges('name'));
         $this->assertEquals(['name' => $originalName], $user->getPrevious());
+        $this->assertEquals($originalName, $user->getPrevious('name'));
         $this->assertTrue($user->wasChanged());
         $this->assertTrue($user->wasChanged('name'));
     }
