@@ -807,7 +807,7 @@ class SupportStrTest extends TestCase
         // Custom character set
         $charSet = 'ABC123!@#';
         $customSet = Str::randomFromSet(32, $charSet);
-        $this->assertMatchesRegularExpression('/^[' . preg_quote($charSet, '/') . ']{32}$/', $customSet);
+        $this->assertMatchesRegularExpression('/^['.preg_quote($charSet, '/').']{32}$/', $customSet);
 
         // Zero length case
         $this->assertEquals('', Str::randomFromSet(0, $charSet));
