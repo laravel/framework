@@ -736,6 +736,25 @@ class Str
     }
 
     /**
+     * Limit the number of words in a string.
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $end
+     * @return string
+     */
+    public static function limitWords($value, $limit, $end = '')
+    {
+        $words = preg_split('/\s+/', $value);
+
+        if (count($words) <= $limit) {
+            return $value;
+        }
+
+        return implode(' ', array_slice($words, 0, $limit)).$end;
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @param  string  $value
