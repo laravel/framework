@@ -323,6 +323,20 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register an array of resource controllers that can be soft deleted.
+     *
+     * @param  array  $resources
+     * @param  array  $options
+     * @return void
+     */
+    public function softDeletableResources(array $resources, array $options = [])
+    {
+        foreach ($resources as $name => $controller) {
+            $this->resource($name, $controller, $options)->withTrashed();
+        }
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name
