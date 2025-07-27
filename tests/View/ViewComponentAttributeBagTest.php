@@ -118,6 +118,32 @@ class ViewComponentAttributeBagTest extends TestCase
         $this->assertSame('class="font-bold" id="my-id"', (string) $bag->except(['name', 'missing']));
     }
 
+    public function testAttributeRetrievalUsingDotNotation()
+    {
+        $bag = new ComponentAttributeBag([
+            'data.config' => 'value1',
+            'x-on:click.prevent' => 'handler',
+            'wire:model.lazy' => 'username',
+            '@submit.prevent' => 'submitForm',
+            'wire:model.debounce.500ms' => 'search',
+        ]);
+
+        $this->assertFalse($bag->has('data'));
+        $this->assertFalse($bag->has('wire:model.debounce'));
+
+        $this->assertTrue($bag->has('data.config'));
+        $this->assertTrue($bag->has('x-on:click.prevent'));
+        $this->assertTrue($bag->has('wire:model.lazy'));
+        $this->assertTrue($bag->has('@submit.prevent'));
+        $this->assertTrue($bag->has('wire:model.debounce.500ms'));
+
+        $this->assertSame('value1', $bag->get('data.config'));
+        $this->assertSame('handler', $bag->get('x-on:click.prevent'));
+        $this->assertSame('username', $bag->get('wire:model.lazy'));
+        $this->assertSame('submitForm', $bag->get('@submit.prevent'));
+        $this->assertSame('search', $bag->get('wire:model.debounce.500ms'));
+    }
+
     public function testItMakesAnExceptionForAlpineXdata()
     {
         $bag = new ComponentAttributeBag([
