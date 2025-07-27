@@ -255,6 +255,19 @@ class PipelineTest extends TestCase
             });
     }
 
+    public function testPipelineThrowsExceptionWhenUsingTransactionsWithoutContainer()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('A container instance has not been passed to the Pipeline.');
+
+        (new Pipeline)->send('data')
+            ->through(PipelineTestPipeOne::class)
+            ->withinTransactions()
+            ->then(function ($piped) {
+                return $piped;
+            });
+    }
+
     public function testPipelineThenReturnMethodRunsPipelineThenReturnsPassable()
     {
         $result = (new Pipeline(new Container))
