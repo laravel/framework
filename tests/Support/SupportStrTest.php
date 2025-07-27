@@ -792,6 +792,27 @@ class SupportStrTest extends TestCase
         $this->assertIsString(Str::random());
     }
 
+    public function testRandomFromSet()
+    {
+        // Default 16-character string
+        $default = Str::randomFromSet();
+        $this->assertEquals(16, strlen($default));
+        $this->assertIsString($default);
+
+        // Custom length
+        $randomLength = random_int(1, 100);
+        $customLength = Str::randomFromSet($randomLength);
+        $this->assertEquals($randomLength, strlen($customLength));
+
+        // Custom character set
+        $charSet = 'ABC123!@#';
+        $customSet = Str::randomFromSet(32, $charSet);
+        $this->assertMatchesRegularExpression('/^[' . preg_quote($charSet, '/') . ']{32}$/', $customSet);
+
+        // Zero length case
+        $this->assertEquals('', Str::randomFromSet(0, $charSet));
+    }
+
     public function testWhetherTheNumberOfGeneratedCharactersIsEquallyDistributed()
     {
         $results = [];
