@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayIterator;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Conditionable;
@@ -20,7 +21,7 @@ use Traversable;
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
  */
-class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
+class Fluent implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
     use Conditionable, InteractsWithData, Macroable {
         __call as macroCall;
@@ -221,6 +222,16 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     public function isNotEmpty(): bool
     {
         return ! $this->isEmpty();
+    }
+
+    /**
+     * Get the number of attributes set on the fluent instance.
+     *
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->attributes);
     }
 
     /**
