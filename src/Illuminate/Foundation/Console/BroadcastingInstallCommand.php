@@ -584,9 +584,9 @@ class BroadcastingInstallCommand extends Command
     }
 
     /**
-     * Detect if the user is using Vue.
+     * Detect if the user is using Inertia and return the import path if so.
      *
-     * @return bool
+     * @return string
      */
     protected function inertiaImport(): ?string
     {
