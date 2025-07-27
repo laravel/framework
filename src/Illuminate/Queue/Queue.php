@@ -382,7 +382,7 @@ abstract class Queue
     protected function shouldDispatchAfterCommit($job)
     {
         if ($job instanceof ShouldQueueAfterCommit) {
-            return true;
+            return ! (isset($job->afterCommit) && $job->afterCommit === false);
         }
 
         if (! $job instanceof Closure && is_object($job) && isset($job->afterCommit)) {
