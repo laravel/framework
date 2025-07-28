@@ -7,6 +7,7 @@ use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Prohibitable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -67,9 +68,9 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
-        });
+        foreach ($this->getSeeders() as $seeder) {
+            Model::unguarded(fn () => $seeder->__invoke());
+        }
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);
@@ -79,14 +80,28 @@ class SeedCommand extends Command
     }
 
     /**
-     * Get a seeder instance from the container.
+     * Get a number of seeder instances from the container.
      *
      * @return \Illuminate\Database\Seeder
      */
-    protected function getSeeder()
+    protected function getSeeders()
     {
-        $class = $this->input->getArgument('class') ?? $this->input->getOption('class');
+        $seeders = [];
 
+        foreach ($this->getClasses() as $class) {
+            $seeders[] = $this->getSeeder($class);
+        }
+
+        return $seeders;
+    }
+
+    /**
+     * Get a seeder from a class.
+     *
+     * @return \Illuminate\Database\Seeder
+     */
+    protected function getSeeder(string $class)
+    {
         if (! str_contains($class, '\\')) {
             $class = 'Database\\Seeders\\'.$class;
         }
@@ -99,6 +114,22 @@ class SeedCommand extends Command
         return $this->laravel->make($class)
             ->setContainer($this->laravel)
             ->setCommand($this);
+    }
+
+    /**
+     * Get seeder classes.
+     *
+     * @return array
+     */
+    protected function getClasses()
+    {
+        $classes = $this->input->getArgument('class') ?? $this->input->getOption('class');
+
+        if (str_contains($classes, ',')) {
+            return explode(',', $classes);
+        }
+
+        return Arr::wrap($classes);
     }
 
     /**
