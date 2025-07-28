@@ -193,6 +193,16 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * The factory to create Monolog
+     *
+     * @see \Monolog\Logger::__construct()
+     */
+    protected function createMonolog(string $name, array $handlers, array $processors = []): Monolog
+    {
+        return new Monolog($name, $handlers, $processors, $this->getTimezone());
+    }
+
+    /**
      * Create an emergency log handler to avoid white screens of death.
      *
      * @return \Psr\Log\LoggerInterface
