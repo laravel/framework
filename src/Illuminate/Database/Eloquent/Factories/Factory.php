@@ -515,7 +515,7 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return (new Collection($definition))
-            ->map($evaluateRelations = function ($attribute, $key) use ($definition) {
+            ->map($evaluateRelations = function ($attribute, $key) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
                 } elseif ($attribute instanceof self &&
