@@ -612,7 +612,7 @@ class LogManager implements LoggerInterface
     public function getTimezone()
     {
         if (is_null($this->timezone)) {
-            $this->timezone = new DateTimeZone($this->app['config']->get('logging.timezone', 'UTC'));
+            $this->timezone = new DateTimeZone($this->app['config']->get('logging.timezone', date_default_timezone_get()));
         }
 
         return $this->timezone;
