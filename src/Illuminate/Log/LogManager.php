@@ -194,7 +194,7 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * The factory to create Monolog
+     * The factory to create Monolog.
      *
      * @see \Monolog\Logger::__construct()
      */
