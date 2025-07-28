@@ -229,7 +229,7 @@ class Pipeline implements PipelineContract
      * Parse full pipe string to get name and parameters.
      *
      * @param  string  $pipe
-     * @return array
+     * @return array<string|null, string[]>
      */
     protected function parsePipeString($pipe)
     {
