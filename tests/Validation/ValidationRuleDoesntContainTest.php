@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
 
-class ValidationRuleDoesntContainTest extends TestCase {
+class ValidationRuleDoesntContainTest extends TestCase
+{
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {
         $rule = Rule::doesntContain('Taylor');
