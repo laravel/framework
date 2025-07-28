@@ -66,6 +66,13 @@ class LogManager implements LoggerInterface
     protected $dateFormat = 'Y-m-d H:i:s';
 
     /**
+     * The timezone to pass to Monolog.
+     *
+     * @var \DateTimeZone
+     */
+    protected $timezone = null;
+
+    /**
      * Create a new Log manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -584,6 +591,20 @@ class LogManager implements LoggerInterface
     public function setDefaultDriver($name)
     {
         $this->app['config']['logging.default'] = $name;
+    }
+
+    /**
+     * Get the timezone to pass to Monolog.
+     *
+     * @return \DateTimeZone
+     */
+    public function getTimezone()
+    {
+        if (is_null($this->timezone)) {
+            $this->timezone = new \DateTimeZone($this->app['config']['logging.timezone']);
+        }
+
+        return $this->timezone;
     }
 
     /**
