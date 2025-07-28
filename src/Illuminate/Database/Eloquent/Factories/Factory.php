@@ -515,10 +515,11 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return (new Collection($definition))
-            ->map($evaluateRelations = function ($attribute) {
+            ->map($evaluateRelations = function ($attribute, $key) use ($definition) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
-                } elseif ($attribute instanceof self && in_array($attribute->modelName(), $this->excludeRelationships)) {
+                } elseif ($attribute instanceof self &&
+                    array_intersect([$attribute->modelName(), $key], $this->excludeRelationships)) {
                     $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
@@ -534,7 +535,7 @@ abstract class Factory
                     $attribute = $attribute($definition);
                 }
 
-                $attribute = $evaluateRelations($attribute);
+                $attribute = $evaluateRelations($attribute, $key);
 
                 $definition[$key] = $attribute;
 
@@ -786,6 +787,7 @@ abstract class Factory
     /**
      * Indicate that related parent models should not be created.
      *
+     * @param  array<string|class-string<Model>>  $parents
      * @return static
      */
     public function withoutParents($parents = [])
