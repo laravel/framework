@@ -50,6 +50,22 @@ class LogManagerTest extends TestCase
         $this->assertEquals('single', $manager->getDefaultDriver());
     }
 
+    public function testTimezone()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.timezone', 'PRC');
+
+        $manager = new LogManager($this->app);
+        $this->assertEquals('PRC', $manager->getTimezone()->getName());
+
+        // createMonolog is protected. so use ReflectionMethod
+        $monolog = (new \ReflectionMethod($manager, 'createMonolog'))
+            ->invoke($manager, 'nameToPassToMonolog');
+
+        $this->assertEquals('PRC', $monolog->getTimezone()->getName());
+    }
+
     public function testStackChannel()
     {
         $config = $this->app['config'];
