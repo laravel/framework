@@ -96,11 +96,12 @@ class SeedCommand extends Command
     }
 
     /**
-     * Get a seeder from a class.
+     * Get a seeder instance from a class.
      *
+     * @param string $class
      * @return \Illuminate\Database\Seeder
      */
-    protected function getSeeder(string $class)
+    protected function getSeeder($class)
     {
         if (! str_contains($class, '\\')) {
             $class = 'Database\\Seeders\\'.$class;
