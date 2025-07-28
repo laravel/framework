@@ -207,7 +207,7 @@ class LogManager implements LoggerInterface
         );
 
         return new Logger(
-            new Monolog('laravel', $this->prepareHandlers([$handler]), [], $this->getTimezone()),
+            new Monolog('laravel', $this->prepareHandlers([$handler])),
             $this->app['events']
         );
     }
@@ -298,7 +298,7 @@ class LogManager implements LoggerInterface
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
-        return new Monolog($this->parseChannel($config), $handlers, $processors, $this->getTimezone());
+        return new Monolog($this->parseChannel($config), $handlers, $processors);
     }
 
     /**
@@ -316,7 +316,7 @@ class LogManager implements LoggerInterface
                     $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
                 ), $config
             ),
-        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : [], $this->getTimezone());
+        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
 
     /**
@@ -332,7 +332,7 @@ class LogManager implements LoggerInterface
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
             ), $config),
-        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : [], $this->getTimezone());
+        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
 
     /**
@@ -356,7 +356,7 @@ class LogManager implements LoggerInterface
                 $config['bubble'] ?? true,
                 $config['exclude_fields'] ?? []
             ), $config),
-        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : [], $this->getTimezone());
+        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
 
     /**
@@ -372,7 +372,7 @@ class LogManager implements LoggerInterface
                 Str::snake($this->app['config']['app.name'], '-'),
                 $config['facility'] ?? LOG_USER, $this->level($config)
             ), $config),
-        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : [], $this->getTimezone());
+        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
 
     /**
@@ -387,7 +387,7 @@ class LogManager implements LoggerInterface
             $this->prepareHandler(new ErrorLogHandler(
                 $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
             )),
-        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : [], $this->getTimezone());
+        ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }
 
     /**
@@ -435,7 +435,6 @@ class LogManager implements LoggerInterface
             $this->parseChannel($config),
             [$handler],
             $processors,
-            $this->getTimezone(),
         );
     }
 
