@@ -61,7 +61,7 @@ class LogManagerTest extends TestCase
 
         // createMonolog is protected. so use ReflectionMethod
         $monolog = (new \ReflectionMethod($manager, 'createMonolog'))
-            ->invoke($manager, 'nameToPassToMonolog');
+            ->invoke($manager, 'nameToPassToMonolog', []);
 
         $this->assertEquals('PRC', $monolog->getTimezone()->getName());
     }
