@@ -114,7 +114,7 @@ class CacheManager implements FactoryContract
     /**
      * Build a cache repository with the given configuration.
      *
-     * @param  array  $config
+     * @param  array{driver: string, name?: string}  $config
      * @return \Illuminate\Cache\Repository
      */
     public function build(array $config)
@@ -137,7 +137,7 @@ class CacheManager implements FactoryContract
     /**
      * Call a custom driver creator.
      *
-     * @param  array  $config
+     * @param  array{driver: string}  $config
      * @return mixed
      */
     protected function callCustomCreator(array $config)
@@ -161,7 +161,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the array cache driver.
      *
-     * @param  array  $config
+     * @param  array{serialize?: bool}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createArrayDriver(array $config)
@@ -172,7 +172,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the file cache driver.
      *
-     * @param  array  $config
+     * @param  array{path: string, lock_path: string, permission?: int}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createFileDriver(array $config)
@@ -187,7 +187,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Memcached cache driver.
      *
-     * @param  array  $config
+     * @param  array{servers: array{host: strint, port: int, weight: int}[], persistent_id?: string|null, options?: array, sasl?: array{string, string}}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createMemcachedDriver(array $config)
@@ -217,7 +217,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Redis cache driver.
      *
-     * @param  array  $config
+     * @param  array{connection?: sttring, lock_connection?: string}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createRedisDriver(array $config)
@@ -237,7 +237,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the database cache driver.
      *
-     * @param  array  $config
+     * @param  array{table: string, connection?: string, lock_table?: string, lock_lottery?: array{int, int}, lock_timeout?: int, lock_connection?: string}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createDatabaseDriver(array $config)
@@ -264,7 +264,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the DynamoDB cache driver.
      *
-     * @param  array  $config
+     * @param  array{table: string, attributes?: array{key?: string, value?: string, expiration?: string}}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createDynamodbDriver(array $config)
@@ -287,6 +287,7 @@ class CacheManager implements FactoryContract
     /**
      * Create new DynamoDb Client instance.
      *
+     * @param  array{region: string, endpoint?: string, key?: string, secret?: string, token?: string}  $config
      * @return \Aws\DynamoDb\DynamoDbClient
      */
     protected function newDynamodbClient(array $config)
@@ -314,7 +315,7 @@ class CacheManager implements FactoryContract
      * Create a new cache repository with the given implementation.
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
-     * @param  array  $config
+     * @param  array{store?: string, events: bool}  $config
      * @return \Illuminate\Cache\Repository
      */
     public function repository(Store $store, array $config = [])
@@ -356,7 +357,7 @@ class CacheManager implements FactoryContract
     /**
      * Get the cache prefix.
      *
-     * @param  array  $config
+     * @param  array{prefix?: string}  $config
      * @return string
      */
     protected function getPrefix(array $config)
@@ -403,7 +404,7 @@ class CacheManager implements FactoryContract
     /**
      * Unset the given driver instances.
      *
-     * @param  array|string|null  $name
+     * @param  string[]|string|null  $name
      * @return $this
      */
     public function forgetDriver($name = null)
