@@ -395,6 +395,34 @@ class Grammar extends BaseGrammar
         return '0 = 1';
     }
 
+    protected function whereRowIn(Builder $query, $where)
+    {
+        if (! empty($where['valueTuples'])) {
+            $parsedColumns = implode(', ', array_map([$this, 'wrap'], $where['columns']));
+            $parsedValues = implode(', ', array_map(function($row) {
+                return '(' . $this->parameterize($row) . ')';
+            }, $where['valueTuples']));
+
+            return '('.$parsedColumns.') in ('.$parsedValues.')';
+        }
+
+        return '0 = 1';
+    }
+
+    protected function whereRowNotIn(Builder $query, $where)
+    {
+        if (! empty($where['valueTuples'])) {
+            $parsedColumns = implode(', ', array_map([$this, 'wrap'], $where['columns']));
+            $parsedValues = implode(', ', array_map(function($row) {
+                return '(' . $this->parameterize($row) . ')';
+            }, $where['valueTuples']));
+
+            return '('.$parsedColumns.') not in ('.$parsedValues.')';
+        }
+
+        return '0 = 1';
+    }
+
     /**
      * Compile a "where null" clause.
      *
