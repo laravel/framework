@@ -38,14 +38,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var \PDO|\Closure
+     * @var \PDO|(\Closure(): \PDO)
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var \PDO|\Closure
+     * @var \PDO|(\Closure(): \PDO)
      */
     protected $readPdo;
 
@@ -80,7 +80,7 @@ class Connection implements ConnectionInterface
     /**
      * The reconnector instance for the connection.
      *
-     * @var callable
+     * @var (callable(\Illuminate\Database\Connection): mixed)
      */
     protected $reconnector;
 
@@ -150,7 +150,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the queries run against the connection.
      *
-     * @var array
+     * @var array{query: string, bindings: array, time: float|null}[]
      */
     protected $queryLog = [];
 
@@ -192,7 +192,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the callbacks that should be invoked before a query is executed.
      *
-     * @var \Closure[]
+     * @var (\Closure(string, array, \Illuminate\Database\Connection): mixed)[]
      */
     protected $beforeExecutingCallbacks = [];
 
@@ -206,7 +206,7 @@ class Connection implements ConnectionInterface
     /**
      * Create a new database connection instance.
      *
-     * @param  \PDO|\Closure  $pdo
+     * @param  \PDO|(\Closure(): \PDO)  $pdo
      * @param  string  $database
      * @param  string  $tablePrefix
      * @param  array  $config
@@ -638,8 +638,8 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
-     * @return array
+     * @param  (\Closure(\Illuminate\Database\Connection): mixed)  $callback
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     public function pretend(Closure $callback)
     {
@@ -681,8 +681,8 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
-     * @return array
+     * @param  (\Closure(): array{query: string, bindings: array, time: float|null}[])  $callback
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     protected function withFreshQueryLog($callback)
     {
@@ -1307,7 +1307,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the reconnect instance on the connection.
      *
-     * @param  callable  $reconnector
+     * @param  (callable(\Illuminate\Database\Connection): mixed)  $reconnector
      * @return $this
      */
     public function setReconnector(callable $reconnector)
@@ -1506,7 +1506,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the connection query log.
      *
-     * @return array
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     public function getQueryLog()
     {
