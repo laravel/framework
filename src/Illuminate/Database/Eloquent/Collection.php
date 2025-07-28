@@ -885,7 +885,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
+        if (!$this->every(fn ($model) => $model instanceof $class)) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 
