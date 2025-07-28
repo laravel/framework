@@ -41,7 +41,7 @@ class ValidationRuleDoesntContainTest extends TestCase {
         $this->assertSame('doesnt_contain:"""foo""","""bar""","""baz"""', (string) $rule);
     }
 
-    public function testContainsValidation()
+    public function testDoesntContainValidation()
     {
         $trans = new Translator(new ArrayLoader, 'en');
 
@@ -63,6 +63,14 @@ class ValidationRuleDoesntContainTest extends TestCase {
 
         // Test passes when array does not contain any value
         $v = new Validator($trans, ['roles' => ['subscriber', 'guest']], ['roles' => Rule::doesntContain(['admin', 'editor'])]);
+        $this->assertTrue($v->passes());
+
+        // Test fails when array includes a value (using string-like format)
+        $v = new Validator($trans, ['roles' => ['admin', 'user']], ['roles' => 'doesnt_contain:admin']);
+        $this->assertTrue($v->fails());
+
+        // Test passes when array doesn't include a value (using string-like format)
+        $v = new Validator($trans, ['roles' => ['admin', 'user']], ['roles' => 'doesnt_contain:editor']);
         $this->assertTrue($v->passes());
 
         // Test fails when array doesn't contain the value
