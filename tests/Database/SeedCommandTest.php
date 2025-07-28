@@ -104,6 +104,59 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
+    public function testClassOptionWithMultipleSeeders()
+    {
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => UserWithoutModelEventsSeeder::class.','.AnotherUserWithoutModelEventsSeeder::class,
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $firstInstance = new UserWithoutModelEventsSeeder();
+
+        $firstSeeder = m::mock($firstInstance);
+        $firstSeeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $firstSeeder->shouldReceive('setCommand')->once()->andReturnSelf();
+
+        $secondInstance = new AnotherUserWithoutModelEventsSeeder();
+
+        $secondSeeder = m::mock($secondInstance);
+        $secondSeeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $secondSeeder->shouldReceive('setCommand')->once()->andReturnSelf();
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(UserWithoutModelEventsSeeder::class)->andReturn($firstSeeder);
+        $container->shouldReceive('make')->with(AnotherUserWithoutModelEventsSeeder::class)->andReturn($secondSeeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        Model::setEventDispatcher($dispatcher = m::mock(Dispatcher::class));
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        Assert::assertSame($dispatcher, Model::getEventDispatcher());
+
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
+
     public function testProhibitable()
     {
         $input = new ArrayInput([]);
@@ -144,6 +197,16 @@ class SeedCommandTest extends TestCase
 }
 
 class UserWithoutModelEventsSeeder extends Seeder
+{
+    use WithoutModelEvents;
+
+    public function run()
+    {
+        Assert::assertInstanceOf(NullDispatcher::class, Model::getEventDispatcher());
+    }
+}
+
+class AnotherUserWithoutModelEventsSeeder extends Seeder
 {
     use WithoutModelEvents;
 
