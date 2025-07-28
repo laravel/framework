@@ -226,9 +226,10 @@ trait InteractsWithIO
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  \Symfony\Component\Console\Helper\TableStyle|string  $tableStyle
      * @param  array  $columnStyles
+     * @param  bool  $horizontal
      * @return void
      */
-    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
+    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [], $horizontal = false)
     {
         $table = new Table($this->output);
 
@@ -241,6 +242,8 @@ trait InteractsWithIO
         foreach ($columnStyles as $columnIndex => $columnStyle) {
             $table->setColumnStyle($columnIndex, $columnStyle);
         }
+
+        $table->setHorizontal($horizontal);
 
         $table->render();
     }
