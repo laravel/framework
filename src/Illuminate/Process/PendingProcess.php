@@ -366,8 +366,8 @@ class PendingProcess
      * Resolve the given fake handler for a synchronous process.
      *
      * @param  string  $command
-     * @param  \Closure  $fake
-     * @return mixed
+     * @param  (\Closure(\Illuminate\Process\PendingProcess): int|string|array|\Illuminate\Process\ProcessResult|\Illuminate\Process\FakeProcessResult|\Illuminate\Process\FakeProcessDescription|\Illuminate\Process\FakeProcessSequence|\Throwable)  $fake
+     * @return \Illuminate\Process\FakeProcessResult|\Illuminate\Contracts\Process\ProcessResult|\Illuminate\Process\FakeProcessDescription|mixed
      */
     protected function resolveSynchronousFake(string $command, Closure $fake)
     {
@@ -396,7 +396,7 @@ class PendingProcess
      *
      * @param  string  $command
      * @param  callable|null  $output
-     * @param  \Closure  $fake
+     * @param  (\Closure(\Illuminate\Process\PendingProcess): int|string|array|\Illuminate\Process\ProcessResult|\Illuminate\Process\FakeProcessResult|\Illuminate\Process\FakeProcessDescription|\Illuminate\Process\FakeProcessSequence|\Throwable)  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
      *
      * @throws \LogicException
