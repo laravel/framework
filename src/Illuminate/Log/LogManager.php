@@ -3,6 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
+use DateTimeZone;
 use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -68,7 +69,7 @@ class LogManager implements LoggerInterface
     /**
      * The timezone to pass to Monolog.
      *
-     * @var \DateTimeZone
+     * @var DateTimeZone
      */
     protected $timezone = null;
 
@@ -606,12 +607,12 @@ class LogManager implements LoggerInterface
     /**
      * Get the timezone to pass to Monolog.
      *
-     * @return \DateTimeZone
+     * @return DateTimeZone
      */
     public function getTimezone()
     {
         if (is_null($this->timezone)) {
-            $this->timezone = new \DateTimeZone($this->app['config']->get('logging.timezone', 'UTC'));
+            $this->timezone = new DateTimeZone($this->app['config']->get('logging.timezone', 'UTC'));
         }
 
         return $this->timezone;
