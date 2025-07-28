@@ -9,10 +9,10 @@ class MemcachedConnector
     /**
      * Create a new Memcached connection.
      *
-     * @param  array  $servers
+     * @param  array{host: strint, port: int, weight: int}[]  $servers
      * @param  string|null  $connectionId
      * @param  array  $options
-     * @param  array  $credentials
+     * @param  array{string, string}  $credentials
      * @return \Memcached
      */
     public function connect(array $servers, $connectionId = null, array $options = [], array $credentials = [])
@@ -39,7 +39,7 @@ class MemcachedConnector
      * Get a new Memcached instance.
      *
      * @param  string|null  $connectionId
-     * @param  array  $credentials
+     * @param  array{string, string}  $credentials
      * @param  array  $options
      * @return \Memcached
      */
@@ -73,7 +73,7 @@ class MemcachedConnector
      * Set the SASL credentials on the Memcached connection.
      *
      * @param  \Memcached  $memcached
-     * @param  array  $credentials
+     * @param  array{string, string}  $credentials
      * @return void
      */
     protected function setCredentials($memcached, $credentials)
