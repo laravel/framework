@@ -217,7 +217,7 @@ class LogManager implements LoggerInterface
         );
 
         return new Logger(
-            new Monolog('laravel', $this->prepareHandlers([$handler])),
+            $this->createMonolog('laravel', $this->prepareHandlers([$handler])),
             $this->app['events']
         );
     }
@@ -308,7 +308,7 @@ class LogManager implements LoggerInterface
             $handlers = [new WhatFailureGroupHandler($handlers)];
         }
 
-        return new Monolog($this->parseChannel($config), $handlers, $processors);
+        return $this->createMonolog($this->parseChannel($config), $handlers, $processors);
     }
 
     /**
@@ -319,7 +319,7 @@ class LogManager implements LoggerInterface
      */
     protected function createSingleDriver(array $config)
     {
-        return new Monolog($this->parseChannel($config), [
+        return $this->createMonolog($this->parseChannel($config), [
             $this->prepareHandler(
                 new StreamHandler(
                     $config['path'], $this->level($config),
@@ -337,7 +337,7 @@ class LogManager implements LoggerInterface
      */
     protected function createDailyDriver(array $config)
     {
-        return new Monolog($this->parseChannel($config), [
+        return $this->createMonolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
                 $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
@@ -353,7 +353,7 @@ class LogManager implements LoggerInterface
      */
     protected function createSlackDriver(array $config)
     {
-        return new Monolog($this->parseChannel($config), [
+        return $this->createMonolog($this->parseChannel($config), [
             $this->prepareHandler(new SlackWebhookHandler(
                 $config['url'],
                 $config['channel'] ?? null,
@@ -377,7 +377,7 @@ class LogManager implements LoggerInterface
      */
     protected function createSyslogDriver(array $config)
     {
-        return new Monolog($this->parseChannel($config), [
+        return $this->createMonolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
                 Str::snake($this->app['config']['app.name'], '-'),
                 $config['facility'] ?? LOG_USER, $this->level($config)
@@ -393,7 +393,7 @@ class LogManager implements LoggerInterface
      */
     protected function createErrorlogDriver(array $config)
     {
-        return new Monolog($this->parseChannel($config), [
+        return $this->createMonolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
                 $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config)
             )),
@@ -441,7 +441,7 @@ class LogManager implements LoggerInterface
             ->map(fn ($processor) => $this->app->make($processor['processor'] ?? $processor, $processor['with'] ?? []))
             ->toArray();
 
-        return new Monolog(
+        return $this->createMonolog(
             $this->parseChannel($config),
             [$handler],
             $processors,
