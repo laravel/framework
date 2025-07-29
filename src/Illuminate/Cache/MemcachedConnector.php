@@ -9,7 +9,7 @@ class MemcachedConnector
     /**
      * Create a new Memcached connection.
      *
-     * @param  array{host: strint, port: int, weight?: int}[]  $servers
+     * @param  array{host: string, port: int, weight?: int}[]  $servers
      * @param  string|null  $connectionId
      * @param  array  $options
      * @param  array{string, string}  $credentials
