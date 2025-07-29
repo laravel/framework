@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Dotenv\Dotenv;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -194,10 +195,36 @@ class Env
 
         $envContent = $filesystem->get($pathToFile);
 
-        $lines = explode(PHP_EOL, $envContent);
-        $lines = array_filter($lines, fn ($line) => ! str_starts_with($line, $key.'='));
+        $parsed = Dotenv::parse($envContent);
 
-        $filesystem->put($pathToFile, implode(PHP_EOL, $lines));
+        if (! isset($parsed[$key])) {
+            return;
+        }
+
+        $value = $parsed[$key];
+
+        $shouldQuote = preg_match('/^[a-zA-z0-9]+$/', $value) === 0;
+
+        $lineToAddVariations = [
+            $key.'='.(is_string($value) ? '"'.addslashes($value).'"' : $value),
+            $key.'='.$value,
+        ];
+
+        $line = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[1];
+
+        if ($value === '') {
+            $line = $key.'=';
+        }
+
+        if (array_key_last($parsed) !== $key) {
+            $line .= "\n";
+        } else {
+            $line = "\n".$line;
+        }
+
+        $envContent = str_replace($line, '', $envContent);
+
+        $filesystem->put($pathToFile, $envContent);
     }
 
     /**
