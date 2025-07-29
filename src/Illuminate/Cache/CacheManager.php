@@ -187,7 +187,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Memcached cache driver.
      *
-     * @param  array{servers: array{host: strint, port: int, weight?: int}[], persistent_id?: string|null, options?: array, sasl?: array{string, string}}  $config
+     * @param  array{servers: array{host: string, port: int, weight?: int}[], persistent_id?: string|null, options?: array, sasl?: array{string, string}}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createMemcachedDriver(array $config)
