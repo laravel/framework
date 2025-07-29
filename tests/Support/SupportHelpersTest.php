@@ -1488,7 +1488,7 @@ class SupportHelpersTest extends TestCase
             'DB_HOST=',
             'FOO="bar
 BAZ=foo"',
-            'BAZ=12345'
+            'BAZ=12345',
         ]));
 
         Env::removeVariable('BAZ', $path);
@@ -1525,7 +1525,7 @@ BAZ=foo"',
             'DB_HOST=',
             'FOO="bar
 BAZ=foo"',
-            'BAZ=12345'
+            'BAZ=12345',
         ]));
 
         Env::removeVariable('FOO', $path);
@@ -1540,7 +1540,7 @@ BAZ=foo"',
                 '',
                 'DB_CONNECTION=mysql',
                 'DB_HOST=',
-                'BAZ=12345'
+                'BAZ=12345',
             ]),
             $filesystem->get($path)
         );
