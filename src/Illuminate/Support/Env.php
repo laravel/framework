@@ -179,7 +179,6 @@ class Env
      *
      * @param  array  $variables
      * @param  string  $pathToFile
-     *
      * @return void
      *
      * @throws RuntimeException
