@@ -1442,6 +1442,39 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    public function testRemoveVariablesFromFile()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::removeVariables([
+            'APP_DEBUG',
+            'APP_URL',
+            'DB_HOST',
+        ], $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                '',
+                'DB_CONNECTION=mysql',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
     public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void
     {
         $this->expectExceptionObject(new RuntimeException('The file [missing-file] does not exist.'));

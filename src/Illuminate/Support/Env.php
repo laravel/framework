@@ -175,6 +175,36 @@ class Env
     }
 
     /**
+     * Remove an array of keys from the environment file.
+     *
+     * @param  array  $variables
+     * @param  string  $pathToFile
+     *
+     * @return void
+     *
+     * @throws RuntimeException
+     * @throws FileNotFoundException
+     */
+    public static function removeVariables(array $variables, string $pathToFile): void
+    {
+        $filesystem = new Filesystem;
+
+        if ($filesystem->missing($pathToFile)) {
+            throw new RuntimeException("The file [{$pathToFile}] does not exist.");
+        }
+
+        $envContent = $filesystem->get($pathToFile);
+
+        $lines = explode(PHP_EOL, $envContent);
+
+        foreach ($variables as $variable) {
+            $lines = array_filter($lines, fn ($line) => ! str_starts_with($line, $variable.'='));
+        }
+
+        $filesystem->put($pathToFile, implode(PHP_EOL, $lines));
+    }
+
+    /**
      * Add a variable to the environment file contents.
      *
      * @param  string  $key
