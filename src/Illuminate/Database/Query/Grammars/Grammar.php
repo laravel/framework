@@ -1453,35 +1453,43 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * Determine if the grammar supports savepoints.
-     *
-     * @return bool
+     * Determine if the connection supports savepoints.
      */
-    public function supportsSavepoints()
+    public function supportsSavepoints(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the connection supports releasing savepoints.
+     */
+    public function supportsSavepointRelease(): bool
     {
         return true;
     }
 
     /**
      * Compile the SQL statement to define a savepoint.
-     *
-     * @param  string  $name
-     * @return string
      */
-    public function compileSavepoint($name)
+    public function compileSavepoint(string $name): string
     {
-        return 'SAVEPOINT '.$name;
+        return 'SAVEPOINT '.$this->wrapValue($name);
     }
 
     /**
      * Compile the SQL statement to execute a savepoint rollback.
-     *
-     * @param  string  $name
-     * @return string
      */
-    public function compileSavepointRollBack($name)
+    public function compileRollbackToSavepoint(string $name): string
     {
-        return 'ROLLBACK TO SAVEPOINT '.$name;
+        return 'ROLLBACK TO SAVEPOINT '.$this->wrapValue($name);
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint release.
+     */
+    public function compileReleaseSavepoint(string $name): string
+    {
+        return 'RELEASE SAVEPOINT '.$this->wrapValue($name);
     }
 
     /**
