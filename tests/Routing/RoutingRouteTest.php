@@ -442,6 +442,33 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->bindingFieldFor('baz'));
     }
 
+    public function testRouteWithConditionableTrue()
+    {
+        $router = $this->getRouter();
+
+        $router->when(true, function (Registrar $router) {
+            $router->get('foo/bar', function () {
+                return 'hello';
+            });
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
+    public function testRouteWithConditionableFalse()
+    {
+        $router = $this->getRouter();
+
+        $router->when(false, function (Registrar $router) {
+            $router->get('foo/bar', function () {
+                return 'hello';
+            });
+        });
+
+        $this->expectException(NotFoundHttpException::class);
+        $router->dispatch(Request::create('foo/bar', 'GET'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
