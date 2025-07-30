@@ -94,7 +94,7 @@ class ConnectionFactory
      * Create a new PDO instance for reading.
      *
      * @param  array  $config
-     * @return \Closure
+     * @return (\Closure(array): \PDO)
      */
     protected function createReadPdo(array $config)
     {
@@ -157,7 +157,7 @@ class ConnectionFactory
      * Create a new Closure that resolves to a PDO instance.
      *
      * @param  array  $config
-     * @return \Closure
+     * @return (\Closure(array): \PDO)
      */
     protected function createPdoResolver(array $config)
     {
@@ -170,7 +170,7 @@ class ConnectionFactory
      * Create a new Closure that resolves to a PDO instance with a specific host or an array of hosts.
      *
      * @param  array  $config
-     * @return \Closure
+     * @return (\Closure(array): \PDO)
      *
      * @throws \PDOException
      */
@@ -216,7 +216,7 @@ class ConnectionFactory
      * Create a new Closure that resolves to a PDO instance where there is no configured host.
      *
      * @param  array  $config
-     * @return \Closure
+     * @return (\Closure(array): \PDO)
      */
     protected function createPdoResolverWithoutHosts(array $config)
     {
