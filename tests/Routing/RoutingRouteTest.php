@@ -453,6 +453,16 @@ class RoutingRouteTest extends TestCase
         });
 
         $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+
+        $router->when(true, function (Registrar $router) {
+            $router->group(['prefix' => 'group'], function (Registrar $router) {
+                $router->get('foo/bar', function () {
+                    return 'hello from group';
+                });
+            });
+        });
+
+        $this->assertSame('hello from group', $router->dispatch(Request::create('group/foo/bar', 'GET'))->getContent());
     }
 
     public function testRouteWithConditionableFalse()
@@ -467,6 +477,17 @@ class RoutingRouteTest extends TestCase
 
         $this->expectException(NotFoundHttpException::class);
         $router->dispatch(Request::create('foo/bar', 'GET'));
+
+        $router->when(false, function (Registrar $router) {
+            $router->group(['prefix' => 'group'], function (Registrar $router) {
+                $router->get('foo/bar', function () {
+                    return 'hello from group';
+                });
+            });
+        });
+
+        $this->expectException(NotFoundHttpException::class);
+        $router->dispatch(Request::create('group/foo/bar', 'GET'));
     }
 
     public function testMacro()
