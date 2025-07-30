@@ -315,7 +315,6 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $queryBuilder = $this->getMockQueryBuilder();
         $queryBuilder->orders = [['column' => 'name', 'direction' => 'asc']];
-        
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
         $model = $this->getMockModel();
         $builder->setModel($model);
@@ -332,7 +331,6 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $queryBuilder = $this->getMockQueryBuilder();
         $queryBuilder->joins = [['table' => 'other_table']];
-        
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
         $model = $this->getMockModel();
         $builder->setModel($model);
@@ -349,7 +347,6 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $queryBuilder = $this->getMockQueryBuilder();
         $queryBuilder->wheres = [['type' => 'Basic', 'column' => 'name', 'operator' => '=', 'value' => 'John']];
-        
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
         $model = $this->getMockModel();
         $builder->setModel($model);
