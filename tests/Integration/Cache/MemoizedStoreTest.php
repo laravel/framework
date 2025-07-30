@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use BadMethodCallException;
 use Illuminate\Cache\Events\CacheEvent;
-use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgotten;
@@ -12,8 +11,6 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
-use Illuminate\Cache\MemoizedStore;
-use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
@@ -164,11 +161,11 @@ class MemoizedStoreTest extends TestCase
 
         $reflection = new \ReflectionClass($memoStore);
 
-        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+        $cacheProperty = tap($reflection->getProperty('cache'), function ($reflectionProperty) {
             $reflectionProperty->setAccessible(true);
         });
 
-        $prefixedKey = tap($reflection->getMethod('prefix'), function($method) {
+        $prefixedKey = tap($reflection->getMethod('prefix'), function ($method) {
             $method->setAccessible(true);
         })->invoke($memoStore, 'name');
 
@@ -227,11 +224,11 @@ class MemoizedStoreTest extends TestCase
 
         $reflection = new \ReflectionClass($memoStore);
 
-        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+        $cacheProperty = tap($reflection->getProperty('cache'), function ($reflectionProperty) {
             $reflectionProperty->setAccessible(true);
         });
 
-        $prefixedKey = tap($reflection->getMethod('prefix'), function($method) {
+        $prefixedKey = tap($reflection->getMethod('prefix'), function ($method) {
             $method->setAccessible(true);
         })->invoke($memoStore, 'count');
 
@@ -272,11 +269,11 @@ class MemoizedStoreTest extends TestCase
 
         $reflection = new \ReflectionClass($memoStore);
 
-        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+        $cacheProperty = tap($reflection->getProperty('cache'), function ($reflectionProperty) {
             $reflectionProperty->setAccessible(true);
         });
 
-        $prefixedKey = tap($reflection->getMethod('prefix'), function($method){
+        $prefixedKey = tap($reflection->getMethod('prefix'), function ($method) {
             $method->setAccessible(true);
         })->invoke($memoStore, 'count');
 
