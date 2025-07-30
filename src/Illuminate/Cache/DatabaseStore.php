@@ -57,7 +57,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * An array representation of the lock lottery odds.
      *
-     * @var array
+     * @var array{int, int}
      */
     protected $lockLottery;
 
@@ -75,7 +75,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $table
      * @param  string  $prefix
      * @param  string  $lockTable
-     * @param  array  $lockLottery
+     * @param  array{int, int}  $lockLottery
      * @param  int  $defaultLockTimeoutInSeconds
      */
     public function __construct(
@@ -253,10 +253,13 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Increment or decrement an item in the cache.
      *
+     * @template TValue of int|float
+     * @template TReturn of int|false
+     *
      * @param  string  $key
-     * @param  int|float  $value
-     * @param  \Closure  $callback
-     * @return int|false
+     * @param  TValue  $value
+     * @param  (\Closure(int, TValue): TReturn)  $callback
+     * @return TReturn
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
     {
@@ -377,7 +380,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @param  array  $keys
+     * @param  array<int, string>  $keys
      * @return bool
      */
     protected function forgetMany(array $keys)
@@ -393,7 +396,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all expired items from the given set from the cache.
      *
-     * @param  array  $keys
+     * @param  array<int, string>  $keys
      * @param  bool  $prefixed
      * @return bool
      */

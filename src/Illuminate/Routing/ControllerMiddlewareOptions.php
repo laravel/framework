@@ -7,14 +7,14 @@ class ControllerMiddlewareOptions
     /**
      * The middleware options.
      *
-     * @var array
+     * @var array{only: (string|mixed)[], except: (string|mixed)[]}
      */
     protected $options;
 
     /**
      * Create a new middleware option instance.
      *
-     * @param  array  $options
+     * @param  array{only: (string|mixed)[], except: (string|mixed)[]}  $options
      */
     public function __construct(array &$options)
     {

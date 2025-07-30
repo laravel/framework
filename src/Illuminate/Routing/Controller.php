@@ -9,15 +9,15 @@ abstract class Controller
     /**
      * The middleware registered on the controller.
      *
-     * @var array
+     * @var array{middleware: \Closure|string, options: array{only: (string|mixed)[], except: (string|mixed)[]}}[]
      */
     protected $middleware = [];
 
     /**
      * Register middleware on the controller.
      *
-     * @param  \Closure|array|string  $middleware
-     * @param  array  $options
+     * @param  \Closure|array<int, \Closure|string>|string  $middleware
+     * @param  array{only: (string|mixed)[], except: (string|mixed)[]}  $options
      * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
     public function middleware($middleware, array $options = [])
