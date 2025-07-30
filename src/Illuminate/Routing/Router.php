@@ -23,6 +23,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use JsonSerializable;
@@ -41,6 +42,7 @@ class Router implements BindingRegistrar, RegistrarContract
         __call as macroCall;
     }
     use Tappable;
+    use Conditionable;
 
     /**
      * The event dispatcher instance.
