@@ -2,17 +2,18 @@
 
 namespace Tests\Database;
 
-use Illuminate\Database\Eloquent\RelationNotFoundException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Tests\Database\Fixtures\Models\User;
 use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
+use Illuminate\Database\Eloquent\RelationNotFoundException;
+use Illuminate\Tests\Database\Fixtures\Models\User;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentStrictRelationsTest extends TestCase
 {
     public function testValidateRelationExistenceThrows()
     {
         $user = new User();
-        $trait = new class($user) {
+        $trait = new class($user)
+        {
             use QueriesRelationships;
 
             public $model;
@@ -40,7 +41,8 @@ class DatabaseEloquentStrictRelationsTest extends TestCase
     public function testValidateRelationExistenceDoesNotThrow()
     {
         $user = new User();
-        $trait = new class($user) {
+        $trait = new class($user)
+        {
             use QueriesRelationships;
 
             public $model;

@@ -29,9 +29,9 @@ trait QueriesRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
-     * @param  string $operator
-     * @param  int $count
-     * @param  string $boolean
+     * @param  string  $operator
+     * @param  int  $count
+     * @param  string  $boolean
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      *
@@ -84,7 +84,7 @@ trait QueriesRelationships
     /**
      * Validate that the given relation exists on the model.
      *
-     * @param string $relation
+     * @param string  $relation
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     protected function validateRelationExistence($relation)
