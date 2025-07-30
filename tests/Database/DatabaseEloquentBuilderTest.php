@@ -295,6 +295,40 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testFirstMethodAddsOrderingForConsistency()
+    {
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        // Ensure orderBy is called with the model's key name when no existing ordering is present
+        $builder->shouldReceive('orderBy')->with('foo')->once()->andReturnSelf();
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testFirstMethodDoesNotAddOrderingWhenAlreadyPresent()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        // Manually set orders property to simulate existing ordering
+        $builder->getQuery()->orders = [['column' => 'name', 'direction' => 'asc']];
+
+        // Ensure orderBy is NOT called when ordering already exists
+        $builder->shouldNotReceive('orderBy');
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
     public function testQualifyColumn()
     {
         $builder = new Builder(m::mock(BaseBuilder::class));

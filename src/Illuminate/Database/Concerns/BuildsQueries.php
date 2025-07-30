@@ -363,6 +363,18 @@ trait BuildsQueries
      */
     public function first($columns = ['*'])
     {
+        // Ensure consistent results across databases by adding default ordering
+        // when no explicit ordering is provided. This addresses inconsistencies
+        // between PostgreSQL and MySQL/MariaDB when using LIMIT without ORDER BY.
+        $query = method_exists($this, 'getQuery') ? $this->getQuery() : $this;
+        
+        if (empty($query->orders)) {
+            // For Eloquent queries, use the model's primary key
+            if (method_exists($this, 'getModel') && $this->getModel()) {
+                $this->orderBy($this->getModel()->getKeyName());
+            }
+        }
+
         return $this->limit(1)->get($columns)->first();
     }
 
