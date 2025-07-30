@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Cache;
 
 use BadMethodCallException;
 use Illuminate\Cache\Events\CacheEvent;
+use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
 use Illuminate\Cache\Events\KeyForgotten;
@@ -11,6 +12,8 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
+use Illuminate\Cache\MemoizedStore;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Support\Facades\Cache;
@@ -155,6 +158,34 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame(['name.0' => 'Tim', 'name.1' => 'Otwell'], $memoized);
     }
 
+    public function test_put_updates_memoized_value()
+    {
+        $memoStore = Cache::memo()->getStore();
+
+        $reflection = new \ReflectionClass($memoStore);
+
+        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+            $reflectionProperty->setAccessible(true);
+        });
+
+        $prefixedKey = tap($reflection->getMethod('prefix'), function($method) {
+            $method->setAccessible(true);
+        })->invoke($memoStore, 'name');
+
+        Cache::memo()->put('name', 'Tim', 60);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertSame('Tim', $memoStoreValues[$prefixedKey]);
+
+        Cache::memo()->put('name', 'Taylor', 60);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertNotSame('Tim', $memoStoreValues[$prefixedKey]);
+        $this->assertSame('Taylor', $memoStoreValues[$prefixedKey]);
+    }
+
     public function test_put_forgets_memoized_value()
     {
         Cache::put(['name.0' => 'Tim', 'name.1' => 'Taylor'], 60);
@@ -190,6 +221,34 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame(['name.0' => 'MacDonald', 'name.1' => 'Taylor'], $memoized);
     }
 
+    public function test_increment_updates_memoized_value()
+    {
+        $memoStore = Cache::memo()->getStore();
+
+        $reflection = new \ReflectionClass($memoStore);
+
+        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+            $reflectionProperty->setAccessible(true);
+        });
+
+        $prefixedKey = tap($reflection->getMethod('prefix'), function($method) {
+            $method->setAccessible(true);
+        })->invoke($memoStore, 'count');
+
+        Cache::memo()->put('count', 5, 60);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertEquals('5', $memoStoreValues[$prefixedKey]);
+
+        Cache::memo()->increment('count', 3);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertNotSame('5', $memoStoreValues[$prefixedKey]);
+        $this->assertEquals('8', $memoStoreValues[$prefixedKey]);
+    }
+
     public function test_increment_forgets_memoized_value()
     {
         Cache::put('count', 1, 60);
@@ -205,6 +264,34 @@ class MemoizedStoreTest extends TestCase
         $memoized = Cache::memo()->get('count');
         $this->assertSame('2', $live);
         $this->assertSame('2', $memoized);
+    }
+
+    public function test_decrement_updates_memoized_value()
+    {
+        $memoStore = Cache::memo()->getStore();
+
+        $reflection = new \ReflectionClass($memoStore);
+
+        $cacheProperty = tap($reflection->getProperty('cache'), function($reflectionProperty){
+            $reflectionProperty->setAccessible(true);
+        });
+
+        $prefixedKey = tap($reflection->getMethod('prefix'), function($method){
+            $method->setAccessible(true);
+        })->invoke($memoStore, 'count');
+
+        Cache::memo()->put('count', 5, 60);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertEquals('5', $memoStoreValues[$prefixedKey]);
+
+        Cache::memo()->decrement('count', 2);
+
+        $memoStoreValues = $cacheProperty->getValue($memoStore);
+        $this->assertArrayHasKey($prefixedKey, $memoStoreValues);
+        $this->assertNotSame('5', $memoStoreValues[$prefixedKey]);
+        $this->assertEquals('3', $memoStoreValues[$prefixedKey]);
     }
 
     public function test_decrement_forgets_memoized_value()
