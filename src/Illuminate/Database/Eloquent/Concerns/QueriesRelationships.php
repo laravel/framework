@@ -39,6 +39,9 @@ trait QueriesRelationships
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
     {
         if (is_string($relation)) {
+            if (config('database.connections.eloquent.strict_relationships', false)) {
+                $this->validateRelationExistence($relation);
+            }
             if (str_contains($relation, '.')) {
                 return $this->hasNested($relation, $operator, $count, $boolean, $callback);
             }
@@ -71,6 +74,19 @@ trait QueriesRelationships
         return $this->addHasWhere(
             $hasQuery, $relation, $operator, $count, $boolean
         );
+    }
+
+    /**
+     * Validate that the given relation exists on the model.
+     *
+     * @param string $relation
+     * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
+     */
+    protected function validateRelationExistence($relation)
+    {
+        if (!method_exists($this->getModel(), $relation)) {
+            throw RelationNotFoundException::make($this->getModel(), $relation);
+        }
     }
 
     /**
