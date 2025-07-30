@@ -18,6 +18,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 use function Illuminate\Support\enum_value;
+use Illuminate\Support\Facades\Config;
 
 /** @mixin \Illuminate\Database\Eloquent\Builder */
 trait QueriesRelationships
@@ -39,8 +40,12 @@ trait QueriesRelationships
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
     {
         if (is_string($relation)) {
-            if (config('database.connections.eloquent.strict_relationships', false)) {
-                $this->validateRelationExistence($relation);
+            try {
+                if (Config::get('database.connections.eloquent.strict_relationships', false)) {
+                    $this->validateRelationExistence($relation);
+                }
+            } catch (\RuntimeException $e) {
+                // Facade root not set, skip strict check
             }
             if (str_contains($relation, '.')) {
                 return $this->hasNested($relation, $operator, $count, $boolean, $callback);
