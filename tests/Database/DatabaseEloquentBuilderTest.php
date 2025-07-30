@@ -299,10 +299,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
         $builder->setModel($model);
 
-        // Ensure orderBy is called with the model's key name when no existing ordering is present
-        $builder->shouldReceive('orderBy')->with('foo')->once()->andReturnSelf();
+        $builder->shouldReceive('orderBy')->with('foo_table.foo')->once()->andReturnSelf();
         $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
         $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
 
@@ -321,6 +321,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->orders = [['column' => 'name', 'direction' => 'asc']];
 
         // Ensure orderBy is NOT called when ordering already exists
+        $builder->shouldNotReceive('orderBy');
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testFirstMethodDoesNotAddOrderingWhenJoinsExist()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $queryBuilder->joins = [['table' => 'other_table']];
+        
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
         $builder->shouldNotReceive('orderBy');
         $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
         $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
