@@ -368,7 +368,6 @@ trait BuildsQueries
             $query = $this->getQuery();
             $model = $this->getModel();
 
-
             if (empty($query->orders) &&
                 empty($query->joins) &&
                 empty($query->wheres) &&
