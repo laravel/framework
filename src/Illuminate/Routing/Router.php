@@ -472,10 +472,6 @@ class Router implements BindingRegistrar, RegistrarContract
     public function group(array $attributes, $routes)
     {
         foreach (Arr::wrap($routes) as $groupRoutes) {
-            if (array_key_exists('register', $attributes) && $attributes['register'] === false) {
-                continue;
-            }
-
             $this->updateGroupStack($attributes);
 
             // Once we have updated the group stack, we'll load the provided routes and
