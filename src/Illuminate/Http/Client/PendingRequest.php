@@ -472,7 +472,7 @@ class PendingRequest
     }
 
     /**
-     * Specify the digest authentication username and password for the request.
+     * Specify the NTLM authentication username and password for the request.
      *
      * @param  string  $username
      * @param  string  $password
