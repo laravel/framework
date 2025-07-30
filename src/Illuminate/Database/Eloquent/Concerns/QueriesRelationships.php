@@ -85,6 +85,7 @@ trait QueriesRelationships
      * Validate that the given relation exists on the model.
      *
      * @param  string  $relation
+     *
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
     protected function validateRelationExistence($relation)
