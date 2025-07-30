@@ -22,7 +22,7 @@ class StrictRelationsCommand extends Command
             ));
             $this->info('Eloquent strict relationship mode enabled.');
         } else {
-            $this->line('Strict mode: ' . ($current ? 'ENABLED' : 'DISABLED'));
+            $this->line('Strict mode: '.($current ? 'ENABLED' : 'DISABLED'));
         }
     }
 }

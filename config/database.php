@@ -29,9 +29,9 @@ return [
     |
     */
 
-        'eloquent' => [
-            'strict_relationships' => env('ELOQUENT_STRICT_RELATIONSHIPS', false),
-        ],
+    'eloquent' => [
+        'strict_relationships' => env('ELOQUENT_STRICT_RELATIONSHIPS', false),
+    ],
     'connections' => [
 
         'sqlite' => [

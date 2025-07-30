@@ -14,11 +14,11 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 use function Illuminate\Support\enum_value;
-use Illuminate\Support\Facades\Config;
 
 /** @mixin \Illuminate\Database\Eloquent\Builder */
 trait QueriesRelationships
@@ -29,9 +29,9 @@ trait QueriesRelationships
      * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
-     * @param  string  $operator
-     * @param  int  $count
-     * @param  string  $boolean
+     * @param  string $operator
+     * @param  int $count
+     * @param  string $boolean
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null  $callback
      * @return $this
      *
@@ -89,7 +89,7 @@ trait QueriesRelationships
      */
     protected function validateRelationExistence($relation)
     {
-        if (!method_exists($this->getModel(), $relation)) {
+        if (! method_exists($this->getModel(), $relation)) {
             throw RelationNotFoundException::make($this->getModel(), $relation);
         }
     }

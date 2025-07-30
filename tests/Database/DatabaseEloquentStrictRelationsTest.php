@@ -2,10 +2,10 @@
 
 namespace Tests\Database;
 
-use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\RelationNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Tests\Database\Fixtures\Models\User;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 
 class DatabaseEloquentStrictRelationsTest extends TestCase
 {
@@ -13,11 +13,22 @@ class DatabaseEloquentStrictRelationsTest extends TestCase
     {
         $user = new User();
         $trait = new class($user) {
-            use \Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
+            use QueriesRelationships;
+
             public $model;
-            public function __construct($model) { $this->model = $model; }
-            public function getModel() { return $this->model; }
-            public function callValidateRelationExistence($relation) {
+
+            public function __construct($model)
+            {
+                $this->model = $model;
+            }
+
+            public function getModel()
+            {
+                return $this->model;
+            }
+
+            public function callValidateRelationExistence($relation)
+            {
                 return $this->validateRelationExistence($relation);
             }
         };
@@ -30,11 +41,22 @@ class DatabaseEloquentStrictRelationsTest extends TestCase
     {
         $user = new User();
         $trait = new class($user) {
-            use \Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
+            use QueriesRelationships;
+
             public $model;
-            public function __construct($model) { $this->model = $model; }
-            public function getModel() { return $this->model; }
-            public function callValidateRelationExistence($relation) {
+
+            public function __construct($model)
+            {
+                $this->model = $model;
+            }
+
+            public function getModel()
+            {
+                return $this->model;
+            }
+
+            public function callValidateRelationExistence($relation)
+            {
                 return $this->validateRelationExistence($relation);
             }
         };
