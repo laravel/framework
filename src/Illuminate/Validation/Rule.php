@@ -276,6 +276,21 @@ class Rule
     }
 
     /**
+     * Get a "does not contain" rule builder instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @return \Illuminate\Validation\Rules\DoesntContain
+     */
+    public static function doesntContain($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Rules\DoesntContain(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
      * Compile a set of rules for an attribute.
      *
      * @param  string  $attribute
