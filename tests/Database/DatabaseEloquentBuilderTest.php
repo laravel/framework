@@ -297,6 +297,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     public function testFirstMethodAddsOrderingForConsistency()
     {
+        // Test that ordering is added for simple queries without WHERE clauses
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$this->getMockQueryBuilder()]);
         $model = $this->getMockModel();
         $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
@@ -331,6 +332,23 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $queryBuilder = $this->getMockQueryBuilder();
         $queryBuilder->joins = [['table' => 'other_table']];
+        
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        $builder->shouldNotReceive('orderBy');
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testFirstMethodDoesNotAddOrderingWhenWheresExist()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $queryBuilder->wheres = [['type' => 'Basic', 'column' => 'name', 'operator' => '=', 'value' => 'John']];
         
         $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
         $model = $this->getMockModel();

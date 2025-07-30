@@ -368,7 +368,12 @@ trait BuildsQueries
             $query = $this->getQuery();
             $model = $this->getModel();
 
-            if (empty($query->orders) && empty($query->joins) && $model->getKeyName() && ! $model instanceof Pivot) {
+
+            if (empty($query->orders) &&
+                empty($query->joins) &&
+                empty($query->wheres) &&
+                $model->getKeyName() &&
+                ! $model instanceof Pivot) {
                 $this->orderBy($model->getQualifiedKeyName());
             }
         }
