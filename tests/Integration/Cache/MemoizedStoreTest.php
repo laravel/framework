@@ -461,6 +461,11 @@ class MemoizedStoreTest extends TestCase
                 return Cache::forget(...func_get_args());
             }
 
+            public function touch(string $key, int $ttl): bool
+            {
+                return Cache::touch(...func_get_args());
+            }
+
             public function flush()
             {
                 return Cache::flush(...func_get_args());

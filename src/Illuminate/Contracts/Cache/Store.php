@@ -84,6 +84,11 @@ interface Store
     public function flush();
 
     /**
+     * Set the expiration of a cached item.
+     */
+    public function touch(string $key, int $ttl): bool;
+
+    /**
      * Get the cache key prefix.
      *
      * @return string
