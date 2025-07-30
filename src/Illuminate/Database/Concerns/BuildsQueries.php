@@ -4,6 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\MultipleRecordsFoundException;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\RecordNotFoundException;
@@ -363,6 +364,15 @@ trait BuildsQueries
      */
     public function first($columns = ['*'])
     {
+        if (method_exists($this, 'getModel') && $this->getModel()) {
+            $query = $this->getQuery();
+            $model = $this->getModel();
+
+            if (empty($query->orders) && empty($query->joins) && $model->getKeyName() && ! $model instanceof Pivot) {
+                $this->orderBy($model->getQualifiedKeyName());
+            }
+        }
+
         return $this->limit(1)->get($columns)->first();
     }
 

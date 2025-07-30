@@ -295,6 +295,55 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('bar', $result);
     }
 
+    public function testFirstMethodAddsOrderingForConsistency()
+    {
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$this->getMockQueryBuilder()]);
+        $model = $this->getMockModel();
+        $model->shouldReceive('getQualifiedKeyName')->andReturn('foo_table.foo');
+        $builder->setModel($model);
+
+        $builder->shouldReceive('orderBy')->with('foo_table.foo')->once()->andReturnSelf();
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testFirstMethodDoesNotAddOrderingWhenAlreadyPresent()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $queryBuilder->orders = [['column' => 'name', 'direction' => 'asc']];
+        
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        $builder->shouldNotReceive('orderBy');
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
+    public function testFirstMethodDoesNotAddOrderingWhenJoinsExist()
+    {
+        $queryBuilder = $this->getMockQueryBuilder();
+        $queryBuilder->joins = [['table' => 'other_table']];
+        
+        $builder = m::mock(Builder::class.'[orderBy,limit,get]', [$queryBuilder]);
+        $model = $this->getMockModel();
+        $builder->setModel($model);
+
+        $builder->shouldNotReceive('orderBy');
+        $builder->shouldReceive('limit')->with(1)->once()->andReturnSelf();
+        $builder->shouldReceive('get')->with(['*'])->once()->andReturn(new Collection(['bar']));
+
+        $result = $builder->first();
+        $this->assertSame('bar', $result);
+    }
+
     public function testQualifyColumn()
     {
         $builder = new Builder(m::mock(BaseBuilder::class));
