@@ -95,7 +95,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * The current cursor resolver callback.
      *
-     * @var \Closure
+     * @var (\Closure(string): \Illuminate\Pagination\Cursor|null) 
      */
     protected static $currentCursorResolver;
 
@@ -512,7 +512,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the current cursor resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param  (\Closure(string): \Illuminate\Pagination\Cursor|null)  $resolver
      * @return void
      */
     public static function currentCursorResolver(Closure $resolver)
