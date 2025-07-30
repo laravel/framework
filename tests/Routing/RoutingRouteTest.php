@@ -442,6 +442,19 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->bindingFieldFor('baz'));
     }
 
+    public function testRouteGroupWithRegisterAttributeSetToTrue()
+    {
+        $router = $this->getRouter();
+
+        $router->group(['register' => true], function (Registrar $router) {
+            $router->get('foo/bar', function () {
+                return 'hello';
+            });
+        });
+
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
