@@ -30,6 +30,8 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ValueError;
 
+use function Illuminate\Support\enum_value;
+
 trait ValidatesAttributes
 {
     /**
@@ -1473,7 +1475,10 @@ trait ValidatesAttributes
             return count(array_diff($value, $parameters)) === 0;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array(
+            $value instanceof \UnitEnum ? enum_value($value) : (string) $value,
+            $parameters
+        );
     }
 
     /**

@@ -88,5 +88,17 @@ class ValidationInRuleTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'foo'], ['x' => ['required', Rule::in('foo', 'bar')]]);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => StringStatus::pending], ['x' => Rule::in(StringStatus::pending)]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => StringStatus::pending], ['x' => Rule::in(StringStatus::done)]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => PureEnum::one], ['x' => Rule::in(PureEnum::one)]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => PureEnum::one], ['x' => Rule::in(PureEnum::two)]);
+        $this->assertFalse($v->passes());
     }
 }
