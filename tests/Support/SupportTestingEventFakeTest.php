@@ -76,6 +76,21 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatched(EventStub::class, 2);
     }
 
+    public function testAssertDispatchedOnce()
+    {
+        $this->fake->dispatch(EventStub::class);
+        $this->fake->dispatch(EventStub::class);
+
+        try {
+            $this->fake->assertDispatchedOnce(EventStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of once.', $e->getMessage());
+        }
+
+        $this->fake->assertDispatchedTimes(EventStub::class, 2);
+    }
+
     public function testAssertDispatchedTimes()
     {
         $this->fake->dispatch(EventStub::class);
