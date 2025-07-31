@@ -49,6 +49,29 @@ class RouteRedirectTest extends TestCase
         $response->assertRedirect('users/999/overview');
     }
 
+    public function testToActionHelper()
+    {
+        Route::get('to', [ApiResourceTestController::class, 'index']);
+
+        Route::get('from-301', function () {
+            return to_action([ApiResourceTestController::class, 'index'], [], 301);
+        });
+
+        Route::get('from-302', function () {
+            return to_action([ApiResourceTestController::class, 'index']);
+        });
+
+        $this->get('from-301')
+            ->assertRedirect('to')
+            ->assertStatus(301)
+            ->assertSee('Redirecting to');
+
+        $this->get('from-302')
+            ->assertRedirect('to')
+            ->assertStatus(302)
+            ->assertSee('Redirecting to');
+    }
+
     public function testToRouteHelper()
     {
         Route::get('to', function () {
