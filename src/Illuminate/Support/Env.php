@@ -191,12 +191,11 @@ class Env
         $shouldQuote = preg_match('/^[a-zA-z0-9]+$/', $value) === 0;
 
         $lineToAddVariations = [
-            $key.'='.(is_string($value) ? '"'.addslashes($value).'"' : $value),
-            $key.'='.(is_string($value) ? "'".addslashes($value)."'" : $value),
+            $key.'='.(is_string($value) ? self::prepareQuotedValue($value) : $value),
             $key.'='.$value,
         ];
 
-        $lineToAdd = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[2];
+        $lineToAdd = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[1];
 
         if ($value === '') {
             $lineToAdd = $key.'=';
@@ -243,6 +242,45 @@ class Env
             [$lineToAdd],
             array_slice($envLines, $lastPrefixIndex + 1)
         );
+    }
+
+    /**
+     * Wrap a string in quotes, choosing single or double quotes
+     * depending on the presence of double quotes inside the string.
+     *
+     * @param  string  $input  The input string to be quoted.
+     * @return string  The quoted string with appropriate escaping applied.
+     */
+    protected static function prepareQuotedValue(string $input): string
+    {
+        $containsDoubleQuotes = strpos($input, '"') !== false;
+
+        if ($containsDoubleQuotes) {
+            $quoted = "'" . self::addslashesExcept($input, ['"']) . "'";
+        } else {
+            $quoted = '"' . self::addslashesExcept($input, ["'"]) . '"';
+        }
+
+        return $quoted;
+    }
+
+    /**
+     * Escape a string using addslashes, excluding specified characters from being escaped.
+     *
+     * @param  string  $value  The input string to be escaped.
+     * @param  array  $except  Characters that should not be escaped.
+     * @return string  The escaped string with exceptions applied.
+     */
+    protected static function addslashesExcept(string $value, array $except = []): string
+    {
+        $escaped = addslashes($value);
+
+        foreach ($except as $char) {
+            $escapedChar = '\\' . $char;
+            $escaped = str_replace($escapedChar, $char, $escaped);
+        }
+
+        return $escaped;
     }
 
     /**
