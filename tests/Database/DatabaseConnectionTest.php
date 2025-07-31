@@ -559,11 +559,11 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals(3, $connection->getMaxQueryLogSize());
 
         for ($i = 0; $i < 5; $i++) {
-            $connection->logQuery("SELECT * FROM test WHERE id = ?", [$i], 10.0);
+            $connection->logQuery('SELECT * FROM test WHERE id = ?', [$i], 10.0);
         }
 
         $queryLog = $connection->getQueryLog();
-        
+
         $this->assertCount(3, $queryLog);
         $this->assertEquals([2], $queryLog[0]['bindings']);
         $this->assertEquals([3], $queryLog[1]['bindings']);
@@ -573,10 +573,10 @@ class DatabaseConnectionTest extends TestCase
     public function testQueryLogSizeLimitMinimumValue()
     {
         $connection = $this->getMockConnection();
-        
+
         $connection->setMaxQueryLogSize(0);
         $this->assertEquals(1, $connection->getMaxQueryLogSize());
-        
+
         $connection->setMaxQueryLogSize(-5);
         $this->assertEquals(1, $connection->getMaxQueryLogSize());
     }
