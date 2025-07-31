@@ -167,9 +167,9 @@ class MemoizedStore implements LockProvider, Store
     public function forever($key, $value)
     {
         return tap($this->repository->forever($key, $value), function ($result) use ($key, $value) {
-           if ($result){
-               $this->cache[$this->prefix($key)] = $value;
-           }
+            if ($result) {
+                $this->cache[$this->prefix($key)] = $value;
+            }
         });
     }
 
