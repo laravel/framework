@@ -13,17 +13,21 @@ use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithMigration('cache')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
+    use LazilyRefreshDatabase;
 
     protected function setUp(): void
     {
@@ -578,5 +582,17 @@ class MemoizedStoreTest extends TestCase
         $value = Cache::get('key');
 
         $this->assertSame('value-2', $value);
+    }
+
+    public function test_it_returns_consistent_types_between_memo_and_underlying_store() {
+        foreach (['redis', 'database', 'memcached'] as $name) {
+            Cache::store($name)->put('count', 0);
+            Cache::store($name)->increment('count');
+
+            $memoized = Cache::memo($name)->get('count');
+            $live = Cache::store($name)->get('count');
+
+            $this->assertSame($live, $memoized, "Failed for cache store: $name" );
+        }
     }
 }
