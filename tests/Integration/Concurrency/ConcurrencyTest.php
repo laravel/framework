@@ -156,6 +156,79 @@ PHP);
         $this->assertEquals('second', $second);
         $this->assertEquals('third', $third);
     }
+
+    public function testTimeoutHandling()
+    {
+        $this->expectException(Exception::class);
+        
+        $app = new Application(__DIR__);
+        $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
+        
+        // This should timeout after 1 second
+        $processDriver->run([
+            fn () => sleep(5), // Task that takes 5 seconds
+        ], 1);
+    }
+
+    public function testLargeDataHandling()
+    {
+        $largeString = str_repeat('x', 1000000); // 1MB string
+        
+        $results = Concurrency::driver('sync')->run([
+            'large_data' => fn () => $largeString,
+            'small_data' => fn () => 'small',
+        ]);
+        
+        $this->assertEquals($largeString, $results['large_data']);
+        $this->assertEquals('small', $results['small_data']);
+    }
+
+    public function testErrorHandlingWithKeys()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/task_1.*failed/');
+        
+        Concurrency::driver('sync')->run([
+            'task_1' => fn () => throw new Exception('Test error'),
+            'task_2' => fn () => 'success',
+        ]);
+    }
+
+    public function testEmptyTaskArray()
+    {
+        $results = Concurrency::run([]);
+        $this->assertEquals([], $results);
+    }
+
+    public function testSingleTaskExecution()
+    {
+        $result = Concurrency::run([fn () => 'single']);
+        $this->assertEquals(['single'], $result);
+    }
+
+    public function testNestedArrayResults()
+    {
+        $results = Concurrency::run([
+            fn () => ['nested' => ['data' => 'value']],
+            fn () => (object) ['property' => 'object_value'],
+        ]);
+        
+        $this->assertEquals(['nested' => ['data' => 'value']], $results[0]);
+        $this->assertEquals('object_value', $results[1]->property);
+    }
+
+    public function testProcessDriverErrorMessages()
+    {
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessageMatches('/Concurrent process.*failed with exit code/');
+        
+        $app = new Application(__DIR__);
+        $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
+        
+        $processDriver->run([
+            'failing_task' => fn () => exit(1),
+        ]);
+    }
 }
 
 class ExceptionWithoutParam extends Exception

@@ -16,9 +16,13 @@ class SyncDriver implements Driver
      */
     public function run(Closure|array $tasks): array
     {
-        return Collection::wrap($tasks)->map(
-            fn ($task) => $task()
-        )->all();
+        return Collection::wrap($tasks)->map(function ($task, $key) {
+            try {
+                return $task();
+            } catch (\Throwable $e) {
+                throw new \Exception("Synchronous task [{$key}] failed: " . $e->getMessage(), 0, $e);
+            }
+        })->all();
     }
 
     /**
