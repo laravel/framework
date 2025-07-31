@@ -155,6 +155,13 @@ class Connection implements ConnectionInterface
     protected $queryLog = [];
 
     /**
+     * The maximum number of queries to keep in the query log.
+     *
+     * @var int
+     */
+    protected $maxQueryLogSize = 1000;
+
+    /**
      * Indicates whether queries are being logged.
      *
      * @var bool
@@ -858,6 +865,10 @@ class Connection implements ConnectionInterface
 
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
+            
+            if (count($this->queryLog) > $this->maxQueryLogSize) {
+                $this->queryLog = array_slice($this->queryLog, -$this->maxQueryLogSize, $this->maxQueryLogSize, false);
+            }
         }
     }
 
@@ -1577,6 +1588,29 @@ class Connection implements ConnectionInterface
     public function logging()
     {
         return $this->loggingQueries;
+    }
+
+    /**
+     * Set the maximum query log size.
+     *
+     * @param  int  $size
+     * @return $this
+     */
+    public function setMaxQueryLogSize(int $size)
+    {
+        $this->maxQueryLogSize = max(1, $size);
+
+        return $this;
+    }
+
+    /**
+     * Get the maximum query log size.
+     *
+     * @return int
+     */
+    public function getMaxQueryLogSize()
+    {
+        return $this->maxQueryLogSize;
     }
 
     /**
