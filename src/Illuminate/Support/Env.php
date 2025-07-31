@@ -249,16 +249,16 @@ class Env
      * depending on the presence of double quotes inside the string.
      *
      * @param  string  $input  The input string to be quoted.
-     * @return string  The quoted string with appropriate escaping applied.
+     * @return string The quoted string with appropriate escaping applied.
      */
     protected static function prepareQuotedValue(string $input): string
     {
         $containsDoubleQuotes = strpos($input, '"') !== false;
 
         if ($containsDoubleQuotes) {
-            $quoted = "'" . self::addslashesExcept($input, ['"']) . "'";
+            $quoted = "'".self::addslashesExcept($input, ['"'])."'";
         } else {
-            $quoted = '"' . self::addslashesExcept($input, ["'"]) . '"';
+            $quoted = '"'.self::addslashesExcept($input, ["'"]).'"';
         }
 
         return $quoted;
@@ -269,14 +269,14 @@ class Env
      *
      * @param  string  $value  The input string to be escaped.
      * @param  array  $except  Characters that should not be escaped.
-     * @return string  The escaped string with exceptions applied.
+     * @return string The escaped string with exceptions applied.
      */
     protected static function addslashesExcept(string $value, array $except = []): string
     {
         $escaped = addslashes($value);
 
         foreach ($except as $char) {
-            $escapedChar = '\\' . $char;
+            $escapedChar = '\\'.$char;
             $escaped = str_replace($escapedChar, $char, $escaped);
         }
 
