@@ -584,7 +584,8 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame('value-2', $value);
     }
 
-    public function test_it_returns_consistent_types_between_memo_and_underlying_store() {
+    public function test_it_returns_consistent_types_between_memo_and_underlying_store()
+    {
         foreach (['redis', 'database', 'memcached'] as $name) {
             Cache::store($name)->put('count', 0);
             Cache::store($name)->increment('count');
@@ -592,7 +593,7 @@ class MemoizedStoreTest extends TestCase
             $memoized = Cache::memo($name)->get('count');
             $live = Cache::store($name)->get('count');
 
-            $this->assertSame($live, $memoized, "Failed for cache store: $name" );
+            $this->assertSame($live, $memoized, "Failed for cache store: $name");
         }
     }
 }
