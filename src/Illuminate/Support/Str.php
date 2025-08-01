@@ -2028,6 +2028,30 @@ class Str
     }
 
     /**
+     * Prepend a ULID to the given string.
+     *
+     * @param  string  $value
+     * @param  string  $separator
+     * @return string
+     */
+    public static function prependUlid($value, $separator = '')
+    {
+        return static::ulid().$separator.$value;
+    }
+
+    /**
+     * Append a ULID to the given string.
+     *
+     * @param  string  $value
+     * @param  string  $separator
+     * @return string
+     */
+    public static function appendUlid($value, $separator = '')
+    {
+        return $value.$separator.static::ulid();
+    }
+
+    /**
      * Generate a ULID.
      *
      * @param  \DateTimeInterface|null  $time

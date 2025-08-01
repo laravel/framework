@@ -63,9 +63,10 @@ class SupportStringableTest extends TestCase
         $result = $this->stringable('test')->prependUuid();
         $this->assertStringEndsWith('test', (string) $result);
         $this->assertGreaterThan(4, strlen((string) $result));
-
+        
         $resultWithSeparator = $this->stringable('test')->prependUuid('-');
         $this->assertStringEndsWith('-test', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
     }
 
     public function testAppendUuid()
@@ -76,6 +77,29 @@ class SupportStringableTest extends TestCase
         
         $resultWithSeparator = $this->stringable('test')->appendUuid('-');
         $this->assertStringStartsWith('test-', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
+    public function testPrependUlid()
+    {
+        $result = $this->stringable('test')->prependUlid();
+        $this->assertStringEndsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+        
+        $resultWithSeparator = $this->stringable('test')->prependUlid('-');
+        $this->assertStringEndsWith('-test', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
+    public function testAppendUlid()
+    {
+        $result = $this->stringable('test')->appendUlid();
+        $this->assertStringStartsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+        
+        $resultWithSeparator = $this->stringable('test')->appendUlid('-');
+        $this->assertStringStartsWith('test-', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
     }
 
     public function testIsUlid()

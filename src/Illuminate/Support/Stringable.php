@@ -78,6 +78,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Append a ULID to the string.
+     *
+     * @param  string  $separator
+     * @return static
+     */
+    public function appendUlid($separator = '')
+    {
+        return new static(Str::appendUlid($this->value, $separator));
+    }
+
+    /**
      * Append a new line to the string.
      *
      * @param  int  $count
@@ -702,6 +713,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function prependUuid($separator = '')
     {
         return new static(Str::prependUuid($this->value, $separator));
+    }
+
+    /**
+     * Prepend a ULID to the string.
+     *
+     * @param  string  $separator
+     * @return static
+     */
+    public function prependUlid($separator = '')
+    {
+        return new static(Str::prependUlid($this->value, $separator));
     }
 
     /**
