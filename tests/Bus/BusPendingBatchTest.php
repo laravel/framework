@@ -259,6 +259,15 @@ class BusPendingBatchTest extends TestCase
         );
         $this->expectNotToPerformAssertions();
     }
+
+    public function test_macroable(): void
+    {
+        PendingBatch::macro('onHighQueue', fn () => $this->onQueue('high'));
+
+        $pendingBatch = (new PendingBatch(new Container, new Collection))->onHighQueue();
+
+        $this->assertSame('high', $pendingBatch->queue());
+    }
 }
 
 class BatchableJob

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use Laravel\SerializableClosure\SerializableClosure;
 use RuntimeException;
 use Throwable;
@@ -17,7 +18,7 @@ use function Illuminate\Support\enum_value;
 
 class PendingBatch
 {
-    use Conditionable;
+    use Conditionable, Macroable;
 
     /**
      * The IoC container instance.
