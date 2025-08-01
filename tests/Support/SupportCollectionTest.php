@@ -5735,11 +5735,20 @@ class SupportCollectionTest extends TestCase
         ];
     }
 
-    public function testJoinPreservesKeys()
+    #[DataProvider('joinPreservesKeysProvider')]
+    public function testJoinPreservesKeys(string|bool $preserveKeys, string $expected)
     {
         $collection = new Collection([['key' => 'a', 'value' => 1], ['key' => 'b', 'value' => 2]]);
 
-        $this->assertSame('a: 1,b: 2', $collection->pluck('value', 'key')->join(',', '', true));
+        $this->assertSame($expected, $collection->pluck('value', 'key')->join(', ', '', $preserveKeys));
+    }
+
+    public static function joinPreservesKeysProvider()
+    {
+        return [
+            'with default key glue' => [true, 'a: 1, b: 2'],
+            'with custom key glue' => [' = ', 'a = 1, b = 2'],
+        ];
     }
 }
 
