@@ -24,7 +24,6 @@ use ReflectionClass;
 use RuntimeException;
 use stdClass;
 use Traversable;
-use function Illuminate\Support\partial_application;
 
 class SupportHelpersTest extends TestCase
 {
