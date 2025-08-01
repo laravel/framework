@@ -283,7 +283,6 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $toInsert = [];
         for ($i = 1; $i <= 4; $i++) {
             $toInsert[] = [
-                'id' => $i,
                 'title' => 'Title '.$i,
             ];
         }
@@ -309,7 +308,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
     public function testNoNextResultsWithPersistentCursors()
     {
-        TestPost::create(['id' => 1, 'title' => 'A title']);
+        TestPost::create(['title' => 'A title']);
 
         $paginated = TestPost::query()
             ->cursorPaginate(1)
