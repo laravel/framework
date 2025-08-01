@@ -1736,7 +1736,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $connection->shouldReceive('select')->once()->andReturn([
             [$morphToKey => EloquentBuilderTestModelFarRelatedStub::class],
-            [$morphToKey => EloquentBuilderTestModelOtherFarRelatedStub::class]
+            [$morphToKey => EloquentBuilderTestModelOtherFarRelatedStub::class],
         ]);
 
         $builder = $model->orWhereHasMorph('morph', [EloquentBuilderTestModelFarRelatedStub::class], function ($q) {
