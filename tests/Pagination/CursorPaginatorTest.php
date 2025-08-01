@@ -120,6 +120,25 @@ class CursorPaginatorTest extends TestCase
         ], $p->toArray());
     }
 
+    public function testWithPersistentCursorsAllowsManipulatingKeys()
+    {
+        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, new Cursor(['id' => 2], true), [
+            'parameters' => ['id'],
+        ]);
+
+        $throughFunc = static function ($item) {
+            return ['other-id' => $item['id']];
+        };
+
+        $paginator->withPersistCursors()->through($throughFunc);
+        $this->assertSame(1, $paginator->previousCursor()->parameter('id'));
+        $this->assertSame(2, $paginator->nextCursor()->parameter('id'));
+        $this->assertEquals([
+            ['other-id' => 1],
+            ['other-id' => 2],
+        ], $paginator->toArray()['data']);
+    }
+
     protected function getCursor($params, $isNext = true)
     {
         return (new Cursor($params, $isNext))->encode();

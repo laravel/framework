@@ -79,6 +79,20 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     protected $cursor;
 
     /**
+     * The memoized next cursor.
+     *
+     * @var \Illuminate\Pagination\Cursor|null|false
+     */
+    protected $nextCursor = false;
+
+    /**
+     * The memoized previous cursor.
+     *
+     * @var \Illuminate\Pagination\Cursor|null|false
+     */
+    protected $previousCursor = false;
+
+    /**
      * The paginator parameters for the cursor.
      *
      * @var array
@@ -157,6 +171,10 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function previousCursor()
     {
+        if ($this->previousCursor !== false) {
+            return $this->previousCursor;
+        }
+
         if (is_null($this->cursor) ||
             ($this->cursor->pointsToPreviousItems() && ! $this->hasMore)) {
             return null;
@@ -176,6 +194,10 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      */
     public function nextCursor()
     {
+        if ($this->nextCursor !== false) {
+            return $this->nextCursor;
+        }
+
         if ((is_null($this->cursor) && ! $this->hasMore) ||
             (! is_null($this->cursor) && $this->cursor->pointsToNextItems() && ! $this->hasMore)) {
             return null;
@@ -186,6 +208,19 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
         }
 
         return $this->getCursorForItem($this->items->last(), true);
+    }
+
+    /**
+     * Memoize the previous and next cursor values so you may manipulate the underlying items format.
+     *
+     * @return $this
+     */
+    public function withPersistCursors()
+    {
+        $this->nextCursor = $this->nextCursor();
+        $this->previousCursor = $this->previousCursor();
+
+        return $this;
     }
 
     /**
