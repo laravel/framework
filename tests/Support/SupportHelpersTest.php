@@ -24,6 +24,7 @@ use ReflectionClass;
 use RuntimeException;
 use stdClass;
 use Traversable;
+use function Illuminate\Support\partial_application;
 
 class SupportHelpersTest extends TestCase
 {
@@ -1505,6 +1506,33 @@ class SupportHelpersTest extends TestCase
             $expectedOutput,
             preg_replace_array($pattern, $replacements, $subject)
         );
+    }
+
+    public static function providesPartialApplicationData()
+    {
+        return [
+            [[], [], [], self::assertIsCallable(...)],
+            [[1], [], [], self::assertIsCallable(...)],
+            [[1, 'foo'], [], [], self::assertIsCallable(...)],
+            [[1, 'foo', true], [], [], self::assertIsInt(...)],
+            [[1, 'foo'], [true]], [], self::assertIsInt(...),
+            [[1], ['foo', true], [], self::assertIsInt(...)],
+            [[1], ['foo'], [true], self::assertIsInt(...)],
+        ];
+    }
+
+    #[DataProvider('providesPartialApplicationData')]
+    public function testPartialApplication(array $firstRun, array $secondRun, array $thirdRun, callable $assertion)
+    {
+        $fn = function (int $a, string $b, bool $c): string|int {
+            return $b ? $a : $c;
+        };
+
+        $partiallyApplied = partial_applicatiopn($fn, $firstRun);
+        $partiallyApplied = $partiallyApplied(...$secondRun);
+        $partiallyApplied = $partiallyApplied(...$thirdRun);
+
+        $assertion($partiallyApplied);
     }
 }
 
