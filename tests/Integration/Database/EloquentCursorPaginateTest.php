@@ -281,7 +281,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
     public function testWithPersistentCursors()
     {
         $toInsert = [];
-        for($i = 1; $i <= 4; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $toInsert[] = [
                 'id' => $i,
                 'title' => 'Title '.$i,
