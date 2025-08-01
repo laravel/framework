@@ -1467,6 +1467,123 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testBasicWhereRowIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            ['first_name' => 'John', 'last_name' => 'Doe'],
+            ['first_name' => 'Jane', 'last_name' => 'Smith'],
+        ]);
+        $this->assertSame('select * from "users" where ("first_name", "last_name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals(['John', 'Doe', 'Jane', 'Smith'], $builder->getBindings());
+    }
+
+    public function testOrWhereRowIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereRowIn([
+            ['first_name' => 'John', 'last_name' => 'Doe'],
+            ['first_name' => 'Jane', 'last_name' => 'Smith'],
+        ]);
+        $this->assertSame('select * from "users" where "active" = ? or ("first_name", "last_name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([true, 'John', 'Doe', 'Jane', 'Smith'], $builder->getBindings());
+    }
+
+    public function testWhereRowNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowNotIn([
+            ['first_name' => 'John', 'last_name' => 'Doe'],
+            ['first_name' => 'Jane', 'last_name' => 'Smith'],
+        ]);
+        $this->assertSame('select * from "users" where ("first_name", "last_name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals(['John', 'Doe', 'Jane', 'Smith'], $builder->getBindings());
+    }
+
+    public function testOrWhereRowNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('active', true)->orWhereRowNotIn([
+            ['first_name' => 'John', 'last_name' => 'Doe'],
+            ['first_name' => 'Jane', 'last_name' => 'Smith'],
+        ]);
+        $this->assertSame('select * from "users" where "active" = ? or ("first_name", "last_name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([true, 'John', 'Doe', 'Jane', 'Smith'], $builder->getBindings());
+    }
+
+    public function testEmptyWhereRowIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([]);
+        $this->assertSame('select * from "users"', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
+    public function testWhereRowInSingleColumn()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            ['name' => 'John'],
+            ['name' => 'Jane'],
+        ]);
+        $this->assertSame('select * from "users" where ("name") in ((?), (?))', $builder->toSql());
+        $this->assertEquals(['John', 'Jane'], $builder->getBindings());
+    }
+
+    public function testWhereRowInMultipleColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            ['first_name' => 'John', 'last_name' => 'Doe', 'age' => 30],
+            ['first_name' => 'Jane', 'last_name' => 'Smith', 'age' => 25],
+        ]);
+        $this->assertSame('select * from "users" where ("first_name", "last_name", "age") in ((?, ?, ?), (?, ?, ?))', $builder->toSql());
+        $this->assertEquals(['John', 'Doe', 30, 'Jane', 'Smith', 25], $builder->getBindings());
+    }
+
+    public function testWhereRowInValidatesArrayStructure()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value arrays passed in must be two dimensional');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['not_an_array']);
+    }
+
+    public function testWhereRowInValidatesNestedArrays()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value arrays must not contain nested arrays (found 3+ dimensional array)');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            ['name' => ['nested' => 'array']],
+        ]);
+    }
+
+    public function testWhereRowInValidatesStringKeys()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('All of the keys must be strings');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            [0 => 'John', 1 => 'Doe'],
+        ]);
+    }
+
+    public function testWhereRowInValidatesConsistentKeys()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('All of the values must contain the same set of keys');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([
+            ['first_name' => 'John', 'last_name' => 'Doe'],
+            ['first_name' => 'Jane', 'age' => 25],
+        ]);
+    }
+
     public function testBasicWhereColumn()
     {
         $builder = $this->getBuilder();

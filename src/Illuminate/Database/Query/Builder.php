@@ -1274,6 +1274,70 @@ class Builder implements BuilderContract
         return $this->whereNotIn($column, $values, 'or');
     }
 
+    public function whereRowIn(array $values, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'RowNotIn' : 'RowIn';
+
+        if (empty($values)) {
+            return $this;
+        }
+
+        // Confirm the array is properly structured for whereRowIn
+        foreach ($values as $row) {
+            if (! is_array($row)) {
+                throw new InvalidArgumentException('Value arrays passed in must be two dimensional');
+            }
+            foreach ($row as $value) {
+                if (is_array($value)) {
+                    throw new InvalidArgumentException('Value arrays must not contain nested arrays (found 3+ dimensional array)');
+                }
+            }
+        }
+
+        // Confirm all keys are strings
+        $valuesCollection = collect($values);
+        $columnsCollection = collect($valuesCollection->first())->keys()->sort()->values();
+        $areAllKeysStrings = $columnsCollection->every(fn ($key) => is_string($key));
+        if (! $areAllKeysStrings) {
+            throw new InvalidArgumentException('All of the keys must be strings');
+        }
+
+        // Confirm all arrays have the same set of keys
+        $sortedColumns = $columnsCollection->toArray();
+        $allHaveSameKeys = $valuesCollection->every(
+            fn ($item) => collect($item)->keys()->sort()->values()->toArray() === $sortedColumns
+        );
+        if (! $allHaveSameKeys) {
+            throw new InvalidArgumentException('All of the values must contain the same set of keys');
+        }
+
+        // Remove the keys from the values
+        $valueTuples = array_map('array_values', $values);
+
+        $columns = collect($valuesCollection->first())->keys()->toArray();
+
+        $this->wheres[] = compact('type', 'columns', 'valueTuples', 'boolean');
+
+        $this->addBinding($this->cleanBindings(Arr::flatten($valueTuples)), 'where');
+
+        return $this;
+    }
+
+    public function orWhereRowIn(array $values)
+    {
+        return $this->whereRowIn($values, 'or');
+    }
+
+    public function whereRowNotIn(array $values, $boolean = 'and')
+    {
+        return $this->whereRowIn($values, $boolean, true);
+    }
+
+    public function orWhereRowNotIn(array $values)
+    {
+        return $this->whereRowNotIn($values, 'or');
+    }
+
     /**
      * Add a "where in raw" clause for integer values to the query.
      *
