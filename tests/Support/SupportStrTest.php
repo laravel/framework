@@ -1307,7 +1307,7 @@ class SupportStrTest extends TestCase
         $result = Str::prependUuid('test');
         $this->assertStringEndsWith('test', $result);
         $this->assertGreaterThan(4, strlen($result));
-        
+
         $resultWithSeparator = Str::prependUuid('test', '-');
         $this->assertStringEndsWith('-test', $resultWithSeparator);
         $this->assertStringContainsString('-', $resultWithSeparator);
@@ -1318,7 +1318,7 @@ class SupportStrTest extends TestCase
         $result = Str::appendUuid('test');
         $this->assertStringStartsWith('test', $result);
         $this->assertGreaterThan(4, strlen($result));
-        
+
         $resultWithSeparator = Str::appendUuid('test', '-');
         $this->assertStringStartsWith('test-', $resultWithSeparator);
         $this->assertStringContainsString('-', $resultWithSeparator);
@@ -1329,7 +1329,7 @@ class SupportStrTest extends TestCase
         $result = Str::prependUlid('test');
         $this->assertStringEndsWith('test', $result);
         $this->assertGreaterThan(4, strlen($result));
-        
+
         $resultWithSeparator = Str::prependUlid('test', '-');
         $this->assertStringEndsWith('-test', $resultWithSeparator);
         $this->assertStringContainsString('-', $resultWithSeparator);
@@ -1340,7 +1340,7 @@ class SupportStrTest extends TestCase
         $result = Str::appendUlid('test');
         $this->assertStringStartsWith('test', $result);
         $this->assertGreaterThan(4, strlen($result));
-        
+
         $resultWithSeparator = Str::appendUlid('test', '-');
         $this->assertStringStartsWith('test-', $resultWithSeparator);
         $this->assertStringContainsString('-', $resultWithSeparator);
