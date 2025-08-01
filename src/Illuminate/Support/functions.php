@@ -56,15 +56,16 @@ if (! function_exists('Illuminate\Support\partial_application')) {
     /**
      * @template TReturn
      * @template TPartial of (callable(): TReturn)
+     *
      * @param  TPartial  $fn
      * @return TPartial|TReturn
      */
     function partial_application(callable $fn, array $params = [])
     {
         $paramCount = (new ReflectionFunction($fn))->getNumberOfParameters();
-    
+
         return fn (...$args) => (count($params) + count($args)) === $paramCount
             ? $fn(...[...$params, ...$args])
-            : partial_application($fn, [ ...$params, ...$args ]);
+            : partial_application($fn, [...$params, ...$args]);
     }
 }
