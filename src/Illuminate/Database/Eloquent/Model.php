@@ -32,7 +32,6 @@ use LogicException;
 use ReflectionClass;
 use ReflectionMethod;
 use Stringable;
-use WeakMap;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
