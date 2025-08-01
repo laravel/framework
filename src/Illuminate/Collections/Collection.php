@@ -741,7 +741,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         if ($preserveKeys !== false) {
             $keyGlue = $preserveKeys === true ? ': ' : $preserveKeys;
-            $this->items = array_values($this->map(fn ($value, $key) => $key . $keyGlue . $value)->all());
+            $this->items = array_values($this->map(fn ($value, $key) => $key.$keyGlue.$value)->all());
         }
 
         if ($finalGlue === '') {
