@@ -2004,6 +2004,30 @@ class Str
     }
 
     /**
+     * Prepend a UUID to the given string.
+     *
+     * @param  string  $value
+     * @param  string  $separator
+     * @return string
+     */
+    public static function prependUuid($value, $separator = '')
+    {
+        return static::uuid7().$separator.$value;
+    }
+
+    /**
+     * Append a UUID to the given string.
+     *
+     * @param  string  $value
+     * @param  string  $separator
+     * @return string
+     */
+    public static function appendUuid($value, $separator = '')
+    {
+        return $value.$separator.static::uuid7();
+    }
+
+    /**
      * Generate a ULID.
      *
      * @param  \DateTimeInterface|null  $time

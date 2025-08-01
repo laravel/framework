@@ -1302,6 +1302,27 @@ class SupportStrTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
     }
 
+    public function testPrependUuid()
+    {
+        $result = Str::prependUuid('test');
+        $this->assertStringEndsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+        
+        $resultWithSeparator = Str::prependUuid('test', '-');
+        $this->assertStringEndsWith('-test', $resultWithSeparator);
+    }
+
+    public function testAppendUuid()
+    {
+        $result = Str::appendUuid('test');
+        $this->assertStringStartsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+        
+        $resultWithSeparator = Str::appendUuid('test', '-');
+        $this->assertStringStartsWith('test-', $resultWithSeparator);
+        $this->assertStringContains('-', $resultWithSeparator);
+    }
+
     public function testAsciiNull()
     {
         $this->assertSame('', Str::ascii(null));
