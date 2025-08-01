@@ -88,6 +88,7 @@ trait QueriesRelationships
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
     {
         $relations = explode('.', $relations);
+        $initialRelations = [...$relations];
 
         $doesntHave = $operator === '<' && $count === 1;
 
@@ -96,7 +97,14 @@ trait QueriesRelationships
             $count = 1;
         }
 
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback, $initialRelations) {
+            // checking if the same closure is called multiple time.
+            // if so, we need to "reset" the relation array to loop through them again.
+            if($count === 1 && empty($relations)) {
+                $relations = [...$initialRelations];
+                array_shift($relations);
+            }
+
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
             // reference to itself so it calls itself recursively on each segment.
