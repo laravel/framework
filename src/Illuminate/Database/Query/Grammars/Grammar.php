@@ -399,8 +399,8 @@ class Grammar extends BaseGrammar
     {
         if (! empty($where['valueTuples'])) {
             $parsedColumns = implode(', ', array_map([$this, 'wrap'], $where['columns']));
-            $parsedValues = implode(', ', array_map(function($row) {
-                return '(' . $this->parameterize($row) . ')';
+            $parsedValues = implode(', ', array_map(function ($row) {
+                return '('.$this->parameterize($row).')';
             }, $where['valueTuples']));
 
             return '('.$parsedColumns.') in ('.$parsedValues.')';
@@ -413,8 +413,8 @@ class Grammar extends BaseGrammar
     {
         if (! empty($where['valueTuples'])) {
             $parsedColumns = implode(', ', array_map([$this, 'wrap'], $where['columns']));
-            $parsedValues = implode(', ', array_map(function($row) {
-                return '(' . $this->parameterize($row) . ')';
+            $parsedValues = implode(', ', array_map(function ($row) {
+                return '('.$this->parameterize($row).')';
             }, $where['valueTuples']));
 
             return '('.$parsedColumns.') not in ('.$parsedValues.')';
