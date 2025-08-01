@@ -737,8 +737,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  string  $finalGlue
      * @return string
      */
-    public function join($glue, $finalGlue = '')
+    public function join($glue, $finalGlue = '', bool|string $preserveKeys = false)
     {
+        if ($preserveKeys !== false) {
+            $keyGlue = $preserveKeys === true ? ': ' : $preserveKeys;
+            $this->items = array_values($this->map(fn ($value, $key) => $key . $keyGlue . $value)->all());
+        }
+
         if ($finalGlue === '') {
             return $this->implode($glue);
         }
