@@ -5737,7 +5737,7 @@ class SupportCollectionTest extends TestCase
 
     public function testJoinPreservesKeys()
     {
-        $collection = new Collection([['key' => 'a', 'value' => 1], ['key' => 'b', 'value' => 2]]));
+        $collection = new Collection([['key' => 'a', 'value' => 1], ['key' => 'b', 'value' => 2]]);
 
         $this->assertSame('a: 1,b: 2', $collection->pluck('value', 'key')->join(',', '', true));
     }
