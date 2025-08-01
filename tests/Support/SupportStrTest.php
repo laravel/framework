@@ -1302,6 +1302,50 @@ class SupportStrTest extends TestCase
         $this->assertInstanceOf(UuidInterface::class, Str::uuid7());
     }
 
+    public function testPrependUuid()
+    {
+        $result = Str::prependUuid('test');
+        $this->assertStringEndsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+
+        $resultWithSeparator = Str::prependUuid('test', '-');
+        $this->assertStringEndsWith('-test', $resultWithSeparator);
+        $this->assertStringContainsString('-', $resultWithSeparator);
+    }
+
+    public function testAppendUuid()
+    {
+        $result = Str::appendUuid('test');
+        $this->assertStringStartsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+
+        $resultWithSeparator = Str::appendUuid('test', '-');
+        $this->assertStringStartsWith('test-', $resultWithSeparator);
+        $this->assertStringContainsString('-', $resultWithSeparator);
+    }
+
+    public function testPrependUlid()
+    {
+        $result = Str::prependUlid('test');
+        $this->assertStringEndsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+
+        $resultWithSeparator = Str::prependUlid('test', '-');
+        $this->assertStringEndsWith('-test', $resultWithSeparator);
+        $this->assertStringContainsString('-', $resultWithSeparator);
+    }
+
+    public function testAppendUlid()
+    {
+        $result = Str::appendUlid('test');
+        $this->assertStringStartsWith('test', $result);
+        $this->assertGreaterThan(4, strlen($result));
+
+        $resultWithSeparator = Str::appendUlid('test', '-');
+        $this->assertStringStartsWith('test-', $resultWithSeparator);
+        $this->assertStringContainsString('-', $resultWithSeparator);
+    }
+
     public function testAsciiNull()
     {
         $this->assertSame('', Str::ascii(null));

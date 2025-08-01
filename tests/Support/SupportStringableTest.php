@@ -58,6 +58,50 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid(7));
     }
 
+    public function testPrependUuid()
+    {
+        $result = $this->stringable('test')->prependUuid();
+        $this->assertStringEndsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+
+        $resultWithSeparator = $this->stringable('test')->prependUuid('-');
+        $this->assertStringEndsWith('-test', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
+    public function testAppendUuid()
+    {
+        $result = $this->stringable('test')->appendUuid();
+        $this->assertStringStartsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+
+        $resultWithSeparator = $this->stringable('test')->appendUuid('-');
+        $this->assertStringStartsWith('test-', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
+    public function testPrependUlid()
+    {
+        $result = $this->stringable('test')->prependUlid();
+        $this->assertStringEndsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+
+        $resultWithSeparator = $this->stringable('test')->prependUlid('-');
+        $this->assertStringEndsWith('-test', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
+    public function testAppendUlid()
+    {
+        $result = $this->stringable('test')->appendUlid();
+        $this->assertStringStartsWith('test', (string) $result);
+        $this->assertGreaterThan(4, strlen((string) $result));
+
+        $resultWithSeparator = $this->stringable('test')->appendUlid('-');
+        $this->assertStringStartsWith('test-', (string) $resultWithSeparator);
+        $this->assertStringContainsString('-', (string) $resultWithSeparator);
+    }
+
     public function testIsUlid()
     {
         $this->assertTrue($this->stringable('01GJSNW9MAF792C0XYY8RX6QFT')->isUlid());
