@@ -472,6 +472,20 @@ class PendingRequest
     }
 
     /**
+     * Specify the NTLM authentication username and password for the request.
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @return $this
+     */
+    public function withNtlmAuth($username, $password)
+    {
+        return tap($this, function () use ($username, $password) {
+            $this->options['auth'] = [$username, $password, 'ntlm'];
+        });
+    }
+
+    /**
      * Specify an authorization token for the request.
      *
      * @param  string  $token
