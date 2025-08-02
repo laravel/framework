@@ -2077,6 +2077,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function testSortBys()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->sortBy('email')->sortBy('age', 'desc')->sortByDesc('name');
+        $this->assertSame('select * from "users" order by "email" asc, "age" desc, "name" desc', $builder->toSql());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->sortBy('age', SORT_NATURAL);
+    }
+
     public function testLatest()
     {
         $builder = $this->getBuilder();
