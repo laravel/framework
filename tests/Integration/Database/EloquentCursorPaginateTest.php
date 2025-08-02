@@ -277,6 +277,48 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
         $this->assertEquals(5, $query->count());
         $this->assertCount(5, $query->cursorPaginate()->items());
     }
+
+    public function testWithPersistentCursors()
+    {
+        $toInsert = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $toInsert[] = [
+                'title' => 'Title '.$i,
+            ];
+        }
+
+        TestPost::query()->fillAndInsert($toInsert);
+
+        $paginated = TestPost::query()
+            ->cursorPaginate(1)
+            ->withPersistentCursors()
+            ->through(static fn ($item) => ['other-id' => $item['id']]);
+
+        $this->assertEquals(1, $paginated->items()[0]['other-id']);
+
+        $nextCursor = $paginated->nextCursor();
+        $previousCursor = $paginated->previousCursor();
+
+        $secondPageNext = TestPost::query()->cursorPaginate(1, cursor: $nextCursor);
+        $this->assertEquals(2, $secondPageNext->items()[0]->id);
+
+        $secondPagePrevious = TestPost::query()->cursorPaginate(1, cursor: $previousCursor);
+        $this->assertEquals(1, $secondPagePrevious->items()[0]->id);
+    }
+
+    public function testNoNextResultsWithPersistentCursors()
+    {
+        TestPost::create(['title' => 'A title']);
+
+        $paginated = TestPost::query()
+            ->cursorPaginate(1)
+            ->withPersistentCursors()
+            ->through(static fn ($item) => ['other-id' => $item['id']]);
+
+        $this->assertEquals(1, $paginated->items()[0]['other-id']);
+        $this->assertNull($paginated->nextCursor());
+        $this->assertNull($paginated->previousCursor());
+    }
 }
 
 class TestPost extends Model
