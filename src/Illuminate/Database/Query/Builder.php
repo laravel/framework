@@ -2716,6 +2716,34 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add an "order by" clause to the query.
+     *
+     * Alias for orderBy.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $direction
+     * @return $this
+     */
+    public function sortBy($column, $direction = 'asc')
+    {
+        return $this->orderBy($column, $direction);
+    }
+    
+    /**
+     * Add a descending "order by" clause to the query.
+     *
+     * Alias for orderByDesc.
+     *
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function sortByDesc($column)
+    {
+        return $this->orderByDesc($column);
+    }
+
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
