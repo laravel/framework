@@ -55,10 +55,9 @@ if (! function_exists('Illuminate\Support\artisan_binary')) {
 if (! function_exists('Illuminate\Support\partial_application')) {
     /**
      * @template TReturn
-     * @template TPartial of (callable(): TReturn)
      *
-     * @param  TPartial  $fn
-     * @return TPartial|TReturn
+     * @param  (callable(): TReturn)  $fn
+     * @return (callable(): TReturn)|TReturn
      */
     function partial_application(callable $fn, array $params = [])
     {
