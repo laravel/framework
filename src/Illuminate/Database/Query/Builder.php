@@ -2742,7 +2742,6 @@ class Builder implements BuilderContract
         return $this->orderByDesc($column);
     }
 
-
     /**
      * Add an "order by" clause for a timestamp to the query.
      *
