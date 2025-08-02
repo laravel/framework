@@ -2076,6 +2076,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('(select * from "posts" where "public" = ?) union all (select * from "videos" where "public" = ?) order by field(category, ?, ?) asc', $builder->toSql());
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
+    
+    public function testSortBys()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->sortBy('email')->sortBy('age', 'desc')->sortByDesc('name');
+        $this->assertSame('select * from "users" order by "email" asc, "age" desc, "name" desc', $builder->toSql());
+    }
 
     public function testLatest()
     {
