@@ -291,7 +291,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
         $paginated = TestPost::query()
             ->cursorPaginate(1)
-            ->withPersistCursors()
+            ->withPersistentCursors()
             ->through(static fn ($item) => ['other-id' => $item['id']]);
 
         $this->assertEquals(1, $paginated->items()[0]['other-id']);
@@ -312,7 +312,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
         $paginated = TestPost::query()
             ->cursorPaginate(1)
-            ->withPersistCursors()
+            ->withPersistentCursors()
             ->through(static fn ($item) => ['other-id' => $item['id']]);
 
         $this->assertEquals(1, $paginated->items()[0]['other-id']);

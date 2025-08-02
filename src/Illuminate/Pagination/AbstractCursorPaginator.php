@@ -215,7 +215,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      *
      * @return $this
      */
-    public function withPersistCursors()
+    public function withPersistentCursors()
     {
         $this->nextCursor = $this->nextCursor();
         $this->previousCursor = $this->previousCursor();

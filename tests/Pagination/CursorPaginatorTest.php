@@ -126,11 +126,7 @@ class CursorPaginatorTest extends TestCase
             'parameters' => ['id'],
         ]);
 
-        $throughFunc = static function ($item) {
-            return ['other-id' => $item['id']];
-        };
-
-        $paginator->withPersistCursors()->through($throughFunc);
+        $paginator->withPersistentCursors()->through(static fn ($item) => ['other-id' => $item['id']]);
         $this->assertSame(1, $paginator->previousCursor()->parameter('id'));
         $this->assertSame(2, $paginator->nextCursor()->parameter('id'));
         $this->assertEquals([
