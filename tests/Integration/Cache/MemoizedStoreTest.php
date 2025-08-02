@@ -597,7 +597,8 @@ class MemoizedStoreTest extends TestCase
         }
     }
 
-    public function test_it_returns_consistent_types_for_increment_operations(){
+    public function test_it_returns_consistent_types_for_increment_operations()
+    {
         foreach (['redis', 'database', 'memcached', 'array', 'file', 'null'] as $name) {
             Cache::store($name)->put('count', 0);
             Cache::memo($name)->increment('count');
@@ -606,7 +607,8 @@ class MemoizedStoreTest extends TestCase
         }
     }
 
-    public function test_it_returns_consistent_types_for_decrement_operations(){
+    public function test_it_returns_consistent_types_for_decrement_operations()
+    {
         foreach (['redis', 'database', 'memcached', 'array', 'file', 'null'] as $name) {
             Cache::store($name)->put('count', 10);
             Cache::memo($name)->decrement('count');

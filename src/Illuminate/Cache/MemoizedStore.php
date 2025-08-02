@@ -134,7 +134,7 @@ class MemoizedStore implements LockProvider, Store
      */
     public function increment($key, $value = 1)
     {
-        return tap($this->repository->increment($key, $value), function ($result) use ($key, $value) {
+        return tap($this->repository->increment($key, $value), function ($result) use ($key) {
             if (false !== $result) {
                 $this->cache[$this->prefix($key)] = $result;
             }
@@ -150,7 +150,7 @@ class MemoizedStore implements LockProvider, Store
      */
     public function decrement($key, $value = 1)
     {
-        return tap($this->repository->decrement($key, $value), function ($result) use ($key, $value) {
+        return tap($this->repository->decrement($key, $value), function ($result) use ($key) {
             if (false !== $result) {
                 $this->cache[$this->prefix($key)] = $result;
             }
