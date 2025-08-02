@@ -24,6 +24,7 @@ use ReflectionClass;
 use RuntimeException;
 use stdClass;
 use Traversable;
+use function Illuminate\Support\partial_application;
 
 class SupportHelpersTest extends TestCase
 {
@@ -1527,7 +1528,7 @@ class SupportHelpersTest extends TestCase
             return $b ? $a : $c;
         };
 
-        $partiallyApplied = \Illuminate\Support\partial_applicatiopn($fn, $firstRun);
+        $partiallyApplied = partial_application($fn, $firstRun);
         $partiallyApplied = $partiallyApplied(...$secondRun);
         $partiallyApplied = $partiallyApplied(...$thirdRun);
 
