@@ -186,7 +186,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function increment($key, $value = 1)
     {
-        return $this->connection()->incrby($this->prefix.$key, $value);
+        return (string) $this->connection()->incrby($this->prefix.$key, $value);
     }
 
     /**
@@ -198,7 +198,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     public function decrement($key, $value = 1)
     {
-        return $this->connection()->decrby($this->prefix.$key, $value);
+        return (string) $this->connection()->decrby($this->prefix.$key, $value);
     }
 
     /**

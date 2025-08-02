@@ -596,4 +596,22 @@ class MemoizedStoreTest extends TestCase
             $this->assertSame($live, $memoized, "Failed for cache store: $name");
         }
     }
+
+    public function test_it_returns_consistent_types_for_increment_operations(){
+        foreach (['redis', 'database', 'memcached', 'array', 'file', 'null'] as $name) {
+            Cache::store($name)->put('count', 0);
+            Cache::memo($name)->increment('count');
+
+            $this->assertSame(Cache::store($name)->get('count'), Cache::memo($name)->get('count'), $name);
+        }
+    }
+
+    public function test_it_returns_consistent_types_for_decrement_operations(){
+        foreach (['redis', 'database', 'memcached', 'array', 'file', 'null'] as $name) {
+            Cache::store($name)->put('count', 10);
+            Cache::memo($name)->decrement('count');
+
+            $this->assertSame(Cache::store($name)->get('count'), Cache::memo($name)->get('count'), $name);
+        }
+    }
 }

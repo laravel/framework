@@ -39,7 +39,7 @@ class MemoizedStore implements LockProvider, Store
         $prefixedKey = $this->prefix($key);
 
         if (array_key_exists($prefixedKey, $this->cache)) {
-            return ! is_null($this->cache[$prefixedKey]) ? strval($this->cache[$prefixedKey]) : null;
+            return ! is_null($this->cache[$prefixedKey]) ? $this->cache[$prefixedKey] : null;
         }
 
         return $this->cache[$prefixedKey] = $this->repository->get($key);
@@ -136,7 +136,7 @@ class MemoizedStore implements LockProvider, Store
     {
         return tap($this->repository->increment($key, $value), function ($result) use ($key, $value) {
             if (false !== $result) {
-                $this->cache[$this->prefix($key)] = ($this->cache[$this->prefix($key)] ?? 0) + $value;
+                $this->cache[$this->prefix($key)] = $result;
             }
         });
     }
@@ -152,7 +152,7 @@ class MemoizedStore implements LockProvider, Store
     {
         return tap($this->repository->decrement($key, $value), function ($result) use ($key, $value) {
             if (false !== $result) {
-                $this->cache[$this->prefix($key)] = ($this->cache[$this->prefix($key)] ?? 0) - $value;
+                $this->cache[$this->prefix($key)] = $result;
             }
         });
     }
@@ -250,5 +250,16 @@ class MemoizedStore implements LockProvider, Store
     protected function prefix($key)
     {
         return $this->getPrefix().$key;
+    }
+
+    private function normalizeForDriver($value)
+    {
+        $driver = $this->repository->getStore();
+
+        if ($driver instanceof \Illuminate\Cache\RedisStore) {
+            return (string) $value;
+        }
+
+        return $value;
     }
 }
