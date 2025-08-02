@@ -1530,8 +1530,12 @@ class SupportHelpersTest extends TestCase
         };
 
         $partiallyApplied = partial_application($fn, $firstRun);
-        $partiallyApplied = $partiallyApplied(...$secondRun);
-        $partiallyApplied = $partiallyApplied(...$thirdRun);
+
+        $runs = [$secondRun, $thirdRun];
+        while (is_callable($partiallyApplied) && count($runs)) {
+            $run = array_shift($runs);
+            $partiallyApplied = $partiallyApplied(...$secondRun);
+        }
 
         $assertion($partiallyApplied);
     }
