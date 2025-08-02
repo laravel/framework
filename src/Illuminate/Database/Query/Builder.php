@@ -2728,7 +2728,7 @@ class Builder implements BuilderContract
     {
         return $this->orderBy($column, $direction);
     }
-    
+
     /**
      * Add a descending "order by" clause to the query.
      *
