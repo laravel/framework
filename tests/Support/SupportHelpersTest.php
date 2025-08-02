@@ -1527,7 +1527,7 @@ class SupportHelpersTest extends TestCase
             return $b ? $a : $c;
         };
 
-        $partiallyApplied = partial_applicatiopn($fn, $firstRun);
+        $partiallyApplied = \Illuminate\Support\partial_applicatiopn($fn, $firstRun);
         $partiallyApplied = $partiallyApplied(...$secondRun);
         $partiallyApplied = $partiallyApplied(...$thirdRun);
 
