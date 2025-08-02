@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use ReflectionFunction;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 if (! function_exists('Illuminate\Support\defer')) {
@@ -49,5 +50,22 @@ if (! function_exists('Illuminate\Support\artisan_binary')) {
     function artisan_binary()
     {
         return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+    }
+}
+
+if (! function_exists('Illuminate\Support\partial_application')) {
+    /**
+     * @template TReturn
+     *
+     * @param  (callable(): TReturn)  $fn
+     * @return (callable(): TReturn)|TReturn
+     */
+    function partial_application(callable $fn, array $params = [])
+    {
+        $paramCount = (new ReflectionFunction($fn))->getNumberOfParameters();
+
+        return fn (...$args) => (count($params) + count($args)) === $paramCount
+            ? $fn(...[...$params, ...$args])
+            : partial_application($fn, [...$params, ...$args]);
     }
 }
