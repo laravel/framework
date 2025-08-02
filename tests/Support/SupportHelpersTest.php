@@ -1514,7 +1514,7 @@ class SupportHelpersTest extends TestCase
             [[1], [], [], self::assertIsCallable(...)],
             [[1, 'foo'], [], [], self::assertIsCallable(...)],
             [[1, 'foo', true], [], [], self::assertIsInt(...)],
-            [[1, 'foo'], [true]], [], self::assertIsInt(...),
+            [[1, 'foo'], [true], [], self::assertIsInt(...)],
             [[1], ['foo', true], [], self::assertIsInt(...)],
             [[1], ['foo'], [true], self::assertIsInt(...)],
         ];
