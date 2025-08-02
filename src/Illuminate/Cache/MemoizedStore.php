@@ -39,7 +39,7 @@ class MemoizedStore implements LockProvider, Store
         $prefixedKey = $this->prefix($key);
 
         if (array_key_exists($prefixedKey, $this->cache)) {
-            return $this->cache[$prefixedKey];
+            return ! is_null($this->cache[$prefixedKey]) ? $this->cache[$prefixedKey] : null;
         }
 
         return $this->cache[$prefixedKey] = $this->repository->get($key);
@@ -100,9 +100,11 @@ class MemoizedStore implements LockProvider, Store
      */
     public function put($key, $value, $seconds)
     {
-        unset($this->cache[$this->prefix($key)]);
-
-        return $this->repository->put($key, $value, $seconds);
+        return tap($this->repository->put($key, $value, $seconds), function ($result) use ($key, $value) {
+            if ($result) {
+                $this->cache[$this->prefix($key)] = $value;
+            }
+        });
     }
 
     /**
@@ -114,11 +116,13 @@ class MemoizedStore implements LockProvider, Store
      */
     public function putMany(array $values, $seconds)
     {
-        foreach ($values as $key => $value) {
-            unset($this->cache[$this->prefix($key)]);
-        }
-
-        return $this->repository->putMany($values, $seconds);
+        return tap($this->repository->putMany($values, $seconds), function ($result) use ($values) {
+            if ($result) {
+                foreach ($values as $key => $value) {
+                    $this->cache[$this->prefix($key)] = $value;
+                }
+            }
+        });
     }
 
     /**
@@ -130,9 +134,11 @@ class MemoizedStore implements LockProvider, Store
      */
     public function increment($key, $value = 1)
     {
-        unset($this->cache[$this->prefix($key)]);
-
-        return $this->repository->increment($key, $value);
+        return tap($this->repository->increment($key, $value), function ($result) use ($key) {
+            if (false !== $result) {
+                $this->cache[$this->prefix($key)] = $result;
+            }
+        });
     }
 
     /**
@@ -144,9 +150,11 @@ class MemoizedStore implements LockProvider, Store
      */
     public function decrement($key, $value = 1)
     {
-        unset($this->cache[$this->prefix($key)]);
-
-        return $this->repository->decrement($key, $value);
+        return tap($this->repository->decrement($key, $value), function ($result) use ($key) {
+            if (false !== $result) {
+                $this->cache[$this->prefix($key)] = $result;
+            }
+        });
     }
 
     /**
@@ -158,9 +166,11 @@ class MemoizedStore implements LockProvider, Store
      */
     public function forever($key, $value)
     {
-        unset($this->cache[$this->prefix($key)]);
-
-        return $this->repository->forever($key, $value);
+        return tap($this->repository->forever($key, $value), function ($result) use ($key, $value) {
+            if ($result) {
+                $this->cache[$this->prefix($key)] = $value;
+            }
+        });
     }
 
     /**
@@ -240,5 +250,16 @@ class MemoizedStore implements LockProvider, Store
     protected function prefix($key)
     {
         return $this->getPrefix().$key;
+    }
+
+    private function normalizeForDriver($value)
+    {
+        $driver = $this->repository->getStore();
+
+        if ($driver instanceof \Illuminate\Cache\RedisStore) {
+            return (string) $value;
+        }
+
+        return $value;
     }
 }
