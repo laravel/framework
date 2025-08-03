@@ -26,7 +26,9 @@ class ScheduleRunCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:run {--whisper : Do not output message indicating that no jobs were ready to run}';
+    protected $signature = 'schedule:run
+        {--whisper : Do not output message indicating that no jobs were ready to run}
+        {--dry-run : Display scheduled commands without executing them}';
 
     /**
      * The console command description.
@@ -55,6 +57,13 @@ class ScheduleRunCommand extends Command
      * @var bool
      */
     protected $eventsRan = false;
+
+    /**
+     * Printw commands without executing them.
+     *
+     * @var bool
+     */
+    protected $dryRun = false;
 
     /**
      * The event dispatcher.
@@ -110,6 +119,7 @@ class ScheduleRunCommand extends Command
         $this->cache = $cache;
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
+        $this->dryRun = $this->option('dry-run');
 
         $events = $this->schedule->dueEvents($this->laravel);
 
@@ -117,6 +127,7 @@ class ScheduleRunCommand extends Command
             $this->clearInterruptSignal();
         }
 
+        /* @var  Event $event */
         foreach ($events as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
@@ -128,7 +139,19 @@ class ScheduleRunCommand extends Command
                 $this->newLine();
             }
 
-            if ($event->onOneServer) {
+            if ( $this->dryRun ){
+                $summary = $event->getSummaryForDisplay();
+
+                $command = $event instanceof CallbackEvent
+                    ? $summary
+                    : trim(str_replace($this->phpBinary, '', $event->command));
+
+                $this->components->info(sprintf(
+                    '<fg=gray>%s</> Skipping [%s], because the scheduler is started with the dry-run option.',
+                    Carbon::now()->format('Y-m-d H:i:s'),
+                    $command
+                ));
+            } else if ($event->onOneServer) {
                 $this->runSingleServerEvent($event);
             } else {
                 $this->runEvent($event);
@@ -254,7 +277,19 @@ class ScheduleRunCommand extends Command
                     continue;
                 }
 
-                if ($event->onOneServer) {
+                if ( $this->dryRun ) {
+                    $summary = $event->getSummaryForDisplay();
+
+                    $command = $event instanceof CallbackEvent
+                        ? $summary
+                        : trim(str_replace($this->phpBinary, '', $event->command));
+
+                    $this->components->info(sprintf(
+                        '<fg=gray>%s</> Skipping [%s], because the scheduler is started with the dry-run option.',
+                        Carbon::now()->format('Y-m-d H:i:s'),
+                        $command
+                    ));
+                } else if ($event->onOneServer) {
                     $this->runSingleServerEvent($event);
                 } else {
                     $this->runEvent($event);
