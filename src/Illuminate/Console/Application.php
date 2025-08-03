@@ -179,7 +179,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $callingClass = true;
 
-            if(is_object($command)) {
+            if (is_object($command)) {
                 $command = get_class($command);
             }
 
