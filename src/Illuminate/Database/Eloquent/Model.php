@@ -12,6 +12,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Attributes\Boot;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -360,23 +362,28 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$traitInitializers[$class] = [];
 
-        foreach (class_uses_recursive($class) as $trait) {
-            $method = 'boot'.class_basename($trait);
+        $uses = class_uses_recursive($class);
 
-            if (method_exists($class, $method) && ! in_array($method, $booted)) {
-                forward_static_call([$class, $method]);
+        $conventionalBootMethods = array_map(static fn ($trait) => 'boot'.class_basename($trait), $uses);
+        $conventionalInitMethods = array_map(static fn ($trait) => 'initialize'.class_basename($trait), $uses);
 
-                $booted[] = $method;
+        foreach ((new ReflectionClass($class))->getMethods() as $method) {
+            if (! in_array($method->getName(), $booted) &&
+                $method->isStatic() &&
+                (in_array($method->getName(), $conventionalBootMethods) ||
+                $method->getAttributes(Boot::class) !== [])) {
+                $method->invoke(null);
+
+                $booted[] = $method->getName();
             }
 
-            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
-                static::$traitInitializers[$class][] = $method;
-
-                static::$traitInitializers[$class] = array_unique(
-                    static::$traitInitializers[$class]
-                );
+            if (in_array($method->getName(), $conventionalInitMethods) ||
+                $method->getAttributes(Initialize::class) !== []) {
+                static::$traitInitializers[$class][] = $method->getName();
             }
         }
+
+        static::$traitInitializers[$class] = array_unique(static::$traitInitializers[$class]);
     }
 
     /**
