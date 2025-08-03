@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\TransformsToResourceCollection;
 use InvalidArgumentException;
+use ReflectionFunction;
 use stdClass;
 use Traversable;
 
@@ -414,7 +415,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function filter(?callable $callback = null)
     {
         if ($callback) {
-            return new static(Arr::where($this->items, $callback));
+            return new static(Arr::where($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key)));
         }
 
         return new static(array_filter($this->items));
@@ -431,7 +432,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function first(?callable $callback = null, $default = null)
     {
-        return Arr::first($this->items, $callback, $default);
+        return Arr::first($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
     }
 
     /**
@@ -794,7 +795,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function last(?callable $callback = null, $default = null)
     {
-        return Arr::last($this->items, $callback, $default);
+        return Arr::last($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
     }
 
     /**
@@ -819,7 +820,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function map(callable $callback)
     {
-        return new static(Arr::map($this->items, $callback));
+        return new static(Arr::map($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key)));
     }
 
     /**
@@ -1947,5 +1948,25 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function offsetUnset($key): void
     {
         unset($this->items[$key]);
+    }
+
+    /**
+     * Built-in or interal functions, unlike userland functions, must be called with the proper
+     * number of arguments. Userland functions can discard additional arguments on their own
+     * To align built-in function behavior with their userland counterparts, callback function calls
+     * with callables have to be wrapped in this function
+     *
+     * @template TReturn
+     * @param  (callable(): TReturn)  $fn
+     * @return TReturn
+     */
+    private function callPotentialBuiltinCallback(callable $fn, ...$arguments): mixed
+    {   
+        $reflectionFunction = new ReflectionFunction($fn);
+        if ($reflectionFunction->isInternal() && ($paramCount = $reflectionFunction->getNumberOfParameters()) < count($arguments)) {
+            return call_user_func($fn, ...array_slice($arguments, 0, $paramCount));
+        }
+
+        return call_user_func($fn, ...$arguments);
     }
 }
