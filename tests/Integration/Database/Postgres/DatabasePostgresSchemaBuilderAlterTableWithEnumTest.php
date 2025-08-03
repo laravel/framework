@@ -32,7 +32,7 @@ class DatabasePostgresSchemaBuilderAlterTableWithEnumTest extends PostgresTestCa
         });
 
         $this->assertTrue(Schema::hasColumn('orders', 'status'));
-        $this->assertContains(Schema::getColumnType('orders', 'status'), ['varchar', 'character varying']);
+        $this->assertSame('varchar', Schema::getColumnType('orders', 'status'));
     }
 
     public function testRenameColumnOnTableWithEnum()
@@ -50,6 +50,6 @@ class DatabasePostgresSchemaBuilderAlterTableWithEnumTest extends PostgresTestCa
             $table->unsignedInteger('id')->change();
         });
 
-        $this->assertContains(Schema::getColumnType('orders', 'id'), ['integer', 'int4']);
+        $this->assertSame('int4', Schema::getColumnType('orders', 'id'));
     }
 }
