@@ -690,6 +690,8 @@ class Container implements ArrayAccess, ContainerContract
             throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
+        $this->removeAbstractAlias($alias);
+
         $this->aliases[$alias] = $abstract;
 
         $this->abstractAliases[$abstract][] = $alias;
