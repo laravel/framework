@@ -141,20 +141,7 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function assertDispatchedOnce($command)
     {
-        $callback = null;
-
-        if ($command instanceof Closure) {
-            [$command, $callback] = [$this->firstClosureParameterType($command), $command];
-        }
-
-        $count = $this->dispatched($command, $callback)->count() +
-                 $this->dispatchedAfterResponse($command, $callback)->count() +
-                 $this->dispatchedSync($command, $callback)->count();
-
-        PHPUnit::assertSame(
-            1, $count,
-            "The expected [{$command}] job was pushed {$count} times instead of once."
-        );
+        $this->assertDispatchedTimes($command, 1);
     }
 
     /**

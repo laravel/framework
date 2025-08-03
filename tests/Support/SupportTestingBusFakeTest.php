@@ -284,7 +284,7 @@ class SupportTestingBusFakeTest extends TestCase
             $this->fake->assertDispatchedOnce(BusJobStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\BusJobStub] job was pushed 2 times instead of once.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\BusJobStub] job was pushed 2 times instead of 1 times.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedTimes(BusJobStub::class, 2);

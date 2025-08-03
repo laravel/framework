@@ -156,12 +156,7 @@ class EventFake implements Dispatcher, Fake
      */
     public function assertDispatchedOnce($event)
     {
-        $count = $this->dispatched($event)->count();
-
-        PHPUnit::assertSame(
-            1, $count,
-            "The expected [{$event}] event was dispatched {$count} times instead of once."
-        );
+        $this->assertDispatchedTimes($event, 1);
     }
 
     /**
