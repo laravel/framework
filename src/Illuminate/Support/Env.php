@@ -245,7 +245,7 @@ class Env
     }
 
     /**
-     * Wrap a string in quotes, choosing single or double quotes
+     * Wrap a string in quotes, choosing double or single quotes
      * depending on the presence of double quotes inside the string.
      *
      * @param  string  $input  The input string to be quoted.
