@@ -253,9 +253,9 @@ class ModelMakeCommandTest extends TestCase
         $this->artisan('make:model', ['name' => 'Foo'])
             ->assertExitCode(0);
 
-       $this->artisan('make:model', ['name' => 'Foo'])
-           ->assertExitCode(0)
-           ->expectsConfirmation('Do you want to generate additional components for the model?', 'yes')
-           ->expectsQuestion('Would you like any of the following?', []);
+        $this->artisan('make:model', ['name' => 'Foo'])
+            ->assertExitCode(0)
+            ->expectsConfirmation('Do you want to generate additional components for the model?', 'yes')
+            ->expectsQuestion('Would you like any of the following?', []);
     }
 }
