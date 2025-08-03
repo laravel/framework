@@ -1951,7 +1951,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Built-in or interal functions, unlike userland functions, must be called with the proper
+     * Built-in or internal functions, unlike userland functions, must be called with the proper
      * number of arguments. Userland functions can discard additional arguments on their own
      * To align built-in function behavior with their userland counterparts, callback function calls
      * with callables have to be wrapped in this function
