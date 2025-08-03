@@ -787,7 +787,7 @@ class SupportArrTest extends TestCase
     public function testIsFlat()
     {
         $this->assertTrue(Arr::isFlat([1, 'foo', 5 => 2.3, 'bar' => 'baz', new stdClass, true]));
-        $this->assertFalse(Arr::isFlat([1, 2, [3]));
+        $this->assertFalse(Arr::isFlat([1, 2, [3]]));
         $this->assertFalse(Arr::isFlat([[1]]));
     }
 
