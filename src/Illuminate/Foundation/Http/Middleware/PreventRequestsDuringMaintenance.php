@@ -134,7 +134,7 @@ class PreventRequestsDuringMaintenance
      */
     protected function bypassResponse(string $secret)
     {
-        return redirect()->intended()->withCookie(
+        return redirect()->intended('/')->withCookie(
             MaintenanceModeBypassCookie::create($secret)
         );
     }
