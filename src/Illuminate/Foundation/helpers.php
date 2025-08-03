@@ -959,7 +959,7 @@ if (! function_exists('to_action')) {
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
-    */
+     */
     function to_action($action, $parameters = [], $status = 302, $headers = [])
     {
         return redirect()->action($action, $parameters, $status, $headers);
