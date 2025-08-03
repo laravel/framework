@@ -238,7 +238,7 @@ class Arr
     }
 
     /**
-     * Determine if the given key exists in the provided array.
+     * Returns all keys from an array
      *
      * @param  array  $array
      * @return array
