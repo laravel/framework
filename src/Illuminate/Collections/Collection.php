@@ -1954,14 +1954,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Built-in or internal functions, unlike userland functions, must be called with the proper
      * number of arguments. Userland functions can discard additional arguments on their own
      * To align built-in function behavior with their userland counterparts, callback function calls
-     * with callables have to be wrapped in this function
+     * with callables have to be wrapped in this function.
      *
      * @template TReturn
+     *
      * @param  (callable(): TReturn)  $fn
      * @return TReturn
      */
     private function callPotentialBuiltinCallback(callable $fn, ...$arguments): mixed
-    {   
+    {
         $reflectionFunction = new ReflectionFunction($fn);
         if ($reflectionFunction->isInternal() && ($paramCount = $reflectionFunction->getNumberOfParameters()) < count($arguments)) {
             return call_user_func($fn, ...array_slice($arguments, 0, $paramCount));
