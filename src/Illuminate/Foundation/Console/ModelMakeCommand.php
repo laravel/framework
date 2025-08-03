@@ -54,8 +54,7 @@ class ModelMakeCommand extends GeneratorCommand
 
             if (! confirm("Do you want to generate additional components for the model?")) {
                 return false;
-            }
-            else {
+            } else {
                 $this->afterPromptingForMissingArguments($this->input, $this->output);
             }
         }
