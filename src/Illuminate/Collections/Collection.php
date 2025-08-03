@@ -5,6 +5,7 @@ namespace Illuminate\Support;
 use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
+use Closure;
 use Illuminate\Support\Traits\EnumeratesValues;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\TransformsToResourceCollection;
@@ -1966,12 +1967,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TReturn
      *
-     * @param  (callable(): TReturn)  $fn
+     * @param  (callable(): TReturn)|string|array{object|class-string, string}  $fn
      * @return TReturn
      */
-    private function callPotentialBuiltinCallback(callable $fn, ...$arguments): mixed
+    private function callPotentialBuiltinCallback(callable|string|array $fn, ...$arguments): mixed
     {
-        $reflectionFunction = new ReflectionFunction($fn);
+        $reflectionFunction = new ReflectionFunction(Closure::fromCallable($fn));
         if ($reflectionFunction->isInternal() && ($paramCount = $reflectionFunction->getNumberOfParameters()) < count($arguments)) {
             return call_user_func($fn, ...array_slice($arguments, 0, $paramCount));
         }
