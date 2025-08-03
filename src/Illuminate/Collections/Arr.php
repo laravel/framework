@@ -595,6 +595,20 @@ class Arr
     }
 
     /**
+     * Determines if an array is one-dimensional.
+     */
+    public static function isFlat($array): bool
+    {
+        foreach ($array as $entry) {
+            if (is_array($entry)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Join all items using a string. The final items can use a separate glue string.
      *
      * @param  array  $array
