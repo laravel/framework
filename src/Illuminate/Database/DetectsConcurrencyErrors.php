@@ -17,6 +17,7 @@ trait DetectsConcurrencyErrors
     protected function causedByConcurrencyError(Throwable $e)
     {
         $container = Container::getInstance();
+
         $detector = $container->bound(ConcurrencyErrorDetectorContract::class)
             ? $container[ConcurrencyErrorDetectorContract::class]
             : new ConcurrencyErrorDetector();

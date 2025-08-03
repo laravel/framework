@@ -83,6 +83,7 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->app->singleton(ConcurrencyErrorDetectorContract::class, function ($app) {
             return new ConcurrencyErrorDetector;
         });
+
         $this->app->singleton(LostConnectionDetectorContract::class, function ($app) {
             return new LostConnectionDetector;
         });

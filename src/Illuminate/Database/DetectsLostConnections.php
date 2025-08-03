@@ -17,6 +17,7 @@ trait DetectsLostConnections
     protected function causedByLostConnection(Throwable $e)
     {
         $container = Container::getInstance();
+
         $detector = $container->bound(LostConnectionDetectorContract::class)
             ? $container[LostConnectionDetectorContract::class]
             : new LostConnectionDetector();
