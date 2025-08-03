@@ -238,7 +238,7 @@ class Arr
     }
 
     /**
-     * Returns all keys from an array
+     * Returns all keys from an array.
      *
      * @param  array  $array
      * @return array
