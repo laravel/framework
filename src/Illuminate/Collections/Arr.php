@@ -553,6 +553,42 @@ class Arr
     }
 
     /**
+     * Determine if all items pass the given truth test.
+     *
+     * @param  iterable  $array
+     * @param  (callable(mixed, array-key): bool)  $callback
+     * @return bool
+     */
+    public static function every($array, callable $callback)
+    {
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if some items pass the given truth test.
+     *
+     * @param  iterable  $array
+     * @param  (callable(mixed, array-key): bool)  $callback
+     * @return bool
+     */
+    public static function some($array, callable $callback)
+    {
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get an integer item from an array using "dot" notation.
      */
     public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): int
