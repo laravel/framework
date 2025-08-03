@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\confirm;
 
 #[AsCommand(name: 'make:model')]
 class ModelMakeCommand extends GeneratorCommand
@@ -47,7 +48,15 @@ class ModelMakeCommand extends GeneratorCommand
     public function handle()
     {
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            if (! $this->alreadyExists($this->getNameInput())) {
+                return false;
+            }
+
+            if (! confirm("Do you want to generate additional components for the model?")) {
+                return false;
+            } else {
+                $this->afterPromptingForMissingArguments($this->input, $this->output);
+            }
         }
 
         if ($this->option('all')) {
