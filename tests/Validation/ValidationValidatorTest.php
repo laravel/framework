@@ -3283,6 +3283,28 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateIntegerStrict()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Integer:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Integer:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1'], ['foo' => 'Integer:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Integer:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 0.1], ['foo' => 'Integer:strict']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 1], ['foo' => 'Integer:strict']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateDecimal()
     {
         $trans = $this->getIlluminateArrayTranslator();
