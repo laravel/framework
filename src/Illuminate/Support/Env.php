@@ -245,43 +245,6 @@ class Env
     }
 
     /**
-     * Wrap a string in quotes, choosing double or single quotes
-     * depending on the presence of double quotes inside the string.
-     *
-     * @param  string  $input  The input string to be quoted.
-     * @return string The quoted string with appropriate escaping applied.
-     */
-    protected static function prepareQuotedValue(string $input): string
-    {
-        $containsDoubleQuotes = strpos($input, '"') !== false;
-
-        if ($containsDoubleQuotes) {
-            return "'".self::addslashesExcept($input, ['"'])."'";
-        }
-
-        return '"'.self::addslashesExcept($input, ["'"]).'"';
-    }
-
-    /**
-     * Escape a string using addslashes, excluding specified characters from being escaped.
-     *
-     * @param  string  $value  The input string to be escaped.
-     * @param  array  $except  Characters that should not be escaped.
-     * @return string The escaped string with exceptions applied.
-     */
-    protected static function addslashesExcept(string $value, array $except = []): string
-    {
-        $escaped = addslashes($value);
-
-        foreach ($except as $char) {
-            $escapedChar = '\\'.$char;
-            $escaped = str_replace($escapedChar, $char, $escaped);
-        }
-
-        return $escaped;
-    }
-
-    /**
      * Get the possible option for this environment variable.
      *
      * @param  string  $key
@@ -312,5 +275,36 @@ class Env
 
                 return $value;
             });
+    }
+
+    /**
+     * Wrap a string in quotes, choosing double or single quotes.
+     *
+     * @param  string  $input
+     * @return string
+     */
+    protected static function prepareQuotedValue(string $input)
+    {
+        return strpos($input, '"') !== false
+            ? "'".self::addSlashesExceptFor($input, ['"'])."'"
+            : '"'.self::addSlashesExceptFor($input, ["'"]).'"';
+    }
+
+    /**
+     * Escape a string using addslashes, excluding the specified characters from being escaped.
+     *
+     * @param  string  $value
+     * @param  array  $except
+     * @return string
+     */
+    protected static function addSlashesExceptFor(string $value, array $except = [])
+    {
+        $escaped = addslashes($value);
+
+        foreach ($except as $character) {
+            $escaped = str_replace('\\'.$character, $character, $escaped);
+        }
+
+        return $escaped;
     }
 }
