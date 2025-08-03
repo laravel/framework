@@ -139,7 +139,7 @@ class ScheduleRunCommand extends Command
                 $this->newLine();
             }
 
-            if ( $this->dryRun ){
+            if ($this->dryRun){
                 $summary = $event->getSummaryForDisplay();
 
                 $command = $event instanceof CallbackEvent
@@ -277,7 +277,7 @@ class ScheduleRunCommand extends Command
                     continue;
                 }
 
-                if ( $this->dryRun ) {
+                if ($this->dryRun) {
                     $summary = $event->getSummaryForDisplay();
 
                     $command = $event instanceof CallbackEvent
