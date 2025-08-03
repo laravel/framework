@@ -238,6 +238,17 @@ class Arr
     }
 
     /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function keys($array)
+    {
+        return array_keys($array);
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @template TKey

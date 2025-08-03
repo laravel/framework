@@ -1773,4 +1773,13 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testKeys()
+    {
+        $array = ['name' => 'Taylor', 'country' => 'USA'];
+
+        $result = Arr::keys($array);
+
+        $this->assertEquals(['name', 'country'], $result);
+    }
 }
