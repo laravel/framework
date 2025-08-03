@@ -179,7 +179,9 @@ class Application extends SymfonyApplication implements ApplicationContract
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $callingClass = true;
 
-            $command = get_class($command);
+            if(is_object($command)) {
+                $command = get_class($command);
+            }
 
             $command = $this->laravel->make($command)->getName();
         }
