@@ -281,6 +281,15 @@ class PostgresGrammar extends Grammar
     public function compileChange(Blueprint $blueprint, Fluent $command)
     {
         $column = $command->column;
+        $statements = [];
+
+        if ($column->type === 'enum') {
+            $constraintName = $blueprint->getTable().'_'.$column->name.'_check';
+            $statements[] = sprintf('alter table %s drop constraint if exists %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($constraintName)
+            );
+        }
 
         $changes = ['type '.$this->getType($column).$this->modifyCollate($blueprint, $column)];
 
@@ -298,10 +307,23 @@ class PostgresGrammar extends Grammar
             }
         }
 
-        return sprintf('alter table %s %s',
+        $statements[] = sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
             implode(', ', $this->prefixArray('alter column '.$this->wrap($column), $changes))
         );
+
+        if ($column->type === 'enum') {
+            $constraintName = $blueprint->getTable().'_'.$column->name.'_check';
+            $statements[] = sprintf('alter table %s add constraint %s check ("%s" in (%s))',
+                $this->wrapTable($blueprint),
+                $this->wrap($constraintName),
+                $column->name,
+                $this->quoteString($column->allowed)
+            );
+        }
+
+        // Return single statement or array of statements
+        return count($statements) === 1 ? $statements[0] : $statements;
     }
 
     /**
@@ -922,6 +944,10 @@ class PostgresGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
+        if ($column->change) {
+            return 'varchar(255)';
+        }
+
         return sprintf(
             'varchar(255) check ("%s" in (%s))',
             $column->name,

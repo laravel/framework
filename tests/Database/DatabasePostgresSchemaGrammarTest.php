@@ -1201,6 +1201,28 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('drop domain "schema"."alpha", "schema"."beta", "schema"."gamma" cascade', $statement);
     }
 
+    public function testNativeColumnModifyingOnPostgres()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'tasks', function ($table) {
+            $table->enum('status', ['pending', 'queued'])->default('pending')->change();
+        });
+
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(4, $statements);
+
+        $this->assertStringContainsString('drop constraint if exists "tasks_status_check"', $statements[0]);
+
+        $this->assertStringContainsString('alter table "tasks" alter column "status" type varchar(255)', $statements[1]);
+        $this->assertStringNotContainsString('check (', $statements[1]);
+        $this->assertStringContainsString('set default \'pending\'', $statements[1]);
+        $this->assertStringContainsString('set not null', $statements[1]);
+
+        $this->assertStringContainsString('add constraint "tasks_status_check" check ("status" in (\'pending\', \'queued\'))', $statements[2]);
+
+        $this->assertStringContainsString('comment on column', $statements[3]);
+    }
+
     public function testCompileColumns()
     {
         $connection = $this->getConnection();
