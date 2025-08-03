@@ -784,6 +784,14 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isList(['foo' => 'bar', 'baz' => 'qux']));
     }
 
+    public function testIsVector()
+    {
+        $this->assertTrue(Arr::isVector([1, 'foo', new stdClass, true]));
+        $this->assertFalse(Arr::isVector([1, 'foo', 5 => 2.3, 'bar' => 'baz', new stdClass, true]));
+        $this->assertFalse(Arr::isVector([1, 2, [3]]));
+        $this->assertFalse(Arr::isVector([[1]]));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];
