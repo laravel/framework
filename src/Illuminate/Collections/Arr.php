@@ -612,8 +612,6 @@ class Arr
         return true;
     }
 
-    public static function 
-
     /**
      * Join all items using a string. The final items can use a separate glue string.
      *
