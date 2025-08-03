@@ -17,8 +17,8 @@ use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
-use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use RuntimeException;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 use function Illuminate\Support\enum_value;
 
