@@ -595,6 +595,26 @@ class Arr
     }
 
     /**
+     * Determines if an array is a one-dimensional list.
+     */
+    public static function isVector($array): bool
+    {
+        if (self::isAssoc($array)) {
+            return false;
+        }
+
+        foreach ($array as $entry) {
+            if (is_array($entry)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function 
+
+    /**
      * Join all items using a string. The final items can use a separate glue string.
      *
      * @param  array  $array
