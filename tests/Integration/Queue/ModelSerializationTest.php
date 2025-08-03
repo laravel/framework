@@ -432,7 +432,8 @@ trait TraitBootsAndInitializersTest
     #[Boot]
     public static function nonConventionalBootFunctionInTrait()
     {
-        static::addGlobalScope('booted_attr_in_trait', function () {});
+        static::addGlobalScope('booted_attr_in_trait', function () {
+        });
     }
 
     #[Initialize]
@@ -453,7 +454,8 @@ class ModelBootTestWithTraitInitialization extends Model
     #[Boot]
     public static function nonConventionalBootFunctionInClass()
     {
-        static::addGlobalScope('booted_attr_in_class', function () {});
+        static::addGlobalScope('booted_attr_in_class', function () {
+        });
     }
 
     #[Initialize]
