@@ -256,9 +256,9 @@ class Env
         $containsDoubleQuotes = strpos($input, '"') !== false;
 
         if ($containsDoubleQuotes) {
-           return "'".self::addslashesExcept($input, ['"'])."'";
+            return "'".self::addslashesExcept($input, ['"'])."'";
         } 
-    
+
         return '"'.self::addslashesExcept($input, ["'"]).'"';
     }
 
