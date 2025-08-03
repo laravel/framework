@@ -876,6 +876,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 3], $c->filter()->all());
     }
 
+    public function testCallPotentialBuiltinCallback()
+    {
+        $this->assertEquals(['foo'], collect(['a' => 1, 'b' => 'foo'])->filter(is_string(...))->all());
+        $this->assertEquals(['Foo', 'Bar'], collect(['a' => 'foo', 'b' => 'bar'])->map(ucfirst(...))->all());
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testHigherOrderKeyBy($collection)
     {
