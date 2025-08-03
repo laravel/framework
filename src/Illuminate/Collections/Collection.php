@@ -432,7 +432,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function first(?callable $callback = null, $default = null)
     {
-        return Arr::first($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
+        if ($callback) {
+            return Arr::first($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
+        }
+
+        return Arr::first($this->items, default: $default);
     }
 
     /**
@@ -795,7 +799,11 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function last(?callable $callback = null, $default = null)
     {
-        return Arr::last($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
+        if ($callback) {
+            return Arr::last($this->items, fn ($value, $key) => $this->callPotentialBuiltinCallback($callback, $value, $key), $default);
+        }
+
+        return Arr::last($this->items, default: $default);
     }
 
     /**
