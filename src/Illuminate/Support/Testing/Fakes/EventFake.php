@@ -172,7 +172,11 @@ class EventFake implements Dispatcher, Fake
 
         PHPUnit::assertSame(
             $times, $count,
-            "The expected [{$event}] event was dispatched {$count} times instead of {$times} times."
+            sprintf(
+                "The expected [{$event}] event was dispatched {$count} %s instead of {$times} %s.",
+                Str::plural('time', $count),
+                Str::plural('time', $times)
+            )
         );
     }
 
