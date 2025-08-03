@@ -366,19 +366,22 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         $conventionalBootMethods = array_map(static fn ($trait) => 'boot'.class_basename($trait), $uses);
         $conventionalInitMethods = array_map(static fn ($trait) => 'initialize'.class_basename($trait), $uses);
+        $isBootedMethod = in_array($method->getName(), $booted);
+		$isConventionalBootMethod = in_array($method->getName(), $conventionalBootMethods);
+		$hasBootAttributes = $method->getAttributes(Boot::class) !== [];
+		$isConventionalInitMethod = in_array($method->getName(), $conventionalInitMethods);
+		$hasInitAttributes = $method->getAttributes(Initialize::class) !== [];
 
         foreach ((new ReflectionClass($class))->getMethods() as $method) {
-            if (! in_array($method->getName(), $booted) &&
+            if (! $isBootedMethod &&
                 $method->isStatic() &&
-                (in_array($method->getName(), $conventionalBootMethods) ||
-                $method->getAttributes(Boot::class) !== [])) {
+                ($isConventionalBootMethod || $hasBootAttributes)) {
                 $method->invoke(null);
 
                 $booted[] = $method->getName();
             }
 
-            if (in_array($method->getName(), $conventionalInitMethods) ||
-                $method->getAttributes(Initialize::class) !== []) {
+            if ($isConventionalInitMethod || $hasInitAttributes) {
                 static::$traitInitializers[$class][] = $method->getName();
             }
         }
