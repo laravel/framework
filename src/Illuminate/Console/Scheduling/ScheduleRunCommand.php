@@ -140,17 +140,7 @@ class ScheduleRunCommand extends Command
             }
 
             if ($this->dryRun) {
-                $summary = $event->getSummaryForDisplay();
-
-                $command = $event instanceof CallbackEvent
-                    ? $summary
-                    : trim(str_replace($this->phpBinary, '', $event->command));
-
-                $this->components->info(sprintf(
-                    '<fg=gray>%s</> Skipping [%s], because the scheduler is started with the dry-run option.',
-                    Carbon::now()->format('Y-m-d H:i:s'),
-                    $command
-                ));
+                $this->outputDryRunMessage($event);
             } elseif ($event->onOneServer) {
                 $this->runSingleServerEvent($event);
             } else {
@@ -278,17 +268,7 @@ class ScheduleRunCommand extends Command
                 }
 
                 if ($this->dryRun) {
-                    $summary = $event->getSummaryForDisplay();
-
-                    $command = $event instanceof CallbackEvent
-                        ? $summary
-                        : trim(str_replace($this->phpBinary, '', $event->command));
-
-                    $this->components->info(sprintf(
-                        '<fg=gray>%s</> Skipping [%s], because the scheduler is started with the dry-run option.',
-                        Carbon::now()->format('Y-m-d H:i:s'),
-                        $command
-                    ));
+                    $this->outputDryRunMessage($event);
                 } elseif ($event->onOneServer) {
                     $this->runSingleServerEvent($event);
                 } else {
@@ -320,5 +300,26 @@ class ScheduleRunCommand extends Command
     protected function clearInterruptSignal()
     {
         $this->cache->forget('illuminate:schedule:interrupt');
+    }
+
+    /**
+     * Output a formatted message indicating a scheduled task is skipped in dry-run mode.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     */
+    private function outputDryRunMessage(Event $event)
+    {
+        $summary = $event->getSummaryForDisplay();
+
+        $command = $event instanceof CallbackEvent
+            ? $summary
+            : trim(str_replace($this->phpBinary, '', $event->command));
+
+        $this->components->info(sprintf(
+            '<fg=gray>%s</> Skipping [%s], because the scheduler is started with the dry-run option.',
+            Carbon::now()->format('Y-m-d H:i:s'),
+            $command
+        ));
     }
 }
