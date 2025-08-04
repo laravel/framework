@@ -59,7 +59,7 @@ class ScheduleRunCommand extends Command
     protected $eventsRan = false;
 
     /**
-     * Printw commands without executing them.
+     * Print commands without executing them.
      *
      * @var bool
      */
