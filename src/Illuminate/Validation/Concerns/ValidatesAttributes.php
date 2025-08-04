@@ -491,7 +491,7 @@ trait ValidatesAttributes
      */
     public function validateBoolean($attribute, $value, $parameters)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [true, false, 0, 1, '0', '1', 'true', 'false'];
 
         if (($parameters[0] ?? null) === 'strict') {
             $acceptable = [true, false];
