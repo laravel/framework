@@ -97,19 +97,6 @@ class PendingChain
     }
 
     /**
-     * Set the desired delay in seconds for the chain.
-     *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
-     * @return $this
-     */
-    public function delay($delay)
-    {
-        $this->delay = $delay;
-
-        return $this;
-    }
-
-    /**
      * Prepend a job to the chain.
      *
      * @param  mixed  $job
@@ -149,6 +136,19 @@ class PendingChain
         }
 
         array_push($this->chain, ...$jobs->toArray());
+
+        return $this;
+    }
+
+    /**
+     * Set the desired delay in seconds for the chain.
+     *
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return $this
+     */
+    public function delay($delay)
+    {
+        $this->delay = $delay;
 
         return $this;
     }
