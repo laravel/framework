@@ -3694,75 +3694,75 @@ class ValidationValidatorTest extends TestCase
     public function testValidateUnlessBetween()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Unless_Between:4,6']);
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'unless_between:4,6']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Unless_Between:5,7']);
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'unless_between:5,7']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Unless_Between:3,5']);
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'unless_between:3,5']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'asdadad'], ['foo' => 'Unless_Between:4,6']);
+        $v = new Validator($trans, ['foo' => 'asdadad'], ['foo' => 'unless_between:4,6']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'asd'], ['foo' => 'Unless_Between:4,6']);
+        $v = new Validator($trans, ['foo' => 'asd'], ['foo' => 'unless_between:4,6']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,150']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|unless_between:100,150']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:123,150']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|unless_between:123,150']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,123']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|unless_between:100,123']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:150,200']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|unless_between:150,200']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,120']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|unless_between:100,120']);
         $this->assertTrue($v->passes());
 
         // can work with float
-        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.01,0.04']);
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|unless_between:0.01,0.04']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.03,0.05']);
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|unless_between:0.03,0.05']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.01,0.03']);
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|unless_between:0.01,0.03']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.01,0.02']);
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|unless_between:0.01,0.02']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.04'], ['foo' => 'Numeric|Unless_Between:0.05,0.07']);
+        $v = new Validator($trans, ['foo' => '0.04'], ['foo' => 'Numeric|unless_between:0.05,0.07']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|Unless_Between:1,5']);
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|unless_between:1,5']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|Unless_Between:4,6']);
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|unless_between:4,6']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|Unless_Between:2,4']);
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|unless_between:2,4']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Unless_Between:4,6']);
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|unless_between:4,6']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3, 4, 5, 6]], ['foo' => 'Array|Unless_Between:2,5']);
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4, 5, 6]], ['foo' => 'Array|unless_between:2,5']);
         $this->assertTrue($v->passes());
 
         $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->expects($this->any())->method('getSize')->willReturn(3072);
-        $v = new Validator($trans, ['photo' => $file], ['photo' => 'Unless_Between:1,2']);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'unless_between:1,2']);
         $this->assertTrue($v->passes());
 
         $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->expects($this->any())->method('getSize')->willReturn(4072);
-        $v = new Validator($trans, ['photo' => $file], ['photo' => 'Unless_Between:2,4']);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'unless_between:2,4']);
         $this->assertFalse($v->passes());
     }
 
