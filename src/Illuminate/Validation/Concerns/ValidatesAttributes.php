@@ -482,6 +482,24 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the size of an attribute is not between a set of values.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateUnlessBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'unless_between');
+
+        return with(
+            BigNumber::of($this->getSize($attribute, $value)),
+            fn ($size) => $size->isLessThanOrEqualTo($this->trim($parameters[0])) || $size->isGreaterThanOrEqualTo($this->trim($parameters[1]))
+        );
+    }
+
+    /**
      * Validate that an attribute is a boolean.
      *
      * @param  string  $attribute
@@ -742,6 +760,24 @@ trait ValidatesAttributes
 
         return ! preg_match('/[^0-9]/', $value)
                     && $length >= $parameters[0] && $length <= $parameters[1];
+    }
+
+    /**
+     * Validate that an attribute is not between a given number of digits.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateDigitsUnlessBetween($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(2, $parameters, 'digits_unless_between');
+
+        $length = strlen((string) $value);
+
+        return ! preg_match('/[^0-9]/', $value)
+            && ($length <= $parameters[0] || $length >= $parameters[1]);
     }
 
     /**

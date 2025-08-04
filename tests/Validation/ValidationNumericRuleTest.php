@@ -29,6 +29,15 @@ class ValidationNumericRuleTest extends TestCase
         $this->assertEquals('numeric|between:1.5,10.5', (string) $rule);
     }
 
+    public function testUnlessBetweenRule()
+    {
+        $rule = Rule::numeric()->unlessBetween(1, 10);
+        $this->assertEquals('numeric|unless_between:1,10', (string) $rule);
+
+        $rule = Rule::numeric()->unlessBetween(1.5, 10.5);
+        $this->assertEquals('numeric|unless_between:1.5,10.5', (string) $rule);
+    }
+
     public function testDecimalRule()
     {
         $rule = Rule::numeric()->decimal(2, 4);
@@ -54,6 +63,12 @@ class ValidationNumericRuleTest extends TestCase
     {
         $rule = Rule::numeric()->digitsBetween(2, 10);
         $this->assertEquals('numeric|integer|digits_between:2,10', (string) $rule);
+    }
+
+    public function testDigitsUnlessBetweenRule()
+    {
+        $rule = Rule::numeric()->digitsUnlessBetween(2, 10);
+        $this->assertEquals('numeric|integer|digits_unless_between:2,10', (string) $rule);
     }
 
     public function testGreaterThanRule()

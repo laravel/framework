@@ -3386,6 +3386,15 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '1.88888888888888888887'], ['foo' => 'Decimal:20|Between:1.88888888888888888886,1.88888888888888888888']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => '1.88888888888888888887'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.88888888888888888885'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.88888888888888888889'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => '1.88888888888888888888'], ['foo' => 'Decimal:20|Gt:1.88888888888888888888']);
         $this->assertFalse($v->passes());
 
@@ -3530,6 +3539,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'digits_unless_between:6,8']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'digits_unless_between:1,10']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'digits_unless_between:2,5']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '+12.3'], ['foo' => 'digits_unless_between:1,6']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => '12345'], ['foo' => 'min_digits:1']);
         $this->assertTrue($v->passes());
 
@@ -3653,6 +3675,59 @@ class ValidationValidatorTest extends TestCase
         $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->expects($this->any())->method('getSize')->willReturn(4072);
         $v = new Validator($trans, ['photo' => $file], ['photo' => 'Between:1,2']);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testValidateUnlessBetween()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Unless_Between:4,6']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'Unless_Between:3,5']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'ancf'], ['foo' => 'Unless_Between:1,4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'ancfs'], ['foo' => 'Unless_Between:2,4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,150']);
+        $this->assertFalse($v->passes());
+
+        // inclusive on min
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:123,200']);
+        $this->assertTrue($v->passes());
+
+        // inclusive on max
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:0,123']);
+        $this->assertTrue($v->passes());
+
+        // can work with float
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Unless_Between:0.01,0.02']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Unless_Between:0.02,0.04']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Unless_Between:4,6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Unless_Between:4,6']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Unless_Between:2,5']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(3072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'Unless_Between:1,2']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
+        $file->expects($this->any())->method('getSize')->willReturn(4072);
+        $v = new Validator($trans, ['photo' => $file], ['photo' => 'Unless_Between:2,4']);
         $this->assertFalse($v->passes());
     }
 
@@ -9611,6 +9686,7 @@ class ValidationValidatorTest extends TestCase
             'min_str' => ' abc ',
             'multiple_of' => ' 0.5 ',
             'between' => "\n 5 \n",
+            'unless_between' => "\n 5 \n",
             'between_str' => ' abc ',
             'gt' => "\t5 ",
             'gt_field' => "\t5 ",
@@ -9639,6 +9715,7 @@ class ValidationValidatorTest extends TestCase
             'min_str' => 'min: 5',
             'multiple_of' => 'multiple_of:0.25 ',
             'between' => "numeric|between:\t 4, 6\n",
+            'unless_between' => "numeric|unless_between:\t 7, 8\n",
             'between_str' => "between:\t 5, 6\n",
             'gt' => 'numeric|gt: 4',
             'gt_field' => 'numeric|gt:foo',
@@ -9664,6 +9741,7 @@ class ValidationValidatorTest extends TestCase
             'min_str' => ' abc ',
             'multiple_of' => ' 0.5 ',
             'between' => "\n 5 \n",
+            'unless_between' => "\n 5 \n",
             'between_str' => ' abc ',
             'gt' => "\t5 ",
             'gt_field' => "\t5 ",
@@ -9692,6 +9770,7 @@ class ValidationValidatorTest extends TestCase
             'min_str' => 'min: 6',
             'multiple_of' => 'multiple_of:0.3 ',
             'between' => "numeric|between:\t 6, 7\n",
+            'unless_between' => "numeric|unless_between:\t 4, 6\n",
             'between_str' => "between:\t 6, 7\n",
             'gt' => 'numeric|gt: 5',
             'gt_field' => 'numeric|gt: foo ',
@@ -9715,6 +9794,7 @@ class ValidationValidatorTest extends TestCase
             'min_str',
             'multiple_of',
             'between',
+            'unless_between',
             'between_str',
             'gt',
             'gt_field',

@@ -28,6 +28,18 @@ class Numeric implements Stringable
     }
 
     /**
+     * The field under validation must not have a size between the given min and max (inclusive).
+     *
+     * @param  int|float  $min
+     * @param  int|float  $max
+     * @return $this
+     */
+    public function unlessBetween(int|float $min, int|float $max): Numeric
+    {
+        return $this->addRule('unless_between:'.$min.','.$max);
+    }
+
+    /**
      * The field under validation must contain the specified number of decimal places.
      *
      * @param  int  $min
@@ -77,6 +89,18 @@ class Numeric implements Stringable
     public function digitsBetween(int $min, int $max): Numeric
     {
         return $this->integer()->addRule('digits_between:'.$min.','.$max);
+    }
+
+    /**
+     * The integer under validation must not between the given min and max number of digits.
+     *
+     * @param  int  $min
+     * @param  int  $max
+     * @return $this
+     */
+    public function digitsUnlessBetween(int $min, int $max): Numeric
+    {
+        return $this->integer()->addRule('digits_unless_between:'.$min.','.$max);
     }
 
     /**
