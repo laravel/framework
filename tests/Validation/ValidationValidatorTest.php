@@ -3386,13 +3386,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => '1.88888888888888888887'], ['foo' => 'Decimal:20|Between:1.88888888888888888886,1.88888888888888888888']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '1.88888888888888888887'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $v = new Validator($trans, ['foo' => '1.88888888888888888887'], ['foo' => 'Decimal:20|unless_between:1.88888888888888888886,1.88888888888888888888']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => '1.88888888888888888885'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $v = new Validator($trans, ['foo' => '1.88888888888888888885'], ['foo' => 'Decimal:20|unless_between:1.88888888888888888886,1.88888888888888888888']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '1.88888888888888888889'], ['foo' => 'Decimal:20|Unless_Between:1.88888888888888888886,1.88888888888888888888']);
+        $v = new Validator($trans, ['foo' => '1.88888888888888888889'], ['foo' => 'Decimal:20|unless_between:1.88888888888888888886,1.88888888888888888888']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '1.88888888888888888888'], ['foo' => 'Decimal:20|Gt:1.88888888888888888888']);
