@@ -691,7 +691,8 @@ class Str
      */
     public static function isEmail($value, array $parameters = ['filter'])
     {
-       return (new class {
+        return (new class
+        {
             use ValidatesAttributes;
         })->validateEmail('email', $value, $parameters);
     }
