@@ -426,9 +426,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @return bool
      */
-    public function isEmail()
+    public function isEmail(array $parameters = ['filter'])
     {
-        return Str::isEmail($this->value);
+        return Str::isEmail($this->value, $parameters);
     }
 
     /**

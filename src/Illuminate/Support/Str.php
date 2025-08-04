@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Concerns\ValidatesAttributes;
 use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -688,13 +689,11 @@ class Str
      * @param  mixed  $value
      * @return bool
      */
-    public static function isEmail($value)
+    public static function isEmail($value, array $parameters = ['filter'])
     {
-        if (! is_string($value)) {
-            return false;
-        }
-
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+       return (new class {
+            use ValidatesAttributes;
+        })->validateEmail('email', $value, $parameters);
     }
 
     /**
