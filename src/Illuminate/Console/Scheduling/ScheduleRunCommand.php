@@ -139,7 +139,7 @@ class ScheduleRunCommand extends Command
                 $this->newLine();
             }
 
-            if ($this->dryRun){
+            if ($this->dryRun) {
                 $summary = $event->getSummaryForDisplay();
 
                 $command = $event instanceof CallbackEvent
@@ -151,7 +151,7 @@ class ScheduleRunCommand extends Command
                     Carbon::now()->format('Y-m-d H:i:s'),
                     $command
                 ));
-            } else if ($event->onOneServer) {
+            } elseif ($event->onOneServer) {
                 $this->runSingleServerEvent($event);
             } else {
                 $this->runEvent($event);
@@ -289,7 +289,7 @@ class ScheduleRunCommand extends Command
                         Carbon::now()->format('Y-m-d H:i:s'),
                         $command
                     ));
-                } else if ($event->onOneServer) {
+                } elseif ($event->onOneServer) {
                     $this->runSingleServerEvent($event);
                 } else {
                     $this->runEvent($event);
