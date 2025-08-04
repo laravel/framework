@@ -683,6 +683,21 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid email address.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isEmail($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value

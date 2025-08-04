@@ -1568,4 +1568,19 @@ class SupportStringableTest extends TestCase
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
     }
+
+    public function testIsEmail()
+    {
+        $this->assertTrue($this->stringable('taylor@laravel.com')->isEmail());
+        $this->assertTrue($this->stringable('taylor123@laravel.com')->isEmail());
+        $this->assertTrue($this->stringable('taylor.otwell.with.dots@sub.laravel.com')->isEmail());
+        $this->assertTrue($this->stringable('taylor_otwell@laravel.com')->isEmail());
+        $this->assertTrue($this->stringable('TAYLOR@LARAVEL.COM')->isEmail());
+
+        $this->assertFalse($this->stringable('taylor')->isEmail());
+        $this->assertFalse($this->stringable('taylor@')->isEmail());
+        $this->assertFalse($this->stringable('@laravel.com')->isEmail());
+        $this->assertFalse($this->stringable('taylor..otwell@laravel.com')->isEmail());
+        $this->assertFalse($this->stringable('taylor@otwell')->isEmail());
+    }
 }

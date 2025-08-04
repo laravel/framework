@@ -422,6 +422,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if the given string is empty.
+     *
+     * @return bool
+     */
+    public function isEmail()
+    {
+        return Str::isEmail($this->value);
+    }
+
+    /**
      * Determine if the given string is not empty.
      *
      * @return bool
