@@ -13,7 +13,7 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static mixed dispatchNow(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
  * @method static \Illuminate\Bus\PendingBatch batch(\Illuminate\Support\Collection|mixed $jobs)
- * @method static \Illuminate\Foundation\Bus\PendingChain chain(\Illuminate\Support\Collection|array $jobs = null)
+ * @method static \Illuminate\Foundation\Bus\PendingChain chain(\Illuminate\Support\Collection|array|null $jobs = null)
  * @method static bool hasCommandHandler(mixed $command)
  * @method static mixed getCommandHandler(mixed $command)
  * @method static mixed dispatchToQueue(mixed $command)
