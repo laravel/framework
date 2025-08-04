@@ -747,6 +747,20 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
     }
 
+    public function testEvery()
+    {
+        $this->assertFalse(Arr::every([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertFalse(Arr::every(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::every(['foo', 'bar'], fn ($value, $key) => is_string($value)));
+    }
+
+    public function testSome()
+    {
+        $this->assertFalse(Arr::some([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 'bar'], fn ($value, $key) => is_string($value)));
+    }
+
     public function testIsAssoc()
     {
         $this->assertTrue(Arr::isAssoc(['a' => 'a', 0 => 'b']));
