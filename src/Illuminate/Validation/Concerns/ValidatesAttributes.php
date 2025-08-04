@@ -495,7 +495,7 @@ trait ValidatesAttributes
 
         return with(
             BigNumber::of($this->getSize($attribute, $value)),
-            fn ($size) => $size->isLessThanOrEqualTo($this->trim($parameters[0])) || $size->isGreaterThanOrEqualTo($this->trim($parameters[1]))
+            fn ($size) => $size->isLessThan($this->trim($parameters[0])) || $size->isGreaterThan($this->trim($parameters[1]))
         );
     }
 
@@ -777,7 +777,7 @@ trait ValidatesAttributes
         $length = strlen((string) $value);
 
         return ! preg_match('/[^0-9]/', $value)
-            && ($length <= $parameters[0] || $length >= $parameters[1]);
+            && ($length < $parameters[0] || $length > $parameters[1]);
     }
 
     /**

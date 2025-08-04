@@ -3684,41 +3684,39 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Unless_Between:4,6']);
         $this->assertFalse($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'anc'], ['foo' => 'Unless_Between:3,5']);
+        $v = new Validator($trans, ['foo' => 'asdadad'], ['foo' => 'Unless_Between:4,6']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => 'ancf'], ['foo' => 'Unless_Between:1,4']);
-        $this->assertTrue($v->passes());
-
-        $v = new Validator($trans, ['foo' => 'ancfs'], ['foo' => 'Unless_Between:2,4']);
+        $v = new Validator($trans, ['foo' => 'asd'], ['foo' => 'Unless_Between:4,6']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,150']);
         $this->assertFalse($v->passes());
 
-        // inclusive on min
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:123,200']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:150,200']);
         $this->assertTrue($v->passes());
 
-        // inclusive on max
-        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:0,123']);
+        $v = new Validator($trans, ['foo' => '123'], ['foo' => 'Numeric|Unless_Between:100,120']);
         $this->assertTrue($v->passes());
 
         // can work with float
-        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Unless_Between:0.01,0.02']);
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.01,0.04']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '0.03'], ['foo' => 'Numeric|Unless_Between:0.01,0.02']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '0.02'], ['foo' => 'Numeric|Unless_Between:0.02,0.04']);
+        $v = new Validator($trans, ['foo' => '0.04'], ['foo' => 'Numeric|Unless_Between:0.05,0.07']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => '3'], ['foo' => 'Numeric|Unless_Between:4,6']);
-        $this->assertTrue($v->passes());
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'Array|Unless_Between:1,5']);
+        $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Unless_Between:4,6']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array|Unless_Between:2,5']);
-        $this->assertFalse($v->passes());
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4, 5, 6]], ['foo' => 'Array|Unless_Between:2,5']);
+        $this->assertTrue($v->passes());
 
         $file = $this->getMockBuilder(File::class)->onlyMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
         $file->expects($this->any())->method('getSize')->willReturn(3072);
