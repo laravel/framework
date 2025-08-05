@@ -52,7 +52,7 @@ class Pipeline implements PipelineContract
     /**
      * Indicates whether to wrap the pipeline in a database transaction.
      *
-     * @var string|false|null|\UnitEnum
+     * @var string|null|\UnitEnum|false
      */
     protected $withinTransactions = false;
 
