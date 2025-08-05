@@ -374,9 +374,18 @@ class Str
      * @param  string  $character
      * @return string
      */
-    public static function deduplicate(string $string, string $character = ' ')
+    public static function deduplicate(string $string, string|array $characters = ' '): string
     {
-        return preg_replace('/'.preg_quote($character, '/').'+/u', $character, $string);
+        if (is_string($characters)) {
+            return preg_replace('/'.preg_quote($characters, '/').'+/u', $characters, $string);
+        }
+
+        $result = $string;
+        foreach ($characters as $character) {
+            $result = preg_replace('/'.preg_quote($character, '/').'+/u', $character, $result);
+        }
+
+        return $result;
     }
 
     /**
