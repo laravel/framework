@@ -7,12 +7,12 @@ use Stringable;
 class Url implements Stringable
 {
     /**
-     * @var string[]|null $protocols
+     * @var string[]|null
      */
     protected ?array $protocols = null;
 
     /**
-     * @param string[]|null $protocols
+     * @param  string[]|null $protocols
      */
     public function protocols(array $protocols): static
     {
