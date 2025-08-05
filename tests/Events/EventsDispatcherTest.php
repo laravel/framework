@@ -48,6 +48,7 @@ class EventsDispatcherTest extends TestCase
         $result = $d->defer(function () use ($d) {
             $d->dispatch('foo', ['bar']);
             $this->assertArrayNotHasKey('__event.test', $_SERVER);
+
             return 'callback_result';
         });
 
