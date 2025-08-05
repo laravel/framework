@@ -2414,10 +2414,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {
+        $modelTwo = new class extends Model
+        {
         };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
@@ -3789,6 +3791,77 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($c->contains('v', '==', 4));
         $this->assertFalse($c->contains('v', '===', 4));
         $this->assertTrue($c->contains('v', '>', 4));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsAny($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAny([1, 2]));
+        $this->assertTrue($c->containsAny([2, 3]));
+        $this->assertFalse($c->containsAny([2, 4]));
+        $this->assertFalse($c->containsAny([]));
+
+        $this->assertTrue($c->containsAny(1, 2));
+        $this->assertTrue($c->containsAny(2, 3));
+        $this->assertFalse($c->containsAny(2, 4));
+
+        $this->assertTrue($c->containsAny(['1', 2]));
+        $this->assertTrue($c->containsAny([2, '3']));
+
+        $c = new $collection([null, false, 0, '']);
+        $this->assertTrue($c->containsAny([null, 'missing']));
+        $this->assertTrue($c->containsAny([false, 'missing']));
+        $this->assertTrue($c->containsAny([0, 'missing']));
+        $this->assertTrue($c->containsAny(['', 'missing']));
+        $this->assertFalse($c->containsAny(['missing', 'also_missing']));
+
+        $c = new $collection([1, 3, 5]);
+        $this->assertTrue($c->containsAny([
+            function ($value) {
+                return $value < 2;
+            },
+            function ($value) {
+                return $value > 10;
+            },
+        ]));
+        $this->assertFalse($c->containsAny([
+            function ($value) {
+                return $value > 10;
+            },
+            function ($value) {
+                return $value < 0;
+            },
+        ]));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+        $this->assertTrue($c->containsAny([['v', 1], ['v', 2]]));
+        $this->assertTrue($c->containsAny([['v', 2], ['v', 1]]));
+        $this->assertTrue($c->containsAny([['v', 2], ['v', 3]]));
+        $this->assertFalse($c->containsAny([['v', 2], ['v', 4]]));
+
+        $c = new $collection([]);
+        $this->assertFalse($c->containsAny([1, 2, 3]));
+        $this->assertFalse($c->containsAny(1, 2, 3));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsAnyWithOperator($collection)
+    {
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => '4'], ['v' => 5]]);
+
+        $this->assertTrue($c->containsAny([['v', '=', 4], ['v', '=', 6]]));
+        $this->assertTrue($c->containsAny([['v', '==', 4], ['v', '==', 6]]));
+        $this->assertFalse($c->containsAny([['v', '===', 4], ['v', '===', 6]]));
+        $this->assertTrue($c->containsAny([['v', '>', 4], ['v', '<', 0]]));
+        $this->assertTrue($c->containsAny([['v', '>', 0], ['v', '<', 0]]));
+        $this->assertFalse($c->containsAny([['v', '>', 10], ['v', '<', 0]]));
+
+        $this->assertTrue($c->containsAny([
+            ['v', '>', 10],
+            ['v', '=', 3],
+        ]));
     }
 
     #[DataProvider('collectionClassProvider')]

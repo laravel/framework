@@ -249,6 +249,37 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if any of the given items exist in the collection.
+     *
+     * @param  mixed  $values
+     * @return bool
+     */
+    public function containsAny($values)
+    {
+        if ($this->isEmpty()) {
+            return false;
+        }
+
+        $values = is_array($values) ? $values : func_get_args();
+
+        foreach ($values as $value) {
+            if ($this->useAsCallable($value)) {
+                if ($this->first($value) !== null) {
+                    return true;
+                }
+            } elseif (is_array($value)) {
+                if ($this->contains(...$value)) {
+                    return true;
+                }
+            } elseif ($this->contains($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if an item exists, using strict comparison.
      *
      * @param  (callable(TValue): bool)|TValue|array-key  $key

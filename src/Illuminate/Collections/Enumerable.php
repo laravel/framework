@@ -154,6 +154,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function contains($key, $operator = null, $value = null);
 
     /**
+     * Determine if any of the given items exist in the collection.
+     *
+     * @param  mixed  $values
+     * @return bool
+     */
+    public function containsAny($values);
+
+    /**
      * Determine if an item is not contained in the collection.
      *
      * @param  mixed  $key
