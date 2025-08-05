@@ -433,6 +433,23 @@ class SupportFluentTest extends TestCase
         ], $fluent->getAttributes());
     }
 
+    public function testForget()
+    {
+        $fluent = new Fluent([
+            'name' => 'Taylor',
+            'email' => 'taylor@example.com',
+            'role' => 'admin',
+        ]);
+
+        $fluent->forget('email');
+        $this->assertNull($fluent->get('email'));
+        $this->assertSame('Taylor', $fluent->get('name'));
+        $this->assertSame('admin', $fluent->get('role'));
+
+        $fluent->forget(['name', 'role']);
+        $this->assertEmpty($fluent->toArray());
+    }
+
     public function testMacroable()
     {
         Fluent::macro('foo', function () {
