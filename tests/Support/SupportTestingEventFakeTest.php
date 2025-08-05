@@ -70,7 +70,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatched(EventStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertDispatched(EventStub::class, 2);
@@ -85,7 +85,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatchedOnce(EventStub::class);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
@@ -100,7 +100,7 @@ class SupportTestingEventFakeTest extends TestCase
             $this->fake->assertDispatchedTimes(EventStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
