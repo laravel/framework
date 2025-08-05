@@ -20,15 +20,14 @@ class PipelineTransactionTest extends TestCase
         $result = Pipeline::withinTransactions()
             ->send('some string')
             ->through([
-                function ($value, $next) {
-                    return $next($value);
-                }
+                fn ($value, $next) => $next($value),
+                fn ($value, $next) => $next($value),
             ])
             ->thenReturn();
 
         $this->assertEquals('some string', $result);
-        Event::assertDispatched(TransactionBeginning::class);
-        Event::assertDispatched(TransactionCommitted::class);
+        Event::assertDispatchedTimes(TransactionBeginning::class, 1);
+        Event::assertDispatchedTimes(TransactionCommitted::class, 1);
     }
 
     public static function transactionConnectionDataProvider(): array
@@ -39,6 +38,7 @@ class PipelineTransactionTest extends TestCase
             'null' => [null, 'testing2'],
         ];
     }
+
     #[DataProvider('transactionConnectionDataProvider')]
     public function testConnection($connection, $connectionName)
     {
