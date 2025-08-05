@@ -637,7 +637,7 @@ class Str
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value
-     * @param  int<0, 8>|'max'|null  $version
+     * @param  int<0, 8>|'nil'|'max'|null  $version
      * @return bool
      */
     public static function isUuid($value, $version = null)
