@@ -98,6 +98,19 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     }
 
     /**
+     * Remove one or many items from the attributes.
+     *
+     * @param  string|array  $keys
+     * @return $this
+     */
+    public function forget($keys)
+    {
+        Arr::forget($this->attributes, $keys);
+
+        return $this;
+    }
+
+    /**
      * Get an attribute from the fluent instance.
      *
      * @param  string  $key
