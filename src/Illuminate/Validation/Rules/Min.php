@@ -11,14 +11,14 @@ class Min implements Stringable
     /**
      * The value that validates the attribute.
      *
-     * @var callable|int
+     * @var (callable(): int)|int
      */
     public $value;
 
     /**
      * Create a new min validation rule based on a value.
      *
-     * @param  callable|int  $value
+     * @param  (callable(): int)|int  $value
      */
     public function __construct($value)
     {
