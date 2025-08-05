@@ -380,12 +380,11 @@ class Str
             return preg_replace('/'.preg_quote($characters, '/').'+/u', $characters, $string);
         }
 
-        $result = $string;
-        foreach ($characters as $character) {
-            $result = preg_replace('/'.preg_quote($character, '/').'+/u', $character, $result);
-        }
-
-        return $result;
+        return array_reduce(
+            $characters,
+            fn ($carry, $character) => preg_replace('/'.preg_quote($character, '/').'+/u', $character, $carry),
+            $string
+        );
     }
 
     /**
