@@ -371,10 +371,10 @@ class Str
      * Replace consecutive instances of a given character with a single character in the given string.
      *
      * @param  string  $string
-     * @param  string|array<string>  $characters
+     * @param  array<string>|string  $characters
      * @return string
      */
-    public static function deduplicate(string $string, string|array $characters = ' '): string
+    public static function deduplicate(string $string, array|string $characters = ' ')
     {
         if (is_string($characters)) {
             return preg_replace('/'.preg_quote($characters, '/').'+/u', $characters, $string);
