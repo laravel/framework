@@ -2282,6 +2282,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testExceptMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', m::on(function ($argument) {
+            return $argument === '1';
+        }));
+
+        $builder->except(new class extends Model
+        {
+            protected $attributes = ['id' => 1];
+        });
+    }
+
+    public function testExceptMethodWithCollectionOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = new Collection([
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ]);
+
+        $builder->except($models);
+    }
+
+    public function testExceptMethodWithArrayOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = [
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ];
+
+        $builder->except($models);
+    }
+
     public function testWhereIn()
     {
         $model = new EloquentBuilderTestNestedStub;

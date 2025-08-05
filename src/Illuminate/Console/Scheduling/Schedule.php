@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 use function Illuminate\Support\enum_value;
 
@@ -149,12 +150,22 @@ class Schedule
     /**
      * Add a new Artisan command event to the schedule.
      *
-     * @param  string  $command
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function command($command, array $parameters = [])
     {
+        if ($command instanceof SymfonyCommand) {
+            $command = get_class($command);
+
+            $command = Container::getInstance()->make($command);
+
+            return $this->exec(
+                Application::formatCommandString($command->getName()), $parameters,
+            )->description($command->getDescription());
+        }
+
         if (class_exists($command)) {
             $command = Container::getInstance()->make($command);
 

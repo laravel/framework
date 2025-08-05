@@ -311,6 +311,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Exclude the given models from the query results.
+     *
+     * @param  iterable|mixed  $models
+     * @return static
+     */
+    public function except($models)
+    {
+        return $this->whereKeyNot(
+            $models instanceof Model
+                ? $models->getKey()
+                : Collection::wrap($models)->modelKeys()
+        );
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
