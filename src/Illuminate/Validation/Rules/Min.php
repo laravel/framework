@@ -25,7 +25,10 @@ class Min implements Stringable
         if ($value instanceof Closure || is_int($value)) {
             $this->value = $value;
         } else {
-            throw new InvalidArgumentException('The provided value must be a callable or an integer.');
+            throw new InvalidArgumentException(sprintf(
+                'The provided value must be a callable or an integer, %s given.',
+                get_debug_type($value),
+            ));
         }
     }
 
