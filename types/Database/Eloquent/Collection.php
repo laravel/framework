@@ -176,7 +176,8 @@ assertType('array<User>', $collection->getDictionary([new User]));
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck('string'));
 assertType('Illuminate\Support\Collection<(int|string), mixed>', $collection->pluck(['string']));
 
-assertType('Illuminate\Support\Collection<int, int>', $collection->keys());
+assertType('Illuminate\Support\Collection<never, int>', $collection->keys());
+assertType('list<int>', $collection->keys()->all());
 
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, int|User>>', $collection->zip([1]));
 assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, string|User>>', $collection->zip(['string']));

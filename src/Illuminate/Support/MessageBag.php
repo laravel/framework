@@ -42,7 +42,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Get the keys present in the message bag.
      *
-     * @return array<string>
+     * @return list<string>
      */
     public function keys()
     {

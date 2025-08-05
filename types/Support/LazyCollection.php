@@ -451,7 +451,8 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->intersec
 
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->intersectByKeys([new User]));
 
-assertType('Illuminate\Support\LazyCollection<int, int>', $collection->keys());
+assertType('Illuminate\Support\LazyCollection<never, int>', $collection->keys());
+assertType('list<int>', $collection->keys()->all());
 
 assertType('User|null', $collection->last());
 assertType('User|null', $collection->last(function ($user, $int) {

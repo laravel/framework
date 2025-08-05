@@ -60,7 +60,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get all of the items in the collection.
      *
-     * @return array<TKey, TValue>
+     * @return (TKey is never ? list<TValue> : array<TKey, TValue>)
      */
     public function all()
     {
@@ -776,7 +776,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the keys of the collection items.
      *
-     * @return static<int, TKey>
+     * @return static<never, TKey>
      */
     public function keys()
     {

@@ -99,7 +99,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get all items in the enumerable.
      *
-     * @return array<TKey, TValue>
+     * @return (TKey is never ? list<TValue> : array<TKey, TValue>)
      */
     public function all()
     {
@@ -744,7 +744,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the keys of the collection items.
      *
-     * @return static<int, TKey>
+     * @return static<never, TKey>
      */
     public function keys()
     {

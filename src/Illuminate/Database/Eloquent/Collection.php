@@ -681,7 +681,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the keys of the collection items.
      *
-     * @return \Illuminate\Support\Collection<int, TKey>
+     * @return \Illuminate\Support\Collection<never, TKey>
      */
     public function keys()
     {

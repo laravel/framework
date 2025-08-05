@@ -76,7 +76,7 @@ class ValidatedInput implements ValidatedData
     /**
      * Get the keys for all of the input.
      *
-     * @return array
+     * @return list<mixed>
      */
     public function keys()
     {
