@@ -371,7 +371,7 @@ class Str
      * Replace consecutive instances of a given character with a single character in the given string.
      *
      * @param  string  $string
-     * @param  string  $character
+     * @param  string|array<string>  $characters
      * @return string
      */
     public static function deduplicate(string $string, string|array $characters = ' '): string
