@@ -101,6 +101,9 @@ class ValidationRuleBuilderMethodTest extends TestCase
         $this->assertSame(Rule::ip()->__toString(), 'ip');
         $this->assertSame(Rule::ip()->version(4)->__toString(), 'ipv4');
         $this->assertSame(Rule::ip()->version(6)->__toString(), 'ipv6');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->assertSame(Rule::ip()->version(1)->__toString(), 'ipv4');
     }
 
     public function testUuidRule()

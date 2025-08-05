@@ -18,7 +18,11 @@ class IpAddress implements Stringable
     public function version(int $version): static
     {
         if (! in_array($version, $this->allowedVersions)) {
-            throw new InvalidArgumentException('The provided IP version is invalid.');
+            throw new InvalidArgumentException(sprintf(
+                'The provided IP version %d is invalid. Please use one of these: %s',
+                $version,
+                implode(', ', $this->allowedVersions),
+            ));
         }
 
         $this->version = $version;
