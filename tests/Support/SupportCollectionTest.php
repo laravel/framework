@@ -3865,6 +3865,92 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testContainsAll($collection)
+    {
+        $c = new $collection([1, 3, 5]);
+
+        $this->assertTrue($c->containsAll([1, 3]));
+        $this->assertTrue($c->containsAll([3, 5]));
+        $this->assertTrue($c->containsAll([1, 3, 5]));
+        $this->assertFalse($c->containsAll([1, 2]));
+        $this->assertFalse($c->containsAll([2, 4]));
+        $this->assertTrue($c->containsAll([]));
+
+        $this->assertTrue($c->containsAll(1, 3));
+        $this->assertTrue($c->containsAll(3, 5));
+        $this->assertFalse($c->containsAll(1, 2));
+
+        $this->assertTrue($c->containsAll(['1', 3]));
+        $this->assertTrue($c->containsAll([3, '5']));
+
+        $c = new $collection([null, false, 0, '']);
+        $this->assertTrue($c->containsAll([null, false]));
+        $this->assertTrue($c->containsAll([0, '']));
+        $this->assertTrue($c->containsAll([null, false, 0, '']));
+        $this->assertFalse($c->containsAll([null, 'missing']));
+        $this->assertFalse($c->containsAll(['missing', 'also_missing']));
+
+        $c = new $collection([1, 3, 5]);
+        $this->assertTrue($c->containsAll([
+            function ($value) {
+                return $value < 2;
+            },
+            function ($value) {
+                return $value > 4;
+            },
+        ]));
+        $this->assertFalse($c->containsAll([
+            function ($value) {
+                return $value > 10;
+            },
+            function ($value) {
+                return $value < 0;
+            },
+        ]));
+        $this->assertFalse($c->containsAll([
+            function ($value) {
+                return $value < 2;
+            },
+            function ($value) {
+                return $value > 10;
+            },
+        ]));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => 5]]);
+        $this->assertTrue($c->containsAll([['v', 1], ['v', 3]]));
+        $this->assertTrue($c->containsAll([['v', 3], ['v', 5]]));
+        $this->assertFalse($c->containsAll([['v', 1], ['v', 2]]));
+        $this->assertFalse($c->containsAll([['v', 2], ['v', 4]]));
+
+        $c = new $collection([]);
+        $this->assertTrue($c->containsAll([]));
+        $this->assertFalse($c->containsAll([1]));
+        $this->assertFalse($c->containsAll(1, 2, 3));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsAllWithOperator($collection)
+    {
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => '4'], ['v' => 5]]);
+
+        $this->assertTrue($c->containsAll([['v', '=', 4], ['v', '=', 3]]));
+        $this->assertTrue($c->containsAll([['v', '==', 4], ['v', '==', 1]]));
+        $this->assertFalse($c->containsAll([['v', '===', 4], ['v', '===', 3]]));
+        $this->assertTrue($c->containsAll([['v', '>', 0], ['v', '<', 10]]));
+        $this->assertTrue($c->containsAll([['v', '>', 4], ['v', '<', 2]]));
+        $this->assertFalse($c->containsAll([['v', '>', 10], ['v', '<', 0]]));
+
+        $this->assertTrue($c->containsAll([
+            ['v', '>', 0],
+            ['v', '=', 3],
+        ]));
+        $this->assertFalse($c->containsAll([
+            ['v', '>', 0],
+            ['v', '=', 99],
+        ]));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testGettingSumFromCollection($collection)
     {
         $c = new $collection([(object) ['foo' => 50], (object) ['foo' => 50]]);
