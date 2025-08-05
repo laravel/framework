@@ -482,6 +482,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
         $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
         $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
+        $this->assertSame(' laravel forever ', Str::deduplicate(' laravell    foreverrr  ', [' ', 'l', 'r']));
     }
 
     public function testParseCallback()
