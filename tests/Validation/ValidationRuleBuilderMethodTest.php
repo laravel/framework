@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Validation\Rule;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationRuleBuilderMethodTest extends TestCase
@@ -187,6 +188,9 @@ class ValidationRuleBuilderMethodTest extends TestCase
     {
         $this->assertSame(Rule::decimal(minPlaces: 2)->__toString(), 'decimal:2');
         $this->assertSame(Rule::decimal(minPlaces: 2, maxPlaces: 5)->__toString(), 'decimal:2,5');
+
+        $this->expectException(InvalidArgumentException::class);
+        Rule::decimal(minPlaces: 5, maxPlaces: 2);
     }
 
     public function testSometimesRule()
