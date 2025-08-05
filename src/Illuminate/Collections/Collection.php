@@ -254,10 +254,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                     return false;
                 }
             } elseif (is_array($value)) {
-                if (!$this->contains(...$value)) {
+                if (! $this->contains(...$value)) {
                     return false;
                 }
-            } elseif (!in_array($value, $this->items)) {
+            } elseif (! in_array($value, $this->items)) {
                 return false;
             }
         }
