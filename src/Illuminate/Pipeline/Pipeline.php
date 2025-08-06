@@ -53,7 +53,7 @@ class Pipeline implements PipelineContract
      *
      * @var bool
      */
-    protected $withinTransactions = false;
+    protected $withinTransaction = false;
 
     /**
      * Create a new class instance.
@@ -130,7 +130,7 @@ class Pipeline implements PipelineContract
         );
 
         try {
-            return $this->withinTransactions
+            return $this->withinTransaction
                 ? $this->getContainer()->make('db')->transaction(fn () => $pipeline($this->passable))
                 : $pipeline($this->passable);
         } finally {
@@ -257,12 +257,12 @@ class Pipeline implements PipelineContract
     /**
      * Execute each pipeline step within a database transaction.
      *
-     * @param  bool  $withinTransactions
+     * @param  bool  $withinTransaction
      * @return $this
      */
-    public function withinTransactions(bool $withinTransactions = true)
+    public function withinTransaction(bool $withinTransaction = true)
     {
-        $this->withinTransactions = $withinTransactions;
+        $this->withinTransaction = $withinTransaction;
 
         return $this;
     }
