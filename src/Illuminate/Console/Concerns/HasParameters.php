@@ -92,19 +92,13 @@ trait HasParameters
             return [];
         }
 
-        $options = [];
         $valueOptions = $this->buildOptionsList($attributes, ValueOption::class);
         $flagOptions = $this->buildOptionsList($attributes, FlagOption::class);
 
-        foreach ($valueOptions as $option) {
-            $options[] = $option;
-        }
-
-        foreach ($flagOptions as $option) {
-            $options[] = $option;
-        }
-
-        return $options;
+        return [
+            ...$valueOptions,
+            ...$flagOptions,
+        ];
     }
 
     private function buildArgumentsList(Collection $attributes, string $attributeClass): Collection
