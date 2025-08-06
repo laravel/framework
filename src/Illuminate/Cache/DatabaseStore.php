@@ -446,16 +446,6 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
-     * Get the connection used to manage locks.
-     *
-     * @return \Illuminate\Database\ConnectionInterface
-     */
-    public function getLockConnection()
-    {
-        return $this->lockConnection;
-    }
-
-    /**
      * Set the underlying database connection.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -466,6 +456,16 @@ class DatabaseStore implements LockProvider, Store
         $this->connection = $connection;
 
         return $this;
+    }
+
+    /**
+     * Get the connection used to manage locks.
+     *
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    public function getLockConnection()
+    {
+        return $this->lockConnection;
     }
 
     /**
