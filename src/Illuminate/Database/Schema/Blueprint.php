@@ -13,6 +13,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 
+use function Illuminate\Support\enum_value;
+
 class Blueprint
 {
     use Macroable;
@@ -1102,7 +1104,7 @@ class Blueprint
      */
     public function enum($column, array $allowed)
     {
-        $allowed = array_map('Illuminate\Support\enum_value', $allowed);
+        $allowed = array_map(fn ($value) => enum_value($value), $allowed);
 
         return $this->addColumn('enum', $column, compact('allowed'));
     }
