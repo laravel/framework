@@ -1646,6 +1646,18 @@ class Blueprint
     }
 
     /**
+     * Set an attribute of the table.
+     * This only works with the mysql or mariadb storage engines.
+     */
+    public function tableAttribute(string $attributeName, string $attributeValue): Fluent
+    {
+        return $this->addCommand('tableAttribute', [
+            'attribute' => $attributeName,
+            'value' => $attributeValue
+        ]);
+    }
+
+    /**
      * Create a new index command on the blueprint.
      *
      * @param  string  $type

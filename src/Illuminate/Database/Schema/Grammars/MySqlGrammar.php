@@ -693,6 +693,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a command that modifies a table attribute.
+     */
+    public function compileTableAttribute(Blueprint $blueprint, Fluent $command): string
+    {
+        return "alter table {$this->wrapTable($blueprint)} {$command->attribute} = {$command->value}";
+    }
+
+    /**
      * Quote-escape the given tables, views, or types.
      *
      * @param  array<string>  $names
