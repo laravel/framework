@@ -70,6 +70,20 @@ class Dispatcher implements DispatcherContract
     protected $transactionManagerResolver;
 
     /**
+     * The currently deferred events.
+     *
+     * @var array
+     */
+    protected $deferredEvents = [];
+
+    /**
+     * Indicates if events should be deferred.
+     *
+     * @var bool
+     */
+    protected $deferringEvents = false;
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -244,6 +258,12 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
+        if ($this->deferringEvents) {
+            $this->deferredEvents[] = func_get_args();
+
+            return null;
+        }
+
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
@@ -766,6 +786,36 @@ class Dispatcher implements DispatcherContract
         $this->transactionManagerResolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Execute the given callback while deferring events, then dispatch all deferred events.
+     *
+     * @param  callable  $callback
+     * @return mixed
+     */
+    public function defer(callable $callback)
+    {
+        $wasDeferring = $this->deferringEvents;
+        $previousDeferredEvents = $this->deferredEvents;
+
+        $this->deferringEvents = true;
+        $this->deferredEvents = [];
+
+        try {
+            $result = $callback();
+
+            $this->deferringEvents = false;
+
+            foreach ($this->deferredEvents as $args) {
+                $this->dispatch(...$args);
+            }
+
+            return $result;
+        } finally {
+            $this->deferringEvents = $wasDeferring;
+            $this->deferredEvents = $previousDeferredEvents;
+        }
     }
 
     /**
