@@ -51,7 +51,7 @@ class Pipeline implements PipelineContract
     /**
      * Indicates whether to wrap the pipeline in a database transaction.
      *
-     * @var bool
+     * @var string|null|\UnitEnum|false
      */
     protected $withinTransaction = false;
 
@@ -130,8 +130,8 @@ class Pipeline implements PipelineContract
         );
 
         try {
-            return $this->withinTransaction
-                ? $this->getContainer()->make('db')->transaction(fn () => $pipeline($this->passable))
+            return $this->withinTransaction !== false
+                ? $this->getContainer()->make('db')->connection($this->withinTransaction)->transaction(fn () => $pipeline($this->passable))
                 : $pipeline($this->passable);
         } finally {
             if ($this->finally) {
@@ -257,10 +257,10 @@ class Pipeline implements PipelineContract
     /**
      * Execute each pipeline step within a database transaction.
      *
-     * @param  bool  $withinTransaction
+     * @param  string|null|\UnitEnum|false  $withinTransaction
      * @return $this
      */
-    public function withinTransaction(bool $withinTransaction = true)
+    public function withinTransaction($withinTransaction = null)
     {
         $this->withinTransaction = $withinTransaction;
 
