@@ -2,6 +2,15 @@
 
 namespace Illuminate\Console\Concerns;
 
+use Illuminate\Console\Attributes\Argument;
+use Illuminate\Console\Attributes\FlagOption;
+use Illuminate\Console\Attributes\Option;
+use Illuminate\Console\Attributes\OptionalArgument;
+use Illuminate\Console\Attributes\RequiredArgument;
+use Illuminate\Console\Attributes\ValueOption;
+use Illuminate\Support\Collection;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -41,7 +50,41 @@ trait HasParameters
      */
     protected function getArguments()
     {
-        return [];
+        $classReflection = new ReflectionClass(static::class);
+        $attributes = collect($classReflection->getAttributes(Argument::class, ReflectionAttribute::IS_INSTANCEOF));
+
+        if ($attributes->isEmpty()) {
+            return [];
+        }
+
+        $arguments = [];
+        $generalArguments = $this->buildArgumentsList($attributes, Argument::class);
+
+        $requiredArguments = $this->buildArgumentsList($attributes, RequiredArgument::class)
+            ->merge($generalArguments->where('mode', InputArgument::REQUIRED));
+
+        [$arrayArguments, $nonArrayArguments] = $requiredArguments->partition(
+            fn (array $argument) => $argument['mode'] > InputArgument::REQUIRED
+        );
+
+        $optionalArguments = $this->buildArgumentsList($attributes, OptionalArgument::class)
+            ->merge($generalArguments->filter(
+                fn (array $argument) => $argument['mode'] === InputArgument::OPTIONAL || $argument['mode'] === InputArgument::IS_ARRAY)
+            );
+
+        foreach ($nonArrayArguments as $argument) {
+            $arguments[] = $argument;
+        }
+
+        foreach ($optionalArguments as $argument) {
+            $arguments[] = $argument;
+        }
+
+        foreach ($arrayArguments as $argument) {
+            $arguments[] = $argument;
+        }
+
+        return $arguments;
     }
 
     /**
@@ -51,6 +94,71 @@ trait HasParameters
      */
     protected function getOptions()
     {
-        return [];
+        $classReflection = new ReflectionClass(static::class);
+        $attributes = collect($classReflection->getAttributes(Option::class, ReflectionAttribute::IS_INSTANCEOF));
+
+        if ($attributes->isEmpty()) {
+            return [];
+        }
+
+        $options = [];
+        $valueOptions = $this->buildOptionsList($attributes, ValueOption::class);
+        $flagOptions = $this->buildOptionsList($attributes, FlagOption::class);
+
+        foreach ($valueOptions as $option) {
+            $options[] = $option;
+        }
+
+        foreach ($flagOptions as $option) {
+            $options[] = $option;
+        }
+
+        return $options;
+    }
+
+    private function buildArgumentsList(Collection $attributes, string $attributeClass): Collection
+    {
+        return $attributes->filter(fn (ReflectionAttribute $attribute) => $attribute->getName() === $attributeClass)
+            ->map(function (ReflectionAttribute $argumentAttribute) {
+                /** @var Argument $attribute */
+                $attribute = $argumentAttribute->newInstance();
+
+                return [
+                    'name' => $attribute->name,
+                    'mode' => $this->resolveArgumentMode($attribute),
+                    'description' => $attribute->description,
+                    'default' => $attribute->default,
+                    'suggestedValues' => $attribute->suggestedValues,
+                ];
+            });
+    }
+
+    private function resolveArgumentMode(Argument $attribute): int
+    {
+        return match (true) {
+            $attribute->required && $attribute->array => InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+            $attribute->required && ! $attribute->array => InputArgument::REQUIRED,
+            ! $attribute->required && $attribute->array => InputArgument::IS_ARRAY,
+            ! $attribute->required && ! $attribute->array => InputArgument::OPTIONAL,
+            default => InputArgument::REQUIRED,
+        };
+    }
+
+    private function buildOptionsList(Collection $attributes, string $attributeClass): Collection
+    {
+        return $attributes->filter(fn (ReflectionAttribute $attribute) => $attribute->getName() === $attributeClass)
+            ->map(function (ReflectionAttribute $optionAttribute) {
+                /** @var Option $attribute */
+                $attribute = $optionAttribute->newInstance();
+
+                return [
+                    'name' => $attribute->name,
+                    'shortcut' => $attribute->shortcut,
+                    'mode' => $attribute->mode,
+                    'description' => $attribute->description,
+                    'default' => $attribute->default,
+                    'suggestedValues' => $attribute->suggestedValues,
+                ];
+            });
     }
 }
