@@ -1102,6 +1102,8 @@ class Blueprint
      */
     public function enum($column, array $allowed)
     {
+        $allowed = array_map('Illuminate\Support\enum_value', $allowed);
+
         return $this->addColumn('enum', $column, compact('allowed'));
     }
 
