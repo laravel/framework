@@ -51,12 +51,12 @@ class PipelineTransactionTest extends TestCase
             ->through([
                 function ($value, $next) {
                     return $next($value);
-                }
+                },
             ])
             ->thenReturn();
 
         $this->assertEquals('some string', $result);
-        Event::dispatched(TransactionBeginning::class, function(TransactionBeginning $event) use ($connectionName) {
+        Event::dispatched(TransactionBeginning::class, function (TransactionBeginning $event) use ($connectionName) {
             return $event->connection === $connectionName;
         });
     }
