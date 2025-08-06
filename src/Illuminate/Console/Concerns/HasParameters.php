@@ -57,7 +57,6 @@ trait HasParameters
             return [];
         }
 
-        $arguments = [];
         $generalArguments = $this->buildArgumentsList($attributes, Argument::class);
 
         $requiredArguments = $this->buildArgumentsList($attributes, RequiredArgument::class)
@@ -72,19 +71,11 @@ trait HasParameters
                 fn (array $argument) => $argument['mode'] === InputArgument::OPTIONAL || $argument['mode'] === InputArgument::IS_ARRAY)
             );
 
-        foreach ($nonArrayArguments as $argument) {
-            $arguments[] = $argument;
-        }
-
-        foreach ($optionalArguments as $argument) {
-            $arguments[] = $argument;
-        }
-
-        foreach ($arrayArguments as $argument) {
-            $arguments[] = $argument;
-        }
-
-        return $arguments;
+        return [
+            ...$nonArrayArguments,
+            ...$optionalArguments,
+            ...$arrayArguments,
+        ];
     }
 
     /**
