@@ -81,6 +81,43 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable(null)->isJson());
     }
 
+    public function testIsRegex()
+    {
+        // Test valid regex patterns
+        $this->assertTrue($this->stringable('/hello/')->isRegex());
+        $this->assertTrue($this->stringable('/hello/i')->isRegex());
+        $this->assertTrue($this->stringable('/^[a-z]+$/')->isRegex());
+        $this->assertTrue($this->stringable('/\d+/')->isRegex());
+        $this->assertTrue($this->stringable('~hello world~')->isRegex());
+        $this->assertTrue($this->stringable('@hello@i')->isRegex());
+        $this->assertTrue($this->stringable('#[a-zA-Z0-9]#')->isRegex());
+        $this->assertTrue($this->stringable('![a-z]+!u')->isRegex());
+        $this->assertTrue($this->stringable('%\s+%m')->isRegex());
+
+        // Test complex valid patterns
+        $this->assertTrue($this->stringable('/(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3})/')->isRegex());
+        $this->assertTrue($this->stringable('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/')->isRegex());
+        $this->assertTrue($this->stringable('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/')->isRegex());
+
+        // Test invalid regex patterns
+        $this->assertFalse($this->stringable('/hello')->isRegex()); // Missing closing delimiter
+        $this->assertFalse($this->stringable('hello/')->isRegex()); // Missing opening delimiter
+        $this->assertFalse($this->stringable('/[a-z+/')->isRegex()); // Unclosed bracket
+        $this->assertFalse($this->stringable('/(/')->isRegex()); // Unclosed parenthesis
+        $this->assertFalse($this->stringable('/(?P<name>test/')->isRegex()); // Unclosed named group
+        $this->assertFalse($this->stringable()->isRegex()); // Empty string
+
+        // Test plain strings (not regex patterns)
+        $this->assertFalse($this->stringable('hello world')->isRegex());
+        $this->assertFalse($this->stringable('123')->isRegex());
+        $this->assertFalse($this->stringable('simple text')->isRegex());
+
+        // Test edge cases
+        $this->assertTrue($this->stringable('/./')->isRegex()); // Dot pattern
+        $this->assertTrue($this->stringable('/$/')->isRegex()); // End anchor
+        $this->assertTrue($this->stringable('/^$/')->isRegex()); // Empty line pattern
+    }
+
     public function testIsMatch()
     {
         $this->assertTrue($this->stringable('Hello, Laravel!')->isMatch('/.*,.*!/'));

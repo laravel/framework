@@ -591,6 +591,25 @@ class Str
     }
 
     /**
+     * Determine if a given value is a valid regex.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function isRegex($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        if ($value === '') {
+            return false;
+        }
+
+        return @preg_match($value, '') !== false;
+    }
+
+    /**
      * Determine if a given value is a valid URL.
      *
      * @param  mixed  $value
