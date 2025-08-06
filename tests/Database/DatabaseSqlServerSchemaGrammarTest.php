@@ -579,15 +579,11 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->enum('role', ['member', 'admin']);
-        $statements = $blueprint->toSql();
-
-        $this->assertCount(1, $statements);
-        $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
-
         $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
         $this->assertCount(2, $statements);
+        $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
         $this->assertSame('alter table "users" add "status" nvarchar(255) check ("status" in (N\'bar\')) not null', $statements[1]);
     }
 
