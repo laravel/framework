@@ -10,7 +10,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed then(\Closure $destination)
  * @method static mixed thenReturn()
  * @method static \Illuminate\Pipeline\Pipeline finally(\Closure $callback)
- * @method static \Illuminate\Pipeline\Pipeline withinTransactions(bool $withinTransactions = true)
+ * @method static \Illuminate\Pipeline\Pipeline withinTransaction(bool $withinTransaction = true)
  * @method static \Illuminate\Pipeline\Pipeline setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Pipeline\Pipeline|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Illuminate\Pipeline\Pipeline|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)

@@ -54,7 +54,7 @@ class Pipeline implements PipelineContract
      *
      * @var string|null|\UnitEnum|false
      */
-    protected $withinTransactions = false;
+    protected $withinTransaction = false;
 
     /**
      * Create a new class instance.
@@ -131,8 +131,8 @@ class Pipeline implements PipelineContract
         );
 
         try {
-            return $this->withinTransactions !== false
-                ? $this->getContainer()->make('db')->connection($this->withinTransactions)->transaction(fn () => $pipeline($this->passable))
+            return $this->withinTransaction !== false
+                ? $this->getContainer()->make('db')->connection($this->withinTransaction)->transaction(fn () => $pipeline($this->passable))
                 : $pipeline($this->passable);
         } finally {
             if ($this->finally) {
@@ -261,9 +261,9 @@ class Pipeline implements PipelineContract
      * @param  string|null|\UnitEnum|false  $withinTransactions
      * @return $this
      */
-    public function withinTransactions($withinTransactions = null)
+    public function withinTransactions($withinTransaction = null)
     {
-        $this->withinTransactions = $withinTransactions;
+        $this->withinTransaction = $withinTransaction;
 
         return $this;
     }
