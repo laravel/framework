@@ -1653,7 +1653,7 @@ class Blueprint
     {
         return $this->addCommand('tableAttribute', [
             'attribute' => $attributeName,
-            'value' => $attributeValue
+            'value' => $attributeValue,
         ]);
     }
 
