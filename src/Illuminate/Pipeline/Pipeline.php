@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 use Illuminate\Support\Traits\Conditionable;
-use UnitEnum;
 use RuntimeException;
 use Throwable;
 
@@ -258,10 +257,10 @@ class Pipeline implements PipelineContract
     /**
      * Execute each pipeline step within a database transaction.
      *
-     * @param  string|null|\UnitEnum|false  $withinTransactions
+     * @param  string|null|\UnitEnum|false  $withinTransaction
      * @return $this
      */
-    public function withinTransactions($withinTransaction = null)
+    public function withinTransaction($withinTransaction = null)
     {
         $this->withinTransaction = $withinTransaction;
 

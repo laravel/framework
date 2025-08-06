@@ -17,7 +17,7 @@ class PipelineTransactionTest extends TestCase
     {
         Event::fake();
 
-        $result = Pipeline::withinTransactions()
+        $result = Pipeline::withinTransaction()
             ->send('some string')
             ->through([
                 fn ($value, $next) => $next($value),
@@ -46,7 +46,7 @@ class PipelineTransactionTest extends TestCase
         config(['database.connections.testing2' => config('database.connections.testing')]);
         config(['database.default' => 'testing2']);
 
-        $result = Pipeline::withinTransactions($connection)
+        $result = Pipeline::withinTransaction($connection)
             ->send('some string')
             ->through([
                 function ($value, $next) {
@@ -67,7 +67,7 @@ class PipelineTransactionTest extends TestCase
 
         $finallyRan = false;
         try {
-            Pipeline::withinTransactions()
+            Pipeline::withinTransaction()
                 ->send('some string')
                 ->through([
                     function ($value, $next) {
