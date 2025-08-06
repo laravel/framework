@@ -22,8 +22,8 @@ class ValueOption extends Option
         public bool $array = false,
         public array|string|null $shortcut = null,
         public string $description = '',
-        public array|bool|float|int|string|null $default = null,
-        public array|Closure $suggestedValues = [],
+        public array|bool|float|int|string|null  $default = null,
+        public array|Closure  $suggestedValues = [],
     ) {
         parent::__construct(
             name: $name,

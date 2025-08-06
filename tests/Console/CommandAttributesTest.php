@@ -19,11 +19,9 @@ class CommandAttributesTest extends TestCase
         $command = resolve(TestCommand::class);
         $definition = $command->getDefinition();
         $arguments = Collection::make($definition->getArguments())
-            ->keyBy(fn (InputArgument $argument) => $argument->getName()
-        );
+            ->keyBy(fn (InputArgument $argument) => $argument->getName());
         $options = Collection::make($definition->getOptions())
-            ->keyBy(fn (InputOption $option) => $option->getName()
-        );
+            ->keyBy(fn (InputOption $option) => $option->getName());
 
         $this->assertCount(2, $arguments);
         $this->assertTrue($arguments->get('name')->isRequired());
