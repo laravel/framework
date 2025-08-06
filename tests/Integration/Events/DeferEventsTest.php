@@ -77,6 +77,32 @@ class DeferEventsTest extends TestCase
         $this->assertEquals('multiple_models_response', $response);
         $this->assertSame(['saved:TestModel', 'created:AnotherTestModel'], $_SERVER['__model_events']);
     }
+
+    public function testDeferSpecificModelEvents()
+    {
+        $_SERVER['__model_events'] = [];
+
+        TestModel::creating(function () {
+            $_SERVER['__model_events'][] = 'creating';
+        });
+
+        TestModel::saved(function () {
+            $_SERVER['__model_events'][] = 'saved';
+        });
+
+        $response = Event::defer(function () {
+            $model = new TestModel();
+            $model->fireModelEvent('creating');
+            $model->fireModelEvent('saved');
+
+            $this->assertSame(['creating'], $_SERVER['__model_events']);
+
+            return 'specific_model_defer_result';
+        }, ['eloquent.saved: '.TestModel::class]);
+
+        $this->assertEquals('specific_model_defer_result', $response);
+        $this->assertSame(['creating', 'saved'], $_SERVER['__model_events']);
+    }
 }
 
 class TestModel extends Model
@@ -93,4 +119,12 @@ class AnotherTestModel extends Model
     {
         return parent::fireModelEvent($event, $halt);
     }
+}
+
+class DeferTestEvent
+{
+}
+
+class AnotherDeferTestEvent
+{
 }

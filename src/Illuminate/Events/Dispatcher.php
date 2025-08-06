@@ -84,6 +84,13 @@ class Dispatcher implements DispatcherContract
     protected $deferringEvents = false;
 
     /**
+     * The specific events to defer (null means defer all events).
+     *
+     * @var array|null
+     */
+    protected $deferringSpecificEvents = null;
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
@@ -258,12 +265,6 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        if ($this->deferringEvents) {
-            $this->deferredEvents[] = func_get_args();
-
-            return null;
-        }
-
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
@@ -271,6 +272,12 @@ class Dispatcher implements DispatcherContract
             is_object($event),
             ...$this->parseEventAndPayload($event, $payload),
         ];
+
+        if ($this->shouldDeferEvent($event)) {
+            $this->deferredEvents[] = func_get_args();
+
+            return null;
+        }
 
         // If the event is not intended to be dispatched unless the current database
         // transaction is successful, we'll register a callback which will handle
@@ -792,15 +799,18 @@ class Dispatcher implements DispatcherContract
      * Execute the given callback while deferring events, then dispatch all deferred events.
      *
      * @param  callable  $callback
+     * @param  array|null  $events
      * @return mixed
      */
-    public function defer(callable $callback)
+    public function defer(callable $callback, ?array $events = null)
     {
         $wasDeferring = $this->deferringEvents;
         $previousDeferredEvents = $this->deferredEvents;
+        $previousDeferringSpecificEvents = $this->deferringSpecificEvents;
 
         $this->deferringEvents = true;
         $this->deferredEvents = [];
+        $this->deferringSpecificEvents = $events;
 
         try {
             $result = $callback();
@@ -815,7 +825,19 @@ class Dispatcher implements DispatcherContract
         } finally {
             $this->deferringEvents = $wasDeferring;
             $this->deferredEvents = $previousDeferredEvents;
+            $this->deferringSpecificEvents = $previousDeferringSpecificEvents;
         }
+    }
+
+    /**
+     * Determine if the given event should be deferred.
+     *
+     * @param  string  $event
+     * @return bool
+     */
+    protected function shouldDeferEvent(string $event)
+    {
+        return $this->deferringEvents && ($this->deferringSpecificEvents === null || in_array($event, $this->deferringSpecificEvents));
     }
 
     /**
