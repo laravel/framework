@@ -655,6 +655,25 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
     }
 
+    public function testTableAttribute()
+    {
+        // Test setting the innoDB row_format attribute
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tableAttribute('ROW_FORMAT', 'COMPACT');
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` ROW_FORMAT = COMPACT'], $getSql('MySql'));
+
+        // Test setting the innoDB page compression attribute
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'posts', function ($table) {
+                $table->tableAttribute('COMPRESSION', '"zlib"');
+            })->toSql();
+        };
+        $this->assertEquals(['alter table `posts` COMPRESSION = "zlib"'], $getSql('MySql'));
+    }
+
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
         $connection = m::mock(Connection::class)
