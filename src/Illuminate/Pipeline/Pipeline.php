@@ -6,12 +6,14 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
 
 class Pipeline implements PipelineContract
 {
     use Conditionable;
+    use Macroable;
 
     /**
      * The container implementation.
