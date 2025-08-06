@@ -88,7 +88,7 @@ class Dispatcher implements DispatcherContract
      *
      * @var array|null
      */
-    protected $deferringSpecificEvents = null;
+    protected $eventsToDefer = null;
 
     /**
      * Create a new event dispatcher instance.
@@ -806,11 +806,11 @@ class Dispatcher implements DispatcherContract
     {
         $wasDeferring = $this->deferringEvents;
         $previousDeferredEvents = $this->deferredEvents;
-        $previousDeferringSpecificEvents = $this->deferringSpecificEvents;
+        $previousEventsToDefer = $this->eventsToDefer;
 
         $this->deferringEvents = true;
         $this->deferredEvents = [];
-        $this->deferringSpecificEvents = $events;
+        $this->eventsToDefer = $events;
 
         try {
             $result = $callback();
@@ -825,7 +825,7 @@ class Dispatcher implements DispatcherContract
         } finally {
             $this->deferringEvents = $wasDeferring;
             $this->deferredEvents = $previousDeferredEvents;
-            $this->deferringSpecificEvents = $previousDeferringSpecificEvents;
+            $this->eventsToDefer = $previousEventsToDefer;
         }
     }
 
@@ -837,7 +837,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function shouldDeferEvent(string $event)
     {
-        return $this->deferringEvents && ($this->deferringSpecificEvents === null || in_array($event, $this->deferringSpecificEvents));
+        return $this->deferringEvents && ($this->eventsToDefer === null || in_array($event, $this->eventsToDefer));
     }
 
     /**
