@@ -70,7 +70,7 @@ class Dispatcher implements DispatcherContract
     protected $transactionManagerResolver;
 
     /**
-     * The deferred events that should be dispatched later.
+     * The currently deferred events.
      *
      * @var array
      */
@@ -258,7 +258,6 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        // If events are being deferred, store them for later dispatch
         if ($this->deferringEvents) {
             $this->deferredEvents[] = func_get_args();
 
@@ -806,7 +805,6 @@ class Dispatcher implements DispatcherContract
         try {
             $result = $callback();
 
-            // Dispatch all deferred events
             $this->deferringEvents = false;
 
             foreach ($this->deferredEvents as $args) {
