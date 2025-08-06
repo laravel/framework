@@ -88,6 +88,7 @@ trait QueriesRelationships
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
     {
         $relations = explode('.', $relations);
+
         $initialRelations = [...$relations];
 
         $doesntHave = $operator === '<' && $count === 1;
@@ -98,10 +99,10 @@ trait QueriesRelationships
         }
 
         $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback, $initialRelations) {
-            // checking if the same closure is called multiple time.
-            // if so, we need to "reset" the relation array to loop through them again.
+            // If the same closure is called multiple times, reset the relation array to loop through them again...
             if ($count === 1 && empty($relations)) {
                 $relations = [...$initialRelations];
+
                 array_shift($relations);
             }
 
