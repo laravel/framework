@@ -106,19 +106,8 @@ class Inspiring
             'The biggest battle is the war against ignorance. - Mustafa Kemal Atatürk',
             'Always remember that you are absolutely unique. Just like everyone else. - Margaret Mead',
             'You must be the change you wish to see in the world. - Mahatma Gandhi',
-            'We must ship. - Taylor Otwell',
-            'We prefer poverty in liberty to riches in slavery. - Ahmed Sékou Touré',
-            'You cannot carry out fundamental change without a certain amount of madness. - Thomas Sankara',
-            'The slave who does not shoulder his revolt does not deserve anyone\'s pity. - Thomas Sankara',
-            'Action without thought is empty. Thought without action is blind. - Kwame Nkrumah',
-            'We face neither East nor West: we face forward. - Kwame Nkrumah',
-            'Feel the needs of others more than your own. - Haile Selassie I',
-            'No one should question the faith of others, for no human being can judge the ways of God. - Haile Selassie I',
-            'We must dare to invent the future. - Thomas Sankara',
-            'Fools multiply when wise men are silent. - Nelson Mandela',
             'It always seems impossible until it is done. - Nelson Mandela',
-            'Remember to celebrate milestones as you prepare for the road ahead. - Nelson Mandela',
-            'No matter what the past has dealt you, don\'t let it destroy your future. - Nelson Mandela',
+            'We must ship. - Taylor Otwell',
         ]);
     }
 
