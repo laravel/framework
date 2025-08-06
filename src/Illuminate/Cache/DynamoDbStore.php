@@ -59,6 +59,13 @@ class DynamoDbStore implements LockProvider, Store
     protected $prefix;
 
     /**
+     * Should stores use consistent reads?
+     *
+     * @var bool
+     */
+    protected $consistentRead;
+
+    /**
      * Create a new store instance.
      *
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
@@ -67,6 +74,7 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $valueAttribute
      * @param  string  $expirationAttribute
      * @param  string  $prefix
+     * @param  bool  $consistentRead
      */
     public function __construct(
         DynamoDbClient $dynamo,
@@ -75,6 +83,7 @@ class DynamoDbStore implements LockProvider, Store
         $valueAttribute = 'value',
         $expirationAttribute = 'expires_at',
         $prefix = '',
+        $consistentRead = false,
     ) {
         $this->table = $table;
         $this->dynamo = $dynamo;
@@ -83,6 +92,8 @@ class DynamoDbStore implements LockProvider, Store
         $this->expirationAttribute = $expirationAttribute;
 
         $this->setPrefix($prefix);
+
+        $this->consistentRead = $consistentRead;
     }
 
     /**
@@ -95,7 +106,7 @@ class DynamoDbStore implements LockProvider, Store
     {
         $response = $this->dynamo->getItem([
             'TableName' => $this->table,
-            'ConsistentRead' => false,
+            'ConsistentRead' => $this->consistentRead,
             'Key' => [
                 $this->keyAttribute => [
                     'S' => $this->prefix.$key,
@@ -141,7 +152,7 @@ class DynamoDbStore implements LockProvider, Store
         $response = $this->dynamo->batchGetItem([
             'RequestItems' => [
                 $this->table => [
-                    'ConsistentRead' => false,
+                    'ConsistentRead' => $this->consistentRead,
                     'Keys' => (new Collection($prefixedKeys))->map(function ($key) {
                         return [
                             $this->keyAttribute => [

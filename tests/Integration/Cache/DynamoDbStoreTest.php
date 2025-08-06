@@ -73,6 +73,8 @@ class DynamoDbStoreTest extends TestCase
 
         $app['config']->set('cache.default', 'dynamodb');
 
+        $app['config']->set('cache.stores.dynamodb.consistent_read', true);
+
         $config = $app['config']->get('cache.stores.dynamodb');
 
         /** @var \Aws\DynamoDb\DynamoDbClient $client */
