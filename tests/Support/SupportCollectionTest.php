@@ -1263,6 +1263,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMergeIfMissingCollection($collection)
+    {
+        $a = new $collection(['name' => 'Hello']);
+        $b = new $collection(['surname' => 'World']);
+
+        $c = new $collection(['name' => 'Hello', 'surname' => 'World']);
+        $d = new $collection(['surname' => 'Laravel']);
+
+        $this->assertEquals(['name' => 'Hello', 'surname' => 'World'], $a->mergeIfMissing($b)->all());
+        $this->assertEquals(['name' => 'Hello', 'surname' => 'World'], $c->mergeIfMissing($d)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMergeRecursiveNull($collection)
     {
         $c = new $collection(['name' => 'Hello']);
