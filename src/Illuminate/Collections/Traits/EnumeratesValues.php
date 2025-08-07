@@ -201,6 +201,8 @@ trait EnumeratesValues
      */
     public static function fromCsv($body, $hasHeader = false, $separator = ',', $enclosure = '"', $escape = '\\')
     {
+        $body = str($body)->replace(["\r\n", "\r"], "\n")->value();
+
         $lines = tap(collect(explode(PHP_EOL, $body)), fn ($collection) => $collection->filter())->all();
 
         if (empty($lines)) {
@@ -210,7 +212,7 @@ trait EnumeratesValues
         $header = $hasHeader ? collect(str_getcsv(array_shift($lines), $separator, $enclosure, $escape)) : false;
 
         return collect($lines)->map(fn ($row) => str_getcsv($row, $separator))
-            ->when($hasHeader, function(Collection $collection) use ($header) {
+            ->when($hasHeader, function (Collection $collection) use ($header) {
                 return $collection->map(fn ($row) => $header->combine($row)->all());
             });
     }
