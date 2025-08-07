@@ -211,7 +211,7 @@ trait EnumeratesValues
 
         return collect($lines)->map(fn ($row) => str_getcsv($row, $separator))
             ->when($hasHeader, function(Collection $collection) use ($header) {
-                return $collection->map(fn($row) => $header->combine($row)->all());
+                return $collection->map(fn ($row) => $header->combine($row)->all());
             });
     }
 
