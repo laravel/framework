@@ -1122,6 +1122,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         }
 
         $this->offsetSet($key, $value);
+
         return $this;
     }
 
@@ -1146,6 +1147,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     protected function putWithDotNotation($key, $value)
     {
         Arr::set($this->items, $key, $value);
+
         return $this;
     }
 
