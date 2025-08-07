@@ -482,7 +482,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
-        if ($this->usesDotNotation($key)){
+        if ($this->usesDotNotation($key)) {
             return Arr::get($this->items, $key, $default);
         }
 
