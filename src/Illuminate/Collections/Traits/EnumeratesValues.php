@@ -203,7 +203,7 @@ trait EnumeratesValues
     {
         $body = str($body)->replace(["\r\n", "\r"], "\n")->value();
 
-        $lines = tap(collect(explode(PHP_EOL, $body)), fn ($collection) => $collection->filter())->all();
+        $lines = tap(collect(explode("\n", $body)), fn ($collection) => $collection->filter())->all();
 
         if (empty($lines)) {
             return new static();
