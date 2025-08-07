@@ -329,7 +329,7 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = [])
@@ -341,7 +341,7 @@ class Gate implements GateContract
      * Determine if any of the given abilities should be denied for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = [])
@@ -353,7 +353,7 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return bool
      */
     public function check($abilities, $arguments = [])
@@ -367,7 +367,7 @@ class Gate implements GateContract
      * Determine if any one of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return bool
      */
     public function any($abilities, $arguments = [])
@@ -379,7 +379,7 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be denied for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return bool
      */
     public function none($abilities, $arguments = [])
@@ -391,7 +391,7 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -405,7 +405,7 @@ class Gate implements GateContract
      * Inspect the user for the given ability.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = [])
@@ -429,7 +429,7 @@ class Gate implements GateContract
      * Get the raw result from the authorization callback.
      *
      * @param  string  $ability
-     * @param  array{class-string<TClass>|TClass, ...}  $arguments
+     * @param  array{class-string<TClass>|TClass, ...}|class-string<TClass>|TClass  $arguments
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
