@@ -175,6 +175,26 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->findOrFail(new Collection([1, 2]), ['column']);
     }
 
+    public function testFindOrFailWithEmptyArrayReturnsEmptyCollection()
+    {
+        $model = $this->getMockModel();
+        $emptyCollection = new Collection();
+        $model->shouldReceive('newCollection')->once()->andReturn($emptyCollection);
+        $model->shouldReceive('getKeyType')->andReturn('int');
+
+        $builder = m::mock(Builder::class.'[get]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+
+        $builder->getQuery()->shouldNotReceive('whereIntegerInRaw');
+        $builder->shouldNotReceive('get');
+
+        $result = $builder->findOrFail([], ['column']);
+
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertTrue($result->isEmpty());
+        $this->assertSame($emptyCollection, $result);
+    }
+
     public function testFindOrMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
