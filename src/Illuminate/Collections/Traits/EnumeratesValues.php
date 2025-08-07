@@ -190,6 +190,32 @@ trait EnumeratesValues
     }
 
     /**
+     * Create a new collection by parsing a CSV string.
+     *
+     * @param  string  $body
+     * @param  bool  $hasHeader
+     * @param  string  $separator
+     * @param  string  $enclosure
+     * @param  string  $escape
+     * @return static<TKey, TValue>
+     */
+    public static function fromCsv($body, $hasHeader = false, $separator = ',', $enclosure = '"', $escape = "\\")
+    {
+        $lines = tap(collect(explode(PHP_EOL, $body)), fn($collection) => $collection->filter())->all();
+
+        if (empty($lines)) {
+            return new static();
+        }
+
+        $header = $hasHeader ? collect(str_getcsv(array_shift($lines), $separator, $enclosure, $escape)) : false;
+
+        return collect($lines)->map(fn($row) => str_getcsv($row, $separator))
+            ->when($hasHeader, function(Collection $collection) use ($header) {
+                return $collection->map(fn($row) => $header->combine($row)->all());
+            });
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  (callable(TValue): float|int)|string|null  $callback

@@ -2434,6 +2434,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    public function testFromCsv()
+    {
+        $csvWithoutHeaders = "John;30\nJane;25";
+        $csvWithHeaders = "Name;Age\nJohn;30";
+
+        $collectionWithoutHeaders = Collection::fromCsv(body: $csvWithoutHeaders, separator: ';');
+        $collectionWithHeaders = Collection::fromCsv(body: $csvWithHeaders, hasHeader: true, separator: ';');
+
+        $this->assertSame([['Name' => 'John', 'Age' => '30']], $collectionWithHeaders->all());
+        $this->assertSame([['John', '30'], ['Jane', '25']], $collectionWithoutHeaders->all());
+    }
+
     public function testGetOrPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
