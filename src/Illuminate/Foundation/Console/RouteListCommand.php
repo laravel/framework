@@ -256,6 +256,21 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Check if the route method matches the filter.
+     *
+     * @param  string  $routeMethod
+     * @param  string  $filterMethod
+     * @return bool
+     */
+    protected function matchesMethod($routeMethod, $filterMethod)
+    {
+        $filterMethods = array_map('strtoupper', array_map('trim', explode(',', $filterMethod)));
+        $routeMethods = explode('|', $routeMethod);
+
+        return ! empty(array_intersect($filterMethods, $routeMethods));
+    }
+
+    /**
      * Filter the route by URI and / or name.
      *
      * @param  array  $route
@@ -266,7 +281,7 @@ class RouteListCommand extends Command
         if (($this->option('name') && ! Str::contains((string) $route['name'], $this->option('name'))) ||
             ($this->option('action') && isset($route['action']) && is_string($route['action']) && ! Str::contains($route['action'], $this->option('action'))) ||
             ($this->option('path') && ! Str::contains($route['uri'], $this->option('path'))) ||
-            ($this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) ||
+            ($this->option('method') && ! $this->matchesMethod($route['method'], $this->option('method'))) ||
             ($this->option('domain') && ! Str::contains((string) $route['domain'], $this->option('domain'))) ||
             ($this->option('except-vendor') && $route['vendor']) ||
             ($this->option('only-vendor') && ! $route['vendor'])) {

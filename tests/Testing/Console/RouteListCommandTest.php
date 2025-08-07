@@ -142,7 +142,67 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
-    public function testDisplayRoutesExceptVendor()
+    public function testRouteCanBeFilteredByMethod()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/get-route', function () {
+            return 'GET';
+        });
+        $this->router->post('/post-route', function () {
+            return 'POST';
+        });
+        $this->router->put('/put-route', function () {
+            return 'PUT';
+        });
+
+        $this->artisan(RouteListCommand::class, ['--method' => 'GET'])
+            ->assertSuccessful()
+            ->expectsOutputToContain('get-route')
+            ->expectsOutputToContain('Showing [1] routes')
+            ->doesntExpectOutputToContain('post-route')
+            ->doesntExpectOutputToContain('put-route');
+    }
+
+    public function testRouteCanBeFilteredByMultipleMethods()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/get-route', function () {
+            return 'GET';
+        });
+        $this->router->post('/post-route', function () {
+            return 'POST';
+        });
+        $this->router->put('/put-route', function () {
+            return 'PUT';
+        });
+
+        $this->artisan(RouteListCommand::class, ['--method' => 'GET,POST'])
+            ->assertSuccessful()
+            ->expectsOutputToContain('get-route')
+            ->expectsOutputToContain('post-route')
+            ->expectsOutputToContain('Showing [2] routes')
+            ->doesntExpectOutputToContain('put-route');
+    }
+
+    public function testRouteFilterByMethodIsCaseInsensitive()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/test-get', function () {
+            return 'test get';
+        });
+        $this->router->post('/test-post', function () {
+            return 'test post';
+        });
+
+        // Test with lowercase 'get' - should match GET routes
+        $this->artisan(RouteListCommand::class, ['--method' => 'get'])
+            ->assertSuccessful()
+            ->expectsOutputToContain('Showing [1] routes')
+            ->doesntExpectOutputToContain('test-post');
+    }    public function testDisplayRoutesExceptVendor()
     {
         $this->router->get('foo/{user}', [FooController::class, 'show']);
         $this->router->view('view', 'blade.path');
