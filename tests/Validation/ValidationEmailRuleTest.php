@@ -347,6 +347,379 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testNoDots()
+    {
+        $this->fails(
+            (new Email())->noDots(),
+            'user.name@gmail.com',
+            ['Gmail addresses with dots are not allowed.']
+        );
+
+        $this->fails(
+            Rule::email()->noDots(),
+            'user.name@gmail.com',
+            ['Gmail addresses with dots are not allowed.']
+        );
+
+        $this->fails(
+            (new Email())->noDots(),
+            'u.s.e.r@googlemail.com',
+            ['Gmail addresses with dots are not allowed.']
+        );
+
+        $this->passes(
+            (new Email())->noDots(),
+            'username@gmail.com'
+        );
+
+        $this->passes(
+            (new Email())->noDots(),
+            'user.name@yahoo.com'  // Only Gmail affected
+        );
+
+        $this->passes(
+            Rule::email()->noDots(),
+            'user.name@yahoo.com'
+        );
+    }
+
+    public function testNoAliases()
+    {
+        $this->fails(
+            (new Email())->noAliases(),
+            'user+test@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->fails(
+            Rule::email()->noAliases(),
+            'user+test@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->fails(
+            (new Email())->noAliases(),
+            'user..name@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->fails(
+            (new Email())->noAliases(),
+            '.username@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->fails(
+            (new Email())->noAliases(),
+            'username.@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->passes(
+            (new Email())->noAliases(),
+            'user@gmail.com'
+        );
+
+        $this->passes(
+            Rule::email()->noAliases(),
+            'validuser@gmail.com'
+        );
+    }
+
+    public function testTrustedDomains()
+    {
+        $this->passes(
+            (new Email())->trustedDomains(),
+            'user@gmail.com'
+        );
+
+        $this->passes(
+            Rule::email()->trustedDomains(),
+            'user@yahoo.com'
+        );
+
+        $this->passes(
+            (new Email())->trustedDomains(),
+            'user@outlook.com'
+        );
+
+        $this->fails(
+            (new Email())->trustedDomains(),
+            'user@untrusted.com',
+            ['Please use an email from a supported provider: gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, msn.com, icloud.com, me.com, mac.com, yahoo.com, yahoo.co.uk, yahoo.ca, yahoo.com.au, yahoo.de, yahoo.fr, yahoo.es, yahoo.it, ymail.com, rocketmail.com, aol.com, aim.com']
+        );
+
+        $this->fails(
+            Rule::email()->trustedDomains(),
+            'user@example.org',
+            ['Please use an email from a supported provider: gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, msn.com, icloud.com, me.com, mac.com, yahoo.com, yahoo.co.uk, yahoo.ca, yahoo.com.au, yahoo.de, yahoo.fr, yahoo.es, yahoo.it, ymail.com, rocketmail.com, aol.com, aim.com']
+        );
+    }
+
+    public function testCustomTrustedDomains()
+    {
+        $this->passes(
+            (new Email())->trustedDomains(['custom.com', 'trusted.org']),
+            'user@custom.com'
+        );
+
+        $this->passes(
+            Rule::email()->trustedDomains(['custom.com', 'trusted.org']),
+            'user@trusted.org'
+        );
+
+        $this->fails(
+            (new Email())->trustedDomains(['custom.com', 'trusted.org']),
+            'user@gmail.com',  // Not in custom list
+            ['Please use an email from a supported provider: custom.com, trusted.org']
+        );
+
+        $this->fails(
+            Rule::email()->trustedDomains(['custom.com']),
+            'user@untrusted.com',
+            ['Please use an email from a supported provider: custom.com']
+        );
+    }
+
+    #[TestWith(['user@10minutemail.com'])]
+    #[TestWith(['user@guerrillamail.com'])]
+    #[TestWith(['user@tempmail.org'])]
+    #[TestWith(['user@yopmail.com'])]
+    #[TestWith(['user@mailinator.com'])]
+    #[TestWith(['user@temp-mail.org'])]
+    #[TestWith(['user@throwaway.email'])]
+    #[TestWith(['user@getnada.com'])]
+    #[TestWith(['user@maildrop.cc'])]
+    #[TestWith(['user@sharklasers.com'])]
+    public function testNoDisposable($email)
+    {
+        $this->fails(
+            (new Email())->noDisposable(),
+            $email,
+            ['Temporary or disposable email services are not allowed.']
+        );
+
+        $this->fails(
+            Rule::email()->noDisposable(),
+            $email,
+            ['Temporary or disposable email services are not allowed.']
+        );
+    }
+
+    public function testNoDisposablePassesValidEmails()
+    {
+        $this->passes(
+            (new Email())->noDisposable(),
+            'user@gmail.com'
+        );
+
+        $this->passes(
+            Rule::email()->noDisposable(),
+            'user@yahoo.com'
+        );
+    }
+
+    #[TestWith(['user@simplelogin.io'])]
+    #[TestWith(['user@anonaddy.com'])]
+    #[TestWith(['user@relay.firefox.com'])]
+    #[TestWith(['user@hide-my-email.com'])]
+    #[TestWith(['user@duckduckgo.com'])]
+    public function testNoForwarding($email)
+    {
+        $this->fails(
+            (new Email())->noForwarding(),
+            $email,
+            ['Email forwarding services are not allowed.']
+        );
+
+        $this->fails(
+            Rule::email()->noForwarding(),
+            $email,
+            ['Email forwarding services are not allowed.']
+        );
+    }
+
+    public function testNoForwardingPassesValidEmails()
+    {
+        $this->passes(
+            (new Email())->noForwarding(),
+            'user@gmail.com'
+        );
+
+        $this->passes(
+            Rule::email()->noForwarding(),
+            'user@outlook.com'
+        );
+    }
+
+    #[TestWith(['a12345678@gmail.com'])]      // Single letter + many numbers
+    #[TestWith(['test123@gmail.com'])]        // Test emails
+    #[TestWith(['temp@gmail.com'])]           // Temp emails
+    #[TestWith(['noreply@gmail.com'])]        // No-reply emails
+    #[TestWith(['admin@gmail.com'])]          // Admin emails
+    #[TestWith(['support@gmail.com'])]        // Support emails
+    #[TestWith(['1234567890@gmail.com'])]     // Only numbers
+    public function testNoSuspiciousPatterns($email)
+    {
+        $this->fails(
+            (new Email())->noSuspiciousPatterns(),
+            $email,
+            ['This email format appears to be temporary or invalid.']
+        );
+
+        $this->fails(
+            Rule::email()->noSuspiciousPatterns(),
+            $email,
+            ['This email format appears to be temporary or invalid.']
+        );
+    }
+
+    public function testNoSuspiciousPatternsPassesValidEmails()
+    {
+        $this->passes(
+            (new Email())->noSuspiciousPatterns(),
+            'validuser@gmail.com'
+        );
+
+        $this->passes(
+            Rule::email()->noSuspiciousPatterns(),
+            'john.doe@gmail.com'
+        );
+
+        $this->passes(
+            (new Email())->noSuspiciousPatterns(),
+            'businessemail@company.com'
+        );
+    }
+
+    public function testStrictAdvanced()
+    {
+        $rule = (new Email())->strictAdvanced();
+        $ruleViaHelper = Rule::email()->strictAdvanced();
+
+        // Should block Gmail dots
+        $this->fails(
+            $rule,
+            'user.name@gmail.com',
+            ['Gmail addresses with dots are not allowed.']
+        );
+
+        // Should block aliases
+        $this->fails(
+            $ruleViaHelper,
+            'user+test@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        // Should block disposable
+        $this->fails(
+            $rule,
+            'user@10minutemail.com',
+            ['Temporary or disposable email services are not allowed.']
+        );
+
+        // Should block forwarding
+        $this->fails(
+            $ruleViaHelper,
+            'user@simplelogin.io',
+            ['Email forwarding services are not allowed.']
+        );
+
+        // Should block non-trusted
+        $this->fails(
+            $rule,
+            'user@untrusted.com',
+            ['Please use an email from a supported provider: gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, msn.com, icloud.com, me.com, mac.com, yahoo.com, yahoo.co.uk, yahoo.ca, yahoo.com.au, yahoo.de, yahoo.fr, yahoo.es, yahoo.it, ymail.com, rocketmail.com, aol.com, aim.com']
+        );
+
+        // Should block suspicious
+        $this->fails(
+            $ruleViaHelper,
+            'test123@gmail.com',
+            ['This email format appears to be temporary or invalid.']
+        );
+
+        // Should allow valid
+        $this->passes(
+            $rule,
+            'validuser@gmail.com'
+        );
+
+        $this->passes(
+            $ruleViaHelper,
+            'john.doe@yahoo.com'
+        );
+    }
+
+    public function testChainingMethods()
+    {
+        $rule = (new Email())
+            ->noDots()
+            ->noAliases()
+            ->trustedDomains();
+
+        $this->fails(
+            $rule,
+            'user.name@gmail.com',
+            ['Gmail addresses with dots are not allowed.']
+        );
+
+        $this->fails(
+            $rule,
+            'user+test@gmail.com',
+            ['Email aliases are not allowed.']
+        );
+
+        $this->fails(
+            $rule,
+            'user@untrusted.com',
+            ['Please use an email from a supported provider: gmail.com, googlemail.com, outlook.com, hotmail.com, live.com, msn.com, icloud.com, me.com, mac.com, yahoo.com, yahoo.co.uk, yahoo.ca, yahoo.com.au, yahoo.de, yahoo.fr, yahoo.es, yahoo.it, ymail.com, rocketmail.com, aol.com, aim.com']
+        );
+
+        $this->passes(
+            $rule,
+            'validuser@gmail.com'
+        );
+    }
+
+    public function testBackwardCompatibility()
+    {
+        // Traditional email validation should still work
+        $rule = new Email;
+
+        $this->passes($rule, 'user.name@gmail.com');     // Dots allowed by default
+        $this->passes($rule, 'user+alias@gmail.com');    // Plus allowed by default
+        $this->passes($rule, 'user@anydomain.com');      // Any domain by default
+        $this->passes($rule, 'user@10minutemail.com');   // Disposable allowed by default
+        $this->passes($rule, 'user@simplelogin.io');     // Forwarding allowed by default
+        $this->passes($rule, 'test123@gmail.com');       // Suspicious allowed by default
+    }
+
+    public function testConditionalValidation()
+    {
+        $emailWithDots = 'user.name@gmail.com';
+
+        // Should pass when condition is false
+        $rule = (new Email())->when(false, function ($email) {
+            return $email->noDots();
+        });
+
+        $this->passes($rule, $emailWithDots);
+
+        // Should fail when condition is true
+        $rule = (new Email())->when(true, function ($email) {
+            return $email->noDots();
+        });
+
+        $this->fails(
+            $rule,
+            $emailWithDots,
+            ['Gmail addresses with dots are not allowed.']
+        );
+    }
+
+    // End of Advanced Email Validation Tests
+
     #[TestWith(['"has space"@example.com'])]             // Quoted local part with space
     #[TestWith(['some(comment)@example.com'])]            // Comment in local part
     #[TestWith(['abc."test"@example.com'])]               // Mixed quoted/unquoted local part
@@ -887,6 +1260,12 @@ class ValidationEmailRuleTest extends TestCase
 
             $translator->addLines([
                 'validation.email' => 'The :attribute must be a valid email address.',
+                'validation.email_trusted_domains' => 'Please use an email from a supported provider: :domains',
+                'validation.email_no_dots' => 'Gmail addresses with dots are not allowed.',
+                'validation.email_no_aliases' => 'Email aliases are not allowed.',
+                'validation.email_no_disposable' => 'Temporary or disposable email services are not allowed.',
+                'validation.email_no_forwarding' => 'Email forwarding services are not allowed.',
+                'validation.email_suspicious' => 'This email format appears to be temporary or invalid.',
             ], 'en');
 
             return $translator;
