@@ -31,22 +31,6 @@ class DatabaseServiceProvider extends ServiceProvider
         Model::setConnectionResolver($this->app['db']);
 
         Model::setEventDispatcher($this->app['events']);
-
-        $this->configureEloquentBehavior();
-    }
-
-    /**
-     * Configure Eloquent model behavior based on configuration.
-     *
-     * @return void
-     */
-    protected function configureEloquentBehavior()
-    {
-        $config = $this->app['config']->get('database.eloquent', []);
-
-        if ($config['prevent_accessing_missing_attributes'] ?? false) {
-            Model::preventAccessingMissingAttributes();
-        }
     }
 
     /**
