@@ -3160,6 +3160,30 @@ class DatabaseEloquentModelTest extends TestCase
         }
     }
 
+    public function testPreventAccessingMissingAttributesCanBeConfigured()
+    {
+        // Ensure we start with the default behavior (no exceptions)
+        $originalMode = Model::preventsAccessingMissingAttributes();
+        Model::preventAccessingMissingAttributes(false);
+
+        try {
+            $model = new EloquentModelStub(['id' => 1]);
+            $model->exists = true;
+
+            // Should not throw when disabled
+            $this->assertNull($model->this_attribute_does_not_exist);
+
+            // Now enable it
+            Model::preventAccessingMissingAttributes(true);
+
+            // Should throw when enabled
+            $this->expectException(MissingAttributeException::class);
+            $model->this_attribute_does_not_exist;
+        } finally {
+            Model::preventAccessingMissingAttributes($originalMode);
+        }
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));

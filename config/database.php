@@ -133,6 +133,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Eloquent Model Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure various options that change the behavior of
+    | Eloquent models. These settings help enforce stricter application
+    | behavior during development and help catch common programming errors.
+    |
+    */
+
+    'eloquent' => [
+        'prevent_accessing_missing_attributes' => env('DB_PREVENT_MISSING_ATTRIBUTES', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Redis Databases
     |--------------------------------------------------------------------------
     |
