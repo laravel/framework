@@ -68,6 +68,18 @@ class ClearCommandTest extends TestCase
         $this->runCommand($this->command);
     }
 
+    public function testClearWithConfirmationRequired()
+    {
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
+
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
+
+        // Test with --force flag to bypass confirmation
+        $this->runCommand($this->command, ['--force' => true]);
+    }
+
     public function testClearWithStoreArgument()
     {
         $this->files->shouldReceive('exists')->andReturn(true);
@@ -151,5 +163,12 @@ class ClearCommandTestStub extends ClearCommand
     public function call($command, array $arguments = [])
     {
         return 0;
+    }
+
+    protected function getDefaultConfirmCallback()
+    {
+        return function () {
+            return false; // Never prompt in tests
+        };
     }
 }

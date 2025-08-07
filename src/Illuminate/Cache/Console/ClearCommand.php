@@ -4,6 +4,7 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 #[AsCommand(name: 'cache:clear')]
 class ClearCommand extends Command
 {
+    use ConfirmableTrait;
     /**
      * The console command name.
      *
@@ -57,10 +59,14 @@ class ClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return Command::FAILURE;
+        }
+
         $this->laravel['events']->dispatch(
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
@@ -70,7 +76,9 @@ class ClearCommand extends Command
         $this->flushFacades();
 
         if (! $successful) {
-            return $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+            $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+
+            return Command::FAILURE;
         }
 
         $this->laravel['events']->dispatch(
@@ -78,6 +86,8 @@ class ClearCommand extends Command
         );
 
         $this->components->info('Application cache cleared successfully.');
+
+        return Command::SUCCESS;
     }
 
     /**
@@ -141,6 +151,7 @@ class ClearCommand extends Command
     {
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
         ];
     }
 }

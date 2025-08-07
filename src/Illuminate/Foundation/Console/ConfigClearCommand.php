@@ -3,12 +3,15 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'config:clear')]
 class ConfigClearCommand extends Command
 {
+    use ConfirmableTrait;
     /**
      * The console command name.
      *
@@ -45,12 +48,30 @@ class ConfigClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return Command::FAILURE;
+        }
+
         $this->files->delete($this->laravel->getCachedConfigPath());
 
         $this->components->info('Configuration cache cleared successfully.');
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+        ];
     }
 }

@@ -3,13 +3,16 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Filesystem\Filesystem;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'view:clear')]
 class ViewClearCommand extends Command
 {
+    use ConfirmableTrait;
     /**
      * The console command name.
      *
@@ -46,12 +49,16 @@ class ViewClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      *
      * @throws \RuntimeException
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return Command::FAILURE;
+        }
+
         $path = $this->laravel['config']['view.compiled'];
 
         if (! $path) {
@@ -67,5 +74,19 @@ class ViewClearCommand extends Command
         }
 
         $this->components->info('Compiled views cleared successfully.');
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production'],
+        ];
     }
 }
