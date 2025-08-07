@@ -482,6 +482,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
+        if ($this->usesDotNotation($key)){
+            return Arr::get($this->items, $key, $default);
+        }
+
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
@@ -1120,6 +1124,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $this->offsetSet($key, $value);
 
         return $this;
+    }
+
+    /**
+     * Determine if the key contains the dot notation syntax.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    protected function usesDotNotation($key)
+    {
+        return is_string($key) && strpos($key, '.');
     }
 
     /**
