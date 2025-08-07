@@ -1117,8 +1117,35 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function put($key, $value)
     {
-        $this->offsetSet($key, $value);
+        if ($this->usesDotNotation($key)) {
+            return $this->putWithDotNotation($key, $value);
+        }
 
+        $this->offsetSet($key, $value);
+        return $this;
+    }
+
+    /**
+     * Determine if the key contains the dot notation syntax.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    protected function usesDotNotation($key)
+    {
+        return is_string($key) && strpos($key, '.');
+    }
+
+    /**
+     * Put an item using dot notation.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    protected function putWithDotNotation($key, $value)
+    {
+        Arr::set($this->items, $key, $value);
         return $this;
     }
 

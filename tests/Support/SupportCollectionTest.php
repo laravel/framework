@@ -2472,6 +2472,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'dayle', 'email' => 'foo'], $data->all());
     }
 
+    public function testPutWithDotNotation()
+    {
+        $data = new Collection(['author' => ['name' => 'taylor']]);
+        $data = $data->put('author.lastname', 'otwell');
+        $this->assertEquals(['author' => ['name' => 'taylor', 'lastname' => 'otwell']], $data->all());
+    }
+
     public function testPutWithNoKey()
     {
         $data = new Collection(['taylor', 'shawn']);
