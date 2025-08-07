@@ -2436,8 +2436,8 @@ class SupportCollectionTest extends TestCase
 
     public function testFromCsv()
     {
-        $csvWithoutHeaders = "John;30" . PHP_EOL . "Jane;25";
-        $csvWithHeaders = "Name;Age" . PHP_EOL . "John;30";
+        $csvWithoutHeaders = 'John;30'.PHP_EOL.'Jane;25';
+        $csvWithHeaders = 'Name;Age'.PHP_EOL.'John;30';
 
         $collectionWithoutHeaders = Collection::fromCsv(body: $csvWithoutHeaders, separator: ';');
         $collectionWithHeaders = Collection::fromCsv(body: $csvWithHeaders, hasHeader: true, separator: ';');
