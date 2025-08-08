@@ -1,6 +1,13 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.21.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.22.1...12.x)
+
+## [v12.22.1](https://github.com/laravel/framework/compare/v12.21.0...v12.22.1) - 2025-08-08
+
+* [12.x] Improved assertion message by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56579
+* [12.x] Fixed version increment by [@dciancu](https://github.com/dciancu) in https://github.com/laravel/framework/pull/56588
+* [12.x] Normalize file path separators in `make:migration` command on Windows by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56591
+* Revert "[12.x] Improve PHPDoc blocks for array of arguments in Gate" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/56593
 
 ## [v12.21.0](https://github.com/laravel/framework/compare/v12.20.0...v12.21.0) - 2025-07-22
 
