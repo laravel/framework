@@ -170,7 +170,13 @@ class MigrationCreator
      */
     protected function getPath($name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        $path = $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+
+        if (windows_os()) {
+            $path = str_replace('/', '\\', $path);
+        }
+
+        return $path;
     }
 
     /**
