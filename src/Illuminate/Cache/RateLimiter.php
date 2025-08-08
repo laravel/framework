@@ -210,7 +210,7 @@ class RateLimiter
      * Reset the number of attempts for the given key.
      *
      * @param  string  $key
-     * @return mixed
+     * @return bool
      */
     public function resetAttempts($key)
     {
