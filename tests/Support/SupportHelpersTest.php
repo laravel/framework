@@ -1391,8 +1391,7 @@ class SupportHelpersTest extends TestCase
 
         Env::writeVariables([
             'APP_DESCRIPTION' => 'This app is called "The best app"',
-            'DB_HOST' => "It's a nice day",
-            'DB_CONNECTION' => 'sqlite',
+            'APP_GREETING' => "It's a nice day",
         ], $path, true);
 
         $this->assertSame(
@@ -1405,8 +1404,8 @@ class SupportHelpersTest extends TestCase
                 "APP_DESCRIPTION='This app is called \"The best app\"'",
                 'APP_GREETING="It\'s a nice day"',
                 '',
-                'DB_CONNECTION=sqlite',
-                'DB_HOST="127:0:0:1"',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
             ]),
             $filesystem->get($path)
         );
