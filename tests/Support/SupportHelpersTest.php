@@ -1374,6 +1374,43 @@ class SupportHelpersTest extends TestCase
         );
     }
 
+    public function testWriteArrayOfEnvVariablesWithQuotesToFile ()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_DESCRIPTION' => 'This app is called "The best app"',
+            'APP_GREETING' => "It's a nice day",
+        ], $path, true);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                "APP_DESCRIPTION='This app is called \"The best app\"'",
+                'APP_GREETING="It\'s a nice day"',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
     public function testWillNotOverwriteVariable()
     {
         $filesystem = new Filesystem;
