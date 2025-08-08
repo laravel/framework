@@ -311,6 +311,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Include the given models from the query results.
+     *
+     * @param  iterable|mixed  $models
+     * @return static
+     */
+    public function only($models)
+    {
+        return $this->whereKey(
+            $models instanceof Model
+                ? $models->getKey()
+                : Collection::wrap($models)->modelKeys()
+        );
+    }
+
+    /**
      * Exclude the given models from the query results.
      *
      * @param  iterable|mixed  $models
