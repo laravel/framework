@@ -777,6 +777,26 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testBindInterfaceToNonSingletonAndMakeSharedViaBinding()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => true);
+        $firstInstantiation = $container->get(ContainerBindNonSingletonButSharedTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindNonSingletonButSharedTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testBindInterfaceToNonSingletonAndMakeNotSharedViaBinding()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => true);
+        $firstInstantiation = $container->get(ContainerBindNonSingletonAndNotSharedTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindNonSingletonAndNotSharedTestInterface::class);
+
+        $this->assertNotSame($firstInstantiation, $secondInstantiation);
+    }
+
     public function testBindInterfaceToScoped()
     {
         $container = new Container;
@@ -1040,6 +1060,10 @@ class ContainerSingletonAttribute
 {
 }
 
+class ContainerNonSingletonAttribute
+{
+}
+
 #[Scoped]
 class ContainerScopedAttribute
 {
@@ -1047,6 +1071,16 @@ class ContainerScopedAttribute
 
 #[Bind(ContainerSingletonAttribute::class, environments: ['foo', ContainerTestEnvironments::Bar])]
 interface ContainerBindSingletonTestInterface
+{
+}
+
+#[Bind(ContainerNonSingletonAttribute::class, shared: true)]
+interface ContainerBindNonSingletonButSharedTestInterface
+{
+}
+
+#[Bind(ContainerNonSingletonAttribute::class, shared: false)]
+interface ContainerBindNonSingletonAndNotSharedTestInterface
 {
 }
 

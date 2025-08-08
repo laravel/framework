@@ -25,6 +25,11 @@ class Bind
     public array $environments = [];
 
     /**
+     * Should the class binding be shared in the container.
+     */
+    public bool $shared;
+
+    /**
      * Create a new attribute instance.
      *
      * @param  class-string  $concrete
@@ -35,6 +40,7 @@ class Bind
     public function __construct(
         string $concrete,
         string|array $environments = ['*'],
+        bool $shared = false,
     ) {
         $environments = array_filter(is_array($environments) ? $environments : [$environments]);
 
@@ -49,5 +55,7 @@ class Bind
             $environment instanceof UnitEnum => $environment->name,
             default => $environment,
         }, $environments);
+
+        $this->shared = $shared;
     }
 }

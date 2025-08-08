@@ -1008,10 +1008,11 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getConcreteBindingFromAttributes($abstract, $reflectedAttributes)
     {
-        $concrete = $maybeConcrete = null;
+        $concrete = $maybeConcrete = $shared = null;
 
         foreach ($reflectedAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
+            $shared = $instance->shared;
 
             if ($instance->environments === ['*']) {
                 $maybeConcrete = $instance->concrete;
@@ -1034,7 +1035,7 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $this->bind($abstract, $concrete);
+        $this->bind($abstract, $concrete, $shared ?? false);
 
         return $this->bindings[$abstract]['concrete'];
     }
