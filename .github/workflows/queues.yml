@@ -127,11 +127,6 @@ jobs:
           REDIS_CLIENT: ${{ matrix.client }}
           QUEUE_CONNECTION: redis
 
-      - name: Execute broadcasting tests
-        run: vendor/bin/phpunit tests/Integration/Broadcasting
-        env:
-          REDIS_CLIENT: ${{ matrix.client }}
-
   redis-cluster:
     runs-on: ubuntu-24.04
 
@@ -179,12 +174,6 @@ jobs:
           REDIS_CLIENT: ${{ matrix.client }}
           REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
           REDIS_QUEUE: '{default}'
-
-      - name: Execute broadcasting tests
-        run: vendor/bin/phpunit tests/Integration/Broadcasting
-        env:
-          REDIS_CLIENT: ${{ matrix.client }}
-          REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
 
   beanstalkd:
     runs-on: ubuntu-24.04

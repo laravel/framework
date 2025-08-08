@@ -133,15 +133,16 @@ class RedisBroadcaster extends Broadcaster
                 foreach ($channels as $channel) {
                     $connection->publish($channel, $payload);
                 }
-            } elseif ($connection instanceof PredisClusterConnection
-                && $connection->client()->getConnection() instanceof RedisCluster
-            ) {
+            } elseif ($connection instanceof PredisClusterConnection &&
+                $connection->client()->getConnection() instanceof RedisCluster) {
                 $randomClusterNodeConnection = new PredisConnection(
                     $connection->client()->getClientBy('slot', mt_rand(0, 16383))
                 );
+
                 if ($events = $connection->getEventDispatcher()) {
                     $randomClusterNodeConnection->setEventDispatcher($events);
                 }
+
                 $randomClusterNodeConnection->eval(
                     $this->broadcastMultipleChannelsScript(),
                     0, $payload, ...$this->formatChannels($channels)
