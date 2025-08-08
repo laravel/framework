@@ -1374,7 +1374,7 @@ class SupportHelpersTest extends TestCase
         );
     }
 
-    public function testWriteArrayOfEnvVariablesWithQuotesToFile ()
+    public function testWriteArrayOfEnvVariablesWithQuotesToFile()
     {
         $filesystem = new Filesystem;
         $path = __DIR__.'/tmp/env-test-file';
@@ -1391,7 +1391,8 @@ class SupportHelpersTest extends TestCase
 
         Env::writeVariables([
             'APP_DESCRIPTION' => 'This app is called "The best app"',
-            'APP_GREETING' => "It's a nice day",
+            'DB_HOST' => "It's a nice day",
+            'DB_CONNECTION' => 'sqlite',
         ], $path, true);
 
         $this->assertSame(
@@ -1404,8 +1405,8 @@ class SupportHelpersTest extends TestCase
                 "APP_DESCRIPTION='This app is called \"The best app\"'",
                 'APP_GREETING="It\'s a nice day"',
                 '',
-                'DB_CONNECTION=mysql',
-                'DB_HOST=',
+                'DB_CONNECTION=sqlite',
+                'DB_HOST="127:0:0:1"',
             ]),
             $filesystem->get($path)
         );
