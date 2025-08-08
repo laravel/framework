@@ -2340,6 +2340,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testOnlyMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', m::on(function ($argument) {
+            return $argument === '1';
+        }));
+
+        $builder->only(new class extends Model
+        {
+            protected $attributes = ['id' => 1];
+        });
+    }
+
+    public function testOnlyMethodWithCollectionOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = new Collection([
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ]);
+
+        $builder->only($models);
+    }
+
+    public function testOnlyMethodWithArrayOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = [
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ];
+
+        $builder->only($models);
+    }
+
     public function testExceptMethodWithModel()
     {
         $model = new EloquentBuilderTestStubStringPrimaryKey;
