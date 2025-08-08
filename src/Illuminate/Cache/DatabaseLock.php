@@ -24,7 +24,7 @@ class DatabaseLock extends Lock
     /**
      * The prune probability odds.
      *
-     * @var array
+     * @var array{int, int}
      */
     protected $lottery;
 
@@ -43,7 +43,7 @@ class DatabaseLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @param  array  $lottery
+     * @param  array{int, int}  $lottery
      * @param  int  $defaultTimeoutInSeconds
      */
     public function __construct(Connection $connection, $table, $name, $seconds, $owner = null, $lottery = [2, 100], $defaultTimeoutInSeconds = 86400)
