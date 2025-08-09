@@ -86,6 +86,13 @@ class Gate implements GateContract
     protected $guessPolicyNamesUsingCallback;
 
     /**
+     * If the policies should be grouped by an additional namespace based on the authenticatable user.
+     *
+     * @var bool
+     */
+    protected $usesPoliciesGroup;
+
+    /**
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -731,9 +738,43 @@ class Gate implements GateContract
         })->when(str_contains($classDirname, '\\Models\\'), function ($collection) use ($class, $classDirname) {
             return $collection->concat([str_replace('\\Models\\', '\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy'])
                 ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
+        })->when($this->getPoliciesGroup($class), function ($collection, $group) use ($classDirname) {
+            return $collection->concat(
+                $collection->map(function ($policy) use ($classDirname, $group) {
+                    return str_replace('\\Policies\\', '\\Policies\\' . $group . '\\', $policy);
+                })
+            );
         })->reverse()->values()->first(function ($class) {
             return class_exists($class);
         }) ?: [$classDirname.'\\Policies\\'.class_basename($class).'Policy']);
+    }
+
+    /**
+     * Groups guessed policies by an additional namespace based on the authenticatable user.
+     *
+     * @param  bool $use
+     * @return $this
+     */
+    public function usePoliciesGroup($use = true)
+    {
+        $this->usesPoliciesGroup = $use;
+
+        return $this;
+    }
+
+    /**
+     * Returns the name of the group policy to use.
+     *
+     * @param  class-string  $class
+     * @return false|null|string
+     */
+    protected function getPoliciesGroup($class)
+    {
+        if ($this->usesPoliciesGroup && $user = $this->resolveUser()) {
+            return method_exists($user, 'policiesGroup') ? $user->policiesGroup($class) : class_basename($user);
+        }
+
+        return false;
     }
 
     /**

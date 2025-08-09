@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUserWithPoliciesGroup;
+use Illuminate\Tests\Integration\Auth\Fixtures\Models\Nested\SubTestUser;
 use Illuminate\Tests\Integration\Auth\Fixtures\Models\Policies\Nested\SubTestUserPolicy;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\AuthenticationTestUserPolicy;
 use Illuminate\Tests\Integration\Auth\Fixtures\Policies\Nested\TopTestUserPolicy;
@@ -77,6 +79,86 @@ class GatePolicyResolutionTest extends TestCase
 
         $this->assertInstanceOf(
             AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
+
+    public function testPolicyCanBeGuessedUsingGroupNamespace()
+    {
+        $this->be(new AuthenticationTestUser());
+
+        Gate::usePoliciesGroup();
+
+        $this->assertInstanceOf(
+            Fixtures\Policies\AuthenticationTestUser\AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
+
+    public function testPolicyCanBueGuessedUsingGroupNamespaceInsideModelsNamespace()
+    {
+        $this->be(new SubTestUser());
+
+        Gate::usePoliciesGroup();
+
+        $this->assertInstanceOf(
+            Fixtures\Models\Policies\SubTestUser\SubTestUserPolicy::class,
+            Gate::getPolicyFor(SubTestUser::class)
+        );
+    }
+
+    public function testPolicyCanBeGuessedUsingGroupNamespaceForParallelHierarchies()
+    {
+        $this->be(new SubTestUser());
+
+        Gate::usePoliciesGroup();
+
+        $this->assertInstanceOf(
+            TopTestUserPolicy::class,
+            Gate::getPolicyFor(Fixtures\Models\Nested\TopTestUser::class)
+        );
+
+        $this->assertInstanceOf(
+            Fixtures\Models\Policies\SubTestUser\Nested\SubTestUserPolicy::class,
+            Gate::getPolicyFor(Fixtures\Models\Nested\SubTestUser::class)
+        );
+    }
+
+    public function testPolicyGroupCanBeGuessedWithoutUserAuthenticated()
+    {
+        $this->actingAsGuest();
+
+        Gate::usePoliciesGroup();
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
+
+    public function testPolicyCallbackOverridesPoliciesGroup()
+    {
+        Gate::usePoliciesGroup()->guessPolicyNamesUsing(function () {
+            return [
+                'App\\Policies\\TestUserPolicy',
+                AuthenticationTestUserPolicy::class,
+            ];
+        });
+
+        $this->assertInstanceOf(
+            AuthenticationTestUserPolicy::class,
+            Gate::getPolicyFor(AuthenticationTestUser::class)
+        );
+    }
+
+    public function testPolicyCanBeGuessedWithExplicitGroupNamespace()
+    {
+        $this->be(new AuthenticationTestUserWithPoliciesGroup());
+
+        Gate::usePoliciesGroup();
+
+        $this->assertInstanceOf(
+            Fixtures\Policies\AuthenticationTestUser\AuthenticationTestUserPolicy::class,
             Gate::getPolicyFor(AuthenticationTestUser::class)
         );
     }
