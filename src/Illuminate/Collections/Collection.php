@@ -1005,7 +1005,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get and remove the last N items from the collection.
      *
      * @param  int  $count
-     * @return static<int, TValue>|TValue|null
+     * @return ($count is 1 ? TValue|null : static<int, TValue>)
      */
     public function pop($count = 1)
     {
@@ -1127,7 +1127,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  (callable(self<TKey, TValue>): int)|int|null  $number
      * @param  bool  $preserveKeys
-     * @return static<int, TValue>|TValue
+     * @return ($number is null ? TValue : static<int, TValue>)
      *
      * @throws \InvalidArgumentException
      */
@@ -1250,7 +1250,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * Get and remove the first N items from the collection.
      *
      * @param  int<0, max>  $count
-     * @return static<int, TValue>|TValue|null
+     * @return ($count is 1 ? TValue|null : static<int, TValue>)
      *
      * @throws \InvalidArgumentException
      */
