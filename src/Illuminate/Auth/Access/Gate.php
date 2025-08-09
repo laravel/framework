@@ -90,7 +90,7 @@ class Gate implements GateContract
      *
      * @var bool
      */
-    protected $usesPoliciesGroup;
+    protected $shouldGroupPoliciesByUser;
 
     /**
      * Create a new gate instance.
@@ -755,9 +755,9 @@ class Gate implements GateContract
      * @param  bool $use
      * @return $this
      */
-    public function usePoliciesGroup($use = true)
+    public function groupPoliciesByUser($use = true)
     {
-        $this->usesPoliciesGroup = $use;
+        $this->shouldGroupPoliciesByUser = $use;
 
         return $this;
     }
@@ -770,8 +770,8 @@ class Gate implements GateContract
      */
     protected function getPoliciesGroup($class)
     {
-        if ($this->usesPoliciesGroup && $user = $this->resolveUser()) {
-            return method_exists($user, 'policiesGroup') ? $user->policiesGroup($class) : class_basename($user);
+        if ($this->shouldGroupPoliciesByUser && $user = $this->resolveUser()) {
+            return method_exists($user, 'groupPoliciesBy') ? $user->groupPoliciesBy($class) : class_basename($user);
         }
 
         return false;

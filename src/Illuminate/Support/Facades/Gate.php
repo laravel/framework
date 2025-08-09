@@ -23,7 +23,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static mixed raw(string $ability, array|mixed $arguments = [])
  * @method static mixed getPolicyFor(object|string $class)
  * @method static \Illuminate\Auth\Access\Gate guessPolicyNamesUsing(callable $callback)
- * @method static \Illuminate\Auth\Access\Gate usePoliciesGroup(bool $use = true)
+ * @method static \Illuminate\Auth\Access\Gate groupPoliciesByUser(bool $use = true)
  * @method static mixed resolvePolicy(object|string $class)
  * @method static \Illuminate\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Authenticatable|mixed $user)
  * @method static array abilities()

@@ -87,7 +87,7 @@ class GatePolicyResolutionTest extends TestCase
     {
         $this->be(new AuthenticationTestUser());
 
-        Gate::usePoliciesGroup();
+        Gate::groupPoliciesByUser();
 
         $this->assertInstanceOf(
             Fixtures\Policies\AuthenticationTestUser\AuthenticationTestUserPolicy::class,
@@ -95,14 +95,14 @@ class GatePolicyResolutionTest extends TestCase
         );
     }
 
-    public function testPolicyCanBueGuessedUsingGroupNamespaceInsideModelsNamespace()
+    public function testNestedPolicyCanBueGuessedUsingGroupNamespaceInsideModelsNamespace()
     {
         $this->be(new SubTestUser());
 
-        Gate::usePoliciesGroup();
+        Gate::groupPoliciesByUser();
 
         $this->assertInstanceOf(
-            Fixtures\Models\Policies\SubTestUser\SubTestUserPolicy::class,
+            Fixtures\Models\Policies\SubTestUser\Nested\SubTestUserPolicy::class,
             Gate::getPolicyFor(SubTestUser::class)
         );
     }
@@ -111,7 +111,7 @@ class GatePolicyResolutionTest extends TestCase
     {
         $this->be(new SubTestUser());
 
-        Gate::usePoliciesGroup();
+        Gate::groupPoliciesByUser();
 
         $this->assertInstanceOf(
             TopTestUserPolicy::class,
@@ -128,7 +128,7 @@ class GatePolicyResolutionTest extends TestCase
     {
         $this->actingAsGuest();
 
-        Gate::usePoliciesGroup();
+        Gate::groupPoliciesByUser();
 
         $this->assertInstanceOf(
             AuthenticationTestUserPolicy::class,
@@ -138,7 +138,7 @@ class GatePolicyResolutionTest extends TestCase
 
     public function testPolicyCallbackOverridesPoliciesGroup()
     {
-        Gate::usePoliciesGroup()->guessPolicyNamesUsing(function () {
+        Gate::groupPoliciesByUser()->guessPolicyNamesUsing(function () {
             return [
                 'App\\Policies\\TestUserPolicy',
                 AuthenticationTestUserPolicy::class,
@@ -155,7 +155,7 @@ class GatePolicyResolutionTest extends TestCase
     {
         $this->be(new AuthenticationTestUserWithPoliciesGroup());
 
-        Gate::usePoliciesGroup();
+        Gate::groupPoliciesByUser();
 
         $this->assertInstanceOf(
             Fixtures\Policies\AuthenticationTestUser\AuthenticationTestUserPolicy::class,
