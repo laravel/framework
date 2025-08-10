@@ -738,9 +738,9 @@ class Gate implements GateContract
         })->when(str_contains($classDirname, '\\Models\\'), function ($collection) use ($class, $classDirname) {
             return $collection->concat([str_replace('\\Models\\', '\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy'])
                 ->concat([str_replace('\\Models\\', '\\Models\\Policies\\', $classDirname).'\\'.class_basename($class).'Policy']);
-        })->when($this->getPoliciesGroup($class), function ($collection, $group) use ($classDirname) {
+        })->when($this->getPoliciesGroup($class), function ($collection, $group) {
             return $collection->concat(
-                $collection->map(function ($policy) use ($classDirname, $group) {
+                $collection->map(function ($policy) use ($group) {
                     return str_replace('\\Policies\\', '\\Policies\\' . $group . '\\', $policy);
                 })
             );
