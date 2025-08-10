@@ -1550,6 +1550,22 @@ class SupportStringableTest extends TestCase
         $this->assertSame('foobarbaz', (string) $this->stringable(base64_encode('foobarbaz'))->fromBase64());
     }
 
+    public function testToUrlSafeBase64()
+    {
+        $this->assertSame('Zm9v', (string) $this->stringable('foo')->toUrlSafeBase64()); // 'foo' is 'Zm9v' in base64
+        $this->assertSame('Zg', (string) $this->stringable('f')->toUrlSafeBase64()); // 'f' is 'Zg==' in base64
+        $this->assertSame('-g', (string) $this->stringable("\xfa")->toUrlSafeBase64()); // '\xfa' is '+g==' in base64
+        $this->assertSame('_w', (string) $this->stringable("\xff")->toUrlSafeBase64()); // '\xff' is '/w==' in base64
+    }
+
+    public function testFromUrlSafeBase64()
+    {
+        $this->assertSame('foo', (string) $this->stringable('Zm9v')->fromUrlSafeBase64()); // 'foo' is 'Zm9v' in base64
+        $this->assertSame('f', (string) $this->stringable('Zg')->fromUrlSafeBase64()); // 'f' is 'Zg==' in base64
+        $this->assertSame("\xfa", (string) $this->stringable('-g')->fromUrlSafeBase64()); // '\xfa' is '+g==' in base64
+        $this->assertSame("\xff", (string) $this->stringable('_w')->fromUrlSafeBase64()); // '\xff' is '/w==' in base64
+    }
+
     public function testHash()
     {
         $this->assertSame(hash('xxh3', 'foo'), (string) $this->stringable('foo')->hash('xxh3'));

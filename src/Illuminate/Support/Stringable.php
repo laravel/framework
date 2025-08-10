@@ -1386,6 +1386,27 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Convert the string to Base64 encoding.
+     *
+     * @return static
+     */
+    public function toUrlSafeBase64()
+    {
+        return new static(Str::toUrlSafeBase64($this->value));
+    }
+
+    /**
+     * Decode the Base64 encoded string.
+     *
+     * @param  bool  $strict
+     * @return static
+     */
+    public function fromUrlSafeBase64($strict = false)
+    {
+        return new static(Str::fromUrlSafeBase64($this->value, $strict));
+    }
+
+    /**
      * Hash the string using the given algorithm.
      *
      * @param  string  $algorithm
