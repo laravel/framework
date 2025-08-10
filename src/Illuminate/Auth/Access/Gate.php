@@ -752,7 +752,7 @@ class Gate implements GateContract
     /**
      * Groups guessed policies by an additional namespace based on the authenticatable user.
      *
-     * @param  bool $use
+     * @param  bool  $use
      * @return $this
      */
     public function groupPoliciesByUser($use = true)
