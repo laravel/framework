@@ -2119,4 +2119,15 @@ class Str
         static::$camelCache = [];
         static::$studlyCache = [];
     }
+    @param  string  $email
+     * @return bool
+     */
+    public static function isValidEmailUnicode($email)
+    {
+        return (bool) filter_var(
+            $email,
+            FILTER_VALIDATE_EMAIL,
+            FILTER_FLAG_EMAIL_UNICODE
+        );
+    }
 }
