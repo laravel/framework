@@ -86,7 +86,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         }
 
         // Next, we will attempt to guess the table name if this the migration has
-        // "create" or "drop" in the name. This will allow us to provide a convenient way
+        // "create" in the name. This will allow us to provide a convenient way
         // of creating migrations that create new tables for the application.
         if (! $table) {
             [$table, $create] = TableGuesser::guess($name);
