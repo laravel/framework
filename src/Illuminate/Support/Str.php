@@ -1832,7 +1832,7 @@ class Str
      */
     public static function toUrlSafeBase64($string): string
     {
-        return str_replace(["+", "/", "="], ["-", "_", ""], base64_encode($string));
+        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($string));
     }
 
     /**
@@ -1844,7 +1844,7 @@ class Str
      */
     public static function fromUrlSafeBase64($string, $strict = false)
     {
-        return base64_decode(str_replace(["-", "_"], ["+", "/"], $string), $strict);
+        return base64_decode(str_replace(['-', '_'], ['+', '/'], $string), $strict);
     }
 
     /**
