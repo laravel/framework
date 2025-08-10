@@ -1825,6 +1825,29 @@ class Str
     }
 
     /**
+     * Convert the given string to url safe Base64 encoding.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function toUrlSafeBase64($string): string
+    {
+        return str_replace(["+", "/", "="], ["-", "_", ""], base64_encode($string));
+    }
+
+    /**
+     * Decode the given url safe Base64 encoded string.
+     *
+     * @param  string  $string
+     * @param  bool  $strict
+     * @return string|false
+     */
+    public static function fromUrlSafeBase64($string, $strict = false)
+    {
+        return base64_decode(str_replace(["-", "_"], ["+", "/"], $string), $strict);
+    }
+
+    /**
      * Make a string's first character lowercase.
      *
      * @param  string  $string

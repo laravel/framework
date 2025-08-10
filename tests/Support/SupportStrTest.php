@@ -1788,6 +1788,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar', Str::fromBase64(base64_encode('foobar'), true));
     }
 
+    public function testToUrlSafeBase64()
+    {
+        $this->assertSame('Zm9v', Str::toUrlSafeBase64('foo')); // 'foo' is 'Zm9v' in base64
+        $this->assertSame('Zg', Str::toUrlSafeBase64('f')); // 'f' is 'Zg==' in base64
+        $this->assertSame('-g', Str::toUrlSafeBase64("\xfa")); // '\xfa' is '+g==' in base64
+        $this->assertSame('_w', Str::toUrlSafeBase64("\xff")); // '\xff' is '/w==' in base64
+    }
+
+    public function testFromUrlSafeBase64()
+    {
+        $this->assertSame('foo', Str::fromUrlSafeBase64('Zm9v')); // 'foo' is 'Zm9v' in base64
+        $this->assertSame('f', Str::fromUrlSafeBase64('Zg')); // 'f' is 'Zg==' in base64
+        $this->assertSame("\xfa", Str::fromUrlSafeBase64('-g')); // '\xfa' is '+g==' in base64
+        $this->assertSame("\xff", Str::fromUrlSafeBase64('_w')); // '\xff' is '/w==' in base64
+    }
+
     public function testChopStart()
     {
         foreach ([
