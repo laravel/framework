@@ -4,6 +4,7 @@ namespace Illuminate\Pagination;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use UnexpectedValueException;
 
 /** @implements Arrayable<array-key, mixed> */
@@ -104,7 +105,7 @@ class Cursor implements Arrayable
      */
     public function encode()
     {
-        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($this->toArray())));
+        return Str::toUrlSafeBase64(json_encode($this->toArray()));
     }
 
     /**
@@ -119,7 +120,7 @@ class Cursor implements Arrayable
             return null;
         }
 
-        $parameters = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $encodedString)), true);
+        $parameters = json_decode(Str::fromUrlSafeBase64($encodedString), true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return null;
