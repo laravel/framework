@@ -52,6 +52,7 @@
         "symfony/mailer": "^7.2.0",
         "symfony/mime": "^7.2.0",
         "symfony/polyfill-php83": "^1.31",
+        "symfony/polyfill-php84": "^1.31",
         "symfony/process": "^7.2.0",
         "symfony/routing": "^7.2.0",
         "symfony/uid": "^7.2.0",
