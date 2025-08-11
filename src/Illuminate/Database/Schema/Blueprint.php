@@ -1569,7 +1569,7 @@ class Blueprint
     public function uuidMorphs($name, $indexName = null, $after = null)
     {
         $this->string("{$name}_type")
-            ->after($after);   $this->after($after);
+            ->after($after);
 
         $this->uuid("{$name}_id")
             ->after(!is_null($after) ? "{$name}_type" : null);
