@@ -67,4 +67,33 @@ final class ScheduleTest extends TestCase
         self::assertSame(JobToTestWithSchedule::class, $scheduledJob->description);
         self::assertFalse($this->container->resolved(JobToTestWithSchedule::class));
     }
+
+    #[DataProvider('scheduledEventAppendsOutputToDefaultOutputProvider')]
+    public function testScheduledEventAppendsOutputToDefaultOutput(string $method, array $arguments): void
+    {
+        $schedule = new Schedule();
+
+        /** @var \Illuminate\Console\Scheduling\Event $oldEvent */
+        $oldEvent = call_user_func_array([$schedule, $method], $arguments);
+        $oldEventOutput = $oldEvent->output;
+
+        $schedule->setDefaultOutput($defaultOutput = '/custom/scheduler/output');
+
+        /** @var \Illuminate\Console\Scheduling\Event $newEvent */
+        $newEvent = call_user_func_array([$schedule, $method], $arguments);
+
+        self::assertSame($oldEventOutput, $oldEvent->output);
+        self::assertSame($defaultOutput, $newEvent->output);
+        self::assertTrue($newEvent->shouldAppendOutput);
+    }
+
+    public static function scheduledEventAppendsOutputToDefaultOutputProvider(): array
+    {
+        return [
+            ['job', [JobToTestWithSchedule::class]],
+            ['command', ['env']],
+            ['call', [fn () => 0]],
+            ['exec', ['whoami']],
+        ];
+    }
 }

@@ -102,6 +102,13 @@ class Schedule
     protected array $groupStack = [];
 
     /**
+     * The schedule default output.
+     *
+     * @var string|null
+     */
+    protected ?string $defaultOutput = null;
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
@@ -327,6 +334,8 @@ class Schedule
      */
     protected function mergePendingAttributes(Event $event)
     {
+        $this->mergeDefaultAttributes($event);
+
         if (isset($this->attributes)) {
             $this->attributes->mergeAttributes($event);
 
@@ -337,6 +346,13 @@ class Schedule
             $group = end($this->groupStack);
 
             $group->mergeAttributes($event);
+        }
+    }
+
+    protected function mergeDefaultAttributes(Event $event): void
+    {
+        if (! is_null($this->defaultOutput)) {
+            $event->appendOutputTo($this->defaultOutput);
         }
     }
 
@@ -460,6 +476,19 @@ class Schedule
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Specify the default output events should use from now on.
+     *
+     * @param  string|null  $output
+     * @return $this
+     */
+    public function setDefaultOutput(?string $output): Schedule
+    {
+        $this->defaultOutput = $output;
+
+        return $this;
     }
 
     /**
