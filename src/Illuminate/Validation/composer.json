@@ -26,7 +26,8 @@
         "illuminate/support": "^12.0",
         "illuminate/translation": "^12.0",
         "symfony/http-foundation": "^7.2",
-        "symfony/mime": "^7.2"
+        "symfony/mime": "^7.2",
+        "symfony/polyfill-php83": "^1.31"
     },
     "autoload": {
         "psr-4": {

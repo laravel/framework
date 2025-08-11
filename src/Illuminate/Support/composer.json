@@ -24,6 +24,7 @@
         "illuminate/contracts": "^12.0",
         "illuminate/macroable": "^12.0",
         "nesbot/carbon": "^3.8.4",
+        "symfony/polyfill-php83": "^1.31",
         "voku/portable-ascii": "^2.0.2"
     },
     "conflict": {
