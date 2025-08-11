@@ -875,6 +875,17 @@ class ContainerTest extends TestCase
         $container->make(ProdEnvOnlyInterface::class);
     }
 
+    public function testScopedSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(HasScope::class);
+        $new = $container->make(HasScope::class);
+
+        $this->assertSame($original, $new);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -1129,5 +1140,16 @@ class OriginalConcrete implements OverrideInterface
 }
 
 class AltConcrete implements OverrideInterface
+{
+}
+
+
+#[Bind(HasScopeConcrete::class)]
+#[Scoped]
+interface HasScope
+{
+}
+
+class HasScopeConcrete implements HasScope
 {
 }
