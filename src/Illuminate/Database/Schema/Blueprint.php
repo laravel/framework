@@ -1483,51 +1483,53 @@ class Blueprint
     /**
      * Add the proper columns for a polymorphic table.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function morphs($name, $indexName = null)
+    public function morphs($name, $indexName = null, $after = null)
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->uuidMorphs($name, $indexName);
+            $this->uuidMorphs($name, $indexName, $after);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->ulidMorphs($name, $indexName);
+            $this->ulidMorphs($name, $indexName, $after);
         } else {
-            $this->numericMorphs($name, $indexName);
+            $this->numericMorphs($name, $indexName, $after);
         }
     }
 
     /**
      * Add nullable columns for a polymorphic table.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function nullableMorphs($name, $indexName = null)
+    public function nullableMorphs($name, $indexName = null, $after = null)
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->nullableUuidMorphs($name, $indexName);
+            $this->nullableUuidMorphs($name, $indexName, $after);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->nullableUlidMorphs($name, $indexName);
+            $this->nullableUlidMorphs($name, $indexName, $after);
         } else {
-            $this->nullableNumericMorphs($name, $indexName);
+            $this->nullableNumericMorphs($name, $indexName, $after);
         }
     }
 
     /**
      * Add the proper columns for a polymorphic table using numeric IDs (incremental).
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function numericMorphs($name, $indexName = null)
+    public function numericMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);
 
-        $this->unsignedBigInteger("{$name}_id");
+        $this->unsignedBigInteger("{$name}_id")
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1535,15 +1537,19 @@ class Blueprint
     /**
      * Add nullable columns for a polymorphic table using numeric IDs (incremental).
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function nullableNumericMorphs($name, $indexName = null)
+    public function nullableNumericMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->unsignedBigInteger("{$name}_id")->nullable();
+        $this->unsignedBigInteger("{$name}_id")
+            ->nullable()
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1551,15 +1557,17 @@ class Blueprint
     /**
      * Add the proper columns for a polymorphic table using UUIDs.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function uuidMorphs($name, $indexName = null)
+    public function uuidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);   $this->after($after);
 
-        $this->uuid("{$name}_id");
+        $this->uuid("{$name}_id")
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1567,15 +1575,19 @@ class Blueprint
     /**
      * Add nullable columns for a polymorphic table using UUIDs.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function nullableUuidMorphs($name, $indexName = null)
+    public function nullableUuidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->uuid("{$name}_id")->nullable();
+        $this->uuid("{$name}_id")
+            ->nullable()
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1583,15 +1595,17 @@ class Blueprint
     /**
      * Add the proper columns for a polymorphic table using ULIDs.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function ulidMorphs($name, $indexName = null)
+    public function ulidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);
 
-        $this->ulid("{$name}_id");
+        $this->ulid("{$name}_id")
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1599,15 +1613,19 @@ class Blueprint
     /**
      * Add nullable columns for a polymorphic table using ULIDs.
      *
-     * @param  string  $name
-     * @param  string|null  $indexName
+     * @param string $name
+     * @param string|null $indexName
      * @return void
      */
-    public function nullableUlidMorphs($name, $indexName = null)
+    public function nullableUlidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->ulid("{$name}_id")->nullable();
+        $this->ulid("{$name}_id")
+            ->nullable()
+            ->after($after ?? "{$name}_type");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
