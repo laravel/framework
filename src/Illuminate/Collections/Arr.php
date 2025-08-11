@@ -263,13 +263,9 @@ class Arr
             return value($default);
         }
 
-        foreach ($array as $key => $value) {
-            if ($callback($value, $key)) {
-                return $value;
-            }
-        }
+        $key = array_find_key($array, $callback);
 
-        return value($default);
+        return $key !== null ? $array[$key] : value($default);
     }
 
     /**
