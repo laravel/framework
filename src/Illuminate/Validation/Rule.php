@@ -49,23 +49,23 @@ class Rule
     }
 
     /**
-     * Get an "active_url" rule builder instance.
+     * Get an "active_url" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\ActiveUrl
+     * @return string
      */
     public static function activeUrl()
     {
-        return new Rules\ActiveUrl;
+        return 'active_url';
     }
 
     /**
-     * Get an "accepted" rule builder instance.
+     * Get an "accepted" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Accepted
+     * @return string
      */
     public static function accepted()
     {
-        return new Rules\Accepted;
+        return 'accepted';
     }
 
     /**
@@ -91,13 +91,13 @@ class Rule
     }
 
     /**
-     * Get a "mac_address" rule builder instance.
+     * Get a "mac_address" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\MacAddress
+     * @return string
      */
     public static function macAddress()
     {
-        return new Rules\MacAddress;
+        return 'mac_address';
     }
 
     /**
@@ -121,23 +121,23 @@ class Rule
     }
 
     /**
-     * Get an "ascii" rule builder instance.
+     * Get an "ascii" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Ascii
+     * @return string
      */
     public static function ascii()
     {
-        return new Rules\Ascii;
+        return 'ascii';
     }
 
     /**
-     * Get a "boolean" rule builder instance.
+     * Get a "boolean" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Boolean
+     * @return string
      */
     public static function boolean()
     {
-        return new Rules\Boolean;
+        return 'boolean';
     }
 
     /**
@@ -165,13 +165,13 @@ class Rule
     }
 
     /**
-     * Get a "declined" rule builder instance.
+     * Get a "declined" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Declined
+     * @return string
      */
     public static function declined()
     {
-        return new Rules\Declined;
+        return 'declined';
     }
 
     /**
@@ -412,33 +412,33 @@ class Rule
     }
 
     /**
-     * Get a "json" rule builder instance.
+     * Get a "json" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Json
+     * @return string
      */
     public static function json()
     {
-        return new Rules\Json();
+        return 'json';
     }
 
     /**
-     * Get a "sometimes" rule builder instance.
+     * Get a "sometimes" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Sometimes
+     * @return string
      */
     public static function sometimes()
     {
-        return new Rules\Sometimes();
+        return 'sometimes';
     }
 
     /**
-     * Get a "nullable" rule builder instance.
+     * Get a "nullable" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Nullable
+     * @return string
      */
     public static function nullable()
     {
-        return new Rules\Nullable();
+        return 'nullable';
     }
 
     /**
@@ -579,93 +579,93 @@ class Rule
     }
 
     /**
-     * Get a "required" rule builder instance.
+     * Get a "required" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Required
+     * @return string
      */
     public static function required()
     {
-        return new Rules\Required;
+        return 'required';
     }
 
     /**
-     * Get a "prohibited" rule builder instance.
+     * Get a "prohibited" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Prohibited
+     * @return string
      */
     public static function prohibited()
     {
-        return new Rules\Prohibited;
+        return 'prohibited';
     }
 
     /**
-     * Get a "present" rule builder instance.
+     * Get a "present" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Present
+     * @return string
      */
     public static function present()
     {
-        return new Rules\Present;
+        return 'present';
     }
 
     /**
-     * Get a "exclude" rule builder instance.
+     * Get an "exclude" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Exclude
+     * @return string
      */
     public static function exclude()
     {
-        return new Rules\Exclude;
+        return 'exclude';
     }
 
     /**
-     * Get a "missing" rule builder instance.
+     * Get a "missing" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Missing
+     * @return string
      */
     public static function missing()
     {
-        return new Rules\Missing;
+        return 'missing';
     }
 
     /**
-     * Get a "list" rule builder instance.
+     * Get a "list" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\ListRule
+     * @return string
      */
     public static function list()
     {
-        return new Rules\ListRule;
+        return 'list';
     }
 
     /**
-     * Get a "bail" rule builder instance.
+     * Get a "bail" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Bail
+     * @return string
      */
     public static function bail()
     {
-        return new Rules\Bail;
+        return 'bail';
     }
 
     /**
-     * Get a "filled" rule builder instance.
+     * Get a "filled" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Filled
+     * @return string
      */
     public static function filled()
     {
-        return new Rules\Filled;
+        return 'filled';
     }
 
     /**
-     * Get an "integer" rule builder instance.
+     * Get an "integer" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Integer
+     * @return string
      */
     public static function integer()
     {
-        return new Rules\Integer;
+        return 'integer';
     }
 
     /**
@@ -866,33 +866,33 @@ class Rule
     }
 
     /**
-     * Get a "lowercase" rule builder instance.
+     * Get a "lowercase" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Lowercase
+     * @return string
      */
     public static function lowercase()
     {
-        return new Rules\Lowercase;
+        return 'lowercase';
     }
 
     /**
-     * Get a "uppercase" rule builder instance.
+     * Get an "uppercase" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Uppercase
+     * @return string
      */
     public static function uppercase()
     {
-        return new Rules\Uppercase;
+        return 'uppercase';
     }
 
     /**
-     * Get a "ulid" rule builder instance.
+     * Get a "ulid" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Ulid
+     * @return string
      */
     public static function ulid()
     {
-        return new Rules\Ulid;
+        return 'ulid';
     }
 
     /**
@@ -907,23 +907,23 @@ class Rule
     }
 
     /**
-     * Get a "string" rule builder instance.
+     * Get a "string" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\Str
+     * @return string
      */
     public static function string()
     {
-        return new Rules\Str;
+        return 'string';
     }
 
     /**
-     * Get a "hex_color" rule builder instance.
+     * Get a "hex_color" validation rule.
      *
-     * @return \Illuminate\Validation\Rules\HexColor
+     * @return string
      */
     public static function hexColor()
     {
-        return new Rules\HexColor;
+        return 'hex_color';
     }
 
     /**

@@ -30,7 +30,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testAsciiRule()
     {
-        $this->assertSame(Rule::ascii()->__toString(), 'ascii');
+        $this->assertSame(Rule::ascii(), 'ascii');
     }
 
     public function testConfirmedRule()
@@ -68,7 +68,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testActiveUrlRule()
     {
-        $this->assertSame(Rule::activeUrl()->__toString(), 'active_url');
+        $this->assertSame(Rule::activeUrl(), 'active_url');
     }
 
     public function testAcceptedIfRule()
@@ -81,7 +81,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testDeclinedRule()
     {
-        $this->assertSame(Rule::declined()->__toString(), 'declined');
+        $this->assertSame(Rule::declined(), 'declined');
     }
 
     public function testDoesntStartWithRule()
@@ -120,22 +120,22 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testJsonRule()
     {
-        $this->assertSame(Rule::json()->__toString(), 'json');
+        $this->assertSame(Rule::json(), 'json');
     }
 
     public function testLowercaseRule()
     {
-        $this->assertSame(Rule::lowercase()->__toString(), 'lowercase');
+        $this->assertSame(Rule::lowercase(), 'lowercase');
     }
 
     public function testUppercaseRule()
     {
-        $this->assertSame(Rule::uppercase()->__toString(), 'uppercase');
+        $this->assertSame(Rule::uppercase(), 'uppercase');
     }
 
     public function testUlidRule()
     {
-        $this->assertSame(Rule::ulid()->__toString(), 'ulid');
+        $this->assertSame(Rule::ulid(), 'ulid');
     }
 
     public function testEndsWithRule()
@@ -146,7 +146,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testHexColorRule()
     {
-        $this->assertSame(Rule::hexColor()->__toString(), 'hex_color');
+        $this->assertSame(Rule::hexColor(), 'hex_color');
     }
 
     public function testDeclinedIfRule()
@@ -159,32 +159,32 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testBooleanRule()
     {
-        $this->assertSame(Rule::boolean()->__toString(), 'boolean');
+        $this->assertSame(Rule::boolean(), 'boolean');
     }
 
     public function testStringRule()
     {
-        $this->assertSame(Rule::string()->__toString(), 'string');
+        $this->assertSame(Rule::string(), 'string');
     }
 
     public function testAcceptedRule()
     {
-        $this->assertSame(Rule::accepted()->__toString(), 'accepted');
+        $this->assertSame(Rule::accepted(), 'accepted');
     }
 
     public function testRequiredRule()
     {
-        $this->assertSame(Rule::required()->__toString(), 'required');
+        $this->assertSame(Rule::required(), 'required');
     }
 
     public function testIntegerRule()
     {
-        $this->assertSame(Rule::integer()->__toString(), 'integer');
+        $this->assertSame(Rule::integer(), 'integer');
     }
 
     public function testNullableRule()
     {
-        $this->assertSame(Rule::nullable()->__toString(), 'nullable');
+        $this->assertSame(Rule::nullable(), 'nullable');
     }
 
     public function testDecimalRule()
@@ -198,7 +198,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testSometimesRule()
     {
-        $this->assertSame(Rule::sometimes()->__toString(), 'sometimes');
+        $this->assertSame(Rule::sometimes(), 'sometimes');
     }
 
     public function testUrlRule()
@@ -209,7 +209,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testMacAddressRule()
     {
-        $this->assertSame(Rule::macAddress()->__toString(), 'mac_address');
+        $this->assertSame(Rule::macAddress(), 'mac_address');
     }
 
     public function testRegexRule()
@@ -327,27 +327,27 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testListRule()
     {
-        $this->assertSame(Rule::list()->__toString(), 'list');
+        $this->assertSame(Rule::list(), 'list');
     }
 
     public function testBailRule()
     {
-        $this->assertSame(Rule::bail()->__toString(), 'bail');
+        $this->assertSame(Rule::bail(), 'bail');
     }
 
     public function testPresentRule()
     {
-        $this->assertSame(Rule::present()->__toString(), 'present');
+        $this->assertSame(Rule::present(), 'present');
     }
 
     public function testProhibitedRule()
     {
-        $this->assertSame(Rule::prohibited()->__toString(), 'prohibited');
+        $this->assertSame(Rule::prohibited(), 'prohibited');
     }
 
     public function testFilledRule()
     {
-        $this->assertSame(Rule::filled()->__toString(), 'filled');
+        $this->assertSame(Rule::filled(), 'filled');
     }
 
     public function testDateEqualsRule()
@@ -369,7 +369,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testExcludeRule()
     {
-        $this->assertSame(Rule::exclude()->__toString(), 'exclude');
+        $this->assertSame(Rule::exclude(), 'exclude');
     }
 
     public function testMimeTypesRule()
@@ -402,7 +402,7 @@ class ValidationRuleBuilderMethodTest extends TestCase
 
     public function testMissingRule()
     {
-        $this->assertSame(Rule::missing()->__toString(), 'missing');
+        $this->assertSame(Rule::missing(), 'missing');
     }
 
     public function testProhibitsRule()
