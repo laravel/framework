@@ -1532,7 +1532,7 @@ class Blueprint
             ->after($after);
 
         $this->unsignedBigInteger("{$name}_id")
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1553,7 +1553,7 @@ class Blueprint
 
         $this->unsignedBigInteger("{$name}_id")
             ->nullable()
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1572,7 +1572,7 @@ class Blueprint
             ->after($after);   $this->after($after);
 
         $this->uuid("{$name}_id")
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1593,7 +1593,7 @@ class Blueprint
 
         $this->uuid("{$name}_id")
             ->nullable()
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1612,7 +1612,7 @@ class Blueprint
             ->after($after);
 
         $this->ulid("{$name}_id")
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1633,7 +1633,7 @@ class Blueprint
 
         $this->ulid("{$name}_id")
             ->nullable()
-            ->after($after ?? "{$name}_type");
+            ->after(!is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
