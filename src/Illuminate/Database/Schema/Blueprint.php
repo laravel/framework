@@ -1485,6 +1485,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function morphs($name, $indexName = null, $after = null)
@@ -1503,6 +1504,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function nullableMorphs($name, $indexName = null, $after = null)
@@ -1521,6 +1523,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function numericMorphs($name, $indexName = null, $after = null)
@@ -1539,6 +1542,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function nullableNumericMorphs($name, $indexName = null, $after = null)
@@ -1559,6 +1563,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function uuidMorphs($name, $indexName = null, $after = null)
@@ -1577,6 +1582,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function nullableUuidMorphs($name, $indexName = null, $after = null)
@@ -1597,6 +1603,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function ulidMorphs($name, $indexName = null, $after = null)
@@ -1615,6 +1622,7 @@ class Blueprint
      *
      * @param string $name
      * @param string|null $indexName
+     * @param string|null $after
      * @return void
      */
     public function nullableUlidMorphs($name, $indexName = null, $after = null)
