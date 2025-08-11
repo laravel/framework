@@ -267,7 +267,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @return bool
      */
-    public function isShared($abstract)
+        public function isShared($abstract)
     {
         if (isset($this->instances[$abstract])) {
             return true;
@@ -281,22 +281,38 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        $reflection = new ReflectionClass($abstract);
-
-        if (! empty($reflection->getAttributes(Singleton::class))) {
-            return true;
+        if ($scopedType = $this->getScopedTyped(new ReflectionClass($abstract)) === null) {
+            return false;
         }
 
-        if (! empty($reflection->getAttributes(Scoped::class))) {
+        if ($scopedType === 'scoped') {
             if (! in_array($abstract, $this->scopedInstances, true)) {
                 $this->scopedInstances[] = $abstract;
             }
-
-            return true;
         }
 
-        return false;
+        return true;
     }
+
+    /**
+     * Determine if a ReflectionClass has scoping attributes applied.
+     *
+     * @param  ReflectionClass<object>  $reflection
+     * @return "singleton"|"scoped"|null
+     */
+    protected function getScopedTyped(ReflectionClass $reflection): ?string
+    {
+        if (! empty($reflection->getAttributes(Singleton::class))) {
+            return 'singleton';
+        }
+
+        if (! empty($reflection->getAttributes(Scoped::class))) {
+            return 'scoped';
+        }
+
+        return null;
+    }
+
 
     /**
      * Determine if a given string is an alias.
