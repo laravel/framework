@@ -101,7 +101,7 @@ trait ManagesTransactions
         // If there was an exception we will rollback this transaction and then we
         // can check if we have exceeded the maximum attempt count for this and
         // if we haven't we will return and try this query again in our loop.
-        $this->rollBack();
+        $this->rollbackTransaction();
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
@@ -158,20 +158,6 @@ trait ManagesTransactions
     }
 
     /**
-     * Create a save point within the database.
-     *
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    protected function createSavepoint()
-    {
-        $this->getPdo()->exec(
-            $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
-        );
-    }
-
-    /**
      * Handle an exception from a transaction beginning.
      *
      * @param  \Throwable  $e
@@ -197,7 +183,7 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function commit()
+    public function commitTransaction()
     {
         if ($this->transactionLevel() == 1) {
             $this->fireConnectionEvent('committing');
@@ -214,6 +200,22 @@ trait ManagesTransactions
         );
 
         $this->fireConnectionEvent('committed');
+    }
+
+    /**
+     * Create a save point within the database.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    protected function createSavepoint()
+    {
+        // we do not use ManagesSavepoint::savepoint() here because this is an internally created savepoint
+        // used as part of nested transaction emulation and therefore not stored in the savepoints array
+        $this->getPdo()->exec(
+            $this->queryGrammar->compileSavepoint('trans'.($this->transactions + 1))
+        );
     }
 
     /**
@@ -249,7 +251,7 @@ trait ManagesTransactions
      *
      * @throws \Throwable
      */
-    public function rollBack($toLevel = null)
+    public function rollbackTransaction($toLevel = null)
     {
         // We allow developers to rollback to a certain transaction level. We will verify
         // that this given transaction level is valid before attempting to rollback to
@@ -298,7 +300,9 @@ trait ManagesTransactions
             }
         } elseif ($this->queryGrammar->supportsSavepoints()) {
             $this->getPdo()->exec(
-                $this->queryGrammar->compileSavepointRollBack('trans'.($toLevel + 1))
+                // we do not use ManagesSavepoints::rollbackToSavepoint() here because this is an internally created
+                // savepoint used as part of nested transaction emulation and therefore not stored in the savepoints array
+                $this->queryGrammar->compileRollbackToSavepoint('trans'.($toLevel + 1))
             );
         }
     }
