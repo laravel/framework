@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Aws\AwsClient;
 use Aws\DynamoDb\DynamoDbClient;
 use Illuminate\Cache\DynamoDbStore;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +21,7 @@ class CacheDynamoDbStoreTest extends TestCase
                 && $dynamo->args['TableName'] === $table
                 && $dynamo->args['Key']['key']['S'] === $key
                 && str_contains($dynamo->args['UpdateExpression'], 'SET')
-       );
+        );
 
         $this->assertTrue(
             $ttl === $dynamo->args['ExpressionAttributeValues'][':expiry']['N']
@@ -35,7 +34,9 @@ class TestDynamo extends DynamoDbClient
 {
     public array $args;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function updateItem(array $args): bool
     {

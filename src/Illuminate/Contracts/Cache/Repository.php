@@ -3,8 +3,6 @@
 namespace Illuminate\Contracts\Cache;
 
 use Closure;
-use DateInterval;
-use DateTimeInterface;
 use Psr\SimpleCache\CacheInterface;
 
 interface Repository extends CacheInterface

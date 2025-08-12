@@ -136,7 +136,7 @@ class CacheFileStoreTest extends TestCase
             ->method('put')
             ->with(
                 $this->equalTo($path),
-                $this->equalTo(($now->clone()->addSeconds($ttl)->getTimestamp()).serialize($content)),
+                $this->equalTo($now->clone()->addSeconds($ttl)->getTimestamp().serialize($content)),
                 $this->equalTo(true)
             )
             ->willReturn(1);

@@ -238,6 +238,7 @@ class CacheDatabaseStoreTest extends TestCase
 
         $this->assertTrue($store->touch('foo', $ttl));
     }
+
     public function testTouchExtendsTtlOnPostgres(): void
     {
         $ttl = 60;

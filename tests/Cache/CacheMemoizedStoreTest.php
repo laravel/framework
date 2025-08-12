@@ -3,12 +3,9 @@
 namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Cache\MemcachedStore;
 use Illuminate\Cache\MemoizedStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Support\Carbon;
-use Memcached;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheMemoizedStoreTest extends TestCase

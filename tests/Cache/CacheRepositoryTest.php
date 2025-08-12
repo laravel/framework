@@ -437,7 +437,7 @@ class CacheRepositoryTest extends TestCase
     {
         $key = 'key';
         $ttl = null;
-        
+
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('forever')->once()->with($key, 'bar')->andReturn(true);
@@ -448,7 +448,7 @@ class CacheRepositoryTest extends TestCase
     {
         $key = 'key';
         $ttl = 60;
-        
+
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->with($key)->andReturn('bar');
         $repo->getStore()->shouldReceive('touch')->once()->with($key, $ttl)->andReturn(true);
