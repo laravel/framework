@@ -875,6 +875,30 @@ class ContainerTest extends TestCase
         $container->make(ProdEnvOnlyInterface::class);
     }
 
+    public function testScopedSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsScoped::class);
+        $new = $container->make(IsScoped::class);
+
+        $this->assertSame($original, $new);
+        $container->forgetScopedInstances();
+        $this->assertNotSame($original, $container->make(IsScoped::class));
+    }
+
+    public function testSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsSingleton::class);
+        $new = $container->make(IsSingleton::class);
+
+        $this->assertSame($original, $new);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -1129,5 +1153,21 @@ class OriginalConcrete implements OverrideInterface
 }
 
 class AltConcrete implements OverrideInterface
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Scoped]
+interface IsScoped
+{
+}
+
+class IsScopedConcrete implements IsScoped
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Singleton]
+interface IsSingleton
 {
 }

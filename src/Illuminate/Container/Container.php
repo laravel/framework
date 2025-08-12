@@ -281,21 +281,36 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        $reflection = new ReflectionClass($abstract);
-
-        if (! empty($reflection->getAttributes(Singleton::class))) {
-            return true;
+        if (($scopedType = $this->getScopedTyped(new ReflectionClass($abstract))) === null) {
+            return false;
         }
 
-        if (! empty($reflection->getAttributes(Scoped::class))) {
+        if ($scopedType === 'scoped') {
             if (! in_array($abstract, $this->scopedInstances, true)) {
                 $this->scopedInstances[] = $abstract;
             }
-
-            return true;
         }
 
-        return false;
+        return true;
+    }
+
+    /**
+     * Determine if a ReflectionClass has scoping attributes applied.
+     *
+     * @param  ReflectionClass<object>  $reflection
+     * @return "singleton"|"scoped"|null
+     */
+    protected function getScopedTyped(ReflectionClass $reflection): ?string
+    {
+        if (! empty($reflection->getAttributes(Singleton::class))) {
+            return 'singleton';
+        }
+
+        if (! empty($reflection->getAttributes(Scoped::class))) {
+            return 'scoped';
+        }
+
+        return null;
     }
 
     /**
@@ -983,34 +998,34 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $attributes = [];
-
-        try {
-            $attributes = (new ReflectionClass($abstract))->getAttributes(Bind::class);
-        } catch (ReflectionException) {
-        }
-
-        $this->checkedForAttributeBindings[$abstract] = true;
-
-        if ($attributes === []) {
-            return $abstract;
-        }
-
-        return $this->getConcreteBindingFromAttributes($abstract, $attributes);
+        return $this->getConcreteBindingFromAttributes($abstract);
     }
 
     /**
      * Get the concrete binding for an abstract from the Bind attribute.
      *
      * @param  string  $abstract
-     * @param  array<int, \ReflectionAttribute<Bind>>  $reflectedAttributes
      * @return mixed
      */
-    protected function getConcreteBindingFromAttributes($abstract, $reflectedAttributes)
+    protected function getConcreteBindingFromAttributes($abstract)
     {
+        $this->checkedForAttributeBindings[$abstract] = true;
+
+        try {
+            $reflected = new ReflectionClass($abstract);
+        } catch (ReflectionException) {
+            return $abstract;
+        }
+
+        $bindAttributes = $reflected->getAttributes(Bind::class);
+
+        if ($bindAttributes === []) {
+            return $abstract;
+        }
+
         $concrete = $maybeConcrete = null;
 
-        foreach ($reflectedAttributes as $reflectedAttribute) {
+        foreach ($bindAttributes as $reflectedAttribute) {
             $instance = $reflectedAttribute->newInstance();
 
             if ($instance->environments === ['*']) {
@@ -1034,7 +1049,11 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $this->bind($abstract, $concrete);
+        match ($this->getScopedTyped($reflected)) {
+            'scoped' => $this->scoped($abstract, $concrete),
+            'singleton' => $this->singleton($abstract, $concrete),
+            null => $this->bind($abstract, $concrete),
+        };
 
         return $this->bindings[$abstract]['concrete'];
     }
