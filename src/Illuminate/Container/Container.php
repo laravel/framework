@@ -998,7 +998,6 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-
         return $this->getConcreteBindingFromAttributes($abstract, $reflected);
     }
 
@@ -1049,7 +1048,7 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        match($this->getScopedTyped($reflected)) {
+        match ($this->getScopedTyped($reflected)) {
             'scoped' => $this->scoped($abstract, $concrete),
             'singleton' => $this->singleton($abstract, $concrete),
             null => $this->bind($abstract, $concrete),

@@ -1156,7 +1156,6 @@ class AltConcrete implements OverrideInterface
 {
 }
 
-
 #[Bind(IsScopedConcrete::class)]
 #[Scoped]
 interface IsScoped
