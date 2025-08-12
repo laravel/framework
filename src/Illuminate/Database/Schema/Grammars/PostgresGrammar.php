@@ -323,7 +323,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @return string
+     * @return string[]
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
     {
@@ -333,12 +333,29 @@ class PostgresGrammar extends Grammar
             $uniqueStatement .= ' nulls '.($command->nullsNotDistinct ? 'not distinct' : 'distinct');
         }
 
-        $sql = sprintf('alter table %s add constraint %s %s (%s)',
-            $this->wrapTable($blueprint),
-            $this->wrap($command->index),
-            $uniqueStatement,
-            $this->columnize($command->columns)
-        );
+        if ($command->online || $command->algorithm) {
+            $createIndexSql = sprintf('create unique index %s%s on %s%s (%s)',
+                $command->online ? 'concurrently ' : '',
+                $this->wrap($command->index),
+                $this->wrapTable($blueprint),
+                $command->algorithm ? ' using '.$command->algorithm : '',
+                $this->columnize($command->columns)
+            );
+
+            $sql = sprintf('alter table %s add constraint %s unique using index %s',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->index),
+                $this->wrap($command->index)
+            );
+        } else {
+            $sql = sprintf(
+                'alter table %s add constraint %s %s (%s)',
+                $this->wrapTable($blueprint),
+                $this->wrap($command->index),
+                $uniqueStatement,
+                $this->columnize($command->columns)
+            );
+        }
 
         if (! is_null($command->deferrable)) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
@@ -348,7 +365,7 @@ class PostgresGrammar extends Grammar
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
-        return $sql;
+        return isset($createIndexSql) ? [$createIndexSql, $sql] : [$sql];
     }
 
     /**
@@ -360,7 +377,8 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('create index %s on %s%s (%s)',
+        return sprintf('create index %s%s on %s%s (%s)',
+            $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
@@ -385,7 +403,8 @@ class PostgresGrammar extends Grammar
             return "to_tsvector({$this->quoteString($language)}, {$this->wrap($column)})";
         }, $command->columns);
 
-        return sprintf('create index %s on %s using gin ((%s))',
+        return sprintf('create index %s%s on %s using gin ((%s))',
+            $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             implode(' || ', $columns)
@@ -421,7 +440,8 @@ class PostgresGrammar extends Grammar
     {
         $columns = $this->columnizeWithOperatorClass($command->columns, $command->operatorClass);
 
-        return sprintf('create index %s on %s%s (%s)',
+        return sprintf('create index %s%s on %s%s (%s)',
+            $command->online ? 'concurrently ' : '',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',

@@ -283,6 +283,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo") with (online = on)', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -291,6 +301,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index(['foo', 'bar'], 'baz')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "baz" on "users" ("foo", "bar") with (online = on)', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
