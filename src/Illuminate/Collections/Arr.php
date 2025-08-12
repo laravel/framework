@@ -557,13 +557,7 @@ class Arr
      */
     public static function every($array, callable $callback)
     {
-        foreach ($array as $key => $value) {
-            if (! $callback($value, $key)) {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($array, $callback);
     }
 
     /**
@@ -575,13 +569,7 @@ class Arr
      */
     public static function some($array, callable $callback)
     {
-        foreach ($array as $key => $value) {
-            if ($callback($value, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($array, $callback);
     }
 
     /**
