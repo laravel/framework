@@ -974,6 +974,22 @@ class Arr
     }
 
     /**
+     * Push an item into an array using "dot" notation.
+     *
+     * @param  ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $value
+     * @return array
+     */
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed $value): array
+    {
+        $target = static::array($array, $key, []);
+        $target[] = $value;
+
+        return static::set($array, $key, $target);
+    }
+
+    /**
      * Shuffle the given array and return the result.
      *
      * @param  array  $array
