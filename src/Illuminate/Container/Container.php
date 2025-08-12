@@ -131,6 +131,11 @@ class Container implements ArrayAccess, ContainerContract
     protected $checkedForAttributeBindings = [];
 
     /**
+     * @var array<class-string, "scoped"|"singleton"|null>
+     */
+    protected $checkedForContainerBindings = [];
+
+    /**
      * All of the registered rebound callbacks.
      *
      * @var array[]
@@ -281,7 +286,7 @@ class Container implements ArrayAccess, ContainerContract
             return false;
         }
 
-        if (($scopedType = $this->getScopedTyped(new ReflectionClass($abstract))) === null) {
+        if (($scopedType = $this->getScopedTyped($abstract)) === null) {
             return false;
         }
 
@@ -297,20 +302,31 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Determine if a ReflectionClass has scoping attributes applied.
      *
-     * @param  ReflectionClass<object>  $reflection
+     * @param  ReflectionClass<object>|class-string  $reflection
      * @return "singleton"|"scoped"|null
      */
-    protected function getScopedTyped(ReflectionClass $reflection): ?string
+    protected function getScopedTyped(ReflectionClass|string $reflection): ?string
     {
+        $className = $reflection instanceof ReflectionClass
+            ? $reflection->getName()
+            : $reflection;
+
+        if (($cached = ($this->checkedForContainerBindings[$className] ?? false)) !== false) {
+            return $cached;
+        }
+
+        $reflection = $reflection instanceof ReflectionClass
+            ? $reflection
+            : new ReflectionClass($reflection);
+
+        $type = null;
         if (! empty($reflection->getAttributes(Singleton::class))) {
-            return 'singleton';
+            $type = 'singleton';
+        } elseif (! empty($reflection->getAttributes(Scoped::class))) {
+            $type = 'scoped';
         }
 
-        if (! empty($reflection->getAttributes(Scoped::class))) {
-            return 'scoped';
-        }
-
-        return null;
+        return $this->checkedForContainerBindings[$className] = $type;
     }
 
     /**
