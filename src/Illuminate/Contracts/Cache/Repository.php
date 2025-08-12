@@ -91,11 +91,6 @@ interface Repository extends CacheInterface
     public function sear($key, Closure $callback);
 
     /**
-     * Set the expiration of a cached item; null TTL will retain indefinitely.
-     */
-    public function touch(string $key, DateTimeInterface|DateInterval|int|null $ttl = null): bool;
-
-    /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
      *
      * @template TCacheValue
@@ -105,6 +100,15 @@ interface Repository extends CacheInterface
      * @return TCacheValue
      */
     public function rememberForever($key, Closure $callback);
+
+    /**
+     * Set the expiration of a cached item; null TTL will retain indefinitely.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
+     */
+    public function touch($key, $ttl = null);
 
     /**
      * Remove an item from the cache.

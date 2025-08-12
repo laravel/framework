@@ -196,6 +196,20 @@ class MemoizedStore implements LockProvider, Store
     }
 
     /**
+     * Set the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        unset($this->cache[$this->prefix($key)]);
+
+        return $this->repository->touch($key, $seconds);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -206,16 +220,6 @@ class MemoizedStore implements LockProvider, Store
         unset($this->cache[$this->prefix($key)]);
 
         return $this->repository->forget($key);
-    }
-
-    /**
-     * Set the expiration time of a cached item.
-     */
-    public function touch(string $key, int $ttl): bool
-    {
-        unset($this->cache[$this->prefix($key)]);
-        
-        return $this->repository->touch($key, $ttl);
     }
 
     /**

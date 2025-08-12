@@ -133,8 +133,12 @@ class ArrayStore extends TaggableStore implements LockProvider
 
     /**
      * Set the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
      */
-    public function touch(string $key, int $ttl): bool
+    public function touch($key, $seconds)
     {
         $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
 
@@ -142,7 +146,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             return false;
         }
 
-        $item['expiresAt'] = $this->calculateExpiration($ttl);
+        $item['expiresAt'] = $this->calculateExpiration($seconds);
 
         $this->storage = array_merge($this->storage, [$key => $item]);
 

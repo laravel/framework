@@ -93,6 +93,24 @@ class ApcStore extends TaggableStore
     }
 
     /**
+     * Set the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $value = $this->apc->get($key = $this->getPrefix().$key);
+
+        if (is_null($value)) {
+            return false;
+        }
+
+        return $this->apc->put($key, $value, $seconds);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -101,20 +119,6 @@ class ApcStore extends TaggableStore
     public function forget($key)
     {
         return $this->apc->delete($this->prefix.$key);
-    }
-
-    /**
-     * Set the expiration time of a cached item.
-     */
-    public function touch(string $key, int $ttl): bool
-    {
-        $value = $this->apc->get($key = $this->getPrefix().$key);
-
-        if (is_null($value)) {
-            return false;
-        }
-
-        return $this->apc->put($key, $value, $ttl);
     }
 
     /**

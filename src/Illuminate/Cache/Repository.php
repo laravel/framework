@@ -527,8 +527,12 @@ class Repository implements ArrayAccess, CacheContract
 
     /**
      * Set the expiration of a cached item; null TTL will retain indefinitely.
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @return bool
      */
-    public function touch(string $key, \DateTimeInterface|\DateInterval|int|null $ttl = null): bool
+    public function touch($key, $ttl = null)
     {
         $value = $this->get($key);
 

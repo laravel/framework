@@ -69,6 +69,15 @@ interface Store
     public function forever($key, $value);
 
     /**
+     * Set the expiration of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds);
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -82,11 +91,6 @@ interface Store
      * @return bool
      */
     public function flush();
-
-    /**
-     * Set the expiration of a cached item.
-     */
-    public function touch(string $key, int $ttl): bool;
 
     /**
      * Get the cache key prefix.

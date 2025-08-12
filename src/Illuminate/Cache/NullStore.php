@@ -96,7 +96,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Set the expiration time of a cached item.
      */
-    public function touch(string $key, int $ttl): bool
+    public function touch($key, $seconds)
     {
         return false;
     }
