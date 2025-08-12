@@ -141,6 +141,5 @@ class ResendTransport extends AbstractTransport
     {
         return 'resend';
     }
-}
    }
 }
