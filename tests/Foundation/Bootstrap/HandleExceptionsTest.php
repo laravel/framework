@@ -38,7 +38,7 @@ class HandleExceptionsTest extends TestCase
     protected function tearDown(): void
     {
         Application::setInstance(null);
-        HandleExceptions::flushState();
+        HandleExceptions::flushState($this);
 
         m::close();
     }
