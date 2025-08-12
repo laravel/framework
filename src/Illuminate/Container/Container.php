@@ -1017,7 +1017,7 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        $bindAttributes = $reflected->getAttributes(Bind::class) ?? [];
+        $bindAttributes = $reflected->getAttributes(Bind::class);
         if ($bindAttributes === []) {
             return $abstract;
         }
