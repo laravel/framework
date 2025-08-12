@@ -1,6 +1,28 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.22.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.23.0...12.x)
+
+## [v12.23.0](https://github.com/laravel/framework/compare/v12.22.1...v12.23.0) - 2025-08-12
+
+* [12.x] Prevent unintended sleep on early failure of assertSequence by [@xHeaven](https://github.com/xHeaven) in https://github.com/laravel/framework/pull/56583
+* [12.x] Redis cluster broadcaster by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/56581
+* [12.x] Alias Benchmark class by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/56594
+* [12.x] Add support for drop patterns to the `make:migration` command's `TableGuesser`. by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56608
+* [12.x] Improve collection return types by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/56599
+* [12.x] Fix collection typo by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/56597
+* Fix return type docblock for resetAttempts method in RateLimiter by [@jonagoldman](https://github.com/jonagoldman) in https://github.com/laravel/framework/pull/56596
+* Add 'page' field to paginator links by [@compico](https://github.com/compico) in https://github.com/laravel/framework/pull/56603
+* [12.x] Add support for inline attachments in Resend transport by [@jayanratna](https://github.com/jayanratna) in https://github.com/laravel/framework/pull/56598
+* Fix test failures in PHPUnit 12.3.2 by [@KentarouTakeda](https://github.com/KentarouTakeda) in https://github.com/laravel/framework/pull/56610
+* [12.x] Use new error and exception handler getters by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56623
+* [12.x] Use PHP 8.4 array helpers by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56619
+* [12.x] Prefer Symfony PHP polyfills over `function_exists` calls by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56621
+* [12.x] `Bind` attribute accepts UnitEnum by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56616
+* [12.x] Add Vitess-specific safe to retry errors by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56615
+* [12.x] Handle null as a falsy condition by [@negoziator](https://github.com/negoziator) in https://github.com/laravel/framework/pull/56612
+* Added "after" support for morphs and nullableMorphs Blueprint by [@marcogermani87](https://github.com/marcogermani87) in https://github.com/laravel/framework/pull/56613
+* [12.x] Fix usage of `Scoped` and `Singleton` on interfaces by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56620
+* [12.x] Online (concurrently) index creation for PostgreSQL and SqlServer by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/56625
 
 ## [v12.22.1](https://github.com/laravel/framework/compare/v12.21.0...v12.22.1) - 2025-08-08
 
