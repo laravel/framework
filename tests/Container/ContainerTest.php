@@ -880,8 +880,21 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->resolveEnvironmentUsing(fn ($environments) => true);
 
-        $original = $container->make(HasScope::class);
-        $new = $container->make(HasScope::class);
+        $original = $container->make(IsScoped::class);
+        $new = $container->make(IsScoped::class);
+
+        $this->assertSame($original, $new);
+        $container->forgetScopedInstances();
+        $this->assertNotSame($original, $container->make(IsScoped::class));
+    }
+
+    public function testSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsSingleton::class);
+        $new = $container->make(IsSingleton::class);
 
         $this->assertSame($original, $new);
     }
@@ -1144,12 +1157,18 @@ class AltConcrete implements OverrideInterface
 }
 
 
-#[Bind(HasScopeConcrete::class)]
+#[Bind(IsScopedConcrete::class)]
 #[Scoped]
-interface HasScope
+interface IsScoped
 {
 }
 
-class HasScopeConcrete implements HasScope
+class IsScopedConcrete implements IsScoped
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Singleton]
+interface IsSingleton
 {
 }
