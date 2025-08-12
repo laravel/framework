@@ -43,8 +43,8 @@ assertType('Illuminate\Support\HigherOrderTapProxy', tap(new User()));
 
 function testThrowIf(float|int $foo, ?DateTime $bar = null): void
 {
-    assertType('never', throw_if(true, Exception::class));
-    assertType('false', throw_if(false, Exception::class));
+    rescue(fn () => assertType('never', throw_if(true, Exception::class)));
+    assertType('false', throw_if(false, Exception::class)); // @phpstan-ignore deadCode.unreachable
     assertType('false', throw_if(empty($foo)));
     throw_if(is_float($foo));
     assertType('int', $foo);
@@ -62,8 +62,8 @@ function testThrowIf(float|int $foo, ?DateTime $bar = null): void
 function testThrowUnless(float|int $foo, ?DateTime $bar = null): void
 {
     assertType('true', throw_unless(true, Exception::class));
-    assertType('never', throw_unless(false, Exception::class));
-    assertType('true', throw_unless(empty($foo)));
+    rescue(fn () => assertType('never', throw_unless(false, Exception::class)));
+    assertType('true', throw_unless(empty($foo))); // @phpstan-ignore deadCode.unreachable
     throw_unless(is_int($foo));
     assertType('int', $foo);
     throw_unless($foo == false);
