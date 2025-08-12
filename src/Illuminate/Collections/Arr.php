@@ -978,13 +978,13 @@ class Arr
      *
      * @param  ArrayAccess|array  $array
      * @param  string|int|null  $key
-     * @param  mixed  $value
+     * @param  mixed  $values
      * @return array
      */
-    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed $value): array
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
         $target = static::array($array, $key, []);
-        $target[] = $value;
+        array_push($target, ...$values);
 
         return static::set($array, $key, $target);
     }

@@ -77,19 +77,16 @@ class SupportArrTest extends TestCase
         Arr::push($array, 'office.furniture', 'Desk');
         $this->assertEquals(['Desk'], $array['office']['furniture']);
 
-        Arr::push($array, 'office.furniture', 'Chair');
-        $this->assertEquals(['Desk', 'Chair'], $array['office']['furniture']);
-
-        Arr::push($array, 'office.furniture', 'Lamp');
+        Arr::push($array, 'office.furniture', 'Chair', 'Lamp');
         $this->assertEquals(['Desk', 'Chair', 'Lamp'], $array['office']['furniture']);
 
         $array = [];
 
-        Arr::push($array, null, 'Chris');
-        $this->assertEquals(['Chris'], $array);
-
-        Arr::push($array, null, 'Nuno');
+        Arr::push($array, null, 'Chris', 'Nuno');
         $this->assertEquals(['Chris', 'Nuno'], $array);
+
+        Arr::push($array, null, 'Taylor');
+        $this->assertEquals(['Chris', 'Nuno', 'Taylor'], $array);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Array value for key [foo.bar] must be an array, boolean found.');
