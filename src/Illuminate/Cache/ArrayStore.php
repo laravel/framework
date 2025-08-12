@@ -132,7 +132,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Set the expiration time of a cached item.
+     * Adjust the expiration time of a cached item.
      *
      * @param  string  $key
      * @param  int  $seconds

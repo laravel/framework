@@ -102,7 +102,7 @@ interface Repository extends CacheInterface
     public function rememberForever($key, Closure $callback);
 
     /**
-     * Set the expiration of a cached item; null TTL will retain indefinitely.
+     * Set the expiration of a cached item; null TTL will retain the item forever.
      *
      * @param  string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
