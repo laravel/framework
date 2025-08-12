@@ -353,6 +353,21 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        return (bool) $this->table()
+            ->where('key', '=', $this->getPrefix().$key)
+            ->where('expiration', '>', $now = $this->getTime())
+            ->update(['expiration' => $now + $seconds]);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
