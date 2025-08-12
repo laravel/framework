@@ -306,7 +306,7 @@ class HandleExceptions
     /**
      * Flush the bootstrapper's global state.
      *
-     * @param \PHPUnit\Framework\TestCase|null  $testCase
+     * @param  \PHPUnit\Framework\TestCase|null  $testCase
      * @return void
      */
     public static function flushState(?TestCase $testCase = null)
@@ -325,7 +325,7 @@ class HandleExceptions
     /**
      * Flush the bootstrapper's global handlers state.
      *
-     * @param \PHPUnit\Framework\TestCase|null  $testCase
+     * @param  \PHPUnit\Framework\TestCase|null  $testCase
      * @return void
      */
     public static function flushHandlersState(?TestCase $testCase = null)
