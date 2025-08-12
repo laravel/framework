@@ -998,7 +998,7 @@ class Container implements ArrayAccess, ContainerContract
             return $abstract;
         }
 
-        return $this->getConcreteBindingFromAttributes($abstract, $reflected);
+        return $this->getConcreteBindingFromAttributes($abstract);
     }
 
     /**
