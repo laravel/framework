@@ -341,6 +341,7 @@ class PostgresGrammar extends Grammar
                 $command->algorithm ? ' using '.$command->algorithm : '',
                 $this->columnize($command->columns)
             );
+
             $sql = sprintf('alter table %s add constraint %s unique using index %s',
                 $this->wrapTable($blueprint),
                 $this->wrap($command->index),
