@@ -15,6 +15,14 @@ interface RouteCollectionInterface
     public function add(Route $route);
 
     /**
+     * Remove a Route instance from the collection.
+     *
+     * @param  \Illuminate\Routing\Route  $route
+     * @return void
+     */
+    public function remove(Route $route);
+
+    /**
      * Refresh the name look-up table.
      *
      * This is done in case any names are fluently defined or if routes are overwritten.
