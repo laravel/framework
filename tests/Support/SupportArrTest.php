@@ -1036,6 +1036,39 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testReduce()
+    {
+        $array = [1, 2, 3, 4];
+        $result = Arr::reduce($array, fn($carry, $item) => $carry + $item, 0);
+        $this->assertEquals(10, $result);
+
+        $array = ['apple', 'banana', 'apple'];
+        $result = Arr::reduce($array, function ($carry, $item) {
+            $carry[$item] = ($carry[$item] ?? 0) + 1;
+            return $carry;
+        }, []);
+        $this->assertEquals(['apple' => 2, 'banana' => 1], $result);
+
+        $array = ['a', 'b', 'c'];
+        $result = Arr::reduce($array, fn($carry, $item) => $carry . $item, '');
+        $this->assertEquals('abc', $result);
+
+        $array = ['a' => 10, 'b' => 20];
+        $result = Arr::reduce($array, function ($carry, $item, $key) {
+            $carry[$key] = $item * 2;
+            return $carry;
+        }, []);
+        $this->assertEquals(['a' => 20, 'b' => 40], $result);
+
+        $array = [];
+        $result = Arr::reduce($array, fn($carry, $item) => $carry + $item, 5);
+        $this->assertEquals(5, $result);
+        
+        $array = [];
+        $result = Arr::reduce($array, fn($carry, $item) => $carry + $item);
+        $this->assertNull($result);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');

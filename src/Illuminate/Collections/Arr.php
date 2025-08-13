@@ -828,6 +828,30 @@ class Arr
     }
 
     /**
+     * Reduce the items to a single value.
+     *
+     * @template TKey
+     * @template TValue
+     * @template TCarry
+     *
+     * @param  array<TKey, TValue>  $array
+     * @param  callable(TCarry, TValue, TKey): TCarry  $callback
+     * @param  TCarry  $initial
+     * @return TCarry
+     */
+    public static function reduce(array $array, callable $callback, mixed $initial = null)
+    {
+        $carry = $initial;
+
+        foreach ($array as $key => $value) {
+            $carry = $callback($carry, $value, $key);
+        }
+
+        return $carry;
+    }
+
+
+    /**
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
