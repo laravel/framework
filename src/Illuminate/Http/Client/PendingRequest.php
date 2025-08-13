@@ -1511,7 +1511,7 @@ class PendingRequest
     /**
      * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
      *
-     * @param  array<int, string>  $urls
+     * @param  array<int, string>  $only
      * @return $this
      */
     public function allowStrayRequests(array $only)
