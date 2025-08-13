@@ -311,13 +311,17 @@ class Container implements ArrayAccess, ContainerContract
             ? $reflection->getName()
             : $reflection;
 
-        if (($cached = ($this->checkedForContainerBindings[$className] ?? false)) !== false) {
-            return $cached;
+        if (array_key_exists($className, $this->checkedForContainerBindings)) {
+            return $this->checkedForContainerBindings[$className];
         }
 
-        $reflection = $reflection instanceof ReflectionClass
-            ? $reflection
-            : new ReflectionClass($reflection);
+        try {
+            $reflection = $reflection instanceof ReflectionClass
+                ? $reflection
+                : new ReflectionClass($reflection);
+        } catch (ReflectionException) {
+            return $this->checkedForContainerBindings[$className] = null;
+        }
 
         $type = null;
         if (! empty($reflection->getAttributes(Singleton::class))) {
