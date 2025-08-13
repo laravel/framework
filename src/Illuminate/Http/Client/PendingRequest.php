@@ -1509,24 +1509,20 @@ class PendingRequest
     }
 
     /**
-     * Allow stray (unfaked) requests entirely, or (optionally) allow only specific URLs.
-     *
-     * Passing no argument keeps the current behavior and disables the guard.
-     * Passing a non-empty array keeps the guard enabled but allows matching URLs to pass through.
+     * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
      *
      * @param  array<int, string>  $urls
      * @return $this
      */
-    public function allowStrayRequests(array $urls)
+    public function allowStrayRequests(array $only)
     {
-        // Guard stays enabled, but whitelisted URLs are permitted.
-        $this->allowedStrayRequestUrls = array_values($urls);
+        $this->allowedStrayRequestUrls = array_values($only);
 
         return $this;
     }
 
     /**
-     * Determine if the given URL is whitelisted for stray requests.
+     * Determine if the given URL is allowed as a stray request.
      *
      * @param  string  $url
      * @return bool

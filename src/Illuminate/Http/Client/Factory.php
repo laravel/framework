@@ -340,25 +340,20 @@ class Factory
     }
 
     /**
-     * Allow stray (unfaked) requests entirely, or (optionally) allow only specific URLs.
+     * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
      *
-     * Passing no argument keeps the current behavior and disables the guard.
-     * Passing a non-empty array keeps the guard enabled but allows matching URLs to pass through.
-     *
-     * @param  array<int, string>|null  $urls
+     * @param  array<int, string>|null  $only
      * @return $this
      */
-    public function allowStrayRequests(?array $urls = null)
+    public function allowStrayRequests(?array $only = null)
     {
-        if (is_null($urls)) {
-            // Backwards-compatible: fully allow stray requests.
-            $this->preventStrayRequests = false;
+        if (is_null($only)) {
+            $this->preventStrayRequests(false);
+
             $this->allowedStrayRequestUrls = [];
-
-            return $this;
+        } else {
+            $this->allowedStrayRequestUrls = array_values($only);
         }
-
-        $this->allowedStrayRequestUrls = array_values($urls);
 
         return $this;
     }
@@ -507,7 +502,10 @@ class Factory
     public function createPendingRequest()
     {
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests)->allowStrayRequests($this->allowedStrayRequestUrls);
+            $request
+                ->stub($this->stubCallbacks)
+                ->preventStrayRequests($this->preventStrayRequests)
+                ->allowStrayRequests($this->allowedStrayRequestUrls);
         });
     }
 
