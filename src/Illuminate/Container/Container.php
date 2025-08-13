@@ -1769,6 +1769,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->abstractAliases = [];
         $this->scopedInstances = [];
         $this->checkedForAttributeBindings = [];
+        $this->checkedForContainerBindings = [];
     }
 
     /**
