@@ -326,6 +326,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         $type = null;
+
         if (! empty($reflection->getAttributes(Singleton::class))) {
             $type = 'singleton';
         } elseif (! empty($reflection->getAttributes(Scoped::class))) {
