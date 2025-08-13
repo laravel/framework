@@ -1,6 +1,16 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.23.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.24.0...12.x)
+
+## [v12.24.0](https://github.com/laravel/framework/compare/v12.23.1...v12.24.0) - 2025-08-13
+
+* [8.4] Use PHP 8.4 array helpers in Arr utils by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56631
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56635
+* [12.x] Update `orchestra/testbench-core` deps by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56637
+* refactor: update cid param name by [@cpenned](https://github.com/cpenned) in https://github.com/laravel/framework/pull/56634
+* [12.x] Cache Singleton/Scoped attribute checks by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56633
+* [12.x] Add `Arr::push()` by [@inxilpro](https://github.com/inxilpro) in https://github.com/laravel/framework/pull/56632
+* [12.x] Add error message for `doesnt_contain` rule by [@apih](https://github.com/apih) in https://github.com/laravel/framework/pull/56644
 
 ## [v12.23.1](https://github.com/laravel/framework/compare/v12.23.0...v12.23.1) - 2025-08-12
 
