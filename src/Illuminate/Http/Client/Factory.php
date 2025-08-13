@@ -352,13 +352,12 @@ class Factory
     {
         if (is_null($urls)) {
             // Backwards-compatible: fully allow stray requests.
-            $this->preventingStrayRequests = false;
+            $this->preventStrayRequests = false;
             $this->allowedStrayRequestUrls = [];
 
             return $this;
         }
 
-        // Guard stays enabled, but whitelisted URLs are permitted.
         $this->allowedStrayRequestUrls = array_values($urls);
 
         return $this;
