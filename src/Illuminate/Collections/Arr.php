@@ -976,7 +976,7 @@ class Arr
     /**
      * Push an item into an array using "dot" notation.
      *
-     * @param  ArrayAccess|array  $array
+     * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $values
      * @return array
@@ -984,6 +984,7 @@ class Arr
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
         $target = static::array($array, $key, []);
+
         array_push($target, ...$values);
 
         return static::set($array, $key, $target);
