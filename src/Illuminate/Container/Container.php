@@ -135,7 +135,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @var array<class-string, "scoped"|"singleton"|null>
      */
-    protected $checkedForSingleOrScopedAttributes = [];
+    protected $checkedForSingletonOrScopedAttributes = [];
 
     /**
      * All of the registered rebound callbacks.
@@ -313,8 +313,8 @@ class Container implements ArrayAccess, ContainerContract
             ? $reflection->getName()
             : $reflection;
 
-        if (array_key_exists($className, $this->checkedForSingleOrScopedAttributes)) {
-            return $this->checkedForSingleOrScopedAttributes[$className];
+        if (array_key_exists($className, $this->checkedForSingletonOrScopedAttributes)) {
+            return $this->checkedForSingletonOrScopedAttributes[$className];
         }
 
         try {
@@ -322,7 +322,7 @@ class Container implements ArrayAccess, ContainerContract
                 ? $reflection
                 : new ReflectionClass($reflection);
         } catch (ReflectionException) {
-            return $this->checkedForSingleOrScopedAttributes[$className] = null;
+            return $this->checkedForSingletonOrScopedAttributes[$className] = null;
         }
 
         $type = null;
@@ -332,7 +332,7 @@ class Container implements ArrayAccess, ContainerContract
             $type = 'scoped';
         }
 
-        return $this->checkedForSingleOrScopedAttributes[$className] = $type;
+        return $this->checkedForSingletonOrScopedAttributes[$className] = $type;
     }
 
     /**
@@ -1775,7 +1775,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->abstractAliases = [];
         $this->scopedInstances = [];
         $this->checkedForAttributeBindings = [];
-        $this->checkedForSingleOrScopedAttributes = [];
+        $this->checkedForSingletonOrScopedAttributes = [];
     }
 
     /**
