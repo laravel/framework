@@ -173,6 +173,13 @@ class PendingRequest
     protected $preventStrayRequests = false;
 
     /**
+     * A list of URL patterns that are allowed to bypass the stray request guard.
+     *
+     * @var array<int, string>
+     */
+    protected $allowedStrayRequestUrls = [];
+
+    /**
      * The middleware callables added by users that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -1376,7 +1383,7 @@ class PendingRequest
                     ->first();
 
                 if (is_null($response)) {
-                    if ($this->preventStrayRequests) {
+                    if (! $this->isAllowedRequestUrl((string) $request->getUri())) {
                         throw new StrayRequestException((string) $request->getUri());
                     }
 
@@ -1499,6 +1506,44 @@ class PendingRequest
         $this->preventStrayRequests = $prevent;
 
         return $this;
+    }
+
+    /**
+     * Allow stray (unfaked) requests entirely, or (optionally) allow only specific URLs.
+     *
+     * Passing no argument keeps the current behavior and disables the guard.
+     * Passing a non-empty array keeps the guard enabled but allows matching URLs to pass through.
+     *
+     * @param  array<int, string>  $urls
+     * @return $this
+     */
+    public function allowStrayRequests(array $urls)
+    {
+        // Guard stays enabled, but whitelisted URLs are permitted.
+        $this->allowedStrayRequestUrls = array_values($urls);
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given URL is whitelisted for stray requests.
+     *
+     * @param  string  $url
+     * @return bool
+     */
+    public function isAllowedRequestUrl($url)
+    {
+        if (! $this->preventStrayRequests) {
+            return true;
+        }
+
+        foreach ($this->allowedStrayRequestUrls as $pattern) {
+            if (Str::is($pattern, $url)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
