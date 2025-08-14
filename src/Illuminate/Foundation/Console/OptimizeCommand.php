@@ -44,6 +44,14 @@ class OptimizeCommand extends Command
             ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
             ->toArray();
 
+        if ($this->option('list')) {
+            foreach($tasks as $description => $command) {
+                $this->components->twoColumnDetail($description, $command);
+            }
+
+            return;
+        }
+
         foreach ($tasks as $description => $command) {
             $this->components->task($description, fn () => $this->callSilently($command) == 0);
         }
@@ -76,6 +84,7 @@ class OptimizeCommand extends Command
     {
         return [
             ['except', 'e', InputOption::VALUE_OPTIONAL, 'Do not run the commands matching the key or name'],
+            ['list', 'l', InputOption::VALUE_NONE, 'List all optimizations to run'],
         ];
     }
 }
