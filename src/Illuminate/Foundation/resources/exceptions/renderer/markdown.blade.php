@@ -31,10 +31,12 @@ No header data available.
 No routing data available.
 @endforelse
 
-@if ($routeParametersContext = $exception->applicationRouteParametersContext())
-## Routing Parameters:
+## Route Parameters
 
+@if ($routeParametersContext = $exception->applicationRouteParametersContext())
 {!! $routeParametersContext !!}
+@else
+No route parameter data available.
 @endif
 
 ## Database Queries
