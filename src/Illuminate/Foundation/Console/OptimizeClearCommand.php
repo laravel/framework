@@ -44,6 +44,14 @@ class OptimizeClearCommand extends Command
             ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
             ->toArray();
 
+        if ($this->option('pretend')) {
+            foreach ($tasks as $description => $command) {
+                $this->components->twoColumnDetail($description, $command);
+            }
+
+            return;
+        }
+
         foreach ($tasks as $description => $command) {
             $this->components->task($description, fn () => $this->callSilently($command) == 0);
         }
@@ -78,6 +86,7 @@ class OptimizeClearCommand extends Command
     {
         return [
             ['except', 'e', InputOption::VALUE_OPTIONAL, 'The commands to skip'],
+            ['pretend', null, InputOption::VALUE_NONE, 'Display commands that run during optimize:clear without executing them'],
         ];
     }
 }
