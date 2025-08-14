@@ -1065,7 +1065,7 @@ class SupportArrTest extends TestCase
         $array = [];
         $result = Arr::reduce($array, fn ($carry, $item) => $carry + $item, 5);
         $this->assertEquals(5, $result);
-        
+
         $array = [];
         $result = Arr::reduce($array, fn ($carry, $item) => $carry + $item);
         $this->assertNull($result);
