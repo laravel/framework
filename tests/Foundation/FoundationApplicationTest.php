@@ -609,6 +609,42 @@ class FoundationApplicationTest extends TestCase
             $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
         }
     }
+
+    public function testRunningDatabaseSeederReturnsFalseByDefault()
+    {
+        $app = new Application();
+        $this->assertFalse($app->runningDatabaseSeeder());
+    }
+
+    public function testCanSetDatabaseSeedingState()
+    {
+        $app = new Application();
+        $app->setDatabaseSeeding(true);
+        $this->assertTrue($app->runningDatabaseSeeder());
+
+        $app->setDatabaseSeeding(false);
+        $this->assertFalse($app->runningDatabaseSeeder());
+    }
+
+    public function testSetDatabaseSeedingReturnsApplicationInstance()
+    {
+        $app = new Application();
+        $result = $app->setDatabaseSeeding(true);
+
+        $this->assertInstanceOf(Application::class, $result);
+        $this->assertSame($app, $result);
+    }
+
+    public function testCanChainDatabaseSeedingMethods()
+    {
+        $app = new Application();
+        $result = $app
+            ->setDatabaseSeeding(true)
+            ->setDatabaseSeeding(false);
+
+        $this->assertInstanceOf(Application::class, $result);
+        $this->assertFalse($app->runningDatabaseSeeder());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
