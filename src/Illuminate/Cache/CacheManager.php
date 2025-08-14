@@ -217,7 +217,7 @@ class CacheManager implements FactoryContract
     /**
      * Create an instance of the Redis cache driver.
      *
-     * @param  array{connection?: sttring, lock_connection?: string}  $config
+     * @param  array{connection?: string, lock_connection?: string}  $config
      * @return \Illuminate\Cache\Repository
      */
     protected function createRedisDriver(array $config)
