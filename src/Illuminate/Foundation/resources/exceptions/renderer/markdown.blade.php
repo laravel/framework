@@ -1,6 +1,10 @@
 # {{ $exception->class() }} - {!! $exception->title() !!}
 {!! $exception->message() !!}
 
+PHP {{ PHP_VERSION }}
+Laravel {{ app()->version() }}
+{{ $exception->request()->httpHost() }}
+
 ## Stack trace:
 @foreach($exception->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
