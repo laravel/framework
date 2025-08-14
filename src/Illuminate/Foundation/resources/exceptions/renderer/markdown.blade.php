@@ -5,12 +5,14 @@ PHP {{ PHP_VERSION }}
 Laravel {{ app()->version() }}
 {{ $exception->request()->httpHost() }}
 
-## Stack trace:
+## Stack Trace
+
 @foreach($exception->frames() as $index => $frame)
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
 
-## Request:
+## Request
+
 {{ $exception->request()->method() }} {{ Str::start($exception->request()->path(), '/') }}
 
 ## Headers
@@ -18,14 +20,15 @@ Laravel {{ app()->version() }}
 @forelse ($exception->requestHeaders() as $key => $value)
 * **{{ $key }}**: {!! $value !!}
 @empty
-No headers data
+No header data available.
 @endforelse
 
-## Route Context:
+## Route Context
+
 @forelse($exception->applicationRouteContext() as $name => $value)
 {{ $name }}: {!! $value !!}
 @empty
-No routing data
+No routing data available.
 @endforelse
 
 @if ($routeParametersContext = $exception->applicationRouteParametersContext())
@@ -34,10 +37,10 @@ No routing data
 {!! $routeParametersContext !!}
 @endif
 
-## Database Queries:
+## Database Queries
 
 @forelse ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
 * {{ $connectionName }} - {!! $sql !!} ({{ $time }} ms)
 @empty
-No database queries
+No database queries detected.
 @endforelse
