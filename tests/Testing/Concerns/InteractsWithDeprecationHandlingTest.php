@@ -45,7 +45,7 @@ class InteractsWithDeprecationHandlingTest extends TestCase
     {
         $this->deprecationsFound = false;
 
-        HandleExceptions::flushHandlersState();
+        HandleExceptions::flushHandlersState($this);
 
         parent::tearDown();
     }
