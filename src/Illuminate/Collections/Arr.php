@@ -828,7 +828,7 @@ class Arr
     }
 
     /**
-     * Reduce the items to a single value.
+     * Reduce the array to a single value (single accumulated result).
      *
      * @template TKey
      * @template TValue
@@ -849,7 +849,6 @@ class Arr
 
         return $carry;
     }
-
 
     /**
      * Push an item onto the beginning of an array.
