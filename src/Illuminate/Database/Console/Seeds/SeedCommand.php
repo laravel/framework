@@ -67,9 +67,17 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
-        Model::unguarded(function () {
-            $this->getSeeder()->__invoke();
-        });
+        // Set the seeding state before running seeders
+        $this->laravel->setDatabaseSeeding(true);
+
+        try {
+            Model::unguarded(function () {
+                $this->getSeeder()->__invoke();
+            });
+        } finally {
+            // Always reset the seeding state, even if an exception occurs
+            $this->laravel->setDatabaseSeeding(false);
+        }
 
         if ($previousConnection) {
             $this->resolver->setDefaultConnection($previousConnection);

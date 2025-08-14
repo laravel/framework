@@ -44,6 +44,12 @@ abstract class Seeder
     {
         $classes = Arr::wrap($class);
 
+        // Ensure seeding state is maintained for nested seeders
+        // This is set once before processing all classes
+        if ($this->container->bound('app')) {
+            $this->container->make('app')->setDatabaseSeeding(true);
+        }
+
         foreach ($classes as $class) {
             $seeder = $this->resolve($class);
 

@@ -93,6 +93,22 @@ interface Application extends Container
     public function runningInConsole();
 
     /**
+     * Determine if the application is running database seeder(s).
+     *
+     * @return bool
+     */
+    public function runningDatabaseSeeder();
+
+
+    /**
+     * Set the database seeding state.
+     *
+     * @param  bool  $seeding
+     * @return $this
+     */
+    public function setDatabaseSeeding($seeding);
+
+    /**
      * Determine if the application is running unit tests.
      *
      * @return bool

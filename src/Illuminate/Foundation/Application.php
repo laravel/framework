@@ -188,6 +188,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $isRunningInConsole;
 
     /**
+     * Indicates if the application is running database seeder(s).
+     *
+     * @var bool
+     */
+    protected $isDatabaseSeeding = false;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -821,6 +828,29 @@ class Application extends Container implements ApplicationContract, CachesConfig
             $_SERVER['argv'][1] ?? null,
             is_array($commands[0]) ? $commands[0] : $commands
         );
+    }
+
+    /**
+     * Determine if the application is running database seeder(s).
+     *
+     * @return bool
+     */
+    public function runningDatabaseSeeder()
+    {
+        return $this->isDatabaseSeeding;
+    }
+
+    /**
+     * Set the database seeding state.
+     *
+     * @param  bool  $seeding
+     * @return $this
+     */
+    public function setDatabaseSeeding($seeding)
+    {
+        $this->isDatabaseSeeding = $seeding;
+
+        return $this;
     }
 
     /**

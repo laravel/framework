@@ -42,6 +42,8 @@ namespace Illuminate\Support\Facades;
  * @method static string detectEnvironment(\Closure $callback)
  * @method static bool runningInConsole()
  * @method static bool runningConsoleCommand(string|array ...$commands)
+ * @method static bool runningDatabaseSeeder()
+ * @method static \Illuminate\Foundation\Application setDatabaseSeeding(bool $seeding)
  * @method static bool runningUnitTests()
  * @method static bool hasDebugModeEnabled()
  * @method static void registered(callable $callback)
@@ -145,7 +147,6 @@ namespace Illuminate\Support\Facades;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
- *
  * @see \Illuminate\Foundation\Application
  */
 class App extends Facade
