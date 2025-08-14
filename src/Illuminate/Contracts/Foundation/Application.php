@@ -99,7 +99,6 @@ interface Application extends Container
      */
     public function runningDatabaseSeeder();
 
-
     /**
      * Set the database seeding state.
      *
