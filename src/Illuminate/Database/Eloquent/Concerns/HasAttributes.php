@@ -2233,21 +2233,31 @@ trait HasAttributes
     /**
      * Get the attributes that were changed when the model was last saved.
      *
-     * @return array<string, mixed>
+     * @param  string|null  $key
+     * @param  mixed  $default
+     *
+     * @return ($key is null ? array<string, mixed> : mixed)
      */
-    public function getChanges()
+    public function getChanges($key = null, $default = null)
     {
-        return $this->changes;
+        return (new static)->setRawAttributes(
+            $this->changes, $sync = true
+        )->getOriginalWithoutRewindingModel($key, $default);
     }
 
     /**
      * Get the attributes that were previously original before the model was last saved.
      *
-     * @return array<string, mixed>
+     * @param  string|null  $key
+     * @param  mixed  $default
+     *
+     * @return ($key is null ? array<string, mixed> : mixed)
      */
-    public function getPrevious()
+    public function getPrevious($key = null, $default = null)
     {
-        return $this->previous;
+        return (new static)->setRawAttributes(
+            $this->previous, $sync = true
+        )->getOriginalWithoutRewindingModel($key, $default);
     }
 
     /**
