@@ -66,6 +66,45 @@ class RateLimiterTest extends TestCase
         $this->assertNotSame($limiterForUser1[0]->key, $limiterForUser2[0]->key);
         $this->assertNotSame($limiterForUser1[1]->key, $limiterForUser2[1]->key);
     }
+
+    public function testRateLimiterResetsAfterDecay()
+    {
+        $store = new ArrayStore;
+        $limiter = new RateLimiter(new Repository(new ArrayStore));
+
+        $key = 'test-key';
+        $maxAttempts = 3;
+        $decaySeconds = 2; // short decay for fast testing
+
+        // 1️⃣ Initially, there should be no attempts
+        $this->assertFalse($limiter->tooManyAttempts($key, $maxAttempts));
+
+        // 2️⃣ Hit the key until reaching maxAttempts
+        $limiter->hit($key, $decaySeconds);
+        $this->assertFalse($limiter->tooManyAttempts($key, $maxAttempts));
+
+        $limiter->hit($key, $decaySeconds);
+        $this->assertFalse($limiter->tooManyAttempts($key, $maxAttempts));
+
+        $limiter->hit($key, $decaySeconds);
+        // Now it should hit the limit
+        $this->assertTrue($limiter->tooManyAttempts($key, $maxAttempts));
+
+        // 3️⃣ Wait for decay period to expire
+        sleep($decaySeconds + 1);
+
+        // After decay, the attempts should reset
+        $this->assertFalse($limiter->tooManyAttempts($key, $maxAttempts));
+
+        // 4️⃣ Hitting again should work correctly
+        $limiter->hit($key, $decaySeconds);
+        $this->assertFalse($limiter->tooManyAttempts($key, $maxAttempts));
+
+        // 5️⃣ Multiple hits after reset should also be tracked properly
+        $limiter->hit($key, $decaySeconds);
+        $limiter->hit($key, $decaySeconds);
+        $this->assertTrue($limiter->tooManyAttempts($key, $maxAttempts));
+    }
 }
 
 enum BackedEnumNamedRateLimiter: string
