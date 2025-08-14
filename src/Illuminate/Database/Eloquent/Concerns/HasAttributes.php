@@ -2235,7 +2235,6 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     *
      * @return ($key is null ? array<string, mixed> : mixed)
      */
     public function getChanges($key = null, $default = null)
@@ -2250,7 +2249,6 @@ trait HasAttributes
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     *
      * @return ($key is null ? array<string, mixed> : mixed)
      */
     public function getPrevious($key = null, $default = null)
