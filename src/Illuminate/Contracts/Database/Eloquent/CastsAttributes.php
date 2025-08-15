@@ -5,7 +5,7 @@ namespace Illuminate\Contracts\Database\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Recommendation: (TGet == TSet) so "$a = $a = $b"
+ * Recommendation: (TGet == TSet) so "$a = $a = $b".
  * 
  * @template TGet
  * @template TSet
@@ -27,6 +27,7 @@ interface CastsAttributes
      * Transform the attribute to its underlying model values.
      *
      * Note: set() may receive the value returned by get().
+     * 
      * @param  TGet|TSet|null  $value
      * @return mixed
      */
