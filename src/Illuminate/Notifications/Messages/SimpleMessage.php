@@ -265,7 +265,8 @@ class SimpleMessage
     {
         $this->content[] = $action;
         $this->actions[] = ['text' => $action->text, 'url' => $action->url];
-        
+
+        // Backwards compatibility
         $this->actionText = $action->text;
         $this->actionUrl = $action->url;
 
