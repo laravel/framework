@@ -57,7 +57,7 @@ class Composer
      *
      * @param  array<int, string>  $packages
      * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  (\Closure('out'|'err', string): void)|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -86,7 +86,7 @@ class Composer
      *
      * @param  array<int, string>  $packages
      * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param  (\Closure('out'|'err', string): void)|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -164,7 +164,7 @@ class Composer
      * Get the Composer binary / command for the environment.
      *
      * @param  string|null  $composerBinary
-     * @return array
+     * @return array{string, string}|array{'composer'}
      */
     public function findComposer($composerBinary = null)
     {
