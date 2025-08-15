@@ -1672,10 +1672,12 @@ class Validator implements ValidatorContract
      */
     public function __call($method, $parameters)
     {
-        $rule = Str::snake(substr($method, 8));
+        if (str_starts_with($method, 'validate')) {
+            $rule = Str::snake(substr($method, 8));
 
-        if (isset($this->extensions[$rule])) {
-            return $this->callExtension($rule, $parameters);
+            if (isset($this->extensions[$rule])) {
+                return $this->callExtension($rule, $parameters);
+            }
         }
 
         throw new BadMethodCallException(sprintf(
