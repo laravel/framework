@@ -5,9 +5,7 @@ namespace Illuminate\Contracts\Database\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Recommendation:
- * Prefer symmetric casts (TGet == TSet) so "$a = $a = $b"
- * remain safe and unsurprising.
+ * Recommendation: (TGet == TSet) so "$a = $a = $b"
  * 
  * @template TGet
  * @template TSet
@@ -28,11 +26,7 @@ interface CastsAttributes
     /**
      * Transform the attribute to its underlying model values.
      *
-     * Important:
-     * Implementations must tolerate receiving the runtime cast value (TGet) here.
-     * As with object caching, `set()` may receive the value returned by `get()` (TGet).
-     * Implementations should therefore accept both TGet and TSet.
-     *
+     * Note: set() may receive the value returned by get().
      * @param  TGet|TSet|null  $value
      * @return mixed
      */
