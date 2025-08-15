@@ -16,7 +16,9 @@ use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ValidatedInput;
+use Illuminate\Validation\Attributes\Validate;
 use InvalidArgumentException;
+use ReflectionMethod;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -678,7 +680,7 @@ class Validator implements ValidatorContract
                 : null;
         }
 
-        $method = "validate{$rule}";
+        $method = $this->getValidationMethodName($rule);
 
         $this->numericRules = $this->defaultNumericRules;
 
@@ -1681,5 +1683,33 @@ class Validator implements ValidatorContract
         throw new BadMethodCallException(sprintf(
             'Method %s::%s does not exist.', static::class, $method
         ));
+    }
+
+    /**
+     * Get validation method name.
+     *
+     * @param  string  $rule
+     * @return string
+     */
+    protected function getValidationMethodName($rule)
+    {
+        if ($this->isValidationMethodWithAttribute($rule)) {
+            return $rule;
+        }
+
+        return 'validate'.ucfirst($rule);
+    }
+
+    /**
+     * Determine if the given validation method has a validate attribute.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected function isValidationMethodWithAttribute($rule)
+    {
+        return method_exists(static::class, $rule) &&
+            (new ReflectionMethod(static::class, $rule))
+                ->getAttributes(Validate::class) !== [];
     }
 }
