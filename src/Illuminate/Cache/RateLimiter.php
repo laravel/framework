@@ -126,8 +126,15 @@ class RateLimiter
      */
     public function tooManyAttempts($key, $maxAttempts)
     {
+        $rateKey = $this->cleanRateLimiterKey($key);
+
+        // Reset attempts if key has expired
+        if ($this->cache->get($rateKey) === null) {
+            $this->resetAttempts($key);
+        }
+
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
+            if ($this->cache->has($rateKey.':timer')) {
                 return true;
             }
 
