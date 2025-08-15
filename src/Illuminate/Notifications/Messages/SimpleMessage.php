@@ -4,6 +4,7 @@ namespace Illuminate\Notifications\Messages;
 
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Notifications\Action;
+use Illuminate\Notifications\Line;
 
 class SimpleMessage
 {
@@ -53,6 +54,7 @@ class SimpleMessage
      * The text / label for the action.
      *
      * @var string
+     * @deprecated Use the $actions array
      */
     public $actionText;
 
@@ -60,8 +62,23 @@ class SimpleMessage
      * The action URL.
      *
      * @var string
+     * @deprecated Use the $actions array
      */
     public $actionUrl;
+
+    /**
+     * The list of action buttons.
+     *
+     * @var array
+     */
+    public $actions = [];
+
+    /**
+     * The ordered mail message components.
+     *
+     * @var array<\Illuminate\Notifications\Action|\Illuminate\Notifications\Line>
+     */
+    public $content = [];
 
     /**
      * The name of the mailer that should send the notification.
@@ -213,12 +230,44 @@ class SimpleMessage
     public function with($line)
     {
         if ($line instanceof Action) {
-            $this->action($line->text, $line->url);
-        } elseif (! $this->actionText) {
-            $this->introLines[] = $this->formatLine($line);
-        } else {
-            $this->outroLines[] = $this->formatLine($line);
+            return $this->pushAction($line);
         }
+
+        return $this->pushLine($line);
+    }
+
+    /**
+     * Push a line to the content.
+     *
+     * @param  mixed  $line
+     * @return $this
+     */
+    protected function pushLine($line)
+    {
+        $formatted = $this->formatLine($line);
+        
+        $this->content[] = new Line($formatted);
+        
+        $this->actions
+            ? $this->outroLines[] = $formatted
+            : $this->introLines[] = $formatted;
+            
+        return $this;
+    }
+
+    /**
+     * Push an action to the content.
+     *
+     * @param  \Illuminate\Notifications\Action  $action
+     * @return $this
+     */
+    protected function pushAction($action)
+    {
+        $this->content[] = $action;
+        $this->actions[] = ['text' => $action->text, 'url' => $action->url];
+        
+        $this->actionText = $action->text;
+        $this->actionUrl = $action->url;
 
         return $this;
     }
@@ -251,10 +300,7 @@ class SimpleMessage
      */
     public function action($text, $url)
     {
-        $this->actionText = $text;
-        $this->actionUrl = $url;
-
-        return $this;
+        return $this->pushAction(new Action($text, $url));
     }
 
     /**
@@ -287,6 +333,8 @@ class SimpleMessage
             'actionText' => $this->actionText,
             'actionUrl' => $this->actionUrl,
             'displayableActionUrl' => str_replace(['mailto:', 'tel:'], '', $this->actionUrl ?? ''),
+            'actions' => $this->actions,
+            'content' => $this->content,
         ];
     }
 }
