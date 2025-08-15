@@ -54,6 +54,7 @@ class SimpleMessage
      * The text / label for the action.
      *
      * @var string
+     *
      * @deprecated Use the $actions array
      */
     public $actionText;
@@ -62,6 +63,7 @@ class SimpleMessage
      * The action URL.
      *
      * @var string
+     *
      * @deprecated Use the $actions array
      */
     public $actionUrl;
@@ -245,13 +247,13 @@ class SimpleMessage
     protected function pushLine($line)
     {
         $formatted = $this->formatLine($line);
-        
+
         $this->content[] = new Line($formatted);
-        
+
         $this->actions
             ? $this->outroLines[] = $formatted
             : $this->introLines[] = $formatted;
-            
+
         return $this;
     }
 

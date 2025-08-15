@@ -463,17 +463,17 @@ class NotificationMailMessageTest extends TestCase
 
         $this->assertArrayHasKey('actions', $data);
         $this->assertCount(3, $data['actions']);
-        
+
         $this->assertSame('Accept', $data['actions'][0]['text']);
         $this->assertSame('https://example.com/accept', $data['actions'][0]['url']);
-        
+
         $this->assertSame('Reject', $data['actions'][1]['text']);
         $this->assertSame('https://example.com/reject', $data['actions'][1]['url']);
-        
+
         $this->assertSame('Review', $data['actions'][2]['text']);
         $this->assertSame('https://example.com/review', $data['actions'][2]['url']);
 
-        $this->assertTrue(!empty($data['actions']));
+        $this->assertTrue(! empty($data['actions']));
         $this->assertFalse(empty($data['actions']));
     }
 
