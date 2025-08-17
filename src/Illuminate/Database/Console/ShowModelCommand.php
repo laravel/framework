@@ -2,14 +2,18 @@
 
 namespace Illuminate\Database\Console;
 
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
+
+use function Laravel\Prompts\suggest;
 
 #[AsCommand(name: 'model:show')]
-class ShowModelCommand extends DatabaseInspectionCommand
+class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMissingInput
 {
     /**
      * The console command name.
@@ -210,5 +214,33 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         $this->newLine();
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'model' => fn() => suggest("Select Model", $this->possibleModels())
+        ];
+    }
+
+    /**
+     * Get a list of possible model names.
+     *
+     * @return array<int, string>
+     */
+    protected function possibleModels()
+    {
+        $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
+
+        return (new Collection(Finder::create()->files()->depth(0)->in($modelPath)))
+            ->map(fn($file) => $file->getBasename('.php'))
+            ->sort()
+            ->values()
+            ->all();
     }
 }
