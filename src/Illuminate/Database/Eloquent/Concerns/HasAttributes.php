@@ -2388,7 +2388,7 @@ trait HasAttributes
     /**
      * Merge new appended attributes with existing appended attributes on the model.
      *
-     * @param  array<string>  $visible
+     * @param  array<string>  $appends
      * @return $this
      */
     public function mergeAppends(array $appends)
