@@ -3953,7 +3953,6 @@ class EloquentModelHiddenStub extends Model
     protected $hidden = ['foo'];
 }
 
-
 class EloquentModelDynamicVisibleStub extends Model
 {
     protected $table = 'stub';
