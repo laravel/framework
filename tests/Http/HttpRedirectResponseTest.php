@@ -151,6 +151,54 @@ class HttpRedirectResponseTest extends TestCase
         $response->withFoo('bar');
     }
 
+    public function testWithSuccessOnRedirect()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET'));
+        $response->setSession($session = m::mock(Store::class));
+
+        $session->shouldReceive('flash')->once()->with('type', 'success');
+        $session->shouldReceive('flash')->once()->with('message', 'Saved');
+
+        $response->withSuccess('Saved');
+    }
+
+    public function testWithErrorOnRedirect()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET'));
+        $response->setSession($session = m::mock(Store::class));
+
+        $session->shouldReceive('flash')->once()->with('type', 'error');
+        $session->shouldReceive('flash')->once()->with('message', 'Failed');
+
+        $response->withError('Failed');
+    }
+
+    public function testWithWarningOnRedirect()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET'));
+        $response->setSession($session = m::mock(Store::class));
+
+        $session->shouldReceive('flash')->once()->with('type', 'warning');
+        $session->shouldReceive('flash')->once()->with('message', 'Be careful');
+
+        $response->withWarning('Be careful');
+    }
+
+    public function testWithInfoOnRedirect()
+    {
+        $response = new RedirectResponse('foo.bar');
+        $response->setRequest(Request::create('/', 'GET'));
+        $response->setSession($session = m::mock(Store::class));
+
+        $session->shouldReceive('flash')->once()->with('type', 'info');
+        $session->shouldReceive('flash')->once()->with('message', 'Heads up');
+
+        $response->withInfo('Heads up');
+    }
+
     public function testMagicCallException()
     {
         $this->expectException(BadMethodCallException::class);

@@ -146,6 +146,62 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
+     * Flash a success message to the session.
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function withSuccess($message)
+    {
+        return $this->with([
+            'type'=> 'success',
+            'message'=> $message
+        ]);
+    }
+
+    /**
+     * Flash a error message to the session.
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function withError($message)
+    {
+        return $this->with([
+            'type'=> 'error',
+            'message'=> $message
+        ]);
+    }
+
+    /**
+     * Flash a warning message to the session.
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function withWarning($message)
+    {
+        return $this->with([
+            'type' => 'warning',
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Flash an info message to the session.
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function withInfo($message)
+    {
+        return $this->with([
+            'type' => 'info',
+            'message' => $message,
+        ]);
+    }
+
+    /**
      * Parse the given errors into an appropriate value.
      *
      * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
