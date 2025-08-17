@@ -1495,6 +1495,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testMergeHiddenMergesHidden()
+    {
+        $model = new EloquentModelHiddenStub;
+
+        $hiddenCount = count($model->getHidden());
+        $this->assertContains('foo', $model->getHidden());
+
+        $model->mergeHidden(['bar']);
+        $this->assertCount($hiddenCount + 1, $model->getHidden());
+        $this->assertContains('bar', $model->getHidden());
+    }
+
     public function testVisible()
     {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
@@ -1502,6 +1514,18 @@ class DatabaseEloquentModelTest extends TestCase
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testMergeVisibleMergesVisible()
+    {
+        $model = new EloquentModelVisibleStub;
+
+        $visibleCount = count($model->getVisible());
+        $this->assertContains('foo', $model->getVisible());
+
+        $model->mergeVisible(['bar']);
+        $this->assertCount($visibleCount + 1, $model->getVisible());
+        $this->assertContains('bar', $model->getVisible());
     }
 
     public function testDynamicHidden()
@@ -2419,6 +2443,18 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->setVisible([]);
         $this->assertEquals([], $model->toArray());
+    }
+
+    public function testMergeAppendsMergesAppends()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $appendsCount = count($model->getAppends());
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
+        $model->mergeAppends(['bar']);
+        $this->assertCount($appendsCount + 1, $model->getAppends());
+        $this->assertContains('bar', $model->getAppends());
     }
 
     public function testGetMutatedAttributes()
@@ -3904,6 +3940,19 @@ class EloquentModelDynamicHiddenStub extends Model
         return ['age', 'id'];
     }
 }
+
+class EloquentModelVisibleStub extends Model
+{
+    protected $table = 'stub';
+    protected $visible = ['foo'];
+}
+
+class EloquentModelHiddenStub extends Model
+{
+    protected $table = 'stub';
+    protected $hidden = ['foo'];
+}
+
 
 class EloquentModelDynamicVisibleStub extends Model
 {
