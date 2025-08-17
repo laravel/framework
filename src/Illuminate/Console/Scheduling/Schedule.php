@@ -312,7 +312,7 @@ class Schedule
             throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
         }
 
-        $this->groupStack[] = $this->attributes;
+        $this->groupStack[] = clone $this->attributes;
 
         $events($this);
 
