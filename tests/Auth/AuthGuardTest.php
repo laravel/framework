@@ -578,7 +578,7 @@ class AuthGuardTest extends TestCase
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
         $guard = m::mock(SessionGuard::class, ['default', $provider, $session])->makePartial();
-        
+
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldNotReceive('dispatch')->with(m::type(Login::class));
 
@@ -623,7 +623,7 @@ class AuthGuardTest extends TestCase
         $timebox->shouldReceive('call')->once()->andReturnUsing(function ($callback) use ($timebox) {
             return $callback($timebox->shouldReceive('returnEarly')->once()->getMock());
         });
-        
+
         $guard->setDispatcher($events = m::mock(Dispatcher::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
         $events->shouldReceive('dispatch')->once()->with(m::type(Validated::class));
