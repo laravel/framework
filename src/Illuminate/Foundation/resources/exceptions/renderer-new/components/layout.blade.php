@@ -19,8 +19,8 @@
     <div class="relative min-h-screen bg-neutral-900">
         <!-- Topbar -->
         <div class="flex items-center justify-center w-full relative">
-            <div class="box-border content-stretch flex flex-row items-center justify-between px-6 py-3 relative shrink-0 w-[1272px]">
-                <div aria-hidden="true" class="absolute border-[0px_1px] border-[rgba(255,255,255,0.09)] border-dotted bottom-0 left-[-0.5px] pointer-events-none right-[-0.5px] top-0"></div>
+            <div class="box-border content-stretch flex flex-row items-center justify-between px-6 py-3 relative shrink-0 max-w-7xl w-full">
+                <div aria-hidden="true" class="absolute border-[0px_1px] border-[rgba(255,255,255,0.09)] border-dashed bottom-0 left-[-0.5px] pointer-events-none right-[-0.5px] top-0"></div>
                 <div class="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative shrink-0">
                     <div class="overflow-clip relative shrink-0 w-[18px] h-[18px]">
                         <svg class="w-full h-full text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -55,7 +55,7 @@
                 </div>
 
                 <!-- Floating Nightwatch Installation Panel -->
-                <div class="absolute backdrop-blur-[6px] backdrop-filter bg-neutral-800 box-border content-stretch flex flex-col gap-6 items-start justify-start right-[24px] p-[24px] rounded-lg top-[49px] w-[478px]">
+                <div class="absolute backdrop-blur-[6px] backdrop-filter bg-neutral-800 box-border content-stretch flex flex-col gap-6 items-start justify-start right-[24px] p-[24px] rounded-lg top-[49px] w-[478px] z-50">
                     <div aria-hidden="true" class="absolute border border-[rgba(255,255,255,0.01)] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px] shadow-[0px_303px_85px_0px_rgba(0,0,0,0),0px_194px_77px_0px_rgba(0,0,0,0.04),0px_109px_65px_0px_rgba(0,0,0,0.13),0px_48px_48px_0px_rgba(0,0,0,0.22),0px_12px_27px_0px_rgba(0,0,0,0.25)]"></div>
                     <div class="box-border content-stretch flex flex-col gap-4 items-start justify-start p-0 relative shrink-0 w-full">
                         <div class="box-border content-stretch flex flex-row gap-[9px] items-center justify-start p-0 relative shrink-0">
@@ -85,8 +85,9 @@
             </div>
         </div>
 
-        <div class="w-full max-w-[1272px] mx-auto">
-            <!-- Main Content -->
+        <x-laravel-exceptions-renderer-new::separator />
+
+        <div class="w-full max-w-7xl mx-auto">
             <div class="flex flex-col gap-8 px-14 py-16 border-x border-white/[0.09] border-dashed">
                 <!-- Header Section -->
                 <div class="flex flex-col gap-6">
@@ -125,16 +126,16 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <x-laravel-exceptions-renderer-new::separator />
+
+        <div class="w-full max-w-7xl mx-auto">
             <!-- Request Information Section -->
-            <div class="flex flex-col items-center justify-start w-full relative">
-                <!-- Gradient Line -->
-                <div class="h-0 w-full relative">
-                    <div class="absolute top-[-1px] left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/10 to-transparent h-px"></div>
-                </div>
+            <div class="flex flex-col items-center justify-start w-full relative border-x border-white/[0.09] border-dashed">
                 <!-- URL Panel -->
-                <div class="w-full max-w-[1272px] mx-auto px-14 relative">
-                    <div class="backdrop-blur-[6px] bg-white/[0.04] border border-white/[0.01] rounded-lg flex items-center justify-between p-2 relative mt-[23px] w-full max-w-[1160px] mx-auto">
+                <div class="w-full mx-auto px-14 relative">
+                    <div class="backdrop-blur-[6px] bg-white/[0.04] border border-white/[0.01] rounded-lg flex items-center justify-between p-2 relative mt-[23px] w-full mx-auto">
                         <div class="flex items-center gap-3">
                             <div class="bg-blue-600 rounded h-[25px] flex items-center justify-center px-2">
                                 <span class="text-[13px] font-mono text-white tracking-[-0.26px]">GET</span>
@@ -468,7 +469,7 @@
             </div>
 
             <!-- Database Queries Section -->
-            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09]">
+            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09] border-dashed">
                 <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
                 <div class="flex flex-col overflow-hidden w-full">
                     <!-- Section Header -->
@@ -553,12 +554,11 @@
                 </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Gradient Line -->
-            <div class="h-0 w-full relative">
-                <div class="absolute top-[-1px] left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/10 to-transparent h-px"></div>
-            </div>
+        <x-laravel-exceptions-renderer-new::separator />
 
+        <div class="w-full max-w-7xl mx-auto">
             <!-- Context Sections -->
             <div class="flex flex-col gap-12 p-[56px] w-full border-x border-white/[0.09] border-dashed">
                 <!-- Headers Section -->
@@ -653,7 +653,11 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <x-laravel-exceptions-renderer-new::separator />
+
+        <div class="w-full max-w-7xl mx-auto">
             <!-- Footer with ASCII Art -->
             <div class="flex flex-col gap-12 px-14 py-0 w-full border-x border-white/[0.09] border-dashed">
                 <div class="grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] relative">
