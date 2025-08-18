@@ -16,7 +16,7 @@ class Renderer
      *
      * @var string
      */
-    protected const DIST = __DIR__.'/../../resources/exceptions/renderer/dist/';
+    protected const DIST = __DIR__.'/../../resources/exceptions/renderer-new/dist/';
 
     /**
      * The view factory instance.
@@ -91,13 +91,13 @@ class Renderer
 
         $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
 
-        $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
-            'exception' => $exception,
-        ])->render();
+        // $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
+        //     'exception' => $exception,
+        // ])->render();
 
-        return $this->viewFactory->make('laravel-exceptions-renderer::show', [
+        return $this->viewFactory->make('laravel-exceptions-renderer-new::show', [
             'exception' => $exception,
-            'exceptionAsMarkdown' => $exceptionAsMarkdown,
+            // 'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
     }
 
@@ -110,8 +110,8 @@ class Renderer
     {
         return (new Collection([
             ['styles.css', []],
-            ['light-mode.css', ['data-theme' => 'light']],
-            ['dark-mode.css', ['data-theme' => 'dark']],
+            // ['light-mode.css', ['data-theme' => 'light']],
+            // ['dark-mode.css', ['data-theme' => 'dark']],
         ]))->map(function ($fileAndAttributes) {
             [$filename, $attributes] = $fileAndAttributes;
 
