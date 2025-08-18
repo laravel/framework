@@ -253,7 +253,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Log a user into the application without sessions or cookies.
+     * Log a user into the application without sessions or cookies and without firing the Login event.
      *
      * @param  array  $credentials
      * @return bool
@@ -276,7 +276,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Log the given user ID into the application without sessions or cookies.
+     * Log the given user ID into the application without sessions or cookies and without firing the Login event.
      *
      * @param  mixed  $id
      * @return \Illuminate\Contracts\Auth\Authenticatable|false

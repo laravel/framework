@@ -14,7 +14,7 @@ interface StatefulGuard extends Guard
     public function attempt(array $credentials = [], $remember = false);
 
     /**
-     * Log a user into the application without sessions or cookies.
+     * Log a user into the application without sessions or cookies and without firing the Login event.
      *
      * @param  array  $credentials
      * @return bool
@@ -40,7 +40,7 @@ interface StatefulGuard extends Guard
     public function loginUsingId($id, $remember = false);
 
     /**
-     * Log the given user ID into the application without sessions or cookies.
+     * Log the given user ID into the application without sessions or cookies and without firing the Login event.
      *
      * @param  mixed  $id
      * @return \Illuminate\Contracts\Auth\Authenticatable|false
