@@ -3,10 +3,14 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
+/**
+ * @mixin Connection
+ */
 trait ManagesTransactions
 {
     /**
@@ -148,7 +152,7 @@ trait ManagesTransactions
             $this->reconnectIfMissingConnection();
 
             try {
-                $this->getPdo()->beginTransaction();
+                $this->executeBeginTransactionStatement();
             } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
@@ -184,7 +188,7 @@ trait ManagesTransactions
         if ($this->causedByLostConnection($e)) {
             $this->reconnect();
 
-            $this->getPdo()->beginTransaction();
+            $this->executeBeginTransactionStatement();
         } else {
             throw $e;
         }

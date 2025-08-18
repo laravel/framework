@@ -1494,6 +1494,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Run the statement to start a new transaction.
+     *
+     * @return void
+     */
+    public function executeBeginTransactionStatement()
+    {
+        $this->getPdo()->beginTransaction();
+    }
+
+    /**
      * Determine if the connection is in a "dry run".
      *
      * @return bool
