@@ -1,6 +1,17 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.24.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.25.0...12.x)
+
+## [v12.25.0](https://github.com/laravel/framework/compare/v12.24.0...v12.25.0) - 2025-08-18
+
+* [12.x] Prioritize Current Schema When Resolving the Table Name in `db:table` Command by [@hafezdivandari](https://github.com/hafezdivandari) in https://github.com/laravel/framework/pull/56646
+* [12.x] Add `allowedUrls` through `preventStrayRequests` by [@rabrowne85](https://github.com/rabrowne85) in https://github.com/laravel/framework/pull/56645
+* [12.x] Add "Copy as Markdown" button to error page by [@mpociot](https://github.com/mpociot) in https://github.com/laravel/framework/pull/56657
+* [12.x] Indicate that `Context@scope()` may throw by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56655
+* [12.x] Remove [@throws](https://github.com/throws) phpDocs in the TransformToResource trait by [@adelf](https://github.com/adelf) in https://github.com/laravel/framework/pull/56667
+* [12.x] Improve docblocks for InteractsWithDatabase by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56666
+* [12.x] Fix prevent group attribute pollution in schedule by [@People-Sea](https://github.com/People-Sea) in https://github.com/laravel/framework/pull/56677
+* Add new `mergeVisible`, `mergeHidden` and `mergeAppends` methods. by [@jonerickson](https://github.com/jonerickson) in https://github.com/laravel/framework/pull/56678
 
 ## [v12.24.0](https://github.com/laravel/framework/compare/v12.23.1...v12.24.0) - 2025-08-13
 
