@@ -295,7 +295,7 @@ trait FormatsMessages
                 : $attribute;
         }
 
-        return str_replace('_', ' ', Str::snake($attribute));
+        return Str::snake($attribute, ' ');
     }
 
     /**
