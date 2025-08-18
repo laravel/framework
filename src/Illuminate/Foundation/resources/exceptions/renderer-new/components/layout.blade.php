@@ -87,7 +87,7 @@
 
         <div class="w-full max-w-[1272px] mx-auto">
             <!-- Main Content -->
-            <div class="flex flex-col gap-8 px-14 py-16 border-x border-white/[0.09]">
+            <div class="flex flex-col gap-8 px-14 py-16 border-x border-white/[0.09] border-dashed">
                 <!-- Header Section -->
                 <div class="flex flex-col gap-6">
                     <div class="flex items-center gap-[9px]">
@@ -160,7 +160,7 @@
             </div>
 
             <!-- Exception Overview Section -->
-            <div class="flex flex-col gap-12 items-center justify-start pt-5 px-14 pb-0 w-full border-x border-white/[0.09]">
+            <div class="flex flex-col gap-12 items-center justify-start pt-5 px-14 pb-0 w-full border-x border-white/[0.09] border-dashed">
                 <div class="flex flex-col w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
                         <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Overview</h2>
@@ -211,7 +211,7 @@
             </div>
 
             <!-- Exception Trace Section -->
-            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09]">
+            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09] border-dashed">
                 <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
                     <div class="flex flex-col overflow-hidden w-full">
                         <!-- Section Header -->
@@ -560,7 +560,7 @@
             </div>
 
             <!-- Context Sections -->
-            <div class="flex flex-col gap-12 p-[56px] w-full border-x border-white/[0.09]">
+            <div class="flex flex-col gap-12 p-[56px] w-full border-x border-white/[0.09] border-dashed">
                 <!-- Headers Section -->
                 <div class="flex flex-col w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
@@ -602,7 +602,7 @@
                     </div>
                 </div>
 
-                <!-- Route Parameters -->
+                <!-- Routing -->
                 <div class="flex flex-col overflow-hidden w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
                         <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing</h2>
@@ -625,7 +625,7 @@
                     </div>
                 </div>
 
-                <!-- Environment Section -->
+                <!-- Routing Section -->
                 <div class="flex flex-col gap-2 overflow-hidden w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
                         <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing parameters</h2>
@@ -655,15 +655,14 @@
             </div>
 
             <!-- Footer with ASCII Art -->
-            <div class="flex flex-col gap-12 px-14 py-0 w-full border-x border-white/[0.09]">
+            <div class="flex flex-col gap-12 px-14 py-0 w-full border-x border-white/[0.09] border-dashed">
                 <div class="grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] relative">
                     <div class="grid-area-[1/1] h-0 mt-0 relative w-full">
                         <div class="absolute top-[-1px] left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/10 to-transparent h-px"></div>
                     </div>
                 </div>
                 <div class="flex gap-2 h-[276px] items-start justify-center w-full">
-                    <div class="flex-1 font-mono text-xs leading-[1.09] text-transparent min-w-0" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">
-1111111111                                                                                                                                                                                                                    111111111
+                    <div class="flex-1 font-mono text-xs leading-[1.09] text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
 1011011011                                                                                                                                                                                                                    110110110
 1111110111                                                                                                                                                                                                                    111101111
 1101011101                                                                                                                                                                                                                    101111011
@@ -694,7 +693,7 @@
 111101101111111111101111111      1101011111111101111111111101111101      1111111111                    1111101011111111111111101011111111                101111111111101                 1011111111011011011110101011         111111011
 110111111010110101111101011         1111111101101010101  1111101011      1010110101                      111111110110101010111  111101011                11101011011011                    110101111111101101111111           110111110
 111110101111111111011111111            11111110111111    1011111011      1111111111                          10111111111111     110111111                 1111111110111                        1101101011111101               111101011
-                    </div>
+&nbsp;</div>
                 </div>
             </div>
 
