@@ -13,7 +13,7 @@ if (! function_exists('collect')) {
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    function collect($value = [])
+    function collect($value = []): Collection
     {
         return new Collection($value);
     }
