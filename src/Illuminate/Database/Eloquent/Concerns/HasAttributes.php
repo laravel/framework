@@ -798,7 +798,7 @@ trait HasAttributes
                     }
 
                     if ($cast instanceof CastsAttributes) {
-                        return $cast::class .':'. implode(',', get_object_vars($cast));
+                        return $cast::class.':'.implode(',', get_object_vars($cast));
                     }
 
                     throw new InvalidArgumentException(

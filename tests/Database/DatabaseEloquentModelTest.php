@@ -3359,7 +3359,7 @@ class DatabaseEloquentModelTest extends TestCase
         $casts = $model->getCasts();
 
         $this->assertSame('int', $casts['castStringableObject']);
-        $this->assertSame(CastsAttributesInstance::class . ':foo,bar', $casts['castCastAttributesObject']);
+        $this->assertSame(CastsAttributesInstance::class.':foo,bar', $casts['castCastAttributesObject']);
     }
 
     public function testUsingPlainObjectAsCastThrowsException()
@@ -3370,7 +3370,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->expectExceptionMessage('The cast object for something attribute must implement Stringable or CastAttributes.');
 
         $model->mergeCasts([
-            'something' => (object) []
+            'something' => (object) [],
         ]);
     }
 
@@ -4416,11 +4416,11 @@ class CastsAttributesInstance implements CastsAttributes
 
     public function get(Model $model, string $key, mixed $value, array $attributes)
     {
-
+        //
     }
 
     public function set(Model $model, string $key, mixed $value, array $attributes)
     {
-
+        //
     }
 }
