@@ -224,7 +224,7 @@ if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast($event = null): PendingBroadcast
     {
@@ -237,7 +237,7 @@ if (! function_exists('broadcast_if')) {
      * Begin broadcasting an event if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast_if($boolean, $event = null): PendingBroadcast
     {
@@ -254,7 +254,7 @@ if (! function_exists('broadcast_unless')) {
      * Begin broadcasting an event unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast_unless($boolean, $event = null): PendingBroadcast
     {

@@ -501,7 +501,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  array|mixed  $dayOfWeek
+     * @param  mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -628,7 +628,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|mixed  $days
+     * @param  mixed  $days
      * @return $this
      */
     public function days($days)

@@ -156,7 +156,7 @@ trait HasEvents
     /**
      * Add an observable event name.
      *
-     * @param  array|mixed  $observables
+     * @param  mixed  $observables
      * @return void
      */
     public function addObservableEvents($observables)
@@ -169,7 +169,7 @@ trait HasEvents
     /**
      * Remove an observable event name.
      *
-     * @param  array|mixed  $observables
+     * @param  mixed  $observables
      * @return void
      */
     public function removeObservableEvents($observables)
@@ -231,7 +231,7 @@ trait HasEvents
      *
      * @param  string  $event
      * @param  string  $method
-     * @return mixed|null
+     * @return mixed
      */
     protected function fireCustomModelEvent($event, $method)
     {
