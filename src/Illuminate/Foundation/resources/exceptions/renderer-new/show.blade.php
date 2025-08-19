@@ -87,51 +87,49 @@
 
         <x-laravel-exceptions-renderer-new::separator />
 
-        <div class="w-full max-w-7xl mx-auto">
-            <div class="flex flex-col gap-8 px-14 py-16 border-x border-white/[0.09] border-dashed">
-                <!-- Header Section -->
-                <div class="flex flex-col gap-6">
-                    <div class="flex items-center gap-[9px]">
-                        <h1 class="text-3xl font-semibold text-white tracking-[-0.6px] leading-[36px]">{{ $exception->class() }}</h1>
-                    </div>
-                    <p class="text-xl font-light text-neutral-300 tracking-[-0.4px] leading-[30px] min-w-full">
-                        {{ $exception->message() }}
-                    </p>
+        <!-- Header Section -->
+        <div class="w-full max-w-7xl mx-auto flex flex-col gap-8 px-14 py-16 border-x border-white/[0.09] border-dashed">
+            <div class="flex flex-col gap-6">
+                <div class="flex items-center gap-[9px]">
+                    <h1 class="text-3xl font-semibold text-white tracking-[-0.6px] leading-[36px]">{{ $exception->class() }}</h1>
                 </div>
+                <p class="text-xl font-light text-neutral-300 tracking-[-0.4px] leading-[30px] min-w-full">
+                    {{ $exception->message() }}
+                </p>
+            </div>
 
-                <!-- Metadata Section -->
-                <div class="flex items-start gap-2">
-                    <div class="bg-white/[0.03] border border-white/[0.01] rounded-md shadow-sm flex items-center gap-0.5">
-                        <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
-                            <span class="text-neutral-500">LARAVEL</span>
-                            <span class="text-neutral-300">{{ app()->version() }}</span>
-                        </div>
-                        <div class="w-0 h-[22px] flex items-center justify-center">
-                            <div class="rotate-90 w-[22px] h-0 border-b border-white/[0.04]"></div>
-                        </div>
-                        <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
-                            <span class="text-neutral-500">PHP</span>
-                            <span class="text-neutral-300">{{ PHP_VERSION }}</span>
-                        </div>
+            <!-- Metadata Section -->
+            <div class="flex items-start gap-2">
+                <div class="bg-white/[0.03] border border-white/[0.01] rounded-md shadow-sm flex items-center gap-0.5">
+                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
+                        <span class="text-neutral-500">LARAVEL</span>
+                        <span class="text-neutral-300">{{ app()->version() }}</span>
                     </div>
-                    <div class="bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                        <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-[13px] font-mono text-white tracking-[-0.26px]">UNHANDLED</span>
+                    <div class="w-0 h-[22px] flex items-center justify-center">
+                        <div class="rotate-90 w-[22px] h-0 border-b border-white/[0.04]"></div>
                     </div>
-                    <div class="bg-rose-950 border border-rose-900 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                        <span class="text-[13px] font-mono text-rose-100 tracking-[-0.26px]">CODE {{ $exception->code() }}</span>
+                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
+                        <span class="text-neutral-500">PHP</span>
+                        <span class="text-neutral-300">{{ PHP_VERSION }}</span>
                     </div>
+                </div>
+                <div class="bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
+                    <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-[13px] font-mono text-white tracking-[-0.26px]">UNHANDLED</span>
+                </div>
+                <div class="bg-rose-950 border border-rose-900 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
+                    <span class="text-[13px] font-mono text-rose-100 tracking-[-0.26px]">CODE {{ $exception->code() }}</span>
                 </div>
             </div>
         </div>
 
         <x-laravel-exceptions-renderer-new::separator />
 
-        <div class="w-full max-w-7xl mx-auto">
+        <div class="w-full max-w-7xl mx-auto border-x border-white/[0.09] border-dashed">
             <!-- Request Information Section -->
-            <div class="flex flex-col items-center justify-start w-full relative border-x border-white/[0.09] border-dashed">
+            <div class="flex flex-col items-center justify-start w-full relative">
                 <!-- URL Panel -->
                 <div class="w-full mx-auto px-14 relative">
                     <div class="backdrop-blur-[6px] bg-white/[0.04] border border-white/[0.01] rounded-lg flex items-center justify-between p-2 relative mt-[23px] w-full mx-auto">
@@ -160,7 +158,7 @@
             </div>
 
             <!-- Exception Overview Section -->
-            <div class="flex flex-col gap-12 items-center justify-start pt-5 px-14 pb-0 w-full border-x border-white/[0.09] border-dashed">
+            <div class="flex flex-col gap-12 items-center justify-start pt-5 px-14 pb-0 w-full">
                 <div class="flex flex-col w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
                         <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Overview</h2>
@@ -211,7 +209,7 @@
             </div>
 
             <!-- Exception Trace Section -->
-            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09] border-dashed">
+            <div class="flex flex-col gap-4 w-full px-14 ">
                 <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
                     <div class="flex flex-col overflow-hidden w-full">
                         <!-- Section Header -->
@@ -468,7 +466,7 @@
             </div>
 
             <!-- Database Queries -->
-            <div class="flex flex-col gap-4 w-full px-14 border-x border-white/[0.09] border-dashed">
+            <div class="flex flex-col gap-4 w-full px-14 ">
                 <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
                 <div class="flex flex-col overflow-hidden w-full">
                     <!-- Section Header -->
@@ -518,87 +516,84 @@
 
         <x-laravel-exceptions-renderer-new::separator />
 
-        <div class="w-full max-w-7xl mx-auto">
-            <!-- Context -->
-            <div class="flex flex-col gap-12 p-[56px] w-full border-x border-white/[0.09] border-dashed">
-                <!-- Headers -->
-                <div class="flex flex-col w-full">
-                    <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                        <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Headers</h2>
-                    </div>
-                    <div class="flex flex-col gap-5 w-full">
-                        <div class="flex flex-col w-full">
-                            @foreach ($exception->requestHeaders() as $key => $value)
-                            <div class="flex items-center gap-2 h-10 px-0 py-0 w-full">
-                                <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px]">{{ $key }}</div>
-                                <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                                <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">{{ $value }}</div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
+        <!-- Context -->
+        <div class="w-full max-w-7xl mx-auto flex flex-col gap-12 p-[56px] border-x border-white/[0.09] border-dashed">
+            <!-- Headers -->
+            <div class="flex flex-col w-full">
+                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
+                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Headers</h2>
                 </div>
-
-                <!-- Body -->
-                <div class="flex flex-col gap-2 overflow-hidden w-full">
-                    <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                        <h2 class="text-lg font-semibold tracking-[-0.36px] leading-[28px]">Body</h2>
-                    </div>
-                    @if($body = $exception->requestBody())
-                    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5 text-sm font-mono">
-                        <pre class="tracking-[-0.28px] leading-[1.7] max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
-                    </div>
-                    @else
-                    <x-laravel-exceptions-renderer-new::empty-state message="No request body" />
-                    @endif
-                </div>
-
-                <!-- Routing -->
-                <div class="flex flex-col overflow-hidden w-full">
-                    <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                        <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing</h2>
-                    </div>
+                <div class="flex flex-col gap-5 w-full">
                     <div class="flex flex-col w-full">
-                        @foreach ($exception->applicationRouteContext() as $key => $value)
+                        @foreach ($exception->requestHeaders() as $key => $value)
                         <div class="flex items-center gap-2 h-10 px-0 py-0 w-full">
-                            <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] capitalize">{{ $key }}</div>
+                            <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px]">{{ $key }}</div>
                             <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                            <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">
-                                {{ $value }}
-                            </div>
+                            <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">{{ $value }}</div>
                         </div>
                         @endforeach
                     </div>
                 </div>
+            </div>
 
-                <!-- Routing Parameters -->
-                <div class="flex flex-col gap-2 overflow-hidden w-full">
-                    <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                        <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing parameters</h2>
-                    </div>
-                    @if ($routeParametersContext = $exception->applicationRouteParametersContext())
-                    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5">
-                        <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
-                    </div>
-                    @else
-                    <x-laravel-exceptions-renderer-new::empty-state message="No routing parameters" />
-                    @endif
+            <!-- Body -->
+            <div class="flex flex-col gap-2 overflow-hidden w-full">
+                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
+                    <h2 class="text-lg font-semibold tracking-[-0.36px] leading-[28px]">Body</h2>
                 </div>
+                @if($body = $exception->requestBody())
+                <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5 text-sm font-mono">
+                    <pre class="tracking-[-0.28px] leading-[1.7] max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
+                </div>
+                @else
+                <x-laravel-exceptions-renderer-new::empty-state message="No request body" />
+                @endif
+            </div>
+
+            <!-- Routing -->
+            <div class="flex flex-col overflow-hidden w-full">
+                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
+                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing</h2>
+                </div>
+                <div class="flex flex-col w-full">
+                    @foreach ($exception->applicationRouteContext() as $key => $value)
+                    <div class="flex items-center gap-2 h-10 px-0 py-0 w-full">
+                        <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] capitalize">{{ $key }}</div>
+                        <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
+                        <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">
+                            {{ $value }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Routing Parameters -->
+            <div class="flex flex-col gap-2 overflow-hidden w-full">
+                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
+                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing parameters</h2>
+                </div>
+                @if ($routeParametersContext = $exception->applicationRouteParametersContext())
+                <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5">
+                    <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
+                </div>
+                @else
+                <x-laravel-exceptions-renderer-new::empty-state message="No routing parameters" />
+                @endif
             </div>
         </div>
 
         <x-laravel-exceptions-renderer-new::separator />
 
-        <div class="w-full max-w-7xl mx-auto">
-            <!-- Footer with ASCII Art -->
-            <div class="flex flex-col gap-12 px-14 py-0 w-full border-x border-white/[0.09] border-dashed">
-                <div class="grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] relative">
-                    <div class="grid-area-[1/1] h-0 mt-0 relative w-full">
-                        <div class="absolute top-[-1px] left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/10 to-transparent h-px"></div>
-                    </div>
+        <!-- Footer with ASCII Art -->
+        <div class="w-full max-w-7xl mx-auto flex flex-col gap-12 px-14 py-0 border-x border-white/[0.09] border-dashed">
+            <div class="grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] relative">
+                <div class="grid-area-[1/1] h-0 mt-0 relative w-full">
+                    <div class="absolute top-[-1px] left-0 right-0 bottom-0 bg-gradient-to-r from-transparent via-white/10 to-transparent h-px"></div>
                 </div>
-                <div class="flex gap-2 h-[276px] items-start justify-center w-full">
-                    <div class="flex-1 font-mono text-xs leading-[1.09] text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
+            </div>
+            <div class="flex gap-2 h-[276px] items-start justify-center w-full">
+                <div class="flex-1 font-mono text-xs leading-[1.09] text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
 1011011011                                                                                                                                                                                                                    110110110
 1111110111                                                                                                                                                                                                                    111101111
 1101011101                                                                                                                                                                                                                    101111011
@@ -629,11 +624,8 @@
 111101101111111111101111111      1101011111111101111111111101111101      1111111111                    1111101011111111111111101011111111                101111111111101                 1011111111011011011110101011         111111011
 110111111010110101111101011         1111111101101010101  1111101011      1010110101                      111111110110101010111  111101011                11101011011011                    110101111111101101111111           110111110
 111110101111111111011111111            11111110111111    1011111011      1111111111                          10111111111111     110111111                 1111111110111                        1101101011111101               111101011
-&nbsp;</div>
                 </div>
             </div>
-
-
         </div>
     </div>
 </body>
