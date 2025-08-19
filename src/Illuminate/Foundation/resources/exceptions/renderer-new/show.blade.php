@@ -167,7 +167,7 @@
                             <!-- Vendor Frames Toggle -->
                             <div class="bg-white/[0.01] opacity-90 rounded-lg h-11 w-full">
                                 <div class="flex items-center justify-between overflow-hidden pl-4 pr-2.5 py-0 h-full w-full">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 flex-1">
                                         <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
@@ -262,7 +262,7 @@
                                 <div class="flex flex-col overflow-hidden w-full">
                                     <!-- Vendor Frames Toggle -->
                                     <div class="bg-white/[0.01] flex items-center justify-between overflow-hidden pl-4 pr-2.5 py-0 h-11 w-full">
-                                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 flex-1">
                                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                             </svg>
@@ -277,7 +277,7 @@
 
                                     <!-- Individual Stack Frames -->
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
-                                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 flex-1">
                                             <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Pipeline\Pipeline::Illuminate\Pipeline\{closure}
                                             </span>
@@ -290,7 +290,7 @@
                                     </div>
 
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
-                                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 flex-1">
                                             <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Routing\Middleware\SubstituteBindings::handle
                                             </span>
@@ -303,7 +303,7 @@
                                     </div>
 
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
-                                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <div class="flex items-center gap-3 flex-1">
                                             <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Pipeline\Pipeline::Illuminate\Pipeline\{closure}
                                             </span>
@@ -319,7 +319,7 @@
 
                             <!-- Additional Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
-                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="flex items-center gap-3 flex-1">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
@@ -340,7 +340,7 @@
 
                             <!-- Another Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
-                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="flex items-center gap-3 flex-1">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
@@ -362,7 +362,7 @@
                             <!-- Vendor Frames Toggle (Another One) -->
                             <div class="bg-white/[0.01] opacity-90 rounded-lg h-11 w-full">
                                 <div class="flex items-center justify-between overflow-hidden pl-4 pr-2.5 py-0 h-full w-full">
-                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 flex-1">
                                         <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
@@ -378,7 +378,7 @@
 
                             <!-- Final Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
-                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <div class="flex items-center gap-3 flex-1">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
@@ -401,48 +401,7 @@
                 </div>
             </div>
 
-            <!-- Database Queries -->
-            <div class="flex flex-col gap-4 w-full">
-                <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
-                <div class="flex flex-col overflow-hidden w-full">
-                    <!-- Section Header -->
-                    <div class="flex items-center justify-between pb-2 pt-[18px] px-[18px] w-full">
-                        <div class="flex items-center gap-2.5 flex-1 min-w-12">
-                            <div class="flex items-center gap-2.5">
-                                <div class="bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                                    </svg>
-                                </div>
-                                <h3 class="text-base font-semibold">Queries</h3>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Query Rows -->
-                    <div class="flex flex-col gap-1 p-[10px] w-full">
-                        @forelse ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
-                        <div class="bg-white/[0.03] rounded-md h-10 flex items-center gap-8 px-4 w-full">
-                            <div class="flex items-center gap-4 flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                                    </svg>
-                                    <span class="text-xs font-mono text-neutral-400">{{ $connectionName }}</span>
-                                </div>
-                                <div class="text-xs font-mono text-neutral-200 overflow-hidden text-ellipsis">
-                                    <pre><code>{{ $sql }}</code></pre>
-                                </div>
-                            </div>
-                            <div class="text-xs font-mono text-neutral-200 w-[65px] text-right">{{ $time }}ms</div>
-                        </div>
-                        @empty
-                        <x-laravel-exceptions-renderer-new::empty-state message="No queries executed" />
-                        @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <x-laravel-exceptions-renderer-new::query :queries="$exception->applicationQueries()" />
         </x-laravel-exceptions-renderer-new::section-container>
 
         <x-laravel-exceptions-renderer-new::separator />
@@ -518,7 +477,7 @@
 
         <!-- Footer with ASCII Art -->
         <x-laravel-exceptions-renderer-new::section-container>
-            <div class="flex-1 font-mono text-xs text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
+            <div class="flex-1 font-mono text-xs text-transparent whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
 1011011011                                                                                                                                                                                                                    110110110
 1111110111                                                                                                                                                                                                                    111101111
 1101011101                                                                                                                                                                                                                    101111011
