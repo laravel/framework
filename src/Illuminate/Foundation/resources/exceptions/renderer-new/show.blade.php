@@ -15,74 +15,20 @@
     {!! Renderer::css() !!}
 </head>
 <body class="bg-neutral-900 font-sans antialiased overflow-x-hidden text-white">
-    <div class="relative min-h-screen bg-neutral-900">
+    <div class="min-h-screen bg-neutral-900">
         <!-- Topbar -->
-        <div class="flex items-center justify-center w-full relative">
-            <div class="box-border content-stretch flex flex-row items-center justify-between px-6 py-3 relative shrink-0 max-w-7xl w-full">
-                <div aria-hidden="true" class="absolute border-[0px_1px] border-[rgba(255,255,255,0.09)] border-dashed bottom-0 left-[-0.5px] pointer-events-none right-[-0.5px] top-0"></div>
-                <div class="box-border content-stretch flex flex-row gap-2 items-center justify-start p-0 relative shrink-0">
-                    <div class="overflow-clip relative shrink-0 w-[18px] h-[18px]">
-                        <svg class="w-full h-full text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-white text-[14px] text-left text-nowrap tracking-[-0.28px]">
-                        <p class="adjustLetterSpacing block leading-[20px] whitespace-pre">{{ $exception->title() }}</p>
-                    </div>
+        <x-laravel-exceptions-renderer-new::section-container class="px-6 py-6">
+            <div class="flex gap-2 items-center">
+                <div class="w-[18px] h-[18px]">
+                    <svg class="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                    </svg>
                 </div>
-                <div class="box-border content-stretch flex flex-row gap-4 items-center justify-start p-0 relative shrink-0">
-                    <div class="bg-[rgba(255,255,255,0.02)] box-border content-stretch flex flex-row h-8 items-center justify-center pl-1 pr-4 py-4 relative rounded-md shrink-0">
-                        <div aria-hidden="true" class="absolute border border-neutral-800 border-solid inset-0 pointer-events-none rounded-md"></div>
-                        <div class="box-border content-stretch flex flex-row gap-2 h-4 items-center justify-start mr-[-4px] pl-2 pr-0 py-0 relative shrink-0">
-                            <div class="overflow-clip relative shrink-0 w-3 h-3">
-                                <svg class="w-full h-full text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="box-border content-stretch flex flex-row gap-2 items-center justify-center mr-[-4px] px-3 py-0 relative shrink-0">
-                            <div class="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[14px] text-center text-neutral-400 text-nowrap tracking-[-0.28px]">
-                                <p class="adjustLetterSpacing block leading-[20px] whitespace-pre">Enable advanced monitoring</p>
-                            </div>
-                        </div>
-                        <div class="mr-[-4px] overflow-clip relative shrink-0 w-2 h-2">
-                            <svg class="w-full h-full text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Floating Nightwatch Installation Panel -->
-                <div class="absolute backdrop-blur-[6px] backdrop-filter bg-neutral-800 box-border content-stretch flex flex-col gap-6 items-start justify-start right-[24px] p-[24px] rounded-lg top-[49px] w-[478px] z-50">
-                    <div aria-hidden="true" class="absolute border border-[rgba(255,255,255,0.01)] border-solid inset-[-0.5px] pointer-events-none rounded-[8.5px] shadow-[0px_303px_85px_0px_rgba(0,0,0,0),0px_194px_77px_0px_rgba(0,0,0,0.04),0px_109px_65px_0px_rgba(0,0,0,0.13),0px_48px_48px_0px_rgba(0,0,0,0.22),0px_12px_27px_0px_rgba(0,0,0,0.25)]"></div>
-                    <div class="box-border content-stretch flex flex-col gap-4 items-start justify-start p-0 relative shrink-0 w-full">
-                        <div class="box-border content-stretch flex flex-row gap-[9px] items-center justify-start p-0 relative shrink-0">
-                            <div class="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-white text-[18px] text-left text-nowrap tracking-[-0.36px]">
-                                <p class="adjustLetterSpacing block leading-[28px] whitespace-pre">Install Nightwatch Local</p>
-                            </div>
-                        </div>
-                        <div class="font-['Inter:Light',_sans-serif] font-light leading-[0] min-w-full not-italic relative shrink-0 text-[14px] text-left text-neutral-300 tracking-[-0.28px]" style="width: min-content">
-                            <p class="block leading-[1.5]">Install Nightwatch locally, with no account required. Capture logs, timelines, traces, and more to better debug local exceptions.</p>
-                        </div>
-                    </div>
-                    <div class="bg-[rgba(255,255,255,0.03)] box-border content-stretch flex flex-row h-10 items-center justify-between pl-4 pr-2 py-1 relative rounded-lg shrink-0 w-full">
-                        <div aria-hidden="true" class="absolute border border-[rgba(255,255,255,0.06)] border-solid inset-0 pointer-events-none rounded-lg"></div>
-                        <div class="flex flex-col font-['CommitMonoLaravel:400Regular',_sans-serif] justify-center leading-[0] not-italic relative shrink-0 text-[#f6c177] text-[12px] text-left text-nowrap tracking-[-0.24px]">
-                            <p class="adjustLetterSpacing block leading-none whitespace-pre">composer require laravel/nightwatch</p>
-                        </div>
-                        <div class="bg-[rgba(255,255,255,0.1)] box-border content-stretch flex flex-row items-center justify-center pl-0 pr-2 py-4 relative rounded-md shrink-0 w-6 h-6">
-                            <div aria-hidden="true" class="absolute border border-[rgba(255,255,255,0.01)] border-solid inset-0 pointer-events-none rounded-md"></div>
-                            <div class="mr-[-8px] overflow-clip relative shrink-0 w-3 h-3">
-                                <svg class="w-full h-full text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
+                <div class="font-medium text-sm">
+                    {{ $exception->title() }}
                 </div>
             </div>
-        </div>
+        </x-laravel-exceptions-renderer-new::section-container>
 
         <x-laravel-exceptions-renderer-new::separator />
 
