@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -59,6 +60,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Stringable as NativeStringable;
 
 include_once 'Enums.php';
 
@@ -3350,6 +3352,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar' => 'foo'], $model->getAttribute('singleElementInArrayAttribute')->toArray());
     }
 
+    public function testConvertsStringableObjectToCastString()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $casts = $model->getCasts();
+
+        $this->assertSame('int', $casts['castStringableObject']);
+        $this->assertSame(CastsAttributesInstance::class . ':foo,bar', $casts['castCastAttributesObject']);
+    }
+
+    public function testUsingPlainObjectAsCastThrowsException()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cast object for something attribute must implement Stringable or CastAttributes.');
+
+        $model->mergeCasts([
+            'something' => (object) []
+        ]);
+    }
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
@@ -3906,6 +3930,8 @@ class EloquentModelCastingStub extends Model
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
             'asToObjectCast' => TestCast::class,
+            'castStringableObject' => new StringableCastBuilder(),
+            'castCastAttributesObject' => new CastsAttributesInstance('foo', 'bar'),
         ];
     }
 
@@ -4371,4 +4397,30 @@ class EloquentModelBootingCallbackTestStub extends Model
 class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
 {
     public static bool $bootHasFinished = false;
+}
+
+class StringableCastBuilder implements NativeStringable
+{
+    public function __toString()
+    {
+        return 'int';
+    }
+}
+
+class CastsAttributesInstance implements CastsAttributes
+{
+    public function __construct(public $foo, public $bar, protected ?Closure $private = null)
+    {
+        //
+    }
+
+    public function get(Model $model, string $key, mixed $value, array $attributes)
+    {
+
+    }
+
+    public function set(Model $model, string $key, mixed $value, array $attributes)
+    {
+
+    }
 }
