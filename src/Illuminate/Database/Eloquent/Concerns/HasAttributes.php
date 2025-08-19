@@ -802,7 +802,7 @@ trait HasAttributes
                     }
 
                     throw new InvalidArgumentException(
-                        "The $attribute cast object must implement Stringable or CastAttributes."
+                        "The cast object for $attribute attribute must implement Stringable or CastAttributes."
                     );
                 }),
                 is_array($cast) => value(function () use ($cast) {
