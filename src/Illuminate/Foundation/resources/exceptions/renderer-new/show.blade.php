@@ -487,7 +487,7 @@
 
                     <!-- Query Rows -->
                     <div class="flex flex-col gap-1 p-[10px] w-full">
-                        @foreach ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
+                        @forelse ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
                         <div class="bg-white/[0.03] rounded-md h-10 flex items-center gap-8 px-4 w-full">
                             <div class="flex items-center gap-4 flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
@@ -507,7 +507,9 @@
                                 </div>
                             </div>
                         </div>
-                        @endforeach
+                        @empty
+                        <x-laravel-exceptions-renderer-new::empty-state message="No queries executed" />
+                        @endforelse
                         </div>
                     </div>
                 </div>
@@ -540,13 +542,15 @@
                 <!-- Body -->
                 <div class="flex flex-col gap-2 overflow-hidden w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                        <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Body</h2>
+                        <h2 class="text-lg font-semibold tracking-[-0.36px] leading-[28px]">Body</h2>
                     </div>
-                    <div class="bg-white/[0.02] border border-white/[0] rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full">
-                        <div class="flex flex-col overflow-hidden p-5 w-full">
-                            <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] whitespace-pre"><code>{{ $exception->requestBody() ?: 'No body data' }}</code></pre>
-                        </div>
+                    @if($body = $exception->requestBody())
+                    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5 text-sm font-mono">
+                        <pre class="tracking-[-0.28px] leading-[1.7] max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
                     </div>
+                    @else
+                    <x-laravel-exceptions-renderer-new::empty-state message="No request body" />
+                    @endif
                 </div>
 
                 <!-- Routing -->
@@ -568,18 +572,18 @@
                 </div>
 
                 <!-- Routing Parameters -->
-                @if ($routeParametersContext = $exception->applicationRouteParametersContext())
                 <div class="flex flex-col gap-2 overflow-hidden w-full">
                     <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
                         <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing parameters</h2>
                     </div>
-                    <div class="bg-white/[0.02] border border-white/[0] rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full">
-                        <div class="flex flex-col overflow-hidden p-5 w-full">
-                            <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
-                        </div>
+                    @if ($routeParametersContext = $exception->applicationRouteParametersContext())
+                    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5">
+                        <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
                     </div>
+                    @else
+                    <x-laravel-exceptions-renderer-new::empty-state message="No routing parameters" />
+                    @endif
                 </div>
-                @endif
             </div>
         </div>
 
