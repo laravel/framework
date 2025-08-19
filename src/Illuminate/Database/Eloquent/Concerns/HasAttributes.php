@@ -2386,6 +2386,19 @@ trait HasAttributes
     }
 
     /**
+     * Merge new appended attributes with existing appended attributes on the model.
+     *
+     * @param  array<string>  $appends
+     * @return $this
+     */
+    public function mergeAppends(array $appends)
+    {
+        $this->appends = array_values(array_unique(array_merge($this->appends, $appends)));
+
+        return $this;
+    }
+
+    /**
      * Return whether the accessor attribute has been appended.
      *
      * @param  string  $attribute
