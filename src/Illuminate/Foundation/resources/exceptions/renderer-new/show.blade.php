@@ -487,28 +487,29 @@
 
                     <!-- Query Rows -->
                     <div class="flex flex-col gap-1 p-[10px] w-full">
-                        <!-- Query 1 -->
+                        @foreach ($exception->applicationQueries() as ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
                         <div class="bg-white/[0.03] rounded-md h-10 flex items-center gap-8 px-4 w-full">
                             <div class="flex items-center gap-4 flex-1 min-w-0">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                                     </svg>
-                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.12px]">sqlite</span>
+                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.12px]">{{ $connectionName }}</span>
                                 </div>
                                 <div class="text-xs font-mono text-neutral-200 tracking-[-0.24px] overflow-hidden text-ellipsis flex-1 min-w-0 leading-[1.5]">
-                                    <span class="text-[#f78c6c]">SELECT</span><span class="text-[#eeffff]"> </span><span class="text-[#89ddff]">*</span><span class="text-[#eeffff]"> </span><span class="text-[#f78c6c]">FROM</span><span class="text-[#eeffff]"> articles </span><span class="text-[#f78c6c]">ORDER BY</span><span class="text-[#eeffff]"> created_at </span><span class="text-[#f78c6c]">DESC</span><span class="text-[#eeffff]"> </span><span class="text-[#f78c6c]">LIMIT</span><span class="text-[#eeffff]"> </span><span class="text-[#f78c6c]">10</span>
+                                    <pre><code>{{ $sql }}</code></pre>
                                 </div>
                             </div>
                             <div class="flex items-center gap-5">
                                 <div class="flex items-center gap-2"></div>
                                 <div class="flex items-center gap-2">
-                                    <div class="text-xs font-mono text-neutral-200 tracking-[-0.12px] w-[65px] text-right">3,424ms</div>
+                                    <div class="text-xs font-mono text-neutral-200 tracking-[-0.12px] w-[65px] text-right">{{ $time }}ms</div>
                                 </div>
                             </div>
                         </div>
+                        @endforeach
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
         </div>
