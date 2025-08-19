@@ -101,18 +101,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Global "From" Address
+    | Global Mail Addresses
     |--------------------------------------------------------------------------
     |
     | You may wish for all emails sent by your application to be sent from
-    | the same address. Here you may specify a name and address that is
-    | used globally for all emails that are sent by your application.
+    | the same address and/or have the same reply address. Here you may
+    | specify the default addresses used for your application mails.
     |
     */
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_REPLY_NAME', 'Example'),
     ],
 
     /*
