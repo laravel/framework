@@ -11,6 +11,7 @@ use Carbon\CarbonInterface;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -41,6 +42,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use Stringable;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
@@ -790,6 +792,19 @@ trait HasAttributes
     {
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
+                is_object($cast) => value(function () use ($cast, $attribute) {
+                    if ($cast instanceof Stringable) {
+                        return (string) $cast;
+                    }
+
+                    if ($cast instanceof CastsAttributes) {
+                        return $cast::class .':'. implode(',', get_object_vars($cast));
+                    }
+
+                    throw new InvalidArgumentException(
+                        "The $attribute cast object must implement Stringable or CastAttributes."
+                    );
+                }),
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
                         return $cast[0];
