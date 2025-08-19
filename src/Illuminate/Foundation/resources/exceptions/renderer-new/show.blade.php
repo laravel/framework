@@ -35,37 +35,32 @@
         <!-- Header Section -->
         <x-laravel-exceptions-renderer-new::section-container class="flex flex-col gap-8">
             <div class="flex flex-col gap-6">
-                <div class="flex items-center gap-[9px]">
-                    <h1 class="text-3xl font-semibold text-white tracking-[-0.6px] leading-[36px]">{{ $exception->class() }}</h1>
-                </div>
-                <p class="text-xl font-light text-neutral-300 tracking-[-0.4px] leading-[30px] min-w-full">
+                <h1 class="text-3xl font-semibold">{{ $exception->class() }}</h1>
+                <p class="text-xl font-light text-neutral-300">
                     {{ $exception->message() }}
                 </p>
             </div>
 
             <!-- Metadata Section -->
             <div class="flex items-start gap-2">
-                <div class="bg-white/[0.03] border border-white/[0.01] rounded-md shadow-sm flex items-center gap-0.5">
-                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
+                <div class="bg-white/[0.03] border border-white/10 divide-x divide-white/10 rounded-md shadow-sm flex items-center gap-0.5">
+                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px]">
                         <span class="text-neutral-500">LARAVEL</span>
                         <span class="text-neutral-300">{{ app()->version() }}</span>
                     </div>
-                    <div class="w-0 h-[22px] flex items-center justify-center">
-                        <div class="rotate-90 w-[22px] h-0 border-b border-white/[0.04]"></div>
-                    </div>
-                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px] tracking-[-0.26px]">
+                    <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px]">
                         <span class="text-neutral-500">PHP</span>
                         <span class="text-neutral-300">{{ PHP_VERSION }}</span>
                     </div>
                 </div>
-                <div class="bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                    <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div class="bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px]">
+                    <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                     </svg>
-                    <span class="text-[13px] font-mono text-white tracking-[-0.26px]">UNHANDLED</span>
+                    <span class="text-[13px] font-mono">UNHANDLED</span>
                 </div>
-                <div class="bg-rose-950 border border-rose-900 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                    <span class="text-[13px] font-mono text-rose-100 tracking-[-0.26px]">CODE {{ $exception->code() }}</span>
+                <div class="bg-rose-950 border border-rose-900 rounded-md h-6 flex items-center gap-1.5 px-[6px]">
+                    <span class="text-[13px] font-mono text-rose-100">CODE {{ $exception->code() }}</span>
                 </div>
             </div>
         </x-laravel-exceptions-renderer-new::section-container>
@@ -79,16 +74,16 @@
                 <div class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2 relative w-full mx-auto">
                     <div class="flex items-center gap-3">
                         <div class="bg-blue-600 rounded h-[25px] flex items-center justify-center px-2">
-                            <span class="text-[13px] font-mono text-white tracking-[-0.26px]">{{ $exception->request()->method() }}</span>
+                            <span class="text-[13px] font-mono">{{ $exception->request()->method() }}</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <div class="opacity-60 w-3 h-3">
-                                <svg class="w-full h-full text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-full h-full" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd" />
                                 </svg>
                             </div>
                         </div>
-                        <div class="text-sm font-light text-white tracking-[-0.28px]">
+                        <div class="text-sm font-light">
                             {{ $exception->request()->fullUrl() }}
                         </div>
                     </div>
@@ -103,16 +98,16 @@
             <!-- Exception Overview Section -->
             <div class="flex flex-col gap-12 items-center justify-start pt-5 pb-0 w-full">
                 <div class="flex flex-col w-full">
-                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px] pb-3">Overview</h2>
+                    <h2 class="text-lg font-semibold pb-3">Overview</h2>
                     <div class="flex flex-col gap-5">
                         <div class="flex flex-col w-full">
                             <!-- Date Row -->
                             <div class="flex items-center gap-2 h-10 px-0 py-[18px] w-full">
-                                <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] uppercase">DATE</div>
+                                <div class="text-sm font-mono text-neutral-400 uppercase">DATE</div>
                                 <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
                                 <div class="flex items-center gap-4">
                                     <div class="flex items-center gap-2">
-                                        <div class="text-sm font-mono text-white tracking-[-0.28px]">
+                                        <div class="text-sm font-mono">
                                             {{ now()->format('Y/m/d H:i:s.v') }} <span class="text-neutral-500">UTC</span>
                                         </div>
                                     </div>
@@ -120,27 +115,27 @@
                             </div>
                             <!-- Status Code Row -->
                             <div class="flex items-center gap-2 h-10 px-0 py-[18px] w-full">
-                                <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] uppercase">STATUS CODE</div>
+                                <div class="text-sm font-mono text-neutral-400 uppercase">STATUS CODE</div>
                                 <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
                                 <div class="flex items-center gap-4">
-                                    <div class="bg-rose-500 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                                        <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <div class="bg-rose-500 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-[6px]">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                                         </svg>
-                                        <span class="text-[13px] font-mono text-neutral-300 tracking-[-0.26px]">500</span>
+                                        <span class="text-[13px] font-mono text-neutral-300">500</span>
                                     </div>
                                 </div>
                             </div>
                             <!-- Method Row -->
                             <div class="flex items-center gap-2 h-10 px-0 py-[18px] w-full">
-                                <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] uppercase">METHOD</div>
+                                <div class="text-sm font-mono text-neutral-400 uppercase">METHOD</div>
                                 <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
                                 <div class="flex items-center gap-4">
-                                    <div class="bg-rose-500 border border-emerald-800 rounded-md h-6 flex items-center gap-1.5 px-[6px] min-w-6">
-                                        <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <div class="bg-rose-500 border border-emerald-800 rounded-md h-6 flex items-center gap-1.5 px-[6px]">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clip-rule="evenodd" />
                                         </svg>
-                                        <span class="text-[13px] font-mono text-neutral-300 tracking-[-0.26px]">{{ $exception->request()->method() }}</span>
+                                        <span class="text-[13px] font-mono text-neutral-300">{{ $exception->request()->method() }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -158,11 +153,11 @@
                             <div class="flex items-center gap-2.5 flex-1 min-w-12">
                                 <div class="flex items-center gap-2.5">
                                     <div class="bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                                        <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.178 2.625-1.516 2.625H3.72c-1.337 0-2.19-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
-                                    <h3 class="text-base font-semibold text-white tracking-[-0.32px] leading-[24px]">Exception trace</h3>
+                                    <h3 class="text-base font-semibold">Exception trace</h3>
                                 </div>
                             </div>
                         </div>
@@ -176,10 +171,10 @@
                                         <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
-                                        <span class="text-[13px] font-mono text-neutral-400 tracking-[-0.26px]">53 vendor frames</span>
+                                        <span class="text-[13px] font-mono text-neutral-400">53 vendor frames</span>
                                     </div>
                                     <div class="bg-white/[0.03] rounded-md w-6 h-6 flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
@@ -192,18 +187,18 @@
                                     <!-- Frame Header -->
                                     <div class="bg-white/[0.04] flex items-center justify-between h-11 pl-4 pr-2.5 py-2.5 w-full border-b border-white/[0]">
                                         <div class="flex items-center gap-3">
-                                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                                 <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                             </svg>
-                                            <span class="text-[13px] font-mono text-white tracking-[-0.26px]">App\Services\FlightService</span>
+                                            <span class="text-[13px] font-mono">App\Services\FlightService</span>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <span class="text-xs font-mono text-neutral-300 tracking-[-0.24px]">
+                                            <span class="text-xs font-mono text-neutral-300">
                                                 resources/views/dashboard/partials/total-requests.blade.php<span class="text-neutral-500">:32</span>
                                             </span>
                                             <div class="bg-white/[0.05] rounded-md w-6 h-6 flex items-center justify-center">
-                                                <svg class="w-2 h-[11px] text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg class="w-2 h-[11px]" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                                 </svg>
                                             </div>
@@ -212,7 +207,7 @@
 
                                     <!-- Function Signature -->
                                     <div class="bg-white/[0.02] flex items-center justify-between h-8 pl-[18px] pr-3 py-2.5 w-full">
-                                        <code class="text-[13px] font-mono text-[#62e884] tracking-[-0.26px] leading-none">
+                                        <code class="text-[13px] font-mono text-[#62e884]">
                                             <span class="text-[#dcdcaa]">createFlight</span><span class="text-[#f8f8f2]">(</span><span class="text-[#9cdcfe]">$id</span><span class="text-[#f8f8f2]">,</span><span class="text-[#50fa7b]"> </span><span class="text-[#9cdcfe]">$name</span><span class="text-[#f8f8f2]">,</span><span class="text-[#50fa7b]"> </span><span class="text-[#9cdcfe]">$origin</span><span class="text-[#f8f8f2]">,</span><span class="text-[#50fa7b]"> </span><span class="text-[#9cdcfe]">$destination</span><span class="text-[#f8f8f2]">,</span><span class="text-[#50fa7b]"> </span><span class="text-[#9cdcfe]">$departure_time</span><span class="text-[#f8f8f2]">,</span><span class="text-[#50fa7b]"> </span><span class="text-[#9cdcfe]">$arrival_time</span><span class="text-[#f8f8f2]">)</span>
                                         </code>
                                     </div>
@@ -235,7 +230,7 @@
 
                                         <!-- Code Content -->
                                         <div class="flex gap-6 items-start justify-start font-mono w-full relative z-10">
-                                            <div class="text-sm text-[rgba(225,228,232,0.3)] text-right tracking-[-0.28px] leading-[2] whitespace-pre">
+                                            <div class="text-sm text-[rgba(225,228,232,0.3)] text-right whitespace-pre">
 29
 30
 31
@@ -246,7 +241,7 @@
 36
 37
 38</div>
-                                            <div class="text-[13px] text-[#89ddff] tracking-[-0.26px] w-[875px] leading-[2.16] whitespace-pre-wrap">
+                                            <div class="text-[13px] text-[#89ddff] w-[875px] leading-[2.16] whitespace-pre-wrap">
 <span class="text-neutral-300">-></span><span class="text-[#dcdcaa]">when</span><span class="text-neutral-300">(</span><span class="text-[#dcdcaa]">in_array</span><span class="text-neutral-300">(</span><span class="text-[#9cdcfe]">$type</span><span class="text-neutral-300">, [</span>
 <span class="text-neutral-300">        </span><span class="text-[#ce9178]">'exception'</span><span class="text-neutral-300">, </span><span class="text-[#ce9178]">'alert'</span><span class="text-neutral-300">,</span>
 <span class="text-neutral-300">    ]), </span><span class="text-[#569cd6]">fn</span><span class="text-neutral-300"> (</span><span class="text-[#9cdcfe]">$query</span><span class="text-neutral-300">) => </span><span class="text-[#9cdcfe]">$query</span><span class="text-neutral-300">-></span><span class="text-[#dcdcaa]">where</span><span class="text-neutral-300">(</span><span class="text-[#ce9178]">'type'</span><span class="text-neutral-300">, </span><span class="text-[#9cdcfe]">$type</span><span class="text-neutral-300">))</span>
@@ -268,13 +263,13 @@
                                     <!-- Vendor Frames Toggle -->
                                     <div class="bg-white/[0.01] flex items-center justify-between overflow-hidden pl-4 pr-2.5 py-0 h-11 w-full">
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
-                                            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                             </svg>
-                                            <span class="text-[13px] font-mono text-white tracking-[-0.26px]">3 vendor frames</span>
+                                            <span class="text-[13px] font-mono">3 vendor frames</span>
                                         </div>
                                         <div class="bg-white/[0.05] rounded-md w-6 h-6 flex items-center justify-center">
-                                            <svg class="w-2 h-[11px] text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-2 h-[11px]" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
                                         </div>
@@ -283,12 +278,12 @@
                                     <!-- Individual Stack Frames -->
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
-                                            <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
+                                            <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Pipeline\Pipeline::Illuminate\Pipeline\{closure}
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">
+                                            <span class="text-xs font-mono text-neutral-400">
                                                 Illuminate/Pipeline/Pipeline.php<span class="text-neutral-500">:163</span>
                                             </span>
                                         </div>
@@ -296,12 +291,12 @@
 
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
-                                            <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
+                                            <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Routing\Middleware\SubstituteBindings::handle
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">
+                                            <span class="text-xs font-mono text-neutral-400">
                                                 Illuminate/Routing/Middleware/SubstituteBindings.php<span class="text-neutral-500">:82</span>
                                             </span>
                                         </div>
@@ -309,12 +304,12 @@
 
                                     <div class="flex items-center justify-between h-11 px-4 py-0 w-full border-t border-white/[0]">
                                         <div class="flex items-center gap-3 flex-1 min-w-0">
-                                            <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
+                                            <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
                                                 Illuminate\Pipeline\Pipeline::Illuminate\Pipeline\{closure}
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">
+                                            <span class="text-xs font-mono text-neutral-400">
                                                 vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php<span class="text-neutral-500">:65</span>
                                             </span>
                                         </div>
@@ -325,18 +320,18 @@
                             <!-- Additional Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
                                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
-                                        App\Models\Flight<span class="text-white">-></span><span class="text-[#9cdcfe]">store()</span>
+                                    <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
+                                        App\Models\Flight<span class=">-></span><span class="text-[#9cdcfe]">store()</span>
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">Services/FlightService.php:45</span>
+                                    <span class="text-xs font-mono text-neutral-400">Services/FlightService.php:45</span>
                                     <div class="bg-white/[0.03] rounded-md w-6 h-6 flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
@@ -346,18 +341,18 @@
                             <!-- Another Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
                                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
-                                        App\Models\Flight<span class="text-white">-></span><span class="text-[#9cdcfe]">store()</span>
+                                    <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
+                                        App\Models\Flight<span class=">-></span><span class="text-[#9cdcfe]">store()</span>
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">Services/FlightService.php:45</span>
+                                    <span class="text-xs font-mono text-neutral-400">Services/FlightService.php:45</span>
                                     <div class="bg-white/[0.03] rounded-md w-6 h-6 flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
@@ -371,10 +366,10 @@
                                         <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                                         </svg>
-                                        <span class="text-[13px] font-mono text-neutral-400 tracking-[-0.26px]">53 vendor frames</span>
+                                        <span class="text-[13px] font-mono text-neutral-400">53 vendor frames</span>
                                     </div>
                                     <div class="bg-white/[0.03] rounded-md w-6 h-6 flex items-center justify-center">
-                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                         </svg>
                                     </div>
@@ -384,16 +379,16 @@
                             <!-- Final Stack Frame -->
                             <div class="bg-white/[0.03] rounded-lg h-11 flex items-center justify-between pl-4 pr-2.5 py-0 w-full">
                                 <div class="flex items-center gap-3 flex-1 min-w-0">
-                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                                         <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
                                     </svg>
-                                    <span class="text-[13px] font-mono text-white tracking-[-0.26px] overflow-hidden text-ellipsis">
-                                        App\Http\Controllers\ApiController<span class="text-white">-></span><span class="text-[#9cdcfe]">handle()</span>
+                                    <span class="text-[13px] font-mono overflow-hidden text-ellipsis">
+                                        App\Http\Controllers\ApiController<span class=">-></span><span class="text-[#9cdcfe]">handle()</span>
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.24px]">app/Http/Controllers/ApiController.php:32</span>
+                                    <span class="text-xs font-mono text-neutral-400">app/Http/Controllers/ApiController.php:32</span>
                                     <div class="bg-white/[0.03] rounded-md w-6 h-6 flex items-center justify-center">
                                         <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                             <circle cx="10" cy="10" r="3" />
@@ -415,11 +410,11 @@
                         <div class="flex items-center gap-2.5 flex-1 min-w-12">
                             <div class="flex items-center gap-2.5">
                                 <div class="bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                                     </svg>
                                 </div>
-                                <h3 class="text-base font-semibold text-white tracking-[-0.32px] leading-[24px]">Queries</h3>
+                                <h3 class="text-base font-semibold">Queries</h3>
                             </div>
                         </div>
                     </div>
@@ -433,18 +428,13 @@
                                     <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
                                     </svg>
-                                    <span class="text-xs font-mono text-neutral-400 tracking-[-0.12px]">{{ $connectionName }}</span>
+                                    <span class="text-xs font-mono text-neutral-400">{{ $connectionName }}</span>
                                 </div>
-                                <div class="text-xs font-mono text-neutral-200 tracking-[-0.24px] overflow-hidden text-ellipsis flex-1 min-w-0 leading-[1.5]">
+                                <div class="text-xs font-mono text-neutral-200 overflow-hidden text-ellipsis">
                                     <pre><code>{{ $sql }}</code></pre>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-5">
-                                <div class="flex items-center gap-2"></div>
-                                <div class="flex items-center gap-2">
-                                    <div class="text-xs font-mono text-neutral-200 tracking-[-0.12px] w-[65px] text-right">{{ $time }}ms</div>
-                                </div>
-                            </div>
+                            <div class="text-xs font-mono text-neutral-200 w-[65px] text-right">{{ $time }}ms</div>
                         </div>
                         @empty
                         <x-laravel-exceptions-renderer-new::empty-state message="No queries executed" />
@@ -462,15 +452,15 @@
             <!-- Headers -->
             <div class="flex flex-col w-full">
                 <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Headers</h2>
+                    <h2 class="text-lg font-semibold">Headers</h2>
                 </div>
                 <div class="flex flex-col gap-5 w-full">
                     <div class="flex flex-col w-full">
                         @foreach ($exception->requestHeaders() as $key => $value)
-                        <div class="flex items-center gap-2 h-10 px-0 py-0 w-full">
-                            <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px]">{{ $key }}</div>
+                        <div class="flex items-center gap-2 h-10 w-full">
+                            <div class="text-sm font-mono text-neutral-400">{{ $key }}</div>
                             <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                            <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">{{ $value }}</div>
+                            <div class="text-sm font-mono max-w-[772px] overflow-hidden text-ellipsis">{{ $value }}</div>
                         </div>
                         @endforeach
                     </div>
@@ -480,11 +470,11 @@
             <!-- Body -->
             <div class="flex flex-col gap-2 overflow-hidden w-full">
                 <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold tracking-[-0.36px] leading-[28px]">Body</h2>
+                    <h2 class="text-lg font-semibold">Body</h2>
                 </div>
                 @if($body = $exception->requestBody())
                 <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5 text-sm font-mono">
-                    <pre class="tracking-[-0.28px] leading-[1.7] max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
+                    <pre class="max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
                 </div>
                 @else
                 <x-laravel-exceptions-renderer-new::empty-state message="No request body" />
@@ -493,15 +483,15 @@
 
             <!-- Routing -->
             <div class="flex flex-col overflow-hidden w-full">
-                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing</h2>
+                <div class="flex gap-6 items-start justify-start pb-3 w-full">
+                    <h2 class="text-lg font-semibold">Routing</h2>
                 </div>
                 <div class="flex flex-col w-full">
                     @foreach ($exception->applicationRouteContext() as $key => $value)
-                    <div class="flex items-center gap-2 h-10 px-0 py-0 w-full">
-                        <div class="text-sm font-mono text-neutral-400 tracking-[-0.28px] capitalize">{{ $key }}</div>
+                    <div class="flex items-center gap-2 h-10 w-full">
+                        <div class="text-sm font-mono text-neutral-400 capitalize">{{ $key }}</div>
                         <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                        <div class="text-sm font-mono text-white tracking-[-0.28px] max-w-[772px] overflow-hidden text-ellipsis leading-[1.6]">
+                        <div class="text-sm font-mono max-w-[772px] overflow-hidden text-ellipsis">
                             {{ $value }}
                         </div>
                     </div>
@@ -511,12 +501,12 @@
 
             <!-- Routing Parameters -->
             <div class="flex flex-col gap-2 overflow-hidden w-full">
-                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold text-white tracking-[-0.36px] leading-[28px]">Routing parameters</h2>
+                <div class="flex gap-6 items-start justify-start pb-3 w-full">
+                    <h2 class="text-lg font-semibold">Routing parameters</h2>
                 </div>
                 @if ($routeParametersContext = $exception->applicationRouteParametersContext())
                 <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5">
-                    <pre class="text-sm font-mono text-white tracking-[-0.28px] leading-[1.7] max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
+                    <pre class="text-sm font-mono max-w-[780px] w-full"><code>{{ $routeParametersContext }}</code></pre>
                 </div>
                 @else
                 <x-laravel-exceptions-renderer-new::empty-state message="No routing parameters" />
@@ -528,7 +518,7 @@
 
         <!-- Footer with ASCII Art -->
         <x-laravel-exceptions-renderer-new::section-container>
-            <div class="flex-1 font-mono text-xs leading-[1.09] text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
+            <div class="flex-1 font-mono text-xs text-transparent min-w-0 whitespace-pre" style="background: radial-gradient(25.8px 13.5px at 106px 70px, rgba(212,212,212,1) 0%, rgba(179,179,179,1) 25%, rgba(146,146,146,1) 50%, rgba(113,113,113,1) 75%, rgba(81,81,81,1) 100%); -webkit-background-clip: text; background-clip: text;">1111111111                                                                                                                                                                                                                    111111111
 1011011011                                                                                                                                                                                                                    110110110
 1111110111                                                                                                                                                                                                                    111101111
 1101011101                                                                                                                                                                                                                    101111011
