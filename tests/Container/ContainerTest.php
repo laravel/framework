@@ -1094,9 +1094,7 @@ class WildcardConcrete implements WildcardOnlyInterface
 {
 }
 
-/*
- * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
- */
+// The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
 #[Bind(FallbackConcrete::class)]
 #[Bind(ProdConcrete::class, environments: 'prod')]
 interface WildcardAndProdInterface

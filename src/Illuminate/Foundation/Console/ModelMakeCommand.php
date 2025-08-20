@@ -113,6 +113,13 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
+        // Check if model already exists and force option is not used
+        if ($this->alreadyExists($this->getNameInput()) && ! $this->option('force')) {
+            $this->error('Model already exists, migration creation skipped.');
+
+            return;
+        }
+
         $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
 
         if ($this->option('pivot')) {

@@ -822,10 +822,12 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             }
         };
 
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
-        $paginator = new class extends AbstractPaginator {
+        $paginator = new class extends AbstractPaginator
+        {
         };
 
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
