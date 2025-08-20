@@ -1471,6 +1471,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Run the statement to start a new transaction.
+     *
+     * @return void
+     */
+    protected function executeBeginTransactionStatement()
+    {
+        $this->getPdo()->beginTransaction();
+    }
+
+    /**
      * Set the transaction manager instance on the connection.
      *
      * @param  \Illuminate\Database\DatabaseTransactionsManager  $manager
