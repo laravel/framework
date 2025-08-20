@@ -371,8 +371,8 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
 
-     public function testRoundToHalfUp()
-     {
+    public function testRoundToHalfUp()
+    {
         // Test cases for rounding up (max flag)
         $this->assertEquals(100.0, Number::roundToHalf(100.0, true));
         $this->assertEquals(100.5, Number::roundToHalf(100.1, true));
