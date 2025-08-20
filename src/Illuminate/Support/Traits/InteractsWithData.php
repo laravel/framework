@@ -15,7 +15,7 @@ trait InteractsWithData
     /**
      * Retrieve all data from the instance.
      *
-     * @param  array|mixed|null  $keys
+     * @param  mixed  $keys
      * @return array
      */
     abstract public function all($keys = null);
@@ -385,7 +385,7 @@ trait InteractsWithData
     /**
      * Get a subset containing the provided keys with values from the instance data.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -410,7 +410,7 @@ trait InteractsWithData
     /**
      * Get all of the data except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function except($keys)

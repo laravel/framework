@@ -1288,7 +1288,7 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  bool  $removeLastSegmentOfAttribute
-     * @return \Illuminate\Support\Fluent|array|mixed
+     * @return \Illuminate\Support\Fluent|mixed
      */
     private function dataForSometimesIteration(string $attribute, bool $removeLastSegmentOfAttribute)
     {
