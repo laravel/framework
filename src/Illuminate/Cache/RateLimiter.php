@@ -177,6 +177,17 @@ class RateLimiter
             );
         }
 
+        // ensure TTL is always present for Redis keys
+        $store = $this->cache->getStore();
+        if ($store instanceof \Illuminate\Cache\RedisStore) {
+            $redis = $store->connection();
+            $ttl = $redis->ttl($key);
+
+            if ($ttl === -1) {
+                $redis->expire($key, $decaySeconds);
+            }
+        }
+
         return $hits;
     }
 
