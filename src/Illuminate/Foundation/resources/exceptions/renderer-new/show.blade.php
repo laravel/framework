@@ -408,22 +408,9 @@
 
         <!-- Context -->
         <x-laravel-exceptions-renderer-new::section-container class="flex flex-col gap-12">
-            <!-- Headers -->
             <x-laravel-exceptions-renderer-new::request-header :headers="$exception->requestHeaders()" />
 
-            <!-- Body -->
-            <div class="flex flex-col gap-2 overflow-hidden w-full">
-                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold">Body</h2>
-                </div>
-                @if($body = $exception->requestBody())
-                <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] w-full overflow-hidden p-5 text-sm font-mono">
-                    <pre class="max-w-[780px] whitespace-pre"><code>{{ $body }}</code></pre>
-                </div>
-                @else
-                <x-laravel-exceptions-renderer-new::empty-state message="No request body" />
-                @endif
-            </div>
+            <x-laravel-exceptions-renderer-new::request-body :body="$exception->requestBody()" />
 
             <!-- Routing -->
             <div class="flex flex-col overflow-hidden w-full">
