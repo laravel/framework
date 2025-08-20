@@ -39,7 +39,7 @@ class RateLimiterRedisTtlFixTest extends TestCase
 
         $store->shouldReceive('add')
             ->once()
-            ->with($key . ':timer', Mockery::type('int'), $decay)
+            ->with($key.':timer', Mockery::type('int'), $decay)
             ->andReturn(true);
         $store->shouldReceive('add')
             ->once()
@@ -79,7 +79,7 @@ class RateLimiterRedisTtlFixTest extends TestCase
 
         $store->shouldReceive('add')
             ->once()
-            ->with($key . ':timer', Mockery::type('int'), $decay)
+            ->with($key.':timer', Mockery::type('int'), $decay)
             ->andReturn(true);
         $store->shouldReceive('add')
             ->once()
@@ -122,7 +122,7 @@ class RateLimiterRedisTtlFixTest extends TestCase
 
         $store->shouldReceive('add')
             ->once()
-            ->with($key . ':timer', Mockery::type('int'), $decay)
+            ->with($key.':timer', Mockery::type('int'), $decay)
             ->andReturn(true);
         $store->shouldReceive('add')
             ->once()
