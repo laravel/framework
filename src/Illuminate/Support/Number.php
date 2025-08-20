@@ -437,4 +437,59 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Round the given number to the nearest half increment (.0 or .5).
+     *
+     * @param  int|float  $number
+     * @param  bool  $up  Whether to round up (true) or down (false) when between increments
+     * @return float
+     */
+    public static function roundToHalf(int|float $number, bool $up = true): float
+    {
+        $integer = floor($number);
+        $decimal = $number - $integer;
+
+        if ($up) {
+            // Round up logic
+            if ($decimal <= 0.0) {
+                return (float) $integer;
+            } elseif ($decimal <= 0.5) {
+                return $integer + 0.5;
+            } else {
+                return (float) ($integer + 1);
+            }
+        } else {
+            // Round down logic
+            if ($decimal < 0.5) {
+                return (float) $integer;
+            } elseif ($decimal < 1.0) {
+                return $integer + 0.5;
+            } else {
+                return (float) ($integer + 1);
+            }
+        }
+    }
+
+    /**
+     * Round the given number up to the nearest half increment (.0 or .5).
+     *
+     * @param  int|float  $number
+     * @return float
+     */
+    public static function ceilToHalf(int|float $number): float
+    {
+        return static::roundToHalf($number, true);
+    }
+
+    /**
+     * Round the given number down to the nearest half increment (.0 or .5).
+     *
+     * @param  int|float  $number
+     * @return float
+     */
+    public static function floorToHalf(int|float $number): float
+    {
+        return static::roundToHalf($number, false);
+    }
 }

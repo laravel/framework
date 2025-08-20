@@ -370,4 +370,76 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
+
+     public function testRoundToHalfUp()
+     {
+        // Test cases for rounding up (max flag)
+        $this->assertEquals(100.0, Number::roundToHalf(100.0, true));
+        $this->assertEquals(100.5, Number::roundToHalf(100.1, true));
+        $this->assertEquals(100.5, Number::roundToHalf(100.22, true));
+        $this->assertEquals(100.5, Number::roundToHalf(100.5, true));
+        $this->assertEquals(101.0, Number::roundToHalf(100.6, true));
+        $this->assertEquals(101.0, Number::roundToHalf(100.77, true));
+        $this->assertEquals(101.0, Number::roundToHalf(100.99, true));
+    }
+
+    public function testRoundToHalfDown()
+    {
+        // Test cases for rounding down (min flag)
+        $this->assertEquals(100.0, Number::roundToHalf(100.0, false));
+        $this->assertEquals(100.0, Number::roundToHalf(100.1, false));
+        $this->assertEquals(100.0, Number::roundToHalf(100.22, false));
+        $this->assertEquals(100.0, Number::roundToHalf(100.49, false));
+        $this->assertEquals(100.5, Number::roundToHalf(100.5, false));
+        $this->assertEquals(100.5, Number::roundToHalf(100.6, false));
+        $this->assertEquals(100.5, Number::roundToHalf(100.77, false));
+        $this->assertEquals(100.5, Number::roundToHalf(100.99, false));
+    }
+
+    public function testCeilToHalf()
+    {
+        $this->assertEquals(100.0, Number::ceilToHalf(100.0));
+        $this->assertEquals(100.5, Number::ceilToHalf(100.1));
+        $this->assertEquals(100.5, Number::ceilToHalf(100.22));
+        $this->assertEquals(101.0, Number::ceilToHalf(100.77));
+    }
+
+    public function testFloorToHalf()
+    {
+        $this->assertEquals(100.0, Number::floorToHalf(100.0));
+        $this->assertEquals(100.0, Number::floorToHalf(100.22));
+        $this->assertEquals(100.5, Number::floorToHalf(100.77));
+        $this->assertEquals(100.5, Number::floorToHalf(100.99));
+    }
+
+    public function testNegativeNumbers()
+    {
+        // Test negative numbers
+        $this->assertEquals(-100.0, Number::roundToHalf(-100.22, true));
+        $this->assertEquals(-100.5, Number::roundToHalf(-100.77, true));
+
+        $this->assertEquals(-100.5, Number::roundToHalf(-100.22, false));
+        $this->assertEquals(-101.0, Number::roundToHalf(-100.77, false));
+    }
+
+    public function testIntegerInputs()
+    {
+        $this->assertEquals(5.0, Number::roundToHalf(5, true));
+        $this->assertEquals(5.0, Number::roundToHalf(5, false));
+    }
+
+    public function testEdgeCases()
+    {
+        // Test exact half values
+        $this->assertEquals(0.5, Number::roundToHalf(0.5, true));
+        $this->assertEquals(0.5, Number::roundToHalf(0.5, false));
+
+        // Test zero
+        $this->assertEquals(0.0, Number::roundToHalf(0.0, true));
+        $this->assertEquals(0.0, Number::roundToHalf(0.0, false));
+
+        // Test very small decimals
+        $this->assertEquals(0.5, Number::roundToHalf(0.01, true));
+        $this->assertEquals(0.0, Number::roundToHalf(0.01, false));
+    }
 }
