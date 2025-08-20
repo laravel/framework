@@ -663,7 +663,7 @@ class SupportCollectionTest extends TestCase
         $this->assertJsonStringEqualsJsonString($expected, $results);
         $this->assertSame($expected, $results);
         $this->assertStringContainsString("\n", $results);
-        $this->assertStringContainsString("    ", $results);
+        $this->assertStringContainsString('    ', $results);
     }
 
     #[DataProvider('collectionClassProvider')]
