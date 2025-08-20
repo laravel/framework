@@ -131,6 +131,31 @@ class Exception
     }
 
     /**
+     * Get the exception's frames grouped by vendor status.
+     *
+     * @return array<int, array{vendor: bool, frames: array<int, Frame>}>
+     */
+    public function frameGroups()
+    {
+        $groups = [];
+
+        foreach ($this->frames() as $frame) {
+            $isFromVendor = $frame->isFromVendor();
+
+            if (empty($groups) || $groups[array_key_last($groups)]['vendor'] !== $isFromVendor) {
+                $groups[] = [
+                    'vendor' => $isFromVendor,
+                    'frames' => [],
+                ];
+            }
+
+            $groups[array_key_last($groups)]['frames'][] = $frame;
+        }
+
+        return $groups;
+    }
+
+    /**
      * Get the exception's request instance.
      *
      * @return \Illuminate\Http\Request
