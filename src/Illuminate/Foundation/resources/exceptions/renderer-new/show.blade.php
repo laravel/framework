@@ -412,26 +412,10 @@
 
             <x-laravel-exceptions-renderer-new::request-body :body="$exception->requestBody()" />
 
-            <!-- Routing -->
-            <div class="flex flex-col overflow-hidden w-full">
-                <div class="flex gap-6 items-start justify-start pb-3 w-full">
-                    <h2 class="text-lg font-semibold">Routing</h2>
-                </div>
-                <div class="flex flex-col w-full">
-                    @foreach ($exception->applicationRouteContext() as $key => $value)
-                    <div class="flex items-center gap-2 h-10 w-full">
-                        <div class="text-sm font-mono text-neutral-400 capitalize">{{ $key }}</div>
-                        <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                        <div class="text-sm font-mono max-w-[772px] overflow-hidden text-ellipsis">
-                            {{ $value }}
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
+            <x-laravel-exceptions-renderer-new::routing :routing="$exception->applicationRouteContext()" />
 
             <!-- Routing Parameters -->
-            <div class="flex flex-col gap-2 overflow-hidden w-full">
+            <div class="flex flex-col gap-2">
                 <div class="flex gap-6 items-start justify-start pb-3 w-full">
                     <h2 class="text-lg font-semibold">Routing parameters</h2>
                 </div>
