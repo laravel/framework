@@ -145,7 +145,7 @@
             </div>
 
             <!-- Exception Trace Section -->
-            <div class="flex flex-col gap-4 w-full">
+            {{-- <div class="flex flex-col gap-4 w-full">
                 <div class="bg-white/[0.01] border border-neutral-800 rounded-xl w-full">
                     <div class="flex flex-col overflow-hidden w-full">
                         <!-- Section Header -->
@@ -399,7 +399,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <x-laravel-exceptions-renderer-new::query :queries="$exception->applicationQueries()" />
         </x-laravel-exceptions-renderer-new::section-container>
@@ -409,22 +409,7 @@
         <!-- Context -->
         <x-laravel-exceptions-renderer-new::section-container class="flex flex-col gap-12">
             <!-- Headers -->
-            <div class="flex flex-col w-full">
-                <div class="flex gap-6 items-start justify-start pb-3 pt-0 px-0 w-full">
-                    <h2 class="text-lg font-semibold">Headers</h2>
-                </div>
-                <div class="flex flex-col gap-5 w-full">
-                    <div class="flex flex-col w-full">
-                        @foreach ($exception->requestHeaders() as $key => $value)
-                        <div class="flex items-center gap-2 h-10 w-full">
-                            <div class="text-sm font-mono text-neutral-400">{{ $key }}</div>
-                            <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-                            <div class="text-sm font-mono max-w-[772px] overflow-hidden text-ellipsis">{{ $value }}</div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
+            <x-laravel-exceptions-renderer-new::request-header :headers="$exception->requestHeaders()" />
 
             <!-- Body -->
             <div class="flex flex-col gap-2 overflow-hidden w-full">
