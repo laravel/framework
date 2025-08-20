@@ -1,7 +1,7 @@
 @props(['queries'])
 
 <div
-    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-white/[0.01] border border-neutral-800 rounded-xl w-full p-[10px]"]) }}
+    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-white/[0.01] border border-neutral-800 rounded-xl p-[10px]"]) }}
 >
     <div class="flex items-center gap-2.5 p-2">
         <div class="bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
