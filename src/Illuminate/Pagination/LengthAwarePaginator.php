@@ -244,7 +244,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
-     * Convert the object to a pretty print formatted JSON.
+     * Convert the object to pretty print formatted JSON.
      *
      * @return string
      */
