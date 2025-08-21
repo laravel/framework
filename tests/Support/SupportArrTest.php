@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakMap;
@@ -1811,5 +1812,45 @@ class SupportArrTest extends TestCase
         $result = Arr::partition($array, fn (string $value) => str_contains($value, 'J'));
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
+    }
+
+    public static function provideFromJsonInvalid()
+    {
+        return [
+            'invalid JSON: JSON_ERROR_SYNTAX' => ['}', false, 512, 0, 'Please provide a valid JSON: Syntax error'],
+            'invalid JSON: JSON_ERROR_UTF8' => ["[\"\u{D800}\"]", false, 512, 0, 'Please provide a valid JSON: Malformed UTF-8 characters, possibly incorrectly encoded'],
+            'invalid JSON: JSON_ERROR_DEPTH' => ['[[[[]]]]', false, 2, 0, 'Please provide a valid JSON: Maximum stack depth exceeded'],
+            'non-array JSON: null' => ['null', false, 512, 0, 'The given JSON cannot be parsed into an array: null given instead'],
+            'non-array JSON: integer' => ['42', false, 512, 0, 'The given JSON cannot be parsed into an array: int given instead'],
+            'non-array JSON: double/float' => ['42.1', false, 512, 0, 'The given JSON cannot be parsed into an array: float given instead'],
+            'non-array JSON: string' => ['"foo"', false, 512, 0, 'The given JSON cannot be parsed into an array: string given instead'],
+            'non-array JSON: boolean' => ['true', false, 512, 0, 'The given JSON cannot be parsed into an array: bool given instead'],
+            'non-array JSON: object with assoc arg' => ['{"foo": "bar"}', false, 512, 0, 'The given JSON cannot be parsed into an array: stdClass given instead'],
+        ];
+    }
+
+    #[DataProvider('provideFromJsonInvalid')
+    public function testFromJsonFails(string $json, ?bool $associative, int $depth, int $flags, string $exceptionMessage)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+        Arr::fromJson($json, $associative, $depth, $flags);
+    }
+
+    public static function provideFromJsonValid()
+    {
+        return [
+            'list strict' => ['[1, 2, 3]', false, 512, 0, [1, 2, 3]],
+            'list loose with array flag' => ['[1, 2, 3]', null, 512, JSON_OBJECT_AS_ARRAY, [1, 2, 3]],
+            'list loose with assoc arg' => ['[1, 2, 3]', true, 512, 0, [1, 2, 3]],
+            'hashmap loose with array flag' => ['{"foo": "bar"}', null, 512, JSON_OBJECT_AS_ARRAY, ["foo" => "bar"]],
+            'hashmap loose with assoc arg' => ['{"foo": "bar"}', true, 512, 0, ["foo" => "bar"]],
+        ];
+    }
+
+    #[DataProvider('provideFromJsonValid')
+    public function testFromJsonSuccessful(string $json, ?bool $associative, int $depth, int $flags, array $expected)
+    {
+        $this->assertEquals($expected, Arr::fromJson($json, $associative, $depth, $flags));
     }
 }
