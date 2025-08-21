@@ -15,6 +15,7 @@ use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Console\Scheduling\ScheduleTestCommand;
 use Illuminate\Console\Scheduling\ScheduleWorkCommand;
+use Illuminate\Console\Scheduling\ScheduleDueCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
@@ -167,6 +168,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ScheduleTest' => ScheduleTestCommand::class,
         'ScheduleWork' => ScheduleWorkCommand::class,
         'ScheduleInterrupt' => ScheduleInterruptCommand::class,
+        'ScheduleDue' => ScheduleDueCommand::class,
         'ShowModel' => ShowModelCommand::class,
         'StorageLink' => StorageLinkCommand::class,
         'StorageUnlink' => StorageUnlinkCommand::class,
