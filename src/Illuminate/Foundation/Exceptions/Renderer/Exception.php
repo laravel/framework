@@ -125,9 +125,16 @@ class Exception
             array_shift($trace);
         }
 
-        return new Collection(array_map(
-            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $trace,
-        ));
+        $frames = [];
+        $previousFrame = null;
+
+        foreach (array_reverse($trace, true) as $frameData) {
+            $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
+            $frames[] = $frame;
+            $previousFrame = $frame;
+        }
+        
+        return new Collection(array_reverse($frames));
     }
 
     /**
