@@ -507,7 +507,7 @@ class Builder implements BuilderContract
             return [];
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_last($values))) {
             $values = [$values];
         }
 
@@ -1265,12 +1265,12 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_last($values))) {
             $values = [$values];
         }
 
         if (is_null($update)) {
-            $update = array_keys(reset($values));
+            $update = array_keys(array_last($values));
         }
 
         return $this->toBase()->upsert(
@@ -1366,7 +1366,7 @@ class Builder implements BuilderContract
 
         $segments = preg_split('/\s+as\s+/i', $this->query->from);
 
-        $qualifiedColumn = end($segments).'.'.$column;
+        $qualifiedColumn = array_last($segments).'.'.$column;
 
         $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 

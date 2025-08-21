@@ -1286,7 +1286,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getLastParameterOverride()
     {
-        return count($this->with) ? end($this->with) : [];
+        return count($this->with) ? array_last($this->with) : [];
     }
 
     /**
@@ -1646,7 +1646,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function currentlyResolving()
     {
-        return end($this->buildStack) ?: null;
+        return array_last($this->buildStack) ?: null;
     }
 
     /**
