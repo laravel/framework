@@ -46,4 +46,23 @@ class JsonResourceTest extends TestCase
 
         $this->assertSame('{"foo":"bar"}', $resource->toJson(JSON_THROW_ON_ERROR));
     }
+
+    public function testJsonResourceToPrettyPrint(): void
+    {
+        $model = new class extends Model {
+        };
+
+        $resource = m::mock(JsonResource::class, ['resource' => $model])
+            ->makePartial()
+            ->shouldReceive('jsonSerialize')->once()->andReturn(['foo' => 'bar', 'bar' => 'foo'])
+            ->getMock();
+
+        $results = $resource->toPrettyJson();
+        $expected = $resource->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
 }
