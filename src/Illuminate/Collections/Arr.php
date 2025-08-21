@@ -1223,4 +1223,28 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Tries to parse the given JSON into an array.
+     *
+     * @param  string  $json
+     * @param  bool|null  $associative
+     * @param  int  $depth
+     * @param  int-mask-of<JSON_BIGINT_AS_STRING|JSON_INVALID_UTF8_IGNORE|JSON_INVALID_UTF8_SUBSTITUTE|JSON_OBJECT_AS_ARRAY|JSON_THROW_ON_ERROR>  $flags
+     */
+    public static function fromJson(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): array
+    {
+        if (! json_validate($json)) {
+            $errorMessage = json_last_error_msg();
+            throw new InvalidArgumentException('Please provide a valid JSON: ' . $errorMessage);
+        }
+
+        $array = json_decode($json, $associative, $depth, $flags);
+
+        if (! is_array($array)) {
+            throw new InvalidArgumentException('The given JSON cannot be parsed into an array.');
+        }
+
+        return $array;
+    }
 }
