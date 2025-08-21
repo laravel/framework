@@ -115,7 +115,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         // Check if model already exists and force option is not used
         if ($this->alreadyExists($this->getNameInput()) && ! $this->option('force')) {
-            $this->error('Model already exists, migration creation skipped.');
+            $this->confirm('Model already exists, migration creation skipped.');
 
             return;
         }
