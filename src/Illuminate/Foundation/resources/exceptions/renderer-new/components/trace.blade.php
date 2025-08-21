@@ -11,13 +11,9 @@
     </div>
 
     <div class="flex flex-col gap-1.5 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
-        @foreach ($exception->frameGroups() as $groupIndex => $group)
+        @foreach ($exception->frameGroups() as $group)
             @if ($group['vendor'])
-                <x-laravel-exceptions-renderer-new::vendor-frames
-                    :$exception
-                    :frameGroup="$group"
-                    :groupIndex="$groupIndex"
-                />
+                <x-laravel-exceptions-renderer-new::vendor-frames :frames="$group['frames']" />
             @else
                 @foreach ($group['frames'] as $frame)
                     <x-laravel-exceptions-renderer-new::frame :$frame />
