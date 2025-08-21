@@ -1242,7 +1242,7 @@ class Arr
         $array = json_decode($json, $associative, $depth, $flags);
 
         if (! is_array($array)) {
-            throw new InvalidArgumentException('The given JSON cannot be parsed into an array.');
+            throw new InvalidArgumentException('The given JSON cannot be parsed into an array: ' . get_debug_type($array) . ' given instead.');
         }
 
         return $array;
