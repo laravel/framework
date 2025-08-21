@@ -1234,7 +1234,7 @@ class Arr
      */
     public static function fromJson(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): array
     {
-        if (! json_validate($json)) {
+        if (! json_validate($json, $depth, $flags)) {
             $errorMessage = json_last_error_msg();
             throw new InvalidArgumentException('Please provide a valid JSON: '.$errorMessage);
         }
