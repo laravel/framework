@@ -1236,13 +1236,13 @@ class Arr
     {
         if (! json_validate($json)) {
             $errorMessage = json_last_error_msg();
-            throw new InvalidArgumentException('Please provide a valid JSON: ' . $errorMessage);
+            throw new InvalidArgumentException('Please provide a valid JSON: '.$errorMessage);
         }
 
         $array = json_decode($json, $associative, $depth, $flags);
 
         if (! is_array($array)) {
-            throw new InvalidArgumentException('The given JSON cannot be parsed into an array: ' . get_debug_type($array) . ' given instead.');
+            throw new InvalidArgumentException('The given JSON cannot be parsed into an array: '.get_debug_type($array).' given instead.');
         }
 
         return $array;
