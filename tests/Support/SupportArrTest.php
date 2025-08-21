@@ -1829,7 +1829,7 @@ class SupportArrTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideFromJsonInvalid')
+    #[DataProvider('provideFromJsonInvalid')]
     public function testFromJsonFails(string $json, ?bool $associative, int $depth, int $flags, string $exceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -1848,7 +1848,7 @@ class SupportArrTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideFromJsonValid')
+    #[DataProvider('provideFromJsonValid')]
     public function testFromJsonSuccessful(string $json, ?bool $associative, int $depth, int $flags, array $expected)
     {
         $this->assertEquals($expected, Arr::fromJson($json, $associative, $depth, $flags));
