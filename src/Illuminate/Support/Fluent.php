@@ -187,7 +187,7 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     /**
      * Convert the object to an Eloquent Model instance.
      *
-     * @param  class-string $class
+     * @param  class-string  $class
      * @return Model
      */
     public function toModel(string $class): Model
