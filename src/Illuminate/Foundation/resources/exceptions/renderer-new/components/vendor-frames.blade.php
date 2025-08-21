@@ -1,4 +1,4 @@
-@props(['exception', 'frameGroup', 'groupIndex'])
+@props(['frames'])
 
 @use('Illuminate\Support\Str')
 
@@ -7,14 +7,14 @@
         {{-- Folder --}}
 
         <div class="flex-1 font-mono text-xs leading-3 text-neutral-600 dark:text-neutral-400">
-            {{ count($frameGroup['frames'])}} vendor {{ Str::plural('frame', count($frameGroup['frames']))}}
+            {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
         </div>
 
         {{-- Expand button --}}
     </div>
 
     <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5">
-        @foreach ($frameGroup['frames'] as $frame)
+        @foreach ($frames as $frame)
             <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5">
                 <x-laravel-exceptions-renderer-new::vendor-frame :$frame />
             </div>
