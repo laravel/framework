@@ -12,4 +12,8 @@
             <x-laravel-exceptions-renderer-new::file-with-line :file="$frame->file()" :line="$frame->line()" />
         </div>
     </div>
+
+    @if($frame->snippet())
+        <x-laravel-exceptions-renderer-new::frame-code :code="$frame->snippet()" :highlightedLine="$frame->line()" />
+    @endif
 </div>
