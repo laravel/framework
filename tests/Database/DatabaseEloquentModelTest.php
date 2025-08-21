@@ -3414,6 +3414,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('{"name":"Mateus"}', $user->toJson(JSON_THROW_ON_ERROR));
     }
 
+    public function testModelToPrettyJson(): void
+    {
+        $user = new EloquentModelStub(['name' => 'Mateus', 'active' => true]);
+        $results = $user->toPrettyJson();
+        $expected = $user->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
+
     public function testFillableWithMutators()
     {
         $model = new EloquentModelWithMutators;
