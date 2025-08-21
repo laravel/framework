@@ -91,13 +91,13 @@ class Renderer
 
         $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
 
-        // $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
-        //     'exception' => $exception,
-        // ])->render();
+        $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
+            'exception' => $exception,
+        ])->render();
 
         return $this->viewFactory->make('laravel-exceptions-renderer-new::show', [
             'exception' => $exception,
-            // 'exceptionAsMarkdown' => $exceptionAsMarkdown,
+            'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
     }
 
