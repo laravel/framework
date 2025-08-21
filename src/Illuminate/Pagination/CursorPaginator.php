@@ -180,4 +180,14 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     {
         return json_encode($this->jsonSerialize(), $options);
     }
+
+    /**
+     * Convert the object to a pretty print formatted JSON.
+     *
+     * @return string
+     */
+    public function toPrettyJson()
+    {
+        return $this->toJson(JSON_PRETTY_PRINT);
+    }
 }
