@@ -6,6 +6,8 @@ use CachingIterator;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Modelable;
+use Illuminate\Database\Eloquent\Model;
 use IteratorAggregate;
 use JsonSerializable;
 use Traversable;
@@ -18,7 +20,7 @@ use Traversable;
  * @extends \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @extends \IteratorAggregate<TKey, TValue>
  */
-interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
+interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable, Modelable
 {
     /**
      * Create a new collection instance if the value isn't one already.
@@ -1253,6 +1255,14 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return array<TKey, mixed>
      */
     public function toArray();
+
+    /**
+     * Convert the object to an Eloquent Model instance.
+     *
+     * @param  class-string $class
+     * @return Model
+     */
+    public function toModel(string $class): Model;
 
     /**
      * Convert the object into something JSON serializable.

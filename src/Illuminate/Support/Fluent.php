@@ -6,6 +6,8 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Modelable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
@@ -20,7 +22,7 @@ use Traversable;
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
  */
-class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
+class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable, Modelable
 {
     use Conditionable, InteractsWithData, Macroable {
         __call as macroCall;
@@ -180,6 +182,17 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     public function toArray()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Convert the object to an Eloquent Model instance.
+     *
+     * @param  class-string $class
+     * @return Model
+     */
+    public function toModel(string $class): Model
+    {
+        return new $class($this->toArray());
     }
 
     /**

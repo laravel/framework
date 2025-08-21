@@ -8,6 +8,7 @@ use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -951,6 +952,17 @@ trait EnumeratesValues
     public function toArray()
     {
         return $this->map(fn ($value) => $value instanceof Arrayable ? $value->toArray() : $value)->all();
+    }
+
+    /**
+     * Convert the object to an Eloquent Model instance.
+     *
+     * @param  class-string $class
+     * @return Model
+     */
+    public function toModel(string $class): Model
+    {
+        return new $class($this->toArray());
     }
 
     /**

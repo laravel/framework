@@ -645,6 +645,18 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testToModelReturnsModel($collection)
+    {
+        $c = new $collection(['name' => 'Taylor', 'active' => true, 'not_valid' => 'foo']);
+        $results = $c->toModel(StubCollectionModel::class);
+
+        $this->assertInstanceOf(StubCollectionModel::class, $results);
+        $this->assertSame('Taylor', $results->name);
+        $this->assertTrue($results->active);
+        $this->assertNull($results->not_valid);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testToJsonEncodesTheJsonSerializeResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
@@ -5924,4 +5936,9 @@ enum StaffEnum
     case Taylor;
     case Joe;
     case James;
+}
+
+class StubCollectionModel extends Model
+{
+    protected $fillable = ['name', 'active'];
 }

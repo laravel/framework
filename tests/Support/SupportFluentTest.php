@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use ArrayIterator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
@@ -130,6 +131,17 @@ class SupportFluentTest extends TestCase
         $results = $fluent->toJson();
 
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
+    }
+
+    public function testToModelReturnsModel()
+    {
+        $fluent = new Fluent(['name' => 'Taylor', 'active' => true, 'not_valid' => 'foo']);
+        $results = $fluent->toModel(StubFluentModel::class);
+
+        $this->assertInstanceOf(StubFluentModel::class, $results);
+        $this->assertSame('Taylor', $results->name);
+        $this->assertTrue($results->active);
+        $this->assertNull($results->not_valid);
     }
 
     public function testScope()
@@ -490,6 +502,11 @@ class SupportFluentTest extends TestCase
         $this->assertTrue($fluent->isNotEmpty());
         $this->assertFalse($fluent->isEmpty());
     }
+}
+
+class StubFluentModel extends Model
+{
+    protected $fillable = ['name', 'active'];
 }
 
 class FluentArrayIteratorStub implements IteratorAggregate
