@@ -3130,7 +3130,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->first([$column]);
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? array_first($result) : null;
     }
 
     /**
@@ -3142,7 +3142,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->selectRaw($expression, $bindings)->first();
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? array_first($result) : null;
     }
 
     /**

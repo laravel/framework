@@ -507,7 +507,7 @@ class Builder implements BuilderContract
             return [];
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
