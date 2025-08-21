@@ -38,19 +38,28 @@ class Frame
     protected $basePath;
 
     /**
+     * The previous frame.
+     *
+     * @var \Illuminate\Foundation\Exceptions\Renderer\Frame|null
+     */
+    protected $previous;
+
+    /**
      * Create a new frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  array<string, string>  $classMap
      * @param  array{file: string, line: int, class?: string, type?: string, function?: string}  $frame
      * @param  string  $basePath
+     * @param  \Illuminate\Foundation\Exceptions\Renderer\Frame|null  $previous
      */
-    public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath)
+    public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath, ?Frame $previous = null)
     {
         $this->exception = $exception;
         $this->classMap = $classMap;
         $this->frame = $frame;
         $this->basePath = $basePath;
+        $this->previous = $previous;
     }
 
     /**
@@ -156,5 +165,15 @@ class Frame
     {
         return ! str_starts_with($this->frame['file'], $this->basePath)
             || str_starts_with($this->frame['file'], $this->basePath.'/vendor');
+    }
+
+    /**
+     * Get the previous frame.
+     *
+     * @return \Illuminate\Foundation\Exceptions\Renderer\Frame|null
+     */
+    public function previous()
+    {
+        return $this->previous;
     }
 }

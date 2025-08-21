@@ -19,17 +19,8 @@
                     :groupIndex="$groupIndex"
                 />
             @else
-                @foreach ($group['frames'] as $frameIndex => $frame)
-                    @php
-                        $previousFrame = null;
-                        if (isset($group['frames'][$frameIndex + 1])) {
-                            $previousFrame = $group['frames'][$frameIndex + 1];
-                        } elseif (isset($exception->frameGroups()[$groupIndex + 1])) {
-                            $previousGroup = $exception->frameGroups()[$groupIndex + 1];
-                            $previousFrame = $previousGroup['frames'][0] ?? null;
-                        }
-                    @endphp
-                    <x-laravel-exceptions-renderer-new::frame :$frame :$previousFrame />
+                @foreach ($group['frames'] as $frame)
+                    <x-laravel-exceptions-renderer-new::frame :$frame />
                 @endforeach
             @endif
         @endforeach

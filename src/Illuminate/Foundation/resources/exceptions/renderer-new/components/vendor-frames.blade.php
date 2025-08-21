@@ -14,19 +14,9 @@
     </div>
 
     <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5">
-        @foreach ($frameGroup['frames'] as $frameIndex => $frame)
-            @php
-                $previousFrame = null;
-                if (isset($frameGroup['frames'][$frameIndex + 1])) {
-                    $previousFrame = $frameGroup['frames'][$frameIndex + 1];
-                } elseif (isset($exception->frameGroups()[$groupIndex + 1])) {
-                    $previousGroup = $exception->frameGroups()[$groupIndex + 1];
-                    $previousFrame = $previousGroup['frames'][0] ?? null;
-                }
-            @endphp
-
+        @foreach ($frameGroup['frames'] as $frame)
             <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5">
-                <x-laravel-exceptions-renderer-new::vendor-frame :$frame :$previousFrame />
+                <x-laravel-exceptions-renderer-new::vendor-frame :$frame />
             </div>
         @endforeach
     </div>

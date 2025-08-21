@@ -1,8 +1,8 @@
-@props(['frame', 'previousFrame'])
+@props(['frame'])
 
 <div class="flex h-11 items-center justify-between gap-6 px-3">
-    @if($previousFrame)
-        <x-laravel-exceptions-renderer-new::formatted-source :$frame :$previousFrame className="text-xs" />
+    @if($frame->previous())
+        <x-laravel-exceptions-renderer-new::formatted-source :$frame className="text-xs" />
     @else
         <span class="font-mono text-xs leading-3 text-neutral-500">
           Entrypoint
