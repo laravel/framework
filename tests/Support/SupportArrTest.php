@@ -1843,8 +1843,8 @@ class SupportArrTest extends TestCase
             'list strict' => ['[1, 2, 3]', false, 512, 0, [1, 2, 3]],
             'list loose with array flag' => ['[1, 2, 3]', null, 512, JSON_OBJECT_AS_ARRAY, [1, 2, 3]],
             'list loose with assoc arg' => ['[1, 2, 3]', true, 512, 0, [1, 2, 3]],
-            'hashmap loose with array flag' => ['{"foo": "bar"}', null, 512, JSON_OBJECT_AS_ARRAY, ["foo" => "bar"]],
-            'hashmap loose with assoc arg' => ['{"foo": "bar"}', true, 512, 0, ["foo" => "bar"]],
+            'hashmap loose with array flag' => ['{"foo": "bar"}', null, 512, JSON_OBJECT_AS_ARRAY, ['foo' => 'bar']],
+            'hashmap loose with assoc arg' => ['{"foo": "bar"}', true, 512, 0, ['foo' => 'bar']],
         ];
     }
 
