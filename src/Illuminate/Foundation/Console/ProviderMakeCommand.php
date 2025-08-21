@@ -61,6 +61,10 @@ class ProviderMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('deferred')) {
+            return $this->resolveStubPath('/stubs/provider.deferred.stub');
+        }
+
         return $this->resolveStubPath('/stubs/provider.stub');
     }
 
@@ -97,6 +101,7 @@ class ProviderMakeCommand extends GeneratorCommand
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the provider already exists'],
+            ['deferred', null, InputOption::VALUE_NONE, 'Create a deferred service provider'],
         ];
     }
 }

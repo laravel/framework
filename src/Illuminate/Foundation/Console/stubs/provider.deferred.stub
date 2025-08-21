@@ -1,0 +1,37 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Support\ServiceProvider;
+
+class {{ class }} extends ServiceProvider implements DeferrableProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        //
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return list<string>
+     */
+    public function provides(): array
+    {
+        return [
+            //
+        ];
+    }
+}
