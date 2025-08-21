@@ -135,7 +135,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Convert the model instance to JSON.
+     * Convert the resource to JSON.
      *
      * @param  int  $options
      * @return string
@@ -151,6 +151,18 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
         }
 
         return $json;
+    }
+
+    /**
+     * Convert the resource to pretty print formatted JSON.
+     *
+     * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+     */
+    public function toPrettyJson()
+    {
+        return $this->toJson(JSON_PRETTY_PRINT);
     }
 
     /**
