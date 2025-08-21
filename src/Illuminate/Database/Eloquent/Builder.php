@@ -507,7 +507,7 @@ class Builder implements BuilderContract
             return [];
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -1265,12 +1265,12 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(reset($values))) {
             $values = [$values];
         }
 
         if (is_null($update)) {
-            $update = array_keys(array_last($values));
+            $update = array_keys(reset($values));
         }
 
         return $this->toBase()->upsert(
