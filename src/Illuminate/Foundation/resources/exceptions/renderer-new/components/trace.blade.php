@@ -10,24 +10,28 @@
         <h3 class="text-base font-semibold">Exception trace</h3>
     </div>
 
-    <div>
+    <div class="flex flex-col gap-1.5 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
         @foreach ($exception->frameGroups() as $groupIndex => $group)
             @if ($group['vendor'])
-                <div>{{ count($group['frames'])}} vendor frames</div>
+                <x-laravel-exceptions-renderer-new::vendor-frames
+                    :$exception
+                    :frameGroup="$group"
+                    :groupIndex="$groupIndex"
+                />
+            @else
+                @foreach ($group['frames'] as $frameIndex => $frame)
+                    @php
+                        $previousFrame = null;
+                        if (isset($group['frames'][$frameIndex + 1])) {
+                            $previousFrame = $group['frames'][$frameIndex + 1];
+                        } elseif (isset($exception->frameGroups()[$groupIndex + 1])) {
+                            $previousGroup = $exception->frameGroups()[$groupIndex + 1];
+                            $previousFrame = $previousGroup['frames'][0] ?? null;
+                        }
+                    @endphp
+                    <x-laravel-exceptions-renderer-new::frame :$frame :$previousFrame />
+                @endforeach
             @endif
-
-            @foreach ($group['frames'] as $frameIndex => $frame)
-                @php
-                    $previousFrame = null;
-                    if (isset($group['frames'][$frameIndex + 1])) {
-                        $previousFrame = $group['frames'][$frameIndex + 1];
-                    } elseif (isset($exception->frameGroups()[$groupIndex + 1])) {
-                        $previousGroup = $exception->frameGroups()[$groupIndex + 1];
-                        $previousFrame = $previousGroup['frames'][0] ?? null;
-                    }
-                @endphp
-                <x-laravel-exceptions-renderer-new::frame :frame="$frame" :previousFrame="$previousFrame" />
-            @endforeach
         @endforeach
     </div>
 </div>
