@@ -204,7 +204,7 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     }
 
     /**
-     * Convert the fluent instance to a pretty print formatted JSON.
+     * Convert the fluent instance to pretty print formatted JSON.
      *
      * @return string
      */

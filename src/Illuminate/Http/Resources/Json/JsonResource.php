@@ -154,7 +154,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
-     * Convert the resource to a pretty print formatted JSON.
+     * Convert the resource to pretty print formatted JSON.
      *
      * @return string
      *

@@ -1801,7 +1801,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
-     * Convert the model instance to a pretty print formatted JSON.
+     * Convert the model instance to pretty print formatted JSON.
      *
      * @return string
      *

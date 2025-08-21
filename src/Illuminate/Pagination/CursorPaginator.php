@@ -182,7 +182,7 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
     }
 
     /**
-     * Convert the object to a pretty print formatted JSON.
+     * Convert the object to pretty print formatted JSON.
      *
      * @return string
      */
