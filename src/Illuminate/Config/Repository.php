@@ -6,6 +6,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
@@ -188,6 +189,18 @@ class Repository implements ArrayAccess, ConfigContract
     public function collection(string $key, $default = null): Collection
     {
         return new Collection($this->array($key, $default));
+    }
+
+    /**
+     * Get the specified array configuration value as a Fluent instance.
+     *
+     * @param  string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return Fluent
+     */
+    public function fluent(string $key, $default = null): Fluent
+    {
+        return new Fluent($this->array($key, $default));
     }
 
     /**

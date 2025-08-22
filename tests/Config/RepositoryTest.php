@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Fluent;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -371,5 +372,21 @@ class RepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('#^Configuration value for key \[a.b\] must be a float, (.*) given.#');
 
         $this->repository->float('a.b');
+    }
+
+    public function testItGetsAsFluent(): void
+    {
+        $config = $this->repository->fluent('associate');
+
+        $this->assertInstanceOf(Fluent::class, $config);
+        $this->assertSame($this->repository->array('associate'), $config->toArray());
+    }
+
+    public function testItTrhowsAnExceptionWhenTryingToGetNonArrayValueAsFluent(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an array, (.*) given.#');
+
+        $this->repository->fluent('a.b');
     }
 }
