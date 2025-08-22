@@ -152,28 +152,18 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
         $this->assertTrue($posts[0]->user->relationLoaded('posts'));
     }
 
-    public function testLoadMissingWithComplexNestedArraySyntax()
+    public function testLoadMissingWithNestedArrayWithColon()
     {
-        $posts = Post::all();
+        $posts = Post::with('comments')->get();
 
         DB::enableQueryLog();
 
-        $posts->loadMissing([
-            'comments' => [
-                'parent' => function ($query) {
-                    $query->select('id', 'parent_id', 'post_id');
-                },
-                'revisions',
-            ],
-            'user:id,name',
-        ]);
+        $posts->loadMissing(['comments' => ['parent:id']]);
 
-        $this->assertCount(4, DB::getQueryLog());
-        $this->assertTrue($posts[0]->relationLoaded('comments'));
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
-        $this->assertTrue($posts[0]->relationLoaded('user'));
+        $this->assertArrayNotHasKey('post_id', $posts[0]->comments[1]->parent->getAttributes());
     }
-
 
     public function testLoadMissingWithNestedArray()
     {
