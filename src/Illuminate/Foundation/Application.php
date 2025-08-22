@@ -209,6 +209,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $absoluteCachePathPrefixes = ['/', '\\'];
 
     /**
+     * Prevent cached routes to be loaded
+     * @var bool
+     */
+    protected $routesCachedMustBeIgnored = false;
+
+    /**
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
@@ -1315,13 +1321,19 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+    public function routesAreCached()
+    {
+        return $this['files']->exists($this->getCachedRoutesPath()) && !$this->routesCachedMustBeIgnored;
+    }
+
+    /**
      * Determine if the application routes are cached.
      *
      * @return bool
      */
     public function routesAreCached()
     {
-        return $this['files']->exists($this->getCachedRoutesPath());
+        return $this['files']->exists($this->getCachedRoutesPath()) && !$this->routesCachedMustBeIgnored;
     }
 
     /**
@@ -1332,6 +1344,15 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function getCachedRoutesPath()
     {
         return $this->normalizeCachePath('APP_ROUTES_CACHE', 'cache/routes-v7.php');
+    }
+
+    /**
+     * Prevent routes cached from being loaded
+     * @return void
+     */
+    public function routesCachedMustBeIgnored()
+    {
+        $this->routesCachedMustBeIgnored = true;
     }
 
     /**

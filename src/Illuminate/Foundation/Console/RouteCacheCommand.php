@@ -51,7 +51,6 @@ class RouteCacheCommand extends Command
      */
     public function handle()
     {
-        $this->callSilent('route:clear');
 
         $routes = $this->getFreshApplicationRoutes();
 
@@ -91,6 +90,7 @@ class RouteCacheCommand extends Command
     protected function getFreshApplication()
     {
         return tap(require $this->laravel->bootstrapPath('app.php'), function ($app) {
+            $app->routesCachedMustBeIgnored();
             $app->make(ConsoleKernelContract::class)->bootstrap();
         });
     }
