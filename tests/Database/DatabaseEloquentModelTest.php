@@ -3352,14 +3352,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar' => 'foo'], $model->getAttribute('singleElementInArrayAttribute')->toArray());
     }
 
-    public function testConvertsStringableObjectToCastString()
+    public function testUsingStringableObjectCastUsesStringRepresentation()
     {
         $model = new EloquentModelCastingStub;
 
-        $casts = $model->getCasts();
+        $this->assertEquals('int', $model->getCasts()['castStringableObject']);
+    }
 
-        $this->assertSame('int', $casts['castStringableObject']);
-        $this->assertSame(CastsAttributesInstance::class.':foo,bar', $casts['castCastAttributesObject']);
+    public function testMergeingStringableObjectCastUSesStringRepresentation()
+    {
+        $stringable = new StringableCastBuilder();
+        $stringable->cast = 'test';
+
+        $model = (new EloquentModelCastingStub)->mergeCasts([
+            'something' => $stringable
+        ]);
+
+        $this->assertEquals('test', $model->getCasts()['something']);
     }
 
     public function testUsingPlainObjectAsCastThrowsException()
@@ -3367,7 +3376,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelCastingStub;
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The cast object for something attribute must implement Stringable or CastAttributes.');
+        $this->expectExceptionMessage('The cast object for something attribute must implement Stringable or be declared as string.');
 
         $model->mergeCasts([
             'something' => (object) [],
@@ -3931,7 +3940,6 @@ class EloquentModelCastingStub extends Model
             'duplicatedAttribute' => 'int',
             'asToObjectCast' => TestCast::class,
             'castStringableObject' => new StringableCastBuilder(),
-            'castCastAttributesObject' => new CastsAttributesInstance('foo', 'bar'),
         ];
     }
 
@@ -4401,26 +4409,10 @@ class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCall
 
 class StringableCastBuilder implements NativeStringable
 {
+    public $cast = 'int';
+
     public function __toString()
     {
-        return 'int';
-    }
-}
-
-class CastsAttributesInstance implements CastsAttributes
-{
-    public function __construct(public $foo, public $bar, protected ?Closure $private = null)
-    {
-        //
-    }
-
-    public function get(Model $model, string $key, mixed $value, array $attributes)
-    {
-        //
-    }
-
-    public function set(Model $model, string $key, mixed $value, array $attributes)
-    {
-        //
+        return $this->cast;
     }
 }

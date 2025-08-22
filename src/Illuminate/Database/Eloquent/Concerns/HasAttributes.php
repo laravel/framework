@@ -793,17 +793,11 @@ trait HasAttributes
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
                 is_object($cast) => value(function () use ($cast, $attribute) {
-                    if ($cast instanceof Stringable) {
-                        return (string) $cast;
-                    }
-
-                    if ($cast instanceof CastsAttributes) {
-                        return $cast::class.':'.implode(',', get_object_vars($cast));
-                    }
-
-                    throw new InvalidArgumentException(
-                        "The cast object for $attribute attribute must implement Stringable or CastAttributes."
-                    );
+                    return $cast instanceof Stringable
+                        ? (string) $cast
+                        : throw new InvalidArgumentException(
+                            "The cast object for the $attribute attribute must implement Stringable or be declared as string."
+                        );
                 }),
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
