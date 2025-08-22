@@ -17,7 +17,7 @@ class LoggingIntegrationTest extends TestCase
         Log::info('Hello World');
     }
 
-    public function testCallingLogDirectlyDispatchesTwoEvents()
+    public function testCallingLoggerDirectlyDispatchesOneEvent()
     {
         Event::fake([MessageLogged::class]);
 
