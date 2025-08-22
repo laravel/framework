@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    @if($frame->snippet())
-        <x-laravel-exceptions-renderer-new::frame-code :code="$frame->snippet()" :highlightedLine="$frame->line()" />
+    @if($snippet = $frame->snippet())
+        <x-laravel-exceptions-renderer-new::frame-code :code="$snippet" :highlightedLine="$frame->line()" />
     @endif
 </div>
