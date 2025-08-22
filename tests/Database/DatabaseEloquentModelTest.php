@@ -3376,7 +3376,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelCastingStub;
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The cast object for something attribute must implement Stringable or be declared as string.');
+        $this->expectExceptionMessage('The cast object for the something attribute must implement Stringable or be declared as string.');
 
         $model->mergeCasts([
             'something' => (object) [],
