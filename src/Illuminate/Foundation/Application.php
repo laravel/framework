@@ -1320,11 +1320,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
         return $this->normalizeCachePath('APP_CONFIG_CACHE', 'cache/config.php');
     }
 
-    /**
-    public function routesAreCached()
-    {
-        return $this['files']->exists($this->getCachedRoutesPath()) && !$this->routesCachedMustBeIgnored;
-    }
 
     /**
      * Determine if the application routes are cached.
