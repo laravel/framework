@@ -245,9 +245,9 @@ class Logger implements LoggerInterface
      */
     protected function fireLogEvent($level, $message, array $context = [])
     {
-        // Avoid dispatching the event multiple times if our logger instance is the
-        // LogManager. The child LogManager will handle dispatching the event.
-        if ($this->logger instanceof LogManager && $this->logger->getEventDispatcher() !== null) {
+        // Avoid dispatching the event multiple times if our logger instance is the LogManager...
+        if ($this->logger instanceof LogManager && 
+            $this->logger->getEventDispatcher() !== null) {
             return;
         }
 
