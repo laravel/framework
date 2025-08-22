@@ -203,7 +203,7 @@ if (! function_exists('head')) {
      */
     function head($array)
     {
-        return array_first($array);
+        return empty($array) ? false : array_first($array);
     }
 }
 
@@ -216,7 +216,7 @@ if (! function_exists('last')) {
      */
     function last($array)
     {
-        return array_last($array);
+        return empty($array) ? false : array_last($array);
     }
 }
 
