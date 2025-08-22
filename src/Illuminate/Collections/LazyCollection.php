@@ -4,6 +4,8 @@ namespace Illuminate\Support;
 
 use ArrayIterator;
 use Closure;
+use DateInterval;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Generator;
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
@@ -1761,6 +1763,42 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 yield $item;
             }
         });
+    }
+
+    /**
+     * Run the given callback every time the interval has passed.
+     *
+     * @return static<TKey, TValue>
+     */
+    public function withHeartbeat(DateInterval|int $interval, callable $callback)
+    {
+        $seconds = is_int($interval) ? $interval : $this->intervalSeconds($interval);
+
+        return new static(function () use ($seconds, $callback) {
+            $start = $this->now();
+
+            foreach ($this as $key => $value) {
+                $now = $this->now();
+
+                if (($now - $start) >= $seconds) {
+                    $callback();
+
+                    $start = $now;
+                }
+
+                yield $key => $value;
+            }
+        });
+    }
+
+    /**
+     * Get the total seconds from the given interval.
+     */
+    protected function intervalSeconds(DateInterval $interval): int
+    {
+        $start = new DateTimeImmutable();
+
+        return $start->add($interval)->getTimestamp() - $start->getTimestamp();
     }
 
     /**

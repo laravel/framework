@@ -72,4 +72,26 @@ class PaginatorTest extends TestCase
         $this->assertInstanceOf(Paginator::class, $p);
         $this->assertSame(['1', '2', '3'], $p->items());
     }
+
+    public function testPaginatorToJson()
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 3, 1);
+        $results = $p->toJson();
+        $expected = json_encode($p->toArray());
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+    }
+
+    public function testPaginatorToPrettyJson()
+    {
+        $p = new Paginator(['item1', 'item2', 'item3'], 3, 1);
+        $results = $p->toPrettyJson();
+        $expected = $p->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
 }

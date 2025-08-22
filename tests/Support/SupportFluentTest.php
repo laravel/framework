@@ -132,6 +132,19 @@ class SupportFluentTest extends TestCase
         $this->assertJsonStringEqualsJsonString(json_encode(['foo']), $results);
     }
 
+    public function testToPrettyJson()
+    {
+        $fluent = $this->getMockBuilder(Fluent::class)->onlyMethods(['toArray'])->getMock();
+        $fluent->expects($this->exactly(2))->method('toArray')->willReturn(['foo' => 'bar', 'bar' => 'foo']);
+        $results = $fluent->toPrettyJson();
+        $expected = $fluent->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
+
     public function testScope()
     {
         $fluent = new Fluent(['user' => ['name' => 'taylor']]);

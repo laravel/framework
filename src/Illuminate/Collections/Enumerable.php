@@ -1270,6 +1270,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function toJson($options = 0);
 
     /**
+     * Get the collection of items as pretty print formatted JSON.
+     *
+     * @return string
+     */
+    public function toPrettyJson();
+
+    /**
      * Get a CachingIterator instance.
      *
      * @param  int  $flags

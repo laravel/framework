@@ -204,6 +204,16 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     }
 
     /**
+     * Convert the fluent instance to pretty print formatted JSON.
+     *
+     * @return string
+     */
+    public function toPrettyJson()
+    {
+        return $this->toJson(JSON_PRETTY_PRINT);
+    }
+
+    /**
      * Determine if the fluent instance is empty.
      *
      * @return bool
@@ -291,7 +301,7 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
             return $this->macroCall($method, $parameters);
         }
 
-        $this->attributes[$method] = count($parameters) > 0 ? reset($parameters) : true;
+        $this->attributes[$method] = count($parameters) > 0 ? array_last($parameters) : true;
 
         return $this;
     }

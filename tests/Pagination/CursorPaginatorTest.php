@@ -120,6 +120,28 @@ class CursorPaginatorTest extends TestCase
         ], $p->toArray());
     }
 
+    public function testCursorPaginatorToJson()
+    {
+        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null);
+        $results = $paginator->toJson();
+        $expected = json_encode($paginator->toArray());
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+    }
+
+    public function testCursorPaginatorToPrettyJson()
+    {
+        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null);
+        $results = $paginator->toPrettyJson();
+        $expected = $paginator->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
+
     protected function getCursor($params, $isNext = true)
     {
         return (new Cursor($params, $isNext))->encode();

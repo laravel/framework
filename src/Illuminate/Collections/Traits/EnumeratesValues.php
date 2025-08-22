@@ -985,6 +985,16 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the collection of items as pretty print formatted JSON.
+     *
+     * @return string
+     */
+    public function toPrettyJson()
+    {
+        return $this->toJson(JSON_PRETTY_PRINT);
+    }
+
+    /**
      * Get a CachingIterator instance.
      *
      * @param  int  $flags

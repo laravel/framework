@@ -256,6 +256,10 @@ class Arr
                 return value($default);
             }
 
+            if (is_array($array)) {
+                return array_first($array);
+            }
+
             foreach ($array as $item) {
                 return $item;
             }
@@ -283,7 +287,7 @@ class Arr
     public static function last($array, ?callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? value($default) : array_last($array);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
@@ -633,7 +637,7 @@ class Arr
         }
 
         if (count($array) === 1) {
-            return end($array);
+            return array_last($array);
         }
 
         $finalItem = array_pop($array);

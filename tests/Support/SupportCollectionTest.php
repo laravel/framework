@@ -654,6 +654,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testToPrettyJsonEncodesTheJsonSerializeResult($collection)
+    {
+        $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
+        $c->expects($this->once())->method('jsonSerialize')->willReturn(['foo' => 'bar', 'baz' => 'qux']);
+        $results = $c->toPrettyJson();
+        $expected = json_encode(['foo' => 'bar', 'baz' => 'qux'], JSON_PRETTY_PRINT);
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCastingToStringJsonEncodesTheToArrayResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();

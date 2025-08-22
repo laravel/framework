@@ -655,7 +655,7 @@ trait ManagesFrequencies
      * Splice the given value into the given position of the expression.
      *
      * @param  int  $position
-     * @param  string  $value
+     * @param  string|int  $value
      * @return $this
      */
     protected function spliceIntoPosition($position, $value)
