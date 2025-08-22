@@ -5,7 +5,7 @@
 @use('Phiki\Theme\Theme')
 
 @php
-    $code = (new Phiki)->codeToHtml($code, Grammar::Php, Theme::OneDarkPro, withGutter: true, startingLineNumber: $highlightedLine - 5);
+    $code = (new Phiki)->codeToHtml($code, Grammar::Php, Theme::OneDarkPro)->withGutter()->startingLine($highlightedLine - 5);
 @endphp
 
 <div
