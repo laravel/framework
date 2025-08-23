@@ -32,42 +32,42 @@ class Gate implements GateContract
     /**
      * The user resolver callable.
      *
-     * @var callable
+     * @var callable(): \Illuminate\Contracts\Auth\Authenticatable
      */
     protected $userResolver;
 
     /**
      * All of the defined abilities.
      *
-     * @var array
+     * @var array<string, callable>
      */
     protected $abilities = [];
 
     /**
      * All of the defined policies.
      *
-     * @var array
+     * @var array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>
      */
     protected $policies = [];
 
     /**
      * All of the registered before callbacks.
      *
-     * @var array
+     * @var (callable(\Illuminate\Contracts\Auth\Authenticatable, string, array): bool|null)[]
      */
     protected $beforeCallbacks = [];
 
     /**
      * All of the registered after callbacks.
      *
-     * @var array
+     * @var (callable(\Illuminate\Contracts\Auth\Authenticatable, string, bool|null, array): bool|null)[]
      */
     protected $afterCallbacks = [];
 
     /**
      * All of the defined abilities using class@method notation.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $stringCallbacks = [];
 
@@ -81,7 +81,7 @@ class Gate implements GateContract
     /**
      * The callback to be used to guess policy names.
      *
-     * @var callable|null
+     * @var (callable(class-string): string|string[])|null
      */
     protected $guessPolicyNamesUsingCallback;
 
@@ -89,12 +89,12 @@ class Gate implements GateContract
      * Create a new gate instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  callable  $userResolver
-     * @param  array  $abilities
-     * @param  array  $policies
-     * @param  array  $beforeCallbacks
-     * @param  array  $afterCallbacks
-     * @param  callable|null  $guessPolicyNamesUsingCallback
+     * @param  callable(): \Illuminate\Contracts\Auth\Authenticatable  $userResolver
+     * @param  array<string, callable>  $abilities
+     * @param  array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>  $policies
+     * @param  (callable(\Illuminate\Contracts\Auth\Authenticatable, string, array): bool|null)[]  $beforeCallbacks
+     * @param  (callable(\Illuminate\Contracts\Auth\Authenticatable, string, bool|null, array): bool|null)[]  $afterCallbacks
+     * @param  (callable(class-string): string|string[])|null  $guessPolicyNamesUsingCallback
      */
     public function __construct(
         Container $container,
@@ -117,7 +117,7 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string|array  $ability
+     * @param  string|string[]  $ability
      * @return bool
      */
     public function has($ability)
@@ -195,7 +195,7 @@ class Gate implements GateContract
      * Define a new ability.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  callable|array|string  $callback
+     * @param  callable|string[]|string  $callback
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -225,8 +225,8 @@ class Gate implements GateContract
      * Define abilities for a resource.
      *
      * @param  string  $name
-     * @param  string  $class
-     * @param  array|null  $abilities
+     * @param  class-string  $class
+     * @param  array<string, string>|null  $abilities
      * @return $this
      */
     public function resource($name, $class, ?array $abilities = null)
@@ -250,7 +250,7 @@ class Gate implements GateContract
      * Create the ability callback for a callback string.
      *
      * @param  string  $ability
-     * @param  string  $callback
+     * @param  class-string|string  $callback
      * @return \Closure
      */
     protected function buildAbilityCallback($ability, $callback)
@@ -285,8 +285,8 @@ class Gate implements GateContract
     /**
      * Define a policy class for a given class type.
      *
-     * @param  string  $class
-     * @param  string  $policy
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
+     * @param  class-string  $policy
      * @return $this
      */
     public function policy($class, $policy)
@@ -299,7 +299,7 @@ class Gate implements GateContract
     /**
      * Register a callback to run before all Gate checks.
      *
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Contracts\Auth\Authenticatable, string, array): bool|null  $callback
      * @return $this
      */
     public function before(callable $callback)
@@ -312,7 +312,7 @@ class Gate implements GateContract
     /**
      * Register a callback to run after all Gate checks.
      *
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Contracts\Auth\Authenticatable, string, bool|null, array): bool|null  $callback
      * @return $this
      */
     public function after(callable $callback)
@@ -462,7 +462,7 @@ class Gate implements GateContract
      * Determine whether the callback/method can be called with the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  \Closure|string|array  $class
+     * @param  \Closure|class-string|array  $class
      * @param  string|null  $method
      * @return bool
      */
@@ -488,7 +488,7 @@ class Gate implements GateContract
     /**
      * Determine if the given class method allows guests.
      *
-     * @param  string  $class
+     * @param  class-string  $class
      * @param  string  $method
      * @return bool
      */
@@ -653,8 +653,8 @@ class Gate implements GateContract
     /**
      * Get a policy instance for a given class.
      *
-     * @param  object|string  $class
-     * @return mixed
+     * @param  object|class-string  $class
+     * @return object|null
      */
     public function getPolicyFor($class)
     {
@@ -711,8 +711,8 @@ class Gate implements GateContract
     /**
      * Guess the policy name for the given class.
      *
-     * @param  string  $class
-     * @return array
+     * @param  class-string  $class
+     * @return array<int, class-string>
      */
     protected function guessPolicyName($class)
     {
@@ -739,7 +739,7 @@ class Gate implements GateContract
     /**
      * Specify a callback to be used to guess policy names.
      *
-     * @param  callable  $callback
+     * @param  (callable(class-string): string|string[])  $callback
      * @return $this
      */
     public function guessPolicyNamesUsing(callable $callback)
@@ -752,8 +752,10 @@ class Gate implements GateContract
     /**
      * Build a policy class instance of the given type.
      *
-     * @param  object|string  $class
-     * @return mixed
+     * @template TClass
+     *
+     * @param  class-string<TClass>  $class
+     * @return TClass
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -801,7 +803,7 @@ class Gate implements GateContract
     /**
      * Call the "before" method on the given policy, if applicable.
      *
-     * @param  mixed  $policy
+     * @param  object|class-string  $policy
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
@@ -878,7 +880,7 @@ class Gate implements GateContract
     /**
      * Resolve the user from the user resolver.
      *
-     * @return mixed
+     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     protected function resolveUser()
     {
@@ -888,7 +890,7 @@ class Gate implements GateContract
     /**
      * Get all of the defined abilities.
      *
-     * @return array
+     * @return array<string, callable>
      */
     public function abilities()
     {
@@ -898,7 +900,7 @@ class Gate implements GateContract
     /**
      * Get all of the defined policies.
      *
-     * @return array
+     * @return array<class-string<\Illuminate\Database\Eloquent\Model>, class-string>
      */
     public function policies()
     {
