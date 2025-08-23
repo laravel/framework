@@ -1510,11 +1510,16 @@ class Str
     {
         $title = $language ? static::ascii($title, $language) : $title;
 
+        // If the string contains uppercase characters and is not preceded by a space, it is most likely in camel, studly and pascal cases
+        if (static::isMatch('/(?<!\s)[A-Z]/', substr($title, 1))) {
+            $title = static::snake($title);
+        }
+
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
-
+        
         // Replace dictionary words
         foreach ($dictionary as $key => $value) {
             $dictionary[$key] = $separator.$value.$separator;
