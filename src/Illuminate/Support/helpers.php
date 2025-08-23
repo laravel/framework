@@ -76,6 +76,24 @@ if (! function_exists('blank')) {
     }
 }
 
+if (! function_exists('blank_any')) {
+    /**
+     * Determine if at least one of the given values is "blank".
+     *
+     * @param  mixed  ...$values
+     */
+    function blank_any(...$values): bool
+    {
+        foreach ($values as $value) {
+            if (blank($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
@@ -165,6 +183,24 @@ if (! function_exists('filled')) {
     function filled($value): bool
     {
         return ! blank($value);
+    }
+}
+
+if (! function_exists('filled_any')) {
+    /**
+     * Determine if at least one of the given values is "filled".
+     *
+     * @param  mixed  ...$values
+     */
+    function filled_any(...$values): bool
+    {
+        foreach ($values as $value) {
+            if (filled($value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

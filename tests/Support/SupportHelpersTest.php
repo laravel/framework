@@ -101,6 +101,13 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(blank($model));
     }
 
+    public function testBlankAny()
+    {
+        $this->assertTrue(blank_any('', 'bar'));
+        $this->assertFalse(blank_any('foo', 'bar'));
+        $this->assertTrue(blank_any(new \Illuminate\Support\Stringable('')));
+    }
+
     public function testClassBasename()
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
@@ -166,6 +173,13 @@ class SupportHelpersTest extends TestCase
 
         $object = new SupportTestCountable();
         $this->assertFalse(filled($object));
+    }
+
+    public function testFilledAny()
+    {
+        $this->assertTrue(filled_any('foo', null));
+        $this->assertFalse(filled_any(null, ''));
+        $this->assertTrue(filled_any(0, false));
     }
 
     public function testValue()
