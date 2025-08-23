@@ -1515,7 +1515,7 @@ class Str
             // Convert abbreviations to lowercase for proper snake-casing
             $title = preg_replace_callback(
                 '/\b[A-Z]{2,}\b/u',
-                fn($matches) => static::lower($matches[0]),
+                fn ($matches) => static::lower($matches[0]),
                 $title
             );
 
@@ -1526,7 +1526,7 @@ class Str
         $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
-        
+
         // Replace dictionary words
         foreach ($dictionary as $key => $value) {
             $dictionary[$key] = $separator.$value.$separator;
