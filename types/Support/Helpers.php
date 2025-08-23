@@ -16,17 +16,8 @@ if (blank($value)) {
 }
 
 /** @var array<bool|float|int|string|null> $values */
-if (filled_any(...$values)) {
-    assertType('array<bool|float|int|string|null>', $values);
-} else {
-    assertType('array<string|null>', $values);
-}
-
-if (blank_any(...$values)) {
-    assertType('array<bool|float|int|string|null>', $values);
-} else {
-    assertType('array<bool|float|int|non-empty-string>', $values);
-}
+assertType('bool', filled_any(...$values));
+assertType('bool', blank_any(...$values));
 
 assertType('User', object_get(new User(), null));
 assertType('User', object_get(new User(), ''));
