@@ -1174,7 +1174,11 @@ class Container implements ArrayAccess, ContainerContract
 
         if (is_a($concrete, WithFactory::class, true)) {
             if (! method_exists($concrete, 'buildWithFactory')) {
-                throw new BindingResolutionException("No builder definition exists for [$concrete].");
+                throw new BindingResolutionException("No buildWithFactory method exists for [$concrete].");
+            }
+            elseif (in_array($concrete, $this->buildStack, true)) {
+                // In the case that the factory methods wants to use the container to build
+                // itself, we can just skip over calling the factory function again.
             }
             else {
                 $instance = $this->call([$concrete, 'buildWithFactory']);
