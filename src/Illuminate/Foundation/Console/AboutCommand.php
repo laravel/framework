@@ -166,6 +166,11 @@ class AboutCommand extends Command
         $formatEnabledStatus = fn ($value) => $value ? '<fg=yellow;options=bold>ENABLED</>' : 'OFF';
         $formatCachedStatus = fn ($value) => $value ? '<fg=green;options=bold>CACHED</>' : '<fg=yellow;options=bold>NOT CACHED</>';
 
+        $baseUrl = (new Stringable(config('app.url')))
+            ->replace('http://', '')
+            ->replace('https://', '')
+            ->value();
+
         static::addToSection('Environment', fn () => [
             'Application Name' => config('app.name'),
             'Laravel Version' => $this->laravel->version(),
@@ -173,7 +178,7 @@ class AboutCommand extends Command
             'Composer Version' => $this->composer->getVersion() ?? '<fg=yellow;options=bold>-</>',
             'Environment' => $this->laravel->environment(),
             'Debug Mode' => static::format(config('app.debug'), console: $formatEnabledStatus),
-            'URL' => Str::of(config('app.url'))->replace(['http://', 'https://'], ''),
+            'URL' => $baseUrl,
             'Maintenance Mode' => static::format($this->laravel->isDownForMaintenance(), console: $formatEnabledStatus),
             'Timezone' => config('app.timezone'),
             'Locale' => config('app.locale'),
