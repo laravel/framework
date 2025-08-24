@@ -2,9 +2,8 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable as StringableAlias;
 use Psr\Log\LoggerInterface;
-use Stringable;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -35,7 +34,7 @@ class LogTransport implements Stringable, TransportInterface
      */
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
-        $string = Str::of($message->toString());
+        $string = new StringableAlias($message->toString());
 
         if ($string->contains('Content-Type: multipart/')) {
             $boundary = $string
