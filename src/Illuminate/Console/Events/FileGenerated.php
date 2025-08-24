@@ -1,4 +1,5 @@
 <?php
+
 namespace Illuminate\Console\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
