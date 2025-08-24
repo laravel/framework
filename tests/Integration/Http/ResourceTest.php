@@ -1853,6 +1853,58 @@ class ResourceTest extends TestCase
         }
     }
 
+    public function testResourceSkipsWrappingWhenDataKeyExists()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'id' => 5,
+            'title' => 'Test',
+            'data' => 'some data',
+        ], $content);
+    }
+
+    public function testResourceWrapsWhenDataKeyDoesNotExist()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test']) extends JsonResource {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+            ]
+        ], $content);
+    }
+
+    public function testResourceForceWrapOverridesDataKeyCheck()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource {
+            public static $wrap = 'data';
+            public static bool $forceWrap = true;
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ]
+        ], $content);
+    }
+
     private function assertJsonResourceResponse($data, $expectedJson)
     {
         Route::get('/', function () use ($data) {

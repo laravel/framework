@@ -75,11 +75,15 @@ class ResourceResponse implements Responsable
     /**
      * Determine if we have a default wrapper and the given data is unwrapped.
      *
-     * @param  array  $data
+     * @param array $data
      * @return bool
      */
-    protected function haveDefaultWrapperAndDataIsUnwrapped($data)
+    protected function haveDefaultWrapperAndDataIsUnwrapped(array $data): bool
     {
+        if ($this->resource instanceof JsonResource && $this->resource::$forceWrap) {
+            return $this->wrapper() !== null;
+        }
+
         return $this->wrapper() && ! array_key_exists($this->wrapper(), $data);
     }
 
