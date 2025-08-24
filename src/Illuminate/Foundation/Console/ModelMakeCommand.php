@@ -6,11 +6,11 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'make:model')]
@@ -253,7 +253,9 @@ class ModelMakeCommand extends GeneratorCommand
         $replacements = [];
 
         if ($this->option('factory') || $this->option('all')) {
-            $modelPath = Str::of($this->argument('name'))->studly()->replace('/', '\\')->toString();
+            $modelPath = (string) (new Stringable($this->argument('name')))
+                ->studly()
+                ->replace('/', '\\');
 
             $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
 
