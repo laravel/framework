@@ -75,7 +75,7 @@ class ResourceResponse implements Responsable
     /**
      * Determine if we have a default wrapper and the given data is unwrapped.
      *
-     * @param array $data
+     * @param  array  $data
      * @return bool
      */
     protected function haveDefaultWrapperAndDataIsUnwrapped(array $data): bool

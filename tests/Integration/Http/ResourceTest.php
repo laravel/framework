@@ -1855,7 +1855,8 @@ class ResourceTest extends TestCase
 
     public function testResourceSkipsWrappingWhenDataKeyExists()
     {
-        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
             public static $wrap = 'data';
         };
 
@@ -1871,7 +1872,8 @@ class ResourceTest extends TestCase
 
     public function testResourceWrapsWhenDataKeyDoesNotExist()
     {
-        $resource = new class(['id' => 5, 'title' => 'Test']) extends JsonResource {
+        $resource = new class(['id' => 5, 'title' => 'Test']) extends JsonResource
+        {
             public static $wrap = 'data';
         };
 
@@ -1882,13 +1884,14 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'title' => 'Test',
-            ]
+            ],
         ], $content);
     }
 
     public function testResourceForceWrapOverridesDataKeyCheck()
     {
-        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
             public static $wrap = 'data';
             public static bool $forceWrap = true;
         };
@@ -1901,7 +1904,7 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'title' => 'Test',
                 'data' => 'some data',
-            ]
+            ],
         ], $content);
     }
 
