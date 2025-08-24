@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
