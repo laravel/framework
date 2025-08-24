@@ -36,7 +36,6 @@ class PruneFailedJobsCommand extends Command
         $failer = $this->laravel['queue.failer'];
 
         if ($failer instanceof PrunableFailedJobProvider) {
-
             $before = ($this->option('days')) ?
                 Carbon::now()->subDays($this->option('days')) :
                 Carbon::now()->subHours($this->option('hours'));
