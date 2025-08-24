@@ -145,7 +145,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Execute the console command.
      *
-     * @return bool|null
+     * Fires a `FileGenerated` event after the file is successfully created.
+     *
+     * @return bool|null Returns false if the command could not create the file, null on success.
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
