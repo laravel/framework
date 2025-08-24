@@ -1212,6 +1212,44 @@ class TestResponseTest extends TestCase
         $response->assertStatus($expectedStatusCode);
     }
 
+    public function testAssertAbortedWithJsonMessageAndHeaders()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new JsonResponse(['message' => 'Forbidden'], 403, ['X-Foo' => 'Bar'])
+        );
+
+        $response->assertAborted(403, 'Forbidden', ['X-Foo' => 'Bar']);
+    }
+
+    public function testAssertAbortedWithJsonWithoutMessageAssertsStructure()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new JsonResponse(['message' => 'Anything'], 400)
+        );
+
+        $response->assertAborted(400);
+    }
+
+    public function testAssertAbortedWithHtmlMessage()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new Response('<h1>Forbidden</h1>', 403, ['Content-Type' => 'text/html; charset=UTF-8'])
+        );
+
+        $response->assertAborted(403, 'Forbidden');
+    }
+
+    public function testAssertAbortedFailsWhenJsonMessageDoesNotMatch()
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        $response = TestResponse::fromBaseResponse(
+            new JsonResponse(['message' => 'Actual'], 422)
+        );
+
+        $response->assertAborted(422, 'Expected');
+    }
+
     public function testAssertHeader()
     {
         $this->expectException(AssertionFailedError::class);

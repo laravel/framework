@@ -177,6 +177,36 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response is the result of an aborted request, matching the given status code, message, and headers.
+     *
+     * @param  int  $status
+     * @param  string|null  $message
+     * @param  array  $headers
+     * @return $this
+     */
+    public function assertAborted(int $status, ?string $message = null, array $headers = [])
+    {
+        $this->assertStatus($status);
+
+        $contentType = $this->baseResponse->headers->get('Content-Type', '');
+        $isJson = Str::of($contentType)->lower()->contains('application/json');
+
+        if ($message !== null) {
+            $isJson
+                ? $this->assertJson(['message' => $message])
+                : $this->assertSeeText($message);
+        } elseif ($isJson) {
+            $this->assertJsonStructure(['message']);
+        }
+
+        foreach ($headers as $header => $value) {
+            $this->assertHeader($header, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get an assertion message for a status assertion containing extra details when available.
      *
      * @param  string|int  $expected
