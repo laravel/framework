@@ -6,7 +6,6 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -116,11 +115,10 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getTestPath()
     {
         return base_path(
-            Str::of($this->testClassFullyQualifiedName())
+            (string) (new Stringable($this->testClassFullyQualifiedName()))
                 ->replace('\\', '/')
                 ->replaceFirst('Tests/Feature', 'tests/Feature')
                 ->append('Test.php')
-                ->value()
         );
     }
 
@@ -157,9 +155,8 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testNamespace()
     {
-        return Str::of($this->testClassFullyQualifiedName())
-            ->beforeLast('\\')
-            ->value();
+        return (string) (new Stringable($this->testClassFullyQualifiedName()))
+            ->beforeLast('\\');
     }
 
     /**
@@ -169,10 +166,9 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassName()
     {
-        return Str::of($this->testClassFullyQualifiedName())
+        return(string) (new Stringable($this->testClassFullyQualifiedName()))
             ->afterLast('\\')
-            ->append('Test')
-            ->value();
+            ->append('Test');
     }
 
     /**
@@ -182,15 +178,17 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassFullyQualifiedName()
     {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+        $name = (new Stringable($this->getNameInput()))
+            ->lower()
+            ->replace('.'.$this->option('extension'), '');
 
-        $namespacedName = Str::of(
-            (new Stringable($name))
-                ->replace('/', ' ')
-                ->explode(' ')
-                ->map(fn ($part) => (new Stringable($part))->ucfirst())
-                ->implode('\\')
-        )
+        $namespacedPath = (new Stringable($name))
+            ->replace('/', ' ')
+            ->explode(' ')
+            ->map(fn ($part) => (new Stringable($part))->ucfirst())
+            ->implode('\\');
+
+        $namespacedName = (new Stringable($namespacedPath))
             ->replace(['-', '_'], ' ')
             ->explode(' ')
             ->map(fn ($part) => (new Stringable($part))->ucfirst())
@@ -220,10 +218,9 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testViewName()
     {
-        return Str::of($this->getNameInput())
+        return (string) (new Stringable($this->getNameInput()))
             ->replace('/', '.')
-            ->lower()
-            ->value();
+            ->lower();
     }
 
     /**
