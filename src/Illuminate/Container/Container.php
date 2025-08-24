@@ -12,6 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\WithFactory;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -1171,6 +1172,23 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->buildStack[] = $concrete;
 
+        if (is_a($concrete, WithFactory::class, true)) {
+            if (! method_exists($concrete, 'buildWithFactory')) {
+                throw new BindingResolutionException("No builder definition exists for [$concrete].");
+            }
+            else {
+                $instance = $this->call([$concrete, 'buildWithFactory']);
+
+                array_pop($this->buildStack);
+
+                $this->fireAfterResolvingAttributeCallbacks(
+                    $reflector->getAttributes(), $instance
+                );
+
+                return $instance;
+            }
+        }
+
         $constructor = $reflector->getConstructor();
 
         // If there are no constructors, that means there are no dependencies then
@@ -1398,6 +1416,7 @@ class Container implements ArrayAccess, ContainerContract
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
+        //
         return $handler($instance, $this);
     }
 
