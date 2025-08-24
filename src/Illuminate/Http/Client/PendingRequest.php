@@ -1529,17 +1529,8 @@ class PendingRequest
      */
     public function isAllowedRequestUrl($url)
     {
-        if (! $this->preventStrayRequests) {
-            return true;
-        }
-
-        foreach ($this->allowedStrayRequestUrls as $pattern) {
-            if (Str::is($pattern, $url)) {
-                return true;
-            }
-        }
-
-        return false;
+        return ! $this->preventStrayRequests ||
+            array_any($this->allowedStrayRequestUrls, fn ($pattern) => Str::is($pattern, $url));
     }
 
     /**

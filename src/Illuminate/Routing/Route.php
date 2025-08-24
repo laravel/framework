@@ -912,17 +912,9 @@ class Route
      */
     public function named(...$patterns)
     {
-        if (is_null($routeName = $this->getName())) {
-            return false;
-        }
+        $routeName = $this->getName();
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return ! is_null($routeName) && array_any($patterns, fn ($pattern) => Str::is($pattern, $routeName));
     }
 
     /**

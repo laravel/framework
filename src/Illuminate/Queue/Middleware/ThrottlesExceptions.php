@@ -190,13 +190,7 @@ class ThrottlesExceptions
      */
     protected function shouldDelete(Throwable $throwable): bool
     {
-        foreach ($this->deleteWhenCallbacks as $callback) {
-            if (call_user_func($callback, $throwable)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->deleteWhenCallbacks, fn ($callback) => call_user_func($callback, $throwable));
     }
 
     /**
@@ -207,13 +201,7 @@ class ThrottlesExceptions
      */
     protected function shouldFail(Throwable $throwable): bool
     {
-        foreach ($this->failWhenCallbacks as $callback) {
-            if (call_user_func($callback, $throwable)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->failWhenCallbacks, fn ($callback) => call_user_func($callback, $throwable));
     }
 
     /**

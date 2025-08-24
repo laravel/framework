@@ -238,13 +238,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         if (func_num_args() === 1) {
             $needle = $key;
 
-            foreach ($this as $value) {
-                if ($value == $needle) {
-                    return true;
-                }
-            }
-
-            return false;
+            return array_any($this->all(), fn ($item) => $value == $needle);
         }
 
         return $this->contains($this->operatorForWhere(...func_get_args()));
@@ -267,13 +261,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return ! is_null($this->first($key));
         }
 
-        foreach ($this as $item) {
-            if ($item === $key) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->all(), fn ($item) => $value == $item);
     }
 
     /**
@@ -615,7 +603,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $count = count($keys);
 
         foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys) && --$count == 0) {
+            if (array_key_exists($key, $keys) && --$count === 0) {
                 return true;
             }
         }
@@ -633,13 +621,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         $keys = array_flip(is_array($key) ? $key : func_get_args());
 
-        foreach ($this as $key => $value) {
-            if (array_key_exists($key, $keys)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->all(), fn ($value, $key) => array_key_exists($key, $keys));
     }
 
     /**

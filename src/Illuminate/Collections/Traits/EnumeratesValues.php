@@ -754,13 +754,7 @@ trait EnumeratesValues
     {
         return $this->filter(function ($value) use ($type) {
             if (is_array($type)) {
-                foreach ($type as $classType) {
-                    if ($value instanceof $classType) {
-                        return true;
-                    }
-                }
-
-                return false;
+                return array_any($type, fn ($classType) => $value instanceof $classType);
             }
 
             return $value instanceof $type;

@@ -403,13 +403,7 @@ class Str
             $needles = (array) $needles;
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_ends_with($haystack, $needle));
     }
 
     /**
@@ -1637,13 +1631,7 @@ class Str
             $needles = [$needles];
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_starts_with($haystack, $needle));
     }
 
     /**

@@ -174,13 +174,9 @@ class Builder
             return (bool) $this->connection->scalar($sql);
         }
 
-        foreach ($this->getTables($schema ?? $this->getCurrentSchemaName()) as $value) {
-            if (strtolower($table) === strtolower($value['name'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->getTables($schema ?? $this->getCurrentSchemaName()), function ($value) use ($table) {
+            return strtolower($table) === strtolower($value['name']);
+        });
     }
 
     /**
@@ -195,13 +191,9 @@ class Builder
 
         $view = $this->connection->getTablePrefix().$view;
 
-        foreach ($this->getViews($schema ?? $this->getCurrentSchemaName()) as $value) {
-            if (strtolower($view) === strtolower($value['name'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->getViews($schema ?? $this->getCurrentSchemaName()), function ($value) use ($view) {
+            return strtolower($view) === strtolower($value['name']);
+        });
     }
 
     /**

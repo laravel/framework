@@ -543,13 +543,7 @@ class Arr
             return false;
         }
 
-        foreach ($keys as $key) {
-            if (static::has($array, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key, $value) => static::has($array, $key));
     }
 
     /**

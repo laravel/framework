@@ -215,13 +215,7 @@ trait InteractsWithInput
             $files = [$files];
         }
 
-        foreach ($files as $file) {
-            if ($this->isValidFile($file)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($files, fn ($file) => $this->isValidFile($file));
     }
 
     /**
