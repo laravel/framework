@@ -5,7 +5,7 @@ namespace Illuminate\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use stdClass;
 
 trait InteractsWithData
@@ -225,7 +225,7 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
+     * @return Stringable
      */
     public function str($key, $default = null)
     {
@@ -237,11 +237,11 @@ trait InteractsWithData
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Stringable
+     * @return Stringable
      */
     public function string($key, $default = null)
     {
-        return Str::of($this->data($key, $default));
+        return new Stringable($this->data($key, $default));
     }
 
     /**
