@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Mailables;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 
 class Headers
@@ -95,7 +96,7 @@ class Headers
     public function referencesString(): string
     {
         return (new Collection($this->references))
-            ->map(fn ($messageId) => Str::of($messageId)->start('<')->finish('>')->value())
+            ->map(fn ($messageId) => (new Stringable($messageId))->start('<')->finish('>')->value())
             ->implode(' ');
     }
 }
