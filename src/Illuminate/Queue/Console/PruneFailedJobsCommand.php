@@ -16,7 +16,8 @@ class PruneFailedJobsCommand extends Command
      * @var string
      */
     protected $signature = 'queue:prune-failed
-                {--hours=24 : The number of hours to retain failed jobs data}';
+                {--hours=24 : The number of hours to retain failed jobs data}
+                {--days= : The number of days to retain failed jobs data}';
 
     /**
      * The console command description.
@@ -35,7 +36,12 @@ class PruneFailedJobsCommand extends Command
         $failer = $this->laravel['queue.failer'];
 
         if ($failer instanceof PrunableFailedJobProvider) {
-            $count = $failer->prune(Carbon::now()->subHours($this->option('hours')));
+
+            $before = ($this->option('days')) ?
+                Carbon::now()->subDays($this->option('days')) :
+                Carbon::now()->subHours($this->option('hours'));
+
+            $count = $failer->prune($before);
         } else {
             $this->components->error('The ['.class_basename($failer).'] failed job storage driver does not support pruning.');
 
