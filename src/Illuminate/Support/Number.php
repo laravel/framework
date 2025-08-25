@@ -194,7 +194,6 @@ class Number
         }
 
         if (isset($symbol)) {
-            // Replace the default currency symbol with this one.
             $formatter->setSymbol(NumberFormatter::CURRENCY_SYMBOL, $symbol);
         }
 
