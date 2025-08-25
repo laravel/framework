@@ -655,6 +655,211 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
     }
 
+    public function testForeignKeyWithAutomaticIndexCreationOnPostgreSQL()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('pgsql');
+        $grammar = new \Illuminate\Database\Schema\Grammars\PostgresGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\PostgresBuilder'));
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->foreignId('user_id')->constrained();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should have both foreign and index commands
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(1, $indexCommands);
+        $this->assertEquals(['user_id'], array_values($indexCommands)[0]->columns);
+    }
+
+    public function testForeignKeyWithAutomaticIndexCreationOnSQLite()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('sqlite');
+        $grammar = new \Illuminate\Database\Schema\Grammars\SQLiteGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\SQLiteBuilder'));
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->foreignId('user_id')->constrained();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should have both foreign and index commands
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(1, $indexCommands);
+        $this->assertEquals(['user_id'], array_values($indexCommands)[0]->columns);
+    }
+
+    public function testForeignKeyWithoutAutomaticIndexCreationOnMySQL()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('mysql');
+        $grammar = new \Illuminate\Database\Schema\Grammars\MySqlGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\MySqlBuilder'));
+        $connection->shouldReceive('isMaria')->andReturn(false);
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->foreignId('user_id')->constrained();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should only have foreign command, no index for MySQL
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(0, $indexCommands);
+    }
+
+    public function testForeignKeyWithExplicitIndexDoesNotCreateDuplicateIndex()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('pgsql');
+        $grammar = new \Illuminate\Database\Schema\Grammars\PostgresGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\PostgresBuilder'));
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->foreignId('user_id')->index()->constrained();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should have one foreign and one index command (explicit index, not auto-created)
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(1, $indexCommands);
+    }
+
+    public function testCompoundForeignKeyWithAutomaticIndexCreation()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('sqlite');
+        $grammar = new \Illuminate\Database\Schema\Grammars\SQLiteGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\SQLiteBuilder'));
+        $connection->shouldReceive('getServerVersion')->andReturn('3.35');
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->unsignedBigInteger('user_id');
+        $blueprint->unsignedBigInteger('tenant_id');
+        $blueprint->foreign(['user_id', 'tenant_id'])->references(['id', 'tenant_id'])->on('users');
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should have both foreign and index commands
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(1, $indexCommands);
+        $this->assertEquals(['user_id', 'tenant_id'], array_values($indexCommands)[0]->columns);
+    }
+
+    public function testForeignKeyAutomaticIndexCreationDisabledByConfig()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(false);
+        $connection->shouldReceive('getDriverName')->andReturn('pgsql');
+        $grammar = new \Illuminate\Database\Schema\Grammars\PostgresGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\PostgresBuilder'));
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->foreignId('user_id')->constrained();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should only have foreign command when config is disabled
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(0, $indexCommands);
+    }
+
+    public function testForeignKeyWithoutIndexMethod()
+    {
+        $connection = m::mock(Connection::class);
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(true);
+        $connection->shouldReceive('getConfig')->with('foreign_key_implicit_index_creation', false)->andReturn(true);
+        $connection->shouldReceive('getDriverName')->andReturn('pgsql');
+        $grammar = new \Illuminate\Database\Schema\Grammars\PostgresGrammar($connection);
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock('Illuminate\Database\Schema\PostgresBuilder'));
+
+        $blueprint = new Blueprint($connection, 'posts');
+        $blueprint->create();
+        $blueprint->id();
+        $blueprint->unsignedBigInteger('user_id');
+        $blueprint->foreign('user_id')->references('id')->on('users')->withoutIndex();
+
+        // Need to call toSql() to trigger addImpliedCommands
+        $blueprint->toSql();
+
+        $commands = $blueprint->getCommands();
+        $foreignCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'foreign');
+        $indexCommands = array_filter($commands, fn ($cmd) => $cmd->name === 'index');
+
+        // Should only have foreign command when withoutIndex is used
+        $this->assertCount(1, $foreignCommands);
+        $this->assertCount(0, $indexCommands);
+    }
+
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
         $connection = m::mock(Connection::class)
