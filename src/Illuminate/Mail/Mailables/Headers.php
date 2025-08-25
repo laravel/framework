@@ -3,7 +3,6 @@
 namespace Illuminate\Mail\Mailables;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Conditionable;
 

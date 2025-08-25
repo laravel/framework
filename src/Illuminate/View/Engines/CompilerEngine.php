@@ -6,7 +6,6 @@ use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\ViewException;
