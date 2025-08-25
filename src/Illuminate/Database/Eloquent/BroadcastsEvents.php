@@ -130,16 +130,16 @@ trait BroadcastsEvents
     {
         return tap($this->newBroadcastableEvent($event), function ($event) {
             $event->connection = property_exists($this, 'broadcastConnection')
-                            ? $this->broadcastConnection
-                            : $this->broadcastConnection();
+                ? $this->broadcastConnection
+                : $this->broadcastConnection();
 
             $event->queue = property_exists($this, 'broadcastQueue')
-                            ? $this->broadcastQueue
-                            : $this->broadcastQueue();
+                ? $this->broadcastQueue
+                : $this->broadcastQueue();
 
             $event->afterCommit = property_exists($this, 'broadcastAfterCommit')
-                            ? $this->broadcastAfterCommit
-                            : $this->broadcastAfterCommit();
+                ? $this->broadcastAfterCommit
+                : $this->broadcastAfterCommit();
         });
     }
 
@@ -149,7 +149,7 @@ trait BroadcastsEvents
      * @param  string  $event
      * @return \Illuminate\Database\Eloquent\BroadcastableModelEventOccurred
      */
-    protected function newBroadcastableEvent($event)
+    protected function newBroadcastableEvent(string $event)
     {
         return new BroadcastableModelEventOccurred($this, $event);
     }

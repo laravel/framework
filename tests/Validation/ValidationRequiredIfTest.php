@@ -3,13 +3,16 @@
 namespace Illuminate\Tests\Validation;
 
 use Exception;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\RequiredIf;
+use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class ValidationRequiredIfTest extends TestCase
 {
-    public function testItClousureReturnsFormatsAStringVersionOfTheRule()
+    public function testItClosureReturnsFormatsAStringVersionOfTheRule()
     {
         $rule = new RequiredIf(function () {
             return true;
@@ -50,5 +53,29 @@ class ValidationRequiredIfTest extends TestCase
         $rule = serialize(new RequiredIf(function () {
             return true;
         }));
+    }
+
+    public function testRequiredIfRuleValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $rule = new RequiredIf(true);
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => $rule]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => ''], ['x' => (string) $rule]);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => [$rule]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
+        $this->assertTrue($v->passes());
+
+        $rule = new RequiredIf(false);
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
+        $this->assertTrue($v->passes());
     }
 }

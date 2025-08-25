@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 down=false
-php="8.1"
+php="8.2"
 
 while true; do
   case "$1" in

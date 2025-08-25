@@ -15,7 +15,7 @@ use RedisCluster;
 class PhpRedisConnector implements Connector
 {
     /**
-     * Create a new clustered PhpRedis connection.
+     * Create a new connection.
      *
      * @param  array  $config
      * @param  array  $options
@@ -23,9 +23,15 @@ class PhpRedisConnector implements Connector
      */
     public function connect(array $config, array $options)
     {
-        $connector = function () use ($config, $options) {
+        $formattedOptions = Arr::pull($config, 'options', []);
+
+        if (isset($config['prefix'])) {
+            $formattedOptions['prefix'] = $config['prefix'];
+        }
+
+        $connector = function () use ($config, $options, $formattedOptions) {
             return $this->createClient(array_merge(
-                $config, $options, Arr::pull($config, 'options', [])
+                $config, $options, $formattedOptions
             ));
         };
 
@@ -45,7 +51,7 @@ class PhpRedisConnector implements Connector
         $options = array_merge($options, $clusterOptions, Arr::pull($config, 'options', []));
 
         return new PhpRedisClusterConnection($this->createRedisClusterInstance(
-            array_map([$this, 'buildClusterConnectionString'], $config), $options
+            array_map($this->buildClusterConnectionString(...), $config), $options
         ));
     }
 
@@ -57,9 +63,7 @@ class PhpRedisConnector implements Connector
      */
     protected function buildClusterConnectionString(array $server)
     {
-        return $this->formatHost($server).':'.$server['port'].'?'.Arr::query(Arr::only($server, [
-            'database', 'password', 'prefix', 'read_timeout',
-        ]));
+        return $this->formatHost($server).':'.$server['port'];
     }
 
     /**
@@ -83,8 +87,28 @@ class PhpRedisConnector implements Connector
 
             $this->establishConnection($client, $config);
 
+            if (array_key_exists('max_retries', $config)) {
+                $client->setOption(Redis::OPT_MAX_RETRIES, $config['max_retries']);
+            }
+
+            if (array_key_exists('backoff_algorithm', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_ALGORITHM, $config['backoff_algorithm']);
+            }
+
+            if (array_key_exists('backoff_base', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_BASE, $config['backoff_base']);
+            }
+
+            if (array_key_exists('backoff_cap', $config)) {
+                $client->setOption(Redis::OPT_BACKOFF_CAP, $config['backoff_cap']);
+            }
+
             if (! empty($config['password'])) {
-                $client->auth($config['password']);
+                if (isset($config['username']) && $config['username'] !== '' && is_string($config['password'])) {
+                    $client->auth([$config['username'], $config['password']]);
+                } else {
+                    $client->auth($config['password']);
+                }
             }
 
             if (isset($config['database'])) {
@@ -148,7 +172,7 @@ class PhpRedisConnector implements Connector
             $parameters[] = $context;
         }
 
-        $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
+        $client->{$persistent ? 'pconnect' : 'connect'}(...$parameters);
     }
 
     /**
@@ -178,31 +202,27 @@ class PhpRedisConnector implements Connector
 
         return tap(new RedisCluster(...$parameters), function ($client) use ($options) {
             if (! empty($options['prefix'])) {
-                $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);
+                $client->setOption(Redis::OPT_PREFIX, $options['prefix']);
             }
 
             if (! empty($options['scan'])) {
-                $client->setOption(RedisCluster::OPT_SCAN, $options['scan']);
+                $client->setOption(Redis::OPT_SCAN, $options['scan']);
             }
 
             if (! empty($options['failover'])) {
                 $client->setOption(RedisCluster::OPT_SLAVE_FAILOVER, $options['failover']);
             }
 
-            if (! empty($options['name'])) {
-                $client->client('SETNAME', $options['name']);
-            }
-
             if (array_key_exists('serializer', $options)) {
-                $client->setOption(RedisCluster::OPT_SERIALIZER, $options['serializer']);
+                $client->setOption(Redis::OPT_SERIALIZER, $options['serializer']);
             }
 
             if (array_key_exists('compression', $options)) {
-                $client->setOption(RedisCluster::OPT_COMPRESSION, $options['compression']);
+                $client->setOption(Redis::OPT_COMPRESSION, $options['compression']);
             }
 
             if (array_key_exists('compression_level', $options)) {
-                $client->setOption(RedisCluster::OPT_COMPRESSION_LEVEL, $options['compression_level']);
+                $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $options['compression_level']);
             }
         });
     }

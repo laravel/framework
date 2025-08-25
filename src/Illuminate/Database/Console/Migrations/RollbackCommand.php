@@ -2,13 +2,17 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Database\Migrations\Migrator;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand('migrate:rollback')]
 class RollbackCommand extends BaseCommand
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, Prohibitable;
 
     /**
      * The console command name.
@@ -35,7 +39,6 @@ class RollbackCommand extends BaseCommand
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @return void
      */
     public function __construct(Migrator $migrator)
     {
@@ -51,8 +54,9 @@ class RollbackCommand extends BaseCommand
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
-            return 1;
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
+            return Command::FAILURE;
         }
 
         $this->migrator->usingConnection($this->option('database'), function () {

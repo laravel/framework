@@ -4,6 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class SQLiteGrammar extends Grammar
@@ -40,6 +41,39 @@ class SQLiteGrammar extends Grammar
     protected function wrapUnion($sql)
     {
         return 'select * from ('.$sql.')';
+    }
+
+    /**
+     * Compile a "where like" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereLike(Builder $query, $where)
+    {
+        if ($where['caseSensitive'] == false) {
+            return parent::whereLike($query, $where);
+        }
+        $where['operator'] = $where['not'] ? 'not glob' : 'glob';
+
+        return $this->whereBasic($query, $where);
+    }
+
+    /**
+     * Convert a LIKE pattern to a GLOB pattern using simple string replacement.
+     *
+     * @param  string  $value
+     * @param  bool  $caseSensitive
+     * @return string
+     */
+    public function prepareWhereLikeBinding($value, $caseSensitive)
+    {
+        return $caseSensitive === false ? $value : str_replace(
+            ['*', '?', '%', '_'],
+            ['[*]', '[?]', '*', '?'],
+            $value
+        );
     }
 
     /**
@@ -118,6 +152,20 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the index hints for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  \Illuminate\Database\Query\IndexHint  $indexHint
+     * @return string
+     */
+    protected function compileIndexHint(Builder $query, $indexHint)
+    {
+        return $indexHint->type === 'force'
+            ? "indexed by {$indexHint->index}"
+            : '';
+    }
+
+    /**
      * Compile a "JSON length" statement into SQL.
      *
      * @param  string  $column
@@ -130,6 +178,63 @@ class SQLiteGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_array_length('.$field.$path.') '.$operator.' '.$value;
+    }
+
+    /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'exists (select 1 from json_each('.$field.$path.') where '.$this->wrap('json_each.value').' is '.$value.')';
+    }
+
+    /**
+     * Prepare the binding for a "JSON contains" statement.
+     *
+     * @param  mixed  $binding
+     * @return mixed
+     */
+    public function prepareBindingForJsonContains($binding)
+    {
+        return $binding;
+    }
+
+    /**
+     * Compile a "JSON contains key" statement into SQL.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    protected function compileJsonContainsKey($column)
+    {
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_type('.$field.$path.') is not null';
+    }
+
+    /**
+     * Compile a group limit clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileGroupLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getServerVersion();
+
+        if (version_compare($version, '3.25.0') >= 0) {
+            return parent::compileGroupLimit($query);
+        }
+
+        $query->groupLimit = null;
+
+        return $this->compileSelect($query);
     }
 
     /**
@@ -161,6 +266,19 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile an insert ignore statement using a subquery into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $columns
+     * @param  string  $sql
+     * @return string
+     */
+    public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
+    {
+        return Str::replaceFirst('insert', 'insert or ignore', $this->compileInsertUsing($query, $columns, $sql));
+    }
+
+    /**
      * Compile the columns for an update statement.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -171,7 +289,7 @@ class SQLiteGrammar extends Grammar
     {
         $jsonGroups = $this->groupJsonColumnsForUpdate($values);
 
-        return collect($values)->reject(function ($value, $key) {
+        return (new Collection($values))->reject(function ($value, $key) {
             return $this->isJsonSelector($key);
         })->merge($jsonGroups)->map(function ($value, $key) use ($jsonGroups) {
             $column = last(explode('.', $key));
@@ -197,7 +315,7 @@ class SQLiteGrammar extends Grammar
 
         $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
 
-        $columns = collect($update)->map(function ($value, $key) {
+        $columns = (new Collection($update))->map(function ($value, $key) {
             return is_numeric($key)
                 ? $this->wrap($value).' = '.$this->wrapValue('excluded').'.'.$this->wrap($value)
                 : $this->wrap($key).' = '.$this->parameter($value);
@@ -268,11 +386,11 @@ class SQLiteGrammar extends Grammar
     {
         $groups = $this->groupJsonColumnsForUpdate($values);
 
-        $values = collect($values)->reject(function ($value, $key) {
-            return $this->isJsonSelector($key);
-        })->merge($groups)->map(function ($value) {
-            return is_array($value) ? json_encode($value) : $value;
-        })->all();
+        $values = (new Collection($values))
+            ->reject(fn ($value, $key) => $this->isJsonSelector($key))
+            ->merge($groups)
+            ->map(fn ($value) => is_array($value) ? json_encode($value) : $value)
+            ->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
 
@@ -321,8 +439,12 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
+        [$schema, $table] = $query->getConnection()->getSchemaBuilder()->parseSchemaAndTable($query->from);
+
+        $schema = $schema ? $this->wrapValue($schema).'.' : '';
+
         return [
-            'delete from sqlite_sequence where name = ?' => [$query->from],
+            'delete from '.$schema.'sqlite_sequence where name = ?' => [$query->getConnection()->getTablePrefix().$table],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
     }

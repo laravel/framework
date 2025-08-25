@@ -3,7 +3,7 @@
 namespace Illuminate\View\Compilers\Concerns;
 
 use Closure;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 trait CompilesEchos
 {
@@ -141,7 +141,7 @@ trait CompilesEchos
      */
     protected function wrapInEchoHandler($value)
     {
-        $value = Str::of($value)
+        $value = (new Stringable($value))
             ->trim()
             ->when(str_ends_with($value, ';'), function ($str) {
                 return $str->beforeLast(';');
@@ -160,6 +160,10 @@ trait CompilesEchos
     {
         if (is_object($value) && isset($this->echoHandlers[get_class($value)])) {
             return call_user_func($this->echoHandlers[get_class($value)], $value);
+        }
+
+        if (is_iterable($value) && isset($this->echoHandlers['iterable'])) {
+            return call_user_func($this->echoHandlers['iterable'], $value);
         }
 
         return $value;

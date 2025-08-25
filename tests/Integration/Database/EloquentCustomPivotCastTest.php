@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Schema;
 
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -171,6 +171,8 @@ class CustomPivotCastTestProject extends Model
 
 class CustomPivotCastTestCollaborator extends Pivot
 {
+    public $timestamps = false;
+
     protected $attributes = [
         'permissions' => '["create", "update"]',
     ];

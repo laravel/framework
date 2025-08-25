@@ -22,8 +22,8 @@ trait ComparesRelatedModels
 
         if ($match && $this instanceof SupportsPartialRelations && $this->isOneOfMany()) {
             return $this->query
-                        ->whereKey($model->getKey())
-                        ->exists();
+                ->whereKey($model->getKey())
+                ->exists();
         }
 
         return $match;

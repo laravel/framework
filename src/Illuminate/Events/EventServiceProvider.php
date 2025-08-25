@@ -17,6 +17,10 @@ class EventServiceProvider extends ServiceProvider
         $this->app->singleton('events', function ($app) {
             return (new Dispatcher($app))->setQueueResolver(function () use ($app) {
                 return $app->make(QueueFactoryContract::class);
+            })->setTransactionManagerResolver(function () use ($app) {
+                return $app->bound('db.transactions')
+                    ? $app->make('db.transactions')
+                    : null;
             });
         });
     }

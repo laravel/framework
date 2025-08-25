@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use Illuminate\Support\Traits\Macroable;
 use OutOfBoundsException;
 
@@ -34,7 +35,6 @@ class ResponseSequence
      * Create a new response sequence.
      *
      * @param  array  $responses
-     * @return void
      */
     public function __construct(array $responses)
     {
@@ -44,15 +44,13 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  string|array  $body
+     * @param  string|array|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return $this
      */
-    public function push($body = '', int $status = 200, array $headers = [])
+    public function push($body = null, int $status = 200, array $headers = [])
     {
-        $body = is_array($body) ? json_encode($body) : $body;
-
         return $this->pushResponse(
             Factory::response($body, $status, $headers)
         );
@@ -73,7 +71,7 @@ class ResponseSequence
     }
 
     /**
-     * Push response with the contents of a file as the body to the sequence.
+     * Push a response with the contents of a file as the body to the sequence.
      *
      * @param  string  $filePath
      * @param  int  $status
@@ -86,6 +84,19 @@ class ResponseSequence
 
         return $this->pushResponse(
             Factory::response($string, $status, $headers)
+        );
+    }
+
+    /**
+     * Push a connection exception to the sequence.
+     *
+     * @param  string|null  $message
+     * @return $this
+     */
+    public function pushFailedConnection($message = null)
+    {
+        return $this->pushResponse(
+            Factory::failedConnection($message)
         );
     }
 
@@ -139,20 +150,23 @@ class ResponseSequence
     /**
      * Get the next response in the sequence.
      *
+     * @param  \Illuminate\Http\Client\Request  $request
      * @return mixed
      *
      * @throws \OutOfBoundsException
      */
-    public function __invoke()
+    public function __invoke($request)
     {
-        if ($this->failWhenEmpty && count($this->responses) === 0) {
+        if ($this->failWhenEmpty && $this->isEmpty()) {
             throw new OutOfBoundsException('A request was made, but the response sequence is empty.');
         }
 
-        if (! $this->failWhenEmpty && count($this->responses) === 0) {
+        if (! $this->failWhenEmpty && $this->isEmpty()) {
             return value($this->emptyResponse ?? Factory::response());
         }
 
-        return array_shift($this->responses);
+        $response = array_shift($this->responses);
+
+        return $response instanceof Closure ? $response($request) : $response;
     }
 }

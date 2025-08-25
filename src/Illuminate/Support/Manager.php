@@ -40,7 +40,6 @@ abstract class Manager
      * Create a new manager instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {
@@ -98,12 +97,12 @@ abstract class Manager
         // callbacks allow developers to build their own "drivers" easily using Closures.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.Str::studly($driver).'Driver';
+        }
 
-            if (method_exists($this, $method)) {
-                return $this->$method();
-            }
+        $method = 'create'.Str::studly($driver).'Driver';
+
+        if (method_exists($this, $method)) {
+            return $this->$method();
         }
 
         throw new InvalidArgumentException("Driver [$driver] not supported.");

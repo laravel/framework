@@ -32,7 +32,7 @@ class PusherBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -73,7 +73,7 @@ class PusherBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')
@@ -115,8 +115,8 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->shouldReceive('socket_auth')
-                     ->once()
-                     ->andReturn(json_encode($data));
+            ->once()
+            ->andReturn(json_encode($data));
 
         $this->assertEquals(
             $data,
@@ -137,13 +137,38 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->shouldReceive('presence_auth')
-                     ->once()
-                     ->andReturn(json_encode($data));
+            ->once()
+            ->andReturn(json_encode($data));
 
         $this->assertEquals(
             $data,
             $this->broadcaster->validAuthenticationResponse($request, true)
         );
+    }
+
+    public function testUserAuthenticationForPusher()
+    {
+        $this->pusher
+            ->shouldReceive('getSettings')
+            ->andReturn([
+                'auth_key' => '278d425bdf160c739803',
+                'secret' => '7ad3773142a6692b25b8',
+            ]);
+
+        $this->broadcaster = new PusherBroadcaster($this->pusher);
+
+        $this->broadcaster->resolveAuthenticatedUserUsing(function () {
+            return ['id' => '12345'];
+        });
+
+        $response = $this->broadcaster->resolveAuthenticatedUser(new Request(['socket_id' => '1234.1234']));
+
+        // The result is hard-coded from the Pusher docs
+        // See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication
+        $this->assertSame([
+            'auth' => '278d425bdf160c739803:4708d583dada6a56435fb8bc611c77c359a31eebde13337c16ab43aa6de336ba',
+            'user_data' => json_encode(['id' => '12345']),
+        ], $response);
     }
 
     /**
@@ -153,21 +178,20 @@ class PusherBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
-        $request->socket_id = 'abcd.1234';
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
-                ->with('callback', false)
-                ->andReturn(false);
+            ->with('callback', false)
+            ->andReturn(false);
 
         $user = m::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
-             ->andReturn(42);
+            ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
-             ->andReturn(42);
+            ->andReturn(42);
 
         $request->shouldReceive('user')
-                ->andReturn($user);
+            ->andReturn($user);
 
         return $request;
     }
@@ -179,10 +203,10 @@ class PusherBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')
-                ->andReturn(null);
+            ->andReturn(null);
 
         return $request;
     }

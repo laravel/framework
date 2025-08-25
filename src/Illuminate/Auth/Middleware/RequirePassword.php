@@ -35,7 +35,6 @@ class RequirePassword
      * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
      * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
      * @param  int|null  $passwordTimeout
-     * @return void
      */
     public function __construct(ResponseFactory $responseFactory, UrlGenerator $urlGenerator, $passwordTimeout = null)
     {
@@ -45,12 +44,26 @@ class RequirePassword
     }
 
     /**
+     * Specify the redirect route and timeout for the middleware.
+     *
+     * @param  string|null  $redirectToRoute
+     * @param  string|int|null  $passwordTimeoutSeconds
+     * @return string
+     *
+     * @named-arguments-supported
+     */
+    public static function using($redirectToRoute = null, $passwordTimeoutSeconds = null)
+    {
+        return static::class.':'.implode(',', func_get_args());
+    }
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string|null  $redirectToRoute
-     * @param  int|null  $passwordTimeoutSeconds
+     * @param  string|int|null  $passwordTimeoutSeconds
      * @return mixed
      */
     public function handle($request, Closure $next, $redirectToRoute = null, $passwordTimeoutSeconds = null)
@@ -63,7 +76,7 @@ class RequirePassword
             }
 
             return $this->responseFactory->redirectGuest(
-                $this->urlGenerator->route($redirectToRoute ?? 'password.confirm')
+                $this->urlGenerator->route($redirectToRoute ?: 'password.confirm')
             );
         }
 

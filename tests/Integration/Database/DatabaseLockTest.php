@@ -2,22 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\WithMigration;
 
+#[WithMigration('cache')]
 class DatabaseLockTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
-    {
-        Schema::create('cache_locks', function (Blueprint $table) {
-            $table->string('key')->primary();
-            $table->string('owner');
-            $table->integer('expiration');
-        });
-    }
-
     public function testLockCanHaveASeparateConnection()
     {
         $this->app['config']->set('cache.stores.database.lock_connection', 'test');
@@ -64,5 +55,17 @@ class DatabaseLockTest extends DatabaseTestCase
         $this->assertTrue($otherLock->get());
 
         $otherLock->release();
+    }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        $firstLock = Cache::store('database')->lock('foo');
+        $this->assertTrue($firstLock->isOwnedBy(null));
+        $this->assertTrue($firstLock->get());
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
+
+        $secondLock = Cache::store('database')->restoreLock('foo', 'other_owner');
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }

@@ -5,13 +5,18 @@ namespace Illuminate\Tests\Testing\Console;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Facade;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', false)]
 class RouteListCommandTest extends TestCase
 {
+    use InteractsWithDeprecationHandling;
+
     /**
      * @var \Illuminate\Contracts\Routing\Registrar
      */
@@ -58,12 +63,14 @@ class RouteListCommandTest extends TestCase
         $this->artisan(RouteListCommand::class)
             ->assertSuccessful()
             ->expectsOutput('')
-            ->expectsOutput('  GET|HEAD   / ..................................................... ')
             ->expectsOutput('  GET|HEAD   {account}.example.com/ ................................ ')
+            ->expectsOutput('  GET|HEAD   / ..................................................... ')
             ->expectsOutput('  GET|HEAD   closure ............................................... ')
             ->expectsOutput('  POST       controller-invokable Illuminate\Tests\Testing\Console\…')
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\Tests\Testing\Cons…')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [6] routes')
             ->expectsOutput('');
     }
 
@@ -89,6 +96,66 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('  GET|HEAD   controller-method/{user} Illuminate\\Tests\\Testing\\Console\\FooController@show')
             ->expectsOutput('  GET|HEAD   {account}.example.com/user/{id} ............. user.show')
             ->expectsOutput('             ⇂ web')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [4] routes')
+            ->expectsOutput('');
+    }
+
+    public function testRouteCanBeFilteredByName()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/', function () {
+            //
+        });
+        $this->router->get('/foo', function () {
+            //
+        })->name('foo.show');
+
+        $this->artisan(RouteListCommand::class, ['--name' => 'foo'])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD       foo ...................................... foo.show')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [1] routes')
+            ->expectsOutput('');
+    }
+
+    public function testRouteCanBeFilteredByAction()
+    {
+        $this->withoutDeprecationHandling();
+
+        $this->router->get('/', function () {
+            //
+        });
+        $this->router->get('foo/{user}', [FooController::class, 'show']);
+
+        $this->artisan(RouteListCommand::class, ['--action' => 'FooController'])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput(
+                '  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
+            )->expectsOutput('')
+            ->expectsOutput(
+                '                                                  Showing [1] routes'
+            )
+            ->expectsOutput('');
+    }
+
+    public function testDisplayRoutesExceptVendor()
+    {
+        $this->router->get('foo/{user}', [FooController::class, 'show']);
+        $this->router->view('view', 'blade.path');
+        $this->router->redirect('redirect', 'destination');
+
+        $this->artisan(RouteListCommand::class, ['-v' => true, '--except-vendor' => true])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput('  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show')
+            ->expectsOutput('  ANY            redirect .... Illuminate\Routing\RedirectController')
+            ->expectsOutput('  GET|HEAD       view .............................................. ')
+            ->expectsOutput('')
+            ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
     }
 

@@ -22,12 +22,8 @@ class AuthPasswordBrokerTest extends TestCase
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
         $mocks = $this->getMocks();
-        $broker = $this->getMockBuilder(PasswordBroker::class)
-            ->onlyMethods(['getUser'])
-            ->addMethods(['makeErrorRedirect'])
-            ->setConstructorArgs(array_values($mocks))
-            ->getMock();
-        $broker->expects($this->once())->method('getUser')->willReturn(null);
+        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
+        $broker->shouldReceive('getUser')->once()->andReturnNull();
 
         $this->assertSame(PasswordBrokerContract::INVALID_USER, $broker->sendResetLink(['credentials']));
     }
@@ -35,7 +31,7 @@ class AuthPasswordBrokerTest extends TestCase
     public function testIfTokenIsRecentlyCreated()
     {
         $mocks = $this->getMocks();
-        $broker = $this->getMockBuilder(PasswordBroker::class)->addMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(true);
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
@@ -65,7 +61,7 @@ class AuthPasswordBrokerTest extends TestCase
     public function testBrokerCreatesTokenAndRedirectsWithoutError()
     {
         $mocks = $this->getMocks();
-        $broker = $this->getMockBuilder(PasswordBroker::class)->addMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(false);
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
@@ -99,12 +95,9 @@ class AuthPasswordBrokerTest extends TestCase
     public function testResetRemovesRecordOnReminderTableAndCallsCallback()
     {
         unset($_SERVER['__password.reset.test']);
-        $broker = $this->getMockBuilder(PasswordBroker::class)
-            ->onlyMethods(['validateReset'])
-            ->addMethods(['getPassword', 'getToken'])
-            ->setConstructorArgs(array_values($mocks = $this->getMocks()))
-            ->getMock();
-        $broker->expects($this->once())->method('validateReset')->willReturn($user = m::mock(CanResetPassword::class));
+        $mocks = $this->getMocks();
+        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial()->shouldAllowMockingProtectedMethods();
+        $broker->shouldReceive('validateReset')->once()->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('delete')->once()->with($user);
         $callback = function ($user, $password) {
             $_SERVER['__password.reset.test'] = compact('user', 'password');
@@ -125,7 +118,7 @@ class AuthPasswordBrokerTest extends TestCase
         };
 
         $mocks = $this->getMocks();
-        $broker = $this->getMockBuilder(PasswordBroker::class)->addMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
+        $broker = m::mock(PasswordBroker::class, array_values($mocks))->makePartial();
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('recentlyCreatedToken')->once()->with($user)->andReturn(false);
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');

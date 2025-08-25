@@ -4,11 +4,15 @@ namespace Illuminate\Mail\Transport;
 
 use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
-use Exception;
+use Illuminate\Support\Collection;
+use Stringable;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
+use Symfony\Component\Mime\Message;
 
-class SesTransport extends AbstractTransport
+class SesTransport extends AbstractTransport implements Stringable
 {
     /**
      * The Amazon SES instance.
@@ -29,7 +33,6 @@ class SesTransport extends AbstractTransport
      *
      * @param  \Aws\Ses\SesClient  $ses
      * @param  array  $options
-     * @return void
      */
     public function __construct(SesClient $ses, $options = [])
     {
@@ -44,11 +47,30 @@ class SesTransport extends AbstractTransport
      */
     protected function doSend(SentMessage $message): void
     {
+        $options = $this->options;
+
+        if ($message->getOriginalMessage() instanceof Message) {
+            if ($listManagementOptions = $this->listManagementOptions($message)) {
+                $options['ListManagementOptions'] = $listManagementOptions;
+            }
+
+            foreach ($message->getOriginalMessage()->getHeaders()->all() as $header) {
+                if ($header instanceof MetadataHeader) {
+                    $options['Tags'][] = ['Name' => $header->getKey(), 'Value' => $header->getValue()];
+                }
+            }
+        }
+
         try {
-            $this->ses->sendRawEmail(
+            $result = $this->ses->sendRawEmail(
                 array_merge(
-                    $this->options, [
+                    $options, [
                         'Source' => $message->getEnvelope()->getSender()->toString(),
+                        'Destinations' => (new Collection($message->getEnvelope()->getRecipients()))
+                            ->map
+                            ->toString()
+                            ->values()
+                            ->all(),
                         'RawMessage' => [
                             'Data' => $message->toString(),
                         ],
@@ -56,18 +78,34 @@ class SesTransport extends AbstractTransport
                 )
             );
         } catch (AwsException $e) {
-            throw new Exception('Request to AWS SES API failed.', $e->getCode(), $e);
+            $reason = $e->getAwsErrorMessage() ?? $e->getMessage();
+
+            throw new TransportException(
+                sprintf('Request to AWS SES API failed. Reason: %s.', $reason),
+                is_int($e->getCode()) ? $e->getCode() : 0,
+                $e
+            );
         }
+
+        $messageId = $result->get('MessageId');
+
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-Message-ID', $messageId);
+        $message->getOriginalMessage()->getHeaders()->addHeader('X-SES-Message-ID', $messageId);
     }
 
     /**
-     * Get the string representation of the transport.
+     * Extract the SES list management options, if applicable.
      *
-     * @return string
+     * @param  \Symfony\Component\Mailer\SentMessage  $message
+     * @return array|null
      */
-    public function __toString(): string
+    protected function listManagementOptions(SentMessage $message)
     {
-        return 'ses';
+        if ($header = $message->getOriginalMessage()->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
+            if (preg_match("/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix", $header->getBodyAsString(), $listManagementOptions)) {
+                return array_filter($listManagementOptions, fn ($e) => in_array($e, ['ContactListName', 'TopicName']), ARRAY_FILTER_USE_KEY);
+            }
+        }
     }
 
     /**
@@ -99,5 +137,15 @@ class SesTransport extends AbstractTransport
     public function setOptions(array $options)
     {
         return $this->options = $options;
+    }
+
+    /**
+     * Get the string representation of the transport.
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return 'ses';
     }
 }

@@ -2,32 +2,38 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\SupportsPartialRelations;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Concerns\CanBeOneOfMany;
+use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
+use Illuminate\Database\Query\JoinClause;
 
-class HasOneThrough extends HasManyThrough
+/**
+ * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
+ * @template TIntermediateModel of \Illuminate\Database\Eloquent\Model
+ * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @extends \Illuminate\Database\Eloquent\Relations\HasOneOrManyThrough<TRelatedModel, TIntermediateModel, TDeclaringModel, ?TRelatedModel>
+ */
+class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelations
 {
-    use InteractsWithDictionary, SupportsDefaultModels;
+    use ComparesRelatedModels, CanBeOneOfMany, InteractsWithDictionary, SupportsDefaultModels;
 
-    /**
-     * Get the results of the relationship.
-     *
-     * @return mixed
-     */
+    /** @inheritDoc */
     public function getResults()
     {
+        if (is_null($this->getParentKey())) {
+            return $this->getDefaultFor($this->farParent);
+        }
+
         return $this->first() ?: $this->getDefaultFor($this->farParent);
     }
 
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array  $models
-     * @param  string  $relation
-     * @return array
-     */
+    /** @inheritDoc */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -37,15 +43,8 @@ class HasOneThrough extends HasManyThrough
         return $models;
     }
 
-    /**
-     * Match the eagerly loaded results to their parents.
-     *
-     * @param  array  $models
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
-     * @param  string  $relation
-     * @return array
-     */
-    public function match(array $models, Collection $results, $relation)
+    /** @inheritDoc */
+    public function match(array $models, EloquentCollection $results, $relation)
     {
         $dictionary = $this->buildDictionary($results);
 
@@ -64,14 +63,59 @@ class HasOneThrough extends HasManyThrough
         return $models;
     }
 
+    /** @inheritDoc */
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        if ($this->isOneOfMany()) {
+            $this->mergeOneOfManyJoinsTo($query);
+        }
+
+        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
+    }
+
+    /** @inheritDoc */
+    public function addOneOfManySubQueryConstraints(Builder $query, $column = null, $aggregate = null)
+    {
+        $query->addSelect([$this->getQualifiedFirstKeyName()]);
+
+        // We need to join subqueries that aren't the inner-most subquery which is joined in the CanBeOneOfMany::ofMany method...
+        if ($this->getOneOfManySubQuery() !== null) {
+            $this->performJoin($query);
+        }
+    }
+
+    /** @inheritDoc */
+    public function getOneOfManySubQuerySelectColumns()
+    {
+        return [$this->getQualifiedFirstKeyName()];
+    }
+
+    /** @inheritDoc */
+    public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)
+    {
+        $join->on($this->qualifySubSelectColumn($this->firstKey), '=', $this->getQualifiedFirstKeyName());
+    }
+
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  TDeclaringModel  $parent
+     * @return TRelatedModel
      */
     public function newRelatedInstanceFor(Model $parent)
     {
         return $this->related->newInstance();
+    }
+
+    /** @inheritDoc */
+    protected function getRelatedKeyFrom(Model $model)
+    {
+        return $model->getAttribute($this->getForeignKeyName());
+    }
+
+    /** @inheritDoc */
+    public function getParentKey()
+    {
+        return $this->farParent->getAttribute($this->localKey);
     }
 }

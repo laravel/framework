@@ -55,7 +55,7 @@ trait ManagesEvents
         $composers = [];
 
         foreach ((array) $views as $view) {
-            $composers[] = $this->addViewEvent($view, $callback, 'composing: ');
+            $composers[] = $this->addViewEvent($view, $callback);
         }
 
         return $composers;
@@ -174,7 +174,9 @@ trait ManagesEvents
      */
     public function callComposer(ViewContract $view)
     {
-        $this->events->dispatch('composing: '.$view->name(), [$view]);
+        if ($this->events->hasListeners($event = 'composing: '.$view->name())) {
+            $this->events->dispatch($event, [$view]);
+        }
     }
 
     /**
@@ -185,6 +187,8 @@ trait ManagesEvents
      */
     public function callCreator(ViewContract $view)
     {
-        $this->events->dispatch('creating: '.$view->name(), [$view]);
+        if ($this->events->hasListeners($event = 'creating: '.$view->name())) {
+            $this->events->dispatch($event, [$view]);
+        }
     }
 }

@@ -21,7 +21,7 @@ interface TokenRepositoryInterface
      * @param  string  $token
      * @return bool
      */
-    public function exists(CanResetPasswordContract $user, $token);
+    public function exists(CanResetPasswordContract $user, #[\SensitiveParameter] $token);
 
     /**
      * Determine if the given user recently created a password reset token.

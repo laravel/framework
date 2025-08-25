@@ -158,6 +158,22 @@ class SimpleMessage
     }
 
     /**
+     * Add a line of text to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  mixed  $line
+     * @return $this
+     */
+    public function lineIf($boolean, $line)
+    {
+        if ($boolean) {
+            return $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add lines of text to the notification.
      *
      * @param  iterable  $lines
@@ -167,6 +183,22 @@ class SimpleMessage
     {
         foreach ($lines as $line) {
             $this->line($line);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add lines of text to the notification if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  iterable  $lines
+     * @return $this
+     */
+    public function linesIf($boolean, $lines)
+    {
+        if ($boolean) {
+            return $this->lines($lines);
         }
 
         return $this;
@@ -194,7 +226,7 @@ class SimpleMessage
     /**
      * Format the given line of text.
      *
-     * @param  \Illuminate\Contracts\Support\Htmlable|string|array  $line
+     * @param  \Illuminate\Contracts\Support\Htmlable|string|array|null  $line
      * @return \Illuminate\Contracts\Support\Htmlable|string
      */
     protected function formatLine($line)
@@ -204,10 +236,10 @@ class SimpleMessage
         }
 
         if (is_array($line)) {
-            return implode(' ', array_map('trim', $line));
+            return implode(' ', array_map(trim(...), $line));
         }
 
-        return trim(implode(' ', array_map('trim', preg_split('/\\r\\n|\\r|\\n/', $line ?? ''))));
+        return trim(implode(' ', array_map(trim(...), preg_split('/\\r\\n|\\r|\\n/', $line ?? ''))));
     }
 
     /**

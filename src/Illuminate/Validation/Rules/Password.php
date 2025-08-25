@@ -38,6 +38,13 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $min = 8;
 
     /**
+     * The maximum size of the password.
+     *
+     * @var int
+     */
+    protected $max;
+
+    /**
      * If the password requires at least one uppercase and one lowercase letter.
      *
      * @var bool
@@ -66,14 +73,14 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $symbols = false;
 
     /**
-     * If the password should has not been compromised in data leaks.
+     * If the password should not have been compromised in data leaks.
      *
      * @var bool
      */
     protected $uncompromised = false;
 
     /**
-     * The number of times a password can appear in data leaks before being consider compromised.
+     * The number of times a password can appear in data leaks before being considered compromised.
      *
      * @var int
      */
@@ -104,7 +111,6 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * Create a new rule instance.
      *
      * @param  int  $min
-     * @return void
      */
     public function __construct($min)
     {
@@ -117,7 +123,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * If no arguments are passed, the default password rule configuration will be returned.
      *
      * @param  static|callable|null  $callback
-     * @return static|null
+     * @return static|void
      */
     public static function defaults($callback = null)
     {
@@ -140,8 +146,8 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public static function default()
     {
         $password = is_callable(static::$defaultCallback)
-                            ? call_user_func(static::$defaultCallback)
-                            : static::$defaultCallback;
+            ? call_user_func(static::$defaultCallback)
+            : static::$defaultCallback;
 
         return $password instanceof Rule ? $password : static::min(8);
     }
@@ -193,7 +199,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Sets the minimum size of the password.
+     * Set the minimum size of the password.
      *
      * @param  int  $size
      * @return $this
@@ -201,6 +207,19 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public static function min($size)
     {
         return new static($size);
+    }
+
+    /**
+     * Set the maximum size of the password.
+     *
+     * @param  int  $size
+     * @return $this
+     */
+    public function max($size)
+    {
+        $this->max = $size;
+
+        return $this;
     }
 
     /**
@@ -269,7 +288,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
-     * @param  string|array  $rules
+     * @param  \Closure|string|array  $rules
      * @return $this
      */
     public function rules($rules)
@@ -292,7 +311,12 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
         $validator = Validator::make(
             $this->data,
-            [$attribute => array_merge(['string', 'min:'.$this->min], $this->customRules)],
+            [$attribute => [
+                'string',
+                'min:'.$this->min,
+                ...($this->max ? ['max:'.$this->max] : []),
+                ...$this->customRules,
+            ]],
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
@@ -300,22 +324,20 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
                 return;
             }
 
-            $value = (string) $value;
-
             if ($this->mixedCase && ! preg_match('/(\p{Ll}+.*\p{Lu})|(\p{Lu}+.*\p{Ll})/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one uppercase and one lowercase letter.');
+                $validator->addFailure($attribute, 'password.mixed');
             }
 
             if ($this->letters && ! preg_match('/\pL/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one letter.');
+                $validator->addFailure($attribute, 'password.letters');
             }
 
             if ($this->symbols && ! preg_match('/\p{Z}|\p{S}|\p{P}/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one symbol.');
+                $validator->addFailure($attribute, 'password.symbols');
             }
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
-                $validator->errors()->add($attribute, 'The :attribute must contain at least one number.');
+                $validator->addFailure($attribute, 'password.numbers');
             }
         });
 
@@ -327,9 +349,9 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'value' => $value,
             'threshold' => $this->compromisedThreshold,
         ])) {
-            return $this->fail(
-                'The given :attribute has appeared in a data leak. Please choose a different :attribute.'
-            );
+            $validator->addFailure($attribute, 'password.uncompromised');
+
+            return $this->fail($validator->messages()->all());
         }
 
         return true;
@@ -353,12 +375,28 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      */
     protected function fail($messages)
     {
-        $messages = collect(Arr::wrap($messages))->map(function ($message) {
-            return $this->validator->getTranslator()->get($message);
-        })->all();
-
-        $this->messages = array_merge($this->messages, $messages);
+        $this->messages = array_merge($this->messages, Arr::wrap($messages));
 
         return false;
+    }
+
+    /**
+     * Get information about the current state of the password validation rules.
+     *
+     * @return array
+     */
+    public function appliedRules()
+    {
+        return [
+            'min' => $this->min,
+            'max' => $this->max,
+            'mixedCase' => $this->mixedCase,
+            'letters' => $this->letters,
+            'numbers' => $this->numbers,
+            'symbols' => $this->symbols,
+            'uncompromised' => $this->uncompromised,
+            'compromisedThreshold' => $this->compromisedThreshold,
+            'customRules' => $this->customRules,
+        ];
     }
 }

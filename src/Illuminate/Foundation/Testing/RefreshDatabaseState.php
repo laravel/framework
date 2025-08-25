@@ -5,6 +5,13 @@ namespace Illuminate\Foundation\Testing;
 class RefreshDatabaseState
 {
     /**
+     * The current SQLite in-memory database connections.
+     *
+     * @var array<string, \PDO>
+     */
+    public static $inMemoryConnections = [];
+
+    /**
      * Indicates if the test database has been migrated.
      *
      * @var bool

@@ -2,6 +2,13 @@
 
 namespace Illuminate\Contracts\Pagination;
 
+/**
+ * @template TKey of array-key
+ *
+ * @template-covariant TValue
+ *
+ * @method $this through(callable(TValue): mixed $callback)
+ */
 interface CursorPaginator
 {
     /**
@@ -30,6 +37,13 @@ interface CursorPaginator
     public function fragment($fragment = null);
 
     /**
+     * Add all current query string values to the paginator.
+     *
+     * @return $this
+     */
+    public function withQueryString();
+
+    /**
      * Get the URL for the previous page, or null.
      *
      * @return string|null
@@ -46,7 +60,7 @@ interface CursorPaginator
     /**
      * Get all of the items being paginated.
      *
-     * @return array
+     * @return array<TKey, TValue>
      */
     public function items();
 
@@ -84,6 +98,13 @@ interface CursorPaginator
      * @return bool
      */
     public function hasPages();
+
+    /**
+     * Determine if there are more items in the data source.
+     *
+     * @return bool
+     */
+    public function hasMorePages();
 
     /**
      * Get the base path for paginator generated URLs.

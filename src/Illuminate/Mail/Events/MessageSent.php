@@ -4,6 +4,7 @@ namespace Illuminate\Mail\Events;
 
 use Exception;
 use Illuminate\Mail\SentMessage;
+use Illuminate\Support\Collection;
 
 /**
  * @property \Symfony\Component\Mime\Email $message
@@ -11,30 +12,15 @@ use Illuminate\Mail\SentMessage;
 class MessageSent
 {
     /**
-     * The message that was sent.
-     *
-     * @var \Illuminate\Mail\SentMessage
-     */
-    public $sent;
-
-    /**
-     * The message data.
-     *
-     * @var array
-     */
-    public $data;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Mail\SentMessage  $message
-     * @param  array  $data
-     * @return void
+     * @param  \Illuminate\Mail\SentMessage  $sent  The message that was sent.
+     * @param  array  $data  The message data.
      */
-    public function __construct(SentMessage $message, array $data = [])
-    {
-        $this->sent = $message;
-        $this->data = $data;
+    public function __construct(
+        public SentMessage $sent,
+        public array $data = [],
+    ) {
     }
 
     /**
@@ -44,16 +30,12 @@ class MessageSent
      */
     public function __serialize()
     {
-        $hasAttachments = collect($this->message->getAttachments())->isNotEmpty();
+        $hasAttachments = (new Collection($this->message->getAttachments()))->isNotEmpty();
 
-        return $hasAttachments ? [
-            'sent' => base64_encode(serialize($this->sent)),
-            'data' => base64_encode(serialize($this->data)),
-            'hasAttachments' => true,
-        ] : [
+        return [
             'sent' => $this->sent,
-            'data' => $this->data,
-            'hasAttachments' => false,
+            'data' => $hasAttachments ? base64_encode(serialize($this->data)) : $this->data,
+            'hasAttachments' => $hasAttachments,
         ];
     }
 
@@ -65,13 +47,11 @@ class MessageSent
      */
     public function __unserialize(array $data)
     {
-        if (isset($data['hasAttachments']) && $data['hasAttachments'] === true) {
-            $this->sent = unserialize(base64_decode($data['sent']));
-            $this->data = unserialize(base64_decode($data['data']));
-        } else {
-            $this->sent = $data['sent'];
-            $this->data = $data['data'];
-        }
+        $this->sent = $data['sent'];
+
+        $this->data = (($data['hasAttachments'] ?? false) === true)
+            ? unserialize(base64_decode($data['data']))
+            : $data['data'];
     }
 
     /**

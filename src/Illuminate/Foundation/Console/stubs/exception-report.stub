@@ -8,10 +8,8 @@ class {{ class }} extends Exception
 {
     /**
      * Report the exception.
-     *
-     * @return bool|null
      */
-    public function report()
+    public function report(): void
     {
         //
     }

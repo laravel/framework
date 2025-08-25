@@ -16,6 +16,13 @@ use Symfony\Component\Console\Question\Question;
 trait InteractsWithIO
 {
     /**
+     * The console components factory.
+     *
+     * @var \Illuminate\Console\View\Components\Factory
+     */
+    protected $components;
+
+    /**
      * The input interface implementation.
      *
      * @var \Symfony\Component\Console\Input\InputInterface
@@ -64,7 +71,7 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return string|array|null
+     * @return array|string|bool|null
      */
     public function argument($key = null)
     {
@@ -86,7 +93,7 @@ trait InteractsWithIO
     }
 
     /**
-     * Determine if the given option is present.
+     * Determine whether the option is defined in the command signature.
      *
      * @param  string  $name
      * @return bool
@@ -198,7 +205,7 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  array  $choices
-     * @param  string|null  $default
+     * @param  string|int|null  $default
      * @param  mixed|null  $attempts
      * @param  bool  $multiple
      * @return string|array
@@ -217,7 +224,7 @@ trait InteractsWithIO
      *
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
-     * @param  string  $tableStyle
+     * @param  \Symfony\Component\Console\Helper\TableStyle|string  $tableStyle
      * @param  array  $columnStyles
      * @return void
      */
@@ -254,8 +261,8 @@ trait InteractsWithIO
         $bar->start();
 
         if (is_iterable($totalSteps)) {
-            foreach ($totalSteps as $value) {
-                $callback($value, $bar);
+            foreach ($totalSteps as $key => $value) {
+                $callback($value, $bar, $key);
 
                 $bar->advance();
             }
@@ -355,28 +362,31 @@ trait InteractsWithIO
      * Write a string in an alert box.
      *
      * @param  string  $string
+     * @param  int|string|null  $verbosity
      * @return void
      */
-    public function alert($string)
+    public function alert($string, $verbosity = null)
     {
         $length = Str::length(strip_tags($string)) + 12;
 
-        $this->comment(str_repeat('*', $length));
-        $this->comment('*     '.$string.'     *');
-        $this->comment(str_repeat('*', $length));
+        $this->comment(str_repeat('*', $length), $verbosity);
+        $this->comment('*     '.$string.'     *', $verbosity);
+        $this->comment(str_repeat('*', $length), $verbosity);
 
-        $this->newLine();
+        $this->comment('', $verbosity);
     }
 
     /**
      * Write a blank line.
      *
      * @param  int  $count
-     * @return void
+     * @return $this
      */
     public function newLine($count = 1)
     {
         $this->output->newLine($count);
+
+        return $this;
     }
 
     /**
@@ -437,5 +447,15 @@ trait InteractsWithIO
     public function getOutput()
     {
         return $this->output;
+    }
+
+    /**
+     * Get the output component factory implementation.
+     *
+     * @return \Illuminate\Console\View\Components\Factory
+     */
+    public function outputComponents()
+    {
+        return $this->components;
     }
 }

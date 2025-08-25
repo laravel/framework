@@ -70,7 +70,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
     <?php echo e($third); ?>
 
 <?php endif; ?>
-<?php echo $__env->make("users", \Illuminate\Support\Arr::except(get_defined_vars(), [\'__data\', \'__path\']))->render(); ?>
+<?php echo $__env->make("users", array_diff_key(get_defined_vars(), [\'__data\' => 1, \'__path\' => 1]))->render(); ?>
 
     {{ $fourth }} @include("test")
 
@@ -84,6 +84,21 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $string = '{{-- @verbatim Block #1 @endverbatim --}} @php "Block #2" @endphp';
         $expected = ' <?php "Block #2" ?>';
 
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
+
+    public function testNewlinesAreInsertedCorrectlyAfterEcho()
+    {
+        $string = "test @verbatim\nhello world\n@endverbatim";
+        $expected = "test \nhello world\n";
+        $this->assertSame($expected, $this->compiler->compileString($string));
+
+        $string = "{{ 1 }}\nhello world\n";
+        $expected = "<?php echo e(1); ?>\n\nhello world\n";
+        $this->assertSame($expected, $this->compiler->compileString($string));
+
+        $string = "{{ 1 }}@verbatim\nhello world\n@endverbatim";
+        $expected = "<?php echo e(1); ?>\n\nhello world\n";
         $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

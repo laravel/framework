@@ -31,7 +31,7 @@ class UploadedFile extends SymfonyUploadedFile
      * @param  array|string  $options
      * @return string|false
      */
-    public function store($path, $options = [])
+    public function store($path = '', $options = [])
     {
         return $this->storeAs($path, $this->hashName(), $this->parseOptions($options));
     }
@@ -43,7 +43,7 @@ class UploadedFile extends SymfonyUploadedFile
      * @param  array|string  $options
      * @return string|false
      */
-    public function storePublicly($path, $options = [])
+    public function storePublicly($path = '', $options = [])
     {
         $options = $this->parseOptions($options);
 
@@ -56,12 +56,16 @@ class UploadedFile extends SymfonyUploadedFile
      * Store the uploaded file on a filesystem disk with public visibility.
      *
      * @param  string  $path
-     * @param  string  $name
+     * @param  array|string|null  $name
      * @param  array|string  $options
      * @return string|false
      */
-    public function storePubliclyAs($path, $name, $options = [])
+    public function storePubliclyAs($path, $name = null, $options = [])
     {
+        if (is_null($name) || is_array($name)) {
+            [$path, $name, $options] = ['', $path, $name ?? []];
+        }
+
         $options = $this->parseOptions($options);
 
         $options['visibility'] = 'public';
@@ -73,12 +77,16 @@ class UploadedFile extends SymfonyUploadedFile
      * Store the uploaded file on a filesystem disk.
      *
      * @param  string  $path
-     * @param  string  $name
+     * @param  string|array  $name
      * @param  array|string  $options
      * @return string|false
      */
-    public function storeAs($path, $name, $options = [])
+    public function storeAs($path, $name = null, $options = [])
     {
+        if (is_null($name) || is_array($name)) {
+            [$path, $name, $options] = ['', $path, $name ?? []];
+        }
+
         $options = $this->parseOptions($options);
 
         $disk = Arr::pull($options, 'disk');
@@ -125,7 +133,7 @@ class UploadedFile extends SymfonyUploadedFile
     {
         return $file instanceof static ? $file : new static(
             $file->getPathname(),
-            $file->getClientOriginalName(),
+            $file->getClientOriginalPath(),
             $file->getClientMimeType(),
             $file->getError(),
             $test

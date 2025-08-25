@@ -5,8 +5,10 @@ namespace Illuminate\Session\Middleware;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Session\Middleware\AuthenticatesSessions;
+use Illuminate\Http\Request;
 
-class AuthenticateSession
+class AuthenticateSession implements AuthenticatesSessions
 {
     /**
      * The authentication factory implementation.
@@ -16,10 +18,16 @@ class AuthenticateSession
     protected $auth;
 
     /**
+     * The callback that should be used to generate the authentication redirect path.
+     *
+     * @var callable
+     */
+    protected static $redirectToCallback;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
-     * @return void
      */
     public function __construct(AuthFactory $auth)
     {
@@ -35,14 +43,14 @@ class AuthenticateSession
      */
     public function handle($request, Closure $next)
     {
-        if (! $request->hasSession() || ! $request->user()) {
+        if (! $request->hasSession() || ! $request->user() || ! $request->user()->getAuthPassword()) {
             return $next($request);
         }
 
         if ($this->guard()->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->auth->getRecallerName()))[2] ?? null;
+            $passwordHash = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
-            if (! $passwordHash || $passwordHash != $request->user()->getAuthPassword()) {
+            if (! $passwordHash || ! hash_equals($request->user()->getAuthPassword(), $passwordHash)) {
                 $this->logout($request);
             }
         }
@@ -51,7 +59,7 @@ class AuthenticateSession
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()) !== $request->user()->getAuthPassword()) {
+        if (! hash_equals($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()), $request->user()->getAuthPassword())) {
             $this->logout($request);
         }
 
@@ -93,7 +101,9 @@ class AuthenticateSession
 
         $request->session()->flush();
 
-        throw new AuthenticationException('Unauthenticated.', [$this->auth->getDefaultDriver()]);
+        throw new AuthenticationException(
+            'Unauthenticated.', [$this->auth->getDefaultDriver()], $this->redirectTo($request)
+        );
     }
 
     /**
@@ -104,5 +114,29 @@ class AuthenticateSession
     protected function guard()
     {
         return $this->auth;
+    }
+
+    /**
+     * Get the path the user should be redirected to when their session is not authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
+    protected function redirectTo(Request $request)
+    {
+        if (static::$redirectToCallback) {
+            return call_user_func(static::$redirectToCallback, $request);
+        }
+    }
+
+    /**
+     * Specify the callback that should be used to generate the redirect path.
+     *
+     * @param  callable  $redirectToCallback
+     * @return void
+     */
+    public static function redirectUsing(callable $redirectToCallback)
+    {
+        static::$redirectToCallback = $redirectToCallback;
     }
 }

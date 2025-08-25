@@ -49,7 +49,6 @@ class ValidationException extends Exception
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @param  string  $errorBag
-     * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {
@@ -78,7 +77,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Create a error message summary from the validation errors.
+     * Create an error message summary from the validation errors.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @return string
@@ -87,16 +86,16 @@ class ValidationException extends Exception
     {
         $messages = $validator->errors()->all();
 
-        if (! count($messages)) {
-            return 'The given data was invalid.';
+        if (! count($messages) || ! is_string($messages[0])) {
+            return $validator->getTranslator()->get('The given data was invalid.');
         }
 
         $message = array_shift($messages);
 
-        if ($additional = count($messages)) {
-            $pluralized = $additional === 1 ? 'error' : 'errors';
+        if ($count = count($messages)) {
+            $pluralized = $count === 1 ? 'error' : 'errors';
 
-            $message .= " (and {$additional} more {$pluralized})";
+            $message .= ' '.$validator->getTranslator()->choice("(and :count more $pluralized)", $count, compact('count'));
         }
 
         return $message;

@@ -11,7 +11,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelRefreshTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
@@ -52,6 +52,18 @@ class EloquentModelRefreshTest extends DatabaseTestCase
         $this->assertEmpty($post->getDirty());
 
         $this->assertSame('patrick', $post->getOriginal('title'));
+    }
+
+    public function testItDoesNotSyncPreviousOnRefresh()
+    {
+        $post = Post::create(['title' => 'pat']);
+
+        Post::find($post->id)->update(['title' => 'patrick']);
+
+        $post->refresh();
+
+        $this->assertEmpty($post->getDirty());
+        $this->assertEmpty($post->getPrevious());
     }
 
     public function testAsPivot()

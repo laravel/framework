@@ -39,28 +39,6 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         Facade::setFacadeApplication(null);
     }
 
-    public function testDropAllTablesWorksWithForeignKeys()
-    {
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('name');
-        });
-
-        $this->db->connection()->getSchemaBuilder()->create('table2', function (Blueprint $table) {
-            $table->integer('id');
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('table1');
-        });
-
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasTable('table1'));
-        $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasTable('table2'));
-
-        $this->db->connection()->getSchemaBuilder()->dropAllTables();
-
-        $this->assertFalse($this->db->connection()->getSchemaBuilder()->hasTable('table1'));
-        $this->assertFalse($this->db->connection()->getSchemaBuilder()->hasTable('table2'));
-    }
-
     public function testHasColumnWithTablePrefix()
     {
         $this->db->connection()->setTablePrefix('test_');
@@ -82,12 +60,12 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'prefix_indexes' => false,
         ]);
 
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->schemaBuilder()->create('table1', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('table1_name_index', $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('table1', 'table1_name_index'));
     }
 
     public function testHasColumnAndIndexWithPrefixIndexEnabled()
@@ -99,12 +77,12 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'prefix_indexes' => true,
         ]);
 
-        $this->db->connection()->getSchemaBuilder()->create('table1', function (Blueprint $table) {
+        $this->schemaBuilder()->create('table1', function (Blueprint $table) {
             $table->integer('id');
             $table->string('name')->index();
         });
 
-        $this->assertArrayHasKey('example_table1_name_index', $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1'));
+        $this->assertTrue($this->schemaBuilder()->hasIndex('table1', 'example_table1_name_index'));
     }
 
     public function testDropColumnWithTablePrefix()

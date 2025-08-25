@@ -25,7 +25,6 @@ class PendingBroadcast
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  mixed  $event
-     * @return void
      */
     public function __construct(Dispatcher $events, $event)
     {

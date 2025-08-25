@@ -19,13 +19,12 @@ class StreamedResponseException extends RuntimeException
      * Create a new exception instance.
      *
      * @param  \Throwable  $originalException
-     * @return void
      */
     public function __construct(Throwable $originalException)
     {
         $this->originalException = $originalException;
 
-        parent::__construct($originalException->message);
+        parent::__construct($originalException->getMessage());
     }
 
     /**

@@ -2,18 +2,27 @@
 
 namespace Illuminate\Tests\Integration\Console;
 
+use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Console\QueuedCommand;
+use Illuminate\Support\Facades\Queue;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 class ConsoleApplicationTest extends TestCase
 {
     protected function setUp(): void
     {
-        parent::setUp();
+        Artisan::starting(function ($artisan) {
+            $artisan->resolveCommands([
+                FooCommandStub::class,
+                ZondaCommandStub::class,
+            ]);
+        });
 
-        $this->app[Kernel::class]->registerCommand(new FooCommandStub);
+        parent::setUp();
     }
 
     public function testArtisanCallUsingCommandName()
@@ -23,9 +32,30 @@ class ConsoleApplicationTest extends TestCase
         ])->assertExitCode(0);
     }
 
+    public function testArtisanCallUsingCommandNameAliases()
+    {
+        $this->artisan('app:foobar', [
+            'id' => 1,
+        ])->assertExitCode(0);
+    }
+
     public function testArtisanCallUsingCommandClass()
     {
         $this->artisan(FooCommandStub::class, [
+            'id' => 1,
+        ])->assertExitCode(0);
+    }
+
+    public function testArtisanCallUsingCommandNameUsingAsCommandAttribute()
+    {
+        $this->artisan('zonda', [
+            'id' => 1,
+        ])->assertExitCode(0);
+    }
+
+    public function testArtisanCallUsingCommandNameAliasesUsingAsCommandAttribute()
+    {
+        $this->artisan('app:zonda', [
             'id' => 1,
         ])->assertExitCode(0);
     }
@@ -65,11 +95,39 @@ class ConsoleApplicationTest extends TestCase
 
         $this->assertTrue($this->app->resolved(Schedule::class));
     }
+
+    public function testArtisanQueue()
+    {
+        Queue::fake();
+
+        $this->app[Kernel::class]->queue('foo:bar', [
+            'id' => 1,
+        ]);
+
+        Queue::assertPushed(QueuedCommand::class, function ($job) {
+            return $job->displayName() === 'foo:bar';
+        });
+    }
 }
 
 class FooCommandStub extends Command
 {
     protected $signature = 'foo:bar {id}';
+
+    protected $aliases = ['app:foobar'];
+
+    public function handle()
+    {
+        //
+    }
+}
+
+#[AsCommand(name: 'zonda', aliases: ['app:zonda'])]
+class ZondaCommandStub extends Command
+{
+    protected $signature = 'zonda {id}';
+
+    protected $aliases = ['app:zonda'];
 
     public function handle()
     {

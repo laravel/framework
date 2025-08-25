@@ -18,7 +18,6 @@ class BatchFactory
      * Create a new batch factory instance.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
-     * @return void
      */
     public function __construct(QueueFactory $queue)
     {

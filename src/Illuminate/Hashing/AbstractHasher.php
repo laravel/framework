@@ -23,9 +23,9 @@ abstract class AbstractHasher
      * @param  array  $options
      * @return bool
      */
-    public function check($value, $hashedValue, array $options = [])
+    public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
-        if (strlen($hashedValue) === 0) {
+        if (is_null($hashedValue) || strlen($hashedValue) === 0) {
             return false;
         }
 

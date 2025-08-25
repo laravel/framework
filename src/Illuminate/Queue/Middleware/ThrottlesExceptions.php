@@ -30,11 +30,11 @@ class ThrottlesExceptions
     protected $maxAttempts;
 
     /**
-     * The number of minutes until the maximum attempts are reset.
+     * The number of seconds until the maximum attempts are reset.
      *
      * @var int
      */
-    protected $decayMinutes;
+    protected $decaySeconds;
 
     /**
      * The number of minutes to wait before retrying the job after an exception.
@@ -44,11 +44,25 @@ class ThrottlesExceptions
     protected $retryAfterMinutes = 0;
 
     /**
+     * The callback that determines if the exception should be reported.
+     *
+     * @var callable
+     */
+    protected $reportCallback;
+
+    /**
      * The callback that determines if rate limiting should apply.
      *
      * @var callable
      */
     protected $whenCallback;
+
+    /**
+     * The callbacks that determine if the job should be deleted.
+     *
+     * @var callable[]
+     */
+    protected array $deleteWhenCallbacks = [];
 
     /**
      * The prefix of the rate limiter key.
@@ -68,13 +82,12 @@ class ThrottlesExceptions
      * Create a new middleware instance.
      *
      * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
-     * @return void
+     * @param  int  $decaySeconds
      */
-    public function __construct($maxAttempts = 10, $decayMinutes = 10)
+    public function __construct($maxAttempts = 10, $decaySeconds = 600)
     {
         $this->maxAttempts = $maxAttempts;
-        $this->decayMinutes = $decayMinutes;
+        $this->decaySeconds = $decaySeconds;
     }
 
     /**
@@ -101,7 +114,15 @@ class ThrottlesExceptions
                 throw $throwable;
             }
 
-            $this->limiter->hit($jobKey, $this->decayMinutes * 60);
+            if ($this->reportCallback && call_user_func($this->reportCallback, $throwable)) {
+                report($throwable);
+            }
+
+            if ($this->shouldDelete($throwable)) {
+                return $job->delete();
+            }
+
+            $this->limiter->hit($jobKey, $this->decaySeconds);
 
             return $job->release($this->retryAfterMinutes * 60);
         }
@@ -118,6 +139,38 @@ class ThrottlesExceptions
         $this->whenCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Add a callback that should determine if the job should be deleted.
+     *
+     * @param  callable|string  $callback
+     * @return $this
+     */
+    public function deleteWhen(callable|string $callback)
+    {
+        $this->deleteWhenCallbacks[] = is_string($callback)
+            ? fn (Throwable $e) => $e instanceof $callback
+            : $callback;
+
+        return $this;
+    }
+
+    /**
+     * Run the skip / delete callbacks to determine if the job should be deleted for the given exception.
+     *
+     * @param  Throwable  $throwable
+     * @return bool
+     */
+    protected function shouldDelete(Throwable $throwable): bool
+    {
+        foreach ($this->deleteWhenCallbacks as $callback) {
+            if (call_user_func($callback, $throwable)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -160,7 +213,7 @@ class ThrottlesExceptions
             return $this->prefix.$job->job->uuid();
         }
 
-        return $this->prefix.md5(get_class($job));
+        return $this->prefix.hash('xxh128', get_class($job));
     }
 
     /**
@@ -184,6 +237,19 @@ class ThrottlesExceptions
     public function byJob()
     {
         $this->byJob = true;
+
+        return $this;
+    }
+
+    /**
+     * Report exceptions and optionally specify a callback that determines if the exception should be reported.
+     *
+     * @param  callable|null  $callback
+     * @return $this
+     */
+    public function report(?callable $callback = null)
+    {
+        $this->reportCallback = $callback ?? fn () => true;
 
         return $this;
     }

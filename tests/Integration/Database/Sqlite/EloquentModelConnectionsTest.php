@@ -6,16 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\RequiresDatabase;
 use Orchestra\Testbench\TestCase;
 
+#[RequiresDatabase('sqlite')]
 class EloquentModelConnectionsTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        if (getenv('DB_CONNECTION') !== 'testing') {
-            $this->markTestSkipped('Test requires a Sqlite connection.');
-        }
-
         $app['config']->set('database.default', 'conn1');
 
         $app['config']->set('database.connections.conn1', [

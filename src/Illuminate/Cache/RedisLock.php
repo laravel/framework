@@ -18,7 +18,6 @@ class RedisLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @return void
      */
     public function __construct($redis, $name, $seconds, $owner = null)
     {
@@ -36,9 +35,9 @@ class RedisLock extends Lock
     {
         if ($this->seconds > 0) {
             return $this->redis->set($this->name, $this->owner, 'EX', $this->seconds, 'NX') == true;
-        } else {
-            return $this->redis->setnx($this->name, $this->owner) === 1;
         }
+
+        return $this->redis->setnx($this->name, $this->owner) === 1;
     }
 
     /**

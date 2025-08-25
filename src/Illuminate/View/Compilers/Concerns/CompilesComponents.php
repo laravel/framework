@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers\Concerns;
 
 use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Support\Str;
+use Illuminate\View\AnonymousComponent;
 use Illuminate\View\ComponentAttributeBag;
 
 trait CompilesComponents
@@ -24,12 +25,14 @@ trait CompilesComponents
     protected function compileComponent($expression)
     {
         [$component, $alias, $data] = str_contains($expression, ',')
-                    ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', '']
-                    : [trim($expression, '()'), '', ''];
+            ? array_map(trim(...), explode(',', trim($expression, '()'), 3)) + ['', '', '']
+            : [trim($expression, '()'), '', ''];
 
         $component = trim($component, '\'"');
 
-        $hash = static::newComponentHash($component);
+        $hash = static::newComponentHash(
+            $component === AnonymousComponent::class ? $component.':'.trim($alias, '\'"') : $component
+        );
 
         if (Str::contains($component, ['::class', '\\'])) {
             return static::compileClassComponentOpening($component, $alias, $data, $hash);
@@ -46,7 +49,7 @@ trait CompilesComponents
      */
     public static function newComponentHash(string $component)
     {
-        static::$componentHashStack[] = $hash = sha1($component);
+        static::$componentHashStack[] = $hash = hash('xxh128', $component);
 
         return $hash;
     }
@@ -64,7 +67,8 @@ trait CompilesComponents
     {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal'.$hash.' = $component; } ?>',
-            '<?php $component = $__env->getContainer()->make('.Str::finish($component, '::class').', '.($data ?: '[]').' + (isset($attributes) ? (array) $attributes->getIterator() : [])); ?>',
+            '<?php if (isset($attributes)) { $__attributesOriginal'.$hash.' = $attributes; } ?>',
+            '<?php $component = '.$component.'::resolve('.($data ?: '[]').' + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>',
             '<?php $component->withName('.$alias.'); ?>',
             '<?php if ($component->shouldRender()): ?>',
             '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
@@ -91,6 +95,10 @@ trait CompilesComponents
         $hash = array_pop(static::$componentHashStack);
 
         return $this->compileEndComponent()."\n".implode("\n", [
+            '<?php endif; ?>',
+            '<?php if (isset($__attributesOriginal'.$hash.')): ?>',
+            '<?php $attributes = $__attributesOriginal'.$hash.'; ?>',
+            '<?php unset($__attributesOriginal'.$hash.'); ?>',
             '<?php endif; ?>',
             '<?php if (isset($__componentOriginal'.$hash.')): ?>',
             '<?php $component = $__componentOriginal'.$hash.'; ?>',
@@ -149,18 +157,35 @@ trait CompilesComponents
      */
     protected function compileProps($expression)
     {
-        return "<?php foreach(\$attributes->onlyProps{$expression} as \$__key => \$__value) {
+        return "<?php \$attributes ??= new \\Illuminate\\View\\ComponentAttributeBag;
+
+\$__newAttributes = [];
+\$__propNames = \Illuminate\View\ComponentAttributeBag::extractPropNames({$expression});
+
+foreach (\$attributes->all() as \$__key => \$__value) {
+    if (in_array(\$__key, \$__propNames)) {
+        \$\$__key = \$\$__key ?? \$__value;
+    } else {
+        \$__newAttributes[\$__key] = \$__value;
+    }
+}
+
+\$attributes = new \Illuminate\View\ComponentAttributeBag(\$__newAttributes);
+
+unset(\$__propNames);
+unset(\$__newAttributes);
+
+foreach (array_filter({$expression}, 'is_string', ARRAY_FILTER_USE_KEY) as \$__key => \$__value) {
     \$\$__key = \$\$__key ?? \$__value;
-} ?>
-<?php \$attributes = \$attributes->exceptProps{$expression}; ?>
-<?php foreach (array_filter({$expression}, 'is_string', ARRAY_FILTER_USE_KEY) as \$__key => \$__value) {
-    \$\$__key = \$\$__key ?? \$__value;
-} ?>
-<?php \$__defined_vars = get_defined_vars(); ?>
-<?php foreach (\$attributes as \$__key => \$__value) {
+}
+
+\$__defined_vars = get_defined_vars();
+
+foreach (\$attributes->all() as \$__key => \$__value) {
     if (array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
-} ?>
-<?php unset(\$__defined_vars); ?>";
+}
+
+unset(\$__defined_vars); ?>";
     }
 
     /**
@@ -190,8 +215,8 @@ trait CompilesComponents
         }
 
         return is_string($value) ||
-               (is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
-                        ? e($value)
-                        : $value;
+            (is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
+                ? e($value)
+                : $value;
     }
 }

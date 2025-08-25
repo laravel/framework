@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 trait CanBeOneOfMany
@@ -27,14 +28,14 @@ trait CanBeOneOfMany
     /**
      * The one of many inner join subselect query builder instance.
      *
-     * @var \Illuminate\Database\Eloquent\Builder|null
+     * @var \Illuminate\Database\Eloquent\Builder<*>|null
      */
     protected $oneOfManySubQuery;
 
     /**
      * Add constraints for inner join subselect for one of many relationships.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $query
      * @param  string|null  $column
      * @param  string|null  $aggregate
      * @return void
@@ -96,11 +97,16 @@ trait CanBeOneOfMany
 
             $subQuery = $this->newOneOfManySubQuery(
                 $this->getOneOfManySubQuerySelectColumns(),
-                $column, $aggregate
+                array_merge([$column], $previous['columns'] ?? []),
+                $aggregate,
             );
 
             if (isset($previous)) {
-                $this->addOneOfManyJoinSubQuery($subQuery, $previous['subQuery'], $previous['column']);
+                $this->addOneOfManyJoinSubQuery(
+                    $subQuery,
+                    $previous['subQuery'],
+                    $previous['columns'],
+                );
             }
 
             if (isset($closure)) {
@@ -112,12 +118,16 @@ trait CanBeOneOfMany
             }
 
             if (array_key_last($columns) == $column) {
-                $this->addOneOfManyJoinSubQuery($this->query, $subQuery, $column);
+                $this->addOneOfManyJoinSubQuery(
+                    $this->query,
+                    $subQuery,
+                    array_merge([$column], $previous['columns'] ?? []),
+                );
             }
 
             $previous = [
                 'subQuery' => $subQuery,
-                'column' => $column,
+                'columns' => array_merge([$column], $previous['columns'] ?? []),
             ];
         }
 
@@ -141,7 +151,7 @@ trait CanBeOneOfMany
      */
     public function latestOfMany($column = 'id', $relation = null)
     {
-        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
+        return $this->ofMany(Collection::wrap($column)->mapWithKeys(function ($column) {
             return [$column => 'MAX'];
         })->all(), 'MAX', $relation);
     }
@@ -155,7 +165,7 @@ trait CanBeOneOfMany
      */
     public function oldestOfMany($column = 'id', $relation = null)
     {
-        return $this->ofMany(collect(Arr::wrap($column))->mapWithKeys(function ($column) {
+        return $this->ofMany(Collection::wrap($column)->mapWithKeys(function ($column) {
             return [$column => 'MIN'];
         })->all(), 'MIN', $relation);
     }
@@ -177,11 +187,11 @@ trait CanBeOneOfMany
      * Get a new query for the related model, grouping the query by the given column, often the foreign key of the relationship.
      *
      * @param  string|array  $groupBy
-     * @param  string|null  $column
+     * @param  array<string>|null  $columns
      * @param  string|null  $aggregate
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder<*>
      */
-    protected function newOneOfManySubQuery($groupBy, $column = null, $aggregate = null)
+    protected function newOneOfManySubQuery($groupBy, $columns = null, $aggregate = null)
     {
         $subQuery = $this->query->getModel()
             ->newQuery()
@@ -191,11 +201,21 @@ trait CanBeOneOfMany
             $subQuery->groupBy($this->qualifyRelatedColumn($group));
         }
 
-        if (! is_null($column)) {
-            $subQuery->selectRaw($aggregate.'('.$subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column)).') as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
+        if (! is_null($columns)) {
+            foreach ($columns as $key => $column) {
+                $aggregatedColumn = $subQuery->getQuery()->grammar->wrap($subQuery->qualifyColumn($column));
+
+                if ($key === 0) {
+                    $aggregatedColumn = "{$aggregate}({$aggregatedColumn})";
+                } else {
+                    $aggregatedColumn = "min({$aggregatedColumn})";
+                }
+
+                $subQuery->selectRaw($aggregatedColumn.' as '.$subQuery->getQuery()->grammar->wrap($column.'_aggregate'));
+            }
         }
 
-        $this->addOneOfManySubQueryConstraints($subQuery, $groupBy, $column, $aggregate);
+        $this->addOneOfManySubQueryConstraints($subQuery, column: null, aggregate: $aggregate);
 
         return $subQuery;
     }
@@ -203,9 +223,9 @@ trait CanBeOneOfMany
     /**
      * Add the join subquery to the given query on the given column and the relationship's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $parent
-     * @param  \Illuminate\Database\Eloquent\Builder  $subQuery
-     * @param  string  $on
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $parent
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $subQuery
+     * @param  array<string>  $on
      * @return void
      */
     protected function addOneOfManyJoinSubQuery(Builder $parent, Builder $subQuery, $on)
@@ -214,9 +234,11 @@ trait CanBeOneOfMany
             $subQuery->applyBeforeQueryCallbacks();
 
             $parent->joinSub($subQuery, $this->relationName, function ($join) use ($on) {
-                $join->on($this->qualifySubSelectColumn($on.'_aggregate'), '=', $this->qualifyRelatedColumn($on));
+                foreach ($on as $onColumn) {
+                    $join->on($this->qualifySubSelectColumn($onColumn.'_aggregate'), '=', $this->qualifyRelatedColumn($onColumn));
+                }
 
-                $this->addOneOfManyJoinSubQueryConstraints($join, $on);
+                $this->addOneOfManyJoinSubQueryConstraints($join);
             });
         });
     }
@@ -224,7 +246,7 @@ trait CanBeOneOfMany
     /**
      * Merge the relationship query joins to the given query builder.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $query
      * @return void
      */
     protected function mergeOneOfManyJoinsTo(Builder $query)
@@ -237,7 +259,7 @@ trait CanBeOneOfMany
     /**
      * Get the query builder that will contain the relationship constraints.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return \Illuminate\Database\Eloquent\Builder<*>
      */
     protected function getRelationQuery()
     {
@@ -249,7 +271,7 @@ trait CanBeOneOfMany
     /**
      * Get the one of many inner join subselect builder instance.
      *
-     * @return \Illuminate\Database\Eloquent\Builder|void
+     * @return \Illuminate\Database\Eloquent\Builder<*>|void
      */
     public function getOneOfManySubQuery()
     {
@@ -275,7 +297,7 @@ trait CanBeOneOfMany
      */
     protected function qualifyRelatedColumn($column)
     {
-        return str_contains($column, '.') ? $column : $this->query->getModel()->getTable().'.'.$column;
+        return $this->query->getModel()->qualifyColumn($column);
     }
 
     /**

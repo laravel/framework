@@ -37,13 +37,14 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         });
 
         $this->schema()->create('articles', function ($table) {
-            $table->increments('aid');
+            $table->increments('id');
             $table->string('title');
         });
 
         $this->schema()->create('article_user', function ($table) {
+            $table->increments('id');
             $table->integer('article_id')->unsigned();
-            $table->foreign('article_id')->references('aid')->on('articles');
+            $table->foreign('article_id')->references('id')->on('articles');
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
         });
@@ -58,7 +59,22 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
 
         $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
             $i++;
-            $this->assertEquals($i, $collection->first()->aid);
+            $this->assertEquals($i, $collection->first()->id);
+        });
+
+        $this->assertSame(3, $i);
+    }
+
+    public function testBelongsToChunkByIdDesc()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+        $i = 0;
+
+        $user->articles()->chunkByIdDesc(1, function (Collection $collection) use (&$i) {
+            $this->assertEquals(3 - $i, $collection->first()->id);
+            $i++;
         });
 
         $this->assertSame(3, $i);
@@ -83,9 +99,9 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
     {
         $user = BelongsToManyChunkByIdTestTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         BelongsToManyChunkByIdTestTestArticle::query()->insert([
-            ['aid' => 1, 'title' => 'Another title'],
-            ['aid' => 2, 'title' => 'Another title'],
-            ['aid' => 3, 'title' => 'Another title'],
+            ['id' => 1, 'title' => 'Another title'],
+            ['id' => 2, 'title' => 'Another title'],
+            ['id' => 3, 'title' => 'Another title'],
         ]);
 
         $user->articles()->sync([3, 1, 2]);
@@ -126,10 +142,9 @@ class BelongsToManyChunkByIdTestTestUser extends Eloquent
 
 class BelongsToManyChunkByIdTestTestArticle extends Eloquent
 {
-    protected $primaryKey = 'aid';
     protected $table = 'articles';
     protected $keyType = 'string';
     public $incrementing = false;
     public $timestamps = false;
-    protected $fillable = ['aid', 'title'];
+    protected $fillable = ['id', 'title'];
 }

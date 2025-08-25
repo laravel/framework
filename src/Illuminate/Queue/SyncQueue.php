@@ -2,8 +2,11 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
@@ -13,6 +16,16 @@ use Throwable;
 class SyncQueue extends Queue implements QueueContract
 {
     /**
+     * Create a new sync queue instance.
+     *
+     * @param  bool  $dispatchAfterCommit
+     */
+    public function __construct($dispatchAfterCommit = false)
+    {
+        $this->dispatchAfterCommit = $dispatchAfterCommit;
+    }
+
+    /**
      * Get the size of the queue.
      *
      * @param  string|null  $queue
@@ -21,6 +34,50 @@ class SyncQueue extends Queue implements QueueContract
     public function size($queue = null)
     {
         return 0;
+    }
+
+    /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null)
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null)
+    {
+        return 0;
+    }
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null)
+    {
+        return 0;
+    }
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null)
+    {
+        return null;
     }
 
     /**
@@ -34,6 +91,36 @@ class SyncQueue extends Queue implements QueueContract
      * @throws \Throwable
      */
     public function push($job, $data = '', $queue = null)
+    {
+        if ($this->shouldDispatchAfterCommit($job) &&
+            $this->container->bound('db.transactions')) {
+            if ($job instanceof ShouldBeUnique) {
+                $this->container->make('db.transactions')->addCallbackForRollback(
+                    function () use ($job) {
+                        (new UniqueLock($this->container->make(Cache::class)))->release($job);
+                    }
+                );
+            }
+
+            return $this->container->make('db.transactions')->addCallback(
+                fn () => $this->executeJob($job, $data, $queue)
+            );
+        }
+
+        return $this->executeJob($job, $data, $queue);
+    }
+
+    /**
+     * Execute a given job synchronously.
+     *
+     * @param  string  $job
+     * @param  mixed  $data
+     * @param  string|null  $queue
+     * @return int
+     *
+     * @throws \Throwable
+     */
+    protected function executeJob($job, $data = '', $queue = null)
     {
         $queueJob = $this->resolveJob($this->createPayload($job, $queue, $data), $queue);
 

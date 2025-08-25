@@ -3,8 +3,9 @@
 namespace Illuminate\Validation\Rules;
 
 use InvalidArgumentException;
+use Stringable;
 
-class RequiredIf
+class RequiredIf implements Stringable
 {
     /**
      * The condition that validates the attribute.
@@ -17,7 +18,6 @@ class RequiredIf
      * Create a new required validation rule based on a condition.
      *
      * @param  callable|bool  $condition
-     * @return void
      */
     public function __construct($condition)
     {

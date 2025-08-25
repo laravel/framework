@@ -282,7 +282,44 @@ class ResolvingCallbackTest extends TestCase
         $container->make(ResolvingContractStub::class);
     }
 
-    public function testResolvingCallbacksAreCallWhenRebindHappenForResolvedAbstract()
+    public function testResolvingCallbacksAreCallWhenRebindHappens()
+    {
+        $container = new Container;
+
+        $resolvingCallCounter = 0;
+        $container->resolving(ResolvingContractStub::class, function () use (&$resolvingCallCounter) {
+            $resolvingCallCounter++;
+        });
+
+        $rebindCallCounter = 0;
+        $container->rebinding(ResolvingContractStub::class, function () use (&$rebindCallCounter) {
+            $rebindCallCounter++;
+        });
+
+        $container->bind(ResolvingContractStub::class, ResolvingImplementationStub::class);
+
+        $container->make(ResolvingContractStub::class);
+        $this->assertEquals(1, $resolvingCallCounter);
+        $this->assertEquals(0, $rebindCallCounter);
+
+        $container->bind(ResolvingContractStub::class, ResolvingImplementationStubTwo::class);
+        $this->assertEquals(2, $resolvingCallCounter);
+        $this->assertEquals(1, $rebindCallCounter);
+
+        $container->make(ResolvingImplementationStubTwo::class);
+        $this->assertEquals(3, $resolvingCallCounter);
+        $this->assertEquals(1, $rebindCallCounter);
+
+        $container->bind(ResolvingContractStub::class, fn () => new ResolvingImplementationStubTwo);
+        $this->assertEquals(4, $resolvingCallCounter);
+        $this->assertEquals(2, $rebindCallCounter);
+
+        $container->make(ResolvingContractStub::class);
+        $this->assertEquals(5, $resolvingCallCounter);
+        $this->assertEquals(2, $rebindCallCounter);
+    }
+
+    public function testResolvingCallbacksArentCalledWhenNoRebindingsAreRegistered()
     {
         $container = new Container;
 
@@ -297,18 +334,16 @@ class ResolvingCallbackTest extends TestCase
         $this->assertEquals(1, $callCounter);
 
         $container->bind(ResolvingContractStub::class, ResolvingImplementationStubTwo::class);
-        $this->assertEquals(2, $callCounter);
+        $this->assertEquals(1, $callCounter);
 
         $container->make(ResolvingImplementationStubTwo::class);
-        $this->assertEquals(3, $callCounter);
+        $this->assertEquals(2, $callCounter);
 
-        $container->bind(ResolvingContractStub::class, function () {
-            return new ResolvingImplementationStubTwo;
-        });
-        $this->assertEquals(4, $callCounter);
+        $container->bind(ResolvingContractStub::class, fn () => new ResolvingImplementationStubTwo);
+        $this->assertEquals(2, $callCounter);
 
         $container->make(ResolvingContractStub::class);
-        $this->assertEquals(5, $callCounter);
+        $this->assertEquals(3, $callCounter);
     }
 
     public function testRebindingDoesNotAffectMultipleResolvingCallbacks()

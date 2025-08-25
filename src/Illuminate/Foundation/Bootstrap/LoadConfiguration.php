@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
-use Exception;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
@@ -24,10 +23,10 @@ class LoadConfiguration
         // First we will see if we have a cache configuration file. If we do, we'll load
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
-        if (is_file($cached = $app->getCachedConfigPath())) {
+        if (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
-            $loadedFromCache = true;
+            $app->instance('config_loaded_from_cache', $loadedFromCache = true);
         }
 
         // Next we will spin through all of the configuration files in the configuration
@@ -42,9 +41,7 @@ class LoadConfiguration
         // Finally, we will set the application's environment based on the configuration
         // values that were loaded. We will pass a callback which will be used to get
         // the environment in a web context where an "--env" switch is not present.
-        $app->detectEnvironment(function () use ($config) {
-            return $config->get('app.env', 'production');
-        });
+        $app->detectEnvironment(fn () => $config->get('app.env', 'production'));
 
         date_default_timezone_set($config->get('app.timezone', 'UTC'));
 
@@ -64,13 +61,75 @@ class LoadConfiguration
     {
         $files = $this->getConfigurationFiles($app);
 
-        if (! isset($files['app'])) {
-            throw new Exception('Unable to load the "app" configuration file.');
+        $shouldMerge = method_exists($app, 'shouldMergeFrameworkConfiguration')
+            ? $app->shouldMergeFrameworkConfiguration()
+            : true;
+
+        $base = $shouldMerge
+            ? $this->getBaseConfiguration()
+            : [];
+
+        foreach (array_diff(array_keys($base), array_keys($files)) as $name => $config) {
+            $repository->set($name, $config);
         }
 
-        foreach ($files as $key => $path) {
-            $repository->set($key, require $path);
+        foreach ($files as $name => $path) {
+            $base = $this->loadConfigurationFile($repository, $name, $path, $base);
         }
+
+        foreach ($base as $name => $config) {
+            $repository->set($name, $config);
+        }
+    }
+
+    /**
+     * Load the given configuration file.
+     *
+     * @param  \Illuminate\Contracts\Config\Repository  $repository
+     * @param  string  $name
+     * @param  string  $path
+     * @param  array  $base
+     * @return array
+     */
+    protected function loadConfigurationFile(RepositoryContract $repository, $name, $path, array $base)
+    {
+        $config = (fn () => require $path)();
+
+        if (isset($base[$name])) {
+            $config = array_merge($base[$name], $config);
+
+            foreach ($this->mergeableOptions($name) as $option) {
+                if (isset($config[$option])) {
+                    $config[$option] = array_merge($base[$name][$option], $config[$option]);
+                }
+            }
+
+            unset($base[$name]);
+        }
+
+        $repository->set($name, $config);
+
+        return $base;
+    }
+
+    /**
+     * Get the options within the configuration file that should be merged again.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function mergeableOptions($name)
+    {
+        return [
+            'auth' => ['guards', 'providers', 'passwords'],
+            'broadcasting' => ['connections'],
+            'cache' => ['stores'],
+            'database' => ['connections'],
+            'filesystems' => ['disks'],
+            'logging' => ['channels'],
+            'mail' => ['mailers'],
+            'queue' => ['connections'],
+        ][$name] ?? [];
     }
 
     /**
@@ -84,6 +143,10 @@ class LoadConfiguration
         $files = [];
 
         $configPath = realpath($app->configPath());
+
+        if (! $configPath) {
+            return [];
+        }
 
         foreach (Finder::create()->files()->name('*.php')->in($configPath) as $file) {
             $directory = $this->getNestedDirectory($file, $configPath);
@@ -112,5 +175,21 @@ class LoadConfiguration
         }
 
         return $nested;
+    }
+
+    /**
+     * Get the base configuration files.
+     *
+     * @return array
+     */
+    protected function getBaseConfiguration()
+    {
+        $config = [];
+
+        foreach (Finder::create()->files()->name('*.php')->in(__DIR__.'/../../../../config') as $file) {
+            $config[basename($file->getRealPath(), '.php')] = require $file->getRealPath();
+        }
+
+        return $config;
     }
 }

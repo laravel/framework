@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Container;
 
+use Attribute;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\ContextualAttribute;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -38,6 +40,24 @@ class ContainerTest extends TestCase
             return 'Taylor';
         });
         $this->assertSame('Taylor', $container->make('name'));
+    }
+
+    public function testAbstractCanBeBoundFromConcreteReturnType()
+    {
+        $container = new Container;
+        $container->bind(function (): IContainerContractStub|ContainerImplementationStub {
+            return new ContainerImplementationStub;
+        });
+        $container->singleton(function (): ContainerConcreteStub {
+            return new ContainerConcreteStub;
+        });
+
+        $this->assertInstanceOf(
+            IContainerContractStub::class,
+            $container->make(IContainerContractStub::class)
+        );
+
+        $this->assertTrue($container->isShared(ContainerConcreteStub::class));
     }
 
     public function testBindIfDoesntRegisterIfServiceAlreadyRegistered()
@@ -114,6 +134,20 @@ class ContainerTest extends TestCase
         $firstInstantiation = $container->make('class');
         $secondInstantiation = $container->make('class');
         $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testScopedIf()
+    {
+        $container = new Container;
+        $container->scopedIf('class', function () {
+            return 'foo';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $container->scopedIf('class', function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $container->make('class'));
+        $this->assertNotSame('bar', $container->make('class'));
     }
 
     public function testScopedClosureResets()
@@ -199,11 +233,22 @@ class ContainerTest extends TestCase
     public function testArrayAccess()
     {
         $container = new Container;
+        $this->assertFalse(isset($container['something']));
         $container['something'] = function () {
             return 'foo';
         };
         $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
         $this->assertSame('foo', $container['something']);
+        unset($container['something']);
+        $this->assertFalse(isset($container['something']));
+
+        //test offsetSet when it's not instanceof Closure
+        $container = new Container;
+        $container['something'] = 'text';
+        $this->assertTrue(isset($container['something']));
+        $this->assertNotEmpty($container['something']);
+        $this->assertSame('text', $container['something']);
         unset($container['something']);
         $this->assertFalse(isset($container['something']));
     }
@@ -262,6 +307,44 @@ class ContainerTest extends TestCase
         $instance = $container->make(ContainerDefaultValueStub::class);
         $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
         $this->assertSame('taylor', $instance->default);
+    }
+
+    public function testResolutionOfClassWithDefaultParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
+        $this->assertSame(null, $instance->default);
+
+        $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
+    public function testResolutionOfClassWithDefaultParametersAndContextualBindings()
+    {
+        $container = new Container;
+
+        $container->when(ContainerClassWithDefaultValueStub::class)
+            ->needs(ContainerConcreteStub::class)
+            ->give(fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
+    public function testBound()
+    {
+        $container = new Container;
+        $container->bind(ContainerConcreteStub::class, function () {
+            //
+        });
+        $this->assertTrue($container->bound(ContainerConcreteStub::class));
+        $this->assertFalse($container->bound(IContainerContractStub::class));
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerConcreteStub::class);
+        $this->assertTrue($container->bound(IContainerContractStub::class));
+        $this->assertFalse($container->bound(ContainerConcreteStub::class));
     }
 
     public function testUnsetRemoveBoundInstances()
@@ -441,6 +524,35 @@ class ContainerTest extends TestCase
         $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
+    public function testCurrentlyResolving()
+    {
+        $container = new Container;
+
+        $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
+            $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
+        });
+
+        $container->when(ContainerCurrentResolvingConcrete::class)
+            ->needs('$currentlyResolving')
+            ->give(fn ($container) => $container->currentlyResolving());
+
+        $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
+
+        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
+    }
+
+    public function testGetAliasRecursive()
+    {
+        $container = new Container;
+        $container->alias('ConcreteStub', 'foo');
+        $container->alias('foo', 'bar');
+        $container->alias('bar', 'baz');
+        $this->assertSame('ConcreteStub', $container->getAlias('baz'));
+        $this->assertTrue($container->isAlias('baz'));
+        $this->assertTrue($container->isAlias('bar'));
+        $this->assertTrue($container->isAlias('foo'));
+    }
+
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
         $this->expectException('LogicException');
@@ -464,13 +576,13 @@ class ContainerTest extends TestCase
     public function testMakeWithMethodIsAnAliasForMakeMethod()
     {
         $mock = $this->getMockBuilder(Container::class)
-                     ->onlyMethods(['make'])
-                     ->getMock();
+            ->onlyMethods(['make'])
+            ->getMock();
 
         $mock->expects($this->once())
-             ->method('make')
-             ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
-             ->willReturn(new stdClass);
+            ->method('make')
+            ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
+            ->willReturn(new stdClass);
 
         $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
 
@@ -491,6 +603,16 @@ class ContainerTest extends TestCase
         });
 
         $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
+    }
+
+    public function testResolvingWithArrayOfMixedParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerMixedPrimitiveStub::class, ['first' => 1, 'last' => 2, 'third' => 3]);
+        $this->assertSame(1, $instance->first);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
+        $this->assertSame(2, $instance->last);
+        $this->assertFalse(isset($instance->third));
     }
 
     public function testResolvingWithUsingAnInterface()
@@ -603,6 +725,21 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 
+    public function testMethodLevelContextualBinding()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
+
+        $container->when(ContainerContextualBindingCallTarget::class)
+            ->needs(IContainerContractStub::class)
+            ->give(ContainerImplementationStub::class);
+
+        $result = $container->call([new ContainerContextualBindingCallTarget, 'work']);
+
+        $this->assertInstanceOf(ContainerImplementationStub::class, $result);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -688,6 +825,15 @@ class ContainerDefaultValueStub
     }
 }
 
+class ContainerClassWithDefaultValueStub
+{
+    public function __construct(
+        public ?ContainerConcreteStub $noDefault,
+        public ?ContainerConcreteStub $default = null,
+    ) {
+    }
+}
+
 class ContainerMixedPrimitiveStub
 {
     public $first;
@@ -719,5 +865,37 @@ class ContainerInjectVariableStubWithInterfaceImplementation implements IContain
     public function __construct(ContainerConcreteStub $concrete, $something)
     {
         $this->something = $something;
+    }
+}
+
+class ContainerContextualBindingCallTarget
+{
+    public function __construct()
+    {
+    }
+
+    public function work(IContainerContractStub $stub)
+    {
+        return $stub;
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class ContainerCurrentResolvingAttribute implements ContextualAttribute
+{
+    public function resolve()
+    {
+    }
+}
+
+class ContainerCurrentResolvingConcrete
+{
+    public $currentlyResolving;
+
+    public function __construct(
+        #[ContainerCurrentResolvingAttribute]
+        string $currentlyResolving
+    ) {
+        $this->currentlyResolving = $currentlyResolving;
     }
 }

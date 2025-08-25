@@ -84,7 +84,7 @@ class RedisCacheLockTest extends TestCase
             $firstLock->block(1, function () {
                 throw new Exception('failed');
             });
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Not testing the exception, just testing the lock
             // is released regardless of the how the exception
             // thrown by the callback was handled.
@@ -107,5 +107,31 @@ class RedisCacheLockTest extends TestCase
         $secondLock->release();
 
         $this->assertTrue(Cache::store('redis')->lock('foo')->get());
+    }
+
+    public function testOwnerStatusCanBeCheckedAfterRestoringLock()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($firstLock->get());
+        $owner = $firstLock->owner();
+
+        $secondLock = Cache::store('redis')->restoreLock('foo', $owner);
+        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
+    }
+
+    public function testOtherOwnerDoesNotOwnLockAfterRestore()
+    {
+        Cache::store('redis')->lock('foo')->forceRelease();
+
+        $firstLock = Cache::store('redis')->lock('foo', 10);
+        $this->assertTrue($firstLock->isOwnedBy(null));
+        $this->assertTrue($firstLock->get());
+        $this->assertTrue($firstLock->isOwnedBy($firstLock->owner()));
+
+        $secondLock = Cache::store('redis')->restoreLock('foo', 'other_owner');
+        $this->assertTrue($secondLock->isOwnedBy($firstLock->owner()));
+        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
     }
 }

@@ -31,7 +31,7 @@ class SessionPersistenceTest extends TestCase
         $this->assertTrue($handler->written);
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app->instance(
             ExceptionHandler::class,

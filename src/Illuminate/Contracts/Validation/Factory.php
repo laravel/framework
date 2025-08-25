@@ -10,10 +10,10 @@ interface Factory
      * @param  array  $data
      * @param  array  $rules
      * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param  array  $attributes
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function make(array $data, array $rules, array $messages = [], array $customAttributes = []);
+    public function make(array $data, array $rules, array $messages = [], array $attributes = []);
 
     /**
      * Register a custom validator extension.

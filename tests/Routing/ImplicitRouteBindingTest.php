@@ -9,7 +9,7 @@ use Illuminate\Routing\ImplicitRouteBinding;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 
-include 'Enums.php';
+include_once 'Enums.php';
 
 class ImplicitRouteBindingTest extends TestCase
 {
@@ -29,6 +29,42 @@ class ImplicitRouteBindingTest extends TestCase
         ImplicitRouteBinding::resolveForRoute($container, $route);
 
         $this->assertSame('fruits', $route->parameter('category')->value);
+    }
+
+    public function test_it_can_resolve_the_implicit_backed_enum_route_bindings_for_the_given_route_with_optional_parameter()
+    {
+        $action = ['uses' => function (?CategoryBackedEnum $category = null) {
+            return $category->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['category' => 'fruits'];
+
+        $route->prepareForSerialization();
+
+        $container = Container::getInstance();
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+
+        $this->assertSame('fruits', $route->parameter('category')->value);
+    }
+
+    public function test_it_handles_optional_implicit_backed_enum_route_bindings_for_the_given_route_with_optional_parameter()
+    {
+        $action = ['uses' => function (?CategoryBackedEnum $category = null) {
+            return $category->value;
+        }];
+
+        $route = new Route('GET', '/test', $action);
+        $route->parameters = ['category' => null];
+
+        $route->prepareForSerialization();
+
+        $container = Container::getInstance();
+
+        ImplicitRouteBinding::resolveForRoute($container, $route);
+
+        $this->assertNull($route->parameter('category'));
     }
 
     public function test_it_does_not_resolve_implicit_non_backed_enum_route_bindings_for_the_given_route()

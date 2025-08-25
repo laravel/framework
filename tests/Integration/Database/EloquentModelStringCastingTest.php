@@ -9,7 +9,7 @@ use stdClass;
 
 class EloquentModelStringCastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('casting_table', function (Blueprint $table) {
             $table->increments('id');

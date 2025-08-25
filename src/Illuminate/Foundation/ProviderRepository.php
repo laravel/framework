@@ -35,7 +35,6 @@ class ProviderRepository
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $manifestPath
-     * @return void
      */
     public function __construct(ApplicationContract $app, Filesystem $files, $manifestPath)
     {
@@ -122,9 +121,7 @@ class ProviderRepository
             return;
         }
 
-        $this->app->make('events')->listen($events, function () use ($provider) {
-            $this->app->register($provider);
-        });
+        $this->app->make('events')->listen($events, fn () => $this->app->register($provider));
     }
 
     /**

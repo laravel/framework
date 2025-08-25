@@ -11,6 +11,8 @@ use Illuminate\Support\ServiceProvider;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FoundationApplicationTest extends TestCase
 {
@@ -67,6 +69,7 @@ class FoundationApplicationTest extends TestCase
         $app->register($provider = new class($app) extends ServiceProvider
         {
             public $singletons = [
+                NonContractBackedClass::class,
                 AbstractClass::class => ConcreteClass::class,
             ];
         });
@@ -77,6 +80,11 @@ class FoundationApplicationTest extends TestCase
 
         $this->assertInstanceOf(ConcreteClass::class, $instance);
         $this->assertSame($instance, $app->make(AbstractClass::class));
+
+        $instance = $app->make(NonContractBackedClass::class);
+
+        $this->assertInstanceOf(NonContractBackedClass::class, $instance);
+        $this->assertSame($instance, $app->make(NonContractBackedClass::class));
     }
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotFilled()
@@ -493,6 +501,114 @@ class FoundationApplicationTest extends TestCase
             $_SERVER['APP_EVENTS_CACHE']
         );
     }
+
+    public function testMacroable(): void
+    {
+        $app = new Application;
+        $app['env'] = 'foo';
+
+        $app->macro('foo', function () {
+            return $this->environment('foo');
+        });
+
+        $this->assertTrue($app->foo());
+
+        $app['env'] = 'bar';
+
+        $this->assertFalse($app->foo());
+    }
+
+    public function testUseConfigPath(): void
+    {
+        $app = new Application;
+        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
+
+        $this->assertSame('bar', $app->make('config')->get('app.foo'));
+    }
+
+    public function testMergingConfig(): void
+    {
+        $app = new Application;
+        $app->useConfigPath(__DIR__.'/fixtures/config');
+        $app->bootstrapWith([\Illuminate\Foundation\Bootstrap\LoadConfiguration::class]);
+
+        $config = $app->make('config');
+
+        $this->assertSame('UTC', $config->get('app.timezone'));
+        $this->assertSame('bar', $config->get('app.foo'));
+
+        $this->assertSame('overwrite', $config->get('broadcasting.default'));
+        $this->assertSame('broadcasting', $config->get('broadcasting.custom_option'));
+        $this->assertIsArray($config->get('broadcasting.connections.pusher'));
+        $this->assertSame(['overwrite' => true], $config->get('broadcasting.connections.reverb'));
+        $this->assertSame(['merge' => true], $config->get('broadcasting.connections.new'));
+
+        $this->assertSame('overwrite', $config->get('cache.default'));
+        $this->assertSame('cache', $config->get('cache.custom_option'));
+        $this->assertIsArray($config->get('cache.stores.database'));
+        $this->assertSame(['overwrite' => true], $config->get('cache.stores.array'));
+        $this->assertSame(['merge' => true], $config->get('cache.stores.new'));
+
+        $this->assertSame('overwrite', $config->get('database.default'));
+        $this->assertSame('database', $config->get('database.custom_option'));
+        $this->assertIsArray($config->get('database.connections.pgsql'));
+        $this->assertSame(['overwrite' => true], $config->get('database.connections.mysql'));
+        $this->assertSame(['merge' => true], $config->get('database.connections.new'));
+
+        $this->assertSame('overwrite', $config->get('filesystems.default'));
+        $this->assertSame('filesystems', $config->get('filesystems.custom_option'));
+        $this->assertIsArray($config->get('filesystems.disks.s3'));
+        $this->assertSame(['overwrite' => true], $config->get('filesystems.disks.local'));
+        $this->assertSame(['merge' => true], $config->get('filesystems.disks.new'));
+
+        $this->assertSame('overwrite', $config->get('logging.default'));
+        $this->assertSame('logging', $config->get('logging.custom_option'));
+        $this->assertIsArray($config->get('logging.channels.single'));
+        $this->assertSame(['overwrite' => true], $config->get('logging.channels.stack'));
+        $this->assertSame(['merge' => true], $config->get('logging.channels.new'));
+
+        $this->assertSame('overwrite', $config->get('mail.default'));
+        $this->assertSame('mail', $config->get('mail.custom_option'));
+        $this->assertIsArray($config->get('mail.mailers.ses'));
+        $this->assertSame(['overwrite' => true], $config->get('mail.mailers.smtp'));
+        $this->assertSame(['merge' => true], $config->get('mail.mailers.new'));
+
+        $this->assertSame('overwrite', $config->get('queue.default'));
+        $this->assertSame('queue', $config->get('queue.custom_option'));
+        $this->assertIsArray($config->get('queue.connections.redis'));
+        $this->assertSame(['overwrite' => true], $config->get('queue.connections.database'));
+        $this->assertSame(['merge' => true], $config->get('queue.connections.new'));
+    }
+
+    public function testAbortThrowsNotFoundHttpException()
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Page was not found');
+
+        $app = new Application();
+        $app->abort(404, 'Page was not found');
+    }
+
+    public function testAbortThrowsHttpException()
+    {
+        $this->expectException(HttpException::class);
+        $this->expectExceptionMessage('Request is bad');
+
+        $app = new Application();
+        $app->abort(400, 'Request is bad');
+    }
+
+    public function testAbortAcceptsHeaders()
+    {
+        try {
+            $app = new Application();
+            $app->abort(400, 'Bad request', ['X-FOO' => 'BAR']);
+            $this->fail(sprintf('abort must throw an %s.', HttpException::class));
+        } catch (HttpException $exception) {
+            $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
+        }
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
@@ -609,6 +725,11 @@ abstract class AbstractClass
 }
 
 class ConcreteClass extends AbstractClass
+{
+    //
+}
+
+class NonContractBackedClass
 {
     //
 }

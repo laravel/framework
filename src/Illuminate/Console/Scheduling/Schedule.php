@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Bus\UniqueLock;
@@ -13,20 +14,32 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
+/**
+ * @mixin \Illuminate\Console\Scheduling\PendingEventAttributes
+ */
 class Schedule
 {
-    use Macroable;
+    use Macroable {
+        __call as macroCall;
+    }
 
     const SUNDAY = 0;
+
     const MONDAY = 1;
+
     const TUESDAY = 2;
+
     const WEDNESDAY = 3;
+
     const THURSDAY = 4;
+
     const FRIDAY = 5;
+
     const SATURDAY = 6;
 
     /**
@@ -65,10 +78,30 @@ class Schedule
     protected $dispatcher;
 
     /**
+     * The cache of mutex results.
+     *
+     * @var array<string, bool>
+     */
+    protected $mutexCache = [];
+
+    /**
+     * The attributes to pass to the event.
+     *
+     * @var \Illuminate\Console\Scheduling\PendingEventAttributes|null
+     */
+    protected $attributes;
+
+    /**
+     * The schedule group attributes stack.
+     *
+     * @var array<int, PendingEventAttributes>
+     */
+    protected array $groupStack = [];
+
+    /**
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
-     * @return void
      *
      * @throws \RuntimeException
      */
@@ -85,12 +118,12 @@ class Schedule
         $container = Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
-                                ? $container->make(EventMutex::class)
-                                : $container->make(CacheEventMutex::class);
+            ? $container->make(EventMutex::class)
+            : $container->make(CacheEventMutex::class);
 
         $this->schedulingMutex = $container->bound(SchedulingMutex::class)
-                                ? $container->make(SchedulingMutex::class)
-                                : $container->make(CacheSchedulingMutex::class);
+            ? $container->make(SchedulingMutex::class)
+            : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -105,6 +138,8 @@ class Schedule
         $this->events[] = $event = new CallbackEvent(
             $this->eventMutex, $callback, $parameters, $this->timezone
         );
+
+        $this->mergePendingAttributes($event);
 
         return $event;
     }
@@ -141,7 +176,15 @@ class Schedule
      */
     public function job($job, $queue = null, $connection = null)
     {
-        return $this->call(function () use ($job, $queue, $connection) {
+        $jobName = $job;
+
+        if (! is_string($job)) {
+            $jobName = method_exists($job, 'displayName')
+                ? $job->displayName()
+                : $job::class;
+        }
+
+        return $this->name($jobName)->call(function () use ($job, $queue, $connection) {
             $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
             if ($job instanceof ShouldQueue) {
@@ -149,7 +192,7 @@ class Schedule
             } else {
                 $this->dispatchNow($job);
             }
-        })->name(is_string($job) ? $job : get_class($job));
+        });
     }
 
     /**
@@ -234,7 +277,51 @@ class Schedule
 
         $this->events[] = $event = new Event($this->eventMutex, $command, $this->timezone);
 
+        $this->mergePendingAttributes($event);
+
         return $event;
+    }
+
+    /**
+     * Create new schedule group.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function group(Closure $events)
+    {
+        if ($this->attributes === null) {
+            throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
+        }
+
+        $this->groupStack[] = $this->attributes;
+
+        $events($this);
+
+        array_pop($this->groupStack);
+    }
+
+    /**
+     * Merge the current group attributes with the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return void
+     */
+    protected function mergePendingAttributes(Event $event)
+    {
+        if (isset($this->attributes)) {
+            $this->attributes->mergeAttributes($event);
+
+            $this->attributes = null;
+        }
+
+        if (! empty($this->groupStack)) {
+            $group = end($this->groupStack);
+
+            $group->mergeAttributes($event);
+        }
     }
 
     /**
@@ -245,7 +332,7 @@ class Schedule
      */
     protected function compileParameters(array $parameters)
     {
-        return collect($parameters)->map(function ($value, $key) {
+        return (new Collection($parameters))->map(function ($value, $key) {
             if (is_array($value)) {
                 return $this->compileArrayInput($key, $value);
             }
@@ -267,7 +354,7 @@ class Schedule
      */
     public function compileArrayInput($key, $value)
     {
-        $value = collect($value)->map(function ($value) {
+        $value = (new Collection($value))->map(function ($value) {
             return ProcessUtils::escapeArgument($value);
         });
 
@@ -293,7 +380,7 @@ class Schedule
      */
     public function serverShouldRun(Event $event, DateTimeInterface $time)
     {
-        return $this->schedulingMutex->create($event, $time);
+        return $this->mutexCache[$event->mutexName()] ??= $this->schedulingMutex->create($event, $time);
     }
 
     /**
@@ -304,7 +391,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return collect($this->events)->filter->isDue($app);
+        return (new Collection($this->events))->filter->isDue($app);
     }
 
     /**
@@ -351,11 +438,35 @@ class Schedule
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install the illuminate/bus package.',
-                    $e->getCode(), $e
+                    is_int($e->getCode()) ? $e->getCode() : 0, $e
                 );
             }
         }
 
         return $this->dispatcher;
+    }
+
+    /**
+     * Dynamically handle calls into the schedule instance.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (method_exists(PendingEventAttributes::class, $method)) {
+            $this->attributes ??= end($this->groupStack) ?: new PendingEventAttributes($this);
+
+            return $this->attributes->$method(...$parameters);
+        }
+
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 }

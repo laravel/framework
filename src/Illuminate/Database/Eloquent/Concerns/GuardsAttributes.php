@@ -7,14 +7,14 @@ trait GuardsAttributes
     /**
      * The attributes that are mass assignable.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected $fillable = [];
 
     /**
      * The attributes that aren't mass assignable.
      *
-     * @var string[]|bool
+     * @var array<string>|bool
      */
     protected $guarded = ['*'];
 
@@ -28,14 +28,14 @@ trait GuardsAttributes
     /**
      * The actual columns that exist on the database and can be guarded.
      *
-     * @var array
+     * @var array<string>
      */
     protected static $guardableColumns = [];
 
     /**
      * Get the fillable attributes for the model.
      *
-     * @return array
+     * @return array<string>
      */
     public function getFillable()
     {
@@ -45,7 +45,7 @@ trait GuardsAttributes
     /**
      * Set the fillable attributes for the model.
      *
-     * @param  array  $fillable
+     * @param  array<string>  $fillable
      * @return $this
      */
     public function fillable(array $fillable)
@@ -58,12 +58,12 @@ trait GuardsAttributes
     /**
      * Merge new fillable attributes with existing fillable attributes on the model.
      *
-     * @param  array  $fillable
+     * @param  array<string>  $fillable
      * @return $this
      */
     public function mergeFillable(array $fillable)
     {
-        $this->fillable = array_merge($this->fillable, $fillable);
+        $this->fillable = array_values(array_unique(array_merge($this->fillable, $fillable)));
 
         return $this;
     }
@@ -71,19 +71,19 @@ trait GuardsAttributes
     /**
      * Get the guarded attributes for the model.
      *
-     * @return array
+     * @return array<string>
      */
     public function getGuarded()
     {
         return $this->guarded === false
-                    ? []
-                    : $this->guarded;
+            ? []
+            : $this->guarded;
     }
 
     /**
      * Set the guarded attributes for the model.
      *
-     * @param  array  $guarded
+     * @param  array<string>  $guarded
      * @return $this
      */
     public function guard(array $guarded)
@@ -96,12 +96,12 @@ trait GuardsAttributes
     /**
      * Merge new guarded attributes with existing guarded attributes on the model.
      *
-     * @param  array  $guarded
+     * @param  array<string>  $guarded
      * @return $this
      */
     public function mergeGuarded(array $guarded)
     {
-        $this->guarded = array_merge($this->guarded, $guarded);
+        $this->guarded = array_values(array_unique(array_merge($this->guarded, $guarded)));
 
         return $this;
     }
@@ -140,8 +140,10 @@ trait GuardsAttributes
     /**
      * Run the given callable while being unguarded.
      *
-     * @param  callable  $callback
-     * @return mixed
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function unguarded(callable $callback)
     {
@@ -202,7 +204,7 @@ trait GuardsAttributes
         }
 
         return $this->getGuarded() == ['*'] ||
-               ! empty(preg_grep('/^'.preg_quote($key).'$/i', $this->getGuarded())) ||
+               ! empty(preg_grep('/^'.preg_quote($key, '/').'$/i', $this->getGuarded())) ||
                ! $this->isGuardableColumn($key);
     }
 
@@ -214,14 +216,19 @@ trait GuardsAttributes
      */
     protected function isGuardableColumn($key)
     {
+        if ($this->hasSetMutator($key) || $this->hasAttributeSetMutator($key)) {
+            return true;
+        }
+
         if (! isset(static::$guardableColumns[get_class($this)])) {
             $columns = $this->getConnection()
-                        ->getSchemaBuilder()
-                        ->getColumnListing($this->getTable());
+                ->getSchemaBuilder()
+                ->getColumnListing($this->getTable());
 
             if (empty($columns)) {
                 return true;
             }
+
             static::$guardableColumns[get_class($this)] = $columns;
         }
 
@@ -241,8 +248,8 @@ trait GuardsAttributes
     /**
      * Get the fillable attributes of a given array.
      *
-     * @param  array  $attributes
-     * @return array
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
      */
     protected function fillableFromArray(array $attributes)
     {

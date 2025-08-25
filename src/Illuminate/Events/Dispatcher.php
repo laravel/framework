@@ -9,13 +9,19 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
+
+use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
@@ -57,12 +63,18 @@ class Dispatcher implements DispatcherContract
     protected $queueResolver;
 
     /**
+     * The database transaction manager resolver instance.
+     *
+     * @var callable
+     */
+    protected $transactionManagerResolver;
+
+    /**
      * Create a new event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Container\Container|null  $container
-     * @return void
      */
-    public function __construct(ContainerContract $container = null)
+    public function __construct(?ContainerContract $container = null)
     {
         $this->container = $container ?: new Container;
     }
@@ -70,19 +82,19 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  \Closure|string|array  $events
-     * @param  \Closure|string|array|null  $listener
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|string  $events
+     * @param  \Illuminate\Events\QueuedClosure|callable|array|class-string|null  $listener
      * @return void
      */
     public function listen($events, $listener = null)
     {
         if ($events instanceof Closure) {
-            return collect($this->firstClosureParameterTypes($events))
+            return (new Collection($this->firstClosureParameterTypes($events)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events);
                 });
         } elseif ($events instanceof QueuedClosure) {
-            return collect($this->firstClosureParameterTypes($events->closure))
+            return (new Collection($this->firstClosureParameterTypes($events->closure)))
                 ->each(function ($event) use ($events) {
                     $this->listen($event, $events->resolve());
                 });
@@ -147,7 +159,7 @@ class Dispatcher implements DispatcherContract
      * Register an event and payload to be fired later.
      *
      * @param  string  $event
-     * @param  array  $payload
+     * @param  object|array  $payload
      * @return void
      */
     public function push($event, $payload = [])
@@ -215,7 +227,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  string|object  $event
      * @param  mixed  $payload
-     * @return array|null
+     * @return mixed
      */
     public function until($event, $payload = [])
     {
@@ -235,10 +247,37 @@ class Dispatcher implements DispatcherContract
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        [$event, $payload] = $this->parseEventAndPayload(
-            $event, $payload
-        );
+        [$isEventObject, $event, $payload] = [
+            is_object($event),
+            ...$this->parseEventAndPayload($event, $payload),
+        ];
 
+        // If the event is not intended to be dispatched unless the current database
+        // transaction is successful, we'll register a callback which will handle
+        // dispatching this event on the next successful DB transaction commit.
+        if ($isEventObject &&
+            $payload[0] instanceof ShouldDispatchAfterCommit &&
+            ! is_null($transactions = $this->resolveTransactionManager())) {
+            $transactions->addCallback(
+                fn () => $this->invokeListeners($event, $payload, $halt)
+            );
+
+            return null;
+        }
+
+        return $this->invokeListeners($event, $payload, $halt);
+    }
+
+    /**
+     * Broadcast an event and call its listeners.
+     *
+     * @param  string|object  $event
+     * @param  mixed  $payload
+     * @param  bool  $halt
+     * @return array|null
+     */
+    protected function invokeListeners($event, $payload, $halt = false)
+    {
         if ($this->shouldBroadcast($payload)) {
             $this->broadcastEvent($payload[0]);
         }
@@ -306,7 +345,8 @@ class Dispatcher implements DispatcherContract
     protected function broadcastWhen($event)
     {
         return method_exists($event, 'broadcastWhen')
-                ? $event->broadcastWhen() : true;
+            ? $event->broadcastWhen()
+            : true;
     }
 
     /**
@@ -334,8 +374,8 @@ class Dispatcher implements DispatcherContract
         );
 
         return class_exists($eventName, false)
-                    ? $this->addInterfaceListeners($eventName, $listeners)
-                    : $listeners;
+            ? $this->addInterfaceListeners($eventName, $listeners)
+            : $listeners;
     }
 
     /**
@@ -451,8 +491,8 @@ class Dispatcher implements DispatcherContract
     protected function createClassCallable($listener)
     {
         [$class, $method] = is_array($listener)
-                            ? $listener
-                            : $this->parseClassCallable($listener);
+            ? $listener
+            : $this->parseClassCallable($listener);
 
         if (! method_exists($class, $method)) {
             $method = '__invoke';
@@ -465,8 +505,8 @@ class Dispatcher implements DispatcherContract
         $listener = $this->container->make($class);
 
         return $this->handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
-                    ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
-                    : [$listener, $method];
+            ? $this->createCallbackForListenerRunningAfterCommits($listener, $method)
+            : [$listener, $method];
     }
 
     /**
@@ -492,7 +532,7 @@ class Dispatcher implements DispatcherContract
             return (new ReflectionClass($class))->implementsInterface(
                 ShouldQueue::class
             );
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -525,7 +565,9 @@ class Dispatcher implements DispatcherContract
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
     {
-        return ($listener->afterCommit ?? null) && $this->container->bound('db.transactions');
+        return (($listener->afterCommit ?? null) ||
+                $listener instanceof ShouldHandleEventsAfterCommit) &&
+                $this->resolveTransactionManager();
     }
 
     /**
@@ -540,7 +582,7 @@ class Dispatcher implements DispatcherContract
         return function () use ($method, $listener) {
             $payload = func_get_args();
 
-            $this->container->make('db.transactions')->addCallback(
+            $this->resolveTransactionManager()->addCallback(
                 function () use ($listener, $method, $payload) {
                     $listener->$method(...$payload);
                 }
@@ -579,16 +621,20 @@ class Dispatcher implements DispatcherContract
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
         $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
-                    ? $listener->viaConnection()
-                    : $listener->connection ?? null);
+            ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
+            : $listener->connection ?? null);
 
         $queue = method_exists($listener, 'viaQueue')
-                    ? $listener->viaQueue()
-                    : $listener->queue ?? null;
+            ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())
+            : $listener->queue ?? null;
 
-        isset($listener->delay)
-                    ? $connection->laterOn($queue, $listener->delay, $job)
-                    : $connection->pushOn($queue, $job);
+        $delay = method_exists($listener, 'withDelay')
+            ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
+            : $listener->delay ?? null;
+
+        is_null($delay)
+            ? $connection->pushOn(enum_value($queue), $job)
+            : $connection->laterOn(enum_value($queue), $delay, $job);
     }
 
     /**
@@ -620,13 +666,20 @@ class Dispatcher implements DispatcherContract
         return tap($job, function ($job) use ($listener) {
             $data = array_values($job->data);
 
-            $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            if ($listener instanceof ShouldQueueAfterCommit) {
+                $job->afterCommit = true;
+            } else {
+                $job->afterCommit = property_exists($listener, 'afterCommit') ? $listener->afterCommit : null;
+            }
+
             $job->backoff = method_exists($listener, 'backoff') ? $listener->backoff(...$data) : ($listener->backoff ?? null);
             $job->maxExceptions = $listener->maxExceptions ?? null;
             $job->retryUntil = method_exists($listener, 'retryUntil') ? $listener->retryUntil(...$data) : null;
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
+            $job->failOnTimeout = $listener->failOnTimeout ?? false;
             $job->tries = $listener->tries ?? null;
+            $job->deleteWhenMissingModels = $listener->deleteWhenMissingModels ?? false;
 
             $job->through(array_merge(
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
@@ -689,6 +742,29 @@ class Dispatcher implements DispatcherContract
     public function setQueueResolver(callable $resolver)
     {
         $this->queueResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Get the database transaction manager implementation from the resolver.
+     *
+     * @return \Illuminate\Database\DatabaseTransactionsManager|null
+     */
+    protected function resolveTransactionManager()
+    {
+        return call_user_func($this->transactionManagerResolver);
+    }
+
+    /**
+     * Set the database transaction manager resolver implementation.
+     *
+     * @param  callable  $resolver
+     * @return $this
+     */
+    public function setTransactionManagerResolver(callable $resolver)
+    {
+        $this->transactionManagerResolver = $resolver;
 
         return $this;
     }

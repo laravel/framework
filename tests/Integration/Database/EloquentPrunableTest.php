@@ -2,28 +2,31 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Events\ModelsPruned;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
 
-/** @group SkipMSSQL */
 class EloquentPrunableTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         collect([
             'prunable_test_models',
             'prunable_soft_delete_test_models',
             'prunable_test_model_missing_prunable_methods',
             'prunable_with_custom_prune_method_test_models',
+            'prunable_with_exceptions',
         ])->each(function ($table) {
             Schema::create($table, function (Blueprint $table) {
                 $table->increments('id');
+                $table->string('name')->nullable();
                 $table->softDeletes();
                 $table->boolean('pruned')->default(false);
                 $table->timestamps();
@@ -46,7 +49,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id];
+            return ['name' => 'foo'];
         })->chunk(200)->each(function ($chunk) {
             PrunableTestModel::insert($chunk->all());
         });
@@ -64,7 +67,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id, 'deleted_at' => now()];
+            return ['deleted_at' => now()];
         })->chunk(200)->each(function ($chunk) {
             PrunableSoftDeleteTestModel::insert($chunk->all());
         });
@@ -83,7 +86,7 @@ class EloquentPrunableTest extends DatabaseTestCase
         Event::fake();
 
         collect(range(1, 5000))->map(function ($id) {
-            return ['id' => $id];
+            return ['name' => 'foo'];
         })->chunk(200)->each(function ($chunk) {
             PrunableWithCustomPruneMethodTestModel::insert($chunk->all());
         });
@@ -96,6 +99,27 @@ class EloquentPrunableTest extends DatabaseTestCase
         $this->assertEquals(5000, PrunableWithCustomPruneMethodTestModel::count());
 
         Event::assertDispatched(ModelsPruned::class, 1);
+    }
+
+    public function testPruneWithExceptionAtOneOfModels()
+    {
+        Event::fake();
+        Exceptions::fake();
+
+        collect(range(1, 5000))->map(function ($id) {
+            return ['name' => 'foo'];
+        })->chunk(200)->each(function ($chunk) {
+            PrunableWithException::insert($chunk->all());
+        });
+
+        $count = (new PrunableWithException)->pruneAll();
+
+        $this->assertEquals(999, $count);
+
+        Event::assertDispatched(ModelsPruned::class, 1);
+        Event::assertDispatched(fn (ModelsPruned $event) => $event->count === 999);
+        Exceptions::assertReportedCount(1);
+        Exceptions::assertReported(fn (Exception $exception) => $exception->getMessage() === 'foo bar');
     }
 }
 
@@ -133,6 +157,23 @@ class PrunableWithCustomPruneMethodTestModel extends Model
         $this->forceFill([
             'pruned' => true,
         ])->save();
+    }
+}
+
+class PrunableWithException extends Model
+{
+    use Prunable;
+
+    public function prunable()
+    {
+        return $this->where('id', '<=', 1000);
+    }
+
+    public function prune()
+    {
+        if ($this->id === 500) {
+            throw new Exception('foo bar');
+        }
     }
 }
 

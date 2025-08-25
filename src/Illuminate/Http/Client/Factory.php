@@ -3,54 +3,20 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
- * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
- * @method \Illuminate\Http\Client\PendingRequest acceptJson()
- * @method \Illuminate\Http\Client\PendingRequest asForm()
- * @method \Illuminate\Http\Client\PendingRequest asJson()
- * @method \Illuminate\Http\Client\PendingRequest asMultipart()
- * @method \Illuminate\Http\Client\PendingRequest async()
- * @method \Illuminate\Http\Client\PendingRequest attach(string|array $name, string|resource $contents = '', string|null $filename = null, array $headers = [])
- * @method \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
- * @method \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
- * @method \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
- * @method \Illuminate\Http\Client\PendingRequest connectTimeout(int $seconds)
- * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
- * @method \Illuminate\Http\Client\PendingRequest dd()
- * @method \Illuminate\Http\Client\PendingRequest dump()
- * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0, ?callable $when = null, bool $throw = true)
- * @method \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
- * @method \Illuminate\Http\Client\PendingRequest stub(callable $callback)
- * @method \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
- * @method \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
- * @method \Illuminate\Http\Client\PendingRequest withBody(resource|string $content, string $contentType)
- * @method \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
- * @method \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
- * @method \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
- * @method \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
- * @method \Illuminate\Http\Client\PendingRequest withOptions(array $options)
- * @method \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
- * @method \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
- * @method \Illuminate\Http\Client\PendingRequest withoutRedirecting()
- * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
- * @method array pool(callable $callback)
- * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
- * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
- * @method \Illuminate\Http\Client\Response head(string $url, array|string|null $query = null)
- * @method \Illuminate\Http\Client\Response patch(string $url, array $data = [])
- * @method \Illuminate\Http\Client\Response post(string $url, array $data = [])
- * @method \Illuminate\Http\Client\Response put(string $url, array $data = [])
- * @method \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
- *
- * @see \Illuminate\Http\Client\PendingRequest
+ * @mixin \Illuminate\Http\Client\PendingRequest
  */
 class Factory
 {
@@ -64,6 +30,20 @@ class Factory
      * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $dispatcher;
+
+    /**
+     * The middleware to apply to every request.
+     *
+     * @var array
+     */
+    protected $globalMiddleware = [];
+
+    /**
+     * The options to apply to every request.
+     *
+     * @var \Closure|array
+     */
+    protected $globalOptions = [];
 
     /**
      * The stub callables that will handle requests.
@@ -82,39 +62,112 @@ class Factory
     /**
      * The recorded response array.
      *
-     * @var array
+     * @var list<array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     protected $recorded = [];
 
     /**
      * All created response sequences.
      *
-     * @var array
+     * @var list<\Illuminate\Http\Client\ResponseSequence>
      */
     protected $responseSequences = [];
+
+    /**
+     * Indicates that an exception should be thrown if any request is not faked.
+     *
+     * @var bool
+     */
+    protected $preventStrayRequests = false;
 
     /**
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
-     * @return void
      */
-    public function __construct(Dispatcher $dispatcher = null)
+    public function __construct(?Dispatcher $dispatcher = null)
     {
         $this->dispatcher = $dispatcher;
 
-        $this->stubCallbacks = collect();
+        $this->stubCallbacks = new Collection;
+    }
+
+    /**
+     * Add middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * Add request middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalRequestMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = Middleware::mapRequest($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Add response middleware to apply to every request.
+     *
+     * @param  callable  $middleware
+     * @return $this
+     */
+    public function globalResponseMiddleware($middleware)
+    {
+        $this->globalMiddleware[] = Middleware::mapResponse($middleware);
+
+        return $this;
+    }
+
+    /**
+     * Set the options to apply to every request.
+     *
+     * @param  \Closure|array  $options
+     * @return $this
+     */
+    public function globalOptions($options)
+    {
+        $this->globalOptions = $options;
+
+        return $this;
     }
 
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string  $body
+     * @param  array|string|null  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public static function response($body = null, $status = 200, $headers = [])
+    {
+        return Create::promiseFor(
+            static::psr7Response($body, $status, $headers)
+        );
+    }
+
+    /**
+     * Create a new PSR-7 response instance for use during stubbing.
+     *
+     * @param  array|string|null  $body
+     * @param  int  $status
+     * @param  array<string, mixed>  $headers
+     * @return \GuzzleHttp\Psr7\Response
+     */
+    public static function psr7Response($body = null, $status = 200, $headers = [])
     {
         if (is_array($body)) {
             $body = json_encode($body);
@@ -122,11 +175,36 @@ class Factory
             $headers['Content-Type'] = 'application/json';
         }
 
-        $response = new Psr7Response($status, $headers, $body);
+        return new Psr7Response($status, $headers, $body);
+    }
 
-        return class_exists(\GuzzleHttp\Promise\Create::class)
-            ? \GuzzleHttp\Promise\Create::promiseFor($response)
-            : \GuzzleHttp\Promise\promise_for($response);
+    /**
+     * Create a new RequestException instance for use during stubbing.
+     *
+     * @param  array|string|null  $body
+     * @param  int  $status
+     * @param  array<string, mixed>  $headers
+     * @return \Illuminate\Http\Client\RequestException
+     */
+    public static function failedRequest($body = null, $status = 200, $headers = [])
+    {
+        return new RequestException(new Response(static::psr7Response($body, $status, $headers)));
+    }
+
+    /**
+     * Create a new connection exception for use during stubbing.
+     *
+     * @param  string|null  $message
+     * @return \Closure(\Illuminate\Http\Client\Request): \GuzzleHttp\Promise\PromiseInterface
+     */
+    public static function failedConnection($message = null)
+    {
+        return function ($request) use ($message) {
+            return Create::rejectionFor(new ConnectException(
+                $message ?? "cURL error 6: Could not resolve host: {$request->toPsrRequest()->getUri()->getHost()} (see https://curl.haxx.se/libcurl/c/libcurl-errors.html) for {$request->toPsrRequest()->getUri()}.",
+                $request->toPsrRequest(),
+            ));
+        };
     }
 
     /**
@@ -143,7 +221,7 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  callable|array  $callback
+     * @param  callable|array<string, mixed>|null  $callback
      * @return $this
      */
     public function fake($callback = null)
@@ -166,11 +244,13 @@ class Factory
             return $this;
         }
 
-        $this->stubCallbacks = $this->stubCallbacks->merge(collect([
+        $this->stubCallbacks = $this->stubCallbacks->merge(new Collection([
             function ($request, $options) use ($callback) {
-                $response = $callback instanceof Closure
-                                ? $callback($request, $options)
-                                : $callback;
+                $response = $callback;
+
+                while ($response instanceof Closure) {
+                    $response = $response($request, $options);
+                }
 
                 if ($response instanceof PromiseInterface) {
                     $options['on_stats'](new TransferStats(
@@ -203,7 +283,7 @@ class Factory
      * Stub the given URL using the given callback.
      *
      * @param  string  $url
-     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable  $callback
+     * @param  \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|callable|int|string|array|\Illuminate\Http\Client\ResponseSequence  $callback
      * @return $this
      */
     public function stubUrl($url, $callback)
@@ -213,10 +293,53 @@ class Factory
                 return;
             }
 
-            return $callback instanceof Closure || $callback instanceof ResponseSequence
-                        ? $callback($request, $options)
-                        : $callback;
+            if (is_int($callback) && $callback >= 100 && $callback < 600) {
+                return static::response(status: $callback);
+            }
+
+            if (is_int($callback) || is_string($callback)) {
+                return static::response($callback);
+            }
+
+            if ($callback instanceof Closure || $callback instanceof ResponseSequence) {
+                return $callback($request, $options);
+            }
+
+            return $callback;
         });
+    }
+
+    /**
+     * Indicate that an exception should be thrown if any request is not faked.
+     *
+     * @param  bool  $prevent
+     * @return $this
+     */
+    public function preventStrayRequests($prevent = true)
+    {
+        $this->preventStrayRequests = $prevent;
+
+        return $this;
+    }
+
+    /**
+     * Determine if stray requests are being prevented.
+     *
+     * @return bool
+     */
+    public function preventingStrayRequests()
+    {
+        return $this->preventStrayRequests;
+    }
+
+    /**
+     * Indicate that an exception should not be thrown if any request is not faked.
+     *
+     * @return $this
+     */
+    public function allowStrayRequests()
+    {
+        return $this->preventStrayRequests(false);
     }
 
     /**
@@ -224,7 +347,7 @@ class Factory
      *
      * @return $this
      */
-    protected function record()
+    public function record()
     {
         $this->recording = true;
 
@@ -235,7 +358,7 @@ class Factory
      * Record a request response pair.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|null  $response
      * @return void
      */
     public function recordRequestResponsePair($request, $response)
@@ -248,7 +371,7 @@ class Factory
     /**
      * Assert that a request / response pair was recorded matching a given truth test.
      *
-     * @param  callable  $callback
+     * @param  callable|(\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)  $callback
      * @return void
      */
     public function assertSent($callback)
@@ -262,7 +385,7 @@ class Factory
     /**
      * Assert that the given request was sent in the given order.
      *
-     * @param  array  $callbacks
+     * @param  list<string|(\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable>  $callbacks
      * @return void
      */
     public function assertSentInOrder($callbacks)
@@ -284,7 +407,7 @@ class Factory
     /**
      * Assert that a request / response pair was not recorded matching a given truth test.
      *
-     * @param  callable  $callback
+     * @param  callable|(\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)  $callback
      * @return void
      */
     public function assertNotSent($callback)
@@ -337,22 +460,21 @@ class Factory
     /**
      * Get a collection of the request / response pairs matching the given truth test.
      *
-     * @param  callable  $callback
-     * @return \Illuminate\Support\Collection
+     * @param  (\Closure(\Illuminate\Http\Client\Request, \Illuminate\Http\Client\Response|null): bool)|callable  $callback
+     * @return \Illuminate\Support\Collection<int, array{0: \Illuminate\Http\Client\Request, 1: \Illuminate\Http\Client\Response|null}>
      */
     public function recorded($callback = null)
     {
         if (empty($this->recorded)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {
             return true;
         };
 
-        return collect($this->recorded)->filter(function ($pair) use ($callback) {
-            return $callback($pair[0], $pair[1]);
-        });
+        return (new Collection($this->recorded))
+            ->filter(fn ($pair) => $callback($pair[0], $pair[1]));
     }
 
     /**
@@ -360,9 +482,21 @@ class Factory
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
+    public function createPendingRequest()
+    {
+        return tap($this->newPendingRequest(), function ($request) {
+            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
+        });
+    }
+
+    /**
+     * Instantiate a new pending request instance for this factory.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
     protected function newPendingRequest()
     {
-        return new PendingRequest($this);
+        return (new PendingRequest($this, $this->globalMiddleware))->withOptions(value($this->globalOptions));
     }
 
     /**
@@ -373,6 +507,16 @@ class Factory
     public function getDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Get the array of global middleware.
+     *
+     * @return array
+     */
+    public function getGlobalMiddleware()
+    {
+        return $this->globalMiddleware;
     }
 
     /**
@@ -388,8 +532,6 @@ class Factory
             return $this->macroCall($method, $parameters);
         }
 
-        return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks);
-        })->{$method}(...$parameters);
+        return $this->createPendingRequest()->{$method}(...$parameters);
     }
 }

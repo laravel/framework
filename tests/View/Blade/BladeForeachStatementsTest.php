@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Contracts\View\ViewCompilationException;
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class BladeForeachStatementsTest extends AbstractBladeTestCase
 {
     public function testForeachStatementsAreCompiled()
@@ -90,5 +93,29 @@ tag info
 <?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); ?>";
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    #[DataProvider('invalidForeachStatementsDataProvider')]
+    public function testForeachStatementsThrowHumanizedMessageWhenInvalidStatement($initialStatement)
+    {
+        $this->expectException(ViewCompilationException::class);
+        $this->expectExceptionMessage('Malformed @foreach statement.');
+        $string = "$initialStatement
+test
+@endforeach";
+        $this->compiler->compileString($string);
+    }
+
+    public static function invalidForeachStatementsDataProvider()
+    {
+        return [
+            ['@foreach'],
+            ['@foreach()'],
+            ['@foreach ()'],
+            ['@foreach($test)'],
+            ['@foreach($test as)'],
+            ['@foreach(as)'],
+            ['@foreach ( as )'],
+        ];
     }
 }

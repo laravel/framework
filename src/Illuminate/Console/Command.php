@@ -2,16 +2,23 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\View\Components\Factory;
+use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 class Command extends SymfonyCommand
 {
     use Concerns\CallsCommands,
+        Concerns\ConfiguresPrompts,
         Concerns\HasParameters,
         Concerns\InteractsWithIO,
+        Concerns\InteractsWithSignals,
+        Concerns\PromptsForMissingInput,
         Macroable;
 
     /**
@@ -38,7 +45,7 @@ class Command extends SymfonyCommand
     /**
      * The console command description.
      *
-     * @var string
+     * @var string|null
      */
     protected $description;
 
@@ -57,9 +64,28 @@ class Command extends SymfonyCommand
     protected $hidden = false;
 
     /**
-     * Create a new console command instance.
+     * Indicates whether only one instance of the command can run at any given time.
      *
-     * @return void
+     * @var bool
+     */
+    protected $isolated = false;
+
+    /**
+     * The default exit code for isolated commands.
+     *
+     * @var int
+     */
+    protected $isolatedExitCode = self::SUCCESS;
+
+    /**
+     * The console command name aliases.
+     *
+     * @var array
+     */
+    protected $aliases;
+
+    /**
+     * Create a new console command instance.
      */
     public function __construct()
     {
@@ -75,14 +101,24 @@ class Command extends SymfonyCommand
         // Once we have constructed the command, we'll set the description and other
         // related properties of the command. If a signature wasn't used to build
         // the command we'll set the arguments and the options on this command.
-        $this->setDescription((string) $this->description);
+        if (isset($this->description)) {
+            $this->setDescription((string) $this->description);
+        }
 
         $this->setHelp((string) $this->help);
 
         $this->setHidden($this->isHidden());
 
+        if (isset($this->aliases)) {
+            $this->setAliases((array) $this->aliases);
+        }
+
         if (! isset($this->signature)) {
             $this->specifyParameters();
+        }
+
+        if ($this instanceof Isolatable) {
+            $this->configureIsolation();
         }
     }
 
@@ -105,21 +141,46 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Configure the console command for isolation.
+     *
+     * @return void
+     */
+    protected function configureIsolation()
+    {
+        $this->getDefinition()->addOption(new InputOption(
+            'isolated',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'Do not run the command if another instance of the command is already running',
+            $this->isolated
+        ));
+    }
+
+    /**
      * Run the console command.
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return int
      */
+    #[\Override]
     public function run(InputInterface $input, OutputInterface $output): int
     {
-        $this->output = $this->laravel->make(
+        $this->output = $output instanceof OutputStyle ? $output : $this->laravel->make(
             OutputStyle::class, ['input' => $input, 'output' => $output]
         );
 
-        return parent::run(
-            $this->input = $input, $this->output
-        );
+        $this->components = $this->laravel->make(Factory::class, ['output' => $this->output]);
+
+        $this->configurePrompts($input);
+
+        try {
+            return parent::run(
+                $this->input = $input, $this->output
+            );
+        } finally {
+            $this->untrap();
+        }
     }
 
     /**
@@ -127,13 +188,46 @@ class Command extends SymfonyCommand
      *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    #[\Override]
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($this instanceof Isolatable && $this->option('isolated') !== false &&
+            ! $this->commandIsolationMutex()->create($this)) {
+            $this->comment(sprintf(
+                'The [%s] command is already running.', $this->getName()
+            ));
+
+            return (int) (is_numeric($this->option('isolated'))
+                ? $this->option('isolated')
+                : $this->isolatedExitCode);
+        }
+
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
 
-        return (int) $this->laravel->call([$this, $method]);
+        try {
+            return (int) $this->laravel->call([$this, $method]);
+        } catch (ManuallyFailedException $e) {
+            $this->components->error($e->getMessage());
+
+            return static::FAILURE;
+        } finally {
+            if ($this instanceof Isolatable && $this->option('isolated') !== false) {
+                $this->commandIsolationMutex()->forget($this);
+            }
+        }
+    }
+
+    /**
+     * Get a command isolation mutex instance for the command.
+     *
+     * @return \Illuminate\Console\CommandMutex
+     */
+    protected function commandIsolationMutex()
+    {
+        return $this->laravel->bound(CommandMutex::class)
+            ? $this->laravel->make(CommandMutex::class)
+            : $this->laravel->make(CacheCommandMutex::class);
     }
 
     /**
@@ -144,11 +238,13 @@ class Command extends SymfonyCommand
      */
     protected function resolveCommand($command)
     {
-        if (! class_exists($command)) {
-            return $this->getApplication()->find($command);
-        }
+        if (is_string($command)) {
+            if (! class_exists($command)) {
+                return $this->getApplication()->find($command);
+            }
 
-        $command = $this->laravel->make($command);
+            $command = $this->laravel->make($command);
+        }
 
         if ($command instanceof SymfonyCommand) {
             $command->setApplication($this->getApplication());
@@ -162,10 +258,32 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Fail the command manually.
+     *
+     * @param  \Throwable|string|null  $exception
+     * @return never
+     *
+     * @throws \Illuminate\Console\ManuallyFailedException|\Throwable
+     */
+    public function fail(Throwable|string|null $exception = null)
+    {
+        if (is_null($exception)) {
+            $exception = 'Command failed manually.';
+        }
+
+        if (is_string($exception)) {
+            $exception = new ManuallyFailedException($exception);
+        }
+
+        throw $exception;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
      */
+    #[\Override]
     public function isHidden(): bool
     {
         return $this->hidden;
@@ -174,6 +292,7 @@ class Command extends SymfonyCommand
     /**
      * {@inheritdoc}
      */
+    #[\Override]
     public function setHidden(bool $hidden = true): static
     {
         parent::setHidden($this->hidden = $hidden);

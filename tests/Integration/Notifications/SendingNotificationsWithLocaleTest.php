@@ -15,23 +15,20 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\View;
 use Illuminate\Testing\Assert;
 use Orchestra\Testbench\TestCase;
 
 class SendingNotificationsWithLocaleTest extends TestCase
 {
-    public $mailer;
-
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('mail.driver', 'array');
 
         $app['config']->set('app.locale', 'en');
 
-        View::addLocation(__DIR__.'/Fixtures');
+        $app['view']->addLocation(__DIR__.'/Fixtures');
 
-        app('translator')->setLoaded([
+        $app['translator']->setLoaded([
             '*' => [
                 '*' => [
                     'en' => ['hi' => 'hello'],

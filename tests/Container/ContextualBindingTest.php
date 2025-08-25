@@ -23,9 +23,7 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
 
-        /*
-         * Test With Closures
-         */
+        // Test With Closures
         $container = new Container;
 
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
@@ -40,6 +38,19 @@ class ContextualBindingTest extends TestCase
 
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
+
+        // Test nesting to make the same 'abstract' in different context
+        $container = new Container;
+
+        $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
+
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContextContractStub::class)->give(function ($container) {
+            return $container->make(IContainerContextContractStub::class);
+        });
+
+        $one = $container->make(ContainerTestContextInjectOne::class);
+
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
     }
 
     public function testContextualBindingWorksForExistingInstancedBindings()
@@ -481,6 +492,26 @@ class ContextualBindingTest extends TestCase
         $this->assertSame('hunter42', $resolvedInstance->settings['password']);
         $this->assertSame('lumen', $resolvedInstance->settings['alias']);
     }
+
+    public function testContextualBindingWorksForMethodInvocation()
+    {
+        $container = new Container;
+
+        $container
+            ->when(ContainerTestContextInjectMethodArgument::class)
+            ->needs(IContainerContextContractStub::class)
+            ->give(ContainerContextImplementationStub::class);
+
+        $object = new ContainerTestContextInjectMethodArgument;
+
+        // array callable syntax...
+        $valueResolvedUsingArraySyntax = $container->call([$object, 'method']);
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingArraySyntax);
+
+        // first class callable syntax...
+        $valueResolvedUsingFirstClassSyntax = $container->call($object->method(...));
+        $this->assertInstanceOf(ContainerContextImplementationStub::class, $valueResolvedUsingFirstClassSyntax);
+    }
 }
 
 interface IContainerContextContractStub
@@ -559,7 +590,7 @@ class ContainerTestContextWithOptionalInnerDependency
 {
     public $inner;
 
-    public function __construct(ContainerTestContextInjectOne $inner = null)
+    public function __construct(?ContainerTestContextInjectOne $inner = null)
     {
         $this->inner = $inner;
     }
@@ -618,5 +649,13 @@ class ContainerTestContextInjectFromConfigArray
     public function __construct($settings)
     {
         $this->settings = $settings;
+    }
+}
+
+class ContainerTestContextInjectMethodArgument
+{
+    public function method(IContainerContextContractStub $dependency)
+    {
+        return $dependency;
     }
 }

@@ -3,7 +3,9 @@
 namespace Illuminate\Foundation;
 
 use Closure;
+use Composer\Autoload\ClassLoader;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -14,6 +16,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Log\Context\ContextServiceProvider;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Illuminate\Support\Arr;
@@ -21,21 +24,28 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+use function Illuminate\Filesystem\join_paths;
+
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
+    use Macroable;
+
     /**
      * The Laravel framework version.
      *
      * @var string
      */
-    const VERSION = '10.x-dev';
+    const VERSION = '13.x-dev';
 
     /**
      * The base path for the Laravel installation.
@@ -43,6 +53,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var string
      */
     protected $basePath;
+
+    /**
+     * The array of registered callbacks.
+     *
+     * @var callable[]
+     */
+    protected $registeredCallbacks = [];
 
     /**
      * Indicates if the application has been bootstrapped before.
@@ -82,7 +99,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * All of the registered service providers.
      *
-     * @var \Illuminate\Support\ServiceProvider[]
+     * @var array<string, \Illuminate\Support\ServiceProvider>
      */
     protected $serviceProviders = [];
 
@@ -101,11 +118,25 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $deferredServices = [];
 
     /**
+     * The custom bootstrap path defined by the developer.
+     *
+     * @var string
+     */
+    protected $bootstrapPath;
+
+    /**
      * The custom application path defined by the developer.
      *
      * @var string
      */
     protected $appPath;
+
+    /**
+     * The custom configuration path defined by the developer.
+     *
+     * @var string
+     */
+    protected $configPath;
 
     /**
      * The custom database path defined by the developer.
@@ -120,6 +151,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @var string
      */
     protected $langPath;
+
+    /**
+     * The custom public / web path defined by the developer.
+     *
+     * @var string
+     */
+    protected $publicPath;
 
     /**
      * The custom storage path defined by the developer.
@@ -157,6 +195,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $namespace;
 
     /**
+     * Indicates if the framework's base configuration should be merged.
+     *
+     * @var bool
+     */
+    protected $mergeFrameworkConfiguration = true;
+
+    /**
      * The prefixes of absolute cache paths for use during normalization.
      *
      * @var string[]
@@ -167,7 +212,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Create a new Illuminate application instance.
      *
      * @param  string|null  $basePath
-     * @return void
      */
     public function __construct($basePath = null)
     {
@@ -178,6 +222,43 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->registerBaseBindings();
         $this->registerBaseServiceProviders();
         $this->registerCoreContainerAliases();
+        $this->registerLaravelCloudServices();
+    }
+
+    /**
+     * Begin configuring a new Laravel application instance.
+     *
+     * @param  string|null  $basePath
+     * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
+     */
+    public static function configure(?string $basePath = null)
+    {
+        $basePath = match (true) {
+            is_string($basePath) => $basePath,
+            default => static::inferBasePath(),
+        };
+
+        return (new Configuration\ApplicationBuilder(new static($basePath)))
+            ->withKernels()
+            ->withEvents()
+            ->withCommands()
+            ->withProviders();
+    }
+
+    /**
+     * Infer the application's base directory from the environment.
+     *
+     * @return string
+     */
+    public static function inferBasePath()
+    {
+        return match (true) {
+            isset($_ENV['APP_BASE_PATH']) => $_ENV['APP_BASE_PATH'],
+            default => dirname(array_values(array_filter(
+                array_keys(ClassLoader::getRegisteredLoaders()),
+                fn ($path) => ! str_starts_with($path, 'phar://'),
+            ))[0]),
+        };
     }
 
     /**
@@ -204,11 +285,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance(Container::class, $this);
         $this->singleton(Mix::class);
 
-        $this->singleton(PackageManifest::class, function () {
-            return new PackageManifest(
-                new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
-            );
-        });
+        $this->singleton(PackageManifest::class, fn () => new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 
     /**
@@ -220,7 +299,30 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->register(new EventServiceProvider($this));
         $this->register(new LogServiceProvider($this));
+        $this->register(new ContextServiceProvider($this));
         $this->register(new RoutingServiceProvider($this));
+    }
+
+    /**
+     * Register any services needed for Laravel Cloud.
+     *
+     * @return void
+     */
+    protected function registerLaravelCloudServices()
+    {
+        if (! laravel_cloud()) {
+            return;
+        }
+
+        $this['events']->listen(
+            'bootstrapping: *',
+            fn ($bootstrapper) => Cloud::bootstrapperBootstrapping($this, Str::after($bootstrapper, 'bootstrapping: '))
+        );
+
+        $this['events']->listen(
+            'bootstrapped: *',
+            fn ($bootstrapper) => Cloud::bootstrapperBootstrapped($this, Str::after($bootstrapper, 'bootstrapped: '))
+        );
     }
 
     /**
@@ -314,18 +416,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
         $this->instance('path.config', $this->configPath());
-        $this->instance('path.public', $this->publicPath());
-        $this->instance('path.storage', $this->storagePath());
         $this->instance('path.database', $this->databasePath());
+        $this->instance('path.public', $this->publicPath());
         $this->instance('path.resources', $this->resourcePath());
-        $this->instance('path.bootstrap', $this->bootstrapPath());
+        $this->instance('path.storage', $this->storagePath());
+
+        $this->useBootstrapPath(value(function () {
+            return is_dir($directory = $this->basePath('.laravel'))
+                ? $directory
+                : $this->basePath('bootstrap');
+        }));
 
         $this->useLangPath(value(function () {
-            if (is_dir($directory = $this->resourcePath('lang'))) {
-                return $directory;
-            }
-
-            return $this->basePath('lang');
+            return is_dir($directory = $this->resourcePath('lang'))
+                ? $directory
+                : $this->basePath('lang');
         }));
     }
 
@@ -337,9 +442,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function path($path = '')
     {
-        $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
-
-        return $appPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->appPath ?: $this->basePath('app'), $path);
     }
 
     /**
@@ -365,7 +468,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function basePath($path = '')
     {
-        return $this->basePath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->basePath, $path);
     }
 
     /**
@@ -376,7 +479,32 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->bootstrapPath, $path);
+    }
+
+    /**
+     * Get the path to the service provider list in the bootstrap directory.
+     *
+     * @return string
+     */
+    public function getBootstrapProvidersPath()
+    {
+        return $this->bootstrapPath('providers.php');
+    }
+
+    /**
+     * Set the bootstrap file directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useBootstrapPath($path)
+    {
+        $this->bootstrapPath = $path;
+
+        $this->instance('path.bootstrap', $path);
+
+        return $this;
     }
 
     /**
@@ -387,7 +515,22 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->configPath ?: $this->basePath('config'), $path);
+    }
+
+    /**
+     * Set the configuration directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function useConfigPath($path)
+    {
+        $this->configPath = $path;
+
+        $this->instance('path.config', $path);
+
+        return $this;
     }
 
     /**
@@ -398,7 +541,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->databasePath ?: $this->basePath('database'), $path);
     }
 
     /**
@@ -424,7 +567,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function langPath($path = '')
     {
-        return $this->langPath.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->langPath, $path);
     }
 
     /**
@@ -445,11 +588,27 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the path to the public / web directory.
      *
+     * @param  string  $path
      * @return string
      */
-    public function publicPath()
+    public function publicPath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'public';
+        return $this->joinPaths($this->publicPath ?: $this->basePath('public'), $path);
+    }
+
+    /**
+     * Set the public / web directory.
+     *
+     * @param  string  $path
+     * @return $this
+     */
+    public function usePublicPath($path)
+    {
+        $this->publicPath = $path;
+
+        $this->instance('path.public', $path);
+
+        return $this;
     }
 
     /**
@@ -460,8 +619,15 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function storagePath($path = '')
     {
-        return ($this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage')
-                            .($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        if (isset($_ENV['LARAVEL_STORAGE_PATH'])) {
+            return $this->joinPaths($this->storagePath ?: $_ENV['LARAVEL_STORAGE_PATH'], $path);
+        }
+
+        if (isset($_SERVER['LARAVEL_STORAGE_PATH'])) {
+            return $this->joinPaths($this->storagePath ?: $_SERVER['LARAVEL_STORAGE_PATH'], $path);
+        }
+
+        return $this->joinPaths($this->storagePath ?: $this->basePath('storage'), $path);
     }
 
     /**
@@ -487,7 +653,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($this->basePath('resources'), $path);
     }
 
     /**
@@ -500,9 +666,21 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function viewPath($path = '')
     {
-        $basePath = $this['config']->get('view.paths')[0];
+        $viewPath = rtrim($this['config']->get('view.paths')[0], DIRECTORY_SEPARATOR);
 
-        return rtrim($basePath, DIRECTORY_SEPARATOR).($path != '' ? DIRECTORY_SEPARATOR.$path : '');
+        return $this->joinPaths($viewPath, $path);
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param  string  $basePath
+     * @param  string  $path
+     * @return string
+     */
+    public function joinPaths($basePath, $path = '')
+    {
+        return join_paths($basePath, $path);
     }
 
     /**
@@ -564,7 +742,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get or check the current application environment.
      *
-     * @param  string|array  $environments
+     * @param  string|array  ...$environments
      * @return string|bool
      */
     public function environment(...$environments)
@@ -606,7 +784,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = $_SERVER['argv'] ?? null;
+        $args = $this->runningInConsole() && isset($_SERVER['argv'])
+            ? $_SERVER['argv']
+            : null;
 
         return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
     }
@@ -623,6 +803,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         return $this->isRunningInConsole;
+    }
+
+    /**
+     * Determine if the application is running any of the given console commands.
+     *
+     * @param  string|array  ...$commands
+     * @return bool
+     */
+    public function runningConsoleCommand(...$commands)
+    {
+        if (! $this->runningInConsole()) {
+            return false;
+        }
+
+        return in_array(
+            $_SERVER['argv'][1] ?? null,
+            is_array($commands[0]) ? $commands[0] : $commands
+        );
     }
 
     /**
@@ -646,21 +844,32 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Register a new registered listener.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function registered($callback)
+    {
+        $this->registeredCallbacks[] = $callback;
+    }
+
+    /**
      * Register all of the configured providers.
      *
      * @return void
      */
     public function registerConfiguredProviders()
     {
-        $providers = Collection::make($this->make('config')->get('app.providers'))
-                        ->partition(function ($provider) {
-                            return str_starts_with($provider, 'Illuminate\\');
-                        });
+        $providers = (new Collection($this->make('config')->get('app.providers')))
+            ->partition(fn ($provider) => str_starts_with($provider, 'Illuminate\\'));
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load($providers->collapse()->toArray());
+            ->load($providers->collapse()->toArray());
+
+        $this->fireAppCallbacks($this->registeredCallbacks);
     }
 
     /**
@@ -696,6 +905,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         if (property_exists($provider, 'singletons')) {
             foreach ($provider->singletons as $key => $value) {
+                $key = is_int($key) ? $value : $key;
+
                 $this->singleton($key, $value);
             }
         }
@@ -720,7 +931,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function getProvider($provider)
     {
-        return array_values($this->getProviders($provider))[0] ?? null;
+        $name = is_string($provider) ? $provider : get_class($provider);
+
+        return $this->serviceProviders[$name] ?? null;
     }
 
     /**
@@ -733,9 +946,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviders, function ($value) use ($name) {
-            return $value instanceof $name;
-        });
+        return Arr::where($this->serviceProviders, fn ($value) => $value instanceof $name);
     }
 
     /**
@@ -757,9 +968,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     protected function markAsRegistered($provider)
     {
-        $this->serviceProviders[] = $provider;
+        $class = get_class($provider);
 
-        $this->loadedProviders[get_class($provider)] = true;
+        $this->serviceProviders[$class] = $provider;
+
+        $this->loadedProviders[$class] = true;
     }
 
     /**
@@ -829,9 +1042,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template TClass of object
+     *
+     * @param  string|class-string<TClass>  $abstract
      * @param  array  $parameters
-     * @return mixed
+     * @return ($abstract is class-string<TClass> ? TClass : mixed)
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function make($abstract, array $parameters = [])
     {
@@ -843,10 +1060,15 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @template TClass of object
+     *
+     * @param  string|class-string<TClass>|callable  $abstract
      * @param  array  $parameters
      * @param  bool  $raiseEvents
-     * @return mixed
+     * @return ($abstract is class-string<TClass> ? TClass : mixed)
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
     protected function resolve($abstract, $parameters = [], $raiseEvents = true)
     {
@@ -985,6 +1207,63 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Handle the incoming HTTP request and send the response to the browser.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    public function handleRequest(Request $request)
+    {
+        $kernel = $this->make(HttpKernelContract::class);
+
+        $response = $kernel->handle($request)->send();
+
+        $kernel->terminate($request, $response);
+    }
+
+    /**
+     * Handle the incoming Artisan command.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return int
+     */
+    public function handleCommand(InputInterface $input)
+    {
+        $kernel = $this->make(ConsoleKernelContract::class);
+
+        $status = $kernel->handle(
+            $input,
+            new ConsoleOutput
+        );
+
+        $kernel->terminate($input, $status);
+
+        return $status;
+    }
+
+    /**
+     * Determine if the framework's base configuration should be merged.
+     *
+     * @return bool
+     */
+    public function shouldMergeFrameworkConfiguration()
+    {
+        return $this->mergeFrameworkConfiguration;
+    }
+
+    /**
+     * Indicate that the framework's base configuration should not be merged.
+     *
+     * @return $this
+     */
+    public function dontMergeFrameworkConfiguration()
+    {
+        $this->mergeFrameworkConfiguration = false;
+
+        return $this;
+    }
+
+    /**
      * Determine if middleware has been disabled for the application.
      *
      * @return bool
@@ -1089,8 +1368,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         return Str::startsWith($env, $this->absoluteCachePathPrefixes)
-                ? $env
-                : $this->basePath($env);
+            ? $env
+            : $this->basePath($env);
     }
 
     /**
@@ -1140,7 +1419,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
-            throw new NotFoundHttpException($message);
+            throw new NotFoundHttpException($message, null, 0, $headers);
         }
 
         throw new HttpException($code, $message, null, $headers);
@@ -1178,7 +1457,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Get the service providers that have been loaded.
      *
-     * @return array
+     * @return array<string, bool>
      */
     public function getLoadedProviders()
     {
@@ -1218,6 +1497,17 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the given service is a deferred service.
+     *
+     * @param  string  $service
+     * @return bool
+     */
+    public function isDeferredService($service)
+    {
+        return isset($this->deferredServices[$service]);
+    }
+
+    /**
      * Add an array of services to the application's deferred services.
      *
      * @param  array  $services
@@ -1229,14 +1519,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Determine if the given service is a deferred service.
+     * Remove an array of services from the application's deferred services.
      *
-     * @param  string  $service
-     * @return bool
+     * @param  array  $services
+     * @return void
      */
-    public function isDeferredService($service)
+    public function removeDeferredServices(array $services)
     {
-        return isset($this->deferredServices[$service]);
+        foreach ($services as $service) {
+            unset($this->deferredServices[$service]);
+        }
     }
 
     /**

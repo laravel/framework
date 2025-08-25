@@ -50,7 +50,6 @@ class PendingMail
      * Create a new mailable mailer instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @return void
      */
     public function __construct(MailerContract $mailer)
     {
@@ -117,11 +116,22 @@ class PendingMail
      * Send a new mailable message instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return void
+     * @return \Illuminate\Mail\SentMessage|null
      */
     public function send(MailableContract $mailable)
     {
-        $this->mailer->send($this->fill($mailable));
+        return $this->mailer->send($this->fill($mailable));
+    }
+
+    /**
+     * Send a new mailable message instance synchronously.
+     *
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @return \Illuminate\Mail\SentMessage|null
+     */
+    public function sendNow(MailableContract $mailable)
+    {
+        return $this->mailer->sendNow($this->fill($mailable));
     }
 
     /**

@@ -4,7 +4,9 @@ namespace Illuminate\Tests\View;
 
 use Illuminate\View\Component;
 use Illuminate\View\ComponentAttributeBag;
+use Illuminate\View\ComponentSlot;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 class ViewComponentTest extends TestCase
 {
@@ -19,13 +21,70 @@ class ViewComponentTest extends TestCase
         $this->assertSame('taylor', $variables['hello']('taylor'));
     }
 
-    public function testAttributeParentInheritance()
+    public function testIgnoredMethodsAreNotExposedToViewData()
+    {
+        $component = new class extends Component
+        {
+            protected $except = ['goodbye'];
+
+            public function render()
+            {
+                return 'test';
+            }
+
+            public function hello()
+            {
+                return 'hello world';
+            }
+
+            public function goodbye()
+            {
+                return 'goodbye';
+            }
+        };
+
+        $data = $component->data();
+
+        $this->assertArrayHasKey('hello', $data);
+        $this->assertArrayNotHasKey('goodbye', $data);
+
+        $reflectionMethod = new ReflectionMethod($component, 'ignoredMethods');
+
+        $ignoredMethods = $reflectionMethod->invoke($component);
+
+        foreach ($ignoredMethods as $method) {
+            $this->assertArrayNotHasKey($method, $data);
+        }
+    }
+
+    public function testAttributeParentInheritance(): void
     {
         $component = new TestViewComponent;
+        $attributes = new ComponentAttributeBag(['class' => 'bar', 'type' => 'button']);
 
-        $component->withAttributes(['class' => 'foo', 'attributes' => new ComponentAttributeBag(['class' => 'bar', 'type' => 'button'])]);
+        $component->withAttributes(['class' => 'foo', 'attributes' => $attributes]);
 
         $this->assertSame('class="foo bar" type="button"', (string) $component->attributes);
+
+        // Test overriding parent class attributes
+        $component->withAttributes(['class' => 'override', 'type' => 'submit']);
+        $this->assertSame('class="override" type="submit"', (string) $component->attributes);
+    }
+
+    public function testSlotAttributeParentInheritance(): void
+    {
+        $attributes = new ComponentAttributeBag(['class' => 'bar', 'type' => 'button']);
+
+        $slot = new ComponentSlot('test', [
+            'class' => 'foo',
+            'attributes' => $attributes,
+        ]);
+
+        $this->assertSame('class="foo bar" type="button"', (string) $slot->attributes);
+
+        // Test overriding parent class attributes
+        $slot->withAttributes(['class' => 'override', 'type' => 'submit']);
+        $this->assertSame('class="override" type="submit"', (string) $slot->attributes);
     }
 
     public function testPublicMethodsWithNoArgsAreConvertedToStringableCallablesInvokedAndNotCached()

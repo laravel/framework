@@ -8,6 +8,7 @@ use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RouteCollectionTest extends TestCase
@@ -63,6 +64,24 @@ class RouteCollectionTest extends TestCase
         ]));
 
         $this->assertSame($action, $routeIndex->getAction());
+    }
+
+    public function testRouteCollectionCanRetrieveByMethod()
+    {
+        $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', $action = [
+            'uses' => 'FooController@index',
+            'as' => 'route_name',
+        ]));
+
+        $this->assertCount(1, $this->routeCollection->get('GET'));
+        $this->assertCount(0, $this->routeCollection->get('GET.foo/index'));
+        $this->assertSame($routeIndex, $this->routeCollection->get('GET')['foo/index']);
+
+        $this->routeCollection->add($routeShow = new Route('GET', 'bar/show', [
+            'uses' => 'BarController@show',
+            'as' => 'bar_show',
+        ]));
+        $this->assertCount(2, $this->routeCollection->get('GET'));
     }
 
     public function testRouteCollectionCanGetIterator()
@@ -268,6 +287,7 @@ class RouteCollectionTest extends TestCase
     public function testRouteCollectionDontMatchNonMatchingDoubleSlashes()
     {
         $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('The route foo could not be found.');
 
         $this->routeCollection->add(new Route('GET', 'foo', [
             'uses' => 'FooController@index',
@@ -280,5 +300,123 @@ class RouteCollectionTest extends TestCase
             'REQUEST_URI', '//foo'
         );
         $this->routeCollection->match($request);
+    }
+
+    public function testRouteCollectionRequestMethodNotAllowed()
+    {
+        $this->expectException(MethodNotAllowedHttpException::class);
+        $this->expectExceptionMessage('The POST method is not supported for route users. Supported methods: GET, HEAD.');
+
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $request = Request::create('users', 'POST');
+
+        $this->routeCollection->match($request);
+    }
+
+    public function testHasNameRouteMethod()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+        $this->routeCollection->add(
+            new Route('GET', 'posts/{post}', ['uses' => 'PostController@show', 'as' => 'posts'])
+        );
+
+        $this->routeCollection->add(
+            new Route('GET', 'books/{book}', ['uses' => 'BookController@show'])
+        );
+
+        $this->assertTrue($this->routeCollection->hasNamedRoute('users'));
+        $this->assertTrue($this->routeCollection->hasNamedRoute('posts'));
+        $this->assertFalse($this->routeCollection->hasNamedRoute('article'));
+        $this->assertFalse($this->routeCollection->hasNamedRoute('books'));
+    }
+
+    public function testToSymfonyRouteCollection()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users', ['uses' => 'UsersController@index', 'as' => 'users'])
+        );
+
+        $this->assertInstanceOf("\Symfony\Component\Routing\RouteCollection", $this->routeCollection->toSymfonyRouteCollection());
+    }
+
+    public function testOverlappingRoutesMatchesFirstRoute()
+    {
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/{other}', ['uses' => 'UsersController@other', 'as' => 'first'])
+        );
+
+        $this->routeCollection->add(
+            new Route('GET', 'users/{id}/show', ['uses' => 'UsersController@show', 'as' => 'second'])
+        );
+
+        $request = Request::create('users/1/show', 'GET');
+
+        $this->assertCount(2, $this->routeCollection->getRoutes());
+        $this->assertEquals('first', $this->routeCollection->match($request)->getName());
+    }
+
+    public function testPrependsRoutesWithDomain()
+    {
+        $this->routeCollection->add(
+            $noDomainGet1 = new Route('GET', 'no-domain-get1', ['uses' => 'NoDomainController@index'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet1 = (new Route('GET', 'foo-domain-get1', ['uses' => 'FooDomainController@index']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet1 = (new Route('GET', 'bar-domain-get1', ['uses' => 'BarDomainController@index']))->domain('bar.test')
+        );
+
+        $this->routeCollection->add(
+            $noDomainGet2 = new Route('GET', 'no-domain-get2', ['uses' => 'NoDomainController@show'])
+        );
+
+        $this->routeCollection->add(
+            $fooDomainGet2 = (new Route('GET', 'foo-domain-get2', ['uses' => 'FooDomainController@show']))->domain('foo.test')
+        );
+
+        $this->routeCollection->add(
+            $barDomainGet2 = (new Route('GET', 'bar-domain-get2', ['uses' => 'BarDomainController@show']))->domain('bar.test')
+        );
+
+        $this->assertSame([
+            $fooDomainGet1,
+            $barDomainGet1,
+            $fooDomainGet2,
+            $barDomainGet2,
+            $noDomainGet1,
+            $noDomainGet2,
+        ], $this->routeCollection->getRoutes());
+
+        $this->assertSame([
+            'GET' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+
+            'HEAD' => [
+                'foo.testfoo-domain-get1' => $fooDomainGet1,
+                'bar.testbar-domain-get1' => $barDomainGet1,
+
+                'foo.testfoo-domain-get2' => $fooDomainGet2,
+                'bar.testbar-domain-get2' => $barDomainGet2,
+
+                'no-domain-get1' => $noDomainGet1,
+                'no-domain-get2' => $noDomainGet2,
+            ],
+        ], $this->routeCollection->getRoutesByMethod());
     }
 }

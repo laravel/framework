@@ -41,7 +41,7 @@ class RedisBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -82,7 +82,7 @@ class RedisBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')
@@ -167,16 +167,17 @@ class RedisBroadcasterTest extends TestCase
     protected function getMockRequestWithUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $user = m::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
-             ->andReturn(42);
+            ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
-             ->andReturn(42);
+            ->andReturn(42);
 
         $request->shouldReceive('user')
-                ->andReturn($user);
+            ->andReturn($user);
 
         return $request;
     }
@@ -188,10 +189,10 @@ class RedisBroadcasterTest extends TestCase
     protected function getMockRequestWithoutUserForChannel($channel)
     {
         $request = m::mock(Request::class);
-        $request->channel_name = $channel;
+        $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')
-                ->andReturn(null);
+            ->andReturn(null);
 
         return $request;
     }

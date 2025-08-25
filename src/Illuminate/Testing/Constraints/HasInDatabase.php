@@ -2,8 +2,8 @@
 
 namespace Illuminate\Testing\Constraints;
 
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Expression;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class HasInDatabase extends Constraint
@@ -25,7 +25,7 @@ class HasInDatabase extends Constraint
     /**
      * The data that will be used to narrow the search in the database table.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $data;
 
@@ -33,8 +33,7 @@ class HasInDatabase extends Constraint
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
-     * @param  array  $data
-     * @return void
+     * @param  array<string, mixed>  $data
      */
     public function __construct(Connection $database, array $data)
     {
@@ -51,7 +50,9 @@ class HasInDatabase extends Constraint
      */
     public function matches($table): bool
     {
-        return $this->database->table($table)->where($this->data)->count() > 0;
+        return $this->database->table($table)
+            ->where($this->data)
+            ->exists();
     }
 
     /**
@@ -64,7 +65,7 @@ class HasInDatabase extends Constraint
     {
         return sprintf(
             "a row in the table [%s] matches the attributes %s.\n\n%s",
-            $table, $this->toString(JSON_PRETTY_PRINT), $this->getAdditionalInfo($table)
+            $table, $this->toString(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $this->getAdditionalInfo($table)
         );
     }
 
@@ -81,20 +82,20 @@ class HasInDatabase extends Constraint
         $similarResults = $query->where(
             array_key_first($this->data),
             $this->data[array_key_first($this->data)]
-        )->limit($this->show)->get();
+        )->select(array_keys($this->data))->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {
-            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT);
+            $description = 'Found similar results: '.json_encode($similarResults, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         } else {
             $query = $this->database->table($table);
 
-            $results = $query->limit($this->show)->get();
+            $results = $query->select(array_keys($this->data))->limit($this->show)->get();
 
             if ($results->isEmpty()) {
-                return 'The table is empty.';
+                return 'The table is empty';
             }
 
-            $description = 'Found: '.json_encode($results, JSON_PRETTY_PRINT);
+            $description = 'Found: '.json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
 
         if ($query->count() > $this->show) {
@@ -113,7 +114,7 @@ class HasInDatabase extends Constraint
     public function toString($options = 0): string
     {
         foreach ($this->data as $key => $data) {
-            $output[$key] = $data instanceof Expression ? (string) $data : $data;
+            $output[$key] = $data instanceof Expression ? $data->getValue($this->database->getQueryGrammar()) : $data;
         }
 
         return json_encode($output ?? [], $options);

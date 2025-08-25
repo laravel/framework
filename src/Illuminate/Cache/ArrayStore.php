@@ -3,6 +3,8 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
 class ArrayStore extends TaggableStore implements LockProvider
@@ -34,7 +36,6 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Create a new Array store.
      *
      * @param  bool  $serializesValues
-     * @return void
      */
     public function __construct($serializesValues = false)
     {
@@ -44,7 +45,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param  string  $key
      * @return mixed
      */
     public function get($key)
@@ -57,7 +58,7 @@ class ArrayStore extends TaggableStore implements LockProvider
 
         $expiresAt = $item['expiresAt'] ?? 0;
 
-        if ($expiresAt !== 0 && $this->currentTime() > $expiresAt) {
+        if ($expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt) {
             $this->forget($key);
 
             return;
@@ -131,6 +132,28 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $item['expiresAt'] = $this->calculateExpiration($seconds);
+
+        $this->storage = array_merge($this->storage, [$key => $item]);
+
+        return true;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -173,7 +196,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Get the expiration time of the key.
      *
      * @param  int  $seconds
-     * @return int
+     * @return float
      */
     protected function calculateExpiration($seconds)
     {
@@ -181,14 +204,14 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Get the UNIX timestamp for the given number of seconds.
+     * Get the UNIX timestamp, with milliseconds, for the given number of seconds in the future.
      *
      * @param  int  $seconds
-     * @return int
+     * @return float
      */
     protected function toTimestamp($seconds)
     {
-        return $seconds > 0 ? $this->availableAt($seconds) : 0;
+        return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
     }
 
     /**

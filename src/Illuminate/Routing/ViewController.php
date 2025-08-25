@@ -17,7 +17,6 @@ class ViewController extends Controller
      * Create a new controller instance.
      *
      * @param  \Illuminate\Contracts\Routing\ResponseFactory  $response
-     * @return void
      */
     public function __construct(ResponseFactory $response)
     {
@@ -27,13 +26,34 @@ class ViewController extends Controller
     /**
      * Invoke the controller method.
      *
-     * @param  array  $args
+     * @param  mixed  ...$args
      * @return \Illuminate\Http\Response
      */
     public function __invoke(...$args)
     {
-        [$view, $data, $status, $headers] = array_slice($args, -4);
+        $routeParameters = array_filter($args, function ($key) {
+            return ! in_array($key, ['view', 'data', 'status', 'headers']);
+        }, ARRAY_FILTER_USE_KEY);
 
-        return $this->response->view($view, $data, $status, $headers);
+        $args['data'] = array_merge($args['data'], $routeParameters);
+
+        return $this->response->view(
+            $args['view'],
+            $args['data'],
+            $args['status'],
+            $args['headers']
+        );
+    }
+
+    /**
+     * Execute an action on the controller.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function callAction($method, $parameters)
+    {
+        return $this->{$method}(...$parameters);
     }
 }

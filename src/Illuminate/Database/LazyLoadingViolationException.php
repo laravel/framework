@@ -25,7 +25,6 @@ class LazyLoadingViolationException extends RuntimeException
      *
      * @param  object  $model
      * @param  string  $relation
-     * @return static
      */
     public function __construct($model, $relation)
     {

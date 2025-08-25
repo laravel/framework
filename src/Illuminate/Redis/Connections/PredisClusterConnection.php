@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis\Connections;
 
+use Predis\Command\Redis\FLUSHDB;
 use Predis\Command\ServerFlushDatabase;
 
 class PredisClusterConnection extends PredisConnection
@@ -13,8 +14,12 @@ class PredisClusterConnection extends PredisConnection
      */
     public function flushdb()
     {
-        $this->client->executeCommandOnNodes(
-            tap(new ServerFlushDatabase)->setArguments(func_get_args())
-        );
+        $command = class_exists(ServerFlushDatabase::class)
+            ? ServerFlushDatabase::class
+            : FLUSHDB::class;
+
+        foreach ($this->client as $node) {
+            $node->executeCommand(tap(new $command)->setArguments(func_get_args()));
+        }
     }
 }

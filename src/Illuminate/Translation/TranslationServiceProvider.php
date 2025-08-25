@@ -22,11 +22,11 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
             // When registering the translator component, we'll need to set the default
             // locale as well as the fallback locale. So, we'll grab the application
             // configuration so we can easily get both of these values from there.
-            $locale = $app['config']['app.locale'];
+            $locale = $app->getLocale();
 
             $trans = new Translator($loader, $locale);
 
-            $trans->setFallback($app['config']['app.fallback_locale']);
+            $trans->setFallback($app->getFallbackLocale());
 
             return $trans;
         });
@@ -40,7 +40,7 @@ class TranslationServiceProvider extends ServiceProvider implements DeferrablePr
     protected function registerLoader()
     {
         $this->app->singleton('translation.loader', function ($app) {
-            return new FileLoader($app['files'], $app['path.lang']);
+            return new FileLoader($app['files'], [__DIR__.'/lang', $app['path.lang']]);
         });
     }
 

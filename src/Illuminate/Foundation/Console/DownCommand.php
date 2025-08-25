@@ -7,8 +7,11 @@ use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Events\MaintenanceModeEnabled;
 use Illuminate\Foundation\Exceptions\RegisterErrorViewPaths;
+use Illuminate\Support\Str;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Throwable;
 
+#[AsCommand(name: 'down')]
 class DownCommand extends Command
 {
     /**
@@ -21,16 +24,8 @@ class DownCommand extends Command
                                  {--retry= : The number of seconds after which the request may be retried}
                                  {--refresh= : The number of seconds after which the browser may refresh}
                                  {--secret= : The secret phrase that may be used to bypass maintenance mode}
+                                 {--with-secret : Generate a random secret phrase that may be used to bypass maintenance mode}
                                  {--status=503 : The status code that should be used when returning the maintenance mode response}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'down';
 
     /**
      * The console command description.
@@ -47,26 +42,33 @@ class DownCommand extends Command
     public function handle()
     {
         try {
-            if ($this->laravel->maintenanceMode()->active()) {
-                $this->comment('Application is already down.');
+            if ($this->laravel->maintenanceMode()->active() && ! $this->getSecret()) {
+                $this->components->info('Application is already down.');
 
                 return 0;
             }
 
-            $this->laravel->maintenanceMode()->activate($this->getDownFilePayload());
+            $downFilePayload = $this->getDownFilePayload();
+
+            $this->laravel->maintenanceMode()->activate($downFilePayload);
 
             file_put_contents(
                 storage_path('framework/maintenance.php'),
                 file_get_contents(__DIR__.'/stubs/maintenance-mode.stub')
             );
 
-            $this->laravel->get('events')->dispatch(MaintenanceModeEnabled::class);
+            $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
-            $this->comment('Application is now in maintenance mode.');
+            $this->components->info('Application is now in maintenance mode.');
+
+            if ($downFilePayload['secret'] !== null) {
+                $this->components->info('You may bypass maintenance mode via ['.config('app.url')."/{$downFilePayload['secret']}].");
+            }
         } catch (Exception $e) {
-            $this->error('Failed to enter maintenance mode.');
-
-            $this->error($e->getMessage());
+            $this->components->error(sprintf(
+                'Failed to enter maintenance mode: %s.',
+                $e->getMessage(),
+            ));
 
             return 1;
         }
@@ -84,8 +86,8 @@ class DownCommand extends Command
             'redirect' => $this->redirectPath(),
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
-            'secret' => $this->option('secret'),
-            'status' => (int) $this->option('status', 503),
+            'secret' => $this->getSecret(),
+            'status' => (int) ($this->option('status') ?? 503),
             'template' => $this->option('render') ? $this->prerenderView() : null,
         ];
     }
@@ -99,7 +101,7 @@ class DownCommand extends Command
     {
         try {
             return $this->laravel->make(PreventRequestsDuringMaintenance::class)->getExcludedPaths();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return [];
         }
     }
@@ -142,5 +144,19 @@ class DownCommand extends Command
         $retry = $this->option('retry');
 
         return is_numeric($retry) && $retry > 0 ? (int) $retry : null;
+    }
+
+    /**
+     * Get the secret phrase that may be used to bypass maintenance mode.
+     *
+     * @return string|null
+     */
+    protected function getSecret()
+    {
+        return match (true) {
+            ! is_null($this->option('secret')) => $this->option('secret'),
+            $this->option('with-secret') => Str::random(),
+            default => null,
+        };
     }
 }

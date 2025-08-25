@@ -16,6 +16,13 @@ abstract class MultipleInstanceManager
     protected $app;
 
     /**
+     * The configuration repository instance.
+     *
+     * @var \Illuminate\Contracts\Config\Repository
+     */
+    protected $config;
+
+    /**
      * The array of resolved instances.
      *
      * @var array
@@ -30,14 +37,21 @@ abstract class MultipleInstanceManager
     protected $customCreators = [];
 
     /**
+     * The key name of the "driver" equivalent configuration option.
+     *
+     * @var string
+     */
+    protected $driverKey = 'driver';
+
+    /**
      * Create a new manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
         $this->app = $app;
+        $this->config = $app->make('config');
     }
 
     /**
@@ -64,7 +78,7 @@ abstract class MultipleInstanceManager
     abstract public function getInstanceConfig($name);
 
     /**
-     * Get an instance instance by name.
+     * Get an instance by name.
      *
      * @param  string|null  $name
      * @return mixed
@@ -94,6 +108,7 @@ abstract class MultipleInstanceManager
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function resolve($name)
     {
@@ -103,20 +118,28 @@ abstract class MultipleInstanceManager
             throw new InvalidArgumentException("Instance [{$name}] is not defined.");
         }
 
-        if (! array_key_exists('driver', $config)) {
-            throw new RuntimeException("Instance [{$name}] does not specify a driver.");
+        if (! array_key_exists($this->driverKey, $config)) {
+            throw new RuntimeException("Instance [{$name}] does not specify a {$this->driverKey}.");
         }
 
-        if (isset($this->customCreators[$config['driver']])) {
+        $driverName = $config[$this->driverKey];
+
+        if (isset($this->customCreators[$driverName])) {
             return $this->callCustomCreator($config);
         } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+            $createMethod = 'create'.ucfirst($driverName).ucfirst($this->driverKey);
 
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Instance driver [{$config['driver']}] is not supported.");
+            if (method_exists($this, $createMethod)) {
+                return $this->{$createMethod}($config);
             }
+
+            $createMethod = 'create'.Str::studly($driverName).ucfirst($this->driverKey);
+
+            if (method_exists($this, $createMethod)) {
+                return $this->{$createMethod}($config);
+            }
+
+            throw new InvalidArgumentException("Instance {$this->driverKey} [{$config[$this->driverKey]}] is not supported.");
         }
     }
 
@@ -128,7 +151,7 @@ abstract class MultipleInstanceManager
      */
     protected function callCustomCreator(array $config)
     {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->customCreators[$config[$this->driverKey]]($this->app, $config);
     }
 
     /**
@@ -168,11 +191,27 @@ abstract class MultipleInstanceManager
      *
      * @param  string  $name
      * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($name, Closure $callback)
     {
         $this->customCreators[$name] = $callback->bindTo($this, $this);
+
+        return $this;
+    }
+
+    /**
+     * Set the application instance used by the manager.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @return $this
+     */
+    public function setApplication($app)
+    {
+        $this->app = $app;
 
         return $this;
     }

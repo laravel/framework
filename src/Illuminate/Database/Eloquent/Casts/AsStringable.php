@@ -4,7 +4,7 @@ namespace Illuminate\Database\Eloquent\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 class AsStringable implements Castable
 {
@@ -12,7 +12,7 @@ class AsStringable implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
-     * @return object|string
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<\Illuminate\Support\Stringable, string|\Stringable>
      */
     public static function castUsing(array $arguments)
     {
@@ -20,7 +20,7 @@ class AsStringable implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return isset($value) ? Str::of($value) : null;
+                return isset($value) ? new Stringable($value) : null;
             }
 
             public function set($model, $key, $value, $attributes)

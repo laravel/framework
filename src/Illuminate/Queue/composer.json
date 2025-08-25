@@ -14,19 +14,18 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "ext-json": "*",
-        "illuminate/collections": "^10.0",
-        "illuminate/console": "^10.0",
-        "illuminate/container": "^10.0",
-        "illuminate/contracts": "^10.0",
-        "illuminate/database": "^10.0",
-        "illuminate/filesystem": "^10.0",
-        "illuminate/pipeline": "^10.0",
-        "illuminate/support": "^10.0",
-        "laravel/serializable-closure": "^1.0",
-        "ramsey/uuid": "^4.2.2",
-        "symfony/process": "^6.1"
+        "php": "^8.3",
+        "illuminate/collections": "^13.0",
+        "illuminate/console": "^13.0",
+        "illuminate/container": "^13.0",
+        "illuminate/contracts": "^13.0",
+        "illuminate/database": "^13.0",
+        "illuminate/filesystem": "^13.0",
+        "illuminate/pipeline": "^13.0",
+        "illuminate/support": "^13.0",
+        "laravel/serializable-closure": "^1.3|^2.0",
+        "ramsey/uuid": "^4.7",
+        "symfony/process": "^7.4.0|^8.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -35,15 +34,18 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "10.x-dev"
+            "dev-master": "13.0.x-dev"
         }
     },
     "suggest": {
+        "ext-pdo": "Required to use the database queue worker.",
+        "ext-filter": "Required to use the SQS queue worker.",
+        "ext-mbstring": "Required to use the database failed job providers.",
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
-        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.198.1).",
-        "illuminate/redis": "Required to use the Redis queue driver (^10.0).",
-        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^4.0)."
+        "aws/aws-sdk-php": "Required to use the SQS queue driver and DynamoDb failed job storage (^3.322.9).",
+        "illuminate/redis": "Required to use the Redis queue driver (^13.0).",
+        "pda/pheanstalk": "Required to use the Beanstalk queue driver (^5.0.6|^7.0.0)."
     },
     "config": {
         "sort-packages": true

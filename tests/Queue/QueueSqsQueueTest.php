@@ -13,6 +13,23 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
+    protected $sqs;
+    protected $account;
+    protected $queueName;
+    protected $baseUrl;
+    protected $prefix;
+    protected $queueUrl;
+    protected $mockedJob;
+    protected $mockedData;
+    protected $mockedPayload;
+    protected $mockedDelay;
+    protected $mockedMessageId;
+    protected $mockedReceiptHandle;
+    protected $mockedSendMessageResponseModel;
+    protected $mockedReceiveMessageResponseModel;
+    protected $mockedReceiveEmptyMessageResponseModel;
+    protected $mockedQueueAttributesResponseModel;
+
     protected function tearDown(): void
     {
         m::close();
@@ -99,7 +116,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => 5])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($now->addSeconds(5), $this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->once();
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testDelayedPushProperlyPushesJobOntoSqs()
@@ -112,7 +129,7 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'DelaySeconds' => $this->mockedDelay])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->once();
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testPushProperlyPushesJobOntoSqs()
@@ -124,16 +141,32 @@ class QueueSqsQueueTest extends TestCase
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
-        $container->shouldHaveReceived('bound')->with('events')->once();
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testSizeProperlyReadsSqsQueueSize()
     {
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('getQueueAttributes')->once()->with(['QueueUrl' => $this->queueUrl, 'AttributeNames' => ['ApproximateNumberOfMessages']])->andReturn($this->mockedQueueAttributesResponseModel);
+
+        $this->sqs->shouldReceive('getQueueAttributes')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'AttributeNames' => [
+                'ApproximateNumberOfMessages',
+                'ApproximateNumberOfMessagesDelayed',
+                'ApproximateNumberOfMessagesNotVisible',
+            ],
+        ])->andReturn(new Result([
+            'Attributes' => [
+                'ApproximateNumberOfMessages' => 1,
+                'ApproximateNumberOfMessagesDelayed' => 2,
+                'ApproximateNumberOfMessagesNotVisible' => 3,
+            ],
+        ]));
+
         $size = $queue->size($this->queueName);
-        $this->assertEquals(1, $size);
+
+        $this->assertEquals(6, $size); // 1 + 2 + 3
     }
 
     public function testGetQueueProperlyResolvesUrlWithPrefix()

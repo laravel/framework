@@ -7,14 +7,14 @@ class WorkerOptions
     /**
      * The name of the worker.
      *
-     * @var int
+     * @var string
      */
     public $name;
 
     /**
      * The number of seconds to wait before retrying a job that encountered an uncaught exception.
      *
-     * @var int
+     * @var int|int[]
      */
     public $backoff;
 
@@ -47,7 +47,7 @@ class WorkerOptions
     public $rest;
 
     /**
-     * The maximum amount of times a job may be attempted.
+     * The maximum number of times a job may be attempted.
      *
      * @var int
      */
@@ -85,7 +85,7 @@ class WorkerOptions
      * Create a new worker options instance.
      *
      * @param  string  $name
-     * @param  int  $backoff
+     * @param  int|int[]  $backoff
      * @param  int  $memory
      * @param  int  $timeout
      * @param  int  $sleep
@@ -95,11 +95,20 @@ class WorkerOptions
      * @param  int  $maxJobs
      * @param  int  $maxTime
      * @param  int  $rest
-     * @return void
      */
-    public function __construct($name = 'default', $backoff = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1,
-                                $force = false, $stopWhenEmpty = false, $maxJobs = 0, $maxTime = 0, $rest = 0)
-    {
+    public function __construct(
+        $name = 'default',
+        $backoff = 0,
+        $memory = 128,
+        $timeout = 60,
+        $sleep = 3,
+        $maxTries = 1,
+        $force = false,
+        $stopWhenEmpty = false,
+        $maxJobs = 0,
+        $maxTime = 0,
+        $rest = 0,
+    ) {
         $this->name = $name;
         $this->backoff = $backoff;
         $this->sleep = $sleep;

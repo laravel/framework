@@ -3,12 +3,17 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
+use ErrorException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Http\MaintenanceModeBypassCookie;
+use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
+use Illuminate\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PreventRequestsDuringMaintenance
 {
+    use ExcludesPaths;
+
     /**
      * The application implementation.
      *
@@ -17,17 +22,23 @@ class PreventRequestsDuringMaintenance
     protected $app;
 
     /**
-     * The URIs that should be accessible while maintenance mode is enabled.
+     * The URIs that should be excluded.
+     *
+     * @var array<int, string>
+     */
+    protected $except = [];
+
+    /**
+     * The URIs that should be accessible during maintenance.
      *
      * @var array
      */
-    protected $except = [];
+    protected static $neverPrevent = [];
 
     /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct(Application $app)
     {
@@ -42,25 +53,37 @@ class PreventRequestsDuringMaintenance
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \ErrorException
      */
     public function handle($request, Closure $next)
     {
+        if ($this->inExceptArray($request)) {
+            return $next($request);
+        }
+
         if ($this->app->maintenanceMode()->active()) {
-            $data = $this->app->maintenanceMode()->data();
+            try {
+                $data = $this->app->maintenanceMode()->data();
+            } catch (ErrorException $exception) {
+                if (! $this->app->maintenanceMode()->active()) {
+                    return $next($request);
+                }
+
+                throw $exception;
+            }
 
             if (isset($data['secret']) && $request->path() === $data['secret']) {
                 return $this->bypassResponse($data['secret']);
             }
 
-            if ($this->hasValidBypassCookie($request, $data) ||
-                $this->inExceptArray($request)) {
+            if ($this->hasValidBypassCookie($request, $data)) {
                 return $next($request);
             }
 
             if (isset($data['redirect'])) {
                 $path = $data['redirect'] === '/'
-                            ? $data['redirect']
-                            : trim($data['redirect'], '/');
+                    ? $data['redirect']
+                    : trim($data['redirect'], '/');
 
                 if ($request->path() !== $path) {
                     return redirect($path);
@@ -104,27 +127,6 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * Determine if the request has a URI that should be accessible in maintenance mode.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
-     */
-    protected function inExceptArray($request)
-    {
-        foreach ($this->except as $except) {
-            if ($except !== '/') {
-                $except = trim($except, '/');
-            }
-
-            if ($request->fullUrlIs($except) || $request->is($except)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Redirect the user back to the root of the application with a maintenance mode bypass cookie.
      *
      * @param  string  $secret
@@ -155,12 +157,35 @@ class PreventRequestsDuringMaintenance
     }
 
     /**
-     * Get the URIs that should be accessible even when maintenance mode is enabled.
+     * Get the URIs that should be excluded.
      *
      * @return array
      */
     public function getExcludedPaths()
     {
-        return $this->except;
+        return array_merge($this->except, static::$neverPrevent);
+    }
+
+    /**
+     * Indicate that the given URIs should always be accessible.
+     *
+     * @param  array|string  $uris
+     * @return void
+     */
+    public static function except($uris)
+    {
+        static::$neverPrevent = array_values(array_unique(
+            array_merge(static::$neverPrevent, Arr::wrap($uris))
+        ));
+    }
+
+    /**
+     * Flush the state of the middleware.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$neverPrevent = [];
     }
 }

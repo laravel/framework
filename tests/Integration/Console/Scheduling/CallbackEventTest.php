@@ -10,13 +10,6 @@ use Orchestra\Testbench\TestCase;
 
 class CallbackEventTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testDefaultResultIsSuccess()
     {
         $success = null;
@@ -64,7 +57,7 @@ class CallbackEventTest extends TestCase
 
         try {
             $event->run($this->app);
-        } catch (Exception $e) {
+        } catch (Exception) {
         }
 
         $this->assertFalse($success);

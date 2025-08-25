@@ -116,6 +116,18 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->assertCount(1, $position);
     }
 
+    public function testWithWhereHasOnARelationWithCustomIntermediateAndLocalKey()
+    {
+        $this->seedData();
+        $position = HasOneThroughIntermediateTestPosition::withWhereHas('contract', function ($query) {
+            $query->where('title', 'A title');
+        })->get();
+
+        $this->assertCount(1, $position);
+        $this->assertTrue($position->first()->relationLoaded('contract'));
+        $this->assertEquals($position->first()->contract->pluck('title')->unique()->toArray(), ['A title']);
+    }
+
     public function testFirstOrFailThrowsAnException()
     {
         $this->expectException(ModelNotFoundException::class);

@@ -46,8 +46,8 @@ class RouteGroup
     {
         if (isset($new['namespace'])) {
             return isset($old['namespace']) && ! str_starts_with($new['namespace'], '\\')
-                    ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
-                    : trim($new['namespace'], '\\');
+                ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
+                : trim($new['namespace'], '\\');
         }
 
         return $old['namespace'] ?? null;
@@ -67,9 +67,9 @@ class RouteGroup
 
         if ($prependExistingPrefix) {
             return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
-        } else {
-            return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
         }
+
+        return isset($new['prefix']) ? trim($new['prefix'], '/').'/'.trim($old, '/') : $old;
     }
 
     /**

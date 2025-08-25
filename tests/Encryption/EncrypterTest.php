@@ -4,17 +4,30 @@ namespace Illuminate\Tests\Encryption;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class EncrypterTest extends TestCase
 {
-    public function testEncryption()
+    public function testEncryption(): void
     {
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decrypt($encrypted));
+
+        $encrypted = $e->encrypt('');
+        $this->assertSame('', $e->decrypt($encrypted));
+
+        $longString = str_repeat('a', 1000);
+        $encrypted = $e->encrypt($longString);
+        $this->assertSame($longString, $e->decrypt($encrypted));
+
+        $data = ['foo' => 'bar', 'baz' => 'qux'];
+        $encryptedArray = $e->encrypt($data);
+        $this->assertNotSame($data, $encryptedArray);
+        $this->assertSame($data, $e->decrypt($encryptedArray));
     }
 
     public function testRawStringEncryption()
@@ -23,6 +36,30 @@ class EncrypterTest extends TestCase
         $encrypted = $e->encryptString('foo');
         $this->assertNotSame('foo', $encrypted);
         $this->assertSame('foo', $e->decryptString($encrypted));
+    }
+
+    public function testRawStringEncryptionWithPreviousKeys()
+    {
+        $previous = new Encrypter(str_repeat('b', 16));
+        $previousValue = $previous->encryptString('foo');
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+
+        $decrypted = $new->decryptString($previousValue);
+        $this->assertSame('foo', $decrypted);
+    }
+
+    public function testItValidatesMacOnPerKeyBasis()
+    {
+        // Payload created with (key: str_repeat('b', 16)) but will
+        // "successfully" decrypt with (key: str_repeat('a', 16)), however it
+        // outputs a random binary string as it is not the correct key.
+        $encrypted = 'eyJpdiI6Ilg0dFM5TVRibEFqZW54c3lQdWJoVVE9PSIsInZhbHVlIjoiRGJpa2p2ZHI3eUs0dUtRakJneUhUUT09IiwibWFjIjoiMjBjZWYxODdhNThhOTk4MTk1NTc0YTE1MDgzODU1OWE0ZmQ4MDc5ZjMxYThkOGM1ZmM1MzlmYzBkYTBjMWI1ZiIsInRhZyI6IiJ9';
+
+        $new = new Encrypter(str_repeat('a', 16));
+        $new->previousKeys([str_repeat('b', 16)]);
+        $this->assertSame('foo', $new->decryptString($encrypted));
     }
 
     public function testEncryptionUsingBase64EncodedKey()
@@ -160,6 +197,18 @@ class EncrypterTest extends TestCase
         $e->decrypt($payload);
     }
 
+    public function testDecryptionExceptionIsThrownWhenUnexpectedTagIsAdded()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('Unable to use tag because the cipher algorithm does not support AEAD.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $payload = $e->encrypt('foo');
+        $decodedPayload = json_decode(base64_decode($payload));
+        $decodedPayload->tag = 'set-manually';
+        $e->decrypt(base64_encode(json_encode($decodedPayload)));
+    }
+
     public function testExceptionThrownWithDifferentKey()
     {
         $this->expectException(DecryptException::class);
@@ -191,5 +240,33 @@ class EncrypterTest extends TestCase
         $this->assertTrue(Encrypter::supported($key, 'AES-128-GCM'));
         $this->assertTrue(Encrypter::supported($key, 'aes-128-CBC'));
         $this->assertTrue(Encrypter::supported($key, 'aes-128-cbc'));
+    }
+
+    public static function provideTamperedData()
+    {
+        $validIv = base64_encode(str_repeat('.', 16));
+
+        return [
+            [['iv' => ['value_in_array'], 'value' => '', 'mac' => '']],
+            [['iv' => new class() {
+            }, 'value' => '', 'mac' => '']],
+            [['iv' => $validIv, 'value' => ['value_in_array'], 'mac' => '']],
+            [['iv' => $validIv, 'value' => new class() {
+            }, 'mac' => '']],
+            [['iv' => $validIv, 'value' => '', 'mac' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => null]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => ['value_in_array']]],
+            [['iv' => $validIv, 'value' => '', 'mac' => '', 'tag' => -1]],
+        ];
+    }
+
+    #[DataProvider('provideTamperedData')]
+    public function testTamperedPayloadWillGetRejected($payload)
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $enc = new Encrypter(str_repeat('x', 16));
+        $enc->decrypt(base64_encode(json_encode($payload)));
     }
 }

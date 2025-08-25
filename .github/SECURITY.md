@@ -15,7 +15,7 @@ If you discover a security vulnerability within Laravel, please send an email to
 ```
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP v2.0.8
-Comment: https://sela.io/pgp/
+Comment: Report Security Vulnerabilities to taylor@laravel.com
 
 xsFNBFugFSQBEACxEKhIY9IoJzcouVTIYKJfWFGvwFgbRjQWBiH3QdHId5vCrbWo
 s2l+4Rv03gMG+yHLJ3rWElnNdRaNdQv59+lShrZF7Bvu7Zvc0mMNmFOM/mQ/K2Lt

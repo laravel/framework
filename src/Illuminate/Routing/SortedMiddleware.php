@@ -11,7 +11,6 @@ class SortedMiddleware extends Collection
      *
      * @param  array  $priorityMap
      * @param  \Illuminate\Support\Collection|array  $middlewares
-     * @return void
      */
     public function __construct(array $priorityMap, $middlewares)
     {
@@ -99,6 +98,14 @@ class SortedMiddleware extends Collection
         if ($interfaces !== false) {
             foreach ($interfaces as $interface) {
                 yield $interface;
+            }
+        }
+
+        $parents = @class_parents($stripped);
+
+        if ($parents !== false) {
+            foreach ($parents as $parent) {
+                yield $parent;
             }
         }
     }

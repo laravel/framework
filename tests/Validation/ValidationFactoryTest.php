@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 use Illuminate\Validation\Factory;
 use Illuminate\Validation\PresenceVerifierInterface;
@@ -63,8 +64,8 @@ class ValidationFactoryTest extends TestCase
         $factory = m::mock(Factory::class.'[make]', [$translator]);
 
         $factory->shouldReceive('make')->once()
-                ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
-                ->andReturn($validator);
+            ->with(['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'required'], [], [])
+            ->andReturn($validator);
 
         $validator->shouldReceive('validate')->once()->andReturn(['foo' => 'bar']);
 
@@ -105,5 +106,49 @@ class ValidationFactoryTest extends TestCase
 
         $validator = $factory->make(['bar' => ['baz']], ['bar' => 'foo']);
         $this->assertTrue($validator->passes());
+    }
+
+    public function testExcludeAndIncludeUnvalidatedArrayKeys()
+    {
+        $translator = m::mock(TranslatorInterface::class);
+
+        $factory = new Factory($translator);
+        // check the default behaviour.
+        $validator1 = $factory->make(['key' => ['val']], ['key' => 'required']);
+        $this->assertTrue($validator1->excludeUnvalidatedArrayKeys);
+
+        $factory->excludeUnvalidatedArrayKeys();
+        $validator2 = $factory->make(['key' => ['val']], ['key' => 'required']);
+        $this->assertTrue($validator2->excludeUnvalidatedArrayKeys);
+
+        $factory->includeUnvalidatedArrayKeys();
+        $validator3 = $factory->make(['key' => ['val']], ['key' => 'required']);
+        $this->assertFalse($validator3->excludeUnvalidatedArrayKeys);
+
+        // checks it does not switch behaviour automatically.
+        $validator4 = $factory->make(['key' => ['val']], ['key' => 'required']);
+        $this->assertFalse($validator4->excludeUnvalidatedArrayKeys);
+
+        // checks it can switch.
+        $factory->excludeUnvalidatedArrayKeys();
+        $validator5 = $factory->make(['key' => ['val']], ['key' => 'required']);
+        $this->assertTrue($validator5->excludeUnvalidatedArrayKeys);
+
+        // checks switching does not affect previously created validator objects.
+        $this->assertTrue($validator1->excludeUnvalidatedArrayKeys);
+        $this->assertTrue($validator2->excludeUnvalidatedArrayKeys);
+        $this->assertFalse($validator3->excludeUnvalidatedArrayKeys);
+        $this->assertFalse($validator4->excludeUnvalidatedArrayKeys);
+    }
+
+    public function testSetContainer()
+    {
+        $translator = m::mock(TranslatorInterface::class);
+        $container = new Container;
+        $factory = new Factory($translator);
+
+        $this->assertNull($factory->getContainer());
+
+        $this->assertSame($container, $factory->setContainer($container)->getContainer());
     }
 }

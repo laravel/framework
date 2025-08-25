@@ -30,8 +30,7 @@ class Sequence implements Countable
     /**
      * Create a new sequence instance.
      *
-     * @param  array  $sequence
-     * @return void
+     * @param  mixed  ...$sequence
      */
     public function __construct(...$sequence)
     {

@@ -45,13 +45,6 @@ class CallbackSchedulingTest extends TestCase
         $container->instance(SchedulingMutex::class, new CacheSchedulingMutex($cache));
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-
-        parent::tearDown();
-    }
-
     public function testExecutionOrder()
     {
         $event = $this->app->make(Schedule::class)
@@ -108,7 +101,7 @@ class CallbackSchedulingTest extends TestCase
 
         $this->artisan('schedule:run');
 
-        // Hooks and execution should happn in correct order
+        // Hooks and execution should happen in correct order
         $this->assertLogged('before', 'call', 'after');
 
         // Our exception should have resulted in a failure event

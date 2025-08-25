@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('test_eloquent_model_with_custom_casts', function (Blueprint $table) {
             $table->increments('id');
@@ -46,6 +46,10 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $model->getOriginal();
 
         $this->assertSame('DRIES', $model->uppercase);
+
+        $model = $model->setAttribute('uppercase', 'james');
+
+        $this->assertInstanceOf(TestEloquentModelWithAttributeCast::class, $model);
 
         $model = new TestEloquentModelWithAttributeCast;
 
@@ -180,7 +184,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 
-    public function testCastsThatOnlyHaveGetterDoNotPeristAnythingToModelOnSave()
+    public function testCastsThatOnlyHaveGetterDoNotPersistAnythingToModelOnSave()
     {
         $model = new TestEloquentModelWithAttributeCast;
 
@@ -200,6 +204,70 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         foreach (range(0, 10) as $ignored) {
             $this->assertNotSame($previous, $previous = $model->virtualString);
         }
+    }
+
+    public function testAttributesCanCacheStrings()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $previous = $model->virtual_string_cached;
+
+        $this->assertIsString($previous);
+
+        $this->assertSame($previous, $model->virtual_string_cached);
+    }
+
+    public function testAttributesCanCacheBooleans()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $first = $model->virtual_boolean_cached;
+
+        $this->assertIsBool($first);
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($first, $model->virtual_boolean_cached);
+        }
+    }
+
+    public function testAttributesCanCacheNull()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $this->assertSame(0, $model->virtualNullCalls);
+
+        $first = $model->virtual_null_cached;
+
+        $this->assertNull($first);
+
+        $this->assertSame(1, $model->virtualNullCalls);
+
+        foreach (range(0, 10) as $ignored) {
+            $this->assertSame($first, $model->virtual_null_cached);
+        }
+
+        $this->assertSame(1, $model->virtualNullCalls);
+    }
+
+    public function testAttributesByDefaultDontCacheBooleans()
+    {
+        $model = new TestEloquentModelWithAttributeCast;
+
+        $first = $model->virtual_boolean;
+
+        $this->assertIsBool($first);
+
+        foreach (range(0, 50) as $ignored) {
+            $current = $model->virtual_boolean;
+
+            $this->assertIsBool($current);
+
+            if ($first !== $current) {
+                return;
+            }
+        }
+
+        $this->fail('"virtual_boolean" seems to be cached.');
     }
 
     public function testCastsThatOnlyHaveGetterThatReturnsObjectAreCached()
@@ -360,6 +428,38 @@ class TestEloquentModelWithAttributeCast extends Model
                 return Str::random(10);
             }
         );
+    }
+
+    public function virtualStringCached(): Attribute
+    {
+        return Attribute::get(function () {
+            return Str::random(10);
+        })->shouldCache();
+    }
+
+    public function virtualBooleanCached(): Attribute
+    {
+        return Attribute::get(function () {
+            return (bool) mt_rand(0, 1);
+        })->shouldCache();
+    }
+
+    public function virtualBoolean(): Attribute
+    {
+        return Attribute::get(function () {
+            return (bool) mt_rand(0, 1);
+        });
+    }
+
+    public $virtualNullCalls = 0;
+
+    public function virtualNullCached(): Attribute
+    {
+        return Attribute::get(function () {
+            $this->virtualNullCalls++;
+
+            return null;
+        })->shouldCache();
     }
 
     public function virtualObject(): Attribute

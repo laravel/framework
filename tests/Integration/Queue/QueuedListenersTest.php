@@ -25,15 +25,32 @@ class QueuedListenersTest extends TestCase
             return $job->class == QueuedListenersTestListenerShouldQueue::class;
         });
 
+        $this->assertCount(1, Queue::listenersPushed(QueuedListenersTestListenerShouldQueue::class));
+        $this->assertCount(
+            0,
+            Queue::listenersPushed(
+                QueuedListenersTestListenerShouldQueue::class,
+                fn ($event, $handler, $queue, $data) => $queue === 'not-a-real-queue'
+            )
+        );
+        $this->assertCount(
+            1,
+            Queue::listenersPushed(
+                QueuedListenersTestListenerShouldQueue::class,
+                fn (QueuedListenersTestEvent $event) => $event->value === 100
+            )
+        );
+
         Queue::assertNotPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldNotQueue::class;
         });
+        $this->assertCount(0, Queue::listenersPushed(QueuedListenersTestListenerShouldNotQueue::class));
     }
 }
 
 class QueuedListenersTestEvent
 {
-    //
+    public int $value = 100;
 }
 
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue

@@ -2,7 +2,9 @@
 
 namespace Illuminate\View;
 
-class AppendableAttributeValue
+use Stringable;
+
+class AppendableAttributeValue implements Stringable
 {
     /**
      * The attribute value.
@@ -15,7 +17,6 @@ class AppendableAttributeValue
      * Create a new appendable attribute value.
      *
      * @param  mixed  $value
-     * @return void
      */
     public function __construct($value)
     {

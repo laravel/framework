@@ -2,9 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class RedisCacheIntegrationTest extends TestCase
@@ -24,10 +26,9 @@ class RedisCacheIntegrationTest extends TestCase
     }
 
     /**
-     * @dataProvider redisDriverProvider
-     *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddTwice($driver)
     {
         $store = new RedisStore($this->redis[$driver]);
@@ -38,12 +39,27 @@ class RedisCacheIntegrationTest extends TestCase
     }
 
     /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
+    public function testRedisCacheRateLimiter($driver)
+    {
+        $store = new RedisStore($this->redis[$driver]);
+        $repository = new Repository($store);
+        $rateLimiter = new RateLimiter($repository);
+
+        $this->assertFalse($rateLimiter->tooManyAttempts('key', 1));
+        $this->assertEquals(1, $rateLimiter->hit('key', 60));
+        $this->assertTrue($rateLimiter->tooManyAttempts('key', 1));
+        $this->assertFalse($rateLimiter->tooManyAttempts('key', 2));
+    }
+
+    /**
      * Breaking change.
-     *
-     * @dataProvider redisDriverProvider
      *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddFalse($driver)
     {
         $store = new RedisStore($this->redis[$driver]);
@@ -56,10 +72,9 @@ class RedisCacheIntegrationTest extends TestCase
     /**
      * Breaking change.
      *
-     * @dataProvider redisDriverProvider
-     *
      * @param  string  $driver
      */
+    #[DataProvider('redisDriverProvider')]
     public function testRedisCacheAddNull($driver)
     {
         $store = new RedisStore($this->redis[$driver]);

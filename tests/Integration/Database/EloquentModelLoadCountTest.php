@@ -11,7 +11,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelLoadCountTest extends DatabaseTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('base_models', function (Blueprint $table) {
             $table->increments('id');

@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
 class FoundationHelpersTest extends TestCase
@@ -65,10 +66,9 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    #[WithConfig('app.debug', false)]
     public function testMixSilentlyFailsWhenAssetIsMissingFromManifestWhenNotInDebugMode()
     {
-        $this->app['config']->set('app.debug', false);
-
         $manifest = $this->makeManifest();
 
         $path = mix('missing.js');
@@ -78,12 +78,11 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    #[WithConfig('app.debug', true)]
     public function testMixThrowsExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Unable to locate Mix file: /missing.js.');
-
-        $this->app['config']->set('app.debug', true);
 
         $manifest = $this->makeManifest();
 
@@ -96,11 +95,11 @@ class FoundationHelpersTest extends TestCase
         }
     }
 
+    #[WithConfig('app.debug', true)]
     public function testMixOnlyThrowsAndReportsOneExceptionWhenAssetIsMissingFromManifestWhenInDebugMode()
     {
         $handler = new FakeHandler;
         $this->app->instance(ExceptionHandler::class, $handler);
-        $this->app['config']->set('app.debug', true);
 
         $manifest = $this->makeManifest();
 
@@ -115,11 +114,39 @@ class FoundationHelpersTest extends TestCase
         unlink($manifest);
     }
 
+    public function testFakeReturnsSameInstance()
+    {
+        $this->assertSame(fake(), fake());
+        $this->assertSame(fake(), fake('en_US'));
+        $this->assertSame(fake('en_AU'), fake('en_AU'));
+        $this->assertNotSame(fake('en_US'), fake('en_AU'));
+    }
+
+    public function testFakeUsesLocale()
+    {
+        mt_srand(12345, MT_RAND_PHP);
+
+        // Should fallback to en_US
+        $this->assertSame('Arkansas', fake()->state());
+        $this->assertContains(fake('de_DE')->state(), [
+            'Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen', 'Hamburg', 'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen', 'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein', 'Thüringen',
+        ]);
+        $this->assertContains(fake('fr_FR')->region(), [
+            'Auvergne-Rhône-Alpes', 'Bourgogne-Franche-Comté', 'Bretagne', 'Centre-Val de Loire', 'Corse', 'Grand Est', 'Hauts-de-France',
+            'Île-de-France', 'Normandie', 'Nouvelle-Aquitaine', 'Occitanie', 'Pays de la Loire', "Provence-Alpes-Côte d'Azur",
+            'Guadeloupe', 'Martinique', 'Guyane', 'La Réunion', 'Mayotte',
+        ]);
+
+        config(['app.faker_locale' => 'en_AU']);
+        mt_srand(4, MT_RAND_PHP);
+
+        // Should fallback to en_US
+        $this->assertSame('Australian Capital Territory', fake()->state());
+    }
+
     protected function makeManifest($directory = '')
     {
-        $this->app->singleton('path.public', function () {
-            return __DIR__;
-        });
+        app()->usePublicPath(__DIR__);
 
         $path = public_path(Str::finish($directory, '/').'mix-manifest.json');
 

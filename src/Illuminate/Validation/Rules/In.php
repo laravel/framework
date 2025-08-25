@@ -2,10 +2,17 @@
 
 namespace Illuminate\Validation\Rules;
 
-class In
+use Illuminate\Contracts\Support\Arrayable;
+use Stringable;
+
+use function Illuminate\Support\enum_value;
+
+class In implements Stringable
 {
     /**
      * The name of the rule.
+     *
+     * @var string
      */
     protected $rule = 'in';
 
@@ -19,12 +26,15 @@ class In
     /**
      * Create a new in rule instance.
      *
-     * @param  array  $values
-     * @return void
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
      */
-    public function __construct(array $values)
+    public function __construct($values)
     {
-        $this->values = $values;
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->values = is_array($values) ? $values : func_get_args();
     }
 
     /**
@@ -37,6 +47,8 @@ class In
     public function __toString()
     {
         $values = array_map(function ($value) {
+            $value = enum_value($value);
+
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
 

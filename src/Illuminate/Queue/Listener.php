@@ -3,8 +3,10 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+
+use function Illuminate\Support\artisan_binary;
+use function Illuminate\Support\php_binary;
 
 class Listener
 {
@@ -30,7 +32,7 @@ class Listener
     protected $sleep = 3;
 
     /**
-     * The amount of times to try a job before logging it failed.
+     * The number of times to try a job before logging it failed.
      *
      * @var int
      */
@@ -47,7 +49,6 @@ class Listener
      * Create a new queue listener.
      *
      * @param  string  $commandPath
-     * @return void
      */
     public function __construct($commandPath)
     {
@@ -61,7 +62,7 @@ class Listener
      */
     protected function phpBinary()
     {
-        return (new PhpExecutableFinder)->find(false);
+        return php_binary();
     }
 
     /**
@@ -71,7 +72,7 @@ class Listener
      */
     protected function artisanBinary()
     {
-        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+        return artisan_binary();
     }
 
     /**
@@ -88,6 +89,10 @@ class Listener
 
         while (true) {
             $this->runProcess($process, $options->memory);
+
+            if ($options->rest) {
+                sleep($options->rest);
+            }
         }
     }
 
@@ -157,6 +162,7 @@ class Listener
             "--memory={$options->memory}",
             "--sleep={$options->sleep}",
             "--tries={$options->maxTries}",
+            $options->force ? '--force' : null,
         ], function ($value) {
             return ! is_null($value);
         });
@@ -211,7 +217,7 @@ class Listener
     /**
      * Stop listening and bail out of the script.
      *
-     * @return void
+     * @return never
      */
     public function stop()
     {

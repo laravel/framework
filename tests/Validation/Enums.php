@@ -19,3 +19,17 @@ enum PureEnum
     case one;
     case two;
 }
+
+enum ArrayKeys
+{
+    case key_1;
+    case key_2;
+    case key_3;
+}
+
+enum ArrayKeysBacked: string
+{
+    case key_1 = 'key_1';
+    case key_2 = 'key_2';
+    case key_3 = 'key_3';
+}

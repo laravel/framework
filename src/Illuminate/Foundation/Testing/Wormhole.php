@@ -17,11 +17,34 @@ class Wormhole
      * Create a new wormhole instance.
      *
      * @param  int  $value
-     * @return void
      */
     public function __construct($value)
     {
         $this->value = $value;
+    }
+
+    /**
+     * Travel forward the given number of microseconds.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function microsecond($callback = null)
+    {
+        return $this->microseconds($callback);
+    }
+
+    /**
+     * Travel forward the given number of microseconds.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function microseconds($callback = null)
+    {
+        Carbon::setTestNow(Carbon::now()->addMicroseconds($this->value));
+
+        return $this->handleCallback($callback);
     }
 
     /**

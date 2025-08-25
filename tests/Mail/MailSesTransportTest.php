@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Aws\Command;
+use Aws\Exception\AwsException;
 use Aws\Ses\SesClient;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -10,6 +12,9 @@ use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\View\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
 class MailSesTransportTest extends TestCase
@@ -55,9 +60,42 @@ class MailSesTransportTest extends TestCase
         $message->sender('myself@example.com');
         $message->to('me@example.com');
         $message->bcc('you@example.com');
+        $message->replyTo(new Address('taylor@example.com', 'Taylor Otwell'));
+        $message->getHeaders()->add(new MetadataHeader('FooTag', 'TagValue'));
+        $message->getHeaders()->addTextHeader('X-Ses-List-Management-Options', 'contactListName=TestList;topicName=TestTopic');
 
         $client = m::mock(SesClient::class);
-        $client->shouldReceive('sendRawEmail')->once();
+        $sesResult = m::mock();
+        $sesResult->shouldReceive('get')
+            ->with('MessageId')
+            ->once()
+            ->andReturn('ses-message-id');
+        $client->shouldReceive('sendRawEmail')->once()
+            ->with(m::on(function ($arg) {
+                return $arg['Source'] === 'myself@example.com' &&
+                    $arg['Destinations'] === ['me@example.com', 'you@example.com'] &&
+                    $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
+                    $arg['Tags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
+                    str_contains($arg['RawMessage']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
+            }))
+            ->andReturn($sesResult);
+
+        (new SesTransport($client))->send($message);
+    }
+
+    public function testSendError()
+    {
+        $message = new Email();
+        $message->subject('Foo subject');
+        $message->text('Bar body');
+        $message->sender('myself@example.com');
+        $message->to('me@example.com');
+
+        $client = m::mock(SesClient::class);
+        $client->shouldReceive('sendRawEmail')->once()
+            ->andThrow(new AwsException('Email address is not verified.', new Command('sendRawEmail')));
+
+        $this->expectException(TransportException::class);
 
         (new SesTransport($client))->send($message);
     }

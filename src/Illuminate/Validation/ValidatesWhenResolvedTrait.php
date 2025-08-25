@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Foundation\Precognition;
+
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
@@ -21,6 +23,10 @@ trait ValidatesWhenResolvedTrait
         }
 
         $instance = $this->getValidatorInstance();
+
+        if ($this->isPrecognitive()) {
+            $instance->after(Precognition::afterValidationHook($this));
+        }
 
         if ($instance->fails()) {
             $this->failedValidation($instance);
@@ -69,7 +75,9 @@ trait ValidatesWhenResolvedTrait
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator);
+        $exception = $validator->getException();
+
+        throw new $exception($validator);
     }
 
     /**

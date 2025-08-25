@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\CarbonInterval as Duration;
+use Illuminate\Foundation\Testing\Wormhole;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -47,7 +50,7 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame($array, $data->all());
     }
 
-    public function testCanCreateCollectionFromClosure()
+    public function testCanCreateCollectionFromGeneratorFunction()
     {
         $data = LazyCollection::make(function () {
             yield 1;
@@ -68,6 +71,15 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testCanCreateCollectionFromNonGeneratorFunction()
+    {
+        $data = LazyCollection::make(function () {
+            return 'laravel';
+        });
+
+        $this->assertSame(['laravel'], $data->all());
     }
 
     public function testDoesNotCreateCollectionFromGenerator()
@@ -214,6 +226,58 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
     }
 
+    public function testThrottle()
+    {
+        Sleep::fake();
+
+        $data = LazyCollection::times(3)
+            ->throttle(2)
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration) {
+            $this->assertEqualsWithDelta(
+                2_000_000, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+    }
+
+    public function testThrottleAccountsForTimePassed()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(now());
+
+        $data = LazyCollection::times(3)
+            ->throttle(3)
+            ->tapEach(function ($value, $index) {
+                if ($index == 1) {
+                    // Travel in time...
+                    (new Wormhole(1))->second();
+                }
+            })
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration, int $index) {
+            $expectation = $index == 1 ? 2_000_000 : 3_000_000;
+
+            $this->assertEqualsWithDelta(
+                $expectation, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+        Carbon::setTestNow();
+    }
+
     public function testUniqueDoubleEnumeration()
     {
         $data = LazyCollection::times(2)->unique();
@@ -221,5 +285,166 @@ class SupportLazyCollectionTest extends TestCase
         $data->all();
 
         $this->assertSame([1, 2], $data->all());
+    }
+
+    public function testAfter()
+    {
+        $data = new LazyCollection([1, '2', 3, 4]);
+
+        // Test finding item after value with non-strict comparison
+        $result = $data->after(1);
+        $this->assertSame('2', $result);
+
+        // Test with strict comparison
+        $result = $data->after('2', true);
+        $this->assertSame(3, $result);
+
+        $users = new LazyCollection([
+            ['name' => 'Taylor', 'age' => 35],
+            ['name' => 'Jeffrey', 'age' => 45],
+            ['name' => 'Mohamed', 'age' => 35],
+        ]);
+
+        // Test finding item after the one that matches a condition
+        $result = $users->after(function ($user) {
+            return $user['name'] === 'Jeffrey';
+        });
+
+        $this->assertSame(['name' => 'Mohamed', 'age' => 35], $result);
+    }
+
+    public function testBefore()
+    {
+        // Test finding item before value with non-strict comparison
+        $data = new LazyCollection([1, 2, '3', 4]);
+        $result = $data->before(2);
+        $this->assertSame(1, $result);
+
+        // Test finding item before value with strict comparison
+        $result = $data->before(4, true);
+        $this->assertSame('3', $result);
+
+        // Test finding item before the one that matches a callback condition
+        $users = new LazyCollection([
+            ['name' => 'Taylor', 'age' => 35],
+            ['name' => 'Jeffrey', 'age' => 45],
+            ['name' => 'Mohamed', 'age' => 35],
+        ]);
+        $result = $users->before(function ($user) {
+            return $user['name'] === 'Jeffrey';
+        });
+        $this->assertSame(['name' => 'Taylor', 'age' => 35], $result);
+    }
+
+    public function testShuffle()
+    {
+        $data = new LazyCollection([1, 2, 3, 4, 5]);
+        $shuffled = $data->shuffle();
+
+        $this->assertCount(5, $shuffled);
+        $this->assertEquals([1, 2, 3, 4, 5], $shuffled->sort()->values()->all());
+
+        // Test shuffling associative array maintains key-value pairs
+        $users = new LazyCollection([
+            'first' => ['name' => 'Taylor'],
+            'second' => ['name' => 'Jeffrey'],
+        ]);
+        $shuffled = $users->shuffle();
+
+        $this->assertCount(2, $shuffled);
+        $this->assertTrue($shuffled->contains('name', 'Taylor'));
+        $this->assertTrue($shuffled->contains('name', 'Jeffrey'));
+    }
+
+    public function testCollapseWithKeys()
+    {
+        $collection = new LazyCollection([
+            ['a' => 1, 'b' => 2],
+            ['c' => 3, 'd' => 4],
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4], $collapsed->all());
+
+        $collection = new LazyCollection([
+            ['a' => 1],
+            new LazyCollection(['b' => 2]),
+        ]);
+        $collapsed = $collection->collapseWithKeys();
+
+        $this->assertEquals(['a' => 1, 'b' => 2], $collapsed->all());
+    }
+
+    public function testContainsOneItem()
+    {
+        $collection = new LazyCollection([5]);
+        $this->assertTrue($collection->containsOneItem());
+
+        $emptyCollection = new LazyCollection([]);
+        $this->assertFalse($emptyCollection->containsOneItem());
+
+        $multipleCollection = new LazyCollection([1, 2, 3]);
+        $this->assertFalse($multipleCollection->containsOneItem());
+    }
+
+    public function testDoesntContain()
+    {
+        $collection = new LazyCollection([1, 2, 3, 4, 5]);
+
+        $this->assertTrue($collection->doesntContain(10));
+        $this->assertFalse($collection->doesntContain(3));
+        $this->assertTrue($collection->doesntContain('value', '>', 10));
+        $this->assertTrue($collection->doesntContain(function ($value) {
+            return $value > 10;
+        }));
+
+        $users = new LazyCollection([
+            [
+                'name' => 'Taylor',
+                'role' => 'developer',
+            ],
+            [
+                'name' => 'Jeffrey',
+                'role' => 'designer',
+            ],
+        ]);
+
+        $this->assertTrue($users->doesntContain('name', 'Adam'));
+        $this->assertFalse($users->doesntContain('name', 'Taylor'));
+    }
+
+    public function testDot()
+    {
+        $collection = new LazyCollection([
+            'foo' => [
+                'bar' => 'baz',
+            ],
+            'user' => [
+                'name' => 'Taylor',
+                'profile' => [
+                    'age' => 30,
+                ],
+            ],
+            'users' => [
+                0 => [
+                    'name' => 'Taylor',
+                ],
+                1 => [
+                    'name' => 'Jeffrey',
+                ],
+            ],
+        ]);
+
+        $dotted = $collection->dot();
+
+        $expected = [
+            'foo.bar' => 'baz',
+            'user.name' => 'Taylor',
+            'user.profile.age' => 30,
+            'users.0.name' => 'Taylor',
+            'users.1.name' => 'Jeffrey',
+        ];
+
+        $this->assertEquals($expected, $dotted->all());
     }
 }

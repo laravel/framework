@@ -121,6 +121,19 @@ class CacheRedisStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testTouchMethodProperlyCallsRedis(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $redis = $this->getRedis();
+
+        $redis->getRedis()->shouldReceive('connection')->once()->with('default')->andReturn($redis->getRedis());
+        $redis->getRedis()->shouldReceive('expire')->once()->with("prefix:$key", $ttl)->andReturn(true);
+
+        $this->assertTrue($redis->touch($key, $ttl));
+    }
+
     public function testForgetMethodProperlyCallsRedis()
     {
         $redis = $this->getRedis();
@@ -143,13 +156,13 @@ class CacheRedisStoreTest extends TestCase
         $redis = $this->getRedis();
         $this->assertSame('prefix:', $redis->getPrefix());
         $redis->setPrefix('foo');
-        $this->assertSame('foo:', $redis->getPrefix());
+        $this->assertSame('foo', $redis->getPrefix());
         $redis->setPrefix(null);
         $this->assertEmpty($redis->getPrefix());
     }
 
     protected function getRedis()
     {
-        return new RedisStore(m::mock(Factory::class), 'prefix');
+        return new RedisStore(m::mock(Factory::class), 'prefix:');
     }
 }

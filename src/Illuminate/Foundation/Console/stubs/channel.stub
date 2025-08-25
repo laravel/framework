@@ -8,8 +8,6 @@ class {{ class }}
 {
     /**
      * Create a new channel instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -18,11 +16,8 @@ class {{ class }}
 
     /**
      * Authenticate the user's access to the channel.
-     *
-     * @param  \{{ namespacedUserModel }}  $user
-     * @return array|bool
      */
-    public function join({{ userModel }} $user)
+    public function join({{ userModel }} $user): array|bool
     {
         //
     }

@@ -3,13 +3,12 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\ConfigurationUrlParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationUrlParserTest extends TestCase
 {
-    /**
-     * @dataProvider databaseUrls
-     */
+    #[DataProvider('databaseUrls')]
     public function testDatabaseUrlsAreParsed($config, $expectedOutput)
     {
         $this->assertEquals($expectedOutput, (new ConfigurationUrlParser)->parseConfiguration($config));
@@ -45,7 +44,7 @@ class ConfigurationUrlParserTest extends TestCase
         ], (new ConfigurationUrlParser)->parseConfiguration('some-particular-alias://null'));
     }
 
-    public function databaseUrls()
+    public static function databaseUrls()
     {
         return [
             'simple URL' => [
@@ -135,7 +134,7 @@ class ConfigurationUrlParserTest extends TestCase
                 ],
             ],
             'query params from URL are used as extra params' => [
-                'url' => 'mysql://foo:bar@localhost/database?charset=UTF-8',
+                'mysql://foo:bar@localhost/database?charset=UTF-8',
                 [
                     'driver' => 'mysql',
                     'database' => 'database',
@@ -256,6 +255,30 @@ class ConfigurationUrlParserTest extends TestCase
                     'driver' => 'sqlite',
                     'database' => '/absolute/path/to/database.sqlite',
                     'foreign_key_constraints' => true,
+                ],
+            ],
+            'Sqlite with busy_timeout' => [
+                'sqlite:////absolute/path/to/database.sqlite?busy_timeout=5000',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'busy_timeout' => 5000,
+                ],
+            ],
+            'Sqlite with journal_mode' => [
+                'sqlite:////absolute/path/to/database.sqlite?journal_mode=WAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'journal_mode' => 'WAL',
+                ],
+            ],
+            'Sqlite with synchronous' => [
+                'sqlite:////absolute/path/to/database.sqlite?synchronous=NORMAL',
+                [
+                    'driver' => 'sqlite',
+                    'database' => '/absolute/path/to/database.sqlite',
+                    'synchronous' => 'NORMAL',
                 ],
             ],
 

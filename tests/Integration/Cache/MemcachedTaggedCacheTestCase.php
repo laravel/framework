@@ -3,10 +3,9 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Support\Facades\Cache;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension memcached
- */
+#[RequiresPhpExtension('memcached')]
 class MemcachedTaggedCacheTestCase extends MemcachedIntegrationTestCase
 {
     public function testMemcachedCanStoreAndRetrieveTaggedCacheItems()
@@ -50,5 +49,29 @@ class MemcachedTaggedCacheTestCase extends MemcachedIntegrationTestCase
 
         $this->assertNull($store->tags(['people', 'artists'])->get('John'));
         $this->assertNull($store->tags(['people', 'artists'])->get('Jane'));
+    }
+
+    public function testMemcachedCanStoreAndFlushTaggedCacheItems()
+    {
+        $store = Cache::store('memcached');
+
+        $this->assertTrue($store->supportsTags());
+
+        $this->assertNull($store->get('foo'));
+
+        $store->put('foo', 'bar');
+
+        $this->assertSame('bar', $store->get('foo'));
+
+        $this->assertNull($store->tags(['bar'])->get('x'));
+
+        $store->tags(['bar'])->put('x', 'y');
+
+        $this->assertSame('y', $store->tags(['bar'])->get('x'));
+
+        $store->tags(['bar'])->flush();
+
+        $this->assertNull($store->tags(['bar'])->get('x'));
+        $this->assertSame('bar', $store->get('foo'));
     }
 }

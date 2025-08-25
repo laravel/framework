@@ -2,10 +2,14 @@
 
 namespace Illuminate\Mail;
 
+use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 
 /**
  * @mixin \Symfony\Component\Mime\Email
@@ -24,6 +28,8 @@ class Message
     /**
      * CIDs of files embedded in the message.
      *
+     * @deprecated Will be removed in a future Laravel version.
+     *
      * @var array
      */
     protected $embeddedFiles = [];
@@ -32,7 +38,6 @@ class Message
      * Create a new message instance.
      *
      * @param  \Symfony\Component\Mime\Email  $message
-     * @return void
      */
     public function __construct(Email $message)
     {
@@ -220,13 +225,17 @@ class Message
         if (is_array($address)) {
             $type = lcfirst($type);
 
-            $addresses = collect($address)->map(function (string|array $address, $key) {
+            $addresses = (new Collection($address))->map(function ($address, $key) {
                 if (is_string($key) && is_string($address)) {
                     return new Address($key, $address);
                 }
 
                 if (is_array($address)) {
                     return new Address($address['email'] ?? $address['address'], $address['name'] ?? null);
+                }
+
+                if (is_null($address)) {
+                    return new Address($key);
                 }
 
                 return $address;
@@ -286,12 +295,20 @@ class Message
     /**
      * Attach a file to the message.
      *
-     * @param  string  $file
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
      * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
     {
+        if ($file instanceof Attachable) {
+            $file = $file->toMailAttachment();
+        }
+
+        if ($file instanceof Attachment) {
+            return $file->attachTo($this);
+        }
+
         $this->message->attachFromPath($file, $options['as'] ?? null, $options['mime'] ?? null);
 
         return $this;
@@ -300,7 +317,7 @@ class Message
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param  string  $data
+     * @param  string|resource  $data
      * @param  string  $name
      * @param  array  $options
      * @return $this
@@ -315,14 +332,41 @@ class Message
     /**
      * Embed a file in the message and get the CID.
      *
-     * @param  string  $file
+     * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
      * @return string
      */
     public function embed($file)
     {
+        if ($file instanceof Attachable) {
+            $file = $file->toMailAttachment();
+        }
+
+        if ($file instanceof Attachment) {
+            return $file->attachWith(
+                function ($path) use ($file) {
+                    $cid = $file->as ?? Str::random();
+
+                    $this->message->addPart(
+                        (new DataPart(new File($path), $cid, $file->mime))->asInline()
+                    );
+
+                    return "cid:{$cid}";
+                },
+                function ($data) use ($file) {
+                    $this->message->addPart(
+                        (new DataPart($data(), $file->as, $file->mime))->asInline()
+                    );
+
+                    return "cid:{$file->as}";
+                }
+            );
+        }
+
         $cid = Str::random(10);
 
-        $this->message->embedFromPath($file, $cid);
+        $this->message->addPart(
+            (new DataPart(new File($file), $cid))->asInline()
+        );
 
         return "cid:$cid";
     }
@@ -330,14 +374,16 @@ class Message
     /**
      * Embed in-memory data in the message and get the CID.
      *
-     * @param  string  $data
+     * @param  string|resource  $data
      * @param  string  $name
      * @param  string|null  $contentType
      * @return string
      */
     public function embedData($data, $name, $contentType = null)
     {
-        $this->message->embed($data, $name, $contentType);
+        $this->message->addPart(
+            (new DataPart($data, $name, $contentType))->asInline()
+        );
 
         return "cid:$name";
     }

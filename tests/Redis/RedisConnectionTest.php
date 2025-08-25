@@ -709,7 +709,7 @@ class RedisConnectionTest extends TestCase
 
                 foreach ($returnedMembers as $member) {
                     $this->assertContains($member, $members);
-                    array_push($result, $member);
+                    $result[] = $member;
                 }
             } while ($iterator > 0);
 
@@ -894,21 +894,6 @@ class RedisConnectionTest extends TestCase
                         'compression' => Redis::COMPRESSION_ZSTD,
                         'compression_level' => Redis::COMPRESSION_ZSTD_DEFAULT,
                         'name' => 'compression_zstd_default',
-                    ],
-                    'timeout' => 0.5,
-                ],
-            ]))->connection();
-
-            $connections['compression_zstd_min'] = (new RedisManager(new Application, 'phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 12,
-                    'options' => [
-                        'compression' => Redis::COMPRESSION_ZSTD,
-                        'compression_level' => Redis::COMPRESSION_ZSTD_MIN,
-                        'name' => 'compression_zstd_min',
                     ],
                     'timeout' => 0.5,
                 ],

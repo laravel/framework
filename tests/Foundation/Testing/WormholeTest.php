@@ -4,11 +4,19 @@ namespace Illuminate\Tests\Foundation\Testing;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\Wormhole;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Date::useDefault();
+    }
+
     public function testCanTravelBackToPresent()
     {
         // Preserve the timelines we want to compare the reality with...
@@ -42,8 +50,18 @@ class WormholeTest extends TestCase
 
         // Assert the time travel was successful...
         $this->assertEquals($future->format('Y-m-d'), now()->format('Y-m-d'));
+    }
 
-        // Restore the default Date Factory...
-        Date::useDefault();
+    public function testItCanTravelByMicroseconds()
+    {
+        Carbon::setTestNow(Carbon::parse('2000-01-01 00:00:00')->startOfSecond());
+
+        (new Wormhole(1))->microsecond();
+        $this->assertSame('2000-01-01 00:00:00.000001', Date::now()->format('Y-m-d H:i:s.u'));
+
+        (new Wormhole(5))->microseconds();
+        $this->assertSame('2000-01-01 00:00:00.000006', Date::now()->format('Y-m-d H:i:s.u'));
+
+        Carbon::setTestnow();
     }
 }

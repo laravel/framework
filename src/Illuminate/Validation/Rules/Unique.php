@@ -4,8 +4,9 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
+use Stringable;
 
-class Unique
+class Unique implements Stringable
 {
     use Conditionable, DatabaseRule;
 
@@ -53,19 +54,6 @@ class Unique
     {
         $this->idColumn = $idColumn ?? $model->getKeyName();
         $this->ignore = $model->{$this->idColumn};
-
-        return $this;
-    }
-
-    /**
-     * Ignore soft deleted models during the unique check.
-     *
-     * @param  string  $deletedAtColumn
-     * @return $this
-     */
-    public function withoutTrashed($deletedAtColumn = 'deleted_at')
-    {
-        $this->whereNull($deletedAtColumn);
 
         return $this;
     }

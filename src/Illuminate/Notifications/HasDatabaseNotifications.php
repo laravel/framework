@@ -7,7 +7,7 @@ trait HasDatabaseNotifications
     /**
      * Get the entity's notifications.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany<DatabaseNotification, $this>
      */
     public function notifications()
     {

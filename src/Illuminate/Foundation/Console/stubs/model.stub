@@ -2,10 +2,10 @@
 
 namespace {{ namespace }};
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+{{ factoryImport }}
 use Illuminate\Database\Eloquent\Model;
 
 class {{ class }} extends Model
 {
-    use HasFactory;
+    {{ factory }}
 }

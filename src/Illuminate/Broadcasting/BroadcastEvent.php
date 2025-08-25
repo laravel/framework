@@ -9,6 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use ReflectionClass;
 use ReflectionProperty;
+use Throwable;
 
 class BroadcastEvent implements ShouldQueue
 {
@@ -36,17 +37,40 @@ class BroadcastEvent implements ShouldQueue
     public $timeout;
 
     /**
+     * The number of seconds to wait before retrying the job when encountering an uncaught exception.
+     *
+     * @var int
+     */
+    public $backoff;
+
+    /**
+     * The maximum number of unhandled exceptions to allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions;
+
+    /**
+     * Indicates if the job should be deleted when models are missing.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
-     * @return void
      */
     public function __construct($event)
     {
         $this->event = $event;
         $this->tries = property_exists($event, 'tries') ? $event->tries : null;
         $this->timeout = property_exists($event, 'timeout') ? $event->timeout : null;
+        $this->backoff = property_exists($event, 'backoff') ? $event->backoff : null;
         $this->afterCommit = property_exists($event, 'afterCommit') ? $event->afterCommit : null;
+        $this->maxExceptions = property_exists($event, 'maxExceptions') ? $event->maxExceptions : null;
+        $this->deleteWhenMissingModels = property_exists($event, 'deleteWhenMissingModels') ? $event->deleteWhenMissingModels : null;
     }
 
     /**
@@ -58,7 +82,8 @@ class BroadcastEvent implements ShouldQueue
     public function handle(BroadcastingFactory $manager)
     {
         $name = method_exists($this->event, 'broadcastAs')
-                ? $this->event->broadcastAs() : get_class($this->event);
+            ? $this->event->broadcastAs()
+            : get_class($this->event);
 
         $channels = Arr::wrap($this->event->broadcastOn());
 
@@ -67,14 +92,16 @@ class BroadcastEvent implements ShouldQueue
         }
 
         $connections = method_exists($this->event, 'broadcastConnections')
-                            ? $this->event->broadcastConnections()
-                            : [null];
+            ? $this->event->broadcastConnections()
+            : [null];
 
         $payload = $this->getPayloadFromEvent($this->event);
 
         foreach ($connections as $connection) {
             $manager->connection($connection)->broadcast(
-                $channels, $name, $payload
+                $this->getConnectionChannels($channels, $connection),
+                $name,
+                $this->getConnectionPayload($payload, $connection)
             );
         }
     }
@@ -116,6 +143,69 @@ class BroadcastEvent implements ShouldQueue
         }
 
         return $value;
+    }
+
+    /**
+     * Get the channels for the given connection.
+     *
+     * @param  array  $channels
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionChannels($channels, $connection)
+    {
+        return is_array($channels[$connection] ?? null)
+            ? $channels[$connection]
+            : $channels;
+    }
+
+    /**
+     * Get the payload for the given connection.
+     *
+     * @param  array  $payload
+     * @param  string  $connection
+     * @return array
+     */
+    protected function getConnectionPayload($payload, $connection)
+    {
+        $connectionPayload = is_array($payload[$connection] ?? null)
+            ? $payload[$connection]
+            : $payload;
+
+        if (isset($payload['socket'])) {
+            $connectionPayload['socket'] = $payload['socket'];
+        }
+
+        return $connectionPayload;
+    }
+
+    /**
+     * Get the middleware for the underlying event.
+     *
+     * @return array<int, object>
+     */
+    public function middleware(): array
+    {
+        if (! method_exists($this->event, 'middleware')) {
+            return [];
+        }
+
+        return $this->event->middleware();
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @param  \Throwable  $e
+     * @return void
+     */
+    public function failed(?Throwable $e = null): void
+    {
+        if (! method_exists($this->event, 'failed')) {
+            return;
+        }
+
+        $this->event->failed($e);
     }
 
     /**

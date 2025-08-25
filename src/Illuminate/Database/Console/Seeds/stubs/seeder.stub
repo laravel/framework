@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace {{ namespace }};
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -9,10 +9,8 @@ class {{ class }} extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         //
     }

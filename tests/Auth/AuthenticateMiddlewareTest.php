@@ -6,6 +6,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\RequestGuard;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
@@ -34,6 +35,30 @@ class AuthenticateMiddlewareTest extends TestCase
         m::close();
 
         Container::setInstance(null);
+    }
+
+    public function testItCanGenerateDefinitionViaStaticMethod()
+    {
+        $signature = (string) Authenticate::using('foo');
+        $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo', $signature);
+
+        $signature = (string) Authenticate::using('foo', 'bar');
+        $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar', $signature);
+
+        $signature = (string) Authenticate::using('foo', 'bar', 'baz');
+        $this->assertSame('Illuminate\Auth\Middleware\Authenticate:foo,bar,baz', $signature);
+    }
+
+    public function testItCanGenerateDefinitionViaStaticMethodForBasic()
+    {
+        $signature = (string) AuthenticateWithBasicAuth::using('guard');
+        $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard', $signature);
+
+        $signature = (string) AuthenticateWithBasicAuth::using('guard', 'field');
+        $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:guard,field', $signature);
+
+        $signature = (string) AuthenticateWithBasicAuth::using(field: 'field');
+        $this->assertSame('Illuminate\Auth\Middleware\AuthenticateWithBasicAuth:,field', $signature);
     }
 
     public function testDefaultUnauthenticatedThrows()
@@ -183,6 +208,8 @@ class AuthenticateMiddlewareTest extends TestCase
     protected function authenticate(...$guards)
     {
         $request = m::mock(Request::class);
+
+        $request->shouldReceive('expectsJson')->andReturn(false);
 
         $nextParam = null;
 

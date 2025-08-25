@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'event:generate')]
 class EventGenerateCommand extends Command
 {
     /**
@@ -15,20 +17,18 @@ class EventGenerateCommand extends Command
     protected $name = 'event:generate';
 
     /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'event:generate';
-
-    /**
      * The console command description.
      *
      * @var string
      */
     protected $description = 'Generate the missing events and listeners based on registration';
+
+    /**
+     * Indicates whether the command should be shown in the Artisan command list.
+     *
+     * @var bool
+     */
+    protected $hidden = true;
 
     /**
      * Execute the console command.
@@ -45,7 +45,7 @@ class EventGenerateCommand extends Command
             }
         }
 
-        $this->info('Events and listeners generated successfully!');
+        $this->components->info('Events and listeners generated successfully.');
     }
 
     /**

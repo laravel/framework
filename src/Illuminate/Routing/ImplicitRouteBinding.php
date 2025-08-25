@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
 use Illuminate\Support\Reflector;
 use Illuminate\Support\Str;
@@ -42,14 +41,16 @@ class ImplicitRouteBinding
 
             $parent = $route->parentOfParameter($parameterName);
 
-            $routeBindingMethod = $route->allowsTrashedBindings() && in_array(SoftDeletes::class, class_uses_recursive($instance))
-                        ? 'resolveSoftDeletableRouteBinding'
-                        : 'resolveRouteBinding';
+            $routeBindingMethod = $route->allowsTrashedBindings() && $instance::isSoftDeletable()
+                ? 'resolveSoftDeletableRouteBinding'
+                : 'resolveRouteBinding';
 
-            if ($parent instanceof UrlRoutable && ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
-                $childRouteBindingMethod = $route->allowsTrashedBindings()
-                            ? 'resolveSoftDeletableChildRouteBinding'
-                            : 'resolveChildRouteBinding';
+            if ($parent instanceof UrlRoutable &&
+                ! $route->preventsScopedBindings() &&
+                ($route->enforcesScopedBindings() || array_key_exists($parameterName, $route->bindingFields()))) {
+                $childRouteBindingMethod = $route->allowsTrashedBindings() && $instance::isSoftDeletable()
+                    ? 'resolveSoftDeletableChildRouteBinding'
+                    : 'resolveChildRouteBinding';
 
                 if (! $model = $parent->{$childRouteBindingMethod}(
                     $parameterName, $parameterValue, $route->bindingFieldFor($parameterName)
@@ -82,9 +83,15 @@ class ImplicitRouteBinding
 
             $parameterValue = $parameters[$parameterName];
 
-            $backedEnumClass = (string) $parameter->getType();
+            if ($parameterValue === null) {
+                continue;
+            }
 
-            $backedEnum = $backedEnumClass::tryFrom((string) $parameterValue);
+            $backedEnumClass = $parameter->getType()?->getName();
+
+            $backedEnum = $parameterValue instanceof $backedEnumClass
+                ? $parameterValue
+                : $backedEnumClass::tryFrom((string) $parameterValue);
 
             if (is_null($backedEnum)) {
                 throw new BackedEnumCaseNotFoundException($backedEnumClass, $parameterValue);

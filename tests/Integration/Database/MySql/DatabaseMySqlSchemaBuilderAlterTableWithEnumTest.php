@@ -4,15 +4,14 @@ namespace Illuminate\Tests\Integration\Database\MySql;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use stdClass;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
-/**
- * @requires extension pdo_mysql
- * @requires OS Linux|Darwin
- */
+#[RequiresOperatingSystem('Linux|Darwin')]
+#[RequiresPhpExtension('pdo_mysql')]
 class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
 {
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->integer('id');
@@ -39,24 +38,18 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
     public function testChangeColumnOnTableWithEnum()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger('age')->charset('')->change();
+            $table->unsignedInteger('age')->change();
         });
 
-        $this->assertSame('integer', Schema::getColumnType('users', 'age'));
+        $this->assertSame('int', Schema::getColumnType('users', 'age'));
     }
 
-    public function testGetAllTablesAndColumnListing()
+    public function testGetTablesAndColumnListing()
     {
-        $tables = Schema::getAllTables();
+        $tables = Schema::getTables();
 
         $this->assertCount(2, $tables);
-        $tableProperties = array_values((array) $tables[0]);
-        $this->assertEquals(['migrations', 'BASE TABLE'], $tableProperties);
-
-        $this->assertInstanceOf(stdClass::class, $tables[1]);
-
-        $tableProperties = array_values((array) $tables[1]);
-        $this->assertEquals(['users', 'BASE TABLE'], $tableProperties);
+        $this->assertEquals(['migrations', 'users'], array_column($tables, 'name'));
 
         $columns = Schema::getColumnListing('users');
 
@@ -68,7 +61,7 @@ class DatabaseMySqlSchemaBuilderAlterTableWithEnumTest extends MySqlTestCase
             $table->integer('id');
             $table->string('title');
         });
-        $tables = Schema::getAllTables();
+        $tables = Schema::getTables();
         $this->assertCount(3, $tables);
         Schema::drop('posts');
     }

@@ -145,6 +145,10 @@ img {
     width: 570px;
 }
 
+.inner-body a {
+    word-break: break-all;
+}
+
 /* Subcopy */
 
 .subcopy {
@@ -219,6 +223,7 @@ img {
     padding: 0;
     text-align: center;
     width: 100%;
+    float: unset;
 }
 
 .button {

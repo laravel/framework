@@ -44,7 +44,9 @@ class MailMailableAssertionsTest extends TestCase
     {
         $mailable = new MailableAssertionsStub;
 
-        $mailable->assertSeeInHtml('<li>First Item</li>');
+        $mailable->assertSeeInHtml('Fourth & Fifth Item');
+
+        $mailable->assertSeeInHtml('<li>First Item</li>', false);
     }
 
     public function testMailableAssertSeeInHtmlFailsWhenAbsent()
@@ -63,13 +65,22 @@ class MailMailableAssertionsTest extends TestCase
         $mailable->assertDontSeeInHtml('<li>Fourth Item</li>');
     }
 
-    public function testMailableAssertDontSeeInHtmlFailsWhenPresent()
+    public function testMailableAssertDontSeeInHtmlEscapedFailsWhenPresent()
     {
         $mailable = new MailableAssertionsStub;
 
         $this->expectException(AssertionFailedError::class);
 
-        $mailable->assertDontSeeInHtml('<li>First Item</li>');
+        $mailable->assertDontSeeInHtml('Fourth & Fifth Item');
+    }
+
+    public function testMailableAssertDontSeeInHtmlUnescapedFailsWhenPresent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertDontSeeInHtml('<li>First Item</li>', false);
     }
 
     public function testMailableAssertSeeInOrderTextPassesWhenPresentInOrder()
@@ -101,10 +112,16 @@ class MailMailableAssertionsTest extends TestCase
         $mailable = new MailableAssertionsStub;
 
         $mailable->assertSeeInOrderInHtml([
+            'Third Item',
+            'Fourth & Fifth Item',
+            'Sixth Item',
+        ]);
+
+        $mailable->assertSeeInOrderInHtml([
             '<li>First Item</li>',
             '<li>Second Item</li>',
             '<li>Third Item</li>',
-        ]);
+        ], false);
     }
 
     public function testMailableAssertInOrderHtmlFailsWhenAbsentInOrder()
@@ -119,6 +136,92 @@ class MailMailableAssertionsTest extends TestCase
             '<li>Third Item</li>',
         ]);
     }
+
+    public function testMailableAssertSeeInTextWithApostrophePassesWhenPresent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertSeeInText("It's a wonderful day");
+    }
+
+    public function testMailableAssertSeeInTextWithApostropheFailsWhenAbsent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertSeeInText("It's not a wonderful day");
+    }
+
+    public function testMailableAssertDontSeeInTextWithApostrophePassesWhenAbsent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertDontSeeInText("It's not a wonderful day");
+    }
+
+    public function testMailableAssertDontSeeInTextWithApostropheFailsWhenPresent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertDontSeeInText("It's a wonderful day");
+    }
+
+    public function testMailableAssertSeeInHtmlWithApostropheFailsWhenAbsent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertSeeInHtml("<li>It's not a wonderful day</li>");
+    }
+
+    public function testMailableAssertDontSeeInHtmlWithApostrophePassesWhenAbsent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertDontSeeInHtml("<li>It's not a wonderful day</li>");
+    }
+
+    public function testMailableAssertDontSeeInHtmlWithApostropheFailsWhenPresent()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertDontSeeInHtml("<li>It's a wonderful day</li>", false);
+    }
+
+    public function testMailableAssertSeeInOrderInHtmlWithApostrophePassesWhenPresentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $mailable->assertSeeInOrderInHtml([
+            'First Item',
+            'Sixth Item',
+            'It\'s a wonderful day',
+        ]);
+
+        $mailable->assertSeeInOrderInHtml([
+            '<li>First Item</li>',
+            '<li>It\'s a wonderful day</li>',
+        ], false);
+    }
+
+    public function testMailableAssertSeeInOrderInHtmlWithApostropheFailsWhenAbsentInOrder()
+    {
+        $mailable = new MailableAssertionsStub;
+
+        $this->expectException(AssertionFailedError::class);
+
+        $mailable->assertSeeInOrderInHtml([
+            'It\'s a wonderful day',
+            'First Item',
+            'Sixth Item',
+        ]);
+    }
 }
 
 class MailableAssertionsStub extends Mailable
@@ -130,6 +233,9 @@ class MailableAssertionsStub extends Mailable
         - First Item
         - Second Item
         - Third Item
+        - Fourth & Fifth Item
+        - Sixth Item
+        - It's a wonderful day
         EOD;
 
         $html = <<<'EOD'
@@ -146,6 +252,9 @@ class MailableAssertionsStub extends Mailable
         <li>First Item</li>
         <li>Second Item</li>
         <li>Third Item</li>
+        <li>Fourth &amp; Fifth Item</li>
+        <li>Sixth Item</li>
+        <li>It's a wonderful day</li>
         </ul>
         </body>
         </html>

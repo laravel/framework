@@ -16,6 +16,14 @@ interface FailedJobProviderInterface
     public function log($connection, $queue, $payload, $exception);
 
     /**
+     * Get the IDs of all of the failed jobs.
+     *
+     * @param  string|null  $queue
+     * @return array
+     */
+    public function ids($queue = null);
+
+    /**
      * Get a list of all of the failed jobs.
      *
      * @return array

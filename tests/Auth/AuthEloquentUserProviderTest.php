@@ -117,6 +117,17 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame('bar', $user);
     }
 
+    public function testRetrieveByCredentialsWithMultiplyPasswordsReturnsNull()
+    {
+        $provider = $this->getProviderMock();
+        $user = $provider->retrieveByCredentials([
+            'password' => 'dayle',
+            'password2' => 'night',
+        ]);
+
+        $this->assertNull($user);
+    }
+
     public function testCredentialValidation()
     {
         $hasher = m::mock(Hasher::class);
@@ -129,6 +140,62 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testCredentialValidationFailed()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCredentialValidationFailsGracefullyWithNullPassword()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('check')->never();
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
+        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+
+        $this->assertFalse($result);
+    }
+
+    public function testRehashPasswordIfRequired()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
+        $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldReceive('getAuthPasswordName')->once()->andReturn('password_attribute');
+        $user->shouldReceive('forceFill')->once()->with(['password_attribute' => 'rehashed'])->andReturnSelf();
+        $user->shouldReceive('save')->once();
+
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+    }
+
+    public function testDontRehashPasswordIfNotRequired()
+    {
+        $hasher = m::mock(Hasher::class);
+        $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
+        $hasher->shouldNotReceive('make');
+
+        $user = m::mock(Authenticatable::class);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
+        $user->shouldNotReceive('getAuthPasswordName');
+        $user->shouldNotReceive('forceFill');
+        $user->shouldNotReceive('save');
+
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+    }
+
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock(Hasher::class);
@@ -136,6 +203,28 @@ class AuthEloquentUserProviderTest extends TestCase
         $model = $provider->createModel();
 
         $this->assertInstanceOf(EloquentProviderUserStub::class, $model);
+    }
+
+    public function testRegistersQueryHandler()
+    {
+        $callback = function ($builder) {
+            $builder->whereIn('group', ['one', 'two']);
+        };
+
+        $provider = $this->getProviderMock();
+        $mock = m::mock(stdClass::class);
+        $mock->shouldReceive('newQuery')->once()->andReturn($mock);
+        $mock->shouldReceive('where')->once()->with('username', 'dayle');
+        $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
+        $mock->shouldReceive('first')->once()->andReturn('bar');
+        $provider->expects($this->once())->method('createModel')->willReturn($mock);
+        $provider->withQuery($callback);
+        $user = $provider->retrieveByCredentials([function ($builder) {
+            $builder->where('username', 'dayle');
+        }]);
+
+        $this->assertSame('bar', $user);
+        $this->assertSame($callback, $provider->getQueryCallback());
     }
 
     protected function getProviderMock()

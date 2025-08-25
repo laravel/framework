@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
@@ -22,6 +23,14 @@ class CacheApcStoreTest extends TestCase
         $apc->expects($this->once())->method('get')->willReturn('bar');
         $store = new ApcStore($apc);
         $this->assertSame('bar', $store->get('foo'));
+    }
+
+    public function testAPCFalseValueIsReturned()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
+        $apc->expects($this->once())->method('get')->willReturn(false);
+        $store = new ApcStore($apc);
+        $this->assertFalse($store->get('foo'));
     }
 
     public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()
@@ -53,14 +62,23 @@ class CacheApcStoreTest extends TestCase
 
     public function testSetMultipleMethodProperlyCallsAPC()
     {
-        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
-        $apc->expects($this->exactly(3))->method('put')->withConsecutive([
-            $this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60),
-        ], [
-            $this->equalTo('baz'), $this->equalTo('qux'), $this->equalTo(60),
-        ], [
-            $this->equalTo('bar'), $this->equalTo('norf'), $this->equalTo(60),
-        ])->willReturn(true);
+        $apc = Mockery::mock(ApcWrapper::class);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('foo', 'bar', 60)
+            ->andReturn(true);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('baz', 'qux', 60)
+            ->andReturn(true);
+
+        $apc->shouldReceive('put')
+            ->once()
+            ->with('bar', 'norf', 60)
+            ->andReturn(true);
+
         $store = new ApcStore($apc);
         $result = $store->putMany([
             'foo' => 'bar',
@@ -104,6 +122,19 @@ class CacheApcStoreTest extends TestCase
         $store = new ApcStore($apc);
         $result = $store->forget('foo');
         $this->assertTrue($result);
+    }
+
+    public function testTouchMethodProperlyCallsAPC(): void
+    {
+        $key = 'key';
+        $ttl = 60;
+
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get', 'put'])->getMock();
+
+        $apc->expects($this->once())->method('get')->with($this->equalTo($key))->willReturn('bar');
+        $apc->expects($this->once())->method('put')->with($this->equalTo($key), $this->equalTo('bar'), $this->equalTo($ttl))->willReturn(true);
+
+        $this->assertTrue((new ApcStore($apc))->touch($key, $ttl));
     }
 
     public function testFlushesCached()

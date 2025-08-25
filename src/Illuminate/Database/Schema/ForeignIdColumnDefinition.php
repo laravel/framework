@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 class ForeignIdColumnDefinition extends ColumnDefinition
 {
@@ -18,7 +18,6 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  array  $attributes
-     * @return void
      */
     public function __construct(Blueprint $blueprint, $attributes = [])
     {
@@ -31,22 +30,27 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      * Create a foreign key constraint on this column referencing the "id" column of the conventionally related table.
      *
      * @param  string|null  $table
-     * @param  string  $column
+     * @param  string|null  $column
+     * @param  string|null  $indexName
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function constrained($table = null, $column = 'id')
+    public function constrained($table = null, $column = null, $indexName = null)
     {
-        return $this->references($column)->on($table ?? Str::plural(Str::beforeLast($this->name, '_'.$column)));
+        $table ??= $this->table;
+        $column ??= $this->referencesModelColumn ?? 'id';
+
+        return $this->references($column, $indexName)->on($table ?? (new Stringable($this->name))->beforeLast('_'.$column)->plural());
     }
 
     /**
      * Specify which column this foreign ID references on another table.
      *
      * @param  string  $column
+     * @param  string  $indexName
      * @return \Illuminate\Database\Schema\ForeignKeyDefinition
      */
-    public function references($column)
+    public function references($column, $indexName = null)
     {
-        return $this->blueprint->foreign($this->name)->references($column);
+        return $this->blueprint->foreign($this->name, $indexName)->references($column);
     }
 }

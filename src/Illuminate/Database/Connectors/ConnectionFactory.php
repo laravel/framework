@@ -4,6 +4,7 @@ namespace Illuminate\Database\Connectors;
 
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\MariaDbConnection;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
@@ -25,7 +26,6 @@ class ConnectionFactory
      * Create a new connection factory instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {
@@ -137,8 +137,8 @@ class ConnectionFactory
     protected function getReadWriteConfig(array $config, $type)
     {
         return isset($config[$type][0])
-                        ? Arr::random($config[$type])
-                        : $config[$type];
+            ? Arr::random($config[$type])
+            : $config[$type];
     }
 
     /**
@@ -162,8 +162,8 @@ class ConnectionFactory
     protected function createPdoResolver(array $config)
     {
         return array_key_exists('host', $config)
-                            ? $this->createPdoResolverWithHosts($config)
-                            : $this->createPdoResolverWithoutHosts($config);
+            ? $this->createPdoResolverWithHosts($config)
+            : $this->createPdoResolverWithoutHosts($config);
     }
 
     /**
@@ -177,7 +177,7 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            foreach (Arr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
+            foreach (Arr::shuffle($this->parseHosts($config)) as $host) {
                 $config['host'] = $host;
 
                 try {
@@ -187,7 +187,9 @@ class ConnectionFactory
                 }
             }
 
-            throw $e;
+            if (isset($e)) {
+                throw $e;
+            }
         };
     }
 
@@ -218,9 +220,7 @@ class ConnectionFactory
      */
     protected function createPdoResolverWithoutHosts(array $config)
     {
-        return function () use ($config) {
-            return $this->createConnector($config)->connect($config);
-        };
+        return fn () => $this->createConnector($config)->connect($config);
     }
 
     /**
@@ -243,6 +243,7 @@ class ConnectionFactory
 
         return match ($config['driver']) {
             'mysql' => new MySqlConnector,
+            'mariadb' => new MariaDbConnector,
             'pgsql' => new PostgresConnector,
             'sqlite' => new SQLiteConnector,
             'sqlsrv' => new SqlServerConnector,
@@ -270,6 +271,7 @@ class ConnectionFactory
 
         return match ($driver) {
             'mysql' => new MySqlConnection($connection, $database, $prefix, $config),
+            'mariadb' => new MariaDbConnection($connection, $database, $prefix, $config),
             'pgsql' => new PostgresConnection($connection, $database, $prefix, $config),
             'sqlite' => new SQLiteConnection($connection, $database, $prefix, $config),
             'sqlsrv' => new SqlServerConnection($connection, $database, $prefix, $config),

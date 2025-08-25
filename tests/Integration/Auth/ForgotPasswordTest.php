@@ -2,16 +2,24 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
+use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
+#[WithMigration]
 class ForgotPasswordTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function tearDown(): void
     {
         ResetPassword::$createUrlCallback = null;
@@ -22,12 +30,8 @@ class ForgotPasswordTest extends TestCase
 
     protected function defineEnvironment($app)
     {
+        $app['config']->set('app.key', Str::random(32));
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
-    }
-
-    protected function defineDatabaseMigrations()
-    {
-        $this->loadLaravelMigrations();
     }
 
     protected function defineRoutes($router)
@@ -41,8 +45,7 @@ class ForgotPasswordTest extends TestCase
         })->name('custom.password.reset');
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email()
+    public function testItCanSendForgotPasswordEmail()
     {
         Notification::fake();
 
@@ -65,8 +68,26 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_create_url_using()
+    public function testItCanTriggerPasswordResetSentEvent()
+    {
+        Event::fake([PasswordResetLinkSent::class]);
+
+        UserFactory::new()->create();
+
+        $user = AuthenticationTestUser::first();
+
+        Password::broker()->sendResetLink([
+            'email' => $user->email,
+        ]);
+
+        Event::assertDispatched(PasswordResetLinkSent::class, function ($event) {
+            $this->assertEquals(1, $event->user->id);
+
+            return true;
+        });
+    }
+
+    public function testItCanSendForgotPasswordEmailViaCreateUrlUsing()
     {
         Notification::fake();
 
@@ -93,8 +114,7 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    /** @test */
-    public function it_can_send_forgot_password_email_via_to_mail_using()
+    public function testItCanSendForgotPasswordEmailViaToMailUsing()
     {
         Notification::fake();
 

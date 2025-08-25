@@ -16,13 +16,6 @@ use Orchestra\Testbench\TestCase;
 
 class EventPingTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testPingRescuesTransferExceptions()
     {
         $this->spy(ExceptionHandler::class)

@@ -5,6 +5,13 @@ namespace Illuminate\Auth;
 trait Authenticatable
 {
     /**
+     * The column name of the password field using during authentication.
+     *
+     * @var string
+     */
+    protected $authPasswordName = 'password';
+
+    /**
      * The column name of the "remember me" token.
      *
      * @var string
@@ -42,13 +49,23 @@ trait Authenticatable
     }
 
     /**
+     * Get the name of the password attribute for the user.
+     *
+     * @return string
+     */
+    public function getAuthPasswordName()
+    {
+        return $this->authPasswordName;
+    }
+
+    /**
      * Get the password for the user.
      *
      * @return string
      */
     public function getAuthPassword()
     {
-        return $this->password;
+        return $this->{$this->getAuthPasswordName()};
     }
 
     /**

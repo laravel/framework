@@ -5,7 +5,9 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Encryption\Encrypter;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'key:generate')]
 class KeyGenerateCommand extends Command
 {
     use ConfirmableTrait;
@@ -18,15 +20,6 @@ class KeyGenerateCommand extends Command
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
                     {--force : Force the operation to run when in production}';
-
-    /**
-     * The name of the console command.
-     *
-     * This name is used to identify the command during lazy loading.
-     *
-     * @var string|null
-     */
-    protected static $defaultName = 'key:generate';
 
     /**
      * The console command description.
@@ -57,7 +50,7 @@ class KeyGenerateCommand extends Command
 
         $this->laravel['config']['app.key'] = $key;
 
-        $this->info('Application key set successfully.');
+        $this->components->info('Application key set successfully.');
     }
 
     /**
@@ -86,7 +79,9 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
-        $this->writeNewEnvironmentFileWith($key);
+        if (! $this->writeNewEnvironmentFileWith($key)) {
+            return false;
+        }
 
         return true;
     }
@@ -95,15 +90,25 @@ class KeyGenerateCommand extends Command
      * Write a new environment file with the given key.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
+        $replaced = preg_replace(
             $this->keyReplacementPattern(),
             'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
-        ));
+            $input = file_get_contents($this->laravel->environmentFilePath())
+        );
+
+        if ($replaced === $input || $replaced === null) {
+            $this->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+
+            return false;
+        }
+
+        file_put_contents($this->laravel->environmentFilePath(), $replaced);
+
+        return true;
     }
 
     /**

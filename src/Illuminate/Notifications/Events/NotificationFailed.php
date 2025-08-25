@@ -10,47 +10,18 @@ class NotificationFailed
     use Queueable, SerializesModels;
 
     /**
-     * The notifiable entity who received the notification.
-     *
-     * @var mixed
-     */
-    public $notifiable;
-
-    /**
-     * The notification instance.
-     *
-     * @var \Illuminate\Notifications\Notification
-     */
-    public $notification;
-
-    /**
-     * The channel name.
-     *
-     * @var string
-     */
-    public $channel;
-
-    /**
-     * The data needed to process this failure.
-     *
-     * @var array
-     */
-    public $data = [];
-
-    /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  string  $channel
-     * @param  array  $data
-     * @return void
+     * @param  mixed  $notifiable  The notifiable entity who received the notification.
+     * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
+     * @param  string  $channel  The channel name.
+     * @param  array  $data  The data needed to process this failure.
      */
-    public function __construct($notifiable, $notification, $channel, $data = [])
-    {
-        $this->data = $data;
-        $this->channel = $channel;
-        $this->notifiable = $notifiable;
-        $this->notification = $notification;
+    public function __construct(
+        public $notifiable,
+        public $notification,
+        public $channel,
+        public $data = [],
+    ) {
     }
 }

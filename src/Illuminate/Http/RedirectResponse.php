@@ -71,7 +71,7 @@ class RedirectResponse extends BaseRedirectResponse
      * @param  array|null  $input
      * @return $this
      */
-    public function withInput(array $input = null)
+    public function withInput(?array $input = null)
     {
         $this->session->flashInput($this->removeFilesFromInput(
             ! is_null($input) ? $input : $this->request->input()
@@ -169,7 +169,7 @@ class RedirectResponse extends BaseRedirectResponse
     public function withFragment($fragment)
     {
         return $this->withoutFragment()
-                ->setTargetUrl($this->getTargetUrl().'#'.Str::after($fragment, '#'));
+            ->setTargetUrl($this->getTargetUrl().'#'.Str::after($fragment, '#'));
     }
 
     /**

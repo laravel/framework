@@ -17,6 +17,10 @@ class TableGuesserTest extends TestCase
         $this->assertSame('users', $table);
         $this->assertFalse($create);
 
+        [$table, $create] = TableGuesser::guess('add_is_sent_to_crm_column_to_users_table');
+        $this->assertSame('users', $table);
+        $this->assertFalse($create);
+
         [$table, $create] = TableGuesser::guess('change_status_column_in_users_table');
         $this->assertSame('users', $table);
         $this->assertFalse($create);
@@ -33,6 +37,10 @@ class TableGuesserTest extends TestCase
         $this->assertTrue($create);
 
         [$table, $create] = TableGuesser::guess('add_status_column_to_users');
+        $this->assertSame('users', $table);
+        $this->assertFalse($create);
+
+        [$table, $create] = TableGuesser::guess('add_is_sent_to_crm_column_column_to_users');
         $this->assertSame('users', $table);
         $this->assertFalse($create);
 

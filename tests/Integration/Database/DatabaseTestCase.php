@@ -27,7 +27,7 @@ abstract class DatabaseTestCase extends TestCase
         parent::setUp();
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $connection = $app['config']->get('database.default');
 
