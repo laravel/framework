@@ -116,7 +116,7 @@ class ViewMakeCommand extends GeneratorCommand
     protected function getTestPath()
     {
         return base_path(
-            Str::of($this->testClassFullyQualifiedName())
+            (new Stringable($this->testClassFullyQualifiedName()))
                 ->replace('\\', '/')
                 ->replaceFirst('Tests/Feature', 'tests/Feature')
                 ->append('Test.php')
@@ -157,7 +157,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testNamespace()
     {
-        return Str::of($this->testClassFullyQualifiedName())
+        return (new Stringable($this->testClassFullyQualifiedName()))
             ->beforeLast('\\')
             ->value();
     }
@@ -169,7 +169,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassName()
     {
-        return Str::of($this->testClassFullyQualifiedName())
+        return (new Stringable($this->testClassFullyQualifiedName()))
             ->afterLast('\\')
             ->append('Test')
             ->value();
@@ -182,15 +182,15 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testClassFullyQualifiedName()
     {
-        $name = Str::of(Str::lower($this->getNameInput()))->replace('.'.$this->option('extension'), '');
+        $name = (new Stringable(Str::lower($this->getNameInput())))->replace('.'.$this->option('extension'), '');
 
-        $namespacedName = Str::of(
-            (new Stringable($name))
-                ->replace('/', ' ')
-                ->explode(' ')
-                ->map(fn ($part) => (new Stringable($part))->ucfirst())
-                ->implode('\\')
-        )
+        $namespacedPath = (new Stringable($name))
+            ->replace('/', ' ')
+            ->explode(' ')
+            ->map(fn ($part) => (new Stringable($part))->ucfirst())
+            ->implode('\\');
+
+        $namespacedName = (new Stringable($namespacedPath))
             ->replace(['-', '_'], ' ')
             ->explode(' ')
             ->map(fn ($part) => (new Stringable($part))->ucfirst())
@@ -220,7 +220,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function testViewName()
     {
-        return Str::of($this->getNameInput())
+        return (new Stringable($this->getNameInput()))
             ->replace('/', '.')
             ->lower()
             ->value();
