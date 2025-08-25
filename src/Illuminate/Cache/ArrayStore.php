@@ -229,13 +229,13 @@ class ArrayStore extends TaggableStore implements LockProvider
         }
 
         $storage = [];
-        foreach($this->storage as $key => $data) {
+        foreach ($this->storage as $key => $data) {
             $storage[$key] = [
                 'expiresAt' => $data['expiresAt'],
-                'value' => unserialize($data['value'])
+                'value' => unserialize($data['value']),
             ];
         }
-        
+
         return $storage;
     }
 }
