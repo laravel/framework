@@ -1,11 +1,13 @@
 @props(['code', 'highlightedLine'])
 
-@use('Phiki\Phiki')
+@use('Phiki\Adapters\Laravel\Facades\Phiki')
 @use('Phiki\Grammar\Grammar')
 @use('Phiki\Theme\Theme')
 
 @php
-    $code = (new Phiki)->codeToHtml($code, Grammar::Php, Theme::OneDarkPro)->withGutter()->startingLine($highlightedLine - 5);
+    $code = Phiki::codeToHtml($code, Grammar::Php, Theme::OneDarkPro)
+        ->withGutter()
+        ->startingLine($highlightedLine - 5);
 @endphp
 
 <div

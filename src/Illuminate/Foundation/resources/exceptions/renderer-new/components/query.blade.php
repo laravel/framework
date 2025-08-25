@@ -1,15 +1,5 @@
 @props(['queries'])
 
-@use('Phiki\Phiki')
-@use('Phiki\Grammar\Grammar')
-@use('Phiki\Theme\Theme')
-
-@php
-    function highlight(string $sql) {
-        return (new Phiki)->codeToHtml($sql, Grammar::Sql, Theme::OneDarkPro);
-    }
-@endphp
-
 <div
     {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-white/[0.01] border border-neutral-800 rounded-xl p-[10px]"]) }}
 >
@@ -33,7 +23,7 @@
                     <span class="text-xs font-mono text-neutral-400">{{ $connectionName }}</span>
                 </div>
                 <div class="text-xs font-mono text-neutral-200 overflow-hidden text-ellipsis [&_pre]:bg-transparent!">
-                    {!! highlight($sql) !!}
+                    <x-phiki::code grammar="sql" theme="one-dark-pro">{{ $sql }}</x-phiki::code>
                 </div>
             </div>
             <div class="text-xs font-mono text-neutral-200 w-[65px] text-right">{{ $time }}ms</div>
