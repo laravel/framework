@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Benchmark;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Js;
 use Illuminate\Support\Number;
@@ -282,6 +283,8 @@ abstract class Facade
             'Broadcast' => Broadcast::class,
             'Bus' => Bus::class,
             'Cache' => Cache::class,
+            'Carbon' => Carbon::class,
+            'Collection' => Collection::class,
             'Concurrency' => Concurrency::class,
             'Config' => Config::class,
             'Context' => Context::class,
