@@ -180,9 +180,10 @@ class Number
      * @param  string  $in
      * @param  string|null  $locale
      * @param  int|null  $precision
+     * @param  string|null  $symbol
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null, ?string $symbol = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -190,6 +191,10 @@ class Number
 
         if (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        if (isset($symbol)) {
+            $formatter->setSymbol(NumberFormatter::CURRENCY_SYMBOL, $symbol);
         }
 
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
