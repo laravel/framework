@@ -339,7 +339,7 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      */
     public function toStringable()
     {
-        return Str::of($this->value());
+        return new \Illuminate\Support\Stringable($this->value());
     }
 
     /**
