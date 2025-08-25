@@ -12,6 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -1167,6 +1168,23 @@ class Container implements ArrayAccess, ContainerContract
         // no binding registered for the abstractions so we need to bail out.
         if (! $reflector->isInstantiable()) {
             return $this->notInstantiable($concrete);
+        }
+
+        if (is_a($concrete, Buildable::class, true)) {
+            if (! method_exists($concrete, 'build')) {
+                throw new BindingResolutionException("No build method exists for [$concrete].");
+            }
+            elseif (! in_array($concrete, $this->buildStack, true)) {
+                $this->buildStack[] = $concrete;
+                $instance = $this->call([$concrete, 'build']);
+                array_pop($this->buildStack);
+
+                $this->fireAfterResolvingAttributeCallbacks(
+                    $reflector->getAttributes(), $instance
+                );
+
+                return $instance;
+            }
         }
 
         $this->buildStack[] = $concrete;
