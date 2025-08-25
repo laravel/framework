@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Stringable;
 use stdClass;
+
 use function Illuminate\Support\enum_value;
 
 trait InteractsWithData
