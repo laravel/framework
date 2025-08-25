@@ -10,7 +10,7 @@
         ->withGutter($withGutter)
         ->startingLine($startingLine);
 
-    if ($highlightedLine) {
+    if ($highlightedLine !== null) {
         $highlightedCode->decoration(
             LineDecoration::forLine($highlightedLine)->class('dark:bg-rose-700/30!'),
         );

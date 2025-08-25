@@ -8,6 +8,6 @@
         grammar="php"
         :with-gutter="true"
         :starting-line="max(1, $highlightedLine - 5)"
-        :highlighted-line="5"
+        :highlighted-line="min(5, $highlightedLine - 1)"
     />
 </div>
