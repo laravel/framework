@@ -7,5 +7,5 @@ use function PHPStan\Testing\assertType;
 assertType('Illuminate\Support\Stringable|null', $cast->get($user, 'email', 'taylor@laravel.com', $user->getAttributes()));
 
 $cast->set($user, 'email', 'taylor@laravel.com', $user->getAttributes()); // This works.
-$cast->set($user, 'email', \Illuminate\Support\Str::of('taylor@laravel.com'), $user->getAttributes()); // This also works!
+$cast->set($user, 'email', new \Illuminate\Support\Stringable('taylor@laravel.com'), $user->getAttributes()); // This also works!
 $cast->set($user, 'email', null, $user->getAttributes()); // Also valid.
