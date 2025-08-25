@@ -22,8 +22,8 @@
                     </svg>
                     <span class="text-xs font-mono text-neutral-400">{{ $connectionName }}</span>
                 </div>
-                <div class="text-xs font-mono text-neutral-200 overflow-hidden text-ellipsis [&_pre]:bg-transparent!">
-                    <x-phiki::code grammar="sql" theme="one-dark-pro">{!! $sql !!}</x-phiki::code>
+                <div class="text-xs font-mono text-neutral-200 overflow-hidden text-ellipsis">
+                    <x-laravel-exceptions-renderer-new::syntax-highlight :code="$sql" grammar="sql" />
                 </div>
             </div>
             <div class="text-xs font-mono text-neutral-200 w-[65px] text-right">{{ $time }}ms</div>
