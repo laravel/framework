@@ -228,9 +228,9 @@ class ArrayStore extends TaggableStore implements LockProvider
             return $this->storage;
         }
 
-        $storageToReturn = [];
+        $storage = [];
         foreach($this->storage as $key => $data) {
-            $storageToReturn[$key] = [
+            $storage[$key] = [
                 'expiresAt' => $data['expiresAt'],
                 'value' => unserialize($data['value'])
             ];
