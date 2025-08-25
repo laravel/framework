@@ -85,7 +85,7 @@ class RedirectResponse extends BaseRedirectResponse
      *
      * @return $this
      */
-    public function permanent()
+    public function movedPermanently()
     {
         $this->setStatusCode(Response::HTTP_MOVED_PERMANENTLY);
 
