@@ -314,7 +314,7 @@ abstract class Facade
             'Session' => Session::class,
             'Storage' => Storage::class,
             'Str' => Str::class,
-            'URL' => URL::class,
+            'URL' => URL::class, 
             'Uri' => Uri::class,
             'Validator' => Validator::class,
             'View' => View::class,
