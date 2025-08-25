@@ -500,9 +500,9 @@ if (! function_exists('event')) {
      * @param  bool  $halt
      * @return array|null
      */
-    function event(...$args)
+    function event($event, $payload = [], $halt = false)
     {
-        return app('events')->dispatch(...$args);
+        return app('events')->dispatch($event, $payload, $halt);
     }
 }
 

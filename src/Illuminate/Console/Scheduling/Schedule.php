@@ -301,7 +301,6 @@ class Schedule
     /**
      * Create new schedule group.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      *
      * @throws \RuntimeException
