@@ -16,6 +16,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
+        Builder::$defaultIdType = 'bigIncrements';
         Builder::$defaultMorphKeyType = 'int';
     }
 
@@ -614,6 +615,41 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $this->assertEquals(['alter table `posts` comment = \'Look at my comment, it is amazing\''], $getSql('MySql'));
         $this->assertEquals(['comment on table "posts" is \'Look at my comment, it is amazing\''], $getSql('Postgres'));
+    }
+
+        public function testDefaultIdIsBigIncrements()
+    {
+        $connection = m::mock(Connection::class);
+        $blueprint = $this->getBlueprint(table: 'users');
+        $column = $blueprint->id();
+
+        $this->assertSame('id', $column->name);
+        $this->assertSame('bigInteger', $column->type);
+        $this->assertTrue($column->autoIncrement);
+        $this->assertTrue($column->unsigned);
+    }
+
+    public function testDefaultIdIsUlid()
+    {
+        Builder::$defaultIdType = 'ulid';
+        $blueprint = $this->getBlueprint(table: 'users');
+        $column = $blueprint->id();
+
+        $this->assertSame('id', $column->name);
+        $this->assertSame('char', $column->type);
+        $this->assertSame(26, $column->length);
+        $this->assertFalse($column->autoIncrement ?? false);
+    }
+
+    public function testDefaultIdIsUuid()
+    {
+        Builder::$defaultIdType = 'uuid';
+        $blueprint = $this->getBlueprint(table: 'users');
+        $column = $blueprint->id();
+
+        $this->assertSame('id', $column->name);
+        $this->assertSame('uuid', $column->type);
+        $this->assertFalse($column->autoIncrement ?? false);
     }
 
     protected function getConnection(?string $grammar = null, string $prefix = '')

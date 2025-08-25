@@ -47,6 +47,14 @@ class Builder
     public static ?int $defaultTimePrecision = 0;
 
     /**
+     * The default id key type.
+     *
+     * @var string
+     */
+    public static $defaultIdType = 'int';
+
+
+    /**
      * The default relationship morph key type.
      *
      * @var string

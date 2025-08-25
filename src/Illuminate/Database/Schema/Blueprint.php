@@ -731,6 +731,11 @@ class Blueprint
      */
     public function id($column = 'id')
     {
+        if (Builder::$defaultIdType === 'uuid') {
+           return $this->uuid($column)->primary();
+        } elseif (Builder::$defaultIdType === 'ulid') {
+          return  $this->ulid($column)->primary();
+        }
         return $this->bigIncrements($column);
     }
 
