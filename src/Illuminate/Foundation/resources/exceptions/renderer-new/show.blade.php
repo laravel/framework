@@ -91,5 +91,7 @@
             </div>
         </x-laravel-exceptions-renderer-new::section-container>
     </div>
+
+    {!! Renderer::js() !!}
 </body>
 </html>

@@ -4,9 +4,10 @@ export default defineConfig({
     plugins: [tailwindcss()],
     build: {
         rollupOptions: {
-            input: ["styles.css"],
+            input: ["styles.css", "scripts.js"],
             output: {
                 assetFileNames: "[name][extname]",
+                entryFileNames: "[name].js",
             },
         },
     },
