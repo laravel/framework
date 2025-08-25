@@ -112,7 +112,7 @@ trait HidesAttributes
     /**
      * Make the given, typically hidden, attributes visible if the given truth test passes.
      *
-     * @param  bool|\Closure  $condition
+     * @param  bool|(\Closure(\Illuminate\Database\Eloquent\Model): bool)  $condition
      * @param  array<string>|string|null  $attributes
      * @return $this
      */
@@ -139,7 +139,7 @@ trait HidesAttributes
     /**
      * Make the given, typically visible, attributes hidden if the given truth test passes.
      *
-     * @param  bool|\Closure  $condition
+     * @param  bool|(\Closure(\Illuminate\Database\Eloquent\Model): bool)  $condition
      * @param  array<string>|string|null  $attributes
      * @return $this
      */
