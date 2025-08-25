@@ -4,13 +4,13 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
-use Illuminate\Contracts\Container\WithFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -1186,7 +1186,7 @@ interface IsSingleton
 {
 }
 
-class RequestDto implements WithFactory
+class RequestDto implements Buildable
 {
     public function __construct(
         public readonly int $userId,
@@ -1194,7 +1194,7 @@ class RequestDto implements WithFactory
     ) {
     }
 
-    public static function buildWithFactory(RequestDtoDependency $dependency): self
+    public static function build(RequestDtoDependency $dependency): self
     {
         return new self(
             $dependency->userId,
