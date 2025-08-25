@@ -13,7 +13,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * The array of stored values.
      *
-     * @var array
+     * @var array<int, array{expiresAt: float, value: mixed}>
      */
     protected $storage = [];
 
@@ -214,5 +214,15 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
+    }
+
+    /**
+     * Get the underlying cache storage.
+     *
+     * @return array<int, array{expiresAt: float, value: mixed}>
+     */
+    public function getStorage()
+    {
+        return $this->storage;
     }
 }
