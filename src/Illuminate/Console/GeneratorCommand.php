@@ -142,9 +142,9 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     abstract protected function getStub();
 
     /**
-     * Execute the console command.
+     * Execute the console command and fire FileGenerated event.
      *
-     * @return bool|null
+     * @return bool|null False if the file exists or name is reserved.
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
