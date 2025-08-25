@@ -67,7 +67,7 @@ class StatusCommand extends BaseCommand
                     return (new Stringable($migration[1]))->contains('Pending');
                 }));
 
-            if (count($migrations) > 0) {
+            if ($migrations->isNotEmpty()) {
                 $this->newLine();
 
                 $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
