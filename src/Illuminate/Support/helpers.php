@@ -84,13 +84,7 @@ if (! function_exists('blank_any')) {
      */
     function blank_any(...$values): bool
     {
-        foreach ($values as $value) {
-            if (blank($value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($values, blank(...));
     }
 }
 
@@ -194,13 +188,7 @@ if (! function_exists('filled_any')) {
      */
     function filled_any(...$values): bool
     {
-        foreach ($values as $value) {
-            if (filled($value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($values, filled(...));
     }
 }
 
