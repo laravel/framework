@@ -50,6 +50,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static $wrap = 'data';
 
     /**
+     * Whether to force wrapping even if $wrap key exists in resource data.
+     *
+     * @var bool
+     */
+    public static bool $forceWrap = false;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
