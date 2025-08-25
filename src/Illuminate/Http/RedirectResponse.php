@@ -93,19 +93,6 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
-     * Set the status to 302 (Found).
-     * This is the default status code.
-     *
-     * @return $this
-     */
-    public function found()
-    {
-        $this->setStatusCode(Response::HTTP_FOUND);
-
-        return $this;
-    }
-
-    /**
      * Remove all uploaded files form the given input array.
      *
      * @param  array  $input
