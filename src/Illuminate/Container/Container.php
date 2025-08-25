@@ -12,7 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
-use Illuminate\Contracts\Container\WithFactory;
+use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -1170,19 +1170,13 @@ class Container implements ArrayAccess, ContainerContract
             return $this->notInstantiable($concrete);
         }
 
-        $this->buildStack[] = $concrete;
-
-        if (is_a($concrete, WithFactory::class, true)) {
-            if (! method_exists($concrete, 'buildWithFactory')) {
-                throw new BindingResolutionException("No buildWithFactory method exists for [$concrete].");
+        if (is_a($concrete, Buildable::class, true)) {
+            if (! method_exists($concrete, 'build')) {
+                throw new BindingResolutionException("No build method exists for [$concrete].");
             }
-            elseif (in_array($concrete, $this->buildStack, true)) {
-                // In the case that the factory methods wants to use the container to build
-                // itself, we can just skip over calling the factory function again.
-            }
-            else {
-                $instance = $this->call([$concrete, 'buildWithFactory']);
-
+            elseif (! in_array($concrete, $this->buildStack, true)) {
+                $this->buildStack[] = $concrete;
+                $instance = $this->call([$concrete, 'build']);
                 array_pop($this->buildStack);
 
                 $this->fireAfterResolvingAttributeCallbacks(
@@ -1192,6 +1186,8 @@ class Container implements ArrayAccess, ContainerContract
                 return $instance;
             }
         }
+
+        $this->buildStack[] = $concrete;
 
         $constructor = $reflector->getConstructor();
 
@@ -1420,7 +1416,6 @@ class Container implements ArrayAccess, ContainerContract
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
-        //
         return $handler($instance, $this);
     }
 
