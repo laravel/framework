@@ -176,11 +176,11 @@ class Number
     /**
      * Convert the given number to its currency equivalent.
      *
-     * @param int|float   $number
-     * @param string      $in
-     * @param string|null $locale
-     * @param int|null    $precision
-     * @param string|null $symbol
+     * @param  int|float  $number
+     * @param  string  $in
+     * @param  string|null  $locale
+     * @param  int|null  $precision
+     * @param  string|null  $symbol
      * @return string|false
      */
     public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null, ?string $symbol = null)
