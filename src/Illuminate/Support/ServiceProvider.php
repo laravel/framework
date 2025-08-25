@@ -483,7 +483,7 @@ abstract class ServiceProvider
      */
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
     {
-        $key ??= (string) Str::of(get_class($this))
+        $key ??= (string) (new Stringable(get_class($this)))
             ->classBasename()
             ->before('ServiceProvider')
             ->kebab()
