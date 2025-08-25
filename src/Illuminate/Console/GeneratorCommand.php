@@ -6,6 +6,7 @@ use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Finder\Finder;
@@ -191,6 +192,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
+
+        Event::dispatch(new Events\FileGenerated($path, $info));
     }
 
     /**
