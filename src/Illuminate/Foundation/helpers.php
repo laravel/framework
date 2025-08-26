@@ -499,7 +499,7 @@ if (! function_exists('event')) {
      * @param  mixed  $payload
      * @param  bool  $halt
      */
-    function event(...$args): ?array
+    function event(...$args)
     {
         return app('events')->dispatch(...$args);
     }
