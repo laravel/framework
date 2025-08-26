@@ -321,7 +321,7 @@ trait ValidatesAttributes
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
     {
-        if ($date = DateTime::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'))) {
+        if ($date = DateTime::createFromFormat('!'.$format, $value)) {
             return $date;
         }
 
