@@ -318,13 +318,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             return [];
         }
 
-        $queueable = match (true) {
-            $job instanceof SendQueuedNotifications => $job->notification,
-            $job instanceof SendQueuedMailable => $job->mailable,
-            default => $job,
-        };
-
-        $messageGroupId = transform($queueable->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
+        $messageGroupId = transform($job->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
         $messageDeduplicationId = null;
 
         if (! is_null($messageGroupId) && $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
