@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.26.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.26.2...12.x)
+
+## [v12.26.2](https://github.com/laravel/framework/compare/v12.26.1...v12.26.2) - 2025-08-26
+
+* [12.x] fix: csrf_token can return null by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56768
+* [12.x] Fix `date_format` validation on DST Timezone by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56767
+* [12.x] Fix event helper by [@jasonvarga](https://github.com/jasonvarga) in https://github.com/laravel/framework/pull/56773
 
 ## [v12.26.1](https://github.com/laravel/framework/compare/v12.26.0...v12.26.1) - 2025-08-26
 
