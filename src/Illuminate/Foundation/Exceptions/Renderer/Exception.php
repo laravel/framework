@@ -133,8 +133,17 @@ class Exception
             $frames[] = $frame;
             $previousFrame = $frame;
         }
-        
-        return new Collection(array_reverse($frames));
+
+        $frames = array_reverse($frames);
+
+        foreach ($frames as $frame) {
+            if (! $frame->isFromVendor()) {
+                $frame->markAsMain();
+                break;
+            }
+        }
+
+        return new Collection($frames);
     }
 
     /**
