@@ -49,18 +49,19 @@ class MigrationCreator
      * @param  string  $path
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  bool  $drop
      * @return string
      *
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $drop = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($table, $create, $drop);
 
         $path = $this->getPath($name, $path);
 
@@ -107,9 +108,10 @@ class MigrationCreator
      *
      * @param  string|null  $table
      * @param  bool  $create
+     * @param  bool  $drop
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getStub($table, $create, $drop)
     {
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
@@ -119,6 +121,10 @@ class MigrationCreator
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
                 ? $customPath
                 : $this->stubPath().'/migration.create.stub';
+        } elseif ($drop) {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.drop.stub')
+                ? $customPath
+                : $this->stubPath().'/migration.drop.stub';
         } else {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
                 ? $customPath

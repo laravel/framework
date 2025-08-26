@@ -29,19 +29,19 @@ class TableGuesser
     {
         foreach (self::CREATE_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
-                return [$matches[1], $create = true];
+                return [$matches[1], $create = true, $drop = false];
             }
         }
 
         foreach (self::CHANGE_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
-                return [$matches[2], $create = false];
+                return [$matches[2], $create = false, $drop = false];
             }
         }
 
         foreach (self::DROP_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
-                return [$matches[1], $create = false];
+                return [$matches[1], $create = false, $drop = true];
             }
         }
     }

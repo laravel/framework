@@ -89,13 +89,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // "create" in the name. This will allow us to provide a convenient way
         // of creating migrations that create new tables for the application.
         if (! $table) {
-            [$table, $create] = TableGuesser::guess($name);
+            [$table, $create, $drop] = TableGuesser::guess($name);
         }
 
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $table, $create, $drop ?? false);
     }
 
     /**
@@ -104,12 +104,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
+     * @param  bool  $drop
      * @return void
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $table, $create, $drop)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $drop
         );
 
         if (windows_os()) {
