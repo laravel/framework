@@ -80,7 +80,7 @@ class ResourceResponse implements Responsable
      */
     protected function haveDefaultWrapperAndDataIsUnwrapped($data)
     {
-        if ($this->resource instanceof JsonResource && $this->resource::$forceWrap) {
+        if ($this->resource instanceof JsonResource && $this->resource::$forceWrapping) {
             return $this->wrapper() !== null;
         }
 

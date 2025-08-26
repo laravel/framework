@@ -1893,7 +1893,7 @@ class ResourceTest extends TestCase
         $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
         {
             public static $wrap = 'data';
-            public static bool $forceWrap = true;
+            public static bool $forceWrapping = true;
         };
 
         $response = $resource->toResponse(request());
