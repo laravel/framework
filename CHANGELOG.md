@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.26.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.26.1...12.x)
+
+## [v12.26.1](https://github.com/laravel/framework/compare/v12.26.0...v12.26.1) - 2025-08-26
+
+* [12.x] fix: add polyfill requirement to illuminate packages by [@erikgaal](https://github.com/erikgaal) in https://github.com/laravel/framework/pull/56765
+* [12.x] revert changes to `old()` helper by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56769
 
 ## [v12.26.0](https://github.com/laravel/framework/compare/v12.25.0...v12.26.0) - 2025-08-26
 
