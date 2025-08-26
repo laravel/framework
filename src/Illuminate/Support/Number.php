@@ -193,11 +193,14 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
+        $currency = ! empty($in) ? $in : static::$currency;
+
         if (isset($symbol)) {
             $formatter->setSymbol(NumberFormatter::CURRENCY_SYMBOL, $symbol);
+            $currency = '';
         }
 
-        return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
+        return $formatter->formatCurrency($number, $currency);
     }
 
     /**
