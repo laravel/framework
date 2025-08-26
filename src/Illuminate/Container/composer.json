@@ -16,7 +16,9 @@
     "require": {
         "php": "^8.2",
         "illuminate/contracts": "^12.0",
-        "psr/container": "^1.1.1|^2.0.1"
+        "psr/container": "^1.1.1|^2.0.1",
+        "symfony/polyfill-php84": "^1.31",
+        "symfony/polyfill-php85": "^1.33"
     },
     "suggest": {
         "illuminate/auth": "Required to use the Auth attribute",
