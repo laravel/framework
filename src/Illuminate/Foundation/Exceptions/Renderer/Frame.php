@@ -45,6 +45,13 @@ class Frame
     protected $previous;
 
     /**
+     * Whether this frame is the main (first non-vendor) frame.
+     *
+     * @var bool
+     */
+    protected $isMain = false;
+
+    /**
      * Create a new frame instance.
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
@@ -175,5 +182,25 @@ class Frame
     public function previous()
     {
         return $this->previous;
+    }
+
+     /**
+     * Mark this frame as the main frame.
+     *
+     * @return void
+     */
+    public function markAsMain()
+    {
+        $this->isMain = true;
+    }
+
+    /**
+     * Determine if this is the main frame.
+     *
+     * @return bool
+     */
+    public function isMain()
+    {
+        return $this->isMain;
     }
 }
