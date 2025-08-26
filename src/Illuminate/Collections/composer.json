@@ -17,7 +17,8 @@
         "php": "^8.3",
         "illuminate/conditionable": "^13.0",
         "illuminate/contracts": "^13.0",
-        "illuminate/macroable": "^13.0"
+        "illuminate/macroable": "^13.0",
+        "symfony/polyfill-php84": "^1.31"
     },
     "autoload": {
         "psr-4": {

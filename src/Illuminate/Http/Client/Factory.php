@@ -81,6 +81,13 @@ class Factory
     protected $preventStrayRequests = false;
 
     /**
+     * A list of URL patterns that are allowed to bypass the stray request guard.
+     *
+     * @var array<int, string>
+     */
+    protected $allowedStrayRequestUrls = [];
+
+    /**
      * Create a new factory instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
@@ -333,13 +340,22 @@ class Factory
     }
 
     /**
-     * Indicate that an exception should not be thrown if any request is not faked.
+     * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
      *
+     * @param  array<int, string>|null  $only
      * @return $this
      */
-    public function allowStrayRequests()
+    public function allowStrayRequests(?array $only = null)
     {
-        return $this->preventStrayRequests(false);
+        if (is_null($only)) {
+            $this->preventStrayRequests(false);
+
+            $this->allowedStrayRequestUrls = [];
+        } else {
+            $this->allowedStrayRequestUrls = array_values($only);
+        }
+
+        return $this;
     }
 
     /**
@@ -469,12 +485,13 @@ class Factory
             return new Collection;
         }
 
-        $callback = $callback ?: function () {
-            return true;
-        };
+        $collect = new Collection($this->recorded);
 
-        return (new Collection($this->recorded))
-            ->filter(fn ($pair) => $callback($pair[0], $pair[1]));
+        if ($callback) {
+            return $collect->filter(fn ($pair) => $callback($pair[0], $pair[1]));
+        }
+
+        return $collect;
     }
 
     /**
@@ -485,7 +502,10 @@ class Factory
     public function createPendingRequest()
     {
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
+            $request
+                ->stub($this->stubCallbacks)
+                ->preventStrayRequests($this->preventStrayRequests)
+                ->allowStrayRequests($this->allowedStrayRequestUrls);
         });
     }
 

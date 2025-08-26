@@ -123,6 +123,23 @@ class ContextualBindingTest extends TestCase
         );
     }
 
+    public function testContextualBindingDoesNotFollowStaleAliases()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectOne::class)->needs('stale')->give(ContainerContextImplementationStub::class);
+        $container->when(ContainerTestContextInjectOne::class)->needs('live')->give(ContainerContextImplementationStubTwo::class);
+
+        $container->alias(IContainerContextContractStub::class, 'stale');
+        $container->alias('unrelated', 'stale');
+        $container->alias(IContainerContextContractStub::class, 'live');
+
+        $this->assertInstanceOf(
+            ContainerContextImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
+        );
+    }
+
     public function testContextualBindingWorksForMultipleClasses()
     {
         $container = new Container;

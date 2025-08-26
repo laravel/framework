@@ -112,6 +112,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
             $name, $this->getMigrationPath(), $table, $create
         );
 
+        if (windows_os()) {
+            $file = str_replace('/', '\\', $file);
+        }
+
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
     }
 

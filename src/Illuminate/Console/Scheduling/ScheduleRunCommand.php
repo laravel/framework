@@ -22,11 +22,11 @@ use Throwable;
 class ScheduleRunCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'schedule:run';
+    protected $signature = 'schedule:run {--whisper : Do not output message indicating that no jobs were ready to run}';
 
     /**
      * The console command description.
@@ -111,8 +111,6 @@ class ScheduleRunCommand extends Command
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
 
-        $this->newLine();
-
         $events = $this->schedule->dueEvents($this->laravel);
 
         if ($events->contains->isRepeatable()) {
@@ -124,6 +122,10 @@ class ScheduleRunCommand extends Command
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
                 continue;
+            }
+
+            if (! $this->eventsRan) {
+                $this->newLine();
             }
 
             if ($event->onOneServer) {
@@ -140,7 +142,9 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->components->info('No scheduled commands are ready to run.');
+            if (! $this->option('whisper')) {
+                $this->components->info('No scheduled commands are ready to run.');
+            }
         } else {
             $this->newLine();
         }

@@ -22,7 +22,7 @@ class DeferredCallback
      * @param  string  $name
      * @return $this
      */
-    public function name(string $name): self
+    public function name(string $name): static
     {
         $this->name = $name;
 
@@ -35,7 +35,7 @@ class DeferredCallback
      * @param  bool  $always
      * @return $this
      */
-    public function always(bool $always = true): self
+    public function always(bool $always = true): static
     {
         $this->always = $always;
 

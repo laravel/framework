@@ -169,7 +169,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool boolean(string|null $key = null, bool $default = false)
  * @method static int integer(string $key, int $default = 0)
  * @method static float float(string $key, float $default = 0)
- * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, string|null $tz = null)
+ * @method static \Illuminate\Support\Carbon|null date(string $key, string|null $format = null, \UnitEnum|string|null $tz = null)
  * @method static \BackedEnum|null enum(string $key, string $enumClass, \BackedEnum|null $default = null)
  * @method static \BackedEnum[] enums(string $key, string $enumClass)
  * @method static array array(array|string|null $key = null)
@@ -185,6 +185,9 @@ namespace Illuminate\Support\Facades;
  * @method static array validate(array $rules, ...$params)
  * @method static array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method static bool hasValidSignature(bool $absolute = true)
+ * @method static bool hasValidRelativeSignature()
+ * @method static bool hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+ * @method static bool hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
  *
  * @see \Illuminate\Http\Request
  */

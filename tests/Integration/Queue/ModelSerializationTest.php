@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Database\Eloquent\Attributes\Boot;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -210,16 +212,26 @@ class ModelSerializationTest extends TestCase
         $model = new ModelBootTestWithTraitInitialization();
 
         $this->assertTrue($model->fooBar);
+        $this->assertTrue($model->initializedViaAttributeInClass);
+        $this->assertTrue($model->initializedViaAttributeInTrait);
         $this->assertTrue($model::hasGlobalScope('foo_bar'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_trait'));
 
         $model::clearBootedModels();
 
         $this->assertFalse($model::hasGlobalScope('foo_bar'));
+        $this->assertFalse($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertFalse($model::hasGlobalScope('booted_attr_in_trait'));
 
         $unSerializedModel = unserialize(serialize($model));
 
         $this->assertFalse($unSerializedModel->fooBar);
+        $this->assertFalse($unSerializedModel->initializedViaAttributeInClass);
+        $this->assertFalse($unSerializedModel->initializedViaAttributeInTrait);
         $this->assertTrue($model::hasGlobalScope('foo_bar'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_trait'));
     }
 
     /**
@@ -402,6 +414,8 @@ class ModelSerializationTest extends TestCase
 
 trait TraitBootsAndInitializersTest
 {
+    public bool $initializedViaAttributeInTrait = false;
+
     public $fooBar = false;
 
     public function initializeTraitBootsAndInitializersTest()
@@ -414,11 +428,41 @@ trait TraitBootsAndInitializersTest
         static::addGlobalScope('foo_bar', function () {
         });
     }
+
+    #[Boot]
+    public static function nonConventionalBootFunctionInTrait()
+    {
+        static::addGlobalScope('booted_attr_in_trait', function () {
+        });
+    }
+
+    #[Initialize]
+    public function nonConventionalInitFunctionInTrait()
+    {
+        $this->initializedViaAttributeInTrait = ! $this->initializedViaAttributeInTrait;
+    }
 }
 
 class ModelBootTestWithTraitInitialization extends Model
 {
     use TraitBootsAndInitializersTest;
+
+    public static bool $bootedViaAttributeInClass = false;
+
+    public bool $initializedViaAttributeInClass = false;
+
+    #[Boot]
+    public static function nonConventionalBootFunctionInClass()
+    {
+        static::addGlobalScope('booted_attr_in_class', function () {
+        });
+    }
+
+    #[Initialize]
+    public function nonConventionalInitFunctionInClass()
+    {
+        $this->initializedViaAttributeInClass = ! $this->initializedViaAttributeInClass;
+    }
 }
 
 class ModelSerializationTestUser extends Model

@@ -13,7 +13,7 @@ if (! function_exists('Illuminate\Support\defer')) {
      * @param  callable|null  $callback
      * @param  string|null  $name
      * @param  bool  $always
-     * @return \Illuminate\Support\Defer\DeferredCallback
+     * @return ($callback is null ? \Illuminate\Support\Defer\DeferredCallbackCollection : \Illuminate\Support\Defer\DeferredCallback)
      */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {

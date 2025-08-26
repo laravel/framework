@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -317,6 +318,14 @@ class RepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('#Configuration value for key \[a.b\] must be an array, (.*) given.#');
 
         $this->repository->array('a.b');
+    }
+
+    public function testItGetsAsCollection(): void
+    {
+        $collection = $this->repository->collection('array');
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame(['aaa', 'zzz'], $collection->toArray());
     }
 
     public function testItGetsAsBoolean(): void
