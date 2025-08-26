@@ -55,4 +55,22 @@ class SupportFacadesHttpTest extends TestCase
 
         $this->assertSame($client, $this->app->make(Factory::class));
     }
+
+    public function testFacadeRootIsSharedWhenEnforcingFakingWithAllowedUrls(): void
+    {
+        $client = Http::preventStrayRequests()->allowStrayRequests(['127.0.0.1']);
+
+        $this->assertSame($client, $this->app->make(Factory::class));
+    }
+
+    public function test_can_set_prevents_to_prevents_stray_requests(): void
+    {
+        Http::preventStrayRequests(true);
+        $this->assertTrue($this->app->make(Factory::class)->preventingStrayRequests());
+        $this->assertTrue(Http::preventingStrayRequests());
+
+        Http::preventStrayRequests(false);
+        $this->assertFalse($this->app->make(Factory::class)->preventingStrayRequests());
+        $this->assertFalse(Http::preventingStrayRequests());
+    }
 }

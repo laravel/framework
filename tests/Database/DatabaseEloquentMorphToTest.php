@@ -368,6 +368,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $related = m::mock(Model::class);
         $related->shouldReceive('getKey')->andReturn(1);
         $related->shouldReceive('getTable')->andReturn('relation');
+        $related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $builder->shouldReceive('getModel')->andReturn($related);
 
         return new MorphTo($builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation');
@@ -380,6 +381,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->related = m::mock(Model::class);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
+        $this->related->shouldReceive('qualifyColumn')->andReturnUsing(fn (string $column) => "relation.{$column}");
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
 

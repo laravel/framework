@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ExceptionsTest extends TestCase
 {
-    public function tearDown(): void
-    {
-        parent::tearDown();
-    }
-
     public function testStopIgnoring()
     {
         $container = new Container;

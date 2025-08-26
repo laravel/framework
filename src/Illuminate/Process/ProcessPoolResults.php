@@ -18,11 +18,30 @@ class ProcessPoolResults implements ArrayAccess
      * Create a new process pool result set.
      *
      * @param  array  $results
-     * @return void
      */
     public function __construct(array $results)
     {
         $this->results = $results;
+    }
+
+    /**
+     * Determine if all of the processes in the pool were successful.
+     *
+     * @return bool
+     */
+    public function successful()
+    {
+        return $this->collect()->every(fn ($p) => $p->successful());
+    }
+
+    /**
+     * Determine if any of the processes in the pool failed.
+     *
+     * @return bool
+     */
+    public function failed()
+    {
+        return ! $this->successful();
     }
 
     /**

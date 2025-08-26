@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,9 +67,19 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
+        $separator = '/';
+
+        if (windows_os()) {
+            $separator = '\\';
+        }
+
         $path = $this->viewPath(
-            str_replace('.', '/', $this->getView()).'.blade.php'
+            str_replace('.', $separator, $this->getView()).'.blade.php'
         );
+
+        if ($this->files->exists($path)) {
+            return $this->components->error(sprintf('%s [%s] already exists.', 'Markdown view', $path));
+        }
 
         $this->files->ensureDirectoryExists(dirname($path));
 
@@ -84,9 +95,19 @@ class MailMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
+        $separator = '/';
+
+        if (windows_os()) {
+            $separator = '\\';
+        }
+
         $path = $this->viewPath(
-            str_replace('.', '/', $this->getView()).'.blade.php'
+            str_replace('.', $separator, $this->getView()).'.blade.php'
         );
+
+        if ($this->files->exists($path)) {
+            return $this->components->error(sprintf('%s [%s] already exists.', 'View', $path));
+        }
 
         $this->files->ensureDirectoryExists(dirname($path));
 
@@ -134,7 +155,7 @@ class MailMakeCommand extends GeneratorCommand
         if (! $view) {
             $name = str_replace('\\', '/', $this->argument('name'));
 
-            $view = 'mail.'.collect(explode('/', $name))
+            $view = 'mail.'.(new Collection(explode('/', $name)))
                 ->map(fn ($part) => Str::kebab($part))
                 ->implode('.');
         }

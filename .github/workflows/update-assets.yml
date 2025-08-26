@@ -1,0 +1,34 @@
+name: 'update assets'
+
+on:
+  push:
+    branches:
+      - '12.x'
+    paths:
+      - '/src/Illuminate/Foundation/resources/exceptions/renderer/package-lock.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Update Exception Renderer Assets
+        run: |
+          npm ci --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
+          npm run build --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
+
+      - name: Commit Compiled Files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Update Assets

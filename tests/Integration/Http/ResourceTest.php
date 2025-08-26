@@ -46,7 +46,6 @@ use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use LogicException;
-use Mockery as m;
 use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
@@ -902,7 +901,7 @@ class ResourceTest extends TestCase
         );
 
         $this->assertEquals(
-            '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","active":false},{"url":"\/?page=1","label":"1","active":true},{"url":null,"label":"Next &raquo;","active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
+            '{"data":[{"id":5,"title":"Test Title","reading_time":3.0}],"links":{"first":"\/?page=1","last":"\/?page=1","prev":null,"next":null},"meta":{"current_page":1,"from":1,"last_page":1,"links":[{"url":null,"label":"&laquo; Previous","page":null,"active":false},{"url":"\/?page=1","label":"1","page":1,"active":true},{"url":null,"label":"Next &raquo;","page":null,"active":false}],"path":"\/","per_page":15,"to":1,"total":10}}',
             $response->baseResponse->content()
         );
     }
@@ -1503,12 +1502,16 @@ class ResourceTest extends TestCase
 
     public function testPostTooLargeException()
     {
-        $this->expectException(PostTooLargeException::class);
-
-        $request = m::mock(Request::class, ['server' => ['CONTENT_LENGTH' => '2147483640']]);
+        $request = new Request(server: ['CONTENT_LENGTH' => '4']);
         $post = new ValidatePostSize;
-        $post->handle($request, function () {
-        });
+        $post->handle($request, fn () => null);
+
+        $this->expectException(PostTooLargeException::class);
+        $this->expectExceptionMessage('The POST data is too large.');
+
+        $request = new Request(server: ['CONTENT_LENGTH' => '2147483640']);
+        $post = new ValidatePostSize;
+        $post->handle($request, fn () => null);
     }
 
     public function testLeadingMergeKeyedValueIsMergedCorrectlyWhenFirstValueIsMissing()
@@ -1848,6 +1851,61 @@ class ResourceTest extends TestCase
         } finally {
             Model::preventAccessingMissingAttributes($originalMode);
         }
+    }
+
+    public function testResourceSkipsWrappingWhenDataKeyExists()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'id' => 5,
+            'title' => 'Test',
+            'data' => 'some data',
+        ], $content);
+    }
+
+    public function testResourceWrapsWhenDataKeyDoesNotExist()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test']) extends JsonResource
+        {
+            public static $wrap = 'data';
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+            ],
+        ], $content);
+    }
+
+    public function testResourceForceWrapOverridesDataKeyCheck()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'data';
+            public static bool $forceWrapping = true;
+        };
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content);
     }
 
     private function assertJsonResourceResponse($data, $expectedJson)

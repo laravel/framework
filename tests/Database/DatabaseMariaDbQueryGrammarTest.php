@@ -18,8 +18,7 @@ class DatabaseMariaDbQueryGrammarTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('escape')->with('foo', false)->andReturn("'foo'");
-        $grammar = new MariaDbGrammar;
-        $grammar->setConnection($connection);
+        $grammar = new MariaDbGrammar($connection);
 
         $query = $grammar->substituteBindingsIntoRawSql(
             'select * from "users" where \'Hello\\\'World?\' IS NOT NULL AND "email" = ?',

@@ -395,7 +395,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsSpecificErrorViewIfExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
 
         $this->container->instance(ViewFactory::class, $viewFactory);
@@ -413,7 +413,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsFallbackErrorViewIfExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->once()->with('errors::502')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::5xx')->andReturn(true);
 
@@ -432,7 +432,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsNullIfNoErrorViewExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::4xx')->andReturn(false);
 
@@ -571,6 +571,36 @@ class FoundationExceptionsHandlerTest extends TestCase
         }
     }
 
+    public function testAssertNoExceptionIsThrown()
+    {
+        try {
+            $this->assertDoesntThrow(function () {
+                throw new Exception;
+            });
+
+            $testFailed = true;
+        } catch (AssertionFailedError) {
+            $testFailed = false;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertDoesntThrow failed: thrown exception was not detected.');
+        }
+
+        try {
+            $this->assertDoesntThrow(function () {
+            });
+
+            $testFailed = false;
+        } catch (AssertionFailedError) {
+            $testFailed = true;
+        }
+
+        if ($testFailed) {
+            Assert::fail('assertDoesntThrow failed: exception was detected while no exception was thrown.');
+        }
+    }
+
     public function testItReportsDuplicateExceptions()
     {
         $reported = [];
@@ -603,6 +633,29 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report($two = new RuntimeException('foo'));
 
         $this->assertSame($reported, [$one, $two]);
+    }
+
+    public function testItCanSkipExceptionReportingUsingCallback()
+    {
+        $reported = [];
+        $e1 = new RuntimeException('foo');
+        $e2 = new RuntimeException('bar');
+
+        $this->handler->reportable(function (\Throwable $e) use (&$reported) {
+            $reported[] = $e;
+
+            return false;
+        });
+
+        $this->handler->dontReportWhen(function (\Throwable $e) {
+            return $e->getMessage() === 'foo';
+        });
+
+        $this->handler->report($e1);
+        $this->handler->report($e2);
+        $this->handler->report($e1);
+
+        $this->assertSame($reported, [$e2]);
     }
 
     public function testItDoesNotThrottleExceptionsByDefault()

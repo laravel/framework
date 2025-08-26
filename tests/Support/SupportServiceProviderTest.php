@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Translation\Translator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -160,6 +161,36 @@ class SupportServiceProviderTest extends TestCase
 
         $this->assertNotContains('source/tagged/five', ServiceProvider::publishableMigrationPaths());
     }
+
+    public function testLoadTranslationsFromWithoutNamespace()
+    {
+        $translator = m::mock(Translator::class);
+        $translator->shouldReceive('addPath')->once()->with(__DIR__.'/translations');
+
+        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+            $callback($translator);
+
+            return true;
+        }));
+
+        $provider = new ServiceProviderForTestingOne($this->app);
+        $provider->loadTranslationsFrom(__DIR__.'/translations');
+    }
+
+    public function testLoadTranslationsFromWithNamespace()
+    {
+        $translator = m::mock(Translator::class);
+        $translator->shouldReceive('addNamespace')->once()->with('namespace', __DIR__.'/translations');
+
+        $this->app->shouldReceive('afterResolving')->once()->with('translator', m::on(function ($callback) use ($translator) {
+            $callback($translator);
+
+            return true;
+        }));
+
+        $provider = new ServiceProviderForTestingOne($this->app);
+        $provider->loadTranslationsFrom(__DIR__.'/translations', 'namespace');
+    }
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider
@@ -178,6 +209,13 @@ class ServiceProviderForTestingOne extends ServiceProvider
         $this->publishesMigrations(['source/unmarked/two' => 'destination/unmarked/two']);
         $this->publishesMigrations(['source/tagged/three' => 'destination/tagged/three'], 'tag_three');
         $this->publishesMigrations(['source/tagged/multiple_two' => 'destination/tagged/multiple_two'], ['tag_four', 'tag_five']);
+    }
+
+    public function loadTranslationsFrom($path, $namespace = null)
+    {
+        $this->callAfterResolving('translator', fn ($translator) => is_null($namespace)
+            ? $translator->addPath($path)
+            : $translator->addNamespace($namespace, $path));
     }
 }
 

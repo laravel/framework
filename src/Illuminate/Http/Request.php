@@ -7,8 +7,11 @@ use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Session\SymfonySessionDecorator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -19,6 +22,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @method array validate(array $rules, ...$params)
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method bool hasValidSignature(bool $absolute = true)
+ * @method bool hasValidRelativeSignature()
+ * @method bool hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+ * @method bool hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
  */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
@@ -26,6 +32,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         Concerns\InteractsWithContentTypes,
         Concerns\InteractsWithFlashData,
         Concerns\InteractsWithInput,
+        Conditionable,
         Macroable;
 
     /**
@@ -38,7 +45,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * All of the converted files for the request.
      *
-     * @var array
+     * @var array<int, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]>
      */
     protected $convertedFiles;
 
@@ -86,6 +93,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function method()
     {
         return $this->getMethod();
+    }
+
+    /**
+     * Get a URI instance for the request.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function uri()
+    {
+        return Uri::of($this->fullUrl());
     }
 
     /**
@@ -210,9 +227,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function is(...$patterns)
     {
-        $path = $this->decodedPath();
-
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $path));
+        return (new Collection($patterns))
+            ->contains(fn ($pattern) => Str::is($pattern, $this->decodedPath()));
     }
 
     /**
@@ -234,9 +250,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlIs(...$patterns)
     {
-        $url = $this->fullUrl();
-
-        return collect($patterns)->contains(fn ($pattern) => Str::is($pattern, $url));
+        return (new Collection($patterns))
+            ->contains(fn ($pattern) => Str::is($pattern, $this->fullUrl()));
     }
 
     /**
@@ -351,10 +366,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     {
         return tap($this, function (Request $request) use ($input) {
             $request->getInputSource()
-                    ->replace(collect($input)->reduce(
-                        fn ($requestInput, $value, $key) => data_set($requestInput, $key, $value),
-                        $this->getInputSource()->all()
-                    ));
+                ->replace((new Collection($input))->reduce(
+                    fn ($requestInput, $value, $key) => data_set($requestInput, $key, $value),
+                    $this->getInputSource()->all()
+                ));
         });
     }
 
@@ -366,9 +381,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function mergeIfMissing(array $input)
     {
-        return $this->merge(collect($input)->filter(function ($value, $key) {
-            return $this->missing($key);
-        })->toArray());
+        return $this->merge((new Collection($input))
+            ->filter(fn ($value, $key) => $this->missing($key))
+            ->toArray()
+        );
     }
 
     /**
@@ -404,7 +420,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return \Symfony\Component\HttpFoundation\InputBag|mixed
+     * @return ($key is null ? \Symfony\Component\HttpFoundation\InputBag : mixed)
      */
     public function json($key = null, $default = null)
     {
@@ -620,7 +636,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string|null  $param
      * @param  mixed  $default
-     * @return \Illuminate\Routing\Route|object|string|null
+     * @return ($param is null ? \Illuminate\Routing\Route : object|string|null)
      */
     public function route($param = null, $default = null)
     {

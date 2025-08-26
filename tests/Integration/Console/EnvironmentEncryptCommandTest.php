@@ -34,6 +34,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->andReturn(false);
 
         $this->artisan('env:encrypt', ['--cipher' => 'invalid'])
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('Unsupported cipher')
             ->assertExitCode(1);
     }
@@ -62,6 +63,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->andReturn(false);
 
         $this->artisan('env:encrypt', ['--env' => 'production'])
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('.env.production.encrypted')
             ->assertExitCode(0);
 
@@ -80,6 +82,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->shouldReceive('get');
 
         $this->artisan('env:encrypt')
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
 
@@ -92,6 +95,7 @@ class EnvironmentEncryptCommandTest extends TestCase
         $this->filesystem->shouldReceive('exists')->andReturn(false);
 
         $this->artisan('env:encrypt')
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('Environment file not found.')
             ->assertExitCode(1);
     }
@@ -101,6 +105,7 @@ class EnvironmentEncryptCommandTest extends TestCase
         $this->filesystem->shouldReceive('exists')->andReturn(true);
 
         $this->artisan('env:encrypt')
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('Encrypted environment file already exists.')
             ->assertExitCode(1);
     }
@@ -115,6 +120,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->andReturn(true);
 
         $this->artisan('env:encrypt', ['--force' => true])
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
 
@@ -166,6 +172,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->andReturn(false);
 
         $this->artisan('env:encrypt', ['--prune' => true])
+            ->expectsQuestion('What encryption key would you like to use?', 'generate')
             ->expectsOutputToContain('.env.encrypted')
             ->assertExitCode(0);
 
@@ -174,5 +181,23 @@ class EnvironmentEncryptCommandTest extends TestCase
 
         $this->filesystem->shouldHaveReceived('delete')
             ->with(base_path('.env'));
+    }
+
+    public function testItEncryptsWithInteractivelyGivenKeyAndDisplaysIt()
+    {
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false);
+
+        $this->artisan('env:encrypt')
+            ->expectsQuestion('What encryption key would you like to use?', 'ask')
+            ->expectsQuestion('What is the encryption key?', $key = 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP')
+            ->expectsOutputToContain('Environment successfully encrypted')
+            ->expectsOutputToContain($key)
+            ->expectsOutputToContain('.env.encrypted')
+            ->assertExitCode(0);
     }
 }

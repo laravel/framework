@@ -15,7 +15,6 @@ class ControllerMiddlewareOptions
      * Create a new middleware option instance.
      *
      * @param  array  $options
-     * @return void
      */
     public function __construct(array &$options)
     {
@@ -25,7 +24,7 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should apply to.
      *
-     * @param  array|string|mixed  $methods
+     * @param  mixed  $methods
      * @return $this
      */
     public function only($methods)
@@ -38,7 +37,7 @@ class ControllerMiddlewareOptions
     /**
      * Set the controller methods the middleware should exclude.
      *
-     * @param  array|string|mixed  $methods
+     * @param  mixed  $methods
      * @return $this
      */
     public function except($methods)

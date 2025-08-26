@@ -7,6 +7,7 @@ use Illuminate\Cache\FileStore;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -328,6 +329,49 @@ class CacheFileStoreTest extends TestCase
         $store = new FileStore($files, __DIR__.'--wrong');
         $result = $store->flush();
         $this->assertFalse($result, 'Flush should not clean directory');
+    }
+
+    public function testItHandlesForgettingNonFlexibleKeys()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+
+        $key = Str::random();
+        $path = $store->path($key);
+        $flexiblePath = "illuminate:cache:flexible:created:{$key}";
+
+        $store->put($key, 'value', 5);
+
+        $this->assertFileExists($path);
+        $this->assertFileDoesNotExist($flexiblePath);
+
+        $store->forget($key);
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileDoesNotExist($flexiblePath);
+    }
+
+    public function itOnlyForgetsFlexibleKeysIfParentIsForgotten()
+    {
+        $store = new FileStore(new Filesystem, __DIR__);
+
+        $key = Str::random();
+        $path = $store->path($key);
+        $flexiblePath = "illuminate:cache:flexible:created:{$key}";
+
+        touch($flexiblePath);
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileExists($flexiblePath);
+
+        $store->forget($key);
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileExists($flexiblePath);
+
+        $store->put($key, 'value', 5);
+
+        $this->assertFileDoesNotExist($path);
+        $this->assertFileDoesNotExist($flexiblePath);
     }
 
     protected function mockFilesystem()

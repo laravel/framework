@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
@@ -35,6 +36,22 @@ class RedisCacheIntegrationTest extends TestCase
         $this->assertTrue($repository->add('k', 'v', 3600));
         $this->assertFalse($repository->add('k', 'v', 3600));
         $this->assertGreaterThan(3500, $this->redis[$driver]->connection()->ttl('k'));
+    }
+
+    /**
+     * @param  string  $driver
+     */
+    #[DataProvider('redisDriverProvider')]
+    public function testRedisCacheRateLimiter($driver)
+    {
+        $store = new RedisStore($this->redis[$driver]);
+        $repository = new Repository($store);
+        $rateLimiter = new RateLimiter($repository);
+
+        $this->assertFalse($rateLimiter->tooManyAttempts('key', 1));
+        $this->assertEquals(1, $rateLimiter->hit('key', 60));
+        $this->assertTrue($rateLimiter->tooManyAttempts('key', 1));
+        $this->assertFalse($rateLimiter->tooManyAttempts('key', 2));
     }
 
     /**

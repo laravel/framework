@@ -2,10 +2,12 @@
 
 namespace Illuminate\Auth\Middleware;
 
-use BackedEnum;
 use Closure;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+
+use function Illuminate\Support\enum_value;
 
 class Authorize
 {
@@ -20,7 +22,6 @@ class Authorize
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
-     * @return void
      */
     public function __construct(Gate $gate)
     {
@@ -30,15 +31,13 @@ class Authorize
     /**
      * Specify the ability and models for the middleware.
      *
-     * @param  \BackedEnum|string  $ability
+     * @param  \UnitEnum|string  $ability
      * @param  string  ...$models
      * @return string
      */
     public static function using($ability, ...$models)
     {
-        $ability = $ability instanceof BackedEnum ? $ability->value : $ability;
-
-        return static::class.':'.implode(',', [$ability, ...$models]);
+        return static::class.':'.implode(',', [enum_value($ability), ...$models]);
     }
 
     /**
@@ -73,9 +72,9 @@ class Authorize
             return [];
         }
 
-        return collect($models)->map(function ($model) use ($request) {
-            return $model instanceof Model ? $model : $this->getModel($request, $model);
-        })->all();
+        return (new Collection($models))
+            ->map(fn ($model) => $model instanceof Model ? $model : $this->getModel($request, $model))
+            ->all();
     }
 
     /**

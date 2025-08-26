@@ -97,6 +97,25 @@ class LogManagerTest extends TestCase
         $this->assertTrue($handlers[1]->getBubble());
     }
 
+    public function testParsingStackChannels()
+    {
+        $config = $this->app['config'];
+
+        $config->set('logging.channels.stack', [
+            'driver' => 'stack',
+            'channels' => 'single, daily, stderr',
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $manager->channel('stack');
+
+        $this->assertSame(
+            array_keys($manager->getChannels()),
+            ['single', 'daily', 'stderr', 'stack']
+        );
+    }
+
     public function testLogManagerCreatesConfiguredMonologHandler()
     {
         $config = $this->app['config'];

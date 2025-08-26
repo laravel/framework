@@ -8,8 +8,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Testing\Assert;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', false)]
 class RouteServiceProviderTest extends TestCase
 {
     /**

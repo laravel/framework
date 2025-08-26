@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Testing\Assert;
+use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\TestCase;
 
 use function Orchestra\Testbench\remote;
@@ -38,6 +39,18 @@ class AboutCommandTest extends TestCase
                 'queue' => 'database',
                 'session' => 'cookie',
             ], $output['drivers']);
+        });
+    }
+
+    #[WithEnv('VIEW_COMPILED_PATH', __DIR__.'/../../View/templates')]
+    public function testItRespectsCustomPathForCompiledViews(): void
+    {
+        $process = remote('about --json', ['APP_ENV' => 'local'])->mustRun();
+
+        tap(json_decode($process->getOutput(), true), static function (array $output) {
+            Assert::assertArraySubset([
+                'views' => true,
+            ], $output['cache']);
         });
     }
 }

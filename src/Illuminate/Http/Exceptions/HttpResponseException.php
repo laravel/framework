@@ -20,7 +20,6 @@ class HttpResponseException extends RuntimeException
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  \Throwable  $previous
-     * @return void
      */
     public function __construct(Response $response, ?Throwable $previous = null)
     {

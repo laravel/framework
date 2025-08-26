@@ -41,7 +41,6 @@ class CacheManager implements FactoryContract
      * Create a new Cache manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -73,6 +72,25 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Get a memoized cache driver instance.
+     *
+     * @param  string|null  $driver
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function memo($driver = null)
+    {
+        $driver = $driver ?: $this->getDefaultDriver();
+
+        if (! $this->app->bound($bindingKey = "cache.__memoized:{$driver}")) {
+            $this->app->scoped($bindingKey, fn () => $this->repository(
+                new MemoizedStore($driver, $this->store($driver)), ['events' => false]
+            ));
+        }
+
+        return $this->app->make($bindingKey);
+    }
+
+    /**
      * Resolve the given store.
      *
      * @param  string  $name
@@ -89,6 +107,19 @@ class CacheManager implements FactoryContract
         }
 
         $config = Arr::add($config, 'store', $name);
+
+        return $this->build($config);
+    }
+
+    /**
+     * Build a cache repository with the given configuration.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    public function build(array $config)
+    {
+        $config = Arr::add($config, 'store', $config['name'] ?? 'ondemand');
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
@@ -270,10 +301,10 @@ class CacheManager implements FactoryContract
             $dynamoConfig['credentials'] = Arr::only(
                 $config, ['key', 'secret']
             );
-        }
 
-        if (! empty($config['token'])) {
-            $dynamoConfig['credentials']['token'] = $config['token'];
+            if (! empty($config['token'])) {
+                $dynamoConfig['credentials']['token'] = $config['token'];
+            }
         }
 
         return new DynamoDbClient($dynamoConfig);
@@ -319,7 +350,7 @@ class CacheManager implements FactoryContract
      */
     public function refreshEventDispatcher()
     {
-        array_map([$this, 'setEventDispatcher'], $this->stores);
+        array_map($this->setEventDispatcher(...), $this->stores);
     }
 
     /**
@@ -406,6 +437,9 @@ class CacheManager implements FactoryContract
      *
      * @param  string  $driver
      * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)

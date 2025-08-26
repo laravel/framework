@@ -27,6 +27,7 @@ use Illuminate\Testing\TestResponse;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -261,6 +262,39 @@ class TestResponseTest extends TestCase
         }
     }
 
+    public function testAssertStreamedAndAssertNotStreamed()
+    {
+        $notStreamedResponse = $this->makeMockResponse([
+            'render' => 'expected response data',
+        ]);
+
+        $streamedResponse = TestResponse::fromBaseResponse(
+            new StreamedResponse(function () {
+                $stream = fopen('php://memory', 'r+');
+                fwrite($stream, 'expected response data');
+                rewind($stream);
+                fpassthru($stream);
+            })
+        );
+
+        $notStreamedResponse->assertNotStreamed();
+        $streamedResponse->assertStreamed();
+
+        try {
+            $notStreamedResponse->assertStreamed();
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Expected the response to be streamed, but it wasn't.\nFailed asserting that false is true.", $e->getMessage());
+        }
+
+        try {
+            $streamedResponse->assertNotStreamed();
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Response was unexpectedly streamed.\nFailed asserting that false is true.", $e->getMessage());
+        }
+    }
+
     public function testAssertStreamedContent()
     {
         $response = TestResponse::fromBaseResponse(
@@ -322,6 +356,40 @@ class TestResponseTest extends TestCase
             $this->fail('xxxx');
         } catch (AssertionFailedError $e) {
             $this->assertSame('Failed asserting that two strings are identical.', $e->getMessage());
+        }
+    }
+
+    public function testJsonAssertionsOnStreamedJsonContent()
+    {
+        $response = TestResponse::fromBaseResponse(
+            new StreamedJsonResponse([
+                'data' => $this->yieldTestModels(),
+            ])
+        );
+
+        $response->assertJsonPath('data', [
+            ['id' => 1],
+            ['id' => 2],
+            ['id' => 3],
+        ]);
+
+        try {
+            $response->assertJsonPath('data', [
+                ['id' => 1],
+                ['id' => 2],
+            ]);
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame('Failed asserting that two arrays are identical.', $e->getMessage());
+        }
+
+        $response->assertJsonCount(3, 'data');
+
+        try {
+            $response->assertJsonCount(2, 'data');
+            $this->fail('xxxx');
+        } catch (AssertionFailedError $e) {
+            $this->assertSame("Failed to assert that the response count matched the expected 2\nFailed asserting that actual size 3 matches expected size 2.", $e->getMessage());
         }
     }
 
@@ -1019,6 +1087,18 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertClientError()
+    {
+        $statusCode = 400;
+
+        $baseResponse = tap(new Response, function ($response) use ($statusCode) {
+            $response->setStatusCode($statusCode);
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertClientError();
+    }
+
     public function testAssertServerError()
     {
         $statusCode = 500;
@@ -1212,6 +1292,7 @@ class TestResponseTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
             $json->where('0.foo', 'foo 0');
+            $json->where('0.meta', []);
         });
     }
 
@@ -1369,6 +1450,27 @@ class TestResponseTest extends TestCase
         $response->assertJsonPath('data.foo', fn ($value) => $value === null);
     }
 
+    public function testAssertJsonPathWithEnum()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'booked'],
+        ]));
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
+    }
+
+    public function testAssertJsonPathWithEnumCanFail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response([
+            'data' => ['status' => 'failed'],
+        ]));
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that two strings are identical.');
+
+        $response->assertJsonPath('data.status', TestStatus::Booked);
+    }
+
     public function testAssertJsonPathCanonicalizing()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -1413,6 +1515,20 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 10]);
+    }
+
+    public function testAssertJsonFragments()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+        ]);
+
+        $response->assertJsonFragments([
+            ['foo' => 'foo 0'],
+            ['foo' => 'foo 1'],
+        ]);
     }
 
     public function testAssertJsonFragmentCanFail()
@@ -1541,7 +1657,7 @@ class TestResponseTest extends TestCase
 
         $this->assertTrue($failed);
 
-        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
+        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar', 'meta']]);
     }
 
     public function testAssertJsonCount()
@@ -1651,6 +1767,103 @@ class TestResponseTest extends TestCase
         );
 
         $testResponse->assertJsonValidationErrors('foo');
+    }
+
+    public function testAssertOnlyJsonValidationErrors()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'oops', 'bar' => 'another oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response)->setContent(json_encode($data))
+        );
+
+        try {
+            $testResponse->assertOnlyJsonValidationErrors('foo');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyJsonValidationErrors(['foo', 'bar']);
+
+        try {
+            $testResponse->assertOnlyJsonValidationErrors(['foo' => 'oops']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyJsonValidationErrors(['foo' => 'oops', 'bar' => 'another oops']);
+    }
+
+    public function testAssertJsonValidationErrorsUsingAssertOnlyInvalid()
+    {
+        $data = [
+            'status' => 'ok',
+            'errors' => ['foo' => 'oops', 'bar' => 'another oops'],
+        ];
+
+        $testResponse = TestResponse::fromBaseResponse(
+            (new Response('', 200, ['Content-Type' => 'application/json']))->setContent(json_encode($data))
+        );
+
+        try {
+            $testResponse->assertOnlyInvalid('foo');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['foo', 'bar']);
+
+        try {
+            $testResponse->assertOnlyInvalid(['foo' => 'oops']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'bar\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['foo' => 'oops', 'bar' => 'another oops']);
+    }
+
+    public function testAssertSessionOnlyValidationErrorsUsingAssertOnlyInvalid()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('errors', $errorBag = new ViewErrorBag);
+
+        $errorBag->put('default', new MessageBag([
+            'first_name' => [
+                'Your first name is required',
+                'Your first name must be at least 1 character',
+            ],
+            'last_name' => [
+                'Your last name is required',
+            ],
+        ]));
+
+        $testResponse = TestResponse::fromBaseResponse(new Response);
+
+        try {
+            $testResponse->assertOnlyInvalid('first_name');
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'last_name\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['first_name', 'last_name']);
+
+        try {
+            $testResponse->assertOnlyInvalid(['first_name' => 'required']);
+            $this->fail();
+        } catch (AssertionFailedError $e) {
+            $this->assertStringStartsWith('Response has unexpected validation errors: \'last_name\'', $e->getMessage());
+        }
+
+        $testResponse->assertOnlyInvalid(['first_name' => 'required', 'last_name' => 'required']);
     }
 
     public function testAssertJsonValidationErrorsUsingAssertInvalid()
@@ -2452,6 +2665,27 @@ class TestResponseTest extends TestCase
         $response->assertRedirect();
     }
 
+    public function testAssertRedirectBack()
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->setPreviousUrl('https://url.com');
+
+        app('url')->setSessionResolver(fn () => app('session.store'));
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response('', 302))->withHeaders(['Location' => 'https://url.com'])
+        );
+
+        $response->assertRedirectBack();
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $store->setPreviousUrl('https://url.net');
+
+        $response->assertRedirectBack();
+    }
+
     public function testGetDecryptedCookie()
     {
         $response = TestResponse::fromBaseResponse(
@@ -2572,6 +2806,21 @@ class TestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response());
         $response->assertSessionMissing('foo');
+    }
+
+    #[TestWith(['foo', 'badvalue'])]
+    #[TestWith(['foo', null])]
+    #[TestWith([['foo', 'bar'], null])]
+    public function testAssertSessionMissingValue(array|string $key, mixed $value)
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
     }
 
     public function testAssertSessionHasInput()
@@ -2734,10 +2983,10 @@ class JsonSerializableSingleResourceStub implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            ['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0'],
-            ['foo' => 'foo 1', 'bar' => 'bar 1', 'foobar' => 'foobar 1'],
-            ['foo' => 'foo 2', 'bar' => 'bar 2', 'foobar' => 'foobar 2'],
-            ['foo' => 'foo 3', 'bar' => 'bar 3', 'foobar' => 'foobar 3'],
+            ['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0', 'meta' => []],
+            ['foo' => 'foo 1', 'bar' => 'bar 1', 'foobar' => 'foobar 1', 'meta' => null],
+            ['foo' => 'foo 2', 'bar' => 'bar 2', 'foobar' => 'foobar 2', 'meta' => []],
+            ['foo' => 'foo 3', 'bar' => 'bar 3', 'foobar' => 'foobar 3', 'meta' => null],
         ];
     }
 }
@@ -2774,4 +3023,9 @@ class TestModel extends Model
 class AnotherTestModel extends Model
 {
     protected $guarded = [];
+}
+
+enum TestStatus: string
+{
+    case Booked = 'booked';
 }

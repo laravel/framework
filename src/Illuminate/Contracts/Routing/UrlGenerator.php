@@ -2,9 +2,6 @@
 
 namespace Illuminate\Contracts\Routing;
 
-/**
- * @method string query(string $path, array $query = [], mixed $extra = [], bool|null $secure = null)
- */
 interface UrlGenerator
 {
     /**
@@ -85,6 +82,17 @@ interface UrlGenerator
      * @return string
      */
     public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true);
+
+    /**
+     * Generate an absolute URL with the given query parameters.
+     *
+     * @param  string  $path
+     * @param  array  $query
+     * @param  mixed  $extra
+     * @param  bool|null  $secure
+     * @return string
+     */
+    public function query($path, $query = [], $extra = [], $secure = null);
 
     /**
      * Get the URL to a controller action.

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class UsePusherChannelsNamesTest extends TestCase
 {
     #[DataProvider('channelsProvider')]
-    public function testChannelNameNormalization($requestChannelName, $normalizedName)
+    public function testChannelNameNormalization($requestChannelName, $normalizedName, $_)
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -27,6 +27,19 @@ class UsePusherChannelsNamesTest extends TestCase
         $this->assertSame(
             'private-123',
             $broadcaster->normalizeChannelName('private-encrypted-private-123')
+        );
+    }
+
+    public function testChannelNamePatternMatching()
+    {
+        $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
+
+        $this->assertEquals(
+            0,
+            $broadcaster->testChannelNameMatchesPattern(
+                'TestChannel',
+                'Test.{id}'
+            )
         );
     }
 
@@ -102,5 +115,10 @@ class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
     public function broadcast(array $channels, $event, array $payload = [])
     {
         //
+    }
+
+    public function testChannelNameMatchesPattern($channel, $pattern)
+    {
+        return $this->channelNameMatchesPattern($channel, $pattern);
     }
 }

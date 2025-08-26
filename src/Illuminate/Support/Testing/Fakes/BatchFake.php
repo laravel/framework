@@ -37,19 +37,19 @@ class BatchFake extends Batch
      * @param  \Carbon\CarbonImmutable  $createdAt
      * @param  \Carbon\CarbonImmutable|null  $cancelledAt
      * @param  \Carbon\CarbonImmutable|null  $finishedAt
-     * @return void
      */
-    public function __construct(string $id,
-                                string $name,
-                                int $totalJobs,
-                                int $pendingJobs,
-                                int $failedJobs,
-                                array $failedJobIds,
-                                array $options,
-                                CarbonImmutable $createdAt,
-                                ?CarbonImmutable $cancelledAt = null,
-                                ?CarbonImmutable $finishedAt = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        int $totalJobs,
+        int $pendingJobs,
+        int $failedJobs,
+        array $failedJobIds,
+        array $options,
+        CarbonImmutable $createdAt,
+        ?CarbonImmutable $cancelledAt = null,
+        ?CarbonImmutable $finishedAt = null,
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->totalJobs = $totalJobs;
@@ -106,7 +106,7 @@ class BatchFake extends Batch
      * Decrement the pending jobs for the batch.
      *
      * @param  string  $jobId
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return void
      */
     public function decrementPendingJobs(string $jobId)
     {

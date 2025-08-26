@@ -4,9 +4,12 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Process\PhpExecutableFinder;
+
+use function Illuminate\Support\artisan_binary;
+use function Illuminate\Support\php_binary;
 
 #[AsCommand(name: 'install:api')]
 class ApiInstallCommand extends Command
@@ -34,7 +37,7 @@ class ApiInstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
     public function handle()
     {
@@ -64,12 +67,11 @@ class ApiInstallCommand extends Command
         }
 
         if ($this->option('passport')) {
-            Process::run(array_filter([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+            Process::run([
+                php_binary(),
+                artisan_binary(),
                 'passport:install',
-                $this->confirm('Would you like to use UUIDs for all client IDs?') ? '--uuids' : null,
-            ]));
+            ]);
 
             $this->components->info('API scaffolding installed. Please add the [Laravel\Passport\HasApiTokens] trait to your User model.');
         } else {
@@ -107,7 +109,7 @@ class ApiInstallCommand extends Command
                 $appBootstrapPath,
             );
         } else {
-            $this->components->warn('Unable to automatically add API route definition to bootstrap file. API route file should be registered manually.');
+            $this->components->warn("Unable to automatically add API route definition to [{$appBootstrapPath}]. API route file should be registered manually.");
 
             return;
         }
@@ -124,14 +126,14 @@ class ApiInstallCommand extends Command
             'laravel/sanctum:^4.0',
         ]);
 
-        $migrationPublished = collect(scandir($this->laravel->databasePath('migrations')))->contains(function ($migration) {
+        $migrationPublished = (new Collection(scandir($this->laravel->databasePath('migrations'))))->contains(function ($migration) {
             return preg_match('/\d{4}_\d{2}_\d{2}_\d{6}_create_personal_access_tokens_table.php/', $migration);
         });
 
         if (! $migrationPublished) {
             Process::run([
-                (new PhpExecutableFinder())->find(false) ?: 'php',
-                defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan',
+                php_binary(),
+                artisan_binary(),
                 'vendor:publish',
                 '--provider',
                 'Laravel\\Sanctum\\SanctumServiceProvider',
@@ -147,7 +149,7 @@ class ApiInstallCommand extends Command
     protected function installPassport()
     {
         $this->requireComposerPackages($this->option('composer'), [
-            'laravel/passport:^12.0',
+            'laravel/passport:^13.0',
         ]);
     }
 }

@@ -34,6 +34,61 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationEnded::class, 2);
     }
 
+    public function testMigrationEventsContainTheOptionsAndPretendFalse()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', $this->migrateOptions());
+        $this->artisan('migrate:rollback', $this->migrateOptions());
+
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'down'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'down'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+    }
+
+    public function testMigrationEventsContainTheOptionsAndPretendTrue()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', $this->migrateOptions() + ['--pretend' => true]);
+        $this->artisan('migrate:rollback', $this->migrateOptions()); // doesn't support pretend
+
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === true;
+        });
+
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === true;
+        });
+    }
+
     public function testMigrationEventsContainTheMigrationAndMethod()
     {
         Event::fake();

@@ -45,13 +45,16 @@ class Lottery
      * Create a new Lottery instance.
      *
      * @param  int|float  $chances
-     * @param  int|null  $outOf
-     * @return void
+     * @param  int<1, max>|null  $outOf
      */
     public function __construct($chances, $outOf = null)
     {
         if ($outOf === null && is_float($chances) && $chances > 1) {
             throw new RuntimeException('Float must not be greater than 1.');
+        }
+
+        if ($outOf !== null && $outOf < 1) {
+            throw new RuntimeException('Lottery "out of" value must be greater than or equal to 1.');
         }
 
         $this->chances = $chances;
@@ -211,7 +214,7 @@ class Lottery
      */
     public static function fix($sequence, $whenMissing = null)
     {
-        return static::forceResultWithSequence($sequence, $whenMissing);
+        static::forceResultWithSequence($sequence, $whenMissing);
     }
 
     /**
@@ -255,7 +258,7 @@ class Lottery
      */
     public static function determineResultsNormally()
     {
-        return static::determineResultNormally();
+        static::determineResultNormally();
     }
 
     /**

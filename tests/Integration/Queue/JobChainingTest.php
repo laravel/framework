@@ -289,6 +289,30 @@ class JobChainingTest extends QueueTestCase
         $this->assertTrue(JobChainAddingAddedJob::$ranAt->isAfter(JobChainAddingExistingJob::$ranAt));
     }
 
+    public function testChainJobsCanBePrependedBatch()
+    {
+        Bus::chain([
+            new JobChainAddingPrependedBatch('j1'),
+            new JobChainingNamedTestJob('j2'),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertEquals(['j1', 'b1', 'b2', 'j2'], JobRunRecorder::$results);
+    }
+
+    public function testChainJobsCanBeAppendedBatch()
+    {
+        Bus::chain([
+            new JobChainAddingAppendingBatch('j1'),
+            new JobChainingNamedTestJob('j2'),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
+        $this->assertEquals(['j1', 'j2', 'b1', 'b2'], JobRunRecorder::$results);
+    }
+
     public function testChainJobsCanBeAppendedWithoutExistingChain()
     {
         JobChainAddingAppendingJob::dispatch();
@@ -296,6 +320,61 @@ class JobChainingTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
+    }
+
+    public function testChainCanBeAppended()
+    {
+        $chain = Bus::chain();
+
+        $chain->append($firstJob = new JobChainingNamedTestJob('j1'));
+        $chain->append($secondJob = new JobChainingNamedTestJob('j2'));
+        $chain->append($thirdJob = new JobChainingNamedTestJob('j3'));
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+    }
+
+    public function testChainCanBeAppendedWithInitialJob()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j1'),
+        ]);
+
+        $chain->append([
+            $secondJob = new JobChainingNamedTestJob('j2'),
+            $thirdJob = new JobChainingNamedTestJob('j3'),
+        ]);
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+    }
+
+    public function testChainCanBePrepended()
+    {
+        $chain = Bus::chain();
+
+        $chain->prepend($firstJob = new JobChainingNamedTestJob('j1'));
+        $chain->prepend($secondJob = new JobChainingNamedTestJob('j2'));
+        $chain->prepend($thirdJob = new JobChainingNamedTestJob('j3'));
+
+        $this->assertEquals($thirdJob, $chain->job);
+        $this->assertEquals([$secondJob, $firstJob], $chain->chain);
+    }
+
+    public function testChainCanBePrependedWithInitialJob()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j4'),
+        ]);
+
+        $chain->prepend([
+            $secondJob = new JobChainingNamedTestJob('j1'),
+            $thirdJob = new JobChainingNamedTestJob('j2'),
+            $fourthJob = new JobChainingNamedTestJob('j3'),
+        ]);
+
+        $this->assertEquals($secondJob, $chain->job);
+        $this->assertEquals([$thirdJob, $fourthJob, $firstJob], $chain->chain);
     }
 
     public function testBatchCanBeAddedToChain()
@@ -650,6 +729,50 @@ class JobChainAddingAppendingJob implements ShouldQueue
     public function handle()
     {
         $this->appendToChain(new JobChainAddingAddedJob);
+    }
+}
+
+class JobChainAddingAppendingBatch implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public string $id;
+
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function handle()
+    {
+        $this->appendToChain(Bus::batch([
+            new JobChainingNamedTestJob('b1'),
+            new JobChainingNamedTestJob('b2'),
+        ]));
+
+        JobRunRecorder::record($this->id);
+    }
+}
+
+class JobChainAddingPrependedBatch implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable;
+
+    public string $id;
+
+    public function __construct(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function handle()
+    {
+        $this->prependToChain(Bus::batch([
+            new JobChainingNamedTestJob('b1'),
+            new JobChainingNamedTestJob('b2'),
+        ]));
+
+        JobRunRecorder::record($this->id);
     }
 }
 

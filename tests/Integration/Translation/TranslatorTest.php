@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Translation;
 
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class TranslatorTest extends TestCase
 {
@@ -14,6 +15,7 @@ class TranslatorTest extends TestCase
      */
     protected function defineEnvironment($app)
     {
+        $app['translator']->addNamespace('tests', __DIR__.'/lang');
         $app['translator']->addJsonPath(__DIR__.'/lang');
 
         parent::defineEnvironment($app);
@@ -95,5 +97,43 @@ class TranslatorTest extends TestCase
         $this->assertSame('ht', $_SERVER['__missing_translation_key_locale']);
 
         $this->app['translator']->handleMissingKeysUsing(null);
+    }
+
+    #[DataProvider('greetingChoiceDataProvider')]
+    public function testItCanHandleChoice(int $count, string $expected, ?string $locale = null)
+    {
+        if (! is_null($locale)) {
+            $this->app->setLocale($locale);
+        }
+
+        $name = 'Taylor';
+
+        $this->assertSame(
+            strtr($expected, [':name' => $name, ':count' => $count]),
+            $this->app['translator']->choice('tests::app.greeting', $count, ['name' => $name])
+        );
+    }
+
+    #[DataProvider('greetingChoiceDataProvider')]
+    public function testItCanHandleChoiceWithChoiceSeparatorInReplaceString(int $count, string $expected, ?string $locale = null)
+    {
+        if (! is_null($locale)) {
+            $this->app->setLocale($locale);
+        }
+
+        $name = 'Taylor | Laravel';
+
+        $this->assertSame(
+            strtr($expected, [':name' => $name, ':count' => $count]),
+            $this->app['translator']->choice('tests::app.greeting', $count, ['name' => $name])
+        );
+    }
+
+    public static function greetingChoiceDataProvider()
+    {
+        yield [0, 'Hello :name'];
+        yield [3, 'Hello :name, you have 3 unread messages'];
+        yield [0, 'Bonjour :name', 'fr'];
+        yield [3, 'Bonjour :name, vous avez :count messages non lus', 'fr'];
     }
 }

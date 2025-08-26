@@ -11,8 +11,20 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function Orchestra\Testbench\artisan;
+use function Orchestra\Testbench\phpunit_version_compare;
+
 class BladeTest extends TestCase
 {
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        artisan($this, 'view:clear');
+
+        parent::tearDown();
+    }
+
     public function test_rendering_blade_string()
     {
         $this->assertSame('Hello Taylor', Blade::render('Hello {{ $name }}', ['name' => 'Taylor']));
@@ -33,8 +45,8 @@ class BladeTest extends TestCase
         // The PHP_MAXPATHLEN restriction is only active, if
         // open_basedir is set and active. Otherwise, the check
         // for the PHP_MAXPATHLEN is not active.
-        if (ini_get('open_basedir') === '') {
-            $openBaseDir = windows_os() ? explode('\\', __DIR__)[0].'\\'.';'.sys_get_temp_dir() : '/';
+        if (ini_get('open_basedir') === '' && phpunit_version_compare('12.1.0', '<')) {
+            $openBaseDir = explode(DIRECTORY_SEPARATOR, __DIR__)[0].DIRECTORY_SEPARATOR.PATH_SEPARATOR.sys_get_temp_dir();
             $iniSet = ini_set(
                 'open_basedir',
                 $openBaseDir
@@ -197,8 +209,6 @@ class BladeTest extends TestCase
 
     public function testViewCacheCommandHandlesConfiguredBladeExtensions()
     {
-        $this->artisan('view:clear');
-
         View::addExtension('sh', 'blade');
         $this->artisan('view:cache');
 
@@ -206,11 +216,11 @@ class BladeTest extends TestCase
         $found = collect($compiledFiles)
             ->contains(fn (SplFileInfo $file) => str_contains($file->getContents(), 'echo "<?php echo e($scriptMessage); ?>" > output.log'));
         $this->assertTrue($found);
-
-        $this->artisan('view:clear');
     }
 
-    protected function getEnvironmentSetUp($app)
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function defineEnvironment($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/templates']);
     }

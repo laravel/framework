@@ -23,7 +23,6 @@ class EncryptedStore extends Store
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      * @param  string|null  $id
      * @param  string  $serialization
-     * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, EncrypterContract $encrypter, $id = null, $serialization = 'php')
     {

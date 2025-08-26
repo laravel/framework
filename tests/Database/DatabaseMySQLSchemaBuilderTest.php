@@ -20,15 +20,12 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $grammar = m::mock(MySqlGrammar::class);
-        $processor = m::mock(MySqlProcessor::class);
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getPostProcessor')->andReturn($processor);
         $builder = new MySqlBuilder($connection);
-        $grammar->shouldReceive('compileTables')->once()->andReturn('sql');
-        $processor->shouldReceive('processTables')->once()->andReturn([['name' => 'prefix_table']]);
+        $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql')->andReturn([['name' => 'prefix_table']]);
+        $connection->shouldReceive('scalar')->once()->with('sql')->andReturn(1);
 
         $this->assertTrue($builder->hasTable('table'));
     }
@@ -41,7 +38,7 @@ class DatabaseMySQLSchemaBuilderTest extends TestCase
         $connection->shouldReceive('getDatabaseName')->andReturn('db');
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $grammar->shouldReceive('compileColumns')->with('db', 'prefix_table')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'prefix_table')->once()->andReturn('sql');
         $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'column']]);
         $builder = new MySqlBuilder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');

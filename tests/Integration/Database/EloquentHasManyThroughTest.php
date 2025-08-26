@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\EloquentHasManyThroughTest;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -381,6 +382,18 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $newArticle->title .= ' v2';
         $newArticle->save();
     }
+
+    public function testOne(): void
+    {
+        $team = Team::create();
+
+        $user = User::create(['team_id' => $team->id, 'name' => Str::random()]);
+
+        Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => now()->subDay()]);
+        $latestArticle = Article::create(['user_id' => $user->id, 'title' => Str::random(), 'created_at' => now()]);
+
+        $this->assertEquals($latestArticle->id, $team->latestArticle->id);
+    }
 }
 
 class User extends Model
@@ -473,6 +486,11 @@ class Team extends Model
     public function articles()
     {
         return $this->hasManyThrough(Article::class, User::class);
+    }
+
+    public function latestArticle(): HasOneThrough
+    {
+        return $this->articles()->one()->latest();
     }
 }
 

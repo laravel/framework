@@ -47,15 +47,14 @@ class TokenGuard implements Guard
      * @param  string  $inputKey
      * @param  string  $storageKey
      * @param  bool  $hash
-     * @return void
      */
     public function __construct(
         UserProvider $provider,
         Request $request,
         $inputKey = 'api_token',
         $storageKey = 'api_token',
-        $hash = false)
-    {
+        $hash = false,
+    ) {
         $this->hash = $hash;
         $this->request = $request;
         $this->provider = $provider;

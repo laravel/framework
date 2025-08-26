@@ -4,6 +4,8 @@ namespace Illuminate\Broadcasting;
 
 use Illuminate\Support\Arr;
 
+use function Illuminate\Support\enum_value;
+
 trait InteractsWithBroadcasting
 {
     /**
@@ -16,14 +18,16 @@ trait InteractsWithBroadcasting
     /**
      * Broadcast the event using a specific broadcaster.
      *
-     * @param  array|string|null  $connection
+     * @param  \UnitEnum|array|string|null  $connection
      * @return $this
      */
     public function broadcastVia($connection = null)
     {
+        $connection = enum_value($connection);
+
         $this->broadcastConnection = is_null($connection)
-                        ? [null]
-                        : Arr::wrap($connection);
+            ? [null]
+            : Arr::wrap($connection);
 
         return $this;
     }

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Translation;
 
+use Illuminate\Support\Collection;
+
 class MessageSelector
 {
     /**
@@ -89,7 +91,7 @@ class MessageSelector
      */
     private function stripConditions($segments)
     {
-        return collect($segments)
+        return (new Collection($segments))
             ->map(fn ($part) => preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part))
             ->all();
     }

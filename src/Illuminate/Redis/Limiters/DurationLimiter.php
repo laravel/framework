@@ -56,7 +56,6 @@ class DurationLimiter
      * @param  string  $name
      * @param  int  $maxLocks
      * @param  int  $decay
-     * @return void
      */
     public function __construct($redis, $name, $maxLocks, $decay)
     {

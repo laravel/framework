@@ -18,7 +18,7 @@ class MorphPivot extends Pivot
      *
      * Explicitly define this so it's not included in saved attributes.
      *
-     * @var string
+     * @var class-string
      */
     protected $morphClass;
 
@@ -100,7 +100,7 @@ class MorphPivot extends Pivot
     /**
      * Set the morph class for the pivot.
      *
-     * @param  string  $morphClass
+     * @param  class-string  $morphClass
      * @return \Illuminate\Database\Eloquent\Relations\MorphPivot
      */
     public function setMorphClass($morphClass)
@@ -148,9 +148,9 @@ class MorphPivot extends Pivot
         $segments = explode(':', $ids);
 
         return $this->newQueryWithoutScopes()
-                        ->where($segments[0], $segments[1])
-                        ->where($segments[2], $segments[3])
-                        ->where($segments[4], $segments[5]);
+            ->where($segments[0], $segments[1])
+            ->where($segments[2], $segments[3])
+            ->where($segments[4], $segments[5]);
     }
 
     /**
@@ -174,8 +174,8 @@ class MorphPivot extends Pivot
 
             $query->orWhere(function ($query) use ($segments) {
                 return $query->where($segments[0], $segments[1])
-                             ->where($segments[2], $segments[3])
-                             ->where($segments[4], $segments[5]);
+                    ->where($segments[2], $segments[3])
+                    ->where($segments[4], $segments[5]);
             });
         }
 

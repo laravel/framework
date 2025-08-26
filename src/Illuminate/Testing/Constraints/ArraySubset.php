@@ -25,7 +25,6 @@ class ArraySubset extends Constraint
      *
      * @param  iterable  $subset
      * @param  bool  $strict
-     * @return void
      */
     public function __construct(iterable $subset, bool $strict = false)
     {

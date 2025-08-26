@@ -3,7 +3,10 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
+use Illuminate\Support\ServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 #[AsCommand(name: 'optimize:clear')]
 class OptimizeClearCommand extends Command
@@ -31,15 +34,50 @@ class OptimizeClearCommand extends Command
     {
         $this->components->info('Clearing cached bootstrap files.');
 
-        collect([
-            'cache' => fn () => $this->callSilent('cache:clear') == 0,
-            'compiled' => fn () => $this->callSilent('clear-compiled') == 0,
-            'config' => fn () => $this->callSilent('config:clear') == 0,
-            'events' => fn () => $this->callSilent('event:clear') == 0,
-            'routes' => fn () => $this->callSilent('route:clear') == 0,
-            'views' => fn () => $this->callSilent('view:clear') == 0,
-        ])->each(fn ($task, $description) => $this->components->task($description, $task));
+        $exceptions = Collection::wrap(explode(',', $this->option('except') ?? ''))
+            ->map(fn ($except) => trim($except))
+            ->filter()
+            ->unique()
+            ->flip();
+
+        $tasks = Collection::wrap($this->getOptimizeClearTasks())
+            ->reject(fn ($command, $key) => $exceptions->hasAny([$command, $key]))
+            ->toArray();
+
+        foreach ($tasks as $description => $command) {
+            $this->components->task($description, fn () => $this->callSilently($command) == 0);
+        }
 
         $this->newLine();
+    }
+
+    /**
+     * Get the commands that should be run to clear the "optimization" files.
+     *
+     * @return array
+     */
+    public function getOptimizeClearTasks()
+    {
+        return [
+            'config' => 'config:clear',
+            'cache' => 'cache:clear',
+            'compiled' => 'clear-compiled',
+            'events' => 'event:clear',
+            'routes' => 'route:clear',
+            'views' => 'view:clear',
+            ...ServiceProvider::$optimizeClearCommands,
+        ];
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['except', 'e', InputOption::VALUE_OPTIONAL, 'The commands to skip'],
+        ];
     }
 }

@@ -3,7 +3,10 @@
 namespace Illuminate\Tests\Validation;
 
 use Exception;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rules\ProhibitedIf;
+use Illuminate\Validation\Validator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -56,5 +59,29 @@ class ValidationProhibitedIfTest extends TestCase
         serialize(new ProhibitedIf(function () {
             return true;
         }));
+    }
+
+    public function testProhibitedIfRuleValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $rule = new ProhibitedIf(true);
+
+        $v = new Validator($trans, ['y' => 'foo'], ['x' => $rule]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['y' => 'foo'], ['x' => (string) $rule]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['y' => 'foo'], ['x' => [$rule]]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
+        $this->assertTrue($v->fails());
+
+        $rule = new ProhibitedIf(false);
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
+        $this->assertTrue($v->passes());
     }
 }

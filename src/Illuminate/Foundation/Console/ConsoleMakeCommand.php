@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,7 +46,7 @@ class ConsoleMakeCommand extends GeneratorCommand
     {
         $stub = parent::replaceClass($stub, $name);
 
-        $command = $this->option('command') ?: 'app:'.Str::of($name)->classBasename()->kebab()->value();
+        $command = $this->option('command') ?: 'app:'.(new Stringable($name))->classBasename()->kebab()->value();
 
         return str_replace(['dummy:command', '{{ command }}'], $command, $stub);
     }

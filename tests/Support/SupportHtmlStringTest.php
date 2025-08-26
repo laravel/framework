@@ -39,12 +39,19 @@ class SupportHtmlStringTest extends TestCase
         $str = '<h1>foo</h1>';
         $html = new HtmlString('<h1>foo</h1>');
         $this->assertEquals($str, (string) $html);
+
+        // Check if HtmlString gracefully handles a null value
+        $html = new HtmlString(null);
+        $this->assertIsString((string) $html);
     }
 
     public function testIsEmpty(): void
     {
         // Check if HtmlString correctly identifies an empty string as empty
         $this->assertTrue((new HtmlString(''))->isEmpty());
+
+        // Check if HtmlString identifies a null value as empty
+        $this->assertTrue((new HtmlString(null))->isEmpty());
 
         // HtmlString with whitespace should not be considered as empty
         $this->assertFalse((new HtmlString('   '))->isEmpty());

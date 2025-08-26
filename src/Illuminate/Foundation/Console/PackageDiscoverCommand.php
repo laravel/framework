@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\PackageManifest;
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'package:discover')]
@@ -35,7 +36,7 @@ class PackageDiscoverCommand extends Command
 
         $manifest->build();
 
-        collect($manifest->manifest)
+        (new Collection($manifest->manifest))
             ->keys()
             ->each(fn ($description) => $this->components->task($description))
             ->whenNotEmpty(fn () => $this->newLine());

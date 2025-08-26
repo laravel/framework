@@ -2,6 +2,8 @@
 
 namespace Illuminate\Events;
 
+use Illuminate\Support\Collection;
+
 class InvokeQueuedClosure
 {
     /**
@@ -29,6 +31,6 @@ class InvokeQueuedClosure
     {
         $arguments[] = $exception;
 
-        collect($catchCallbacks)->each->__invoke(...$arguments);
+        (new Collection($catchCallbacks))->each->__invoke(...$arguments);
     }
 }

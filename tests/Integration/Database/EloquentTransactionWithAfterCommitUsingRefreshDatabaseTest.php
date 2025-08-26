@@ -17,6 +17,7 @@ class EloquentTransactionWithAfterCommitUsingRefreshDatabaseTest extends TestCas
      */
     protected $driver;
 
+    /** {@inheritDoc} */
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
@@ -28,7 +29,8 @@ class EloquentTransactionWithAfterCommitUsingRefreshDatabaseTest extends TestCas
         parent::setUp();
     }
 
-    protected function getEnvironmentSetUp($app)
+    /** {@inheritDoc} */
+    protected function defineEnvironment($app)
     {
         $connection = $app['config']->get('database.default');
 

@@ -48,7 +48,6 @@ class FileStore implements Store, LockProvider
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
      * @param  int|null  $filePermission
-     * @return void
      */
     public function __construct(Filesystem $files, $directory, $filePermission = null)
     {
@@ -248,9 +247,11 @@ class FileStore implements Store, LockProvider
     public function forget($key)
     {
         if ($this->files->exists($file = $this->path($key))) {
-            $this->files->delete($this->path("illuminate:cache:flexible:created:{$key}"));
-
-            return $this->files->delete($file);
+            return tap($this->files->delete($file), function ($forgotten) use ($key) {
+                if ($forgotten && $this->files->exists($file = $this->path("illuminate:cache:flexible:created:{$key}"))) {
+                    $this->files->delete($file);
+                }
+            });
         }
 
         return false;

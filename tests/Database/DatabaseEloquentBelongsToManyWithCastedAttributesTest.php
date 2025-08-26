@@ -27,6 +27,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model1->shouldReceive('getAttribute')->with('foo')->passthru();
         $model1->shouldReceive('hasGetMutator')->andReturn(false);
         $model1->shouldReceive('hasAttributeMutator')->andReturn(false);
+        $model1->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
         $model1->shouldReceive('getCasts')->andReturn([]);
         $model1->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
@@ -36,6 +37,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $model2->shouldReceive('getAttribute')->with('foo')->passthru();
         $model2->shouldReceive('hasGetMutator')->andReturn(false);
         $model2->shouldReceive('hasAttributeMutator')->andReturn(false);
+        $model2->shouldReceive('hasRelationAutoloadCallback')->andReturn(false);
         $model2->shouldReceive('getCasts')->andReturn([]);
         $model2->shouldReceive('getRelationValue', 'relationLoaded', 'relationResolver', 'setRelation', 'isRelation')->passthru();
 
@@ -62,6 +64,7 @@ class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
         $builder = m::mock(Builder::class);
         $related = m::mock(Model::class);
         $related->shouldReceive('newCollection')->passthru();
+        $related->shouldReceive('resolveCollectionFromAttribute')->passthru();
         $builder->shouldReceive('getModel')->andReturn($related);
         $related->shouldReceive('qualifyColumn');
         $builder->shouldReceive('join', 'where');

@@ -3,18 +3,24 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
+use Illuminate\Database\Connection;
 use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
+/**
+ * @mixin Connection
+ */
 trait ManagesTransactions
 {
     /**
+     * @template TReturn of mixed
+     *
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @return mixed
+     * @return TReturn
      *
      * @throws \Throwable
      */
@@ -146,7 +152,7 @@ trait ManagesTransactions
             $this->reconnectIfMissingConnection();
 
             try {
-                $this->getPdo()->beginTransaction();
+                $this->executeBeginTransactionStatement();
             } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
@@ -182,7 +188,7 @@ trait ManagesTransactions
         if ($this->causedByLostConnection($e)) {
             $this->reconnect();
 
-            $this->getPdo()->beginTransaction();
+            $this->executeBeginTransactionStatement();
         } else {
             throw $e;
         }
@@ -253,8 +259,8 @@ trait ManagesTransactions
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
         $toLevel = is_null($toLevel)
-                    ? $this->transactions - 1
-                    : $toLevel;
+            ? $this->transactions - 1
+            : $toLevel;
 
         if ($toLevel < 0 || $toLevel >= $this->transactions) {
             return;

@@ -26,7 +26,6 @@ use JsonSerializable;
 use OutOfBoundsException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
-use RuntimeException;
 use Symfony\Component\VarDumper\VarDumper;
 
 class PendingRequest
@@ -174,6 +173,13 @@ class PendingRequest
     protected $preventStrayRequests = false;
 
     /**
+     * A list of URL patterns that are allowed to bypass the stray request guard.
+     *
+     * @var array<int, string>
+     */
+    protected $allowedStrayRequestUrls = [];
+
+    /**
      * The middleware callables added by users that will handle requests.
      *
      * @var \Illuminate\Support\Collection
@@ -216,11 +222,17 @@ class PendingRequest
     ];
 
     /**
+     * The length at which request exceptions will be truncated.
+     *
+     * @var int<1, max>|false|null
+     */
+    protected $truncateExceptionsAt = null;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @param  array  $middleware
-     * @return void
      */
     public function __construct(?Factory $factory = null, $middleware = [])
     {
@@ -236,7 +248,7 @@ class PendingRequest
             'timeout' => 30,
         ];
 
-        $this->beforeSendingCallbacks = collect([function (Request $request, array $options, PendingRequest $pendingRequest) {
+        $this->beforeSendingCallbacks = new Collection([function (Request $request, array $options, PendingRequest $pendingRequest) {
             $pendingRequest->request = $request;
             $pendingRequest->cookies = $options['cookies'];
 
@@ -467,6 +479,20 @@ class PendingRequest
     }
 
     /**
+     * Specify the NTLM authentication username and password for the request.
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @return $this
+     */
+    public function withNtlmAuth($username, $password)
+    {
+        return tap($this, function () use ($username, $password) {
+            $this->options['auth'] = [$username, $password, 'ntlm'];
+        });
+    }
+
+    /**
      * Specify an authorization token for the request.
      *
      * @param  string  $token
@@ -575,10 +601,10 @@ class PendingRequest
     /**
      * Specify the timeout (in seconds) for the request.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      * @return $this
      */
-    public function timeout(int $seconds)
+    public function timeout(int|float $seconds)
     {
         return tap($this, function () use ($seconds) {
             $this->options['timeout'] = $seconds;
@@ -588,10 +614,10 @@ class PendingRequest
     /**
      * Specify the connect timeout (in seconds) for the request.
      *
-     * @param  int  $seconds
+     * @param  int|float  $seconds
      * @return $this
      */
-    public function connectTimeout(int $seconds)
+    public function connectTimeout(int|float $seconds)
     {
         return tap($this, function () use ($seconds) {
             $this->options['connect_timeout'] = $seconds;
@@ -794,7 +820,7 @@ class PendingRequest
      * Issue a POST request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -810,7 +836,7 @@ class PendingRequest
      * Issue a PATCH request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -826,7 +852,7 @@ class PendingRequest
      * Issue a PUT request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -842,7 +868,7 @@ class PendingRequest
      * Issue a DELETE request to the given URL.
      *
      * @param  string  $url
-     * @param  array  $data
+     * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -911,7 +937,7 @@ class PendingRequest
 
                     if (! $response->successful()) {
                         try {
-                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this) : true;
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
                         } catch (Exception $exception) {
                             $shouldRetry = false;
 
@@ -937,15 +963,23 @@ class PendingRequest
                         }
                     }
                 });
-            } catch (ConnectException $e) {
-                $exception = new ConnectionException($e->getMessage(), 0, $e);
+            } catch (TransferException $e) {
+                if ($e instanceof ConnectException) {
+                    $this->marshalConnectionException($e);
+                }
 
-                $this->dispatchConnectionFailedEvent(new Request($e->getRequest()), $exception);
+                if ($e instanceof RequestException && ! $e->hasResponse()) {
+                    $this->marshalRequestExceptionWithoutResponse($e);
+                }
 
-                throw $exception;
+                if ($e instanceof RequestException && $e->hasResponse()) {
+                    $this->marshalRequestExceptionWithResponse($e);
+                }
+
+                throw $e;
             }
         }, $this->retryDelay ?? 100, function ($exception) use (&$shouldRetry) {
-            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this) : true);
+            $result = $shouldRetry ?? ($this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $exception, $this, $this->request?->toPsrRequest()->getMethod()) : true);
 
             $shouldRetry = null;
 
@@ -988,13 +1022,15 @@ class PendingRequest
             $options[$this->bodyFormat] = $this->pendingBody;
         }
 
-        return collect($options)->map(function ($value, $key) {
-            if ($key === 'json' && $value instanceof JsonSerializable) {
-                return $value;
-            }
+        return (new Collection($options))
+            ->map(function ($value, $key) {
+                if ($key === 'json' && $value instanceof JsonSerializable) {
+                    return $value;
+                }
 
-            return $value instanceof Arrayable ? $value->toArray() : $value;
-        })->all();
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            })
+            ->all();
     }
 
     /**
@@ -1005,9 +1041,24 @@ class PendingRequest
      */
     protected function parseMultipartBodyFormat(array $data)
     {
-        return collect($data)->map(function ($value, $key) {
-            return is_array($value) ? $value : ['name' => $key, 'contents' => $value];
-        })->values()->all();
+        return (new Collection($data))
+            ->flatMap(function ($value, $key) {
+                if (is_array($value)) {
+                    // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
+                    if (isset($value['name']) && isset($value['contents'])) {
+                        return [$value];
+                    }
+
+                    // Otherwise, treat it as multiple values for the same field name...
+                    return (new Collection($value))->map(function ($item) use ($key) {
+                        return ['name' => $key.'[]', 'contents' => $item];
+                    });
+                }
+
+                return [['name' => $key, 'contents' => $value]];
+            })
+            ->values()
+            ->all();
     }
 
     /**
@@ -1028,7 +1079,11 @@ class PendingRequest
                     $this->dispatchResponseReceivedEvent($response);
                 });
             })
-            ->otherwise(function (OutOfBoundsException|TransferException $e) {
+            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
+                if ($e instanceof StrayRequestException) {
+                    throw $e;
+                }
+
                 if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
@@ -1149,7 +1204,7 @@ class PendingRequest
 
         $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
 
-        $urlString = Str::of($url);
+        $urlString = (new Stringable($url));
 
         if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
             $laravelData = (string) $urlString->after('?');
@@ -1321,15 +1376,15 @@ class PendingRequest
     {
         return function ($handler) {
             return function ($request, $options) use ($handler) {
-                $response = ($this->stubCallbacks ?? collect())
-                     ->map
-                     ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
-                     ->filter()
-                     ->first();
+                $response = ($this->stubCallbacks ?? new Collection)
+                    ->map
+                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->filter()
+                    ->first();
 
                 if (is_null($response)) {
-                    if ($this->preventStrayRequests) {
-                        throw new RuntimeException('Attempted request to ['.(string) $request->getUri().'] without a matching fake.');
+                    if (! $this->isAllowedRequestUrl((string) $request->getUri())) {
+                        throw new StrayRequestException((string) $request->getUri());
                     }
 
                     return $handler($request, $options);
@@ -1416,7 +1471,15 @@ class PendingRequest
      */
     protected function newResponse($response)
     {
-        return new Response($response);
+        return tap(new Response($response), function (Response $laravelResponse) {
+            if ($this->truncateExceptionsAt === null) {
+                return;
+            }
+
+            $this->truncateExceptionsAt === false
+                ? $laravelResponse->dontTruncateExceptions()
+                : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
+        });
     }
 
     /**
@@ -1427,7 +1490,7 @@ class PendingRequest
      */
     public function stub($callback)
     {
-        $this->stubCallbacks = collect($callback);
+        $this->stubCallbacks = new Collection($callback);
 
         return $this;
     }
@@ -1443,6 +1506,40 @@ class PendingRequest
         $this->preventStrayRequests = $prevent;
 
         return $this;
+    }
+
+    /**
+     * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
+     *
+     * @param  array<int, string>  $only
+     * @return $this
+     */
+    public function allowStrayRequests(array $only)
+    {
+        $this->allowedStrayRequestUrls = array_values($only);
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given URL is allowed as a stray request.
+     *
+     * @param  string  $url
+     * @return bool
+     */
+    public function isAllowedRequestUrl($url)
+    {
+        if (! $this->preventStrayRequests) {
+            return true;
+        }
+
+        foreach ($this->allowedStrayRequestUrls as $pattern) {
+            if (Str::is($pattern, $url)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1507,6 +1604,91 @@ class PendingRequest
         if ($dispatcher = $this->factory?->getDispatcher()) {
             $dispatcher->dispatch(new ConnectionFailed($request, $exception));
         }
+    }
+
+    /**
+     * Indicate that request exceptions should be truncated to the given length.
+     *
+     * @param  int<1, max>  $length
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length)
+    {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that request exceptions should not be truncated.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions()
+    {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
+    }
+
+    /**
+     * Handle the given connection exception.
+     *
+     * @param  \GuzzleHttp\Exception\ConnectException  $e
+     * @return void
+     */
+    protected function marshalConnectionException(ConnectException $e)
+    {
+        $exception = new ConnectionException($e->getMessage(), 0, $e);
+
+        $request = new Request($e->getRequest());
+
+        $this->factory?->recordRequestResponsePair(
+            $request, null
+        );
+
+        $this->dispatchConnectionFailedEvent($request, $exception);
+
+        throw $exception;
+    }
+
+    /**
+     * Handle the given request exception.
+     *
+     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @return void
+     */
+    protected function marshalRequestExceptionWithoutResponse(RequestException $e)
+    {
+        $exception = new ConnectionException($e->getMessage(), 0, $e);
+
+        $request = new Request($e->getRequest());
+
+        $this->factory?->recordRequestResponsePair(
+            $request, null
+        );
+
+        $this->dispatchConnectionFailedEvent($request, $exception);
+
+        throw $exception;
+    }
+
+    /**
+     * Handle the given request exception.
+     *
+     * @param  \GuzzleHttp\Exception\RequestException  $e
+     * @return void
+     */
+    protected function marshalRequestExceptionWithResponse(RequestException $e)
+    {
+        $response = $this->populateResponse($this->newResponse($e->getResponse()));
+
+        $this->factory?->recordRequestResponsePair(
+            new Request($e->getRequest()),
+            $response
+        );
+
+        throw $response->toException() ?? new ConnectionException($e->getMessage(), 0, $e);
     }
 
     /**

@@ -679,6 +679,31 @@ class HttpRequestTest extends TestCase
         $this->assertSame(0.0, $request->float('null', 123.456));
     }
 
+    public function testArrayMethod()
+    {
+        $request = Request::create('/', 'GET', []);
+        $this->assertIsArray($request->array());
+        $this->assertEmpty($request->array());
+
+        $request = Request::create('/', 'GET', [
+            'users' => [1, 2, 3],
+            'roles' => [4, 5, 6],
+            'email' => 'test@example.com',
+        ]);
+
+        $this->assertEmpty($request->array('missing'));
+        $this->assertEmpty($request->array(['missing']));
+        $this->assertEquals([1, 2, 3], $request->array('users'));
+        $this->assertEquals(['users' => [1, 2, 3]], $request->array(['users']));
+        $this->assertEquals(['users' => [1, 2, 3], 'email' => 'test@example.com'], $request->array(['users', 'email']));
+
+        $this->assertEquals([
+            'users' => [1, 2, 3],
+            'roles' => [4, 5, 6],
+            'email' => 'test@example.com',
+        ], $request->array());
+    }
+
     public function testCollectMethod()
     {
         $request = Request::create('/', 'GET', ['users' => [1, 2, 3]]);
@@ -763,15 +788,77 @@ class HttpRequestTest extends TestCase
             'valid_enum_value' => 'test',
             'invalid_enum_value' => 'invalid',
             'empty_value_request' => '',
+            'string' => [
+                'minus_1' => '-1',
+                '0' => '0',
+                'plus_1' => '1',
+                'doesnt_exist' => '-1024',
+            ],
+            'int' => [
+                'minus_1' => -1,
+                '0' => 0,
+                'plus_1' => 1,
+                'doesnt_exist' => 1024,
+            ],
         ]);
 
-        $this->assertNull($request->enum('doesnt_exists', TestEnumBacked::class));
+        $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
+
+        $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
 
         $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
         $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
         $this->assertNull($request->enum('empty_value_request', TestEnumBacked::class));
         $this->assertNull($request->enum('valid_enum_value', TestEnum::class));
+
+        $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('string.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('string.0', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('string.plus_1', TestIntegerEnumBacked::class));
+        $this->assertNull($request->enum('string.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::minus_1, $request->enum('int.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::zero, $request->enum('int.0', TestIntegerEnumBacked::class));
+        $this->assertEquals(TestIntegerEnumBacked::plus_1, $request->enum('int.plus_1', TestIntegerEnumBacked::class));
+        $this->assertNull($request->enum('int.doesnt_exist', TestIntegerEnumBacked::class));
+    }
+
+    public function testEnumsMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'valid_enum_values' => ['test', 'test'],
+            'invalid_enum_values' => ['invalid', 'invalid'],
+            'empty_value_request' => [],
+            'string' => [
+                'minus_1' => ['-1', '0'],
+                '0' => '0',
+                'plus_1' => '1',
+                'doesnt_exist' => '-1024',
+            ],
+            'int' => [
+                'minus_1' => -1,
+                '0' => 0,
+                'plus_1' => 1,
+                'doesnt_exist' => 1024,
+            ],
+        ]);
+
+        $this->assertEmpty($request->enums('doesnt_exist', TestEnumBacked::class));
+
+        $this->assertEquals([TestEnumBacked::test, TestEnumBacked::test], $request->enums('valid_enum_values', TestEnumBacked::class));
+
+        $this->assertEmpty($request->enums('invalid_enum_value', TestEnumBacked::class));
+        $this->assertEmpty($request->enums('empty_value_request', TestEnumBacked::class));
+        $this->assertEmpty($request->enums('valid_enum_value', TestEnum::class));
+
+        $this->assertEquals([TestIntegerEnumBacked::minus_1, TestIntegerEnumBacked::zero], $request->enums('string.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('string.0', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('string.plus_1', TestIntegerEnumBacked::class));
+        $this->assertEmpty($request->enums('string.doesnt_exist', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::minus_1], $request->enums('int.minus_1', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::zero], $request->enums('int.0', TestIntegerEnumBacked::class));
+        $this->assertEquals([TestIntegerEnumBacked::plus_1], $request->enums('int.plus_1', TestIntegerEnumBacked::class));
+        $this->assertEmpty($request->enums('int.doesnt_exist', TestIntegerEnumBacked::class));
     }
 
     public function testArrayAccess()
@@ -1025,10 +1112,16 @@ class HttpRequestTest extends TestCase
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer fooBearerbar']);
         $this->assertSame('fooBearerbar', $request->bearerToken());
 
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer fooBearerbar']);
+        $this->assertSame('fooBearerbar', $request->bearerToken());
+
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic foo, Bearer bar']);
         $this->assertSame('bar', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer foo,bar']);
+        $this->assertSame('foo', $request->bearerToken());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'bearer foo,bar']);
         $this->assertSame('foo', $request->bearerToken());
 
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'foo,bar']);

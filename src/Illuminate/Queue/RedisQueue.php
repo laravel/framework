@@ -6,6 +6,8 @@ use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Str;
 
 class RedisQueue extends Queue implements QueueContract, ClearableQueue
@@ -55,6 +57,15 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     protected $migrationBatchSize = -1;
 
     /**
+     * Indicates if a secondary queue had a job available between checks of the primary queue.
+     *
+     * Only applicable when monitoring multiple named queues with a single instance.
+     *
+     * @var bool
+     */
+    protected $secondaryQueueHadJob = false;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
@@ -64,16 +75,16 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  int|null  $blockFor
      * @param  bool  $dispatchAfterCommit
      * @param  int  $migrationBatchSize
-     * @return void
      */
-    public function __construct(Redis $redis,
-                                $default = 'default',
-                                $connection = null,
-                                $retryAfter = 60,
-                                $blockFor = null,
-                                $dispatchAfterCommit = false,
-                                $migrationBatchSize = -1)
-    {
+    public function __construct(
+        Redis $redis,
+        $default = 'default',
+        $connection = null,
+        $retryAfter = 60,
+        $blockFor = null,
+        $dispatchAfterCommit = false,
+        $migrationBatchSize = -1,
+    ) {
         $this->redis = $redis;
         $this->default = $default;
         $this->blockFor = $blockFor;
@@ -99,6 +110,58 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     }
 
     /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null)
+    {
+        return $this->getConnection()->llen($this->getQueue($queue));
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':delayed');
+    }
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null)
+    {
+        return $this->getConnection()->zcard($this->getQueue($queue).':reserved');
+    }
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null)
+    {
+        $payload = $this->getConnection()->lindex($this->getQueue($queue), 0);
+
+        if (! $payload) {
+            return null;
+        }
+
+        $data = json_decode($payload, true);
+
+        return $data['createdAt'] ?? null;
+    }
+
+    /**
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs
@@ -108,17 +171,25 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        $this->getConnection()->pipeline(function () use ($jobs, $data, $queue) {
-            $this->getConnection()->transaction(function () use ($jobs, $data, $queue) {
-                foreach ((array) $jobs as $job) {
-                    if (isset($job->delay)) {
-                        $this->later($job->delay, $job, $data, $queue);
-                    } else {
-                        $this->push($job, $data, $queue);
-                    }
+        $connection = $this->getConnection();
+
+        $bulk = function () use ($jobs, $data, $queue) {
+            foreach ((array) $jobs as $job) {
+                if (isset($job->delay)) {
+                    $this->later($job->delay, $job, $data, $queue);
+                } else {
+                    $this->push($job, $data, $queue);
                 }
-            });
-        });
+            }
+        };
+
+        if ($connection instanceof PhpRedisClusterConnection) {
+            $connection->transaction($bulk);
+        } elseif ($connection instanceof PredisClusterConnection) {
+            $connection->pipeline($bulk);
+        } else {
+            $connection->pipeline(fn () => $connection->transaction($bulk));
+        }
     }
 
     /**
@@ -173,7 +244,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $this->getQueue($queue), $data),
+            $this->createPayload($job, $this->getQueue($queue), $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {
@@ -221,13 +292,23 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string|null  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
      */
-    public function pop($queue = null)
+    public function pop($queue = null, $index = 0)
     {
         $this->migrate($prefixed = $this->getQueue($queue));
 
-        [$job, $reserved] = $this->retrieveNextJob($prefixed);
+        $block = ! $this->secondaryQueueHadJob && $index == 0;
+
+        [$job, $reserved] = $this->retrieveNextJob($prefixed, $block);
+
+        if ($index == 0) {
+            $this->secondaryQueueHadJob = false;
+        }
 
         if ($reserved) {
+            if ($index > 0) {
+                $this->secondaryQueueHadJob = true;
+            }
+
             return new RedisJob(
                 $this->container, $this, $job,
                 $reserved, $this->connectionName, $queue ?: $this->default

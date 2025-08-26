@@ -4,6 +4,7 @@ namespace Illuminate\Process;
 
 use Closure;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use LogicException;
@@ -96,7 +97,6 @@ class PendingProcess
      * Create a new pending process instance.
      *
      * @param  \Illuminate\Process\Factory  $factory
-     * @return void
      */
     public function __construct(Factory $factory)
     {
@@ -245,9 +245,8 @@ class PendingProcess
     {
         $this->command = $command ?: $this->command;
 
+        $process = $this->toSymfonyProcess($command);
         try {
-            $process = $this->toSymfonyProcess($command);
-
             if ($fake = $this->fakeFor($command = $process->getCommandline())) {
                 return tap($this->resolveSynchronousFake($command, $fake), function ($result) {
                     $this->factory->recordIfRecording($this, $result);
@@ -299,8 +298,8 @@ class PendingProcess
         $command = $command ?? $this->command;
 
         $process = is_iterable($command)
-                ? new Process($command, null, $this->environment)
-                : Process::fromShellCommandline((string) $command, null, $this->environment);
+            ? new Process($command, null, $this->environment)
+            : Process::fromShellCommandline((string) $command, null, $this->environment);
 
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
@@ -329,6 +328,16 @@ class PendingProcess
     }
 
     /**
+     * Determine whether TTY is supported on the current operating system.
+     *
+     * @return bool
+     */
+    public function supportsTty()
+    {
+        return Process::isTtySupported();
+    }
+
+    /**
      * Specify the fake process result handlers for the pending process.
      *
      * @param  array  $fakeHandlers
@@ -349,8 +358,8 @@ class PendingProcess
      */
     protected function fakeFor(string $command)
     {
-        return collect($this->fakeHandlers)
-                ->first(fn ($handler, $pattern) => Str::is($pattern, $command));
+        return (new Collection($this->fakeHandlers))
+            ->first(fn ($handler, $pattern) => $pattern === '*' || Str::is($pattern, $command));
     }
 
     /**
@@ -390,7 +399,7 @@ class PendingProcess
      * @param  \Closure  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
      *
-     * @throw \LogicException
+     * @throws \LogicException
      */
     protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {

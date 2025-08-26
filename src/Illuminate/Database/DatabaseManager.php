@@ -5,12 +5,15 @@ namespace Illuminate\Database;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\ConfigurationUrlParser;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use PDO;
 use RuntimeException;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @mixin \Illuminate\Database\Connection
@@ -43,6 +46,13 @@ class DatabaseManager implements ConnectionResolverInterface
     protected $connections = [];
 
     /**
+     * The dynamically configured (DB::build) connection configurations.
+     *
+     * @var array<string, array>
+     */
+    protected $dynamicConnectionConfigurations = [];
+
+    /**
      * The custom connection resolvers.
      *
      * @var array<string, callable>
@@ -61,7 +71,6 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
-     * @return void
      */
     public function __construct($app, ConnectionFactory $factory)
     {
@@ -69,19 +78,21 @@ class DatabaseManager implements ConnectionResolverInterface
         $this->factory = $factory;
 
         $this->reconnector = function ($connection) {
-            $this->reconnect($connection->getNameWithReadWriteType());
+            $connection->setPdo(
+                $this->reconnect($connection->getNameWithReadWriteType())->getRawPdo()
+            );
         };
     }
 
     /**
      * Get a database connection instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function connection($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = enum_value($name) ?: $this->getDefaultConnection();
 
         [$database, $type] = $this->parseConnectionName($name);
 
@@ -97,6 +108,34 @@ class DatabaseManager implements ConnectionResolverInterface
         }
 
         return $this->connections[$name];
+    }
+
+    /**
+     * Build a database connection instance from the given configuration.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    public function build(array $config)
+    {
+        $config['name'] ??= static::calculateDynamicConnectionName($config);
+
+        $this->dynamicConnectionConfigurations[$config['name']] = $config;
+
+        return $this->connectUsing($config['name'], $config, true);
+    }
+
+    /**
+     * Calculate the dynamic connection name for an on-demand connection based on its configuration.
+     *
+     * @param  array  $config
+     * @return string
+     */
+    public static function calculateDynamicConnectionName(array $config)
+    {
+        return 'dynamic_'.md5((new Collection($config))->map(function ($value, $key) {
+            return $key.(is_string($value) || is_int($value) ? $value : '');
+        })->implode(''));
     }
 
     /**
@@ -137,7 +176,8 @@ class DatabaseManager implements ConnectionResolverInterface
         $name = $name ?: $this->getDefaultConnection();
 
         return Str::endsWith($name, ['::read', '::write'])
-                            ? explode('::', $name, 2) : [$name, null];
+            ? explode('::', $name, 2)
+            : [$name, null];
     }
 
     /**
@@ -179,17 +219,16 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $name = $name ?: $this->getDefaultConnection();
 
-        // To get the database connection configuration, we will just pull each of the
-        // connection configurations and get the configurations for the given name.
-        // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        $config = $this->dynamicConnectionConfigurations[$name] ?? Arr::get($connections, $name);
+
+        if (is_null($config)) {
             throw new InvalidArgumentException("Database connection [{$name}] not configured.");
         }
 
         return (new ConfigurationUrlParser)
-                    ->parseConfiguration($config);
+            ->parseConfiguration($config);
     }
 
     /**
@@ -315,9 +354,11 @@ class DatabaseManager implements ConnectionResolverInterface
 
         $this->setDefaultConnection($name);
 
-        return tap($callback(), function () use ($previousName) {
+        try {
+            return $callback();
+        } finally {
             $this->setDefaultConnection($previousName);
-        });
+        }
     }
 
     /**
@@ -335,8 +376,8 @@ class DatabaseManager implements ConnectionResolverInterface
         );
 
         return $this->connections[$name]
-                    ->setPdo($fresh->getRawPdo())
-                    ->setReadPdo($fresh->getRawReadPdo());
+            ->setPdo($fresh->getRawPdo())
+            ->setReadPdo($fresh->getRawReadPdo());
     }
 
     /**

@@ -339,6 +339,42 @@ class ValidationPasswordRuleTest extends TestCase
         ]);
     }
 
+    public function testCanRetrieveAllRulesApplied()
+    {
+        $password = Password::min(2)
+            ->max(4)
+            ->mixedCase()
+            ->numbers()
+            ->letters()
+            ->symbols();
+
+        $this->assertSame($password->appliedRules(), [
+            'min' => 2,
+            'max' => 4,
+            'mixedCase' => true,
+            'letters' => true,
+            'numbers' => true,
+            'symbols' => true,
+            'uncompromised' => false,
+            'compromisedThreshold' => 0,
+            'customRules' => [],
+        ]);
+
+        $password = Password::min(2);
+
+        $this->assertSame($password->appliedRules(), [
+            'min' => 2,
+            'max' => null,
+            'mixedCase' => false,
+            'letters' => false,
+            'numbers' => false,
+            'symbols' => false,
+            'uncompromised' => false,
+            'compromisedThreshold' => 0,
+            'customRules' => [],
+        ]);
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);

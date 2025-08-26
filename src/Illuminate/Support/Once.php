@@ -24,7 +24,6 @@ class Once
      * Create a new once instance.
      *
      * @param  \WeakMap<object, array<string, mixed>>  $values
-     * @return void
      */
     protected function __construct(protected WeakMap $values)
     {
@@ -57,12 +56,12 @@ class Once
 
         $hash = $onceable->hash;
 
-        if (isset($this->values[$object][$hash])) {
-            return $this->values[$object][$hash];
-        }
-
         if (! isset($this->values[$object])) {
             $this->values[$object] = [];
+        }
+
+        if (array_key_exists($hash, $this->values[$object])) {
+            return $this->values[$object][$hash];
         }
 
         return $this->values[$object][$hash] = call_user_func($onceable->callable);

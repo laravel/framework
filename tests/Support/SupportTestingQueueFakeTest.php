@@ -171,7 +171,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushed(JobStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertPushed(JobStub::class, 2);
@@ -486,6 +486,44 @@ class SupportTestingQueueFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertStringContainsString('The job has chained jobs.', $e->getMessage());
         }
+    }
+
+    public function testGetRawPushes()
+    {
+        $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
+        $this->fake->pushRaw('some-other-payload', 'my-queue', ['options' => 'also yeah']);
+
+        $actualPushedRaw = $this->fake->rawPushes();
+
+        $this->assertEqualsCanonicalizing([
+            ['payload' => 'some-payload', 'queue' => null, 'options' => ['options' => 'yeah']],
+            ['payload' => 'some-other-payload', 'queue' => 'my-queue', 'options' => ['options' => 'also yeah']],
+        ], $actualPushedRaw);
+    }
+
+    public function testPushedRaw()
+    {
+        $this->fake->pushRaw('some-payload', null, ['options' => 'yeah']);
+        $this->fake->pushRaw('some-other-payload', 'my-queue', ['options' => 'also yeah']);
+
+        $this->assertCount(2, $this->fake->pushedRaw());
+
+        $pushedRaw = $this->fake->pushedRaw(fn ($payload) => $payload === 'some-payload');
+        $this->assertCount(1, $pushedRaw);
+        $this->assertEqualsCanonicalizing(
+            ['payload' => 'some-payload', 'queue' => null, 'options' => ['options' => 'yeah']],
+            $pushedRaw[0]
+        );
+
+        $pushedRaw = $this->fake->pushedRaw(
+            fn ($payload, $queue, $options) => $payload === 'some-other-payload'
+                && $queue === 'my-queue'
+                && $options['options'] === 'also yeah'
+        );
+        $this->assertCount(1, $pushedRaw);
+
+        $pushedRaw = $this->fake->pushedRaw(fn ($payload, $queue, $options) => $options === []);
+        $this->assertCount(0, $pushedRaw);
     }
 }
 

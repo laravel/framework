@@ -20,7 +20,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * The Eloquent user model.
      *
-     * @var string
+     * @var class-string<\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model>
      */
     protected $model;
 
@@ -36,7 +36,6 @@ class EloquentUserProvider implements UserProvider
      *
      * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $model
-     * @return void
      */
     public function __construct(HasherContract $hasher, $model)
     {
@@ -48,15 +47,15 @@ class EloquentUserProvider implements UserProvider
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed  $identifier
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveById($identifier)
     {
         $model = $this->createModel();
 
         return $this->newModelQuery($model)
-                    ->where($model->getAuthIdentifierName(), $identifier)
-                    ->first();
+            ->where($model->getAuthIdentifierName(), $identifier)
+            ->first();
     }
 
     /**
@@ -64,7 +63,7 @@ class EloquentUserProvider implements UserProvider
      *
      * @param  mixed  $identifier
      * @param  string  $token
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveByToken($identifier, #[\SensitiveParameter] $token)
     {
@@ -86,7 +85,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model  $user
      * @param  string  $token
      * @return void
      */
@@ -107,7 +106,7 @@ class EloquentUserProvider implements UserProvider
      * Retrieve a user by the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
     {
@@ -152,13 +151,17 @@ class EloquentUserProvider implements UserProvider
             return false;
         }
 
-        return $this->hasher->check($plain, $user->getAuthPassword());
+        if (is_null($hashed = $user->getAuthPassword())) {
+            return false;
+        }
+
+        return $this->hasher->check($plain, $hashed);
     }
 
     /**
      * Rehash the user's password if required and supported.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model  $user
      * @param  array  $credentials
      * @param  bool  $force
      * @return void
@@ -185,8 +188,8 @@ class EloquentUserProvider implements UserProvider
     protected function newModelQuery($model = null)
     {
         $query = is_null($model)
-                ? $this->createModel()->newQuery()
-                : $model->newQuery();
+            ? $this->createModel()->newQuery()
+            : $model->newQuery();
 
         with($query, $this->queryCallback);
 
@@ -196,7 +199,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Create a new instance of the model.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model
      */
     public function createModel()
     {
@@ -231,7 +234,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Gets the name of the Eloquent user model.
      *
-     * @return string
+     * @return class-string<\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model>
      */
     public function getModel()
     {
@@ -241,7 +244,7 @@ class EloquentUserProvider implements UserProvider
     /**
      * Sets the name of the Eloquent user model.
      *
-     * @param  string  $model
+     * @param  class-string<\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model>  $model
      * @return $this
      */
     public function setModel($model)

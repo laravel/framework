@@ -3,8 +3,11 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
@@ -68,5 +71,22 @@ class ValidationInRuleTest extends TestCase
         $rule = Rule::in([PureEnum::one]);
 
         $this->assertSame('in:"one"', (string) $rule);
+    }
+
+    public function testInRuleValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => Rule::in('foo', 'bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => (string) Rule::in('foo', 'bar')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => [Rule::in('bar', 'baz')]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['required', Rule::in('foo', 'bar')]]);
+        $this->assertTrue($v->passes());
     }
 }

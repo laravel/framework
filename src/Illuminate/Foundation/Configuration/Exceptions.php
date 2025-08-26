@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Configuration;
 
 use Closure;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 
 class Exceptions
@@ -12,7 +13,6 @@ class Exceptions
      * Create a new exception handling configuration instance.
      *
      * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
-     * @return void
      */
     public function __construct(public Handler $handler)
     {
@@ -151,6 +151,19 @@ class Exceptions
     }
 
     /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param  (\Closure(\Throwable): bool)  $dontReportWhen
+     * @return $this
+     */
+    public function dontReportWhen(Closure $dontReportWhen)
+    {
+        $this->handler->dontReportWhen($dontReportWhen);
+
+        return $this;
+    }
+
+    /**
      * Do not report duplicate exceptions.
      *
      * @return $this
@@ -197,6 +210,31 @@ class Exceptions
     public function stopIgnoring(array|string $class)
     {
         $this->handler->stopIgnoring($class);
+
+        return $this;
+    }
+
+    /**
+     * Set the truncation length for request exception messages.
+     *
+     * @param  int  $length
+     * @return $this
+     */
+    public function truncateRequestExceptionsAt(int $length)
+    {
+        RequestException::truncateAt($length);
+
+        return $this;
+    }
+
+    /**
+     * Disable truncation of request exception messages.
+     *
+     * @return $this
+     */
+    public function dontTruncateRequestExceptions()
+    {
+        RequestException::dontTruncate();
 
         return $this;
     }

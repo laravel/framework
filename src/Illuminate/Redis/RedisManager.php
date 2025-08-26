@@ -11,6 +11,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
  */
@@ -64,7 +66,6 @@ class RedisManager implements Factory
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
-     * @return void
      */
     public function __construct($app, $driver, array $config)
     {
@@ -76,12 +77,12 @@ class RedisManager implements Factory
     /**
      * Get a Redis connection by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
     {
-        $name = $name ?: 'default';
+        $name = enum_value($name) ?: 'default';
 
         if (isset($this->connections[$name])) {
             return $this->connections[$name];
@@ -255,6 +256,9 @@ class RedisManager implements Factory
      *
      * @param  string  $driver
      * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)

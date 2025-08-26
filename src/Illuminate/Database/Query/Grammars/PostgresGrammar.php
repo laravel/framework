@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query\Grammars;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class PostgresGrammar extends Grammar
@@ -23,6 +24,13 @@ class PostgresGrammar extends Grammar
     ];
 
     /**
+     * The Postgres grammar specific custom operators.
+     *
+     * @var array
+     */
+    protected static $customOperators = [];
+
+    /**
      * The grammar specific bitwise operators.
      *
      * @var array
@@ -30,6 +38,13 @@ class PostgresGrammar extends Grammar
     protected $bitwiseOperators = [
         '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
     ];
+
+    /**
+     * Indicates if the cascade option should be used when truncating.
+     *
+     * @var bool
+     */
+    protected static $cascadeTruncate = true;
 
     /**
      * Compile a basic where clause.
@@ -93,9 +108,14 @@ class PostgresGrammar extends Grammar
      */
     protected function whereDate(Builder $query, $where)
     {
+        $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).'::date '.$where['operator'].' '.$value;
+        if ($this->isJsonSelector($where['column'])) {
+            $column = '('.$column.')';
+        }
+
+        return $column.'::date '.$where['operator'].' '.$value;
     }
 
     /**
@@ -107,9 +127,14 @@ class PostgresGrammar extends Grammar
      */
     protected function whereTime(Builder $query, $where)
     {
+        $column = $this->wrap($where['column']);
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).'::time '.$where['operator'].' '.$value;
+        if ($this->isJsonSelector($where['column'])) {
+            $column = '('.$column.')';
+        }
+
+        return $column.'::time '.$where['operator'].' '.$value;
     }
 
     /**
@@ -142,9 +167,9 @@ class PostgresGrammar extends Grammar
             $language = 'english';
         }
 
-        $columns = collect($where['columns'])->map(function ($column) use ($language) {
-            return "to_tsvector('{$language}', {$this->wrap($column)})";
-        })->implode(' || ');
+        $columns = (new Collection($where['columns']))
+            ->map(fn ($column) => "to_tsvector('{$language}', {$this->wrap($column)})")
+            ->implode(' || ');
 
         $mode = 'plainto_tsquery';
 
@@ -358,7 +383,7 @@ class PostgresGrammar extends Grammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return string
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
@@ -391,7 +416,7 @@ class PostgresGrammar extends Grammar
      */
     protected function compileUpdateColumns(Builder $query, array $values)
     {
-        return collect($values)->map(function ($value, $key) {
+        return (new Collection($values))->map(function ($value, $key) {
             $column = last(explode('.', $key));
 
             if ($this->isJsonSelector($key)) {
@@ -417,7 +442,7 @@ class PostgresGrammar extends Grammar
 
         $sql .= ' on conflict ('.$this->columnize($uniqueBy).') do update set ';
 
-        $columns = collect($update)->map(function ($value, $key) {
+        $columns = (new Collection($update))->map(function ($value, $key) {
             return is_numeric($key)
                 ? $this->wrap($value).' = '.$this->wrapValue('excluded').'.'.$this->wrap($value)
                 : $this->wrap($key).' = '.$this->parameter($value);
@@ -478,9 +503,9 @@ class PostgresGrammar extends Grammar
             // When using Postgres, updates with joins list the joined tables in the from
             // clause, which is different than other systems like MySQL. Here, we will
             // compile out the tables that are joined and add them to a from clause.
-            $froms = collect($query->joins)->map(function ($join) {
-                return $this->wrapTable($join->table);
-            })->all();
+            $froms = (new Collection($query->joins))
+                ->map(fn ($join) => $this->wrapTable($join->table))
+                ->all();
 
             if (count($froms) > 0) {
                 $from = ' from '.implode(', ', $froms);
@@ -551,11 +576,13 @@ class PostgresGrammar extends Grammar
      */
     public function prepareBindingsForUpdateFrom(array $bindings, array $values)
     {
-        $values = collect($values)->map(function ($value, $column) {
-            return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
-                ? json_encode($value)
-                : $value;
-        })->all();
+        $values = (new Collection($values))
+            ->map(function ($value, $column) {
+                return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
+                    ? json_encode($value)
+                    : $value;
+            })
+            ->all();
 
         $bindingsWithoutWhere = Arr::except($bindings, ['select', 'where']);
 
@@ -593,7 +620,7 @@ class PostgresGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $values = collect($values)->map(function ($value, $column) {
+        $values = (new Collection($values))->map(function ($value, $column) {
             return is_array($value) || ($this->isJsonSelector($column) && ! $this->isExpression($value))
                 ? json_encode($value)
                 : $value;
@@ -646,7 +673,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
-        return ['truncate '.$this->wrapTable($query->from).' restart identity cascade' => []];
+        return ['truncate '.$this->wrapTable($query->from).' restart identity'.(static::$cascadeTruncate ? ' cascade' : '') => []];
     }
 
     /**
@@ -719,13 +746,15 @@ class PostgresGrammar extends Grammar
     {
         $quote = func_num_args() === 2 ? func_get_arg(1) : "'";
 
-        return collect($path)->map(function ($attribute) {
-            return $this->parseJsonPathArrayKeys($attribute);
-        })->collapse()->map(function ($attribute) use ($quote) {
-            return filter_var($attribute, FILTER_VALIDATE_INT) !== false
-                        ? $attribute
-                        : $quote.$attribute.$quote;
-        })->all();
+        return (new Collection($path))
+            ->map(fn ($attribute) => $this->parseJsonPathArrayKeys($attribute))
+            ->collapse()
+            ->map(function ($attribute) use ($quote) {
+                return filter_var($attribute, FILTER_VALIDATE_INT) !== false
+                    ? $attribute
+                    : $quote.$attribute.$quote;
+            })
+            ->all();
     }
 
     /**
@@ -741,7 +770,7 @@ class PostgresGrammar extends Grammar
 
             preg_match_all('/\[([^\]]+)\]/', $parts[0], $keys);
 
-            return collect([$key])
+            return (new Collection([$key]))
                 ->merge($keys[1])
                 ->diff('')
                 ->values()
@@ -771,5 +800,47 @@ class PostgresGrammar extends Grammar
         }
 
         return $query;
+    }
+
+    /**
+     * Get the Postgres grammar specific operators.
+     *
+     * @return array
+     */
+    public function getOperators()
+    {
+        return array_values(array_unique(array_merge(parent::getOperators(), static::$customOperators)));
+    }
+
+    /**
+     * Set any Postgres grammar specific custom operators.
+     *
+     * @param  array  $operators
+     * @return void
+     */
+    public static function customOperators(array $operators)
+    {
+        static::$customOperators = array_values(
+            array_merge(static::$customOperators, array_filter(array_filter($operators, 'is_string')))
+        );
+    }
+
+    /**
+     * Enable or disable the "cascade" option when compiling the truncate statement.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public static function cascadeOnTruncate(bool $value = true)
+    {
+        static::$cascadeTruncate = $value;
+    }
+
+    /**
+     * @deprecated use cascadeOnTruncate
+     */
+    public static function cascadeOnTrucate(bool $value = true)
+    {
+        self::cascadeOnTruncate($value);
     }
 }

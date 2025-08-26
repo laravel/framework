@@ -39,7 +39,6 @@ class GateEvaluated
      * @param  string  $ability
      * @param  bool|null  $result
      * @param  array  $arguments
-     * @return void
      */
     public function __construct($user, $ability, $result, $arguments)
     {

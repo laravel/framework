@@ -23,13 +23,17 @@ class ExceptionsFacadeTest extends TestCase
     {
         Exceptions::fake();
 
-        Exceptions::report(new RuntimeException('test 1'));
+        Exceptions::report($thrownException = new RuntimeException('test 1'));
         report(new RuntimeException('test 2'));
 
         Exceptions::assertReported(RuntimeException::class);
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 1');
         Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'test 2');
         Exceptions::assertReportedCount(2);
+
+        $reported = Exceptions::reported();
+        $this->assertCount(2, $reported);
+        $this->assertSame($thrownException, $reported[0]);
     }
 
     public function testFakeAssertReportedCount()

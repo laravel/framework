@@ -59,6 +59,18 @@ class CacheManagerTest extends TestCase
         $this->assertSame('mm(u_u)mm', $driver->flag);
     }
 
+    public function testItCanBuildRepositories()
+    {
+        $app = $this->getApp([]);
+        $cacheManager = new CacheManager($app);
+
+        $arrayCache = $cacheManager->build(['driver' => 'array']);
+        $nullCache = $cacheManager->build(['driver' => 'null']);
+
+        $this->assertInstanceOf(ArrayStore::class, $arrayCache->getStore());
+        $this->assertInstanceOf(NullStore::class, $nullCache->getStore());
+    }
+
     public function testItMakesRepositoryWhenContainerHasNoDispatcher()
     {
         $userConfig = [

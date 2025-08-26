@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -62,8 +63,14 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     protected function writeMarkdownTemplate()
     {
+        $separator = '/';
+
+        if (windows_os()) {
+            $separator = '\\';
+        }
+
         $path = $this->viewPath(
-            str_replace('.', '/', $this->option('markdown')).'.blade.php'
+            str_replace('.', $separator, $this->option('markdown')).'.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -144,7 +151,7 @@ class NotificationMakeCommand extends GeneratorCommand
         $wantsMarkdownView = confirm('Would you like to create a markdown view?');
 
         if ($wantsMarkdownView) {
-            $defaultMarkdownView = collect(explode('/', str_replace('\\', '/', $this->argument('name'))))
+            $defaultMarkdownView = (new Collection(explode('/', str_replace('\\', '/', $this->argument('name')))))
                 ->map(fn ($path) => Str::kebab($path))
                 ->prepend('mail')
                 ->implode('.');
