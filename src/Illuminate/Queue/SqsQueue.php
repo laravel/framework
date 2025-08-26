@@ -310,7 +310,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * Get queueable options from the job.
      *
      * @param  mixed  $job
-     *
      * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
      */
     protected function getQueueableOptions($job): array

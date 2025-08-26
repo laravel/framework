@@ -113,7 +113,6 @@ trait Queueable
      * Set the desired message group id for the job.
      *
      * @param  string  $messageGroup
-     *
      * @return $this
      */
     public function onMessageGroup($messageGroup)
