@@ -1,6 +1,10 @@
 @props(['frame'])
 
-<div class="overflow-hidden rounded-lg border dark:border-white/10">
+<div
+    class="overflow-hidden rounded-lg border dark:border-white/10"
+    x-data="{ expanded: {{ $frame->isMain() ? 'true' : 'false' }} }"
+    @expand-button-clicked="expanded = $event.detail.expanded"
+>
     <div class="flex h-11 items-center gap-2.5 bg-white pr-2.5 pl-4 dark:bg-white/3">
         {{-- Dot --}}
         <div class="flex size-3 items-center justify-center">
@@ -11,9 +15,11 @@
             <x-laravel-exceptions-renderer-new::formatted-source :$frame />
             <x-laravel-exceptions-renderer-new::file-with-line :file="$frame->file()" :line="$frame->line()" />
         </div>
+
+        <x-laravel-exceptions-renderer-new::expand-button :expanded="$frame->isMain()" />
     </div>
 
     @if($snippet = $frame->snippet())
-        <x-laravel-exceptions-renderer-new::frame-code :code="$snippet" :highlightedLine="$frame->line()" />
+        <x-laravel-exceptions-renderer-new::frame-code :code="$snippet" :highlightedLine="$frame->line()" x-show="expanded" />
     @endif
 </div>
