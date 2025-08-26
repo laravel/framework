@@ -14,8 +14,8 @@ assertType('mixed', $cache->get('cache', function (): int {
 }));
 
 assertType('mixed', $cache->pull('key'));
-assertType('mixed', $cache->pull('cache', 28));
-assertType('mixed', $cache->pull('cache', function (): int {
+assertType('28', $cache->pull('cache', 28));
+assertType('30', $cache->pull('cache', function (): int {
     return 30;
 }));
 assertType('33', $cache->sear('cache', function (): int {
