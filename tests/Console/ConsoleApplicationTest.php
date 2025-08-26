@@ -222,6 +222,25 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $statusCode);
     }
 
+    public function testCallMethodCanCallArtisanCommandUsingCommandClassObject()
+    {
+        $app = new Application(
+            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $events = m::mock(Dispatcher::class, ['dispatch' => null, 'fire' => null]),
+            'testing'
+        );
+
+        $app->addCommands([$command = new FakeCommandWithInputPrompting()]);
+
+        $command->setLaravel($laravel);
+
+        $statusCode = $app->call($command);
+
+        $this->assertTrue($command->prompted);
+        $this->assertSame('foo', $command->argument('name'));
+        $this->assertSame(0, $statusCode);
+    }
+
     protected function getMockConsole(array $methods)
     {
         $app = m::mock(ApplicationContract::class, ['version' => '6.0']);

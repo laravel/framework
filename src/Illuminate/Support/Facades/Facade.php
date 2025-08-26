@@ -5,6 +5,7 @@ namespace Illuminate\Support\Facades;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Benchmark;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Js;
 use Illuminate\Support\Number;
@@ -276,6 +277,7 @@ abstract class Facade
             'Arr' => Arr::class,
             'Artisan' => Artisan::class,
             'Auth' => Auth::class,
+            'Benchmark' => Benchmark::class,
             'Blade' => Blade::class,
             'Broadcast' => Broadcast::class,
             'Bus' => Bus::class,

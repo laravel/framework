@@ -76,7 +76,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
      *
      * @return $this
      */
-    protected function forgetDuplicates(): self
+    protected function forgetDuplicates(): static
     {
         $this->callbacks = (new Collection($this->callbacks))
             ->reverse()

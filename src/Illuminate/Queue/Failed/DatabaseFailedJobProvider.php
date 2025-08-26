@@ -136,7 +136,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
         $totalDeleted = 0;
 
         do {
-            $deleted = $query->take(1000)->delete();
+            $deleted = $query->limit(1000)->delete();
 
             $totalDeleted += $deleted;
         } while ($deleted !== 0);
@@ -164,7 +164,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function getTable()
+    public function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
     }

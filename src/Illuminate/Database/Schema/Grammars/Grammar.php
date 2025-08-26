@@ -478,12 +478,12 @@ abstract class Grammar extends BaseGrammar
         }
 
         if ($value instanceof BackedEnum) {
-            return "'{$value->value}'";
+            return "'".str_replace("'", "''", $value->value)."'";
         }
 
         return is_bool($value)
             ? "'".(int) $value."'"
-            : "'".(string) $value."'";
+            : "'".str_replace("'", "''", $value)."'";
     }
 
     /**

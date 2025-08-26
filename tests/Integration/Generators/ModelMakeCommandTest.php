@@ -247,4 +247,15 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
         $this->assertFilenameExists('tests/Feature/Models/FooTest.php');
     }
+
+    public function testItAsksForAdditionalComponentsForExistingModel()
+    {
+        $this->artisan('make:model', ['name' => 'Foo'])
+            ->assertExitCode(0);
+
+        $this->artisan('make:model', ['name' => 'Foo'])
+            ->assertExitCode(0)
+            ->expectsConfirmation('Do you want to generate additional components for the model?', 'yes')
+            ->expectsQuestion('Would you like any of the following?', []);
+    }
 }

@@ -159,7 +159,7 @@ class FilesystemAdapter implements CloudFilesystemContract
         $actual = count($this->files($path, $recursive));
 
         PHPUnit::assertEquals(
-            $actual, $count, "Expected [{$count}] files at [{$path}], but found [{$actual}]."
+            $count, $actual, "Expected [{$count}] files at [{$path}], but found [{$actual}]."
         );
 
         return $this;

@@ -12,6 +12,8 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
+use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
 
 class NotificationSender
@@ -144,6 +146,8 @@ class NotificationSender
      * @param  mixed  $notification
      * @param  string  $channel
      * @return void
+     *
+     * @throws \Throwable
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
@@ -159,6 +163,10 @@ class NotificationSender
             $response = $this->manager->driver($channel)->send($notifiable, $notification);
         } catch (Throwable $exception) {
             if (! $this->failedEventWasDispatched) {
+                if ($exception instanceof HttpTransportException) {
+                    $exception = new TransportException($exception->getMessage(), $exception->getCode());
+                }
+
                 $this->events->dispatch(
                     new NotificationFailed($notifiable, $notification, $channel, ['exception' => $exception])
                 );

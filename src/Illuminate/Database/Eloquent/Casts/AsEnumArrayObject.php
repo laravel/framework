@@ -68,9 +68,9 @@ class AsEnumArrayObject implements Castable
 
             public function serialize($model, string $key, $value, array $attributes)
             {
-                return (new Collection($value->getArrayCopy()))->map(function ($enum) {
-                    return $this->getStorableEnumValue($enum);
-                })->toArray();
+                return (new Collection($value->getArrayCopy()))
+                    ->map(fn ($enum) => $this->getStorableEnumValue($enum))
+                    ->toArray();
             }
 
             protected function getStorableEnumValue($enum)

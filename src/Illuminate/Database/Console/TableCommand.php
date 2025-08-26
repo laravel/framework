@@ -47,7 +47,17 @@ class TableCommand extends DatabaseInspectionCommand
             array_keys($tables)
         );
 
-        $table = $tables[$tableName] ?? Arr::first($tables, fn ($table) => $table['name'] === $tableName);
+        $table = $tables[$tableName] ?? (new Collection($tables))->when(
+            Arr::wrap($connection->getSchemaBuilder()->getCurrentSchemaListing()
+                ?? $connection->getSchemaBuilder()->getCurrentSchemaName()),
+            fn (Collection $collection, array $currentSchemas) => $collection->sortBy(
+                function (array $table) use ($currentSchemas) {
+                    $index = array_search($table['schema'], $currentSchemas);
+
+                    return $index === false ? PHP_INT_MAX : $index;
+                }
+            )
+        )->firstWhere('name', $tableName);
 
         if (! $table) {
             $this->components->warn("Table [{$tableName}] doesn't exist.");

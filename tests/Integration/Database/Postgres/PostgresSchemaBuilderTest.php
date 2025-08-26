@@ -205,4 +205,27 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
 
         $this->assertSame([], collect($indexes)->firstWhere('name', 'table_raw_index')['columns']);
     }
+
+    public function testCreateIndexesOnline()
+    {
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('title', 200);
+            $table->text('body');
+
+            $table->unique('title')->online();
+            $table->index(['created_at'])->online();
+            $table->fullText(['body'])->online();
+            $table->rawIndex("DATE_TRUNC('year'::text,created_at)", 'table_raw_index')->online();
+        });
+
+        $indexes = Schema::getIndexes('public.table');
+        $indexNames = collect($indexes)->pluck('name');
+
+        $this->assertContains('public_table_title_unique', $indexNames);
+        $this->assertContains('public_table_created_at_index', $indexNames);
+        $this->assertContains('public_table_body_fulltext', $indexNames);
+        $this->assertContains('table_raw_index', $indexNames);
+    }
 }

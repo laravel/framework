@@ -3,8 +3,10 @@
 namespace Illuminate\Foundation\Bus;
 
 use Closure;
+use Illuminate\Bus\ChainedBatch;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 
@@ -90,6 +92,50 @@ class PendingChain
     public function onQueue($queue)
     {
         $this->queue = enum_value($queue);
+
+        return $this;
+    }
+
+    /**
+     * Prepend a job to the chain.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function prepend($job)
+    {
+        $jobs = ChainedBatch::prepareNestedBatches(
+            Collection::wrap($job)
+        );
+
+        if ($this->job) {
+            array_unshift($this->chain, $this->job);
+        }
+
+        $this->job = $jobs->shift();
+
+        array_unshift($this->chain, ...$jobs->toArray());
+
+        return $this;
+    }
+
+    /**
+     * Append a job to the chain.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function append($job)
+    {
+        $jobs = ChainedBatch::prepareNestedBatches(
+            Collection::wrap($job)
+        );
+
+        if (! $this->job) {
+            $this->job = $jobs->shift();
+        }
+
+        array_push($this->chain, ...$jobs->toArray());
 
         return $this;
     }

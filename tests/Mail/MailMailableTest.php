@@ -55,7 +55,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasTo('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected recipient [taylor@laravel.com (Taylor Otwell)] in email 'to' recipients.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected recipient in email 'to' recipients.\nExpected: [taylor@laravel.com (Taylor Otwell)]\nActual: [taylor@laravel.com]\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -101,7 +101,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected recipient [{$address}] in email 'to' recipients.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Did not see expected recipient in email 'to' recipients.\nExpected: [{$address}]\nActual: [none]\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -134,7 +134,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasCc('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected recipient [taylor@laravel.com (Taylor Otwell)] in email 'cc' recipients.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected recipient in email 'cc' recipients.\nExpected: [taylor@laravel.com (Taylor Otwell)]\nActual: [taylor@laravel.com]\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -192,7 +192,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected recipient [{$address}] in email 'cc' recipients.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Did not see expected recipient in email 'cc' recipients.\nExpected: [{$address}]\nActual: [none]\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -225,7 +225,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasBcc('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected recipient [taylor@laravel.com (Taylor Otwell)] in email 'bcc' recipients.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected recipient in email 'bcc' recipients.\nExpected: [taylor@laravel.com (Taylor Otwell)]\nActual: [taylor@laravel.com]\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -283,7 +283,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected recipient [{$address}] in email 'bcc' recipients.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Did not see expected recipient in email 'bcc' recipients.\nExpected: [{$address}]\nActual: [none]\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -316,7 +316,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasReplyTo('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected address [taylor@laravel.com (Taylor Otwell)] as email 'reply to' recipient.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected address as email 'reply to' recipient.\nExpected: [taylor@laravel.com (Taylor Otwell)]\nActual: [taylor@laravel.com]\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -363,7 +363,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Did not see expected address [{$address}] as email 'reply to' recipient.\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Did not see expected address as email 'reply to' recipient.\nExpected: [{$address}]\nActual: [none]\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -396,7 +396,7 @@ class MailMailableTest extends TestCase
             $mailable->assertFrom('taylor@laravel.com', 'Taylor Otwell');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Email was not from expected address [taylor@laravel.com (Taylor Otwell)].\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Email was not from expected address.\nExpected: [taylor@laravel.com (Taylor Otwell)]\nActual: [taylor@laravel.com]\nFailed asserting that false is true.", $e->getMessage());
         }
 
         $mailable = new WelcomeMailableStub;
@@ -443,7 +443,7 @@ class MailMailableTest extends TestCase
                 if (! is_string($address)) {
                     $address = json_encode($address);
                 }
-                $this->assertSame("Email was not from expected address [{$address}].\nFailed asserting that false is true.", $e->getMessage());
+                $this->assertSame("Email was not from expected address.\nExpected: [{$address}]\nActual: [none]\nFailed asserting that false is true.", $e->getMessage());
             }
         }
     }
@@ -573,10 +573,11 @@ class MailMailableTest extends TestCase
         $mailable = new WelcomeMailableStub;
 
         $mailable->mailer('array');
+        $this->assertTrue($mailable->usesMailer('array'));
 
-        $mailable = unserialize(serialize($mailable));
-
-        $this->assertSame('array', $mailable->mailer);
+        $mailable->mailer('smtp');
+        $this->assertTrue($mailable->usesMailer('smtp'));
+        $this->assertFalse($mailable->usesMailer('ses'));
     }
 
     public function testMailablePriorityGetsSent()
@@ -629,8 +630,47 @@ class MailMailableTest extends TestCase
             $mailable->assertHasMetadata('test', 'test');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected key [test] and value [test] in email metadata.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Email metadata does not match expected value.\nExpected: [test] => [test]\nActual: key [test] not found\nFailed asserting that false is true.", $e->getMessage());
         }
+    }
+
+    public function testMailableMergeMetadata()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->to('hello@laravel.com');
+        $mailable->from('taylor@laravel.com');
+        $mailable->html('test content');
+
+        $mailable->metadata([
+            'template_id' => 'external-template-id',
+            'customer_id' => 101,
+            'order_id' => 1000,
+            'subtotal' => 1500,
+            'gst' => 150,
+            'shipping_fee' => 20,
+            'total' => 1670,
+        ]);
+
+        $this->assertTrue($mailable->hasMetadata('template_id', 'external-template-id'));
+        $this->assertTrue($mailable->hasMetadata('customer_id', 101));
+        $this->assertTrue($mailable->hasMetadata('order_id', 1000));
+        $this->assertTrue($mailable->hasMetadata('subtotal', 1500));
+        $this->assertTrue($mailable->hasMetadata('gst', 150));
+        $this->assertTrue($mailable->hasMetadata('shipping_fee', 20));
+        $this->assertTrue($mailable->hasMetadata('total', 1670));
+
+        $this->stubMailer();
+        $view = m::mock(Factory::class);
+        $mailer = new Mailer('array', $view, new ArrayTransport);
+
+        $sentMessage = $mailer->send($mailable);
+        $this->assertStringContainsString('X-Metadata-template_id: external-template-id', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-customer_id: 101', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-order_id: 1000', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-subtotal: 1500', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-gst: 150', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-shipping_fee: 20', $sentMessage->toString());
+        $this->assertStringContainsString('X-Metadata-total: 1670', $sentMessage->toString());
     }
 
     public function testMailableTagGetsSent()
@@ -664,7 +704,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasTag('bar');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected tag [bar] in email tags.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertSame("Did not see expected tag in email tags.\nExpected: [bar]\nActual: [test, foo]\nFailed asserting that false is true.", $e->getMessage());
         }
     }
 
@@ -1088,7 +1128,7 @@ class MailMailableTest extends TestCase
             $mailable->assertHasSubject('Foo Subject');
             $this->fail();
         } catch (AssertionFailedError $e) {
-            $this->assertSame("Did not see expected text [Foo Subject] in email subject.\nFailed asserting that false is true.", $e->getMessage());
+            $this->assertStringContainsString("Email subject does not match expected value.\nExpected: [Foo Subject]\nActual:", $e->getMessage());
         }
 
         $mailable = new class() extends Mailable

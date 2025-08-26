@@ -73,4 +73,22 @@ class DatabaseSqlServerSchemaBuilderTest extends SqlServerTestCase
         $userColumns = Schema::getColumns('users');
         $this->assertNull($userColumns[1]['generation']);
     }
+
+    public function testCreateIndexesOnline()
+    {
+        Schema::create('table', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('title', 200);
+
+            $table->unique('title')->online();
+            $table->index(['created_at'])->online();
+        });
+
+        $indexes = Schema::getIndexes('table');
+        $indexNames = collect($indexes)->pluck('name');
+
+        $this->assertContains('table_title_unique', $indexNames);
+        $this->assertContains('table_created_at_index', $indexNames);
+    }
 }

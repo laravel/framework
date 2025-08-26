@@ -151,6 +151,19 @@ class Exceptions
     }
 
     /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param  (\Closure(\Throwable): bool)  $dontReportWhen
+     * @return $this
+     */
+    public function dontReportWhen(Closure $dontReportWhen)
+    {
+        $this->handler->dontReportWhen($dontReportWhen);
+
+        return $this;
+    }
+
+    /**
      * Do not report duplicate exceptions.
      *
      * @return $this

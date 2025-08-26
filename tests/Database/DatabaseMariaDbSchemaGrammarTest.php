@@ -835,10 +835,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->enum('role', ['member', 'admin']);
+        $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertSame('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
+        $this->assertSame('alter table `users` add `status` enum(\'bar\') not null', $statements[1]);
     }
 
     public function testAddingSet()

@@ -167,9 +167,9 @@ class PostgresGrammar extends Grammar
             $language = 'english';
         }
 
-        $columns = (new Collection($where['columns']))->map(function ($column) use ($language) {
-            return "to_tsvector('{$language}', {$this->wrap($column)})";
-        })->implode(' || ');
+        $columns = (new Collection($where['columns']))
+            ->map(fn ($column) => "to_tsvector('{$language}', {$this->wrap($column)})")
+            ->implode(' || ');
 
         $mode = 'plainto_tsquery';
 

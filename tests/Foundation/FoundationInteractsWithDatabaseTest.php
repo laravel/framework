@@ -86,7 +86,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false);
 
-        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('limit')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([['title' => 'Forge']]));
 
         $this->assertDatabaseHas($this->table, $this->data);
@@ -100,7 +100,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(false, countResult: [5, 5]);
 
-        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('limit')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(
             collect(array_fill(0, 3, 'data'))
         );
@@ -142,7 +142,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
         $builder = $this->mockCountBuilder(true);
 
-        $builder->shouldReceive('take')->andReturnSelf();
+        $builder->shouldReceive('limit')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$this->data]));
 
         $this->assertDatabaseMissing($this->table, $this->data);

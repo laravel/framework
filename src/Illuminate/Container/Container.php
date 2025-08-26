@@ -5,6 +5,9 @@ namespace Illuminate\Container;
 use ArrayAccess;
 use Closure;
 use Exception;
+use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Scoped;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -121,6 +124,20 @@ class Container implements ArrayAccess, ContainerContract
     public $contextualAttributes = [];
 
     /**
+     * Whether an abstract class has already had its attributes checked for bindings.
+     *
+     * @var array<class-string, true>
+     */
+    protected $checkedForAttributeBindings = [];
+
+    /**
+     * Whether a class has already been checked for Singleton or Scoped attributes.
+     *
+     * @var array<class-string, "scoped"|"singleton"|null>
+     */
+    protected $checkedForSingletonOrScopedAttributes = [];
+
+    /**
      * All of the registered rebound callbacks.
      *
      * @var array[]
@@ -175,6 +192,13 @@ class Container implements ArrayAccess, ContainerContract
      * @var array[]
      */
     protected $afterResolvingAttributeCallbacks = [];
+
+    /**
+     * The callback used to determine the container's environment.
+     *
+     * @var (callable(array<int, string>|string): bool|string)|null
+     */
+    protected $environmentResolver = null;
 
     /**
      * Define a contextual binding.
@@ -252,9 +276,64 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function isShared($abstract)
     {
-        return isset($this->instances[$abstract]) ||
-               (isset($this->bindings[$abstract]['shared']) &&
-               $this->bindings[$abstract]['shared'] === true);
+        if (isset($this->instances[$abstract])) {
+            return true;
+        }
+
+        if (isset($this->bindings[$abstract]['shared']) && $this->bindings[$abstract]['shared'] === true) {
+            return true;
+        }
+
+        if (! class_exists($abstract)) {
+            return false;
+        }
+
+        if (($scopedType = $this->getScopedTyped($abstract)) === null) {
+            return false;
+        }
+
+        if ($scopedType === 'scoped') {
+            if (! in_array($abstract, $this->scopedInstances, true)) {
+                $this->scopedInstances[] = $abstract;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if a ReflectionClass has scoping attributes applied.
+     *
+     * @param  ReflectionClass<object>|class-string  $reflection
+     * @return "singleton"|"scoped"|null
+     */
+    protected function getScopedTyped(ReflectionClass|string $reflection): ?string
+    {
+        $className = $reflection instanceof ReflectionClass
+            ? $reflection->getName()
+            : $reflection;
+
+        if (array_key_exists($className, $this->checkedForSingletonOrScopedAttributes)) {
+            return $this->checkedForSingletonOrScopedAttributes[$className];
+        }
+
+        try {
+            $reflection = $reflection instanceof ReflectionClass
+                ? $reflection
+                : new ReflectionClass($reflection);
+        } catch (ReflectionException) {
+            return $this->checkedForSingletonOrScopedAttributes[$className] = null;
+        }
+
+        $type = null;
+
+        if (! empty($reflection->getAttributes(Singleton::class))) {
+            $type = 'singleton';
+        } elseif (! empty($reflection->getAttributes(Scoped::class))) {
+            $type = 'scoped';
+        }
+
+        return $this->checkedForSingletonOrScopedAttributes[$className] = $type;
     }
 
     /**
@@ -649,6 +728,8 @@ class Container implements ArrayAccess, ContainerContract
             throw new LogicException("[{$abstract}] is aliased to itself.");
         }
 
+        $this->removeAbstractAlias($alias);
+
         $this->aliases[$alias] = $abstract;
 
         $this->abstractAliases[$abstract][] = $alias;
@@ -935,7 +1016,69 @@ class Container implements ArrayAccess, ContainerContract
             return $this->bindings[$abstract]['concrete'];
         }
 
-        return $abstract;
+        if ($this->environmentResolver === null ||
+            ($this->checkedForAttributeBindings[$abstract] ?? false) || ! is_string($abstract)) {
+            return $abstract;
+        }
+
+        return $this->getConcreteBindingFromAttributes($abstract);
+    }
+
+    /**
+     * Get the concrete binding for an abstract from the Bind attribute.
+     *
+     * @param  string  $abstract
+     * @return mixed
+     */
+    protected function getConcreteBindingFromAttributes($abstract)
+    {
+        $this->checkedForAttributeBindings[$abstract] = true;
+
+        try {
+            $reflected = new ReflectionClass($abstract);
+        } catch (ReflectionException) {
+            return $abstract;
+        }
+
+        $bindAttributes = $reflected->getAttributes(Bind::class);
+
+        if ($bindAttributes === []) {
+            return $abstract;
+        }
+
+        $concrete = $maybeConcrete = null;
+
+        foreach ($bindAttributes as $reflectedAttribute) {
+            $instance = $reflectedAttribute->newInstance();
+
+            if ($instance->environments === ['*']) {
+                $maybeConcrete = $instance->concrete;
+
+                continue;
+            }
+
+            if ($this->currentEnvironmentIs($instance->environments)) {
+                $concrete = $instance->concrete;
+
+                break;
+            }
+        }
+
+        if ($maybeConcrete !== null && $concrete === null) {
+            $concrete = $maybeConcrete;
+        }
+
+        if ($concrete === null) {
+            return $abstract;
+        }
+
+        match ($this->getScopedTyped($reflected)) {
+            'scoped' => $this->scoped($abstract, $concrete),
+            'singleton' => $this->singleton($abstract, $concrete),
+            null => $this->bind($abstract, $concrete),
+        };
+
+        return $this->bindings[$abstract]['concrete'];
     }
 
     /**
@@ -1596,6 +1739,30 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     * Set the callback which determines the current container environment.
+     *
+     * @param  (callable(array<int, string>|string): bool|string)|null  $callback
+     * @return void
+     */
+    public function resolveEnvironmentUsing(?callable $callback)
+    {
+        $this->environmentResolver = $callback;
+    }
+
+    /**
+     * Determine the environment for the container.
+     *
+     * @param  array<int, string>|string  $environments
+     * @return bool
+     */
+    public function currentEnvironmentIs($environments)
+    {
+        return $this->environmentResolver === null
+            ? false
+            : call_user_func($this->environmentResolver, $environments);
+    }
+
+    /**
      * Flush the container of all bindings and resolved instances.
      *
      * @return void
@@ -1608,6 +1775,8 @@ class Container implements ArrayAccess, ContainerContract
         $this->instances = [];
         $this->abstractAliases = [];
         $this->scopedInstances = [];
+        $this->checkedForAttributeBindings = [];
+        $this->checkedForSingletonOrScopedAttributes = [];
     }
 
     /**

@@ -105,6 +105,10 @@ trait InteractsWithRedis
      */
     public function tearDownRedis()
     {
+        if (static::$connectionFailedOnceWithDefaultsSkip === true) {
+            return;
+        }
+
         if (isset($this->redis['phpredis'])) {
             $this->redis['phpredis']->connection()->flushdb();
         }

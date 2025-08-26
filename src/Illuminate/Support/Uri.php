@@ -11,12 +11,13 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Dumpable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use JsonSerializable;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Uri as LeagueUri;
 use SensitiveParameter;
 use Stringable;
 
-class Uri implements Htmlable, Responsable, Stringable
+class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
 {
     use Conditionable, Dumpable, Macroable, Tappable;
 
@@ -332,7 +333,17 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
-     * Create an HTTP response that represents the object.
+     * Get the URI as a Stringable instance.
+     *
+     * @return \Illuminate\Support\Stringable
+     */
+    public function toStringable()
+    {
+        return Str::of($this->value());
+    }
+
+    /**
+     * Create an HTTP response that represents the URI object.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -343,7 +354,7 @@ class Uri implements Htmlable, Responsable, Stringable
     }
 
     /**
-     * Get content as a string of HTML.
+     * Get the URI as a string of HTML.
      *
      * @return string
      */
@@ -407,6 +418,16 @@ class Uri implements Htmlable, Responsable, Stringable
     public function getUri(): UriInterface
     {
         return $this->uri;
+    }
+
+    /**
+     * Convert the object into a value that is JSON serializable.
+     *
+     * @return string
+     */
+    public function jsonSerialize(): string
+    {
+        return $this->value();
     }
 
     /**

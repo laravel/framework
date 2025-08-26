@@ -175,7 +175,7 @@ trait InteractsWithTestCaseLifecycle
         Factory::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
-        HandleExceptions::flushState();
+        HandleExceptions::flushState($this);
         Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();

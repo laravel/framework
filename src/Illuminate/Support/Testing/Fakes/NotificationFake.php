@@ -215,7 +215,11 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
-            "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
+            sprintf(
+                "Expected [{$notification}] to be sent {$expectedCount} %s, but was sent {$actualCount} %s.",
+                Str::plural('time', $expectedCount),
+                Str::plural('time', $actualCount)
+            )
         );
     }
 

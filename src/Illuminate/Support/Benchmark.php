@@ -58,7 +58,7 @@ class Benchmark
      * @param  int  $iterations
      * @return never
      */
-    public static function dd(Closure|array $benchmarkables, int $iterations = 1): void
+    public static function dd(Closure|array $benchmarkables, int $iterations = 1): never
     {
         $result = (new Collection(static::measure(Arr::wrap($benchmarkables), $iterations)))
             ->map(fn ($average) => number_format($average, 3).'ms')

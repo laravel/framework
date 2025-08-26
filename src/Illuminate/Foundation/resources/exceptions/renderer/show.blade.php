@@ -1,6 +1,6 @@
 <x-laravel-exceptions-renderer::layout :$exception>
     <div class="renderer container mx-auto lg:px-8">
-        <x-laravel-exceptions-renderer::navigation :$exception />
+        <x-laravel-exceptions-renderer::navigation :$exception :$exceptionAsMarkdown />
 
         <main class="px-6 pb-12 pt-6">
             <div class="container mx-auto">

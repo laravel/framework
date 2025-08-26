@@ -50,7 +50,7 @@ trait Interaction
      *
      * @return $this
      */
-    public function etc(): self
+    public function etc(): static
     {
         $this->interacted = array_keys($this->prop());
 

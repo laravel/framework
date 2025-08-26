@@ -31,7 +31,10 @@ class SupportTestingMailFakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->mailManager = m::mock(MailManager::class);
+        $this->mailManager = m::mock(MailManager::class, function ($mock) {
+            $mock->shouldReceive('getDefaultDriver')
+                ->andReturn('smtp');
+        });
         $this->fake = new MailFake($this->mailManager);
         $this->mailable = new MailableStub;
     }
@@ -179,7 +182,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertSent(MailableStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertSent(MailableStub::class, 2);
@@ -251,7 +254,7 @@ class SupportTestingMailFakeTest extends TestCase
             $this->fake->assertQueued(MailableStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
@@ -379,6 +382,33 @@ class SupportTestingMailFakeTest extends TestCase
         $this->mailManager->shouldReceive('foo')->andReturn('bar');
 
         $this->assertEquals('bar', $this->fake->foo());
+    }
+
+    public function testAssertMailer()
+    {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('smtp');
+        });
+
+        $this->fake->mailer('ses')->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('ses');
+        });
+
+        $this->fake->mailer('sendgrid')->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('sendgrid');
+        });
+
+        $this->fake->mailer('mailjet')->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->usesMailer('mailjet');
+        });
     }
 }
 

@@ -51,7 +51,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     protected $messages = [];
 
     /**
-     * The callback that will generate the "default" version of the file rule.
+     * The callback that will generate the "default" version of the email rule.
      *
      * @var string|array|callable|null
      */
@@ -79,7 +79,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
-     * Get the default configuration of the file rule.
+     * Get the default configuration of the email rule.
      *
      * @return static
      */

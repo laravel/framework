@@ -932,4 +932,22 @@ trait ReplacesAttributes
 
         return str_replace(':values', implode(', ', $parameters), $message);
     }
+
+    /**
+     * Replace all place-holders for the doesnt_contain rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceDoesntContain($message, $attribute, $rule, $parameters)
+    {
+        foreach ($parameters as &$parameter) {
+            $parameter = $this->getDisplayableValue($attribute, $parameter);
+        }
+
+        return str_replace(':values', implode(', ', $parameters), $message);
+    }
 }

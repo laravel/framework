@@ -11,7 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static int increment(string $key, \DateTimeInterface|\DateInterval|int $decaySeconds = 60, int $amount = 1)
  * @method static int decrement(string $key, \DateTimeInterface|\DateInterval|int $decaySeconds = 60, int $amount = 1)
  * @method static mixed attempts(string $key)
- * @method static mixed resetAttempts(string $key)
+ * @method static bool resetAttempts(string $key)
  * @method static int remaining(string $key, int $maxAttempts)
  * @method static int retriesLeft(string $key, int $maxAttempts)
  * @method static void clear(string $key)

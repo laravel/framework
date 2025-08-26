@@ -204,11 +204,9 @@ trait Queueable
      */
     public function chain($chain)
     {
-        $jobs = ChainedBatch::prepareNestedBatches(new Collection($chain));
-
-        $this->chained = $jobs->map(function ($job) {
-            return $this->serializeJob($job);
-        })->all();
+        $this->chained = ChainedBatch::prepareNestedBatches(new Collection($chain))
+            ->map(fn ($job) => $this->serializeJob($job))
+            ->all();
 
         return $this;
     }

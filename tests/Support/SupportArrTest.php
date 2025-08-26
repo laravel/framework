@@ -70,6 +70,31 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['category' => ['type' => 'Table']], Arr::add(['category' => ['type' => 'Table']], 'category.type', 'Chair'));
     }
 
+    public function testPush()
+    {
+        $array = [];
+
+        Arr::push($array, 'office.furniture', 'Desk');
+        $this->assertEquals(['Desk'], $array['office']['furniture']);
+
+        Arr::push($array, 'office.furniture', 'Chair', 'Lamp');
+        $this->assertEquals(['Desk', 'Chair', 'Lamp'], $array['office']['furniture']);
+
+        $array = [];
+
+        Arr::push($array, null, 'Chris', 'Nuno');
+        $this->assertEquals(['Chris', 'Nuno'], $array);
+
+        Arr::push($array, null, 'Taylor');
+        $this->assertEquals(['Chris', 'Nuno', 'Taylor'], $array);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Array value for key [foo.bar] must be an array, boolean found.');
+
+        $array = ['foo' => ['bar' => false]];
+        Arr::push($array, 'foo.bar', 'baz');
+    }
+
     public function testCollapse()
     {
         // Normal case: a two-dimensional array with different elements
@@ -745,6 +770,20 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::hasAny($array, 'foo.baz'));
         $this->assertFalse(Arr::hasAny($array, 'foo.bax'));
         $this->assertTrue(Arr::hasAny($array, ['foo.bax', 'foo.baz']));
+    }
+
+    public function testEvery()
+    {
+        $this->assertFalse(Arr::every([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertFalse(Arr::every(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::every(['foo', 'bar'], fn ($value, $key) => is_string($value)));
+    }
+
+    public function testSome()
+    {
+        $this->assertFalse(Arr::some([1, 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 2], fn ($value, $key) => is_string($value)));
+        $this->assertTrue(Arr::some(['foo', 'bar'], fn ($value, $key) => is_string($value)));
     }
 
     public function testIsAssoc()

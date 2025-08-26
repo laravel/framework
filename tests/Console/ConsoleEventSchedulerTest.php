@@ -117,6 +117,26 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
     }
 
+    public function testCreateNewArtisanCommandUsingCommandClassObject()
+    {
+        $command = new class extends Command
+        {
+            protected $signature = 'foo:bar';
+
+            public function handle()
+            {
+            }
+        };
+
+        $schedule = $this->schedule;
+        $schedule->command($command, ['--force']);
+
+        $events = $schedule->events();
+        $phpBinary = Application::phpBinary();
+        $artisanBinary = Application::artisanBinary();
+        $this->assertEquals($phpBinary.' '.$artisanBinary.' foo:bar --force', $events[0]->command);
+    }
+
     public function testItUsesCommandDescriptionAsEventDescription()
     {
         $schedule = $this->schedule;

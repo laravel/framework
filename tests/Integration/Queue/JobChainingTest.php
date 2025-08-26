@@ -322,6 +322,61 @@ class JobChainingTest extends QueueTestCase
         $this->assertNotNull(JobChainAddingAddedJob::$ranAt);
     }
 
+    public function testChainCanBeAppended()
+    {
+        $chain = Bus::chain();
+
+        $chain->append($firstJob = new JobChainingNamedTestJob('j1'));
+        $chain->append($secondJob = new JobChainingNamedTestJob('j2'));
+        $chain->append($thirdJob = new JobChainingNamedTestJob('j3'));
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+    }
+
+    public function testChainCanBeAppendedWithInitialJob()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j1'),
+        ]);
+
+        $chain->append([
+            $secondJob = new JobChainingNamedTestJob('j2'),
+            $thirdJob = new JobChainingNamedTestJob('j3'),
+        ]);
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
+    }
+
+    public function testChainCanBePrepended()
+    {
+        $chain = Bus::chain();
+
+        $chain->prepend($firstJob = new JobChainingNamedTestJob('j1'));
+        $chain->prepend($secondJob = new JobChainingNamedTestJob('j2'));
+        $chain->prepend($thirdJob = new JobChainingNamedTestJob('j3'));
+
+        $this->assertEquals($thirdJob, $chain->job);
+        $this->assertEquals([$secondJob, $firstJob], $chain->chain);
+    }
+
+    public function testChainCanBePrependedWithInitialJob()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingNamedTestJob('j4'),
+        ]);
+
+        $chain->prepend([
+            $secondJob = new JobChainingNamedTestJob('j1'),
+            $thirdJob = new JobChainingNamedTestJob('j2'),
+            $fourthJob = new JobChainingNamedTestJob('j3'),
+        ]);
+
+        $this->assertEquals($secondJob, $chain->job);
+        $this->assertEquals([$thirdJob, $fourthJob, $firstJob], $chain->chain);
+    }
+
     public function testBatchCanBeAddedToChain()
     {
         Bus::chain([

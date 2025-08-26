@@ -11,14 +11,14 @@ class ProhibitedIf implements Stringable
     /**
      * The condition that validates the attribute.
      *
-     * @var \Closure|bool
+     * @var (\Closure(): bool)|bool
      */
     public $condition;
 
     /**
      * Create a new prohibited validation rule based on a condition.
      *
-     * @param  \Closure|bool  $condition
+     * @param  (\Closure(): bool)|bool  $condition
      * @return void
      *
      * @throws \InvalidArgumentException

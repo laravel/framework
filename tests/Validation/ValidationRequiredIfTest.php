@@ -77,5 +77,10 @@ class ValidationRequiredIfTest extends TestCase
 
         $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
         $this->assertTrue($v->passes());
+
+        $rule = new RequiredIf(null);
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['string', $rule]]);
+        $this->assertTrue($v->passes());
     }
 }

@@ -12,7 +12,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
  * @method static \Illuminate\Console\Scheduling\Schedule resolveConsoleSchedule()
  * @method static \Illuminate\Foundation\Console\ClosureCommand command(string $signature, \Closure $callback)
  * @method static void registerCommand(\Symfony\Component\Console\Command\Command $command)
- * @method static int call(string $command, array $parameters = [], \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer = null)
+ * @method static int call(\Symfony\Component\Console\Command\Command|string $command, array $parameters = [], \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer = null)
  * @method static \Illuminate\Foundation\Bus\PendingDispatch queue(string $command, array $parameters = [])
  * @method static array all()
  * @method static string output()

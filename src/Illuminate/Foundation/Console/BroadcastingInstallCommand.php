@@ -367,9 +367,7 @@ class BroadcastingInstallCommand extends Command
             return;
         }
 
-        $install = confirm('Would you like to install Laravel Reverb?', default: true);
-
-        if (! $install) {
+        if (! confirm('Would you like to install Laravel Reverb?', default: true)) {
             return;
         }
 
