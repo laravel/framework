@@ -796,7 +796,7 @@ trait HasAttributes
                     return $cast instanceof Stringable
                         ? (string) $cast
                         : throw new InvalidArgumentException(
-                            "The cast object for the $attribute attribute must implement Stringable or be declared as string."
+                            "The cast object for the {$attribute} attribute must implement Stringable."
                         );
                 }),
                 is_array($cast) => value(function () use ($cast) {
