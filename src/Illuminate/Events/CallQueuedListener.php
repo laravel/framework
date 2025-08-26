@@ -106,7 +106,6 @@ class CallQueuedListener implements ShouldQueue
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function handle(Container $container)
@@ -123,7 +122,6 @@ class CallQueuedListener implements ShouldQueue
     /**
      * Set the job instance of the given class if necessary.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  object  $instance
      * @return object
      */

@@ -43,8 +43,6 @@ class EnvironmentEncryptCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {
@@ -126,7 +124,6 @@ class EnvironmentEncryptCommand extends Command
     /**
      * Parse the encryption key.
      *
-     * @param  string  $key
      * @return string
      */
     protected function parseKey(string $key)

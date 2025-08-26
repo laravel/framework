@@ -100,8 +100,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Get the information regarding the table's columns.
      *
-     * @param  \Illuminate\Database\Schema\Builder  $schema
-     * @param  string  $table
      * @return \Illuminate\Support\Collection
      */
     protected function columns(Builder $schema, string $table)
@@ -134,8 +132,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Get the information regarding the table's indexes.
      *
-     * @param  \Illuminate\Database\Schema\Builder  $schema
-     * @param  string  $table
      * @return \Illuminate\Support\Collection
      */
     protected function indexes(Builder $schema, string $table)
@@ -166,8 +162,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Get the information regarding the table's foreign keys.
      *
-     * @param  \Illuminate\Database\Schema\Builder  $schema
-     * @param  string  $table
      * @return \Illuminate\Support\Collection
      */
     protected function foreignKeys(Builder $schema, string $table)
@@ -186,7 +180,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Render the table information.
      *
-     * @param  array  $data
      * @return void
      */
     protected function display(array $data)
@@ -197,7 +190,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Render the table information as JSON.
      *
-     * @param  array  $data
      * @return void
      */
     protected function displayJson(array $data)
@@ -208,7 +200,6 @@ class TableCommand extends DatabaseInspectionCommand
     /**
      * Render the table information formatted for the CLI.
      *
-     * @param  array  $data
      * @return void
      */
     protected function displayForCli(array $data)

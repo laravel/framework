@@ -56,7 +56,6 @@ class EncryptionServiceProvider extends ServiceProvider
     /**
      * Parse the encryption key.
      *
-     * @param  array  $config
      * @return string
      */
     protected function parseKey(array $config)
@@ -71,7 +70,6 @@ class EncryptionServiceProvider extends ServiceProvider
     /**
      * Extract the encryption key from the given configuration.
      *
-     * @param  array  $config
      * @return string
      *
      * @throws \Illuminate\Encryption\MissingAppKeyException

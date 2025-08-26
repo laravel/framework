@@ -36,8 +36,6 @@ class Message
 
     /**
      * Create a new message instance.
-     *
-     * @param  \Symfony\Component\Mime\Email  $message
      */
     public function __construct(Email $message)
     {
@@ -252,7 +250,6 @@ class Message
     /**
      * Add an address debug header for a list of recipients.
      *
-     * @param  string  $header
      * @param  \Symfony\Component\Mime\Address[]  $addresses
      * @return $this
      */
@@ -296,7 +293,6 @@ class Message
      * Attach a file to the message.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -319,7 +315,6 @@ class Message
      *
      * @param  string|resource  $data
      * @param  string  $name
-     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -403,7 +398,6 @@ class Message
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

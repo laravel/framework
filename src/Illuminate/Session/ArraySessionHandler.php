@@ -35,8 +35,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function open($savePath, $sessionName): bool
     {
@@ -45,8 +43,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function close(): bool
     {
@@ -55,8 +51,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|false
      */
     public function read($sessionId): string|false
     {
@@ -77,8 +71,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function write($sessionId, $data): bool
     {
@@ -92,8 +84,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function destroy($sessionId): bool
     {
@@ -106,8 +96,6 @@ class ArraySessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function gc($lifetime): int
     {

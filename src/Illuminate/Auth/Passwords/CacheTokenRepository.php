@@ -30,7 +30,6 @@ class CacheTokenRepository implements TokenRepositoryInterface
     /**
      * Create a new token.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return string
      */
     public function create(CanResetPasswordContract $user)
@@ -51,7 +50,6 @@ class CacheTokenRepository implements TokenRepositoryInterface
     /**
      * Determine if a token record exists and is valid.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @param  string  $token
      * @return bool
      */
@@ -78,7 +76,6 @@ class CacheTokenRepository implements TokenRepositoryInterface
     /**
      * Determine if the given user recently created a password reset token.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return bool
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
@@ -108,7 +105,6 @@ class CacheTokenRepository implements TokenRepositoryInterface
     /**
      * Delete a token record.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return void
      */
     public function delete(CanResetPasswordContract $user)
@@ -127,9 +123,6 @@ class CacheTokenRepository implements TokenRepositoryInterface
 
     /**
      * Determine the cache key for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @return string
      */
     public function cacheKey(CanResetPasswordContract $user): string
     {

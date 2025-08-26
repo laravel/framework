@@ -33,9 +33,6 @@ class MailChannel
 
     /**
      * Create a new mail channel instance.
-     *
-     * @param  \Illuminate\Contracts\Mail\Factory  $mailer
-     * @param  \Illuminate\Mail\Markdown  $markdown
      */
     public function __construct(MailFactory $mailer, Markdown $markdown)
     {
@@ -46,8 +43,6 @@ class MailChannel
     /**
      * Send the given notification.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
      * @return \Illuminate\Mail\SentMessage|null
      */
     public function send($notifiable, Notification $notification)
@@ -73,7 +68,6 @@ class MailChannel
     /**
      * Get the mailer Closure for the message.
      *
-     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return \Closure
@@ -166,7 +160,6 @@ class MailChannel
      * Build the mail message.
      *
      * @param  \Illuminate\Mail\Message  $mailMessage
-     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return void
@@ -204,7 +197,6 @@ class MailChannel
      * Address the mail message.
      *
      * @param  \Illuminate\Mail\Message  $mailMessage
-     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
      * @return void
@@ -251,10 +243,8 @@ class MailChannel
     /**
      * Get the recipients of the given message.
      *
-     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  \Illuminate\Notifications\Messages\MailMessage  $message
-     * @return mixed
      */
     protected function getRecipients($notifiable, $notification, $message)
     {

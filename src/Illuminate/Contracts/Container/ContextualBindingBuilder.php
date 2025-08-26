@@ -32,7 +32,6 @@ interface ContextualBindingBuilder
      * Specify the configuration item to bind as a primitive.
      *
      * @param  string  $key
-     * @param  mixed  $default
      * @return $this
      */
     public function giveConfig($key, $default = null);

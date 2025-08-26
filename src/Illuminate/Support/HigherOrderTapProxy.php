@@ -6,15 +6,11 @@ class HigherOrderTapProxy
 {
     /**
      * The target being tapped.
-     *
-     * @var mixed
      */
     public $target;
 
     /**
      * Create a new tap proxy instance.
-     *
-     * @param  mixed  $target
      */
     public function __construct($target)
     {
@@ -26,7 +22,6 @@ class HigherOrderTapProxy
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

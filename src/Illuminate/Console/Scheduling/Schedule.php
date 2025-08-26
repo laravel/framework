@@ -133,7 +133,6 @@ class Schedule
      * Add a new callback event to the schedule.
      *
      * @param  string|callable  $callback
-     * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function call($callback, array $parameters = [])
@@ -151,7 +150,6 @@ class Schedule
      * Add a new Artisan command event to the schedule.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
-     * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function command($command, array $parameters = [])
@@ -282,7 +280,6 @@ class Schedule
      * Add a new command event to the schedule.
      *
      * @param  string  $command
-     * @param  array  $parameters
      * @return \Illuminate\Console\Scheduling\Event
      */
     public function exec($command, array $parameters = [])
@@ -322,7 +319,6 @@ class Schedule
     /**
      * Merge the current group attributes with the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
     protected function mergePendingAttributes(Event $event)
@@ -343,7 +339,6 @@ class Schedule
     /**
      * Compile parameters for a command.
      *
-     * @param  array  $parameters
      * @return string
      */
     protected function compileParameters(array $parameters)
@@ -390,8 +385,6 @@ class Schedule
     /**
      * Determine if the server is allowed to run this event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
      * @return bool
      */
     public function serverShouldRun(Event $event, DateTimeInterface $time)
@@ -467,7 +460,6 @@ class Schedule
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

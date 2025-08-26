@@ -65,7 +65,6 @@ class ListFailedCommand extends Command
     /**
      * Parse the failed job row.
      *
-     * @param  array  $failed
      * @return array
      */
     protected function parseFailedJob(array $failed)
@@ -110,7 +109,6 @@ class ListFailedCommand extends Command
     /**
      * Display the failed jobs in the console.
      *
-     * @param  array  $jobs
      * @return void
      */
     protected function displayFailedJobs(array $jobs)

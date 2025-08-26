@@ -118,9 +118,6 @@ class DurationLimiterBuilder
     /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $failure
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      */

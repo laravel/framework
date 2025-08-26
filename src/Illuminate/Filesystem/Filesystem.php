@@ -106,8 +106,6 @@ class Filesystem
      * Get the returned value of a file.
      *
      * @param  string  $path
-     * @param  array  $data
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -131,8 +129,6 @@ class Filesystem
      * Require the given file once.
      *
      * @param  string  $path
-     * @param  array  $data
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -280,7 +276,6 @@ class Filesystem
      *
      * @param  string  $path
      * @param  int|null  $mode
-     * @return mixed
      */
     public function chmod($path, $mode = null)
     {

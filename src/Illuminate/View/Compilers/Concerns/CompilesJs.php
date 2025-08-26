@@ -9,7 +9,6 @@ trait CompilesJs
     /**
      * Compile the "@js" directive into valid PHP.
      *
-     * @param  string  $expression
      * @return string
      */
     protected function compileJs(string $expression)

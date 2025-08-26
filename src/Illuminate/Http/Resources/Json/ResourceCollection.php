@@ -43,8 +43,6 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
 
     /**
      * Create a new resource instance.
-     *
-     * @param  mixed  $resource
      */
     public function __construct($resource)
     {
@@ -68,7 +66,6 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Specify the query string parameters that should be present on pagination links.
      *
-     * @param  array  $query
      * @return $this
      */
     public function withQuery(array $query)
@@ -82,8 +79,6 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
 
     /**
      * Return the count of items in the resource collection.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -93,7 +88,6 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * Transform the resource into a JSON array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray(Request $request)

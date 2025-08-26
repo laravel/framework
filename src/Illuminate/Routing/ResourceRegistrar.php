@@ -60,8 +60,6 @@ class ResourceRegistrar
 
     /**
      * Create a new resource registrar instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
      */
     public function __construct(Router $router)
     {
@@ -73,7 +71,6 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\RouteCollection
      */
     public function register($name, $controller, array $options = [])
@@ -140,7 +137,6 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\RouteCollection
      */
     public function singleton($name, $controller, array $options = [])
@@ -203,7 +199,6 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\Router
      */
     protected function prefixedResource($name, $controller, array $options)
@@ -225,7 +220,6 @@ class ResourceRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\Router
      */
     protected function prefixedSingleton($name, $controller, array $options)
@@ -593,7 +587,6 @@ class ResourceRegistrar
     /**
      * Get the URI for a nested resource segment array.
      *
-     * @param  array  $segments
      * @return string
      */
     protected function getNestedResourceUri(array $segments)
@@ -714,7 +707,6 @@ class ResourceRegistrar
     /**
      * Set the global parameter mapping.
      *
-     * @param  array  $parameters
      * @return void
      */
     public static function setParameters(array $parameters = [])
@@ -725,7 +717,6 @@ class ResourceRegistrar
     /**
      * Get or set the action verbs used in the resource URIs.
      *
-     * @param  array  $verbs
      * @return array
      */
     public static function verbs(array $verbs = [])

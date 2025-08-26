@@ -62,9 +62,7 @@ class WithoutOverlapping
     /**
      * Process the job.
      *
-     * @param  mixed  $job
      * @param  callable  $next
-     * @return mixed
      */
     public function handle($job, $next)
     {
@@ -124,7 +122,6 @@ class WithoutOverlapping
     /**
      * Set the prefix of the lock key.
      *
-     * @param  string  $prefix
      * @return $this
      */
     public function withPrefix(string $prefix)
@@ -149,7 +146,6 @@ class WithoutOverlapping
     /**
      * Get the lock key for the given job.
      *
-     * @param  mixed  $job
      * @return string
      */
     public function getLockKey($job)

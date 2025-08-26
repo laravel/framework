@@ -16,7 +16,6 @@ class RetrievingManyKeys extends CacheEvent
      *
      * @param  string|null  $storeName
      * @param  array  $keys
-     * @param  array  $tags
      */
     public function __construct($storeName, $keys, array $tags = [])
     {

@@ -37,7 +37,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Create a new exception handler fake.
      *
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @param  list<class-string<\Throwable>>  $exceptions
      */
     public function __construct(
@@ -90,7 +89,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Assert the number of exceptions that have been reported.
      *
-     * @param  int  $count
      * @return void
      */
     public function assertReportedCount(int $count)
@@ -167,7 +165,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Determine if the given exception is faked.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     protected function isFakedException(Throwable $e)
@@ -212,7 +209,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      * Render an exception to the console.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Throwable  $e
      * @return void
      */
     public function renderForConsole($output, Throwable $e)
@@ -261,7 +257,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Set the "original" handler that should be used by the fake.
      *
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @return $this
      */
     public function setHandler(ExceptionHandler $handler)
@@ -274,9 +269,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
     /**
      * Handle dynamic method calls to the handler.
      *
-     * @param  string  $method
      * @param  array<string, mixed>  $parameters
-     * @return mixed
      */
     public function __call(string $method, array $parameters)
     {

@@ -87,14 +87,6 @@ class Gate implements GateContract
 
     /**
      * Create a new gate instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  callable  $userResolver
-     * @param  array  $abilities
-     * @param  array  $policies
-     * @param  array  $beforeCallbacks
-     * @param  array  $afterCallbacks
-     * @param  callable|null  $guessPolicyNamesUsingCallback
      */
     public function __construct(
         Container $container,
@@ -226,7 +218,6 @@ class Gate implements GateContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, ?array $abilities = null)
@@ -299,7 +290,6 @@ class Gate implements GateContract
     /**
      * Register a callback to run before all Gate checks.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function before(callable $callback)
@@ -312,7 +302,6 @@ class Gate implements GateContract
     /**
      * Register a callback to run after all Gate checks.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function after(callable $callback)
@@ -326,7 +315,6 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = [])
@@ -338,7 +326,6 @@ class Gate implements GateContract
      * Determine if any of the given abilities should be denied for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = [])
@@ -350,7 +337,6 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
      * @return bool
      */
     public function check($abilities, $arguments = [])
@@ -364,7 +350,6 @@ class Gate implements GateContract
      * Determine if any one of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
      * @return bool
      */
     public function any($abilities, $arguments = [])
@@ -376,7 +361,6 @@ class Gate implements GateContract
      * Determine if all of the given abilities should be denied for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
      * @return bool
      */
     public function none($abilities, $arguments = [])
@@ -388,7 +372,6 @@ class Gate implements GateContract
      * Determine if the given ability should be granted for the current user.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -402,7 +385,6 @@ class Gate implements GateContract
      * Inspect the user for the given ability.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = [])
@@ -426,8 +408,6 @@ class Gate implements GateContract
      * Get the raw result from the authorization callback.
      *
      * @param  string  $ability
-     * @param  mixed  $arguments
-     * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -543,7 +523,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
-     * @param  array  $arguments
      * @return bool
      */
     protected function callAuthCallback($user, $ability, array $arguments)
@@ -558,7 +537,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
-     * @param  array  $arguments
      * @return bool|null
      */
     protected function callBeforeCallbacks($user, $ability, array $arguments)
@@ -579,7 +557,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
-     * @param  array  $arguments
      * @param  bool|null  $result
      * @return bool|null
      */
@@ -603,7 +580,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
-     * @param  array  $arguments
      * @param  bool|null  $result
      * @return void
      */
@@ -621,7 +597,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
-     * @param  array  $arguments
      * @return callable
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
@@ -654,7 +629,6 @@ class Gate implements GateContract
      * Get a policy instance for a given class.
      *
      * @param  object|string  $class
-     * @return mixed
      */
     public function getPolicyFor($class)
     {
@@ -739,7 +713,6 @@ class Gate implements GateContract
     /**
      * Specify a callback to be used to guess policy names.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function guessPolicyNamesUsing(callable $callback)
@@ -753,7 +726,6 @@ class Gate implements GateContract
      * Build a policy class instance of the given type.
      *
      * @param  object|string  $class
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -767,8 +739,6 @@ class Gate implements GateContract
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
-     * @param  array  $arguments
-     * @param  mixed  $policy
      * @return bool|callable
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
@@ -801,11 +771,9 @@ class Gate implements GateContract
     /**
      * Call the "before" method on the given policy, if applicable.
      *
-     * @param  mixed  $policy
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @return mixed
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
@@ -821,11 +789,8 @@ class Gate implements GateContract
     /**
      * Call the appropriate method on the given policy.
      *
-     * @param  mixed  $policy
      * @param  string  $method
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  array  $arguments
-     * @return mixed
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
     {
@@ -877,8 +842,6 @@ class Gate implements GateContract
 
     /**
      * Resolve the user from the user resolver.
-     *
-     * @return mixed
      */
     protected function resolveUser()
     {
@@ -908,7 +871,6 @@ class Gate implements GateContract
     /**
      * Set the default denial response for gates and policies.
      *
-     * @param  \Illuminate\Auth\Access\Response  $response
      * @return $this
      */
     public function defaultDenialResponse(Response $response)
@@ -921,7 +883,6 @@ class Gate implements GateContract
     /**
      * Set the container instance used by the gate.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)

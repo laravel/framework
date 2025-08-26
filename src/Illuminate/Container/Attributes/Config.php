@@ -18,10 +18,6 @@ class Config implements ContextualAttribute
 
     /**
      * Resolve the configuration value.
-     *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
      */
     public static function resolve(self $attribute, Container $container)
     {

@@ -28,8 +28,6 @@ class CacheCommandMutex implements CommandMutex
 
     /**
      * Create a new command mutex.
-     *
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      */
     public function __construct(Cache $cache)
     {

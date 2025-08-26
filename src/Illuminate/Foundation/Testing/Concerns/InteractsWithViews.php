@@ -14,7 +14,6 @@ trait InteractsWithViews
     /**
      * Create a new TestView from the given view.
      *
-     * @param  string  $view
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
@@ -26,7 +25,6 @@ trait InteractsWithViews
     /**
      * Render the contents of the given Blade template string.
      *
-     * @param  string  $template
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
@@ -50,7 +48,6 @@ trait InteractsWithViews
     /**
      * Render the given view component.
      *
-     * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestComponent
      */
@@ -70,7 +67,6 @@ trait InteractsWithViews
     /**
      * Populate the shared view error bag with the given errors.
      *
-     * @param  array  $errors
      * @param  string  $key
      * @return $this
      */

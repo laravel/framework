@@ -60,9 +60,6 @@ class BladeMapper
 
     /**
      * Create a new Blade mapper instance.
-     *
-     * @param  \Illuminate\Contracts\View\Factory  $factory
-     * @param  \Illuminate\View\Compilers\BladeCompiler  $bladeCompiler
      */
     public function __construct(Factory $factory, BladeCompiler $bladeCompiler)
     {
@@ -73,7 +70,6 @@ class BladeMapper
     /**
      * Map cached view paths to their original paths.
      *
-     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @return \Symfony\Component\ErrorHandler\Exception\FlattenException
      */
     public function map(FlattenException $exception)
@@ -102,7 +98,6 @@ class BladeMapper
     /**
      * Find the compiled view file for the given compiled path.
      *
-     * @param  string  $compiledPath
      * @return string|null
      */
     protected function findCompiledView(string $compiledPath)
@@ -161,8 +156,6 @@ class BladeMapper
     /**
      * Detect the line number in the original blade file.
      *
-     * @param  string  $filename
-     * @param  int  $compiledLineNumber
      * @return int
      */
     protected function detectLineNumber(string $filename, int $compiledLineNumber)
@@ -175,7 +168,6 @@ class BladeMapper
     /**
      * Compile the source map for the given blade file.
      *
-     * @param  string  $value
      * @return string
      */
     protected function compileSourcemap(string $value)
@@ -198,7 +190,6 @@ class BladeMapper
     /**
      * Add line numbers to echo statements.
      *
-     * @param  string  $value
      * @return string
      */
     protected function addEchoLineNumbers(string $value)
@@ -224,7 +215,6 @@ class BladeMapper
     /**
      * Add line numbers to blade statements.
      *
-     * @param  string  $value
      * @return string
      */
     protected function addStatementLineNumbers(string $value)
@@ -250,7 +240,6 @@ class BladeMapper
     /**
      * Add line numbers to blade components.
      *
-     * @param  string  $value
      * @return string
      */
     protected function addBladeComponentLineNumbers(string $value)
@@ -276,8 +265,6 @@ class BladeMapper
     /**
      * Insert a line number at the given position.
      *
-     * @param  int  $position
-     * @param  string  $value
      * @return string
      */
     protected function insertLineNumberAtPosition(int $position, string $value)
@@ -292,7 +279,6 @@ class BladeMapper
     /**
      * Trim empty lines from the given value.
      *
-     * @param  string  $value
      * @return string
      */
     protected function trimEmptyLines(string $value)
@@ -305,8 +291,6 @@ class BladeMapper
     /**
      * Find the closest line number mapping in the given source map.
      *
-     * @param  string  $map
-     * @param  int  $compiledLineNumber
      * @return int
      */
     protected function findClosestLineNumberMapping(string $map, int $compiledLineNumber)

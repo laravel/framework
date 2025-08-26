@@ -55,7 +55,6 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
-     * @param  mixed  $options
      * @return bool
      */
     public function put($path, $contents, $options = []);
@@ -65,7 +64,6 @@ interface Filesystem
      *
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $path
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null  $file
-     * @param  mixed  $options
      * @return string|false
      */
     public function putFile($path, $file = null, $options = []);
@@ -76,7 +74,6 @@ interface Filesystem
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $path
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null  $file
      * @param  string|array|null  $name
-     * @param  mixed  $options
      * @return string|false
      */
     public function putFileAs($path, $file, $name = null, $options = []);
@@ -86,7 +83,6 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  resource  $resource
-     * @param  array  $options
      * @return bool
      */
     public function writeStream($path, $resource, array $options = []);

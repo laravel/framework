@@ -15,8 +15,6 @@ class PublishingStubs
 
     /**
      * Create a new event instance.
-     *
-     * @param  array  $stubs
      */
     public function __construct(array $stubs)
     {
@@ -26,8 +24,6 @@ class PublishingStubs
     /**
      * Add a new stub to be published.
      *
-     * @param  string  $path
-     * @param  string  $name
      * @return $this
      */
     public function add(string $path, string $name)

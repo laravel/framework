@@ -97,8 +97,6 @@ class RouteRegistrar
 
     /**
      * Create a new route registrar instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
      */
     public function __construct(Router $router)
     {
@@ -109,7 +107,6 @@ class RouteRegistrar
      * Set the value for a given attribute.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -152,7 +149,6 @@ class RouteRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function resource($name, $controller, array $options = [])
@@ -165,7 +161,6 @@ class RouteRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function apiResource($name, $controller, array $options = [])
@@ -178,7 +173,6 @@ class RouteRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function singleton($name, $controller, array $options = [])
@@ -191,7 +185,6 @@ class RouteRegistrar
      *
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function apiSingleton($name, $controller, array $options = [])

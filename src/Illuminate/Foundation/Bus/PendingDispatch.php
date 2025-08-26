@@ -15,8 +15,6 @@ class PendingDispatch
 
     /**
      * The job.
-     *
-     * @var mixed
      */
     protected $job;
 
@@ -29,8 +27,6 @@ class PendingDispatch
 
     /**
      * Create a new pending job dispatch.
-     *
-     * @param  mixed  $job
      */
     public function __construct($job)
     {
@@ -210,8 +206,6 @@ class PendingDispatch
 
     /**
      * Get the underlying job instance.
-     *
-     * @return mixed
      */
     public function getJob()
     {

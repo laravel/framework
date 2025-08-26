@@ -15,7 +15,6 @@ trait InteractsWithPivotTable
      *
      * Each existing model is detached, and non existing ones are attached.
      *
-     * @param  mixed  $ids
      * @param  bool  $touch
      * @return array
      */
@@ -135,8 +134,6 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
-     * @param  array  $values
-     * @param  bool  $detaching
      * @return array{attached: array, detached: array, updated: array}
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
@@ -149,7 +146,6 @@ trait InteractsWithPivotTable
     /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
-     * @param  array  $records
      * @return array
      */
     protected function formatRecordsList(array $records)
@@ -170,8 +166,6 @@ trait InteractsWithPivotTable
     /**
      * Attach all of the records that aren't in the given current records.
      *
-     * @param  array  $records
-     * @param  array  $current
      * @param  bool  $touch
      * @return array
      */
@@ -204,8 +198,6 @@ trait InteractsWithPivotTable
     /**
      * Update an existing pivot record on the table.
      *
-     * @param  mixed  $id
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return int
      */
@@ -233,8 +225,6 @@ trait InteractsWithPivotTable
     /**
      * Update an existing pivot record on the table via a custom class.
      *
-     * @param  mixed  $id
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return int
      */
@@ -258,8 +248,6 @@ trait InteractsWithPivotTable
     /**
      * Attach a model to the parent.
      *
-     * @param  mixed  $ids
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return void
      */
@@ -284,8 +272,6 @@ trait InteractsWithPivotTable
     /**
      * Attach a model to the parent using a custom class.
      *
-     * @param  mixed  $ids
-     * @param  array  $attributes
      * @return void
      */
     protected function attachUsingCustomClass($ids, array $attributes)
@@ -303,7 +289,6 @@ trait InteractsWithPivotTable
      * Create an array of records to insert into the pivot table.
      *
      * @param  array  $ids
-     * @param  array  $attributes
      * @return array
      */
     protected function formatAttachRecords($ids, array $attributes)
@@ -329,7 +314,6 @@ trait InteractsWithPivotTable
      * Create a full attachment record payload.
      *
      * @param  int  $key
-     * @param  mixed  $value
      * @param  array  $attributes
      * @param  bool  $hasTimestamps
      * @return array
@@ -346,9 +330,6 @@ trait InteractsWithPivotTable
     /**
      * Get the attach record ID and extra attributes.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
-     * @param  array  $attributes
      * @return array
      */
     protected function extractAttachIdAndAttributes($key, $value, array $attributes)
@@ -388,7 +369,6 @@ trait InteractsWithPivotTable
     /**
      * Set the creation and update timestamps on an attach record.
      *
-     * @param  array  $record
      * @param  bool  $exists
      * @return array
      */
@@ -427,7 +407,6 @@ trait InteractsWithPivotTable
     /**
      * Detach models from the relationship.
      *
-     * @param  mixed  $ids
      * @param  bool  $touch
      * @return int
      */
@@ -467,7 +446,6 @@ trait InteractsWithPivotTable
     /**
      * Detach models from the relationship using a custom class.
      *
-     * @param  mixed  $ids
      * @return int
      */
     protected function detachUsingCustomClass($ids)
@@ -496,7 +474,6 @@ trait InteractsWithPivotTable
     /**
      * Get the pivot models that are currently attached, filtered by related model keys.
      *
-     * @param  mixed  $ids
      * @return \Illuminate\Support\Collection
      */
     protected function getCurrentlyAttachedPivotsForIds($ids = null)
@@ -520,7 +497,6 @@ trait InteractsWithPivotTable
     /**
      * Create a new pivot model instance.
      *
-     * @param  array  $attributes
      * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
@@ -540,7 +516,6 @@ trait InteractsWithPivotTable
     /**
      * Create a new existing pivot model instance.
      *
-     * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newExistingPivot(array $attributes = [])
@@ -561,7 +536,6 @@ trait InteractsWithPivotTable
     /**
      * Get a new pivot statement for a given "other" ID.
      *
-     * @param  mixed  $id
      * @return \Illuminate\Database\Query\Builder
      */
     public function newPivotStatementForId($id)
@@ -596,7 +570,6 @@ trait InteractsWithPivotTable
     /**
      * Set the columns on the pivot table to retrieve.
      *
-     * @param  mixed  $columns
      * @return $this
      */
     public function withPivot($columns)
@@ -611,7 +584,6 @@ trait InteractsWithPivotTable
     /**
      * Get all of the IDs from the given mixed value.
      *
-     * @param  mixed  $value
      * @return array
      */
     protected function parseIds($value)
@@ -635,9 +607,6 @@ trait InteractsWithPivotTable
 
     /**
      * Get the ID from the given mixed value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function parseId($value)
     {
@@ -647,7 +616,6 @@ trait InteractsWithPivotTable
     /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
-     * @param  array  $keys
      * @return array
      */
     protected function castKeys(array $keys)
@@ -659,9 +627,6 @@ trait InteractsWithPivotTable
 
     /**
      * Cast the given key to convert to primary key type.
-     *
-     * @param  mixed  $key
-     * @return mixed
      */
     protected function castKey($key)
     {
@@ -688,8 +653,6 @@ trait InteractsWithPivotTable
      * Converts a given value to a given type value.
      *
      * @param  string  $type
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function getTypeSwapValue($type, $value)
     {

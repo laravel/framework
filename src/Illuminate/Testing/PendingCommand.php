@@ -81,8 +81,6 @@ class PendingCommand
     /**
      * Create a new pending console command run.
      *
-     * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  string  $command
      * @param  array  $parameters
      */
@@ -225,7 +223,6 @@ class PendingCommand
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
-     * @param  array  $columnStyles
      * @return $this
      */
     public function expectsTable($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
@@ -341,9 +338,10 @@ class PendingCommand
      *
      * @param  array<int, string|array<int, string>>|Collection<int, string|array<int, string>>  $headers
      * @param  array<int, array<int, string>>|Collection<int, array<int, string>>|null  $rows
-     * @return $this
      *
      * @phpstan-param ($rows is null ? list<list<string>>|Collection<int, list<string>> : list<string|list<string>>|Collection<int, string|list<string>>) $headers
+     *
+     * @return $this
      */
     public function expectsPromptsTable(array|Collection $headers, array|Collection|null $rows)
     {

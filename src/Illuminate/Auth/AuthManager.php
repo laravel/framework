@@ -104,8 +104,6 @@ class AuthManager implements FactoryContract
      * Call a custom driver creator.
      *
      * @param  string  $name
-     * @param  array  $config
-     * @return mixed
      */
     protected function callCustomCreator($name, array $config)
     {
@@ -221,7 +219,6 @@ class AuthManager implements FactoryContract
      * Register a new callback based request guard.
      *
      * @param  string  $driver
-     * @param  callable  $callback
      * @return $this
      */
     public function viaRequest($driver, callable $callback)
@@ -248,7 +245,6 @@ class AuthManager implements FactoryContract
     /**
      * Set the callback to be used to resolve users.
      *
-     * @param  \Closure  $userResolver
      * @return $this
      */
     public function resolveUsersUsing(Closure $userResolver)
@@ -262,7 +258,6 @@ class AuthManager implements FactoryContract
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
      *
@@ -279,7 +274,6 @@ class AuthManager implements FactoryContract
      * Register a custom provider creator Closure.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
      * @return $this
      */
     public function provider($name, Closure $callback)
@@ -329,7 +323,6 @@ class AuthManager implements FactoryContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

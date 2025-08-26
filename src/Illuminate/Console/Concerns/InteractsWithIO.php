@@ -145,7 +145,6 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  string|null  $default
-     * @return mixed
      */
     public function ask($question, $default = null)
     {
@@ -158,7 +157,6 @@ trait InteractsWithIO
      * @param  string  $question
      * @param  array|callable  $choices
      * @param  string|null  $default
-     * @return mixed
      */
     public function anticipate($question, $choices, $default = null)
     {
@@ -171,7 +169,6 @@ trait InteractsWithIO
      * @param  string  $question
      * @param  array|callable  $choices
      * @param  string|null  $default
-     * @return mixed
      */
     public function askWithCompletion($question, $choices, $default = null)
     {
@@ -189,7 +186,6 @@ trait InteractsWithIO
      *
      * @param  string  $question
      * @param  bool  $fallback
-     * @return mixed
      */
     public function secret($question, $fallback = true)
     {
@@ -204,9 +200,7 @@ trait InteractsWithIO
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question
-     * @param  array  $choices
      * @param  string|int|null  $default
-     * @param  mixed  $attempts
      * @param  bool  $multiple
      * @return string|array
      */
@@ -225,7 +219,6 @@ trait InteractsWithIO
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  \Symfony\Component\Console\Helper\TableStyle|string  $tableStyle
-     * @param  array  $columnStyles
      * @return void
      */
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
@@ -249,7 +242,6 @@ trait InteractsWithIO
      * Execute a given callback while advancing a progress bar.
      *
      * @param  iterable|int  $totalSteps
-     * @param  \Closure  $callback
      * @return mixed|void
      */
     public function withProgressBar($totalSteps, Closure $callback)
@@ -392,7 +384,6 @@ trait InteractsWithIO
     /**
      * Set the input interface implementation.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return void
      */
     public function setInput(InputInterface $input)
@@ -403,7 +394,6 @@ trait InteractsWithIO
     /**
      * Set the output interface implementation.
      *
-     * @param  \Illuminate\Console\OutputStyle  $output
      * @return void
      */
     public function setOutput(OutputStyle $output)

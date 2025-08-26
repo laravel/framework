@@ -35,7 +35,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Create a new DynamoDb failed job provider.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
      */
@@ -129,7 +128,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
      * @return object|null
      */
     public function find($id)
@@ -161,7 +159,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
      * @return bool
      */
     public function forget($id)

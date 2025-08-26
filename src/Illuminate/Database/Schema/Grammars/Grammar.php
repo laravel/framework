@@ -169,8 +169,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a rename column command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return list<string>|string
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
@@ -185,8 +183,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a change column command into a series of SQL statements.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return list<string>|string
      *
      * @throws \RuntimeException
@@ -199,8 +195,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a fulltext index key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      *
      * @throws \RuntimeException
@@ -213,8 +207,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a drop fulltext index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      *
      * @throws \RuntimeException
@@ -227,8 +219,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
@@ -267,8 +257,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile a drop foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
@@ -279,7 +267,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile the blueprint's added column definitions.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return array
      */
     protected function getColumns(Blueprint $blueprint)
@@ -296,7 +283,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Compile the column definition.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Database\Schema\ColumnDefinition  $column
      * @return string
      */
@@ -313,7 +299,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Get the SQL for the column data type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function getType(Fluent $column)
@@ -324,7 +309,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Create the column definition for a generated, computed column type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return void
      *
      * @throws \RuntimeException
@@ -337,7 +321,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Create the column definition for a vector type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      *
      * @throws \RuntimeException
@@ -350,7 +333,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Create the column definition for a raw column type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeRaw(Fluent $column)
@@ -362,8 +344,6 @@ abstract class Grammar extends BaseGrammar
      * Add the column modifiers to the definition.
      *
      * @param  string  $sql
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function addModifiers($sql, Blueprint $blueprint, Fluent $column)
@@ -380,7 +360,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Get the command with a given name if it exists on the blueprint.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  string  $name
      * @return \Illuminate\Support\Fluent|null
      */
@@ -396,7 +375,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Get all of the commands with a given name.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  string  $name
      * @return array
      */
@@ -442,7 +420,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  mixed  $table
      * @param  string|null  $prefix
      * @return string
      */
@@ -470,7 +447,6 @@ abstract class Grammar extends BaseGrammar
     /**
      * Format a value so that it can be used in "default" clauses.
      *
-     * @param  mixed  $value
      * @return string
      */
     protected function getDefaultValue($value)

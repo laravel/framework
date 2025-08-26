@@ -11,8 +11,6 @@ class Onceable
     /**
      * Create a new onceable instance.
      *
-     * @param  string  $hash
-     * @param  object|null  $object
      * @param  callable  $callable
      */
     public function __construct(

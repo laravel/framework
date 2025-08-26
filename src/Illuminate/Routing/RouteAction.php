@@ -14,7 +14,6 @@ class RouteAction
      * Parse the given action into an array.
      *
      * @param  string  $uri
-     * @param  mixed  $action
      * @return array
      */
     public static function parse($uri, $action)
@@ -68,7 +67,6 @@ class RouteAction
     /**
      * Find the callable in an action array.
      *
-     * @param  array  $action
      * @return callable
      */
     protected static function findCallable(array $action)
@@ -98,7 +96,6 @@ class RouteAction
     /**
      * Determine if the given array actions contain a serialized Closure.
      *
-     * @param  array  $action
      * @return bool
      */
     public static function containsSerializedClosure(array $action)

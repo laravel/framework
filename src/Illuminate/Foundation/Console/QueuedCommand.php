@@ -31,7 +31,6 @@ class QueuedCommand implements ShouldQueue
     /**
      * Handle the job.
      *
-     * @param  \Illuminate\Contracts\Console\Kernel  $kernel
      * @return void
      */
     public function handle(KernelContract $kernel)

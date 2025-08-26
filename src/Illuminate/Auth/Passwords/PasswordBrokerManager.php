@@ -77,7 +77,6 @@ class PasswordBrokerManager implements FactoryContract
     /**
      * Create a token repository instance based on the given configuration.
      *
-     * @param  array  $config
      * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
      */
     protected function createTokenRepository(array $config)
@@ -145,7 +144,6 @@ class PasswordBrokerManager implements FactoryContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

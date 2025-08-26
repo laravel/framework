@@ -28,8 +28,6 @@ class Connector
      * Create a new PDO connection.
      *
      * @param  string  $dsn
-     * @param  array  $config
-     * @param  array  $options
      * @return \PDO
      *
      * @throws \Exception
@@ -70,7 +68,6 @@ class Connector
     /**
      * Handle an exception that occurred during connect execution.
      *
-     * @param  \Throwable  $e
      * @param  string  $dsn
      * @param  string  $username
      * @param  string  $password
@@ -91,7 +88,6 @@ class Connector
     /**
      * Get the PDO options based on the configuration.
      *
-     * @param  array  $config
      * @return array
      */
     public function getOptions(array $config)
@@ -114,7 +110,6 @@ class Connector
     /**
      * Set the default PDO connection options.
      *
-     * @param  array  $options
      * @return void
      */
     public function setDefaultOptions(array $options)

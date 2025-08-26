@@ -36,7 +36,6 @@ class DatabaseNotificationTest extends TestCase
      * Define database and convert User's ID to UUID.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @return void
      */
     protected function defineDatabaseAndConvertUserIdToUuid($app): void
     {

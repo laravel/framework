@@ -25,7 +25,6 @@ class RewindableGenerator implements Countable, IteratorAggregate
     /**
      * Create a new generator instance.
      *
-     * @param  callable  $generator
      * @param  callable|int  $count
      */
     public function __construct(callable $generator, $count)
@@ -36,8 +35,6 @@ class RewindableGenerator implements Countable, IteratorAggregate
 
     /**
      * Get an iterator from the generator.
-     *
-     * @return \Traversable
      */
     public function getIterator(): Traversable
     {
@@ -46,8 +43,6 @@ class RewindableGenerator implements Countable, IteratorAggregate
 
     /**
      * Get the total number of tagged services.
-     *
-     * @return int
      */
     public function count(): int
     {

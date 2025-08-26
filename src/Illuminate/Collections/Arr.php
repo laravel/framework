@@ -21,7 +21,6 @@ class Arr
     /**
      * Determine whether the given value is array accessible.
      *
-     * @param  mixed  $value
      * @return bool
      */
     public static function accessible($value)
@@ -32,7 +31,6 @@ class Arr
     /**
      * Determine whether the given value is arrayable.
      *
-     * @param  mixed  $value
      * @return bool
      */
     public static function arrayable($value)
@@ -49,7 +47,6 @@ class Arr
      *
      * @param  array  $array
      * @param  string|int|float  $key
-     * @param  mixed  $value
      * @return array
      */
     public static function add($array, $key, $value)
@@ -430,8 +427,6 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public static function get($array, $key, $default = null)
     {
@@ -597,7 +592,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return bool
      */
     public static function isAssoc(array $array)
@@ -766,8 +760,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -835,8 +827,6 @@ class Arr
      * Push an item onto the beginning of an array.
      *
      * @param  array  $array
-     * @param  mixed  $value
-     * @param  mixed  $key
      * @return array
      */
     public static function prepend($array, $value, $key = null)
@@ -855,8 +845,6 @@ class Arr
      *
      * @param  array  $array
      * @param  string|int  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public static function pull(&$array, $key, $default = null)
     {
@@ -884,7 +872,6 @@ class Arr
      * @param  array  $array
      * @param  int|null  $number
      * @param  bool  $preserveKeys
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -932,7 +919,6 @@ class Arr
      *
      * @param  array  $array
      * @param  string|int|null  $key
-     * @param  mixed  $value
      * @return array
      */
     public static function set(&$array, $key, $value)
@@ -967,11 +953,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
@@ -1152,7 +1133,6 @@ class Arr
      * Filter the array using the given callback.
      *
      * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function where($array, callable $callback)
@@ -1164,7 +1144,6 @@ class Arr
      * Filter the array using the negation of the given callback.
      *
      * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function reject($array, callable $callback)
@@ -1212,7 +1191,6 @@ class Arr
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-     * @param  mixed  $value
      * @return array
      */
     public static function wrap($value)

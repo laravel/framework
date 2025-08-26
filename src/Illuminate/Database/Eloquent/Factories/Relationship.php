@@ -26,7 +26,6 @@ class Relationship
     /**
      * Create a new child relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
      * @param  string  $relationship
      */
     public function __construct(Factory $factory, $relationship)
@@ -38,7 +37,6 @@ class Relationship
     /**
      * Create the child relationship for the given parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @return void
      */
     public function createFor(Model $parent)

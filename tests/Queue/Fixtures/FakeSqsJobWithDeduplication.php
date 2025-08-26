@@ -21,7 +21,6 @@ class FakeSqsJobWithDeduplication implements ShouldQueue
      *
      * @param  string  $payload
      * @param  string  $queue
-     * @return string
      */
     public function deduplicationId($payload, $queue): string
     {
@@ -33,7 +32,6 @@ class FakeSqsJobWithDeduplication implements ShouldQueue
     /**
      * Set the callable that will be used to generate deduplication IDs.
      *
-     * @param  callable|null  $factory
      * @return void
      */
     public static function createDeduplicationIdsUsing(?callable $factory = null)

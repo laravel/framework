@@ -39,7 +39,6 @@ class PruneCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function handle(Dispatcher $events)
@@ -88,7 +87,6 @@ class PruneCommand extends Command
     /**
      * Prune the given model.
      *
-     * @param  string  $model
      * @return void
      */
     protected function pruneModel(string $model)
@@ -184,7 +182,6 @@ class PruneCommand extends Command
     /**
      * Determine if the given model is prunable.
      *
-     * @param  string  $model
      * @return bool
      */
     private function isPrunable(string $model)

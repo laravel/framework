@@ -57,8 +57,6 @@ class QueueFake extends QueueManager implements Fake, Queue
 
     /**
      * Indicates if items should be serialized and restored when pushed to the queue.
-     *
-     * @var bool
      */
     protected bool $serializeAndRestore = false;
 
@@ -391,7 +389,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Resolve a queue connection instance.
      *
-     * @param  mixed  $value
      * @return \Illuminate\Contracts\Queue\Queue
      */
     public function connection($value = null)
@@ -461,9 +458,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Push a new job onto the queue.
      *
      * @param  string|object  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -527,8 +522,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
-     * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -544,9 +537,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|object  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -558,8 +549,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  string  $queue
      * @param  string|object  $job
-     * @param  mixed  $data
-     * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
     {
@@ -572,8 +561,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|object  $job
-     * @param  mixed  $data
-     * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
@@ -595,9 +582,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
@@ -629,7 +614,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Specify if jobs should be serialized and restored when being "pushed" to the queue.
      *
-     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
@@ -641,9 +625,6 @@ class QueueFake extends QueueManager implements Fake, Queue
 
     /**
      * Serialize and unserialize the job to simulate the queueing process.
-     *
-     * @param  mixed  $job
-     * @return mixed
      */
     protected function serializeAndRestoreJob($job)
     {
@@ -676,7 +657,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

@@ -149,7 +149,6 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  mixed  $line
      * @return $this
      */
     public function line($line)
@@ -161,7 +160,6 @@ class SimpleMessage
      * Add a line of text to the notification if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed  $line
      * @return $this
      */
     public function lineIf($boolean, $line)
@@ -207,7 +205,6 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  mixed  $line
      * @return $this
      */
     public function with($line)

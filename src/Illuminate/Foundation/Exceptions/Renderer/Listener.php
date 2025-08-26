@@ -23,7 +23,6 @@ class Listener
     /**
      * Register the appropriate listeners on the given event dispatcher.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function registerListeners(Dispatcher $events)
@@ -54,7 +53,6 @@ class Listener
     /**
      * Listens for the query executed event.
      *
-     * @param  \Illuminate\Database\Events\QueryExecuted  $event
      * @return void
      */
     public function onQueryExecuted(QueryExecuted $event)

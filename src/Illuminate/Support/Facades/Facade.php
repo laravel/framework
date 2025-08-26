@@ -42,7 +42,6 @@ abstract class Facade
     /**
      * Run a Closure when the facade has been resolved.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolved(Closure $callback)
@@ -176,7 +175,6 @@ abstract class Facade
     /**
      * Hotswap the underlying instance behind the facade.
      *
-     * @param  mixed  $instance
      * @return void
      */
     public static function swap($instance)
@@ -203,8 +201,6 @@ abstract class Facade
 
     /**
      * Get the root object behind the facade.
-     *
-     * @return mixed
      */
     public static function getFacadeRoot()
     {
@@ -227,7 +223,6 @@ abstract class Facade
      * Resolve the facade root instance from the container.
      *
      * @param  string  $name
-     * @return mixed
      */
     protected static function resolveFacadeInstance($name)
     {
@@ -348,7 +343,6 @@ abstract class Facade
      *
      * @param  string  $method
      * @param  array  $args
-     * @return mixed
      *
      * @throws \RuntimeException
      */

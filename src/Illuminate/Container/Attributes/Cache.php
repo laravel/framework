@@ -19,8 +19,6 @@ class Cache implements ContextualAttribute
     /**
      * Resolve the cache store.
      *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Illuminate\Contracts\Cache\Repository
      */
     public static function resolve(self $attribute, Container $container)

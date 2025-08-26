@@ -71,7 +71,6 @@ class DurationLimiter
      * @param  int  $timeout
      * @param  callable|null  $callback
      * @param  int  $sleep
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      */

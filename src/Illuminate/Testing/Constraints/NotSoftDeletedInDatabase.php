@@ -37,10 +37,6 @@ class NotSoftDeletedInDatabase extends Constraint
 
     /**
      * Create a new constraint instance.
-     *
-     * @param  \Illuminate\Database\Connection  $database
-     * @param  array  $data
-     * @param  string  $deletedAtColumn
      */
     public function __construct(Connection $database, array $data, string $deletedAtColumn)
     {
@@ -53,7 +49,6 @@ class NotSoftDeletedInDatabase extends Constraint
      * Check if the data is found in the given table.
      *
      * @param  string  $table
-     * @return bool
      */
     public function matches($table): bool
     {
@@ -67,7 +62,6 @@ class NotSoftDeletedInDatabase extends Constraint
      * Get the description of the failure.
      *
      * @param  string  $table
-     * @return string
      */
     public function failureDescription($table): string
     {
@@ -104,8 +98,6 @@ class NotSoftDeletedInDatabase extends Constraint
 
     /**
      * Get a string representation of the object.
-     *
-     * @return string
      */
     public function toString(): string
     {

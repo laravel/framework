@@ -32,7 +32,6 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     /**
      * Create a new database failed job provider.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  string  $database
      * @param  string  $table
      */
@@ -91,7 +90,6 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
      * @return object|null
      */
     public function find($id)
@@ -102,7 +100,6 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
      * @return bool
      */
     public function forget($id)
@@ -126,7 +123,6 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     /**
      * Prune all of the entries older than the given date.
      *
-     * @param  \DateTimeInterface  $before
      * @return int
      */
     public function prune(DateTimeInterface $before)

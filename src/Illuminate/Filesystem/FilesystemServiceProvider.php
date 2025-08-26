@@ -109,7 +109,6 @@ class FilesystemServiceProvider extends ServiceProvider
     /**
      * Determine if the disk is serveable.
      *
-     * @param  array  $config
      * @return bool
      */
     protected function shouldServeFiles(array $config)

@@ -26,8 +26,6 @@ class Redirector
 
     /**
      * Create a new Redirector instance.
-     *
-     * @param  \Illuminate\Routing\UrlGenerator  $generator
      */
     public function __construct(UrlGenerator $generator)
     {
@@ -39,7 +37,6 @@ class Redirector
      *
      * @param  int  $status
      * @param  array  $headers
-     * @param  mixed  $fallback
      * @return \Illuminate\Http\RedirectResponse
      */
     public function back($status = 302, $headers = [], $fallback = false)
@@ -86,7 +83,6 @@ class Redirector
     /**
      * Create a new redirect response to the previously intended location.
      *
-     * @param  mixed  $default
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
@@ -143,7 +139,6 @@ class Redirector
      * Create a new redirect response to a named route.
      *
      * @param  \BackedEnum|string  $route
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -157,7 +152,6 @@ class Redirector
      * Create a new redirect response to a signed named route.
      *
      * @param  \BackedEnum|string  $route
-     * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  int  $status
      * @param  array  $headers
@@ -173,7 +167,6 @@ class Redirector
      *
      * @param  \BackedEnum|string  $route
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -187,7 +180,6 @@ class Redirector
      * Create a new redirect response to a controller action.
      *
      * @param  string|array  $action
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -229,7 +221,6 @@ class Redirector
     /**
      * Set the active session store.
      *
-     * @param  \Illuminate\Session\Store  $session
      * @return void
      */
     public function setSession(SessionStore $session)

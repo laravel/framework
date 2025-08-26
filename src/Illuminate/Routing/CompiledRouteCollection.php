@@ -51,9 +51,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
 
     /**
      * Create a new CompiledRouteCollection instance.
-     *
-     * @param  array  $compiled
-     * @param  array  $attributes
      */
     public function __construct(array $compiled, array $attributes)
     {
@@ -65,7 +62,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Add a Route instance to the collection.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
     public function add(Route $route)
@@ -100,7 +96,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Find the first route matching a given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
@@ -146,7 +141,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Get a cloned instance of the given request without any trailing slash on the URI.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Request
      */
     protected function requestWithoutTrailingSlash(Request $request)
@@ -274,7 +268,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Resolve an array of attributes to a Route instance.
      *
-     * @param  array  $attributes
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute(array $attributes)
@@ -304,7 +297,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Set the router instance on the route.
      *
-     * @param  \Illuminate\Routing\Router  $router
      * @return $this
      */
     public function setRouter(Router $router)
@@ -317,7 +309,6 @@ class CompiledRouteCollection extends AbstractRouteCollection
     /**
      * Set the container instance on the route.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)

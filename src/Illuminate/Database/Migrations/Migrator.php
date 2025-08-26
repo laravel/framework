@@ -95,11 +95,6 @@ class Migrator
 
     /**
      * Create a new migrator instance.
-     *
-     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      */
     public function __construct(
         MigrationRepositoryInterface $repository,
@@ -305,7 +300,6 @@ class Migrator
     /**
      * Rollback the given migrations.
      *
-     * @param  array  $migrations
      * @param  string[]|string  $paths
      * @param  array<string, mixed>  $options
      * @return string[]
@@ -533,7 +527,6 @@ class Migrator
     /**
      * Resolve a migration instance from a migration path.
      *
-     * @param  string  $path
      * @return object
      */
     protected function resolvePath(string $path)
@@ -557,9 +550,6 @@ class Migrator
 
     /**
      * Generate a migration class name based on the migration file name.
-     *
-     * @param  string  $migrationName
-     * @return string
      */
     protected function getMigrationClass(string $migrationName): string
     {
@@ -653,8 +643,6 @@ class Migrator
      * Execute the given callback using the given connection as the default connection.
      *
      * @param  string  $name
-     * @param  callable  $callback
-     * @return mixed
      */
     public function usingConnection($name, callable $callback)
     {
@@ -708,7 +696,6 @@ class Migrator
     /**
      * Set a connection resolver callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolveConnectionsUsing(Closure $callback)
@@ -786,7 +773,6 @@ class Migrator
     /**
      * Set the output implementation that should be used by the console.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return $this
      */
     public function setOutput(OutputInterface $output)

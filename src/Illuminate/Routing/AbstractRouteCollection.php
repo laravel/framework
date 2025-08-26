@@ -21,7 +21,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Handle the matched route.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Routing\Route|null  $route
      * @return \Illuminate\Routing\Route
      *
@@ -112,7 +111,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
      * Throw a method not allowed HTTP exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $others
      * @param  string  $method
      * @return never
      *
@@ -134,7 +132,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Throw a method not allowed HTTP exception.
      *
-     * @param  array  $others
      * @param  string  $method
      * @return void
      *
@@ -222,8 +219,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
     /**
      * Add a route to the SymfonyRouteCollection instance.
      *
-     * @param  \Symfony\Component\Routing\RouteCollection  $symfonyRoutes
-     * @param  \Illuminate\Routing\Route  $route
      * @return \Symfony\Component\Routing\RouteCollection
      *
      * @throws \LogicException
@@ -275,8 +270,6 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
 
     /**
      * Count the number of items in the collection.
-     *
-     * @return int
      */
     public function count(): int
     {

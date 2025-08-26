@@ -17,8 +17,6 @@ use Illuminate\Support\Stringable as SupportStringable;
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
-     *
-     * @param  array  $array
      */
     function append_config(array $array): array
     {
@@ -43,8 +41,6 @@ if (! function_exists('blank')) {
      * @phpstan-assert-if-false !=null|'' $value
      *
      * @phpstan-assert-if-true !=numeric|bool $value
-     *
-     * @param  mixed  $value
      */
     function blank($value): bool
     {
@@ -143,8 +139,6 @@ if (! function_exists('env')) {
      * Gets the value of an environment variable.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     function env($key, $default = null)
     {
@@ -159,8 +153,6 @@ if (! function_exists('filled')) {
      * @phpstan-assert-if-true !=null|'' $value
      *
      * @phpstan-assert-if-false !=numeric|bool $value
-     *
-     * @param  mixed  $value
      */
     function filled($value): bool
     {
@@ -183,8 +175,6 @@ if (! function_exists('fluent')) {
 if (! function_exists('literal')) {
     /**
      * Return a new literal or anonymous object using named arguments.
-     *
-     * @return mixed
      */
     function literal(...$arguments)
     {
@@ -204,7 +194,6 @@ if (! function_exists('object_get')) {
      *
      * @param  TValue  $object
      * @param  string|null  $key
-     * @param  mixed  $default
      * @return ($key is empty ? TValue : mixed)
      */
     function object_get($object, $key, $default = null)
@@ -282,7 +271,6 @@ if (! function_exists('preg_replace_array')) {
      * Replace a given pattern with each value in the array in sequentially.
      *
      * @param  string  $pattern
-     * @param  array  $replacements
      * @param  string  $subject
      */
     function preg_replace_array($pattern, array $replacements, $subject): string
@@ -402,7 +390,6 @@ if (! function_exists('throw_if')) {
      *
      * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
      * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
      * @throws TException
@@ -430,7 +417,6 @@ if (! function_exists('throw_unless')) {
      *
      * @param  TValue  $condition
      * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
      * @return ($condition is false ? never : ($condition is non-empty-mixed ? TValue : never))
      *
      * @throws TException

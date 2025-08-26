@@ -31,7 +31,6 @@ class Rule
      * Get a can constraint builder instance.
      *
      * @param  string  $ability
-     * @param  mixed  ...$arguments
      * @return \Illuminate\Validation\Rules\Can
      */
     public static function can($ability, ...$arguments)
@@ -229,7 +228,6 @@ class Rule
     /**
      * Get a dimensions rule builder instance.
      *
-     * @param  array  $constraints
      * @return \Illuminate\Validation\Rules\Dimensions
      */
     public static function dimensions(array $constraints = [])

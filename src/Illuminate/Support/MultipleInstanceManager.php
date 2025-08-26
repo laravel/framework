@@ -81,7 +81,6 @@ abstract class MultipleInstanceManager
      * Get an instance by name.
      *
      * @param  string|null  $name
-     * @return mixed
      */
     public function instance($name = null)
     {
@@ -94,7 +93,6 @@ abstract class MultipleInstanceManager
      * Attempt to get an instance from the local cache.
      *
      * @param  string  $name
-     * @return mixed
      */
     protected function get($name)
     {
@@ -105,7 +103,6 @@ abstract class MultipleInstanceManager
      * Resolve the given instance.
      *
      * @param  string  $name
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -145,9 +142,6 @@ abstract class MultipleInstanceManager
 
     /**
      * Call a custom instance creator.
-     *
-     * @param  array  $config
-     * @return mixed
      */
     protected function callCustomCreator(array $config)
     {
@@ -190,7 +184,6 @@ abstract class MultipleInstanceManager
      * Register a custom instance creator Closure.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
      *
@@ -221,7 +214,6 @@ abstract class MultipleInstanceManager
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

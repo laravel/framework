@@ -359,7 +359,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Render a component instance to HTML.
      *
-     * @param  \Illuminate\View\Component  $component
      * @return string
      */
     public static function renderComponent(Component $component)
@@ -615,7 +614,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Determine if the given expression has the same number of opening and closing parentheses.
      *
-     * @param  string  $expression
      * @return bool
      */
     protected function hasEvenNumberOfParentheses(string $expression)
@@ -697,7 +695,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a custom Blade compiler.
      *
-     * @param  callable  $compiler
      * @return void
      */
     public function extend(callable $compiler)
@@ -719,7 +716,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  callable  $callback
      * @return void
      */
     public function if($name, callable $callback)
@@ -753,7 +749,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Check the result of a condition.
      *
      * @param  string  $name
-     * @param  mixed  ...$parameters
      * @return bool
      */
     public function check($name, ...$parameters)
@@ -793,7 +788,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register an array of class-based components.
      *
-     * @param  array  $components
      * @param  string  $prefix
      * @return void
      */
@@ -821,8 +815,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a new anonymous component path.
      *
-     * @param  string  $path
-     * @param  string|null  $prefix
      * @return void
      */
     public function anonymousComponentPath(string $path, ?string $prefix = null)
@@ -843,8 +835,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register an anonymous component namespace.
      *
-     * @param  string  $directory
-     * @param  string|null  $prefix
      * @return void
      */
     public function anonymousComponentNamespace(string $directory, ?string $prefix = null)
@@ -955,7 +945,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives, binding the handler to the compiler.
      *
      * @param  string  $name
-     * @param  callable  $handler
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -969,8 +958,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register a handler for custom directives.
      *
      * @param  string  $name
-     * @param  callable  $handler
-     * @param  bool  $bind
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -997,7 +984,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Indicate that the following callable should be used to prepare strings for compilation.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function prepareStringsForCompilationUsing(callable $callback)
@@ -1010,7 +996,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a new precompiler.
      *
-     * @param  callable  $precompiler
      * @return void
      */
     public function precompiler(callable $precompiler)
@@ -1022,7 +1007,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Execute the given callback using a custom echo format.
      *
      * @param  string  $format
-     * @param  callable  $callback
      * @return string
      */
     public function usingEchoFormat($format, callable $callback)

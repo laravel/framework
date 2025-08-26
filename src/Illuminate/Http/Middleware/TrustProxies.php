@@ -43,9 +43,6 @@ class TrustProxies
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
@@ -61,7 +58,6 @@ class TrustProxies
     /**
      * Sets the trusted proxies on the request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function setTrustedProxyIpAddresses(Request $request)
@@ -96,8 +92,6 @@ class TrustProxies
     /**
      * Specify the IP addresses to trust explicitly.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $trustedIps
      * @return void
      */
     protected function setTrustedProxyIpAddressesToSpecificIps(Request $request, array $trustedIps)
@@ -114,7 +108,6 @@ class TrustProxies
     /**
      * Set the trusted proxy to be the IP address calling this servers.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function setTrustedProxyIpAddressesToTheCallingIp(Request $request)
@@ -170,7 +163,6 @@ class TrustProxies
     /**
      * Specify the IP addresses of proxies that should always be trusted.
      *
-     * @param  array|string  $proxies
      * @return void
      */
     public static function at(array|string $proxies)
@@ -181,7 +173,6 @@ class TrustProxies
     /**
      * Specify the proxy headers that should always be trusted.
      *
-     * @param  int  $headers
      * @return void
      */
     public static function withHeaders(int $headers)

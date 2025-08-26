@@ -57,9 +57,6 @@ class FakeInvokedProcess implements InvokedProcessContract
 
     /**
      * Create a new invoked process instance.
-     *
-     * @param  string  $command
-     * @param  \Illuminate\Process\FakeProcessDescription  $process
      */
     public function __construct(string $command, FakeProcessDescription $process)
     {
@@ -92,7 +89,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Send a signal to the process.
      *
-     * @param  int  $signal
      * @return $this
      */
     public function signal(int $signal)
@@ -107,7 +103,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Determine if the process has received the given signal.
      *
-     * @param  int  $signal
      * @return bool
      */
     public function hasReceivedSignal(int $signal)
@@ -264,7 +259,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Wait for the process to finish.
      *
-     * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function wait(?callable $output = null)
@@ -299,7 +293,6 @@ class FakeInvokedProcess implements InvokedProcessContract
     /**
      * Set the general output handler for the fake invoked process.
      *
-     * @param  callable|null  $outputHandler
      * @return $this
      */
     public function withOutputHandler(?callable $outputHandler)

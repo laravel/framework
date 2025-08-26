@@ -82,7 +82,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Create a new translator instance.
      *
-     * @param  \Illuminate\Contracts\Translation\Loader  $loader
      * @param  string  $locale
      */
     public function __construct(Loader $loader, $locale)
@@ -141,7 +140,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Get the translation for the given key.
      *
      * @param  string  $key
-     * @param  array  $replace
      * @param  string|null  $locale
      * @param  bool  $fallback
      * @return string|array
@@ -192,7 +190,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  string  $key
      * @param  \Countable|int|float|array  $number
-     * @param  array  $replace
      * @param  string|null  $locale
      * @return string
      */
@@ -239,7 +236,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $group
      * @param  string  $locale
      * @param  string  $item
-     * @param  array  $replace
      * @return string|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace)
@@ -263,7 +259,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Make the place-holder replacements on a line.
      *
      * @param  string  $line
-     * @param  array  $replace
      * @return string
      */
     protected function makeReplacements($line, array $replace)
@@ -300,7 +295,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Add translation lines to the given locale.
      *
-     * @param  array  $lines
      * @param  string  $locale
      * @param  string  $namespace
      * @return void
@@ -381,7 +375,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Register a callback that is responsible for handling missing translation keys.
      *
-     * @param  callable|null  $callback
      * @return static
      */
     public function handleMissingKeysUsing(?callable $callback)
@@ -483,7 +476,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Set the message selector instance.
      *
-     * @param  \Illuminate\Translation\MessageSelector  $selector
      * @return void
      */
     public function setSelector(MessageSelector $selector)
@@ -562,7 +554,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     /**
      * Set the loaded translation groups.
      *
-     * @param  array  $loaded
      * @return void
      */
     public function setLoaded(array $loaded)

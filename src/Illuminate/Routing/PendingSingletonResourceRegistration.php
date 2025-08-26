@@ -47,10 +47,8 @@ class PendingSingletonResourceRegistration
     /**
      * Create a new pending singleton resource registration instance.
      *
-     * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      */
     public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
     {
@@ -63,7 +61,6 @@ class PendingSingletonResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  mixed  $methods
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function only($methods)
@@ -76,7 +73,6 @@ class PendingSingletonResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  mixed  $methods
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function except($methods)
@@ -167,7 +163,6 @@ class PendingSingletonResourceRegistration
     /**
      * Add middleware to the resource routes.
      *
-     * @param  mixed  $middleware
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function middleware($middleware)
@@ -255,7 +250,6 @@ class PendingSingletonResourceRegistration
     /**
      * Add "where" constraints to the resource routes.
      *
-     * @param  mixed  $wheres
      * @return \Illuminate\Routing\PendingSingletonResourceRegistration
      */
     public function where($wheres)

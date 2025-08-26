@@ -100,9 +100,7 @@ class ThrottlesExceptions
     /**
      * Process the job.
      *
-     * @param  mixed  $job
      * @param  callable  $next
-     * @return mixed
      */
     public function handle($job, $next)
     {
@@ -142,7 +140,6 @@ class ThrottlesExceptions
     /**
      * Specify a callback that should determine if rate limiting behavior should apply.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function when(callable $callback)
@@ -155,7 +152,6 @@ class ThrottlesExceptions
     /**
      * Add a callback that should determine if the job should be deleted.
      *
-     * @param  callable|string  $callback
      * @return $this
      */
     public function deleteWhen(callable|string $callback)
@@ -170,7 +166,6 @@ class ThrottlesExceptions
     /**
      * Add a callback that should determine if the job should be failed.
      *
-     * @param  callable|string  $callback
      * @return $this
      */
     public function failWhen(callable|string $callback)
@@ -184,9 +179,6 @@ class ThrottlesExceptions
 
     /**
      * Run the skip / delete callbacks to determine if the job should be deleted for the given exception.
-     *
-     * @param  Throwable  $throwable
-     * @return bool
      */
     protected function shouldDelete(Throwable $throwable): bool
     {
@@ -201,9 +193,6 @@ class ThrottlesExceptions
 
     /**
      * Run the skip / fail callbacks to determine if the job should be failed for the given exception.
-     *
-     * @param  Throwable  $throwable
-     * @return bool
      */
     protected function shouldFail(Throwable $throwable): bool
     {
@@ -219,7 +208,6 @@ class ThrottlesExceptions
     /**
      * Set the prefix of the rate limiter key.
      *
-     * @param  string  $prefix
      * @return $this
      */
     public function withPrefix(string $prefix)
@@ -245,7 +233,6 @@ class ThrottlesExceptions
     /**
      * Get the cache key associated for the rate limiter.
      *
-     * @param  mixed  $job
      * @return string
      */
     protected function getKey($job)
@@ -287,7 +274,6 @@ class ThrottlesExceptions
     /**
      * Report exceptions and optionally specify a callback that determines if the exception should be reported.
      *
-     * @param  callable|null  $callback
      * @return $this
      */
     public function report(?callable $callback = null)

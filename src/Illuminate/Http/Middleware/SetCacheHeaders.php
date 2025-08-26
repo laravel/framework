@@ -40,7 +40,6 @@ class SetCacheHeaders
      * Add cache related HTTP headers.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|array  $options
      * @return \Symfony\Component\HttpFoundation\Response
      *

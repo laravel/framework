@@ -19,8 +19,6 @@ class Log implements ContextualAttribute
     /**
      * Resolve the log channel.
      *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Psr\Log\LoggerInterface
      */
     public static function resolve(self $attribute, Container $container)

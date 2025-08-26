@@ -48,7 +48,6 @@ trait HasGlobalScopes
      *
      * @param  \Illuminate\Database\Eloquent\Scope|(\Closure(\Illuminate\Database\Eloquent\Builder<static>): mixed)|string  $scope
      * @param  \Illuminate\Database\Eloquent\Scope|(\Closure(\Illuminate\Database\Eloquent\Builder<static>): mixed)|null  $implementation
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -70,7 +69,6 @@ trait HasGlobalScopes
     /**
      * Register multiple global scopes on the model.
      *
-     * @param  array  $scopes
      * @return void
      */
     public static function addGlobalScopes(array $scopes)

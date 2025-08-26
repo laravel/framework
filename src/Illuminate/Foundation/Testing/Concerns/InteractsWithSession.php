@@ -7,7 +7,6 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param  array  $data
      * @return $this
      */
     public function withSession(array $data)
@@ -20,7 +19,6 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param  array  $data
      * @return $this
      */
     public function session(array $data)

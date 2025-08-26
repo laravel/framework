@@ -21,8 +21,6 @@ class LogTransport implements Stringable, TransportInterface
 
     /**
      * Create a new log transport instance.
-     *
-     * @param  \Psr\Log\LoggerInterface  $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -59,7 +57,6 @@ class LogTransport implements Stringable, TransportInterface
     /**
      * Decode the given quoted printable content.
      *
-     * @param  string  $part
      * @return string
      */
     protected function decodeQuotedPrintableContent(string $part)
@@ -88,8 +85,6 @@ class LogTransport implements Stringable, TransportInterface
 
     /**
      * Get the string representation of the transport.
-     *
-     * @return string
      */
     public function __toString(): string
     {

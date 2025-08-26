@@ -82,7 +82,6 @@ class Auth extends Facade
     /**
      * Register the typical authentication routes for an application.
      *
-     * @param  array  $options
      * @return void
      *
      * @throws \RuntimeException

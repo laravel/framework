@@ -22,7 +22,6 @@ class UriQueryString implements Arrayable, Stringable
     /**
      * Retrieve all data from the instance.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -46,8 +45,6 @@ class UriQueryString implements Arrayable, Stringable
      * Retrieve data from the instance.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     protected function data($key = null, $default = null)
     {

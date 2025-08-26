@@ -22,8 +22,6 @@ class PusherBroadcaster extends Broadcaster
 
     /**
      * Create a new broadcaster instance.
-     *
-     * @param  \Pusher\Pusher  $pusher
      */
     public function __construct(Pusher $pusher)
     {
@@ -67,7 +65,6 @@ class PusherBroadcaster extends Broadcaster
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -90,8 +87,6 @@ class PusherBroadcaster extends Broadcaster
      * Return the valid authentication response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
     {
@@ -124,7 +119,6 @@ class PusherBroadcaster extends Broadcaster
      * Decode the given Pusher response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $response
      * @return array
      */
     protected function decodePusherResponse($request, $response)
@@ -140,9 +134,7 @@ class PusherBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
      * @param  string  $event
-     * @param  array  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException

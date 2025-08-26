@@ -104,7 +104,6 @@ class ConfigShowCommand extends Command
     /**
      * Format the given configuration value.
      *
-     * @param  mixed  $value
      * @return string
      */
     protected function formatValue($value)

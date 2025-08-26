@@ -33,8 +33,6 @@ class ScheduleInterruptCommand extends Command
 
     /**
      * Create a new schedule interrupt command.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      */
     public function __construct(Cache $cache)
     {

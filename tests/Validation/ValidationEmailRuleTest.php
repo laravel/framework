@@ -72,7 +72,6 @@ class ValidationEmailRuleTest extends TestCase
     }
 
     /**
-     * @param  mixed  $rule
      * @param  string|array  $values
      * @param  array  $expectedMessages
      * @param  string|null  $customValidationMessage
@@ -84,7 +83,6 @@ class ValidationEmailRuleTest extends TestCase
     }
 
     /**
-     * @param  mixed  $rule
      * @param  string|array  $values
      * @param  bool  $expectToPass
      * @param  array  $expectedMessages
@@ -116,7 +114,6 @@ class ValidationEmailRuleTest extends TestCase
     }
 
     /**
-     * @param  mixed  $rule
      * @param  string|array  $values
      * @return void
      */

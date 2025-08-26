@@ -57,7 +57,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Assert if a notification was sent based on a truth-test callback.
      *
-     * @param  mixed  $notifiable
      * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
@@ -107,7 +106,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Assert if a notification was sent a number of times.
      *
-     * @param  mixed  $notifiable
      * @param  string  $notification
      * @param  int  $times
      * @return void
@@ -125,7 +123,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Determine if a notification was sent based on a truth-test callback.
      *
-     * @param  mixed  $notifiable
      * @param  string|\Closure  $notification
      * @param  callable|null  $callback
      * @return void
@@ -175,7 +172,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Assert that no notifications were sent to the given notifiable.
      *
-     * @param  mixed  $notifiable
      * @return void
      *
      * @throws \Exception
@@ -242,7 +238,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Get all of the notifications matching a truth-test callback.
      *
-     * @param  mixed  $notifiable
      * @param  string  $notification
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
@@ -265,7 +260,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Determine if there are more notifications left to inspect.
      *
-     * @param  mixed  $notifiable
      * @param  string  $notification
      * @return bool
      */
@@ -277,7 +271,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Get all of the notifications for a notifiable entity by type.
      *
-     * @param  mixed  $notifiable
      * @param  string  $notification
      * @return array
      */
@@ -290,7 +283,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
-     * @param  mixed  $notification
      * @return void
      */
     public function send($notifiables, $notification)
@@ -302,8 +294,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * Send the given notification immediately.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
-     * @param  mixed  $notification
-     * @param  array|null  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
@@ -349,7 +339,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * Get a channel instance by name.
      *
      * @param  string|null  $name
-     * @return mixed
      */
     public function channel($name = null)
     {
@@ -372,7 +361,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Specify if notification should be serialized and restored when being "pushed" to the queue.
      *
-     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
@@ -384,9 +372,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
     /**
      * Serialize and unserialize the notification to simulate the queueing process.
-     *
-     * @param  mixed  $notification
-     * @return mixed
      */
     protected function serializeAndRestoreNotification($notification)
     {

@@ -38,7 +38,6 @@ trait ValidatesAttributes
      * This validation rule implies the attribute is "required".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateAccepted($attribute, $value)
@@ -52,8 +51,6 @@ trait ValidatesAttributes
      * Validate that an attribute was "accepted" when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateAcceptedIf($attribute, $value, $parameters)
@@ -77,7 +74,6 @@ trait ValidatesAttributes
      * This validation rule implies the attribute is "required".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateDeclined($attribute, $value)
@@ -91,8 +87,6 @@ trait ValidatesAttributes
      * Validate that an attribute was "declined" when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateDeclinedIf($attribute, $value, $parameters)
@@ -114,7 +108,6 @@ trait ValidatesAttributes
      * Validate that an attribute is an active URL.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateActiveUrl($attribute, $value)
@@ -154,7 +147,6 @@ trait ValidatesAttributes
      * Validate that an attribute is 7 bit ASCII.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateAscii($attribute, $value)
@@ -178,7 +170,6 @@ trait ValidatesAttributes
      * Validate the date is before a given date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -193,7 +184,6 @@ trait ValidatesAttributes
      * Validate the date is before or equal a given date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -208,7 +198,6 @@ trait ValidatesAttributes
      * Validate the date is after a given date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -223,7 +212,6 @@ trait ValidatesAttributes
      * Validate the date is equal or after a given date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -238,7 +226,6 @@ trait ValidatesAttributes
      * Compare a given date against another using an operator.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @param  string  $operator
      * @return bool
@@ -276,7 +263,6 @@ trait ValidatesAttributes
     /**
      * Get the date timestamp.
      *
-     * @param  mixed  $value
      * @return int
      */
     protected function getDateTimestamp($value)
@@ -348,7 +334,6 @@ trait ValidatesAttributes
      * If the 'ascii' option is passed, validate that an attribute contains only ascii alphabetic characters.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateAlpha($attribute, $value, $parameters)
@@ -366,7 +351,6 @@ trait ValidatesAttributes
      * dashes, and underscores.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateAlphaDash($attribute, $value, $parameters)
@@ -387,7 +371,6 @@ trait ValidatesAttributes
      * If the 'ascii' option is passed, validate that an attribute contains only ascii alpha-numeric characters.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateAlphaNum($attribute, $value, $parameters)
@@ -407,7 +390,6 @@ trait ValidatesAttributes
      * Validate that an attribute is an array.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -428,7 +410,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a list.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateList($attribute, $value)
@@ -440,7 +421,6 @@ trait ValidatesAttributes
      * Validate that an array has all of the given keys.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -463,7 +443,6 @@ trait ValidatesAttributes
      * Validate the size of an attribute is between a set of values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -484,7 +463,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a boolean.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
@@ -503,7 +481,6 @@ trait ValidatesAttributes
      * Validate that an attribute has a matching confirmation.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array{0: string}  $parameters
      * @return bool
      */
@@ -516,7 +493,6 @@ trait ValidatesAttributes
      * Validate an attribute contains a list of values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -539,7 +515,6 @@ trait ValidatesAttributes
      * Validate an attribute does not contain a list of values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -562,7 +537,6 @@ trait ValidatesAttributes
      * Validate that the password of the currently authenticated user matches the given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -584,7 +558,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateDate($attribute, $value)
@@ -610,7 +583,6 @@ trait ValidatesAttributes
      * Validate that an attribute matches a date format.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -641,7 +613,6 @@ trait ValidatesAttributes
      * Validate that an attribute is equal to another date.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -656,7 +627,6 @@ trait ValidatesAttributes
      * Validate that an attribute has a given number of decimal places.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -688,7 +658,6 @@ trait ValidatesAttributes
      * Validate that an attribute is different from another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -713,7 +682,6 @@ trait ValidatesAttributes
      * Validate that an attribute has a given number of digits.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -729,7 +697,6 @@ trait ValidatesAttributes
      * Validate that an attribute is between a given number of digits.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -747,7 +714,6 @@ trait ValidatesAttributes
      * Validate the dimensions of an image matches the given values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -870,7 +836,6 @@ trait ValidatesAttributes
      * Validate an attribute is unique among other values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -929,7 +894,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid e-mail address.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -962,7 +926,6 @@ trait ValidatesAttributes
      * Validate the existence of an attribute value in a database table.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -991,10 +954,8 @@ trait ValidatesAttributes
     /**
      * Get the number of records that exist in storage.
      *
-     * @param  mixed  $connection
      * @param  string  $table
      * @param  string  $column
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return int
      */
@@ -1021,7 +982,6 @@ trait ValidatesAttributes
      * If a database column is not specified, the attribute will be used.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1079,7 +1039,6 @@ trait ValidatesAttributes
     /**
      * Prepare the given ID for querying.
      *
-     * @param  mixed  $id
      * @return int
      */
     protected function prepareUniqueId($id)
@@ -1173,7 +1132,6 @@ trait ValidatesAttributes
     /**
      * Get the extra conditions for a unique / exists rule.
      *
-     * @param  array  $segments
      * @return array
      */
     protected function getExtraConditions(array $segments)
@@ -1193,7 +1151,6 @@ trait ValidatesAttributes
      * Validate the extension of a file upload attribute is in a set of defined extensions.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1214,7 +1171,6 @@ trait ValidatesAttributes
      * Validate the given value is a valid file.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateFile($attribute, $value)
@@ -1226,7 +1182,6 @@ trait ValidatesAttributes
      * Validate the given attribute is filled if it is present.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateFilled($attribute, $value)
@@ -1242,7 +1197,6 @@ trait ValidatesAttributes
      * Validate that an attribute is greater than another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1289,7 +1243,6 @@ trait ValidatesAttributes
      * Validate that an attribute is less than another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1332,7 +1285,6 @@ trait ValidatesAttributes
      * Validate that an attribute is greater than or equal another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1379,7 +1331,6 @@ trait ValidatesAttributes
      * Validate that an attribute is less than or equal another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1422,7 +1373,6 @@ trait ValidatesAttributes
      * Validate that an attribute is lowercase.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1435,7 +1385,6 @@ trait ValidatesAttributes
      * Validate that an attribute is uppercase.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1448,7 +1397,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid HEX color.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateHexColor($attribute, $value)
@@ -1460,7 +1408,6 @@ trait ValidatesAttributes
      * Validate the MIME type of a file is an image MIME type.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, string>  $parameters
      * @return bool
      */
@@ -1479,7 +1426,6 @@ trait ValidatesAttributes
      * Validate an attribute is contained within a list of values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1502,7 +1448,6 @@ trait ValidatesAttributes
      * Validate that the values of an attribute are in another attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1525,7 +1470,6 @@ trait ValidatesAttributes
      * Validate that an array has at least one of the given keys.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1552,7 +1496,6 @@ trait ValidatesAttributes
      * Validate that an attribute is an integer.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
@@ -1569,7 +1512,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid IP.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateIp($attribute, $value)
@@ -1581,7 +1523,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid IPv4.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateIpv4($attribute, $value)
@@ -1593,7 +1534,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid IPv6.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateIpv6($attribute, $value)
@@ -1605,7 +1545,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid MAC address.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateMacAddress($attribute, $value)
@@ -1617,7 +1556,6 @@ trait ValidatesAttributes
      * Validate the attribute is a valid JSON string.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateJson($attribute, $value)
@@ -1637,7 +1575,6 @@ trait ValidatesAttributes
      * Validate the size of an attribute is less than or equal to a maximum value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1660,7 +1597,6 @@ trait ValidatesAttributes
      * Validate that an attribute has a maximum number of digits.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1677,7 +1613,6 @@ trait ValidatesAttributes
      * Validate the guessed extension of a file upload is in a set of file extensions.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1702,7 +1637,6 @@ trait ValidatesAttributes
      * Validate the MIME type of a file upload attribute is in a set of MIME types.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1724,7 +1658,6 @@ trait ValidatesAttributes
     /**
      * Check if PHP uploads are explicitly allowed.
      *
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1747,7 +1680,6 @@ trait ValidatesAttributes
      * Validate the size of an attribute is greater than or equal to a minimum value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1766,7 +1698,6 @@ trait ValidatesAttributes
      * Validate that an attribute has a minimum number of digits.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1783,7 +1714,6 @@ trait ValidatesAttributes
      * Validate that an attribute is missing.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1796,7 +1726,6 @@ trait ValidatesAttributes
      * Validate that an attribute is missing when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1817,7 +1746,6 @@ trait ValidatesAttributes
      * Validate that an attribute is missing unless another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1838,7 +1766,6 @@ trait ValidatesAttributes
      * Validate that an attribute is missing when any given attribute is present.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1857,7 +1784,6 @@ trait ValidatesAttributes
      * Validate that an attribute is missing when all given attributes are present.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1876,7 +1802,6 @@ trait ValidatesAttributes
      * Validate the value of an attribute is a multiple of a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1926,7 +1851,6 @@ trait ValidatesAttributes
      * Validate an attribute is not contained within a list of values.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1939,7 +1863,6 @@ trait ValidatesAttributes
      * Validate that an attribute is numeric.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
@@ -1956,7 +1879,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists even if not filled.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validatePresent($attribute, $value)
@@ -1968,7 +1890,6 @@ trait ValidatesAttributes
      * Validate that an attribute is present when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -1989,7 +1910,6 @@ trait ValidatesAttributes
      * Validate that an attribute is present unless another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2010,7 +1930,6 @@ trait ValidatesAttributes
      * Validate that an attribute is present when any given attribute is present.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2029,7 +1948,6 @@ trait ValidatesAttributes
      * Validate that an attribute is present when all given attributes are present.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2048,7 +1966,6 @@ trait ValidatesAttributes
      * Validate that an attribute passes a regular expression check.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2067,7 +1984,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not pass a regular expression check.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2086,7 +2002,6 @@ trait ValidatesAttributes
      * Validate that a required attribute exists.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateRequired($attribute, $value)
@@ -2108,8 +2023,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredIf($attribute, $value, $parameters)
@@ -2133,8 +2046,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when another attribute was "accepted".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredIfAccepted($attribute, $value, $parameters)
@@ -2152,8 +2063,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when another attribute was "declined".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredIfDeclined($attribute, $value, $parameters)
@@ -2171,7 +2080,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not exist or is an empty string.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateProhibited($attribute, $value)
@@ -2183,8 +2091,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not exist when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibitedIf($attribute, $value, $parameters)
@@ -2204,8 +2110,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not exist when another attribute was "accepted".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibitedIfAccepted($attribute, $value, $parameters)
@@ -2223,8 +2127,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not exist when another attribute was "declined".
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibitedIfDeclined($attribute, $value, $parameters)
@@ -2242,8 +2144,6 @@ trait ValidatesAttributes
      * Validate that an attribute does not exist unless another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibitedUnless($attribute, $value, $parameters)
@@ -2263,8 +2163,6 @@ trait ValidatesAttributes
      * Validate that other attributes do not exist when this attribute exists.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateProhibits($attribute, $value, $parameters)
@@ -2294,8 +2192,6 @@ trait ValidatesAttributes
      * Indicate that an attribute should be excluded when another attribute has a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateExcludeIf($attribute, $value, $parameters)
@@ -2315,8 +2211,6 @@ trait ValidatesAttributes
      * Indicate that an attribute should be excluded when another attribute does not have a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateExcludeUnless($attribute, $value, $parameters)
@@ -2332,8 +2226,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when another attribute does not have a given value.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredUnless($attribute, $value, $parameters)
@@ -2353,8 +2245,6 @@ trait ValidatesAttributes
      * Indicate that an attribute should be excluded when another attribute presents.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateExcludeWith($attribute, $value, $parameters)
@@ -2372,8 +2262,6 @@ trait ValidatesAttributes
      * Indicate that an attribute should be excluded when another attribute is missing.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateExcludeWithout($attribute, $value, $parameters)
@@ -2457,8 +2345,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when any other attribute exists.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredWith($attribute, $value, $parameters)
@@ -2474,8 +2360,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when all other attributes exist.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredWithAll($attribute, $value, $parameters)
@@ -2491,8 +2375,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when another attribute does not.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredWithout($attribute, $value, $parameters)
@@ -2508,8 +2390,6 @@ trait ValidatesAttributes
      * Validate that an attribute exists when all other attributes do not.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $parameters
      * @return bool
      */
     public function validateRequiredWithoutAll($attribute, $value, $parameters)
@@ -2524,7 +2404,6 @@ trait ValidatesAttributes
     /**
      * Determine if any of the given attributes fail the required test.
      *
-     * @param  array  $attributes
      * @return bool
      */
     protected function anyFailingRequired(array $attributes)
@@ -2541,7 +2420,6 @@ trait ValidatesAttributes
     /**
      * Determine if all of the given attributes fail the required test.
      *
-     * @param  array  $attributes
      * @return bool
      */
     protected function allFailingRequired(array $attributes)
@@ -2559,7 +2437,6 @@ trait ValidatesAttributes
      * Validate that two attributes match.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2576,7 +2453,6 @@ trait ValidatesAttributes
      * Validate the size of an attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2607,7 +2483,6 @@ trait ValidatesAttributes
      * Validate the attribute starts with a given substring.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2620,7 +2495,6 @@ trait ValidatesAttributes
      * Validate the attribute does not start with a given substring.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2633,7 +2507,6 @@ trait ValidatesAttributes
      * Validate the attribute ends with a given substring.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2646,7 +2519,6 @@ trait ValidatesAttributes
      * Validate the attribute does not end with a given substring.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
      * @return bool
      */
@@ -2659,7 +2531,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a string.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateString($attribute, $value)
@@ -2671,7 +2542,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid timezone.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<string, null|string>  $parameters
      * @return bool
      */
@@ -2687,7 +2557,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid URL.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, string>  $parameters
      * @return bool
      */
@@ -2700,7 +2569,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid ULID.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function validateUlid($attribute, $value)
@@ -2712,7 +2580,6 @@ trait ValidatesAttributes
      * Validate that an attribute is a valid UUID.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  array<int, int<0, 8>|'max'>  $parameters
      * @return bool
      */
@@ -2735,7 +2602,6 @@ trait ValidatesAttributes
      * Get the size of an attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return int|float|string
      */
     protected function getSize($attribute, $value)
@@ -2760,7 +2626,6 @@ trait ValidatesAttributes
     /**
      * Check that the given value is a valid file instance.
      *
-     * @param  mixed  $value
      * @return bool
      */
     public function isValidFileInstance($value)
@@ -2775,8 +2640,6 @@ trait ValidatesAttributes
     /**
      * Determine if a comparison passes between the given values.
      *
-     * @param  mixed  $first
-     * @param  mixed  $second
      * @param  string  $operator
      * @return bool
      *
@@ -2831,8 +2694,6 @@ trait ValidatesAttributes
     /**
      * Check if the parameters are of the same type.
      *
-     * @param  mixed  $first
-     * @param  mixed  $second
      * @return bool
      */
     protected function isSameType($first, $second)
@@ -2856,9 +2717,6 @@ trait ValidatesAttributes
 
     /**
      * Trim the value if it is a string.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function trim($value)
     {
@@ -2869,8 +2727,6 @@ trait ValidatesAttributes
      * Ensure the exponent is within the allowed range.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @return mixed
      *
      * @throws \Illuminate\Support\Exceptions\MathException
      */

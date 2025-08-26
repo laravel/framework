@@ -20,8 +20,6 @@ class Database implements ContextualAttribute
     /**
      * Resolve the database connection.
      *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Illuminate\Database\Connection
      */
     public static function resolve(self $attribute, Container $container)

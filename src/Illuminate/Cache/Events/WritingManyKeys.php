@@ -6,15 +6,11 @@ class WritingManyKeys extends CacheEvent
 {
     /**
      * The keys that are being written.
-     *
-     * @var mixed
      */
     public $keys;
 
     /**
      * The value that is being written.
-     *
-     * @var mixed
      */
     public $values;
 

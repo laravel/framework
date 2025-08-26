@@ -23,7 +23,6 @@ class NullStore extends TaggableStore implements LockProvider
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -36,7 +35,6 @@ class NullStore extends TaggableStore implements LockProvider
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return false
      */
     public function increment($key, $value = 1)
@@ -48,7 +46,6 @@ class NullStore extends TaggableStore implements LockProvider
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return false
      */
     public function decrement($key, $value = 1)
@@ -60,7 +57,6 @@ class NullStore extends TaggableStore implements LockProvider
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)

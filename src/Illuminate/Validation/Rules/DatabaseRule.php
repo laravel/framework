@@ -204,7 +204,6 @@ trait DatabaseRule
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function using(Closure $callback)

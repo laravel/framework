@@ -6,8 +6,6 @@ class KeyWriteFailed extends CacheEvent
 {
     /**
      * The value that would have been written.
-     *
-     * @var mixed
      */
     public $value;
 
@@ -23,7 +21,6 @@ class KeyWriteFailed extends CacheEvent
      *
      * @param  string|null  $storeName
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int|null  $seconds
      * @param  array  $tags
      */

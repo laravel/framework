@@ -7,9 +7,7 @@ class SkipIfBatchCancelled
     /**
      * Process the job.
      *
-     * @param  mixed  $job
      * @param  callable  $next
-     * @return mixed
      */
     public function handle($job, $next)
     {

@@ -178,7 +178,6 @@ class DatabaseTransactionsManager
     /**
      * Remove all transactions that are children of the given transaction.
      *
-     * @param  \Illuminate\Database\DatabaseTransactionRecord  $transaction
      * @return void
      */
     protected function removeCommittedTransactionsThatAreChildrenOf(DatabaseTransactionRecord $transaction)

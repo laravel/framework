@@ -21,7 +21,6 @@ class AnonymousResourceCollection extends ResourceCollection
     /**
      * Create a new anonymous resource collection.
      *
-     * @param  mixed  $resource
      * @param  string  $collects
      */
     public function __construct($resource, $collects)

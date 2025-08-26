@@ -11,7 +11,6 @@ class SqlServerProcessor extends Processor
     /**
      * Process an "insert get ID" query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
      * @param  array  $values
      * @param  string|null  $sequence
@@ -35,7 +34,6 @@ class SqlServerProcessor extends Processor
     /**
      * Process an "insert get ID" query for ODBC.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @return int
      *
      * @throws \Exception

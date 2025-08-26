@@ -50,8 +50,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
     /**
      * Create a new mail fake.
-     *
-     * @param  MailManager  $manager
      */
     public function __construct(MailManager $manager)
     {
@@ -433,7 +431,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
      * @return \Illuminate\Mail\PendingMail
      */
     public function to($users)
@@ -444,7 +441,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
      * @return \Illuminate\Mail\PendingMail
      */
     public function cc($users)
@@ -455,7 +451,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
      * @return \Illuminate\Mail\PendingMail
      */
     public function bcc($users)
@@ -479,7 +474,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Send a new message using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return mixed|void
      */
@@ -492,7 +486,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Send a new message synchronously using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return void
      */
@@ -530,7 +523,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
-     * @return mixed
      */
     public function queue($view, $queue = null)
     {
@@ -551,7 +543,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
      * @param  string|null  $queue
-     * @return mixed
      */
     public function later($delay, $view, $queue = null)
     {
@@ -591,7 +582,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

@@ -209,7 +209,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
-     * @return mixed
      */
     protected function toKilobytes($size)
     {
@@ -247,7 +246,6 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

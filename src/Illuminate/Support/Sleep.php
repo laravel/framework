@@ -264,7 +264,6 @@ class Sleep
     /**
      * Sleep while a given callback returns "true".
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function while(Closure $callback)
@@ -276,9 +275,6 @@ class Sleep
 
     /**
      * Specify a callback that should be executed after sleeping.
-     *
-     * @param  callable  $then
-     * @return mixed
      */
     public function then(callable $then)
     {

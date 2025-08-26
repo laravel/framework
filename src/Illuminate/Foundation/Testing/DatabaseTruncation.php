@@ -14,15 +14,11 @@ trait DatabaseTruncation
 
     /**
      * The cached names of the database tables for each connection.
-     *
-     * @var array
      */
     protected static array $allTables;
 
     /**
      * Truncate the database tables for all configured connections.
-     *
-     * @return void
      */
     protected function truncateDatabaseTables(): void
     {
@@ -55,8 +51,6 @@ trait DatabaseTruncation
 
     /**
      * Truncate the database tables for all configured connections.
-     *
-     * @return void
      */
     protected function truncateTablesForAllConnections(): void
     {
@@ -74,10 +68,6 @@ trait DatabaseTruncation
 
     /**
      * Truncate the database tables for the given database connection.
-     *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  string|null  $name
-     * @return void
      */
     protected function truncateTablesForConnection(ConnectionInterface $connection, ?string $name): void
     {
@@ -136,8 +126,6 @@ trait DatabaseTruncation
 
     /**
      * The database connections that should have their tables truncated.
-     *
-     * @return array
      */
     protected function connectionsToTruncate(): array
     {
@@ -176,8 +164,6 @@ trait DatabaseTruncation
 
     /**
      * Perform any work that should take place before the database has started truncating.
-     *
-     * @return void
      */
     protected function beforeTruncatingDatabase(): void
     {
@@ -186,8 +172,6 @@ trait DatabaseTruncation
 
     /**
      * Perform any work that should take place once the database has finished truncating.
-     *
-     * @return void
      */
     protected function afterTruncatingDatabase(): void
     {

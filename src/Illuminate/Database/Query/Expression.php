@@ -23,7 +23,6 @@ class Expression implements ExpressionContract
     /**
      * Get the value of the expression.
      *
-     * @param  \Illuminate\Database\Grammar  $grammar
      * @return TValue
      */
     public function getValue(Grammar $grammar)

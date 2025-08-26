@@ -35,8 +35,6 @@ class DynamicComponent extends Component
 
     /**
      * Create a new component instance.
-     *
-     * @param  \BackedEnum|string  $component
      */
     public function __construct(BackedEnum|string $component)
     {
@@ -87,7 +85,6 @@ EOF;
     /**
      * Compile the @props directive for the component.
      *
-     * @param  array  $bindings
      * @return string
      */
     protected function compileProps(array $bindings)
@@ -104,7 +101,6 @@ EOF;
     /**
      * Compile the bindings for the component.
      *
-     * @param  array  $bindings
      * @return string
      */
     protected function compileBindings(array $bindings)
@@ -117,7 +113,6 @@ EOF;
     /**
      * Compile the slots for the component.
      *
-     * @param  array  $slots
      * @return string
      */
     protected function compileSlots(array $slots)
@@ -146,7 +141,6 @@ EOF;
     /**
      * Get the names of the variables that should be bound to the component.
      *
-     * @param  string  $class
      * @return array
      */
     protected function bindings(string $class)

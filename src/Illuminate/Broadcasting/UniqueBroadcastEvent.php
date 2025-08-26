@@ -10,8 +10,6 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
 {
     /**
      * The unique lock identifier.
-     *
-     * @var mixed
      */
     public $uniqueId;
 
@@ -24,8 +22,6 @@ class UniqueBroadcastEvent extends BroadcastEvent implements ShouldBeUnique
 
     /**
      * Create a new event instance.
-     *
-     * @param  mixed  $event
      */
     public function __construct($event)
     {

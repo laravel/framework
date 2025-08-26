@@ -44,9 +44,6 @@ class Markdown
 
     /**
      * Create a new Markdown renderer instance.
-     *
-     * @param  \Illuminate\Contracts\View\Factory  $view
-     * @param  array  $options
      */
     public function __construct(ViewFactory $view, array $options = [])
     {
@@ -59,7 +56,6 @@ class Markdown
      * Render the Markdown template into HTML.
      *
      * @param  string  $view
-     * @param  array  $data
      * @param  \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles|null  $inliner
      * @return \Illuminate\Support\HtmlString
      */
@@ -116,7 +112,6 @@ class Markdown
      * Render the Markdown template into text.
      *
      * @param  string  $view
-     * @param  array  $data
      * @return \Illuminate\Support\HtmlString
      */
     public function renderText($view, array $data = [])
@@ -136,7 +131,6 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
-     * @param  bool  $encoded
      * @return \Illuminate\Support\HtmlString
      */
     public static function parse($text, bool $encoded = false)
@@ -230,7 +224,6 @@ class Markdown
     /**
      * Register new mail component paths.
      *
-     * @param  array  $paths
      * @return void
      */
     public function loadComponentsFrom(array $paths = [])

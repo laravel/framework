@@ -109,10 +109,6 @@ class Queue extends Facade
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
-     *
-     * @param  callable  $callable
-     * @param  array  $jobsToFake
-     * @return mixed
      */
     public static function fakeFor(callable $callable, array $jobsToFake = [])
     {
@@ -129,10 +125,6 @@ class Queue extends Facade
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
-     *
-     * @param  callable  $callable
-     * @param  array  $jobsToAllow
-     * @return mixed
      */
     public static function fakeExceptFor(callable $callable, array $jobsToAllow = [])
     {

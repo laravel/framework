@@ -56,7 +56,6 @@ class ArrayLoader implements Loader
      *
      * @param  string  $locale
      * @param  string  $group
-     * @param  array  $messages
      * @param  string|null  $namespace
      * @return $this
      */

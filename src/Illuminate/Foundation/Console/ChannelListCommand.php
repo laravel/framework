@@ -36,7 +36,6 @@ class ChannelListCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Broadcaster  $broadcaster
      * @return void
      */
     public function handle(Broadcaster $broadcaster)

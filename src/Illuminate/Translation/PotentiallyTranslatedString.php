@@ -58,7 +58,6 @@ class PotentiallyTranslatedString implements Stringable
      * Translates the string based on a count.
      *
      * @param  \Countable|int|float|array  $number
-     * @param  array  $replace
      * @param  string|null  $locale
      * @return $this
      */

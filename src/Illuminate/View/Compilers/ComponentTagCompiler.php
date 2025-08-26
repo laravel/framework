@@ -50,10 +50,6 @@ class ComponentTagCompiler
 
     /**
      * Create a new component tag compiler.
-     *
-     * @param  array  $aliases
-     * @param  array  $namespaces
-     * @param  \Illuminate\View\Compilers\BladeCompiler|null  $blade
      */
     public function __construct(array $aliases = [], array $namespaces = [], ?BladeCompiler $blade = null)
     {
@@ -66,7 +62,6 @@ class ComponentTagCompiler
     /**
      * Compile the component and slot tags within the given string.
      *
-     * @param  string  $value
      * @return string
      */
     public function compile(string $value)
@@ -79,7 +74,6 @@ class ComponentTagCompiler
     /**
      * Compile the tags within the given string.
      *
-     * @param  string  $value
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -96,7 +90,6 @@ class ComponentTagCompiler
     /**
      * Compile the opening tags within the given string.
      *
-     * @param  string  $value
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -160,7 +153,6 @@ class ComponentTagCompiler
     /**
      * Compile the self-closing tags within the given string.
      *
-     * @param  string  $value
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -224,8 +216,6 @@ class ComponentTagCompiler
     /**
      * Compile the Blade component string for the given component and attributes.
      *
-     * @param  string  $component
-     * @param  array  $attributes
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -268,7 +258,6 @@ class ComponentTagCompiler
     /**
      * Get the component class for a given component alias.
      *
-     * @param  string  $component
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -320,8 +309,6 @@ class ComponentTagCompiler
     /**
      * Attempt to find an anonymous component using the registered anonymous component paths.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $viewFactory
-     * @param  string  $component
      * @return string|null
      */
     protected function guessAnonymousComponentUsingPaths(Factory $viewFactory, string $component)
@@ -356,8 +343,6 @@ class ComponentTagCompiler
     /**
      * Attempt to find an anonymous component using the registered anonymous component namespaces.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $viewFactory
-     * @param  string  $component
      * @return string|null
      */
     protected function guessAnonymousComponentUsingNamespaces(Factory $viewFactory, string $component)
@@ -393,7 +378,6 @@ class ComponentTagCompiler
     /**
      * Find the class for the given component using the registered namespaces.
      *
-     * @param  string  $component
      * @return string|null
      */
     public function findClassByComponent(string $component)
@@ -418,7 +402,6 @@ class ComponentTagCompiler
     /**
      * Guess the class name for the given component.
      *
-     * @param  string  $component
      * @return string
      */
     public function guessClassName(string $component)
@@ -435,7 +418,6 @@ class ComponentTagCompiler
     /**
      * Format the class name for the given component.
      *
-     * @param  string  $component
      * @return string
      */
     public function formatClassName(string $component)
@@ -473,7 +455,6 @@ class ComponentTagCompiler
      * Partition the data and extra attributes from the given array of attributes.
      *
      * @param  string  $class
-     * @param  array  $attributes
      * @return array
      */
     public function partitionDataAndAttributes($class, array $attributes)
@@ -499,7 +480,6 @@ class ComponentTagCompiler
     /**
      * Compile the closing tags within the given string.
      *
-     * @param  string  $value
      * @return string
      */
     protected function compileClosingTags(string $value)
@@ -510,7 +490,6 @@ class ComponentTagCompiler
     /**
      * Compile the slot tags within the given string.
      *
-     * @param  string  $value
      * @return string
      */
     public function compileSlots(string $value)
@@ -591,7 +570,6 @@ class ComponentTagCompiler
     /**
      * Get an array of attributes from the given attribute string.
      *
-     * @param  string  $attributeString
      * @return array
      */
     protected function getAttributesFromAttributeString(string $attributeString)
@@ -653,7 +631,6 @@ class ComponentTagCompiler
     /**
      * Parses a short attribute syntax like :$foo into a fully-qualified syntax like :foo="$foo".
      *
-     * @param  string  $value
      * @return string
      */
     protected function parseShortAttributeSyntax(string $value)
@@ -668,7 +645,6 @@ class ComponentTagCompiler
     /**
      * Parse the attribute bag in a given attribute string into its fully-qualified syntax.
      *
-     * @param  string  $attributeString
      * @return string
      */
     protected function parseAttributeBag(string $attributeString)
@@ -684,7 +660,6 @@ class ComponentTagCompiler
     /**
      * Parse @class statements in a given attribute string into their fully-qualified syntax.
      *
-     * @param  string  $attributeString
      * @return string
      */
     protected function parseComponentTagClassStatements(string $attributeString)
@@ -705,7 +680,6 @@ class ComponentTagCompiler
     /**
      * Parse @style statements in a given attribute string into their fully-qualified syntax.
      *
-     * @param  string  $attributeString
      * @return string
      */
     protected function parseComponentTagStyleStatements(string $attributeString)
@@ -726,7 +700,6 @@ class ComponentTagCompiler
     /**
      * Parse the "bind" attributes in a given attribute string into their fully-qualified syntax.
      *
-     * @param  string  $attributeString
      * @return string
      */
     protected function parseBindAttributes(string $attributeString)
@@ -746,7 +719,6 @@ class ComponentTagCompiler
      *
      * These echo statements need to be converted to string concatenation statements.
      *
-     * @param  string  $attributeString
      * @return string
      */
     protected function compileAttributeEchos(string $attributeString)
@@ -764,7 +736,6 @@ class ComponentTagCompiler
     /**
      * Escape the single quotes in the given string that are outside of PHP blocks.
      *
-     * @param  string  $value
      * @return string
      */
     protected function escapeSingleQuotesOutsideOfPhpBlocks(string $value)
@@ -783,7 +754,6 @@ class ComponentTagCompiler
     /**
      * Convert an array of attributes to a string.
      *
-     * @param  array  $attributes
      * @param  bool  $escapeBound
      * @return string
      */
@@ -801,7 +771,6 @@ class ComponentTagCompiler
     /**
      * Strip any quotes from the given string.
      *
-     * @param  string  $value
      * @return string
      */
     public function stripQuotes(string $value)

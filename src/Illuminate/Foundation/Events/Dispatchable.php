@@ -6,8 +6,6 @@ trait Dispatchable
 {
     /**
      * Dispatch the event with the given arguments.
-     *
-     * @return mixed
      */
     public static function dispatch()
     {
@@ -18,8 +16,6 @@ trait Dispatchable
      * Dispatch the event with the given arguments if the given truth test passes.
      *
      * @param  bool  $boolean
-     * @param  mixed  ...$arguments
-     * @return mixed
      */
     public static function dispatchIf($boolean, ...$arguments)
     {
@@ -32,8 +28,6 @@ trait Dispatchable
      * Dispatch the event with the given arguments unless the given truth test passes.
      *
      * @param  bool  $boolean
-     * @param  mixed  ...$arguments
-     * @return mixed
      */
     public static function dispatchUnless($boolean, ...$arguments)
     {

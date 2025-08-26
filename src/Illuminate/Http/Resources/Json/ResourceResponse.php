@@ -10,15 +10,11 @@ class ResourceResponse implements Responsable
 {
     /**
      * The underlying resource.
-     *
-     * @var mixed
      */
     public $resource;
 
     /**
      * Create a new resource response.
-     *
-     * @param  mixed  $resource
      */
     public function __construct($resource)
     {

@@ -160,10 +160,6 @@ class Command extends SymfonyCommand
 
     /**
      * Run the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return int
      */
     #[\Override]
     public function run(InputInterface $input, OutputInterface $output): int
@@ -187,9 +183,6 @@ class Command extends SymfonyCommand
 
     /**
      * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      */
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -262,7 +255,6 @@ class Command extends SymfonyCommand
     /**
      * Fail the command manually.
      *
-     * @param  \Throwable|string|null  $exception
      * @return never
      *
      * @throws \Illuminate\Console\ManuallyFailedException|\Throwable
@@ -282,8 +274,6 @@ class Command extends SymfonyCommand
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     #[\Override]
     public function isHidden(): bool

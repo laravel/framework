@@ -66,7 +66,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function resolveAuthenticatedUserUsing(Closure $callback)
@@ -102,7 +101,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -206,7 +204,6 @@ abstract class Broadcaster implements BroadcasterContract
      * @param  string  $key
      * @param  string  $value
      * @param  array  $callbackParameters
-     * @return mixed
      */
     protected function resolveBinding($key, $value, $callbackParameters)
     {
@@ -221,8 +218,6 @@ abstract class Broadcaster implements BroadcasterContract
      * Resolve an explicit parameter binding if applicable.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function resolveExplicitBindingIfPossible($key, $value)
     {
@@ -239,9 +234,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Resolve an implicit parameter binding if applicable.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  array  $callbackParameters
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -280,7 +273,6 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
      * @return array
      */
     protected function formatChannels(array $channels)
@@ -309,7 +301,6 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Normalize the given callback into a callable.
      *
-     * @param  mixed  $callback
      * @return callable
      */
     protected function normalizeChannelHandlerToCallable($callback)
@@ -326,7 +317,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
-     * @return mixed
      */
     protected function retrieveUser($request, $channel)
     {

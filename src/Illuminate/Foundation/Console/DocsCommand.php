@@ -94,8 +94,6 @@ class DocsCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Http\Client\Factory  $http
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @return int
      */
     public function handle(Http $http, Cache $cache)
