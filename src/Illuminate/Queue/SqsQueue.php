@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Str;
 
@@ -162,9 +163,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data),
             $queue,
             null,
-            function ($payload, $queue) {
-                return $this->pushRaw($payload, $queue);
-            }
+            fn ($payload, $queue) => $this->pushRaw($payload, $queue, $this->getQueueableOptions($job)),
         );
     }
 
@@ -305,5 +304,37 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function getSqs()
     {
         return $this->sqs;
+    }
+
+    /**
+     * Get queueable options from the job.
+     *
+     * @param  mixed  $job
+     *
+     * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
+     */
+    protected function getQueueableOptions($job): array
+    {
+        if (! is_object($job)) {
+            return [];
+        }
+
+        $queueable = match (true) {
+            $job instanceof SendQueuedNotifications => $job->notification,
+            $job instanceof SendQueuedMailable => $job->mailable,
+            default => $job,
+        };
+
+        $messageGroupId = transform($queueable->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
+        $messageDeduplicationId = null;
+
+        if (! is_null($messageGroupId) && $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
+            $messageDeduplicationId = $job->uniqueId();
+        }
+
+        return array_filter([
+            'MessageGroupId' => $messageGroupId,
+            'MessageDeduplicationId' => $messageDeduplicationId,
+        ]);
     }
 }

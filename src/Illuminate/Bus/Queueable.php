@@ -28,6 +28,13 @@ trait Queueable
     public $queue;
 
     /**
+     * The message group id the job should be sent to.
+     *
+     * @var string|null
+     */
+    public $messageGroup;
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
@@ -98,6 +105,20 @@ trait Queueable
     public function onQueue($queue)
     {
         $this->queue = enum_value($queue);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired message group id for the job.
+     *
+     * @param  string  $messageGroup
+     *
+     * @return $this
+     */
+    public function onMessageGroup($messageGroup)
+    {
+        $this->messageGroup = enum_value($messageGroup);
 
         return $this;
     }
