@@ -322,7 +322,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $messageDeduplicationId = null;
 
         if (! is_null($messageGroupId) && $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
-            $messageDeduplicationId = $job->uniqueId();
+            $messageDeduplicationId = transform($job->uniqueId(), fn ($deduplication) => strval($deduplication));
         }
 
         return array_filter([
