@@ -42,6 +42,30 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Get all of the cached values and their expiration times.
+     *
+     * @param  bool  $unserialize
+     * @return array<string, array{expiresAt: float, value: mixed}>
+     */
+    public function all($unserialize = true)
+    {
+        if ($unserialize === false || $this->serializesValues === false) {
+            return $this->storage;
+        }
+
+        $storage = [];
+
+        foreach ($this->storage as $key => $data) {
+            $storage[$key] = [
+                'expiresAt' => $data['expiresAt'],
+                'value' => unserialize($data['value']),
+            ];
+        }
+
+        return $storage;
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
@@ -214,28 +238,5 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function restoreLock($name, $owner)
     {
         return $this->lock($name, 0, $owner);
-    }
-
-    /**
-     * Get the underlying cache storage.
-     *
-     * @param  bool  $unserializeIfSerialized
-     * @return array<string, array{expiresAt: float, value: mixed}>
-     */
-    public function getStorage($unserializeIfSerialized = true)
-    {
-        if ($unserializeIfSerialized === false || $this->serializesValues === false) {
-            return $this->storage;
-        }
-
-        $storage = [];
-        foreach ($this->storage as $key => $data) {
-            $storage[$key] = [
-                'expiresAt' => $data['expiresAt'],
-                'value' => unserialize($data['value']),
-            ];
-        }
-
-        return $storage;
     }
 }

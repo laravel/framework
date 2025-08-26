@@ -326,7 +326,7 @@ class CacheArrayStoreTest extends TestCase
         $this->assertFalse($firstLock->isOwnedByCurrentProcess());
     }
 
-    public function testCanGetStorage()
+    public function testCanGetAll()
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -335,10 +335,10 @@ class CacheArrayStoreTest extends TestCase
 
         $this->assertEquals([
             'foo' => ['value' => 'bar', 'expiresAt' => Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000],
-        ], $store->getStorage());
+        ], $store->all());
     }
 
-    public function testCanGetStorageWhenSerialized()
+    public function testCanGetAllWhenSerialized()
     {
         Carbon::setTestNow(Carbon::now());
 
@@ -346,7 +346,7 @@ class CacheArrayStoreTest extends TestCase
         $store->put('foo', 'bar', 10);
         $this->assertEquals([
             'foo' => ['value' => 'bar', 'expiresAt' => $expiresAt = (Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000)],
-        ], $store->getStorage());
+        ], $store->all());
 
         // Now let's put a serializable value in there
         $store->forget('foo');
@@ -357,11 +357,11 @@ class CacheArrayStoreTest extends TestCase
                 'value' => Carbon::now(),
                 'expiresAt' => $expiresAt,
             ],
-        ], $store->getStorage());
+        ], $store->all());
 
         $this->assertEquals(
             serialize(Carbon::now()),
-            $store->getStorage(false)['foo']['value']
+            $store->all(false)['foo']['value']
         );
     }
 }
