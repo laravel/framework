@@ -630,8 +630,9 @@ if (! function_exists('old')) {
      *
      * @param  string|null  $key
      * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
+     * @return string|array|null
      */
-    function old($key = null, $default = null): string|array|null
+    function old($key = null, $default = null)
     {
         return app('request')->old($key, $default);
     }
