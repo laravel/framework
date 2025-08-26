@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Closure;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -3365,7 +3364,7 @@ class DatabaseEloquentModelTest extends TestCase
         $stringable->cast = 'test';
 
         $model = (new EloquentModelCastingStub)->mergeCasts([
-            'something' => $stringable
+            'something' => $stringable,
         ]);
 
         $this->assertEquals('test', $model->getCasts()['something']);
