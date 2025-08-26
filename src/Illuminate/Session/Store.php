@@ -718,7 +718,7 @@ class Store implements Session
      */
     public function token()
     {
-        return $this->get('_token');
+        return (string) $this->get('_token');
     }
 
     /**
