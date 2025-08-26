@@ -55,7 +55,6 @@ class FoundationHelpersTest extends TestCase
         $app = new Application;
         $app['events'] = $dispatcher = m::mock(Dispatcher::class);
 
-        // 1. event('a', 'b', 'c');
         $dispatcher->shouldReceive('dispatch')->once()->with('a', 'b', 'c')->andReturn('foo');
         $this->assertSame('foo', event('a', 'b', 'c'));
     }
