@@ -398,10 +398,8 @@ class Batch implements Arrayable, JsonSerializable
 
     /**
      * Determine if the batch has "failure" callbacks.
-     *
-     * @return bool
      */
-    public function hasFailureCallbacks()
+    public function hasFailureCallbacks(): bool
     {
         return isset($this->options['failure']) && ! empty($this->options['failure']);
     }

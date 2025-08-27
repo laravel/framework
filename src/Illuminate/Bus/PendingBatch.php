@@ -237,7 +237,7 @@ class PendingBatch
      *
      * @template TParam of Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
      *
-     * @param bool|TParam|array<array-key, TParam> $param
+     * @param  bool|TParam|array<array-key, TParam>  $param
      */
     public function allowFailures(bool|Closure|callable|array $param = true): self
     {
@@ -362,7 +362,7 @@ class PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return Batch
+     * @return \Illuminate\Bus\Batch
      *
      * @throws \Throwable
      */
@@ -392,7 +392,7 @@ class PendingBatch
     /**
      * Dispatch the batch after the response is sent to the browser.
      *
-     * @return Batch
+     * @return \Illuminate\Bus\Batch
      */
     public function dispatchAfterResponse()
     {
@@ -412,7 +412,7 @@ class PendingBatch
     /**
      * Dispatch an existing batch.
      *
-     * @param Batch $batch
+     * @param  \Illuminate\Bus\Batch  $batch
      * @return void
      *
      * @throws \Throwable
@@ -436,7 +436,7 @@ class PendingBatch
      * Dispatch the batch if the given truth test passes.
      *
      * @param  bool|\Closure  $boolean
-     * @return Batch|null
+     * @return \Illuminate\Bus\Batch|null
      */
     public function dispatchIf($boolean)
     {
@@ -447,7 +447,7 @@ class PendingBatch
      * Dispatch the batch unless the given truth test passes.
      *
      * @param  bool|\Closure  $boolean
-     * @return Batch|null
+     * @return \Illuminate\Bus\Batch|null
      */
     public function dispatchUnless($boolean)
     {
@@ -458,7 +458,7 @@ class PendingBatch
      * Store the batch using the given repository.
      *
      * @param  \Illuminate\Bus\BatchRepository  $repository
-     * @return Batch
+     * @return \Illuminate\Bus\Batch
      */
     protected function store($repository)
     {

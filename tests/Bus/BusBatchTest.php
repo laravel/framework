@@ -10,7 +10,6 @@ use Illuminate\Bus\DatabaseBatchRepository;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
