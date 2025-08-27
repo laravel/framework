@@ -9800,6 +9800,23 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testEscapedAsteriskKey()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        // Escaped asterisk fails on empty value
+        $v = new Validator($trans, ['foo' => 'valid', '*' => ''], ['\*' => 'required']);
+        $this->assertTrue($v->fails());
+        // Escaped asterisk succeeds on not empty value
+        $v = new Validator($trans, ['foo' => '', '*' => 'zxc'], ['\*' => 'required']);
+        $this->assertFalse($v->fails());
+        // Interpreted asterisk followed by escaped asterisk fails on empty value
+        $v = new Validator($trans, ['foo' => ['bar' => 'valid', '*' => '']], ['*.\*' => 'required']);
+        $this->assertTrue($v->fails());
+        // Interpreted asterisk followed by escaped asterisk succeeds on not empty value
+        $v = new Validator($trans, ['foo' => ['bar' => '', '*' => 'zxc']], ['*.\*' => 'required']);
+        $this->assertFalse($v->fails());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);

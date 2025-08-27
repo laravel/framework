@@ -1220,7 +1220,11 @@ class Validator implements ValidatorContract
     {
         $rules = (new Collection($rules))
             ->mapWithKeys(function ($value, $key) {
-                return [str_replace('\.', '__dot__'.static::$placeholderHash, $key) => $value];
+                return [str_replace(
+                    ['\.', '\*'],
+                    ['__dot__'.static::$placeholderHash, '__asterisk__'.static::$placeholderHash],
+                    $key
+                ) => $value];
             })
             ->toArray();
 
