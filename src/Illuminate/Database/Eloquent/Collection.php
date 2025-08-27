@@ -242,7 +242,6 @@ class Collection extends BaseCollection implements QueueableCollection
                     $path[count($segments) - 1][array_last($segments)] = $value;
                 }
 
-
                 $this->loadMissingRelation($this, $path);
             }
         }
