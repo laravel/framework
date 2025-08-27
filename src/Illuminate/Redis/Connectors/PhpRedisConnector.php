@@ -260,7 +260,7 @@ class PhpRedisConnector implements Connector
             'constant' => Redis::BACKOFF_ALGORITHM_CONSTANT,
         ];
 
-        if (is_int($algorithm) && in_array($algorithm, $algorithms)) {
+        if (is_int($algorithm)) {
             return $algorithm;
         }
 

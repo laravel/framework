@@ -128,6 +128,25 @@ class RedisCacheIntegrationTest extends TestCase
         );
     }
 
+    public function testAnInvalidPhpRedisBackoffAlgorithmIsConvertedToDefault()
+    {
+        $host = Env::get('REDIS_HOST', '127.0.0.1');
+        $port = Env::get('REDIS_PORT', 6379);
+
+        $manager = new RedisManager(new Application(), 'phpredis', [
+            'default' => [
+                'host' => $host,
+                'port' => $port,
+                'backoff_algorithm' => 7,
+            ],
+        ]);
+
+        $this->assertEquals(
+            Redis::BACKOFF_ALGORITHM_DEFAULT,
+            $manager->connection()->client()->getOption(Redis::OPT_BACKOFF_ALGORITHM)
+        );
+    }
+
     public function testItFailsWithAnInvalidPhpRedisAlgorithm()
     {
         $this->expectException(InvalidArgumentException::class);
