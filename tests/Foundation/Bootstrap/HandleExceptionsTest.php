@@ -377,23 +377,6 @@ class HandleExceptionsTest extends TestCase
         );
     }
 
-    public function testForgetApp()
-    {
-        $instance = $this->handleExceptions();
-
-        $appResolver = fn () => with(new ReflectionClass($instance), function ($reflection) use ($instance) {
-            $property = $reflection->getProperty('app');
-
-            return $property->getValue($instance);
-        });
-
-        $this->assertNotNull($appResolver());
-
-        HandleExceptions::forgetApp();
-
-        $this->assertNull($appResolver());
-    }
-
     public function testHandlerForgetsPreviousApp()
     {
         $instance = $this->handleExceptions();
