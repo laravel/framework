@@ -103,6 +103,14 @@ class BusPendingDispatchTest extends TestCase
         );
     }
 
+    public function testDefer()
+    {
+        $this->pendingDispatch->defer();
+        $this->assertTrue(
+            (new ReflectionClass($this->pendingDispatch))->getProperty('defer')->getValue($this->pendingDispatch)
+        );
+    }
+
     public function testGetJob()
     {
         $this->assertSame($this->job, $this->pendingDispatch->getJob());
