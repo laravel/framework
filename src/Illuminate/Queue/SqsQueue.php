@@ -163,7 +163,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data),
             $queue,
             null,
-            function ($payload, $queue) {
+            function ($payload, $queue) use ($job) {
                 return $this->pushRaw($payload, $queue, $this->getQueueableOptions($job));
             }
         );
@@ -200,7 +200,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data, $delay),
             $queue,
             $delay,
-            function ($payload, $queue, $delay) {
+            function ($payload, $queue, $delay) use ($job) {
                 return $this->pushRaw($payload, $queue, ['DelaySeconds' => $this->secondsUntil($delay), ...$this->getQueueableOptions($job)]);
             }
         );
