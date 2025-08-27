@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Illuminate\Container\Attributes\Config;
-use Illuminate\Contracts\Container\Buildable;
+use Illuminate\Contracts\Container\BuildsItself;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
@@ -41,7 +41,7 @@ class BuildableIntegrationTest extends TestCase
     }
 }
 
-class AolInstantMessengerConfig implements Buildable
+class AolInstantMessengerConfig implements BuildsItself
 {
     public function __construct(
         #[Config('aim.api_key')]
@@ -55,7 +55,7 @@ class AolInstantMessengerConfig implements Buildable
     ) {
     }
 
-    public static function build()
+    public static function newInstance()
     {
         Validator::make(config('aim'), [
             'api-key' => 'string',
