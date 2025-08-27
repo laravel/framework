@@ -46,7 +46,7 @@ class SupportStrTest extends TestCase
         foreach ($assertions as $assertion) {
             foreach ($assertion as $case => $expected) {
                 // ensure that the expected prefix is added to the original case
-                $this->assertEquals($expected, Str::a($case));
+                $this->assertEquals($expected.' '.$case, Str::a($case));
             }
         }
     }
