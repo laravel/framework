@@ -9,8 +9,8 @@ use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -1187,7 +1187,7 @@ interface IsSingleton
 {
 }
 
-class RequestDto implements Buildable
+class RequestDto implements SelfBuilding
 {
     public function __construct(
         public readonly int $userId,
@@ -1195,7 +1195,7 @@ class RequestDto implements Buildable
     ) {
     }
 
-    public static function build(RequestDtoDependencyContract $dependency): self
+    public static function newInstance(RequestDtoDependencyContract $dependency): self
     {
         return new self(
             $dependency->userId,
