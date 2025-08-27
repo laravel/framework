@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.26.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.26.3...12.x)
+
+## [v12.26.3](https://github.com/laravel/framework/compare/v12.26.2...v12.26.3) - 2025-08-27
+
+* [12.x] add back return type by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56774
+* fix: base class guard in return types is breaking custom guards by [@phadaphunk](https://github.com/phadaphunk) in https://github.com/laravel/framework/pull/56779
+* [12.x] Standardise polyfill dependencies by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56781
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56790
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56789
+* [12.x] Improve output grammar in `ScheduleRunCommand` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56776
 
 ## [v12.26.2](https://github.com/laravel/framework/compare/v12.26.1...v12.26.2) - 2025-08-26
 
