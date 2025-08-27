@@ -85,6 +85,110 @@ class Str
     }
 
     /**
+     * Determine appropriate indefinite article.
+     *
+     * @param  string  $string  A word or phrase
+     * @return string
+     */
+    public static function a($string)
+    {
+        $a = 'a';
+        $an = 'an';
+
+        // Any number starting with an '8' uses 'an'
+        if (preg_match("/^[8](\d+)?/", $string)) {
+            return $an;
+        }
+
+        // Numbers starting with a '1' are trickier, only use 'an' if there are
+        // 3, 6, 9, … digits after the 11 or 18
+        if (preg_match("/^[1][1](\d+)?/", $string) || (preg_match("/^[1][8](\d+)?/", $string))) {
+            if (strlen(preg_replace(["/\s/", '/,/', "/\.(\d+)?/"], '', $string)) % 3 == 2) {
+                return $an;
+            }
+        }
+
+        // Ordinal forms
+        if (preg_match('/^([bcdgjkpqtuvwyz]-?th)/i', $string)) {
+            return $a;
+        }
+
+        if (preg_match('/^([aefhilmnorsx]-?th)/i', $string)) {
+            return $an;
+        }
+
+        // Special cases
+        if (preg_match('/^(euler|hour(?!i)|heir|honest|hono)/i', $string)) {
+            return $an;
+        }
+
+        if (preg_match('/^[aefhilmnorsx]$/i', $string)) {
+            return $an;
+        }
+
+        if (preg_match('/^[bcdgjkpqtuvwyz]$/i', $string)) {
+            return $a;
+        }
+
+        // Abbreviations
+        if (preg_match('/^((?! FJO | [HLMNS]Y.  | RY[EO] | SQU | ( F[LR]? | [HL] | MN? | N | RH? | S[CHKLMNPTVW]? | X(YL)?) [AEIOU]) [FHLMNRSX][A-Z])/x', $string)) {
+            return $an;
+        }
+
+        if (preg_match('/^[aefhilmnorsx][.-]/i', $string)) {
+            return $an;
+        }
+
+        if (preg_match('/^[a-z][.-]/i', $string)) {
+            return $a;
+        }
+
+        // Consonants
+        if (preg_match('/^[^aeiouy]/i', $string)) {
+            return $a;
+        }
+
+        // Special vowel forms
+        if (preg_match('/^e[uw]/i', $string)) {
+            return $a;
+        }
+
+        if (preg_match("/^onc?e\b/i", $string)) {
+            return $a;
+        }
+
+        if (preg_match('/^uni([^nmd]|mo)/i', $string)) {
+            return $a;
+        }
+
+        if (preg_match('/^ut[th]/i', $string)) {
+            return $an;
+        }
+
+        if (preg_match('/^u[bcfhjkqrst][aeiou]/i', $string)) {
+            return $a;
+        }
+
+        // Special capitals
+        if (preg_match('/^U[NK][AIEO]?/', $string)) {
+            return $a;
+        }
+
+        // Vowels
+        if (preg_match('/^[aeiou]/i', $string)) {
+            return $an;
+        }
+
+        // Before certain consonants, y implies an "i" sound
+        if (preg_match('/^(y(b[lor]|cl[ea]|fere|gg|p[ios]|rou|tt))/i', $string)) {
+            return $an;
+        }
+
+        // Not sure, so guess 'a'
+        return $a;
+    }
+
+    /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
      * @param  string  $subject

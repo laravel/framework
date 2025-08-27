@@ -12,6 +12,46 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
+
+    public function testStringIndefiniteArticles() {
+        $assertions = [];
+
+        // Numbers
+        $assertions[] = [0 => 'a', 1 => 'a', 8 => 'an', 88 => 'an', 800 => 'an', 11 => 'an', 100 => 'a', 18 => 'an', 28 => 'a', 110 => 'a', 111 => 'a', 1111 => 'a', 1100 => 'a', 18000 => 'an', 11000000 => 'an', '-1' => 'a', '-18' => 'a'];
+
+        // Ordinal forms
+        $assertions[] = ['eleventh' => 'an', 'eighth' => 'an', 'ninth' => 'a', 'one hundredth' => 'a', 'eighteenth' => 'an', 'millionth' => 'a', 'elevenhundredth' => 'an', 'hundredth' => 'a'];
+
+        // Special cases
+        $assertions[] = ['euler number' => 'an', 's' => 'an', 'x' => 'an', 'hour' => 'an', 'heir' => 'an', 'honest' => 'an', 'honorary' => 'an', 'b' => 'a', 'z' => 'a'];
+
+        // Abbreviations
+        $assertions[] = ['mr.' => 'a', 'mrs.' => 'a', 'dr.' => 'a', 'st.' => 'a', 'x-ray' => 'an'];
+
+        // Consonants
+        $assertions[] = ['dog' => 'a', 'horse' => 'a', 'zealot' => 'a', 'doctor' => 'a', 'dancer' => 'a', 'car' => 'a', 'laser' => 'a', 'beer' => 'a'];
+
+        // Special vowel forms
+        $assertions[] = ['european' => 'a', 'once' => 'a', 'one' => 'a', 'university' => 'a', 'universal' => 'a', 'utter' => 'an', 'useful' => 'a'];
+
+        // Special capitals
+        $assertions[] = ['Ukranian' => 'an', 'Uzbekistani' => 'an', 'UNO' => 'a', 'American' => 'an'];
+
+        // Vowels
+        $assertions[] = ['apple' => 'an', 'elephant' => 'an', 'ugly duck' => 'an', 'unit' => 'a', 'itchy sweater' => 'an', 'engineer' => 'an', 'orange' => 'an'];
+
+        // Y
+        $assertions[] = ['year' => 'a', 'yellow' => 'a', 'yclad' => 'an'];
+
+        foreach ($assertions as $assertion) {
+            foreach ($assertion as $case => $expected) {
+                // ensure that the expected prefix is added to the original case
+                $this->assertEquals($expected, Str::a($case));
+            }
+        }
+    }
+
+
     public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
