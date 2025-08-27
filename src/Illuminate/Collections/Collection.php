@@ -576,6 +576,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         foreach ($this->items as $key => $item) {
             $resolvedKey = $keyBy($item, $key);
 
+            if ($resolvedKey instanceof \BackedEnum) {
+                $resolvedKey = $resolvedKey->value;
+            }
+
             if (is_object($resolvedKey)) {
                 $resolvedKey = (string) $resolvedKey;
             }
