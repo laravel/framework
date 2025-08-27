@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use Illuminate\Container\Attributes\Config;
-use Illuminate\Contracts\Container\BuildsItself;
+use Illuminate\Contracts\Container\SelfBuilding;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Orchestra\Testbench\TestCase;
@@ -41,7 +41,7 @@ class BuildableIntegrationTest extends TestCase
     }
 }
 
-class AolInstantMessengerConfig implements BuildsItself
+class AolInstantMessengerConfig implements SelfBuilding
 {
     public function __construct(
         #[Config('aim.api_key')]
