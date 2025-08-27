@@ -35,11 +35,7 @@ trait ReplacesAttributes
      */
     protected function replaceDeclinedIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $this->replaceAcceptedIf($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -213,11 +209,7 @@ trait ReplacesAttributes
      */
     protected function replaceMissingIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $this->replaceAcceptedIf($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -400,10 +392,7 @@ trait ReplacesAttributes
      */
     protected function replacePresentIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $this->replaceAcceptedIf($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -604,11 +593,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $this->replaceAcceptedIf($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -674,11 +659,7 @@ trait ReplacesAttributes
      */
     protected function replaceProhibitedIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], Arr::get($this->data, $parameters[0]));
-
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other', ':value'], $parameters, $message);
+        return $this->replaceAcceptedIf($message, $attribute, $rule, $parameters);
     }
 
     /**
