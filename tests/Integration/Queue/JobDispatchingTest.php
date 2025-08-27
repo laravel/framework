@@ -142,12 +142,14 @@ class JobDispatchingTest extends QueueTestCase
 
     public function testDispatchDeferDelaysDispatchingUntilDeferredCallbacksAreRun()
     {
-        $this->assertFalse(Job::$ran);
-
         Job::dispatchDefer('test');
 
         $this->assertFalse(Job::$ran);
-        $this->app[DeferredCallbackCollection::class]->invoke();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->assertFalse(Job::$ran);
+
+        $this->app->get(DeferredCallbackCollection::class)->invoke();
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
         $this->assertTrue(Job::$ran);
     }
 
