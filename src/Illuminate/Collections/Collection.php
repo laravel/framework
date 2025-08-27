@@ -12,8 +12,6 @@ use InvalidArgumentException;
 use stdClass;
 use Traversable;
 
-use function Illuminate\Support\enum_value;
-
 /**
  * @template TKey of array-key
  *
