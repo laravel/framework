@@ -136,13 +136,13 @@ class RedisCacheIntegrationTest extends TestCase
         $host = Env::get('REDIS_HOST', '127.0.0.1');
         $port = Env::get('REDIS_PORT', 6379);
 
-        new RedisManager($this->app ?? new Application(), 'phpredis', [
+        (new RedisManager($this->app ?? new Application(), 'phpredis', [
             'default' => [
                 'host' => $host,
                 'port' => $port,
                 'backoff_algorithm' => 'foo',
             ],
-        ])->connection();
+        ]))->connection();
     }
 
     public static function phpRedisBackoffAlgorithmsProvider()
