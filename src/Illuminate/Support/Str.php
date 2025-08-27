@@ -983,11 +983,12 @@ class Str
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $prepend
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $prepend = false)
     {
-        return Pluralizer::plural($value, $count);
+        return ($prepend ? number_format($count) . ' ' : '') . Pluralizer::plural($value, $count);
     }
 
     /**
