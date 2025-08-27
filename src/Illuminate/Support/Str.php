@@ -988,7 +988,7 @@ class Str
      */
     public static function plural($value, $count = 2, $prepend = false)
     {
-        return ($prepend ? number_format($count) . ' ' : '') . Pluralizer::plural($value, $count);
+        return ($prepend ? number_format($count).' ' : '').Pluralizer::plural($value, $count);
     }
 
     /**
