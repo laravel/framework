@@ -144,12 +144,14 @@ class JobDispatchingTest extends QueueTestCase
     {
         Job::dispatchDefer('test');
 
+        $this->assertSame(1, $this->app[DeferredCallbackCollection::class]->count());
         $this->assertFalse(Job::$ran);
+
         $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
         $this->assertFalse(Job::$ran);
 
-        $this->app->get(DeferredCallbackCollection::class)->invoke();
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->app[DeferredCallbackCollection::class]->invoke();
+        $this->runQueueWorkerCommand(['--once' => true]);
         $this->assertTrue(Job::$ran);
     }
 
