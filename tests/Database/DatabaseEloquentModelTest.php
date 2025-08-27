@@ -3523,6 +3523,201 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testWhenLoadedWithLoadedRelation()
+    {
+        $model = new EloquentModelStub;
+        $loadedModel = new EloquentModelSaveStub;
+        $model->setRelation('belongsToStub', $loadedModel);
+
+        $callbackExecuted = false;
+        $defaultExecuted = false;
+
+        $returnValue = $model->whenLoaded(
+            'belongsToStub',
+            function ($relation) use (&$callbackExecuted, $loadedModel) {
+                $callbackExecuted = true;
+                $this->assertSame($loadedModel, $relation);
+
+                return 'callback result';
+            },
+            function ($relation) use (&$defaultExecuted) {
+                $defaultExecuted = true;
+
+                return 'default result';
+            }
+        );
+
+        $this->assertTrue($callbackExecuted);
+        $this->assertFalse($defaultExecuted);
+        $this->assertEquals('callback result', $returnValue);
+    }
+
+    public function testWhenLoadedWithUnloadedRelation()
+    {
+        $model = new EloquentModelStub;
+        $callbackExecuted = false;
+        $defaultExecuted = false;
+
+        $returnValue = $model->whenLoaded(
+            'belongsToStub',
+            function ($relation) use (&$callbackExecuted) {
+                $callbackExecuted = true;
+
+                return 'callback result';
+            },
+            function ($relation) use (&$defaultExecuted) {
+                $defaultExecuted = true;
+                $this->assertInstanceOf(BelongsTo::class, $relation);
+
+                return 'default result';
+            }
+        );
+
+        $this->assertFalse($callbackExecuted);
+        $this->assertTrue($defaultExecuted);
+        $this->assertEquals('default result', $returnValue);
+    }
+
+    public function testWhenLoadedWithUnloadedRelationAndNoDefault()
+    {
+        $model = new EloquentModelStub;
+
+        $callbackExecuted = false;
+        $returnValue = $model->whenLoaded('belongsToStub', function ($relation) use (&$callbackExecuted) {
+            $callbackExecuted = true;
+
+            return 'callback result';
+        });
+
+        $this->assertFalse($callbackExecuted);
+        $this->assertNull($returnValue);
+    }
+
+    public function testWhenLoadedAndWhenNotLoadedThrowExceptionWhenNoCallbackProvided()
+    {
+        $model = new EloquentModelStub;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('A callable must be provided.');
+
+        $model->whenNotLoaded('belongsToStub');
+    }
+
+    public function testWhenLoadedThrowsExceptionForNonexistentRelation()
+    {
+        $model = new EloquentModelStub;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Relation [nonexistentRelation] is not defined on model [Illuminate\Tests\Database\EloquentModelStub].');
+
+        $model->whenLoaded('nonexistentRelation', function () {
+            return 'callback result';
+        });
+    }
+
+    public function testWhenLoadedThrowsExceptionWhenRelationMethodDoesNotReturnRelation()
+    {
+        $model = new EloquentModelStub;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship instance.');
+
+        $model->whenLoaded('incorrectRelationStub', null, function () {
+            return 'default result';
+        });
+    }
+
+    public function testWhenNotLoadedWithUnloadedRelation()
+    {
+        $model = new EloquentModelStub;
+        $callbackExecuted = false;
+        $defaultExecuted = false;
+
+        $returnValue = $model->whenNotLoaded(
+            'belongsToStub',
+            function ($relation) use (&$callbackExecuted) {
+                $callbackExecuted = true;
+                $this->assertInstanceOf(BelongsTo::class, $relation);
+
+                return 'callback result';
+            },
+            function ($relation) use (&$defaultExecuted) {
+                $defaultExecuted = true;
+
+                return 'default result';
+            }
+        );
+
+        $this->assertTrue($callbackExecuted);
+        $this->assertFalse($defaultExecuted);
+        $this->assertEquals('callback result', $returnValue);
+    }
+
+    public function testWhenNotLoadedWithLoadedRelation()
+    {
+        $model = new EloquentModelStub;
+        $loadedModel = new EloquentModelSaveStub;
+        $model->setRelation('belongsToStub', $loadedModel);
+
+        $callbackExecuted = false;
+        $defaultExecuted = false;
+
+        $returnValue = $model->whenNotLoaded(
+            'belongsToStub',
+            function ($relation) use (&$callbackExecuted) {
+                $callbackExecuted = true;
+
+                return 'callback result';
+            },
+            function ($relation) use (&$defaultExecuted, $loadedModel) {
+                $defaultExecuted = true;
+                $this->assertSame($loadedModel, $relation);
+
+                return 'default result';
+            }
+        );
+
+        $this->assertFalse($callbackExecuted);
+        $this->assertTrue($defaultExecuted);
+        $this->assertEquals('default result', $returnValue);
+    }
+
+    public function testWhenNotLoadedThrowsExceptionWhenNoCallbackProvided()
+    {
+        $model = new EloquentModelStub;
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('A callable must be provided.');
+
+        $model->whenNotLoaded('belongsToStub');
+    }
+
+    public function testWhenLoadedWithSpecialRelationTypes()
+    {
+        $model = new EloquentModelStub;
+
+        $relatedModels = new Collection([new EloquentModelSaveStub, new EloquentModelSaveStub]);
+        $model->setRelation('morphToStub', $relatedModels);
+
+        $returnValue = $model->whenLoaded('morphToStub', function ($relation) use ($relatedModels) {
+            $this->assertSame($relatedModels, $relation);
+
+            return 'collection result';
+        });
+
+        $this->assertEquals('collection result', $returnValue);
+
+        $model->setRelation('belongsToStub', null);
+
+        $returnValue = $model->whenLoaded('belongsToStub', function ($relation) {
+            $this->assertNull($relation);
+
+            return 'null result';
+        });
+
+        $this->assertEquals('null result', $returnValue);
+    }
 }
 
 class CustomBuilder extends Builder

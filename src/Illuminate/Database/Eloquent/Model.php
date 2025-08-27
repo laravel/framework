@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
@@ -1006,6 +1007,64 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function loadMorphAvg($relation, $relations, $column)
     {
         return $this->loadMorphAggregate($relation, $relations, $column, 'avg');
+    }
+
+    /**
+     * Execute the given callback if the relationship has been loaded.
+     *
+     * @template TReturn
+     *
+     * @param  (callable(mixed): TReturn)|null  $callback
+     * @param  (callable(Relation<*, *, *>): TReturn)|null  $default
+     * @return TReturn
+     *
+     * @throws \LogicException
+     */
+    public function whenLoaded(string $key, ?callable $callback = null, ?callable $default = null): mixed
+    {
+        if ($callback === null && $default === null) {
+            throw new LogicException('A callable must be provided.');
+        }
+
+        if (! $this->isRelation($key)) {
+            throw new LogicException(sprintf(
+                'Relation [%s] is not defined on model [%s].', $key, static::class
+            ));
+        }
+
+        if ($callback !== null && $this->relationLoaded($key)) {
+            return $callback($this->getRelation($key));
+        }
+
+        if ($default !== null) {
+            $relation = $this->{$key}();
+
+            if (! $relation instanceof Relation) {
+                throw new LogicException(sprintf(
+                    '%s::%s must return a relationship instance.', static::class, $key,
+                ));
+            }
+
+            return $default($relation);
+        }
+
+        return null;
+    }
+
+    /**
+     * Execute the given callback if the relationship has not been loaded.
+     *
+     * @template TReturn
+     *
+     * @param  (callable(Relation<*, *, *>): TReturn)|null  $callback
+     * @param  (callable(mixed): TReturn)|null  $default
+     * @return TReturn
+     *
+     * @throws \LogicException
+     */
+    public function whenNotLoaded(string $key, ?callable $callback = null, ?callable $default = null): mixed
+    {
+        return $this->whenLoaded($key, $default, $callback);
     }
 
     /**
