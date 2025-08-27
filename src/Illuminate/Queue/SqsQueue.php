@@ -201,7 +201,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $queue,
             $delay,
             function ($payload, $queue, $delay) use ($job) {
-                return $this->pushRaw($payload, $queue, ['DelaySeconds' => $this->secondsUntil($delay), ...$this->getQueueableOptions($job)]);
+                return $this->pushRaw($payload, $queue, ['DelaySeconds' => $this->secondsUntil($delay), ...$this->getQueueableOptions($job, $queue)]);
             }
         );
     }
@@ -308,20 +308,20 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      * Get queueable options from the job.
      *
      * @param  mixed  $job
+     * @param  string|null  $queue
      * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
      */
-    protected function getQueueableOptions($job): array
+    protected function getQueueableOptions($job, $queue): array
     {
-        if (! is_object($job)) {
+        if (! (is_object($job) && str_ends_with($queue, '.fifo'))) {
             return [];
         }
 
         $messageGroupId = transform($job->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
-        $messageDeduplicationId = null;
 
-        if (! is_null($messageGroupId) && $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
-            $messageDeduplicationId = transform($job->uniqueId(), fn ($deduplication) => strval($deduplication));
-        }
+        $messageDeduplicationId = $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')
+            ? transform($job->uniqueId(), fn ($deduplication) => strval($deduplication))
+            : Str::orderedUuid()->toString();
 
         return array_filter([
             'MessageGroupId' => $messageGroupId,
