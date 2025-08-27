@@ -4,12 +4,12 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Container\Attributes\Bind;
-use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Buildable;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
