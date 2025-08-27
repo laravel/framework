@@ -638,9 +638,7 @@ trait ReplacesAttributes
      */
     public function replaceRequiredIfDeclined($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other'], $parameters, $message);
+        return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -694,9 +692,7 @@ trait ReplacesAttributes
      */
     protected function replaceProhibitedIfAccepted($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other'], $parameters, $message);
+        return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -710,9 +706,7 @@ trait ReplacesAttributes
      */
     public function replaceProhibitedIfDeclined($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
-
-        return str_replace([':other'], $parameters, $message);
+        return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
     }
 
     /**
