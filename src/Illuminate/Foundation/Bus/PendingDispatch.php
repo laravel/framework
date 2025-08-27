@@ -32,7 +32,7 @@ class PendingDispatch
      *
      * @var bool
      */
-    protected $defer = true;
+    protected $defer = false;
 
     /**
      * Create a new pending job dispatch.
