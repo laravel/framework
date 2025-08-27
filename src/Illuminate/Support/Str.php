@@ -1458,8 +1458,9 @@ class Str
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
         $words = mb_split('\s+', $value);
+        $wordCount = count($words);
 
-        for ($i = 0; $i < count($words); $i++) {
+        for ($i = 0; $i < $wordCount; $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
 
             if (str_contains($lowercaseWord, '-')) {
