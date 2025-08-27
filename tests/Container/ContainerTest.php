@@ -906,6 +906,7 @@ class ContainerTest extends TestCase
         $_SERVER['__withFactory.email'] = 'taylor@laravel.com';
         $_SERVER['__withFactory.userId'] = 999;
 
+        $container->bind(RequestDtoDependencyContract::class, RequestDtoDependency::class);
         $r = $container->make(RequestDto::class);
 
         $this->assertInstanceOf(RequestDto::class, $r);
@@ -1194,7 +1195,7 @@ class RequestDto implements Buildable
     ) {
     }
 
-    public static function build(RequestDtoDependency $dependency): self
+    public static function build(RequestDtoDependencyContract $dependency): self
     {
         return new self(
             $dependency->userId,
@@ -1203,7 +1204,11 @@ class RequestDto implements Buildable
     }
 }
 
-class RequestDtoDependency
+interface RequestDtoDependencyContract
+{
+}
+
+class RequestDtoDependency implements RequestDtoDependencyContract
 {
     public int $userId;
 
