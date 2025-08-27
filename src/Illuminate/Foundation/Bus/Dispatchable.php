@@ -88,6 +88,14 @@ trait Dispatchable
     }
 
     /**
+     * Defer dispatching a command to its appropriate handler.
+     */
+    public static function dispatchDefer(...$arguments)
+    {
+        return self::dispatch(...$arguments)->defer();
+    }
+
+    /**
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain

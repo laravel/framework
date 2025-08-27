@@ -28,7 +28,7 @@ class PendingDispatch
     protected $afterResponse = false;
 
     /**
-     * Indicates if the job should be dispatched to the queue after the current request.
+     * Indicates if the job dispatch should be deferred.
      *
      * @var bool
      */
@@ -171,7 +171,7 @@ class PendingDispatch
     }
 
     /**
-     * Indicate that the job should be dispatched to the queue after the current request.
+     * Indicate that the job dispatch should be deferred.
      *
      * @return $this
      */
