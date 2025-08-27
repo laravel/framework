@@ -292,18 +292,6 @@ class HandleExceptions
     }
 
     /**
-     * Clear the local application instance from memory.
-     *
-     * @return void
-     *
-     * @deprecated This method will be removed in a future Laravel version.
-     */
-    public static function forgetApp()
-    {
-        static::$app = null;
-    }
-
-    /**
      * Flush the bootstrapper's global state.
      *
      * @param  \PHPUnit\Framework\TestCase|null  $testCase
