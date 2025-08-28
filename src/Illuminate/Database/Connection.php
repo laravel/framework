@@ -369,7 +369,7 @@ class Connection implements ConnectionInterface
             throw new MultipleColumnsSelectedException;
         }
 
-        return array_last($record);
+        return array_first($record);
     }
 
     /**
