@@ -317,11 +317,15 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             return [];
         }
 
+        $transformToString = fn ($value) => strval($value);
+
         $messageGroupId = transform($job->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
 
-        $messageDeduplicationId = $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')
-            ? transform($job->uniqueId(), fn ($deduplication) => strval($deduplication))
-            : Str::orderedUuid()->toString();
+        $messageDeduplicationId = match (true) {
+            method_exists($job, 'duplicateId') => transform($job->duplicateId(), $transformToString),
+            $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId') => transform($job->uniqueId(), $transformToString),
+            default => Str::orderedUuid()->toString(),
+        };
 
         return array_filter([
             'MessageGroupId' => $messageGroupId,
