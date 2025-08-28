@@ -5,7 +5,6 @@ namespace Illuminate\Queue;
 use Aws\Sqs\SqsClient;
 use Illuminate\Contracts\Queue\ClearableQueue;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Support\Str;
 
@@ -323,7 +322,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $messageDeduplicationId = match (true) {
             method_exists($job, 'duplicateId') => transform($job->duplicateId(), $transformToString),
-            $job instanceof ShouldBeUnique && method_exists($job, 'uniqueId') => transform($job->uniqueId(), $transformToString),
             default => Str::orderedUuid()->toString(),
         };
 
