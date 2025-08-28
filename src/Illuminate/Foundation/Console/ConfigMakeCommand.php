@@ -43,7 +43,7 @@ class ConfigMakeCommand extends GeneratorCommand
     protected $aliases = ['config:make'];
 
     /**
-     * Get the destination view path.
+     * Get the destination file path.
      *
      * @param  string  $name
      */
