@@ -57,8 +57,10 @@ class InvokeSerializedClosureCommandTest extends TestCase
         $closure = fn () => 'From Environment';
         $serialized = serialize(new SerializableClosure($closure));
 
+        $encoded = base64_encode($serialized);
+
         // Set the environment variable
-        $_SERVER['LARAVEL_INVOKABLE_CLOSURE'] = $serialized;
+        $_SERVER['LARAVEL_INVOKABLE_CLOSURE'] = $encoded;
 
         // Create a new output buffer
         $output = new BufferedOutput;

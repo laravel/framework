@@ -59,6 +59,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
+use Stringable as NativeStringable;
 
 include_once 'Enums.php';
 
@@ -3350,6 +3351,37 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['bar' => 'foo'], $model->getAttribute('singleElementInArrayAttribute')->toArray());
     }
 
+    public function testUsingStringableObjectCastUsesStringRepresentation()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $this->assertEquals('int', $model->getCasts()['castStringableObject']);
+    }
+
+    public function testMergeingStringableObjectCastUSesStringRepresentation()
+    {
+        $stringable = new StringableCastBuilder();
+        $stringable->cast = 'test';
+
+        $model = (new EloquentModelCastingStub)->mergeCasts([
+            'something' => $stringable,
+        ]);
+
+        $this->assertEquals('test', $model->getCasts()['something']);
+    }
+
+    public function testUsingPlainObjectAsCastThrowsException()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cast object for the something attribute must implement Stringable.');
+
+        $model->mergeCasts([
+            'something' => (object) [],
+        ]);
+    }
+
     public function testUnsavedModel()
     {
         $user = new UnsavedModel;
@@ -3918,6 +3950,7 @@ class EloquentModelCastingStub extends Model
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
             'asToObjectCast' => TestCast::class,
+            'castStringableObject' => new StringableCastBuilder(),
         ];
     }
 
@@ -4383,4 +4416,14 @@ class EloquentModelBootingCallbackTestStub extends Model
 class EloquentChildModelBootingCallbackTestStub extends EloquentModelBootingCallbackTestStub
 {
     public static bool $bootHasFinished = false;
+}
+
+class StringableCastBuilder implements NativeStringable
+{
+    public $cast = 'int';
+
+    public function __toString()
+    {
+        return $this->cast;
+    }
 }

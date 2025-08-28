@@ -1,6 +1,56 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.25.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.26.3...12.x)
+
+## [v12.26.3](https://github.com/laravel/framework/compare/v12.26.2...v12.26.3) - 2025-08-27
+
+* [12.x] add back return type by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56774
+* fix: base class guard in return types is breaking custom guards by [@phadaphunk](https://github.com/phadaphunk) in https://github.com/laravel/framework/pull/56779
+* [12.x] Standardise polyfill dependencies by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56781
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56790
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56789
+* [12.x] Improve output grammar in `ScheduleRunCommand` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56776
+
+## [v12.26.2](https://github.com/laravel/framework/compare/v12.26.1...v12.26.2) - 2025-08-26
+
+* [12.x] fix: csrf_token can return null by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56768
+* [12.x] Fix `date_format` validation on DST Timezone by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56767
+* [12.x] Fix event helper by [@jasonvarga](https://github.com/jasonvarga) in https://github.com/laravel/framework/pull/56773
+
+## [v12.26.1](https://github.com/laravel/framework/compare/v12.26.0...v12.26.1) - 2025-08-26
+
+* [12.x] fix: add polyfill requirement to illuminate packages by [@erikgaal](https://github.com/erikgaal) in https://github.com/laravel/framework/pull/56765
+* [12.x] revert changes to `old()` helper by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56769
+
+## [v12.26.0](https://github.com/laravel/framework/compare/v12.25.0...v12.26.0) - 2025-08-26
+
+* [12.x] feat: add native return types to helper functions by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56684
+* [12.x] Allow passing enum to `Database` attribute by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56688
+* [12.x] Clean up redundant type hints in docblocks by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56690
+* Add ability to specify a transaction mode for SQLite connection by [@panda-madness](https://github.com/panda-madness) in https://github.com/laravel/framework/pull/56681
+* [12.x] Fix `spliceIntoPosition` docblock to allow `string|int` values by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56698
+* [12.x] Use array_first and array_last polyfills by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/56703
+* [12.x] Fix path to Str in exception markdown by [@apreiml](https://github.com/apreiml) in https://github.com/laravel/framework/pull/56705
+* [12.x] Add `withHeartbeat` method to `LazyCollection` by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/56477
+* [12.x] Add toPrettyJson method by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/56697
+* [12.x] Use `array_first` and `array_last` by [@KIKOmanasijev](https://github.com/KIKOmanasijev) in https://github.com/laravel/framework/pull/56706
+* [12.x] Do not dispatch `MessageLogged` twice by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56713
+* [12.x] Order classes alphabetically by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56743
+* [12.x] Normalize file path separators for commands on Windows by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56734
+* [12.x] Improve `queue:prune-failed` tests coverage by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56732
+* [12.x] Align trait usage for consistency by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56727
+* [12.x] Fix composer suggests for illuminate/container by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56722
+* Add nullableTimestampsTz method to Blueprint by [@mohamedhabibwork](https://github.com/mohamedhabibwork) in https://github.com/laravel/framework/pull/56720
+* Add possibility to override symbol when using currency format by [@PhilippeThouvenot](https://github.com/PhilippeThouvenot) in https://github.com/laravel/framework/pull/56749
+* [12.x] Revert #56608 by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56752
+* Revert "Add possibility to override symbol when using currency format" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/56753
+* [12.x] Support `null` parameter in `BusFake::chain()` method by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/56750
+* [12.x] Remove unnecessary return in ddBody for consistency by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56759
+* [12.x] Make interface accept UnitEnum by [@parijke](https://github.com/parijke) in https://github.com/laravel/framework/pull/56758
+* [12.x] Fix concurrency closure invocation: use base64 encoding by [@sashko-guz](https://github.com/sashko-guz) in https://github.com/laravel/framework/pull/56757
+* [12.x] `ArrayStore::all()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56751
+* [12.x] Fix: Add `$forceWrap` property to JsonResource for consistent API response #56724 by [@achrafAa](https://github.com/achrafAa) in https://github.com/laravel/framework/pull/56736
+* [12.x] Ensures casts objects can be transformed into strings by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/56687
 
 ## [v12.25.0](https://github.com/laravel/framework/compare/v12.24.0...v12.25.0) - 2025-08-18
 
