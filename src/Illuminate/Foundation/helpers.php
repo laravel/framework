@@ -893,7 +893,7 @@ if (! function_exists('secure_url')) {
      */
     function secure_url($path, $parameters = []): string
     {
-        return url($path, $parameters, true);
+        return url()->secure($path, $parameters);
     }
 }
 
