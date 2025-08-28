@@ -80,6 +80,8 @@ class RequestGuard implements Guard
     public function setRequest(Request $request)
     {
         $this->request = $request;
+        // Reset the cached user since it might depend on the current request.
+        $this->user = null;
 
         return $this;
     }
