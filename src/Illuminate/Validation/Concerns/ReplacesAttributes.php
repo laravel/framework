@@ -678,15 +678,7 @@ trait ReplacesAttributes
      */
     protected function replaceProhibitedUnless($message, $attribute, $rule, $parameters)
     {
-        $other = $this->getDisplayableAttribute($parameters[0]);
-
-        $values = [];
-
-        foreach (array_slice($parameters, 1) as $value) {
-            $values[] = $this->getDisplayableValue($parameters[0], $value);
-        }
-
-        return str_replace([':other', ':values'], [$other, implode(', ', $values)], $message);
+        return $this->replaceRequiredUnless($message, $attribute, $rule, $parameters);
     }
 
     /**
