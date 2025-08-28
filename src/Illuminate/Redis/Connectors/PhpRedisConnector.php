@@ -248,26 +248,23 @@ class PhpRedisConnector implements Connector
      *
      * @param  mixed  $algorithm
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseBackoffAlgorithm(mixed $algorithm)
     {
-        $algorithms = [
+        if (is_int($algorithm)) {
+            return $algorithm;
+        }
+
+        return match ($algorithm) {
             'default' => Redis::BACKOFF_ALGORITHM_DEFAULT,
             'decorrelated_jitter' => Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER,
             'equal_jitter' => Redis::BACKOFF_ALGORITHM_EQUAL_JITTER,
             'exponential' => Redis::BACKOFF_ALGORITHM_EXPONENTIAL,
             'uniform' => Redis::BACKOFF_ALGORITHM_UNIFORM,
             'constant' => Redis::BACKOFF_ALGORITHM_CONSTANT,
-        ];
-
-        if (is_int($algorithm)) {
-            return $algorithm;
-        }
-
-        if (array_key_exists($algorithm, $algorithms)) {
-            return $algorithms[$algorithm];
-        }
-
-        throw new InvalidArgumentException("Algorithm [{$algorithm}] is not a valid PhpRedis backoff algorithm.");
+            default => throw new InvalidArgumentException("Algorithm [{$algorithm}] is not a valid PhpRedis backoff algorithm.")
+        };
     }
 }
