@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Illuminate\Tests\Foundation;
 
 use Orchestra\Testbench\TestCase;
