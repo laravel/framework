@@ -64,6 +64,19 @@ class PendingDispatch
     }
 
     /**
+     * Set the desired message group id for the job.
+     *
+     * @param  string  $messageGroup
+     * @return $this
+     */
+    public function onMessageGroup($messageGroup)
+    {
+        $this->job->onMessageGroup($queue);
+
+        return $this;
+    }
+
+    /**
      * Set the desired connection for the chain.
      *
      * @param  \BackedEnum|string|null  $connection
