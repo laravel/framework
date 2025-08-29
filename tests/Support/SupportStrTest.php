@@ -308,9 +308,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
             'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            Str::excerpt(
+                'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?',
+                'very',
                 ['omission' => '[...]'],
-            ));
+            )
+        );
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
@@ -516,9 +519,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
-        $this->assertSame('method-name-in-camel-case', Str::slug('methodNameInCamelCase'));
-        $this->assertSame('class-name-is-long', Str::slug('ClassNameIsLong'));
         $this->assertSame('there-is-faq-module-here', Str::slug('There is FAQ module here'));
+        $this->assertSame('method-name-in-camel-case', Str::slug('methodNameInCamelCase'));
+        $this->assertSame('class-name-in-pascal-case', Str::slug('ClassNameInPascalCase'));
     }
 
     public function testStrStart()
@@ -1876,8 +1879,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
 
         // Test with Countable
-        $countable = new class implements \Countable
-        {
+        $countable = new class () implements \Countable {
             public function count(): int
             {
                 return 3;
