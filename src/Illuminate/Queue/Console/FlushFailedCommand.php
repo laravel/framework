@@ -13,7 +13,7 @@ class FlushFailedCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:flush {--hours= : The number of hours to retain failed job data}';
+    protected $signature = 'queue:flush {--hours= : The number of hours to retain failed jobs data}';
 
     /**
      * The console command description.
