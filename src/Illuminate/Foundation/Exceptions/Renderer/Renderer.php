@@ -98,6 +98,7 @@ class Renderer
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
+            'uriEncodedExceptionMarkdown' => urlencode($exceptionAsMarkdown),
         ])->render();
     }
 

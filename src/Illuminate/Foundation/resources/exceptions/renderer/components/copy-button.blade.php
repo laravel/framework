@@ -2,7 +2,7 @@
     let exceptionAsMarkdown = {{ Illuminate\Support\Js::from($markdown) }}
 </script>
 <div
-    class="relative inline-block text-sm rounded-full bg-white px-3 py-2 dark:bg-gray-800 sm:col-span-1 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out"
+    class="relative inline-block text-sm rounded-l-full bg-white px-3 py-2 dark:bg-gray-800 sm:col-span-1 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200 ease-in-out"
     x-data="{
         copied: false,
         copy() {
