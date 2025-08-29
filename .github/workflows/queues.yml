@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: "false"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -54,6 +56,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: "false"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -102,6 +106,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: "false"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -140,6 +146,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: "false"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -192,6 +200,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: "false"
 
       - name: Download & Extract beanstalkd
         run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
