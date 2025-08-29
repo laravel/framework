@@ -1,6 +1,20 @@
 @props(['request'])
 
-<div class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2">
+<div
+    x-data="{
+        copied: false,
+        async copyToClipboard() {
+            try {
+                await navigator.clipboard.writeText('{{ $request->fullUrl() }}');
+                this.copied = true;
+                setTimeout(() => { this.copied = false }, 3000);
+            } catch (err) {
+                console.error('Failed to copy the requestURL: ', err);
+            }
+        }
+    }"
+    class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2"
+>
     <div class="flex items-center gap-3">
         <div class="bg-blue-600 rounded h-[25px] px-2">
             <span class="text-[13px] font-mono">{{ $request->method() }}</span>
@@ -14,9 +28,15 @@
             {{ $request->fullUrl() }}
         </div>
     </div>
-    <div class="bg-white/[0.05] rounded-md w-6 h-6 flex items-center justify-center">
-        <svg class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button
+        @click="copyToClipboard()"
+        class="bg-white/[0.05] rounded-md w-6 h-6 flex items-center justify-center cursor-pointer transition-colors hover:bg-white/10"
+    >
+        <svg x-show="!copied" class="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
         </svg>
-    </div>
+        <svg x-show="copied" class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </button>
 </div>
