@@ -11,8 +11,6 @@ trait InteractsWithComposerPackages
     /**
      * Installs the given Composer Packages into the application.
      *
-     * @param  string  $composer
-     * @param  array  $packages
      * @return bool
      */
     protected function requireComposerPackages(string $composer, array $packages)

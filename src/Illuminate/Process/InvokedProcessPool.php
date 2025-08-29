@@ -16,8 +16,6 @@ class InvokedProcessPool implements Countable
 
     /**
      * Create a new invoked process pool.
-     *
-     * @param  array  $invokedProcesses
      */
     public function __construct(array $invokedProcesses)
     {
@@ -27,7 +25,6 @@ class InvokedProcessPool implements Countable
     /**
      * Send a signal to each running process in the pool, returning the processes that were signalled.
      *
-     * @param  int  $signal
      * @return \Illuminate\Support\Collection
      */
     public function signal(int $signal)
@@ -38,8 +35,6 @@ class InvokedProcessPool implements Countable
     /**
      * Stop all processes that are still running.
      *
-     * @param  float  $timeout
-     * @param  int|null  $signal
      * @return \Illuminate\Support\Collection
      */
     public function stop(float $timeout = 10, ?int $signal = null)
@@ -69,8 +64,6 @@ class InvokedProcessPool implements Countable
 
     /**
      * Get the total number of processes.
-     *
-     * @return int
      */
     public function count(): int
     {

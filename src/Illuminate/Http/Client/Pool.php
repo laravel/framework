@@ -32,8 +32,6 @@ class Pool
 
     /**
      * Create a new requests pool.
-     *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
      */
     public function __construct(?Factory $factory = null)
     {
@@ -44,7 +42,6 @@ class Pool
     /**
      * Add a request to the pool with a key.
      *
-     * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      */
     public function as(string $key)

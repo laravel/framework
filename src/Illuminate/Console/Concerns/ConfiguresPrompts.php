@@ -22,7 +22,6 @@ trait ConfiguresPrompts
     /**
      * Configure the prompt fallbacks.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return void
      */
     protected function configurePrompts(InputInterface $input)
@@ -118,7 +117,6 @@ trait ConfiguresPrompts
      * @param  \Closure  $prompt
      * @param  bool|string  $required
      * @param  \Closure|null  $validate
-     * @return mixed
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {
@@ -154,8 +152,6 @@ trait ConfiguresPrompts
     /**
      * Validate the given prompt value using the validator.
      *
-     * @param  mixed  $value
-     * @param  mixed  $rules
      * @return ?string
      */
     protected function validatePrompt($value, $rules)
@@ -184,11 +180,6 @@ trait ConfiguresPrompts
     /**
      * Get the validator instance that should be used to validate prompts.
      *
-     * @param  mixed  $field
-     * @param  mixed  $value
-     * @param  mixed  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      * @return \Illuminate\Validation\Validator
      */
     protected function getPromptValidatorInstance($field, $value, $rules, array $messages = [], array $attributes = [])

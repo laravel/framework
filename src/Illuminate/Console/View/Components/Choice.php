@@ -11,10 +11,8 @@ class Choice extends Component
      *
      * @param  string  $question
      * @param  array<array-key, string>  $choices
-     * @param  mixed  $default
      * @param  int  $attempts
      * @param  bool  $multiple
-     * @return mixed
      */
     public function render($question, $choices, $default = null, $attempts = null, $multiple = false)
     {
@@ -32,7 +30,6 @@ class Choice extends Component
      *
      * @param  string  $question
      * @param  array  $choices
-     * @param  mixed  $default
      * @return \Symfony\Component\Console\Question\ChoiceQuestion
      */
     protected function getChoiceQuestion($question, $choices, $default)

@@ -16,7 +16,6 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     /**
      * Create a new foreign ID column definition.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  array  $attributes
      */
     public function __construct(Blueprint $blueprint, $attributes = [])

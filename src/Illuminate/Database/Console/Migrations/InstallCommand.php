@@ -33,8 +33,6 @@ class InstallCommand extends Command
 
     /**
      * Create a new migration install command instance.
-     *
-     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      */
     public function __construct(MigrationRepositoryInterface $repository)
     {

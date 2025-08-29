@@ -38,9 +38,6 @@ class CallQueuedHandler
 
     /**
      * Create a new handler instance.
-     *
-     * @param  \Illuminate\Contracts\Bus\Dispatcher  $dispatcher
-     * @param  \Illuminate\Contracts\Container\Container  $container
      */
     public function __construct(Dispatcher $dispatcher, Container $container)
     {
@@ -51,8 +48,6 @@ class CallQueuedHandler
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  array  $data
      * @return void
      */
     public function call(Job $job, array $data)
@@ -84,8 +79,6 @@ class CallQueuedHandler
     /**
      * Get the command from the given payload.
      *
-     * @param  array  $data
-     * @return mixed
      *
      * @throws \RuntimeException
      */
@@ -104,10 +97,6 @@ class CallQueuedHandler
 
     /**
      * Dispatch the given job / command through its specified middleware.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  mixed  $command
-     * @return mixed
      */
     protected function dispatchThroughMiddleware(Job $job, $command)
     {
@@ -141,8 +130,6 @@ class CallQueuedHandler
      * Resolve the handler for the given command.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  mixed  $command
-     * @return mixed
      */
     protected function resolveHandler($job, $command)
     {
@@ -157,10 +144,6 @@ class CallQueuedHandler
 
     /**
      * Set the job instance of the given class if necessary.
-     *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  mixed  $instance
-     * @return mixed
      */
     protected function setJobInstanceIfNecessary(Job $job, $instance)
     {
@@ -174,7 +157,6 @@ class CallQueuedHandler
     /**
      * Ensure the next job in the chain is dispatched if applicable.
      *
-     * @param  mixed  $command
      * @return void
      */
     protected function ensureNextJobInChainIsDispatched($command)
@@ -187,7 +169,6 @@ class CallQueuedHandler
     /**
      * Ensure the batch is notified of the successful job completion.
      *
-     * @param  mixed  $command
      * @return void
      */
     protected function ensureSuccessfulBatchJobIsRecorded($command)
@@ -207,7 +188,6 @@ class CallQueuedHandler
     /**
      * Ensure the lock for a unique job is released.
      *
-     * @param  mixed  $command
      * @return void
      */
     protected function ensureUniqueJobLockIsReleased($command)
@@ -220,7 +200,6 @@ class CallQueuedHandler
     /**
      * Handle a model not found exception.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  \Throwable  $e
      * @return void
      */
@@ -280,10 +259,7 @@ class CallQueuedHandler
      *
      * The exception that caused the failure will be passed.
      *
-     * @param  array  $data
      * @param  \Throwable|null  $e
-     * @param  string  $uuid
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
      * @return void
      */
     public function failed(array $data, $e, string $uuid, ?Job $job = null)
@@ -313,8 +289,6 @@ class CallQueuedHandler
     /**
      * Ensure the batch is notified of the failed job.
      *
-     * @param  string  $uuid
-     * @param  mixed  $command
      * @param  \Throwable  $e
      * @return void
      */
@@ -332,8 +306,6 @@ class CallQueuedHandler
     /**
      * Ensure the chained job catch callbacks are invoked.
      *
-     * @param  string  $uuid
-     * @param  mixed  $command
      * @param  \Throwable  $e
      * @return void
      */

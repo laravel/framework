@@ -43,7 +43,6 @@ class ScheduleListCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      *
      * @throws \Exception
@@ -183,8 +182,6 @@ class ScheduleListCommand extends Command
     /**
      * Sort the events by due date if option set.
      *
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Collection
      */
     private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
@@ -198,7 +195,6 @@ class ScheduleListCommand extends Command
      * Get the next due date for an event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Carbon
      */
     private function getNextDueDateForEvent($event, DateTimeZone $timezone)
@@ -249,7 +245,6 @@ class ScheduleListCommand extends Command
     /**
      * Get the file and line number for the event closure.
      *
-     * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
      * @return string
      */
     private function getClosureLocation(CallbackEvent $event)

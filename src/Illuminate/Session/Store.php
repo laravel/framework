@@ -66,7 +66,6 @@ class Store implements Session
      * Create a new session instance.
      *
      * @param  string  $name
-     * @param  \SessionHandlerInterface  $handler
      * @param  string|null  $id
      * @param  string  $serialization
      */
@@ -240,7 +239,6 @@ class Store implements Session
     /**
      * Get a subset of the session data.
      *
-     * @param  array  $keys
      * @return array
      */
     public function only(array $keys)
@@ -251,7 +249,6 @@ class Store implements Session
     /**
      * Get all the session data except for a specified array of items.
      *
-     * @param  array  $keys
      * @return array
      */
     public function except(array $keys)
@@ -315,8 +312,6 @@ class Store implements Session
      * Get an item from the session.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -327,8 +322,6 @@ class Store implements Session
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function pull($key, $default = null)
     {
@@ -352,8 +345,6 @@ class Store implements Session
      * Get the requested item from the flashed input array.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function getOldInput($key = null, $default = null)
     {
@@ -363,7 +354,6 @@ class Store implements Session
     /**
      * Replace the given session attributes entirely.
      *
-     * @param  array  $attributes
      * @return void
      */
     public function replace(array $attributes)
@@ -375,7 +365,6 @@ class Store implements Session
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return void
      */
     public function put($key, $value = null)
@@ -393,8 +382,6 @@ class Store implements Session
      * Get an item from the session, or store the default value.
      *
      * @param  string  $key
-     * @param  \Closure  $callback
-     * @return mixed
      */
     public function remember($key, Closure $callback)
     {
@@ -411,7 +398,6 @@ class Store implements Session
      * Push a value onto a session array.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function push($key, $value)
@@ -428,7 +414,6 @@ class Store implements Session
      *
      * @param  string  $key
      * @param  int  $amount
-     * @return mixed
      */
     public function increment($key, $amount = 1)
     {
@@ -452,8 +437,6 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function flash(string $key, $value = true)
@@ -469,7 +452,6 @@ class Store implements Session
      * Flash a key / value pair to the session for immediate use.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function now($key, $value)
@@ -494,7 +476,6 @@ class Store implements Session
     /**
      * Reflash a subset of the current flash data.
      *
-     * @param  mixed  $keys
      * @return void
      */
     public function keep($keys = null)
@@ -507,7 +488,6 @@ class Store implements Session
     /**
      * Merge new flash keys into the new flash array.
      *
-     * @param  array  $keys
      * @return void
      */
     protected function mergeNewFlashes(array $keys)
@@ -520,7 +500,6 @@ class Store implements Session
     /**
      * Remove the given keys from the old flash data.
      *
-     * @param  array  $keys
      * @return void
      */
     protected function removeFromOldFlashData(array $keys)
@@ -531,7 +510,6 @@ class Store implements Session
     /**
      * Flash an input array to the session.
      *
-     * @param  array  $value
      * @return void
      */
     public function flashInput(array $value)
@@ -543,7 +521,6 @@ class Store implements Session
      * Remove an item from the session, returning its value.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function remove($key)
     {
@@ -801,7 +778,6 @@ class Store implements Session
     /**
      * Set the underlying session handler implementation.
      *
-     * @param  \SessionHandlerInterface  $handler
      * @return \SessionHandlerInterface
      */
     public function setHandler(SessionHandlerInterface $handler)

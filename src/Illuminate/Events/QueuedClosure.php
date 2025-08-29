@@ -47,8 +47,6 @@ class QueuedClosure
 
     /**
      * Create a new queued closure event listener resolver.
-     *
-     * @param  \Closure  $closure
      */
     public function __construct(Closure $closure)
     {
@@ -97,7 +95,6 @@ class QueuedClosure
     /**
      * Specify a callback that should be invoked if the queued listener job fails.
      *
-     * @param  \Closure  $closure
      * @return $this
      */
     public function catch(Closure $closure)

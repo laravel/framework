@@ -50,8 +50,6 @@ class SendQueuedMailable
 
     /**
      * Create a new job instance.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      */
     public function __construct(MailableContract $mailable)
     {
@@ -74,7 +72,6 @@ class SendQueuedMailable
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Mail\Factory  $factory
      * @return void
      */
     public function handle(MailFactory $factory)
@@ -84,8 +81,6 @@ class SendQueuedMailable
 
     /**
      * Get the number of seconds before a released mailable will be available.
-     *
-     * @return mixed
      */
     public function backoff()
     {

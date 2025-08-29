@@ -80,7 +80,6 @@ trait InteractsWithInput
     /**
      * Get all of the input and files for the request.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -104,8 +103,6 @@ trait InteractsWithInput
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function input($key = null, $default = null)
     {
@@ -227,7 +224,6 @@ trait InteractsWithInput
     /**
      * Check that the given file is a valid file instance.
      *
-     * @param  mixed  $file
      * @return bool
      */
     protected function isValidFile($file)
@@ -239,7 +235,6 @@ trait InteractsWithInput
      * Retrieve a file from the request.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
      * @return ($key is null ? array<string, \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]> : \Illuminate\Http\UploadedFile|\Illuminate\Http\UploadedFile[]|null)
      */
     public function file($key = null, $default = null)
@@ -251,8 +246,6 @@ trait InteractsWithInput
      * Retrieve data from the instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     protected function data($key = null, $default = null)
     {
@@ -283,7 +276,6 @@ trait InteractsWithInput
     /**
      * Dump the items.
      *
-     * @param  mixed  $keys
      * @return $this
      */
     public function dump($keys = [])

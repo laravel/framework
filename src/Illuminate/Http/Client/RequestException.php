@@ -22,8 +22,6 @@ class RequestException extends HttpClientException
 
     /**
      * Create a new exception instance.
-     *
-     * @param  \Illuminate\Http\Client\Response  $response
      */
     public function __construct(Response $response)
     {
@@ -45,7 +43,6 @@ class RequestException extends HttpClientException
     /**
      * Set the truncation length for request exception messages.
      *
-     * @param  int  $length
      * @return void
      */
     public static function truncateAt(int $length)
@@ -66,7 +63,6 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
      * @return string
      */
     protected function prepareMessage(Response $response)

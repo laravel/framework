@@ -11,7 +11,6 @@ trait Debugging
     /**
      * Dumps the given props.
      *
-     * @param  string|null  $prop
      * @return $this
      */
     public function dump(?string $prop = null): static
@@ -23,9 +22,6 @@ trait Debugging
 
     /**
      * Retrieve a prop within the current scope using "dot" notation.
-     *
-     * @param  string|null  $key
-     * @return mixed
      */
     abstract protected function prop(?string $key = null);
 }

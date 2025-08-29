@@ -55,8 +55,6 @@ class DatabaseEloquentTimestampsTest extends TestCase
 
     /**
      * Tear down the database schema.
-     *
-     * @return void
      */
     protected function tearDown(): void
     {

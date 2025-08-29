@@ -143,7 +143,6 @@ trait HasEvents
     /**
      * Set the observable event names.
      *
-     * @param  array  $observables
      * @return $this
      */
     public function setObservableEvents(array $observables)
@@ -156,7 +155,6 @@ trait HasEvents
     /**
      * Add an observable event name.
      *
-     * @param  mixed  $observables
      * @return void
      */
     public function addObservableEvents($observables)
@@ -169,7 +167,6 @@ trait HasEvents
     /**
      * Remove an observable event name.
      *
-     * @param  mixed  $observables
      * @return void
      */
     public function removeObservableEvents($observables)
@@ -200,7 +197,6 @@ trait HasEvents
      *
      * @param  string  $event
      * @param  bool  $halt
-     * @return mixed
      */
     protected function fireModelEvent($event, $halt = true)
     {
@@ -231,7 +227,6 @@ trait HasEvents
      *
      * @param  string  $event
      * @param  string  $method
-     * @return mixed
      */
     protected function fireCustomModelEvent($event, $method)
     {
@@ -248,9 +243,6 @@ trait HasEvents
 
     /**
      * Filter the model event results.
-     *
-     * @param  mixed  $result
-     * @return mixed
      */
     protected function filterModelEventResults($result)
     {
@@ -418,7 +410,6 @@ trait HasEvents
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public static function setEventDispatcher(Dispatcher $dispatcher)
@@ -438,9 +429,6 @@ trait HasEvents
 
     /**
      * Execute a callback without firing any model events for any model type.
-     *
-     * @param  callable  $callback
-     * @return mixed
      */
     public static function withoutEvents(callable $callback)
     {

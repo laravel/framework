@@ -70,7 +70,6 @@ class DatabaseManager implements ConnectionResolverInterface
      * Create a new database manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
      */
     public function __construct($app, ConnectionFactory $factory)
     {
@@ -113,7 +112,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Build a database connection instance from the given configuration.
      *
-     * @param  array  $config
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function build(array $config)
@@ -128,7 +126,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Calculate the dynamic connection name for an on-demand connection based on its configuration.
      *
-     * @param  array  $config
      * @return string
      */
     public static function calculateDynamicConnectionName(array $config)
@@ -141,9 +138,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance from the given configuration.
      *
-     * @param  string  $name
-     * @param  array  $config
-     * @param  bool  $force
      * @return \Illuminate\Database\ConnectionInterface
      */
     public function connectUsing(string $name, array $config, bool $force = false)
@@ -234,7 +228,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Prepare the database connection instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $type
      * @return \Illuminate\Database\Connection
      */
@@ -264,7 +257,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Dispatch the ConnectionEstablished event if the event dispatcher is available.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
     protected function dispatchConnectionEstablishedEvent(Connection $connection)
@@ -281,7 +273,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Prepare the read / write mode for database connection instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string|null  $type
      * @return \Illuminate\Database\Connection
      */
@@ -345,8 +336,6 @@ class DatabaseManager implements ConnectionResolverInterface
      * Set the default database connection for the callback execution.
      *
      * @param  string  $name
-     * @param  callable  $callback
-     * @return mixed
      */
     public function usingConnection($name, callable $callback)
     {
@@ -428,7 +417,6 @@ class DatabaseManager implements ConnectionResolverInterface
      * Register an extension connection resolver.
      *
      * @param  string  $name
-     * @param  callable  $resolver
      * @return void
      */
     public function extend($name, callable $resolver)
@@ -460,7 +448,6 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Set the database reconnector callback.
      *
-     * @param  callable  $reconnector
      * @return void
      */
     public function setReconnector(callable $reconnector)
@@ -486,7 +473,6 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

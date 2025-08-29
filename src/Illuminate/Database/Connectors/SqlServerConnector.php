@@ -22,7 +22,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Establish a database connection.
      *
-     * @param  array  $config
      * @return \PDO
      */
     public function connect(array $config)
@@ -42,7 +41,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      * https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql
      *
      * @param  \PDO  $connection
-     * @param  array  $config
      * @return void
      */
     protected function configureIsolationLevel($connection, array $config)
@@ -59,7 +57,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array  $config
      * @return string
      */
     protected function getDsn(array $config)
@@ -81,7 +78,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Determine if the database configuration prefers ODBC.
      *
-     * @param  array  $config
      * @return bool
      */
     protected function prefersOdbc(array $config)
@@ -93,7 +89,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Get the DSN string for a DbLib connection.
      *
-     * @param  array  $config
      * @return string
      */
     protected function getDblibDsn(array $config)
@@ -107,7 +102,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Get the DSN string for an ODBC connection.
      *
-     * @param  array  $config
      * @return string
      */
     protected function getOdbcDsn(array $config)
@@ -120,7 +114,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Get the DSN string for a SqlSrv connection.
      *
-     * @param  array  $config
      * @return string
      */
     protected function getSqlSrvDsn(array $config)
@@ -196,7 +189,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      * Build a connection string from the given arguments.
      *
      * @param  string  $driver
-     * @param  array  $arguments
      * @return string
      */
     protected function buildConnectString($driver, array $arguments)
@@ -209,7 +201,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Build a host string from the given configuration.
      *
-     * @param  array  $config
      * @param  string  $separator
      * @return string
      */

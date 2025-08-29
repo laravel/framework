@@ -25,9 +25,6 @@ class SqsJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  array  $job
      * @param  string  $connectionName
      * @param  string  $queue
      */

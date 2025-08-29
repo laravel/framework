@@ -29,10 +29,6 @@ abstract class QueueTestCase extends TestCase
 
     /**
      * Run queue worker command.
-     *
-     * @param  array  $options
-     * @param  int  $times
-     * @return void
      */
     protected function runQueueWorkerCommand(array $options = [], int $times = 1): void
     {
@@ -53,7 +49,6 @@ abstract class QueueTestCase extends TestCase
      * Mark test as skipped when using given queue drivers.
      *
      * @param  array<int, string>  $drivers
-     * @return void
      */
     protected function markTestSkippedWhenUsingQueueDrivers(array $drivers): void
     {
@@ -66,8 +61,6 @@ abstract class QueueTestCase extends TestCase
 
     /**
      * Mark test as skipped when using "sync" queue driver.
-     *
-     * @return void
      */
     protected function markTestSkippedWhenUsingSyncQueueDriver(): void
     {
@@ -76,8 +69,6 @@ abstract class QueueTestCase extends TestCase
 
     /**
      * Get the queue driver.
-     *
-     * @return string
      */
     protected function getQueueDriver(): string
     {

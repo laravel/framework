@@ -175,7 +175,6 @@ class DummyQueuedNotificationWithStringVia extends Notification implements Shoul
     /**
      * Get the notification channels.
      *
-     * @param  mixed  $notifiable
      * @return array|string
      */
     public function via($notifiable)
@@ -191,7 +190,6 @@ class DummyNotificationWithEmptyStringVia extends Notification
     /**
      * Get the notification channels.
      *
-     * @param  mixed  $notifiable
      * @return array|string
      */
     public function via($notifiable)
@@ -207,7 +205,6 @@ class DummyNotificationWithDatabaseVia extends Notification
     /**
      * Get the notification channels.
      *
-     * @param  mixed  $notifiable
      * @return array|string
      */
     public function via($notifiable)

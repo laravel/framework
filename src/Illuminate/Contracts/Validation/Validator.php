@@ -43,7 +43,6 @@ interface Validator extends MessageProvider
      *
      * @param  string|array  $attribute
      * @param  string|array  $rules
-     * @param  callable  $callback
      * @return $this
      */
     public function sometimes($attribute, $rules, callable $callback);

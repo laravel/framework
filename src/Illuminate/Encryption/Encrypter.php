@@ -95,7 +95,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Encrypt the given value.
      *
-     * @param  mixed  $value
      * @param  bool  $serialize
      * @return string
      *
@@ -148,7 +147,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  string  $payload
      * @param  bool  $unserialize
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
@@ -212,7 +210,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * Create a MAC for the given value.
      *
      * @param  string  $iv
-     * @param  mixed  $value
      * @param  string  $key
      * @return string
      */
@@ -250,7 +247,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Verify that the encryption payload is valid.
      *
-     * @param  mixed  $payload
      * @return bool
      */
     protected function validPayload($payload)
@@ -275,7 +271,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Determine if the MAC for the given payload is valid for the primary key.
      *
-     * @param  array  $payload
      * @return bool
      */
     protected function validMac(array $payload)
@@ -357,7 +352,6 @@ class Encrypter implements EncrypterContract, StringEncrypter
     /**
      * Set the previous / legacy encryption keys that should be utilized if decryption fails.
      *
-     * @param  array  $keys
      * @return $this
      */
     public function previousKeys(array $keys)

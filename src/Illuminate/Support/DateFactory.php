@@ -133,8 +133,6 @@ class DateFactory
     /**
      * Use the given handler when generating dates (class name, callable, or factory).
      *
-     * @param  mixed  $handler
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -166,7 +164,6 @@ class DateFactory
     /**
      * Execute the given callable on each date creation.
      *
-     * @param  callable  $callable
      * @return void
      */
     public static function useCallable(callable $callable)
@@ -210,7 +207,6 @@ class DateFactory
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \RuntimeException
      */

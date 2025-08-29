@@ -45,8 +45,6 @@ class ListenCommand extends Command
 
     /**
      * Create a new queue listen command.
-     *
-     * @param  \Illuminate\Queue\Listener  $listener
      */
     public function __construct(Listener $listener)
     {
@@ -118,7 +116,6 @@ class ListenCommand extends Command
     /**
      * Set the options on the queue listener.
      *
-     * @param  \Illuminate\Queue\Listener  $listener
      * @return void
      */
     protected function setOutputHandler(Listener $listener)

@@ -60,9 +60,6 @@ class Dispatcher implements QueueingDispatcher
 
     /**
      * Create a new command dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Closure|null  $queueResolver
      */
     public function __construct(Container $container, ?Closure $queueResolver = null)
     {
@@ -73,9 +70,6 @@ class Dispatcher implements QueueingDispatcher
 
     /**
      * Dispatch a command to its appropriate handler.
-     *
-     * @param  mixed  $command
-     * @return mixed
      */
     public function dispatch($command)
     {
@@ -88,10 +82,6 @@ class Dispatcher implements QueueingDispatcher
      * Dispatch a command to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
-     *
-     * @param  mixed  $command
-     * @param  mixed  $handler
-     * @return mixed
      */
     public function dispatchSync($command, $handler = null)
     {
@@ -106,10 +96,6 @@ class Dispatcher implements QueueingDispatcher
 
     /**
      * Dispatch a command to its appropriate handler in the current process without using the synchronous queue.
-     *
-     * @param  mixed  $command
-     * @param  mixed  $handler
-     * @return mixed
      */
     public function dispatchNow($command, $handler = null)
     {
@@ -139,7 +125,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Attempt to find the batch with the given ID.
      *
-     * @param  string  $batchId
      * @return \Illuminate\Bus\Batch|null
      */
     public function findBatch(string $batchId)
@@ -175,7 +160,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Determine if the given command has a handler.
      *
-     * @param  mixed  $command
      * @return bool
      */
     public function hasCommandHandler($command)
@@ -185,9 +169,6 @@ class Dispatcher implements QueueingDispatcher
 
     /**
      * Retrieve the handler for a command.
-     *
-     * @param  mixed  $command
-     * @return mixed
      */
     public function getCommandHandler($command)
     {
@@ -201,7 +182,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Determine if the given command should be queued.
      *
-     * @param  mixed  $command
      * @return bool
      */
     protected function commandShouldBeQueued($command)
@@ -212,8 +192,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler behind a queue.
      *
-     * @param  mixed  $command
-     * @return mixed
      *
      * @throws \RuntimeException
      */
@@ -238,8 +216,6 @@ class Dispatcher implements QueueingDispatcher
      * Push the command onto the given queue instance.
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
-     * @param  mixed  $command
-     * @return mixed
      */
     protected function pushCommandToQueue($queue, $command)
     {
@@ -253,8 +229,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Dispatch a command to its appropriate handler after the current process.
      *
-     * @param  mixed  $command
-     * @param  mixed  $handler
      * @return void
      */
     public function dispatchAfterResponse($command, $handler = null)
@@ -273,7 +247,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Set the pipes through which commands should be piped before dispatching.
      *
-     * @param  array  $pipes
      * @return $this
      */
     public function pipeThrough(array $pipes)
@@ -286,7 +259,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Map a command to a handler.
      *
-     * @param  array  $map
      * @return $this
      */
     public function map(array $map)

@@ -74,8 +74,6 @@ class RouteListCommand extends Command
 
     /**
      * Create a new route command instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
      */
     public function __construct(Router $router)
     {
@@ -134,7 +132,6 @@ class RouteListCommand extends Command
     /**
      * Get the route information for a given route.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return array
      */
     protected function getRouteInformation(Route $route)
@@ -154,7 +151,6 @@ class RouteListCommand extends Command
      * Sort the routes by a given element.
      *
      * @param  string  $sort
-     * @param  array  $routes
      * @return array
      */
     protected function sortRoutes($sort, array $routes)
@@ -175,7 +171,6 @@ class RouteListCommand extends Command
     /**
      * Remove unnecessary columns from the routes.
      *
-     * @param  array  $routes
      * @return array
      */
     protected function pluckColumns(array $routes)
@@ -188,7 +183,6 @@ class RouteListCommand extends Command
     /**
      * Display the route information on the console.
      *
-     * @param  array  $routes
      * @return void
      */
     protected function displayRoutes(array $routes)
@@ -216,7 +210,6 @@ class RouteListCommand extends Command
     /**
      * Determine if the route has been defined outside of the application.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return bool
      */
     protected function isVendorRoute(Route $route)
@@ -244,7 +237,6 @@ class RouteListCommand extends Command
     /**
      * Determine if the route uses a framework controller.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return bool
      */
     protected function isFrameworkController(Route $route)
@@ -258,7 +250,6 @@ class RouteListCommand extends Command
     /**
      * Filter the route by URI and / or name.
      *
-     * @param  array  $route
      * @return array|null
      */
     protected function filterRoute(array $route)
@@ -307,7 +298,6 @@ class RouteListCommand extends Command
     /**
      * Parse the column list.
      *
-     * @param  array  $columns
      * @return array
      */
     protected function parseColumns(array $columns)

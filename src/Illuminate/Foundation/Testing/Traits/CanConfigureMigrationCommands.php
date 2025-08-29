@@ -54,8 +54,6 @@ trait CanConfigureMigrationCommands
 
     /**
      * Determine the specific seeder class that should be used when refreshing the database.
-     *
-     * @return mixed
      */
     protected function seeder()
     {

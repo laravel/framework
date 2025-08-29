@@ -18,8 +18,6 @@ class PendingChain
 
     /**
      * The class name of the job being dispatched.
-     *
-     * @var mixed
      */
     public $job;
 
@@ -61,7 +59,6 @@ class PendingChain
     /**
      * Create a new PendingChain instance.
      *
-     * @param  mixed  $job
      * @param  array  $chain
      */
     public function __construct($job, $chain)
@@ -99,7 +96,6 @@ class PendingChain
     /**
      * Prepend a job to the chain.
      *
-     * @param  mixed  $job
      * @return $this
      */
     public function prepend($job)
@@ -122,7 +118,6 @@ class PendingChain
     /**
      * Append a job to the chain.
      *
-     * @param  mixed  $job
      * @return $this
      */
     public function append($job)

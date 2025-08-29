@@ -17,8 +17,6 @@ abstract class Job
 
     /**
      * The job handler instance.
-     *
-     * @var mixed
      */
     protected $instance;
 
@@ -259,7 +257,6 @@ abstract class Job
      * Resolve the given class.
      *
      * @param  string  $class
-     * @return mixed
      */
     protected function resolve($class)
     {
@@ -268,8 +265,6 @@ abstract class Job
 
     /**
      * Get the resolved job handler instance.
-     *
-     * @return mixed
      */
     public function getResolvedJob()
     {

@@ -42,24 +42,17 @@ trait ComparesRelatedModels
 
     /**
      * Get the value of the parent model's key.
-     *
-     * @return mixed
      */
     abstract public function getParentKey();
 
     /**
      * Get the value of the model's related key.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed
      */
     abstract protected function getRelatedKeyFrom(Model $model);
 
     /**
      * Compare the parent key with the related key.
      *
-     * @param  mixed  $parentKey
-     * @param  mixed  $relatedKey
      * @return bool
      */
     protected function compareKeys($parentKey, $relatedKey)

@@ -221,8 +221,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Define a contextual binding based on an attribute.
      *
-     * @param  string  $attribute
-     * @param  \Closure  $handler
      * @return void
      */
     public function whenHasAttribute(string $attribute, Closure $handler)
@@ -245,8 +243,6 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function has(string $id): bool
     {
@@ -459,8 +455,6 @@ class Container implements ArrayAccess, ContainerContract
      * Get the method binding for the given method.
      *
      * @param  string  $method
-     * @param  mixed  $instance
-     * @return mixed
      */
     public function callMethodBinding($method, $instance)
     {
@@ -571,7 +565,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Get the class names / types of the return type of the given Closure.
      *
-     * @param  \Closure  $closure
      * @return list<class-string>
      *
      * @throws \ReflectionException
@@ -601,7 +594,6 @@ class Container implements ArrayAccess, ContainerContract
      * "Extend" an abstract type in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure  $closure
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -677,7 +669,6 @@ class Container implements ArrayAccess, ContainerContract
      * Assign a set of tags to a given binding.
      *
      * @param  array|string  $abstracts
-     * @param  mixed  ...$tags
      * @return void
      */
     public function tag($abstracts, $tags)
@@ -740,8 +731,6 @@ class Container implements ArrayAccess, ContainerContract
      * Bind a new callback to an abstract's rebind event.
      *
      * @param  string  $abstract
-     * @param  \Closure  $callback
-     * @return mixed
      */
     public function rebinding($abstract, Closure $callback)
     {
@@ -756,9 +745,7 @@ class Container implements ArrayAccess, ContainerContract
      * Refresh an instance on the given target and method.
      *
      * @param  string  $abstract
-     * @param  mixed  $target
      * @param  string  $method
-     * @return mixed
      */
     public function refresh($abstract, $target, $method)
     {
@@ -800,8 +787,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Wrap the given closure such that its dependencies will be injected when executed.
      *
-     * @param  \Closure  $callback
-     * @param  array  $parameters
      * @return \Closure
      */
     public function wrap(Closure $callback, array $parameters = [])
@@ -815,7 +800,6 @@ class Container implements ArrayAccess, ContainerContract
      * @param  callable|string  $callback
      * @param  array<string, mixed>  $parameters
      * @param  string|null  $defaultMethod
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -877,7 +861,6 @@ class Container implements ArrayAccess, ContainerContract
      * @template TClass of object
      *
      * @param  string|class-string<TClass>|callable  $abstract
-     * @param  array  $parameters
      * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -893,7 +876,6 @@ class Container implements ArrayAccess, ContainerContract
      * @template TClass of object
      *
      * @param  string|class-string<TClass>  $abstract
-     * @param  array  $parameters
      * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -1006,7 +988,6 @@ class Container implements ArrayAccess, ContainerContract
      * Get the concrete type for a given abstract.
      *
      * @param  string|callable  $abstract
-     * @return mixed
      */
     protected function getConcrete($abstract)
     {
@@ -1029,7 +1010,6 @@ class Container implements ArrayAccess, ContainerContract
      * Get the concrete binding for an abstract from the Bind attribute.
      *
      * @param  string  $abstract
-     * @return mixed
      */
     protected function getConcreteBindingFromAttributes($abstract)
     {
@@ -1122,7 +1102,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Determine if the given concrete is buildable.
      *
-     * @param  mixed  $concrete
      * @param  string  $abstract
      * @return bool
      */
@@ -1306,7 +1285,6 @@ class Container implements ArrayAccess, ContainerContract
      * Get a parameter override for a dependency.
      *
      * @param  \ReflectionParameter  $dependency
-     * @return mixed
      */
     protected function getParameterOverride($dependency)
     {
@@ -1326,8 +1304,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve a non-class hinted primitive dependency.
      *
-     * @param  \ReflectionParameter  $parameter
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -1355,8 +1331,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve a class based dependency from the container.
      *
-     * @param  \ReflectionParameter  $parameter
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -1395,9 +1369,6 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * Resolve a class based variadic dependency from the container.
-     *
-     * @param  \ReflectionParameter  $parameter
-     * @return mixed
      */
     protected function resolveVariadicClass(ReflectionParameter $parameter)
     {
@@ -1414,9 +1385,6 @@ class Container implements ArrayAccess, ContainerContract
 
     /**
      * Resolve a dependency based on an attribute.
-     *
-     * @param  \ReflectionAttribute  $attribute
-     * @return mixed
      */
     public function resolveFromAttribute(ReflectionAttribute $attribute)
     {
@@ -1459,7 +1427,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Throw an exception for an unresolvable primitive.
      *
-     * @param  \ReflectionParameter  $parameter
      * @return void
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -1475,7 +1442,6 @@ class Container implements ArrayAccess, ContainerContract
      * Register a new before resolving callback for all types.
      *
      * @param  \Closure|string  $abstract
-     * @param  \Closure|null  $callback
      * @return void
      */
     public function beforeResolving($abstract, ?Closure $callback = null)
@@ -1495,7 +1461,6 @@ class Container implements ArrayAccess, ContainerContract
      * Register a new resolving callback.
      *
      * @param  \Closure|string  $abstract
-     * @param  \Closure|null  $callback
      * @return void
      */
     public function resolving($abstract, ?Closure $callback = null)
@@ -1515,7 +1480,6 @@ class Container implements ArrayAccess, ContainerContract
      * Register a new after resolving callback for all types.
      *
      * @param  \Closure|string  $abstract
-     * @param  \Closure|null  $callback
      * @return void
      */
     public function afterResolving($abstract, ?Closure $callback = null)
@@ -1534,8 +1498,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a new after resolving attribute callback for all types.
      *
-     * @param  string  $attribute
-     * @param  \Closure  $callback
      * @return void
      */
     public function afterResolvingAttribute(string $attribute, \Closure $callback)
@@ -1566,7 +1528,6 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  array  $parameters
-     * @param  array  $callbacks
      * @return void
      */
     protected function fireBeforeCallbackArray($abstract, $parameters, array $callbacks)
@@ -1580,7 +1541,6 @@ class Container implements ArrayAccess, ContainerContract
      * Fire all of the resolving callbacks.
      *
      * @param  string  $abstract
-     * @param  mixed  $object
      * @return void
      */
     protected function fireResolvingCallbacks($abstract, $object)
@@ -1598,7 +1558,6 @@ class Container implements ArrayAccess, ContainerContract
      * Fire all of the after resolving callbacks.
      *
      * @param  string  $abstract
-     * @param  mixed  $object
      * @return void
      */
     protected function fireAfterResolvingCallbacks($abstract, $object)
@@ -1614,7 +1573,6 @@ class Container implements ArrayAccess, ContainerContract
      * Fire all of the after resolving attribute callbacks.
      *
      * @param  \ReflectionAttribute[]  $attributes
-     * @param  mixed  $object
      * @return void
      */
     public function fireAfterResolvingAttributeCallbacks(array $attributes, $object)
@@ -1643,7 +1601,6 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  object  $object
-     * @param  array  $callbacksPerType
      * @return array
      */
     protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
@@ -1662,8 +1619,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Fire an array of callbacks with an object.
      *
-     * @param  mixed  $object
-     * @param  array  $callbacks
      * @return void
      */
     protected function fireCallbackArray($object, array $callbacks)
@@ -1826,7 +1781,6 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Set the shared instance of the container.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return \Illuminate\Contracts\Container\Container|static
      */
     public static function setInstance(?ContainerContract $container = null)
@@ -1838,7 +1792,6 @@ class Container implements ArrayAccess, ContainerContract
      * Determine if a given offset exists.
      *
      * @param  string  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -1849,7 +1802,6 @@ class Container implements ArrayAccess, ContainerContract
      * Get the value at a given offset.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -1860,8 +1812,6 @@ class Container implements ArrayAccess, ContainerContract
      * Set the value at a given offset.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -1872,7 +1822,6 @@ class Container implements ArrayAccess, ContainerContract
      * Unset the value at a given offset.
      *
      * @param  string  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {
@@ -1883,7 +1832,6 @@ class Container implements ArrayAccess, ContainerContract
      * Dynamically access container services.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {
@@ -1894,7 +1842,6 @@ class Container implements ArrayAccess, ContainerContract
      * Dynamically set container services.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)

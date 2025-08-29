@@ -12,7 +12,6 @@ class MessageSelector
      * @param  string  $line
      * @param  int  $number
      * @param  string  $locale
-     * @return mixed
      */
     public function choose($line, $number, $locale)
     {
@@ -38,7 +37,6 @@ class MessageSelector
      *
      * @param  array  $segments
      * @param  int  $number
-     * @return mixed
      */
     private function extract($segments, $number)
     {
@@ -54,7 +52,6 @@ class MessageSelector
      *
      * @param  string  $part
      * @param  int  $number
-     * @return mixed
      */
     private function extractFromString($part, $number)
     {

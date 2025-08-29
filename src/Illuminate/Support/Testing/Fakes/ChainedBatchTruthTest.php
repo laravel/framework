@@ -15,8 +15,6 @@ class ChainedBatchTruthTest
 
     /**
      * Create a new truth test instance.
-     *
-     * @param  \Closure  $callback
      */
     public function __construct(Closure $callback)
     {

@@ -85,7 +85,6 @@ trait InteractsWithDatabase
      * Assert the count of table entries.
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  int  $count
      * @param  string|null  $connection
      * @return $this
      */
@@ -249,7 +248,6 @@ trait InteractsWithDatabase
     /**
      * Determine if the argument is a soft deletable model.
      *
-     * @param  mixed  $model
      * @return bool
      */
     protected function isSoftDeletableModel($model)

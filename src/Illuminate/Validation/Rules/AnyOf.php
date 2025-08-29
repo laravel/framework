@@ -12,8 +12,6 @@ class AnyOf implements Rule, ValidatorAwareRule
 {
     /**
      * The rules to match against.
-     *
-     * @var array
      */
     protected array $rules = [];
 
@@ -44,7 +42,6 @@ class AnyOf implements Rule, ValidatorAwareRule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

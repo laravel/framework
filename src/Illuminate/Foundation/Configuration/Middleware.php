@@ -163,7 +163,6 @@ class Middleware
     /**
      * Prepend middleware to the application's global middleware stack.
      *
-     * @param  array|string  $middleware
      * @return $this
      */
     public function prepend(array|string $middleware)
@@ -179,7 +178,6 @@ class Middleware
     /**
      * Append middleware to the application's global middleware stack.
      *
-     * @param  array|string  $middleware
      * @return $this
      */
     public function append(array|string $middleware)
@@ -195,7 +193,6 @@ class Middleware
     /**
      * Remove middleware from the application's global middleware stack.
      *
-     * @param  array|string  $middleware
      * @return $this
      */
     public function remove(array|string $middleware)
@@ -211,8 +208,6 @@ class Middleware
     /**
      * Specify a middleware that should be replaced with another middleware.
      *
-     * @param  string  $search
-     * @param  string  $replace
      * @return $this
      */
     public function replace(string $search, string $replace)
@@ -225,7 +220,6 @@ class Middleware
     /**
      * Define the global middleware for the application.
      *
-     * @param  array  $middleware
      * @return $this
      */
     public function use(array $middleware)
@@ -238,8 +232,6 @@ class Middleware
     /**
      * Define a middleware group.
      *
-     * @param  string  $group
-     * @param  array  $middleware
      * @return $this
      */
     public function group(string $group, array $middleware)
@@ -252,8 +244,6 @@ class Middleware
     /**
      * Prepend the given middleware to the specified group.
      *
-     * @param  string  $group
-     * @param  array|string  $middleware
      * @return $this
      */
     public function prependToGroup(string $group, array|string $middleware)
@@ -269,8 +259,6 @@ class Middleware
     /**
      * Append the given middleware to the specified group.
      *
-     * @param  string  $group
-     * @param  array|string  $middleware
      * @return $this
      */
     public function appendToGroup(string $group, array|string $middleware)
@@ -286,8 +274,6 @@ class Middleware
     /**
      * Remove the given middleware from the specified group.
      *
-     * @param  string  $group
-     * @param  array|string  $middleware
      * @return $this
      */
     public function removeFromGroup(string $group, array|string $middleware)
@@ -303,9 +289,6 @@ class Middleware
     /**
      * Replace the given middleware in the specified group with another middleware.
      *
-     * @param  string  $group
-     * @param  string  $search
-     * @param  string  $replace
      * @return $this
      */
     public function replaceInGroup(string $group, string $search, string $replace)
@@ -318,10 +301,6 @@ class Middleware
     /**
      * Modify the middleware in the "web" group.
      *
-     * @param  array|string  $append
-     * @param  array|string  $prepend
-     * @param  array|string  $remove
-     * @param  array  $replace
      * @return $this
      */
     public function web(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
@@ -332,10 +311,6 @@ class Middleware
     /**
      * Modify the middleware in the "api" group.
      *
-     * @param  array|string  $append
-     * @param  array|string  $prepend
-     * @param  array|string  $remove
-     * @param  array  $replace
      * @return $this
      */
     public function api(array|string $append = [], array|string $prepend = [], array|string $remove = [], array $replace = [])
@@ -346,11 +321,6 @@ class Middleware
     /**
      * Modify the middleware in the given group.
      *
-     * @param  string  $group
-     * @param  array|string  $append
-     * @param  array|string  $prepend
-     * @param  array|string  $remove
-     * @param  array  $replace
      * @return $this
      */
     protected function modifyGroup(string $group, array|string $append, array|string $prepend, array|string $remove, array $replace)
@@ -379,7 +349,6 @@ class Middleware
     /**
      * Register the Folio / page middleware for the application.
      *
-     * @param  array  $middleware
      * @return $this
      */
     public function pages(array $middleware)
@@ -392,7 +361,6 @@ class Middleware
     /**
      * Register additional middleware aliases.
      *
-     * @param  array  $aliases
      * @return $this
      */
     public function alias(array $aliases)
@@ -405,7 +373,6 @@ class Middleware
     /**
      * Define the middleware priority for the application.
      *
-     * @param  array  $priority
      * @return $this
      */
     public function priority(array $priority)
@@ -533,7 +500,6 @@ class Middleware
     /**
      * Configure where guests are redirected by the "auth" middleware.
      *
-     * @param  callable|string  $redirect
      * @return $this
      */
     public function redirectGuestsTo(callable|string $redirect)
@@ -544,7 +510,6 @@ class Middleware
     /**
      * Configure where users are redirected by the "guest" middleware.
      *
-     * @param  callable|string  $redirect
      * @return $this
      */
     public function redirectUsersTo(callable|string $redirect)
@@ -593,7 +558,6 @@ class Middleware
     /**
      * Configure the CSRF token validation middleware.
      *
-     * @param  array  $except
      * @return $this
      */
     public function validateCsrfTokens(array $except = [])
@@ -606,7 +570,6 @@ class Middleware
     /**
      * Configure the URL signature validation middleware.
      *
-     * @param  array  $except
      * @return $this
      */
     public function validateSignatures(array $except = [])
@@ -650,7 +613,6 @@ class Middleware
      * Indicate that the trusted host middleware should be enabled.
      *
      * @param  array<int, string>|(callable(): array<int, string>)|null  $at
-     * @param  bool  $subdomains
      * @return $this
      */
     public function trustHosts(array|callable|null $at = null, bool $subdomains = true)
@@ -668,7 +630,6 @@ class Middleware
      * Configure the trusted proxies for the application.
      *
      * @param  array<int, string>|string|null  $at
-     * @param  int|null  $headers
      * @return $this
      */
     public function trustProxies(array|string|null $at = null, ?int $headers = null)

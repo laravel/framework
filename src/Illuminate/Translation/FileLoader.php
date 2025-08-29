@@ -39,9 +39,6 @@ class FileLoader implements Loader
 
     /**
      * Create a new file loader instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  array|string  $path
      */
     public function __construct(Filesystem $files, array|string $path)
     {
@@ -93,7 +90,6 @@ class FileLoader implements Loader
     /**
      * Load a local namespaced translation group for overrides.
      *
-     * @param  array  $lines
      * @param  string  $locale
      * @param  string  $group
      * @param  string  $namespace
@@ -116,7 +112,6 @@ class FileLoader implements Loader
     /**
      * Load a locale from a given path.
      *
-     * @param  array  $paths
      * @param  string  $locale
      * @param  string  $group
      * @return array

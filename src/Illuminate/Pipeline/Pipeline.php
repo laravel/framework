@@ -24,8 +24,6 @@ class Pipeline implements PipelineContract
 
     /**
      * The object being passed through the pipeline.
-     *
-     * @var mixed
      */
     protected $passable;
 
@@ -59,8 +57,6 @@ class Pipeline implements PipelineContract
 
     /**
      * Create a new class instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      */
     public function __construct(?Container $container = null)
     {
@@ -70,7 +66,6 @@ class Pipeline implements PipelineContract
     /**
      * Set the object being sent through the pipeline.
      *
-     * @param  mixed  $passable
      * @return $this
      */
     public function send($passable)
@@ -83,7 +78,6 @@ class Pipeline implements PipelineContract
     /**
      * Set the array of pipes.
      *
-     * @param  mixed  $pipes
      * @return $this
      */
     public function through($pipes)
@@ -96,7 +90,6 @@ class Pipeline implements PipelineContract
     /**
      * Push additional pipes onto the pipeline.
      *
-     * @param  mixed  $pipes
      * @return $this
      */
     public function pipe($pipes)
@@ -121,9 +114,6 @@ class Pipeline implements PipelineContract
 
     /**
      * Run the pipeline with a final destination callback.
-     *
-     * @param  \Closure  $destination
-     * @return mixed
      */
     public function then(Closure $destination)
     {
@@ -144,8 +134,6 @@ class Pipeline implements PipelineContract
 
     /**
      * Run the pipeline and return the result.
-     *
-     * @return mixed
      */
     public function thenReturn()
     {
@@ -157,7 +145,6 @@ class Pipeline implements PipelineContract
     /**
      * Set a final callback to be executed after the pipeline ends regardless of the outcome.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function finally(Closure $callback)
@@ -170,7 +157,6 @@ class Pipeline implements PipelineContract
     /**
      * Get the final piece of the Closure onion.
      *
-     * @param  \Closure  $destination
      * @return \Closure
      */
     protected function prepareDestination(Closure $destination)
@@ -288,7 +274,6 @@ class Pipeline implements PipelineContract
     /**
      * Set the container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -300,9 +285,6 @@ class Pipeline implements PipelineContract
 
     /**
      * Handle the value returned from each pipe before passing it to the next.
-     *
-     * @param  mixed  $carry
-     * @return mixed
      */
     protected function handleCarry($carry)
     {
@@ -312,9 +294,6 @@ class Pipeline implements PipelineContract
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Throwable  $e
-     * @return mixed
      *
      * @throws \Throwable
      */

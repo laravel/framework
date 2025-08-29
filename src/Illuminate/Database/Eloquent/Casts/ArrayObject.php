@@ -37,8 +37,6 @@ class ArrayObject extends BaseArrayObject implements Arrayable, JsonSerializable
 
     /**
      * Get the array that should be JSON serialized.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

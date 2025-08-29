@@ -19,7 +19,6 @@ class Timebox
      * @template TCallReturnType
      *
      * @param  (callable($this): TCallReturnType)  $callback
-     * @param  int  $microseconds
      * @return TCallReturnType
      *
      * @throws \Throwable
@@ -76,7 +75,6 @@ class Timebox
     /**
      * Sleep for the specified number of microseconds.
      *
-     * @param  int  $microseconds
      * @return void
      */
     protected function usleep(int $microseconds)

@@ -123,8 +123,6 @@ class Repository
      * Retrieve the given key's value.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function get($key, $default = null)
     {
@@ -135,8 +133,6 @@ class Repository
      * Retrieve the given key's hidden value.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function getHidden($key, $default = null)
     {
@@ -147,8 +143,6 @@ class Repository
      * Retrieve the given key's value and then forget it.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function pull($key, $default = null)
     {
@@ -161,8 +155,6 @@ class Repository
      * Retrieve the given key's hidden value and then forget it.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function pullHidden($key, $default = null)
     {
@@ -219,7 +211,6 @@ class Repository
      * Add a context value.
      *
      * @param  string|array<string, mixed>  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function add($key, $value = null)
@@ -236,7 +227,6 @@ class Repository
      * Add a hidden context value.
      *
      * @param  string|array<string, mixed>  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function addHidden($key, #[\SensitiveParameter] $value = null)
@@ -253,8 +243,6 @@ class Repository
      * Add a context value if it does not exist yet, and return the value.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
      */
     public function remember($key, $value)
     {
@@ -271,8 +259,6 @@ class Repository
      * Add a hidden context value if it does not exist yet, and return the value.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
      */
     public function rememberHidden($key, #[\SensitiveParameter] $value)
     {
@@ -319,7 +305,6 @@ class Repository
      * Add a context value if it does not exist yet.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function addIf($key, $value)
@@ -335,7 +320,6 @@ class Repository
      * Add a hidden context value if it does not exist yet.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function addHiddenIf($key, #[\SensitiveParameter] $value)
@@ -351,7 +335,6 @@ class Repository
      * Push the given values onto the key's stack.
      *
      * @param  string  $key
-     * @param  mixed  ...$values
      * @return $this
      *
      * @throws \RuntimeException
@@ -374,7 +357,6 @@ class Repository
      * Pop the latest value from the key's stack.
      *
      * @param  string  $key
-     * @return mixed
      *
      * @throws \RuntimeException
      */
@@ -391,7 +373,6 @@ class Repository
      * Push the given hidden values onto the key's stack.
      *
      * @param  string  $key
-     * @param  mixed  ...$values
      * @return $this
      *
      * @throws \RuntimeException
@@ -414,7 +395,6 @@ class Repository
      * Pop the latest hidden value from the key's stack.
      *
      * @param  string  $key
-     * @return mixed
      *
      * @throws \RuntimeException
      */
@@ -430,8 +410,6 @@ class Repository
     /**
      * Increment a context counter.
      *
-     * @param  string  $key
-     * @param  int  $amount
      * @return $this
      */
     public function increment(string $key, int $amount = 1)
@@ -447,8 +425,6 @@ class Repository
     /**
      * Decrement a context counter.
      *
-     * @param  string  $key
-     * @param  int  $amount
      * @return $this
      */
     public function decrement(string $key, int $amount = 1)
@@ -459,10 +435,6 @@ class Repository
     /**
      * Determine if the given value is in the given stack.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  bool  $strict
-     * @return bool
      *
      * @throws \RuntimeException
      */
@@ -486,10 +458,6 @@ class Repository
     /**
      * Determine if the given value is in the given hidden stack.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  bool  $strict
-     * @return bool
      *
      * @throws \RuntimeException
      */
@@ -537,10 +505,8 @@ class Repository
     /**
      * Run the callback function with the given context values and restore the original context state when complete.
      *
-     * @param  callable  $callback
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $hidden
-     * @return mixed
      *
      * @throws \Throwable
      */

@@ -44,7 +44,6 @@ class Factory
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

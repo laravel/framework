@@ -8,8 +8,6 @@ class NullSessionHandler implements SessionHandlerInterface
 {
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function open($savePath, $sessionName): bool
     {
@@ -18,8 +16,6 @@ class NullSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function close(): bool
     {
@@ -28,8 +24,6 @@ class NullSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function read($sessionId): string
     {
@@ -38,8 +32,6 @@ class NullSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function write($sessionId, $data): bool
     {
@@ -48,8 +40,6 @@ class NullSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function destroy($sessionId): bool
     {
@@ -58,8 +48,6 @@ class NullSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function gc($lifetime): int
     {

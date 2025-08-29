@@ -240,7 +240,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Add an array of query string values.
      *
-     * @param  array  $keys
      * @return $this
      */
     protected function appendArray(array $keys)
@@ -505,7 +504,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Set the current request path resolver callback.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public static function currentPathResolver(Closure $resolver)
@@ -532,7 +530,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Set the current page resolver callback.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public static function currentPageResolver(Closure $resolver)
@@ -558,7 +555,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Set with query string resolver callback.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public static function queryStringResolver(Closure $resolver)
@@ -579,7 +575,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Set the view factory resolver callback.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public static function viewFactoryResolver(Closure $resolver)
@@ -695,8 +690,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
 
     /**
      * Get the number of items for the current page.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -740,7 +733,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      * Determine if the given item exists.
      *
      * @param  TKey  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -763,7 +755,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      *
      * @param  TKey|null  $key
      * @param  TValue  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -774,7 +765,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      * Unset the item at the given key.
      *
      * @param  TKey  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {
@@ -796,7 +786,6 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

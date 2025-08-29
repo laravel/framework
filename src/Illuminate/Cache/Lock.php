@@ -83,7 +83,6 @@ abstract class Lock implements LockContract
      * Attempt to acquire the lock.
      *
      * @param  callable|null  $callback
-     * @return mixed
      */
     public function get($callback = null)
     {
@@ -105,7 +104,6 @@ abstract class Lock implements LockContract
      *
      * @param  int  $seconds
      * @param  callable|null  $callback
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */

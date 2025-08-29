@@ -18,7 +18,6 @@ interface ConnectionInterface
     /**
      * Get a new raw query expression.
      *
-     * @param  mixed  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value);
@@ -29,7 +28,6 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
      */
     public function selectOne($query, $bindings = [], $useReadPdo = true);
 
@@ -39,7 +37,6 @@ interface ConnectionInterface
      * @param  string  $query
      * @param  array  $bindings
      * @param  bool  $useReadPdo
-     * @return mixed
      *
      * @throws \Illuminate\Database\MultipleColumnsSelectedException
      */
@@ -121,7 +118,6 @@ interface ConnectionInterface
     /**
      * Prepare the query bindings for execution.
      *
-     * @param  array  $bindings
      * @return array
      */
     public function prepareBindings(array $bindings);
@@ -129,9 +125,7 @@ interface ConnectionInterface
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
      * @param  int  $attempts
-     * @return mixed
      *
      * @throws \Throwable
      */
@@ -168,7 +162,6 @@ interface ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
      * @return array
      */
     public function pretend(Closure $callback);

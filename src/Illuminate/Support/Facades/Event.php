@@ -80,10 +80,6 @@ class Event extends Facade
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
-     *
-     * @param  callable  $callable
-     * @param  array  $eventsToFake
-     * @return mixed
      */
     public static function fakeFor(callable $callable, array $eventsToFake = [])
     {
@@ -103,10 +99,6 @@ class Event extends Facade
 
     /**
      * Replace the bound instance with a fake during the given callable's execution.
-     *
-     * @param  callable  $callable
-     * @param  array  $eventsToAllow
-     * @return mixed
      */
     public static function fakeExceptFor(callable $callable, array $eventsToAllow = [])
     {

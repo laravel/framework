@@ -130,7 +130,6 @@ class Http extends Facade
     /**
      * Register a response sequence for the given URL pattern.
      *
-     * @param  string  $urlPattern
      * @return \Illuminate\Http\Client\ResponseSequence
      */
     public static function fakeSequence(string $urlPattern = '*')

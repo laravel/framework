@@ -79,7 +79,6 @@ trait Macroable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */
@@ -105,7 +104,6 @@ trait Macroable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

@@ -44,7 +44,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a select query into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     public function compileSelect(Builder $query)
@@ -60,7 +59,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the "select *" portion of the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $columns
      * @return string|null
      */
@@ -85,7 +83,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the "from" portion of the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @return string
      */
@@ -107,7 +104,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the index hints for the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
      */
@@ -121,7 +117,6 @@ class SqlServerGrammar extends Grammar
     /**
      * {@inheritdoc}
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -137,7 +132,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a "where date" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -151,7 +145,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a "where time" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -179,7 +172,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Prepare the binding for a "JSON contains" statement.
      *
-     * @param  mixed  $binding
      * @return string
      */
     public function prepareBindingForJsonContains($binding)
@@ -241,7 +233,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a single having clause.
      *
-     * @param  array  $having
      * @return string
      */
     protected function compileHaving(array $having)
@@ -271,7 +262,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile a delete statement without joins into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
      * @return string
@@ -299,7 +289,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the "limit" portions of the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  int  $limit
      * @return string
      */
@@ -333,7 +322,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the "offset" portions of the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  int  $offset
      * @return string
      */
@@ -351,7 +339,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile the lock into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  bool|string  $value
      * @return string
      */
@@ -374,7 +361,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile an exists statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     public function compileExists(Builder $query)
@@ -389,7 +375,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile an update statement with joins into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
@@ -407,10 +392,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Compile an "upsert" statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @param  array  $uniqueBy
-     * @param  array  $update
      * @return string
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
@@ -449,8 +430,6 @@ class SqlServerGrammar extends Grammar
     /**
      * Prepare the bindings for an update statement.
      *
-     * @param  array  $bindings
-     * @param  array  $values
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
@@ -464,10 +443,6 @@ class SqlServerGrammar extends Grammar
 
     /**
      * Compile a "lateral join" clause.
-     *
-     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
-     * @param  string  $expression
-     * @return string
      */
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {

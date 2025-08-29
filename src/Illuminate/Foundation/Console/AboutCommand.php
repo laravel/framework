@@ -51,8 +51,6 @@ class AboutCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Support\Composer  $composer
      */
     public function __construct(Composer $composer)
     {
@@ -224,7 +222,6 @@ class AboutCommand extends Command
     /**
      * Determine storage symbolic links status.
      *
-     * @param  callable  $formatStorageLinkedStatus
      * @return array<string,mixed>
      */
     protected function determineStoragePathLinkStatus(callable $formatStorageLinkedStatus): array
@@ -240,9 +237,6 @@ class AboutCommand extends Command
 
     /**
      * Determine whether the given directory has PHP files.
-     *
-     * @param  string  $path
-     * @return bool
      */
     protected function hasPhpFiles(string $path): bool
     {
@@ -252,9 +246,7 @@ class AboutCommand extends Command
     /**
      * Add additional data to the output of the "about" command.
      *
-     * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
      * @return void
      */
     public static function add(string $section, $data, ?string $value = null)
@@ -265,9 +257,7 @@ class AboutCommand extends Command
     /**
      * Add additional data to the output of the "about" command.
      *
-     * @param  string  $section
      * @param  callable|string|array  $data
-     * @param  string|null  $value
      * @return void
      */
     protected static function addToSection(string $section, $data, ?string $value = null)
@@ -299,7 +289,6 @@ class AboutCommand extends Command
     /**
      * Materialize a function that formats a given value for CLI or JSON output.
      *
-     * @param  mixed  $value
      * @param  (\Closure(mixed):(mixed))|null  $console
      * @param  (\Closure(mixed):(mixed))|null  $json
      * @return \Closure(bool):mixed
@@ -320,7 +309,6 @@ class AboutCommand extends Command
     /**
      * Format the given string for searching.
      *
-     * @param  string  $value
      * @return string
      */
     protected function toSearchKeyword(string $value)

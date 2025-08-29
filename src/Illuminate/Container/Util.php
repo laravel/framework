@@ -17,7 +17,6 @@ class Util
      *
      * From Arr::wrap() in Illuminate\Support.
      *
-     * @param  mixed  $value
      * @return array
      */
     public static function arrayWrap($value)
@@ -33,10 +32,6 @@ class Util
      * Return the default value of the given value.
      *
      * From global value() helper in Illuminate\Support.
-     *
-     * @param  mixed  $value
-     * @param  mixed  ...$args
-     * @return mixed
      */
     public static function unwrapIfClosure($value, ...$args)
     {

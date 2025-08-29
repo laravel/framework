@@ -95,7 +95,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure that the email is an RFC compliant email address.
      *
-     * @param  bool  $strict
      * @return $this
      */
     public function rfcCompliant(bool $strict = false)
@@ -148,7 +147,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure the email address is valid using PHP's native email validation functions.
      *
-     * @param  bool  $allowUnicode
      * @return $this
      */
     public function withNativeValidation(bool $allowUnicode = false)
@@ -179,7 +177,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

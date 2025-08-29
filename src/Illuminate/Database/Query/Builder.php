@@ -278,7 +278,6 @@ class Builder implements BuilderContract
     /**
      * Set the columns to be selected.
      *
-     * @param  mixed  $columns
      * @return $this
      */
     public function select($columns = ['*'])
@@ -354,7 +353,6 @@ class Builder implements BuilderContract
      * Add a raw from clause to the query.
      *
      * @param  string  $expression
-     * @param  mixed  $bindings
      * @return $this
      */
     public function fromRaw($expression, $bindings = [])
@@ -389,7 +387,6 @@ class Builder implements BuilderContract
     /**
      * Parse the subquery into SQL and bindings.
      *
-     * @param  mixed  $query
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -411,9 +408,6 @@ class Builder implements BuilderContract
 
     /**
      * Prepend the database name if the given query is on another database.
-     *
-     * @param  mixed  $query
-     * @return mixed
      */
     protected function prependDatabaseNameIfCrossDatabaseQuery($query)
     {
@@ -432,7 +426,6 @@ class Builder implements BuilderContract
     /**
      * Add a new select column to the query.
      *
-     * @param  mixed  $column
      * @return $this
      */
     public function addSelect($column)
@@ -815,8 +808,6 @@ class Builder implements BuilderContract
      * Add a basic where clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -965,7 +956,6 @@ class Builder implements BuilderContract
      * Prevents using Null values with invalid operators.
      *
      * @param  string  $operator
-     * @param  mixed  $value
      * @return bool
      */
     protected function invalidOperatorAndValue($operator, $value)
@@ -1002,8 +992,6 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -1019,8 +1007,6 @@ class Builder implements BuilderContract
      * Add a basic "where not" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1039,8 +1025,6 @@ class Builder implements BuilderContract
      * Add an "or where not" clause to the query.
      *
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNot($column, $operator = null, $value = null)
@@ -1102,7 +1086,6 @@ class Builder implements BuilderContract
      * Add a raw where clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
-     * @param  mixed  $bindings
      * @param  string  $boolean
      * @return $this
      */
@@ -1119,7 +1102,6 @@ class Builder implements BuilderContract
      * Add a raw or where clause to the query.
      *
      * @param  string  $sql
-     * @param  mixed  $bindings
      * @return $this
      */
     public function orWhereRaw($sql, $bindings = [])
@@ -1196,7 +1178,6 @@ class Builder implements BuilderContract
      * Add a "where in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1241,7 +1222,6 @@ class Builder implements BuilderContract
      * Add an "or where in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  mixed  $values
      * @return $this
      */
     public function orWhereIn($column, $values)
@@ -1253,7 +1233,6 @@ class Builder implements BuilderContract
      * Add a "where not in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
      */
@@ -1266,7 +1245,6 @@ class Builder implements BuilderContract
      * Add an "or where not in" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  mixed  $values
      * @return $this
      */
     public function orWhereNotIn($column, $values)
@@ -1492,7 +1470,6 @@ class Builder implements BuilderContract
     /**
      * Add a where between columns statement using a value to the query.
      *
-     * @param  mixed  $value
      * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
      * @param  string  $boolean
      * @param  bool  $not
@@ -1512,7 +1489,6 @@ class Builder implements BuilderContract
     /**
      * Add an or where between columns statement using a value to the query.
      *
-     * @param  mixed  $value
      * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
      * @return $this
      */
@@ -1524,7 +1500,6 @@ class Builder implements BuilderContract
     /**
      * Add a where not between columns statement using a value to the query.
      *
-     * @param  mixed  $value
      * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
      * @param  string  $boolean
      * @return $this
@@ -1537,7 +1512,6 @@ class Builder implements BuilderContract
     /**
      * Add an or where not between columns statement using a value to the query.
      *
-     * @param  mixed  $value
      * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
      * @return $this
      */
@@ -1811,7 +1785,6 @@ class Builder implements BuilderContract
      * @param  string  $type
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2020,7 +1993,6 @@ class Builder implements BuilderContract
      * Add a "where JSON contains" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -2042,7 +2014,6 @@ class Builder implements BuilderContract
      * Add an "or where JSON contains" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereJsonContains($column, $value)
@@ -2054,7 +2025,6 @@ class Builder implements BuilderContract
      * Add a "where JSON not contains" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2067,7 +2037,6 @@ class Builder implements BuilderContract
      * Add an "or where JSON not contains" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereJsonDoesntContain($column, $value)
@@ -2079,7 +2048,6 @@ class Builder implements BuilderContract
      * Add a "where JSON overlaps" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -2101,7 +2069,6 @@ class Builder implements BuilderContract
      * Add an "or where JSON overlaps" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereJsonOverlaps($column, $value)
@@ -2113,7 +2080,6 @@ class Builder implements BuilderContract
      * Add a "where JSON not overlap" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2126,7 +2092,6 @@ class Builder implements BuilderContract
      * Add an "or where JSON not overlap" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereJsonDoesntOverlap($column, $value)
@@ -2189,8 +2154,6 @@ class Builder implements BuilderContract
      * Add a "where JSON length" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2222,8 +2185,6 @@ class Builder implements BuilderContract
      * Add an "or where JSON length" clause to the query.
      *
      * @param  string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereJsonLength($column, $operator, $value = null)
@@ -2334,8 +2295,6 @@ class Builder implements BuilderContract
      * Add a "where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2358,8 +2317,6 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query for multiple columns with "and" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereAll($columns, $operator = null, $value = null)
@@ -2371,8 +2328,6 @@ class Builder implements BuilderContract
      * Add a "where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2395,8 +2350,6 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query for multiple columns with "or" conditions between them.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereAny($columns, $operator = null, $value = null)
@@ -2408,8 +2361,6 @@ class Builder implements BuilderContract
      * Add a "where not" clause to the query for multiple columns where none of the conditions should be true.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -2422,8 +2373,6 @@ class Builder implements BuilderContract
      * Add an "or where not" clause to the query for multiple columns where none of the conditions should be true.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[]  $columns
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereNone($columns, $operator = null, $value = null)
@@ -3046,9 +2995,6 @@ class Builder implements BuilderContract
 
     /**
      * Invoke the "after query" modification callbacks.
-     *
-     * @param  mixed  $result
-     * @return mixed
      */
     public function applyAfterQueryCallbacks($result)
     {
@@ -3100,7 +3046,6 @@ class Builder implements BuilderContract
      *
      * @template TValue
      *
-     * @param  mixed  $id
      * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return object|TValue
@@ -3124,7 +3069,6 @@ class Builder implements BuilderContract
      * Get a single column's value from the first result of a query.
      *
      * @param  string  $column
-     * @return mixed
      */
     public function value($column)
     {
@@ -3135,8 +3079,6 @@ class Builder implements BuilderContract
 
     /**
      * Get a single expression value from the first result of a query.
-     *
-     * @return mixed
      */
     public function rawValue(string $expression, array $bindings = [])
     {
@@ -3149,7 +3091,6 @@ class Builder implements BuilderContract
      * Get a single column's value from the first result of a query if it's the sole matching record.
      *
      * @param  string  $column
-     * @return mixed
      *
      * @throws \Illuminate\Database\RecordsNotFoundException
      * @throws \Illuminate\Database\MultipleRecordsFoundException
@@ -3586,8 +3527,6 @@ class Builder implements BuilderContract
 
     /**
      * Execute the given callback if no rows exist for the current query.
-     *
-     * @return mixed
      */
     public function existsOr(Closure $callback)
     {
@@ -3596,8 +3535,6 @@ class Builder implements BuilderContract
 
     /**
      * Execute the given callback if rows exist for the current query.
-     *
-     * @return mixed
      */
     public function doesntExistOr(Closure $callback)
     {
@@ -3619,7 +3556,6 @@ class Builder implements BuilderContract
      * Retrieve the minimum value of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
      */
     public function min($column)
     {
@@ -3630,7 +3566,6 @@ class Builder implements BuilderContract
      * Retrieve the maximum value of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
      */
     public function max($column)
     {
@@ -3641,7 +3576,6 @@ class Builder implements BuilderContract
      * Retrieve the sum of the values of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
      */
     public function sum($column)
     {
@@ -3654,7 +3588,6 @@ class Builder implements BuilderContract
      * Retrieve the average of the values of a given column.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
      */
     public function avg($column)
     {
@@ -3665,7 +3598,6 @@ class Builder implements BuilderContract
      * Alias for the "avg" method.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @return mixed
      */
     public function average($column)
     {
@@ -3677,7 +3609,6 @@ class Builder implements BuilderContract
      *
      * @param  string  $function
      * @param  array  $columns
-     * @return mixed
      */
     public function aggregate($function, $columns = ['*'])
     {
@@ -4092,7 +4023,6 @@ class Builder implements BuilderContract
     /**
      * Delete records from the database.
      *
-     * @param  mixed  $id
      * @return int
      */
     public function delete($id = null)
@@ -4162,7 +4092,6 @@ class Builder implements BuilderContract
     /**
      * Create a raw database expression.
      *
-     * @param  mixed  $value
      * @return \Illuminate\Contracts\Database\Query\Expression
      */
     public function raw($value)
@@ -4184,8 +4113,6 @@ class Builder implements BuilderContract
 
     /**
      * Get the "limit" value for the query or null if it's not set.
-     *
-     * @return mixed
      */
     public function getLimit()
     {
@@ -4196,8 +4123,6 @@ class Builder implements BuilderContract
 
     /**
      * Get the "offset" value for the query or null if it's not set.
-     *
-     * @return mixed
      */
     public function getOffset()
     {
@@ -4259,7 +4184,6 @@ class Builder implements BuilderContract
     /**
      * Add a binding to the query.
      *
-     * @param  mixed  $value
      * @param  "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder"  $type
      * @return $this
      *
@@ -4285,9 +4209,6 @@ class Builder implements BuilderContract
 
     /**
      * Cast the given binding value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     public function castBinding($value)
     {
@@ -4301,7 +4222,6 @@ class Builder implements BuilderContract
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)
@@ -4330,9 +4250,6 @@ class Builder implements BuilderContract
 
     /**
      * Get a scalar type value from an unknown type of input.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function flattenValue($value)
     {
@@ -4394,7 +4311,6 @@ class Builder implements BuilderContract
     /**
      * Determine if the value is a query builder instance or a Closure.
      *
-     * @param  mixed  $value
      * @return bool
      */
     protected function isQueryable($value)
@@ -4446,7 +4362,6 @@ class Builder implements BuilderContract
     /**
      * Dump the current SQL and bindings.
      *
-     * @param  mixed  ...$args
      * @return $this
      */
     public function dump(...$args)
@@ -4497,7 +4412,6 @@ class Builder implements BuilderContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

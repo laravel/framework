@@ -12,8 +12,6 @@ class Unique implements Stringable
 
     /**
      * The ID that should be ignored.
-     *
-     * @var mixed
      */
     protected $ignore;
 
@@ -27,7 +25,6 @@ class Unique implements Stringable
     /**
      * Ignore the given ID during the unique check.
      *
-     * @param  mixed  $id
      * @param  string|null  $idColumn
      * @return $this
      */

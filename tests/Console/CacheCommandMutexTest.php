@@ -131,9 +131,6 @@ class CacheCommandMutexTest extends TestCase
         $this->mutex->create($this->command);
     }
 
-    /**
-     * @return void
-     */
     private function mockUsingCacheStore(): void
     {
         $this->cacheFactory->expects('store')->once()->andReturn($this->cacheRepository);

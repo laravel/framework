@@ -32,8 +32,6 @@ class TestView implements Stringable
 
     /**
      * Create a new test view instance.
-     *
-     * @param  \Illuminate\View\View  $view
      */
     public function __construct(View $view)
     {
@@ -45,7 +43,6 @@ class TestView implements Stringable
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function assertViewHas($key, $value = null)
@@ -77,7 +74,6 @@ class TestView implements Stringable
     /**
      * Assert that the response view has a given list of bound data.
      *
-     * @param  array  $bindings
      * @return $this
      */
     public function assertViewHasAll(array $bindings)
@@ -137,7 +133,6 @@ class TestView implements Stringable
     /**
      * Assert that the given strings are contained in order within the view.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -169,7 +164,6 @@ class TestView implements Stringable
     /**
      * Assert that the given strings are contained in order within the view text.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */

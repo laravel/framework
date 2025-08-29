@@ -15,8 +15,6 @@ class Once
 
     /**
      * Indicates if the once instance is enabled.
-     *
-     * @var bool
      */
     protected static bool $enabled = true;
 
@@ -42,9 +40,6 @@ class Once
 
     /**
      * Get the value of the given onceable.
-     *
-     * @param  Onceable  $onceable
-     * @return mixed
      */
     public function value(Onceable $onceable)
     {

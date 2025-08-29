@@ -14,7 +14,6 @@ class PostResourceWithAnonymousResourceCollectionWithPaginationInformation exten
     /**
      * Create a new anonymous resource collection.
      *
-     * @param  mixed  $resource
      * @return \Illuminate\Tests\Integration\Http\Fixtures\AnonymousResourceCollectionWithPaginationInformation
      */
     public static function collection($resource)

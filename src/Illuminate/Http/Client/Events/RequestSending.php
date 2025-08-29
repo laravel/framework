@@ -15,8 +15,6 @@ class RequestSending
 
     /**
      * Create a new event instance.
-     *
-     * @param  \Illuminate\Http\Client\Request  $request
      */
     public function __construct(Request $request)
     {

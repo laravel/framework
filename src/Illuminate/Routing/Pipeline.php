@@ -17,9 +17,6 @@ class Pipeline extends BasePipeline
 {
     /**
      * Handles the value returned from each pipe before passing it to the next.
-     *
-     * @param  mixed  $carry
-     * @return mixed
      */
     protected function handleCarry($carry)
     {
@@ -31,9 +28,6 @@ class Pipeline extends BasePipeline
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Throwable  $e
-     * @return mixed
      *
      * @throws \Throwable
      */

@@ -16,8 +16,6 @@ class ProcessFailedException extends RuntimeException
 
     /**
      * Create a new exception instance.
-     *
-     * @param  \Illuminate\Contracts\Process\ProcessResult  $result
      */
     public function __construct(ProcessResult $result)
     {

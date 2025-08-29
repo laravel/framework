@@ -61,9 +61,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
 
     /**
      * Create a new migration command instance.
-     *
-     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      */
     public function __construct(Migrator $migrator, Dispatcher $dispatcher)
     {
@@ -173,7 +170,6 @@ class MigrateCommand extends BaseCommand implements Isolatable
     /**
      * Attempt to create the database if it is missing.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     protected function handleMissingDatabase(Throwable $e)

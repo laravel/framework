@@ -56,7 +56,6 @@ class ValidateSignature
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  array|null  $args
      * @return \Illuminate\Http\Response
      *
@@ -76,7 +75,6 @@ class ValidateSignature
     /**
      * Parse the additional arguments given to the middleware.
      *
-     * @param  array  $args
      * @return array
      */
     protected function parseArguments(array $args)

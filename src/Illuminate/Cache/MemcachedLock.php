@@ -64,8 +64,6 @@ class MemcachedLock extends Lock
 
     /**
      * Returns the owner value written into the driver for this lock.
-     *
-     * @return mixed
      */
     protected function getCurrentOwner()
     {

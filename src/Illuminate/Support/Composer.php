@@ -27,7 +27,6 @@ class Composer
     /**
      * Create a new Composer manager instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string|null  $workingPath
      */
     public function __construct(Filesystem $files, $workingPath = null)
@@ -56,8 +55,6 @@ class Composer
      * Install the given Composer packages into the application.
      *
      * @param  array<int, string>  $packages
-     * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -85,8 +82,6 @@ class Composer
      * Remove the given Composer packages from the application.
      *
      * @param  array<int, string>  $packages
-     * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -208,8 +203,6 @@ class Composer
     /**
      * Get a new Symfony process instance.
      *
-     * @param  array  $command
-     * @param  array  $env
      * @return \Symfony\Component\Process\Process
      */
     protected function getProcess(array $command, array $env = [])

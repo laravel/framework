@@ -17,8 +17,6 @@ class BroadcastEvent implements ShouldQueue
 
     /**
      * The event instance.
-     *
-     * @var mixed
      */
     public $event;
 
@@ -52,8 +50,6 @@ class BroadcastEvent implements ShouldQueue
 
     /**
      * Create a new job handler instance.
-     *
-     * @param  mixed  $event
      */
     public function __construct($event)
     {
@@ -68,7 +64,6 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Broadcasting\Factory  $manager
      * @return void
      */
     public function handle(BroadcastingFactory $manager)
@@ -101,7 +96,6 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Get the payload for the given event.
      *
-     * @param  mixed  $event
      * @return array
      */
     protected function getPayloadFromEvent($event)
@@ -124,9 +118,6 @@ class BroadcastEvent implements ShouldQueue
 
     /**
      * Format the given value for a property.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function formatProperty($value)
     {
@@ -187,9 +178,6 @@ class BroadcastEvent implements ShouldQueue
 
     /**
      * Handle a job failure.
-     *
-     * @param  \Throwable  $e
-     * @return void
      */
     public function failed(?Throwable $e = null): void
     {

@@ -9,7 +9,6 @@ interface RouteCollectionInterface
     /**
      * Add a Route instance to the collection.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
     public function add(Route $route);
@@ -35,7 +34,6 @@ interface RouteCollectionInterface
     /**
      * Find the first route matching a given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException

@@ -11,7 +11,6 @@ class RedisTaggedCache extends TaggedCache
      * Store an item in the cache if the key does not exist.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
@@ -37,7 +36,6 @@ class RedisTaggedCache extends TaggedCache
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */
@@ -63,7 +61,6 @@ class RedisTaggedCache extends TaggedCache
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -77,7 +74,6 @@ class RedisTaggedCache extends TaggedCache
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -91,7 +87,6 @@ class RedisTaggedCache extends TaggedCache
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)

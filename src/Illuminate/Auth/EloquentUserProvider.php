@@ -34,7 +34,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $model
      */
     public function __construct(HasherContract $hasher, $model)
@@ -46,7 +45,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier.
      *
-     * @param  mixed  $identifier
      * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveById($identifier)
@@ -61,7 +59,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
-     * @param  mixed  $identifier
      * @param  string  $token
      * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
@@ -105,7 +102,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param  array  $credentials
      * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
@@ -141,8 +137,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Validate a user against the given credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
      * @return bool
      */
     public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
@@ -162,8 +156,6 @@ class EloquentUserProvider implements UserProvider
      * Rehash the user's password if required and supported.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model  $user
-     * @param  array  $credentials
-     * @param  bool  $force
      * @return void
      */
     public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)
@@ -221,7 +213,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Sets the hasher implementation.
      *
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @return $this
      */
     public function setHasher(HasherContract $hasher)

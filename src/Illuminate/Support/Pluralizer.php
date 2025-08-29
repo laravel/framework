@@ -115,7 +115,6 @@ class Pluralizer
     /**
      * Specify the language that should be used by the inflector.
      *
-     * @param  string  $language
      * @return void
      */
     public static function useLanguage(string $language)

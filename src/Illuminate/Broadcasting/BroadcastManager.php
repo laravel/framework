@@ -61,7 +61,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Register the routes for handling broadcast channel authentication and sockets.
      *
-     * @param  array|null  $attributes
      * @return void
      */
     public function routes(?array $attributes = null)
@@ -83,7 +82,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Register the routes for handling broadcast user authentication.
      *
-     * @param  array|null  $attributes
      * @return void
      */
     public function userRoutes(?array $attributes = null)
@@ -107,7 +105,6 @@ class BroadcastManager implements FactoryContract
      *
      * Alias of "routes" method.
      *
-     * @param  array|null  $attributes
      * @return void
      */
     public function channelRoutes(?array $attributes = null)
@@ -159,7 +156,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed  $event
      * @return \Illuminate\Broadcasting\PendingBroadcast
      */
     public function event($event = null)
@@ -170,7 +166,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Queue the given event for broadcast.
      *
-     * @param  mixed  $event
      * @return void
      */
     public function queue($event)
@@ -219,7 +214,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Determine if the broadcastable event must be unique and determine if we can acquire the necessary lock.
      *
-     * @param  mixed  $event
      * @return bool
      */
     protected function mustBeUniqueAndCannotAcquireLock($event)
@@ -235,7 +229,6 @@ class BroadcastManager implements FactoryContract
      * Get a driver instance.
      *
      * @param  string|null  $driver
-     * @return mixed
      */
     public function connection($driver = null)
     {
@@ -246,7 +239,6 @@ class BroadcastManager implements FactoryContract
      * Get a driver instance.
      *
      * @param  string|null  $name
-     * @return mixed
      */
     public function driver($name = null)
     {
@@ -297,9 +289,6 @@ class BroadcastManager implements FactoryContract
 
     /**
      * Call a custom driver creator.
-     *
-     * @param  array  $config
-     * @return mixed
      */
     protected function callCustomCreator(array $config)
     {
@@ -309,7 +298,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createReverbDriver(array $config)
@@ -320,7 +308,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createPusherDriver(array $config)
@@ -331,7 +318,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a Pusher instance for the given configuration.
      *
-     * @param  array  $config
      * @return \Pusher\Pusher
      */
     public function pusher(array $config)
@@ -365,7 +351,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createAblyDriver(array $config)
@@ -376,7 +361,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Get an Ably instance for the given configuration.
      *
-     * @param  array  $config
      * @return \Ably\AblyRest
      */
     public function ably(array $config)
@@ -387,7 +371,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createRedisDriver(array $config)
@@ -401,7 +384,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createLogDriver(array $config)
@@ -414,7 +396,6 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createNullDriver(array $config)
@@ -475,7 +456,6 @@ class BroadcastManager implements FactoryContract
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -487,9 +467,6 @@ class BroadcastManager implements FactoryContract
 
     /**
      * Execute the given callback using "rescue" if possible.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
      */
     protected function rescue(Closure $callback)
     {
@@ -540,7 +517,6 @@ class BroadcastManager implements FactoryContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

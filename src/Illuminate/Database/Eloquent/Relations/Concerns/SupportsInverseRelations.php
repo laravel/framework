@@ -11,8 +11,6 @@ trait SupportsInverseRelations
 {
     /**
      * The name of the inverse relationship.
-     *
-     * @var string|null
      */
     protected ?string $inverseRelationship = null;
 
@@ -21,7 +19,6 @@ trait SupportsInverseRelations
      *
      * Alias of "chaperone".
      *
-     * @param  string|null  $relation
      * @return $this
      */
     public function inverse(?string $relation = null)
@@ -32,7 +29,6 @@ trait SupportsInverseRelations
     /**
      * Instruct Eloquent to link the related models back to the parent after the relationship query has run.
      *
-     * @param  string|null  $relation
      * @return $this
      */
     public function chaperone(?string $relation = null)
@@ -58,8 +54,6 @@ trait SupportsInverseRelations
 
     /**
      * Guess the name of the inverse relationship.
-     *
-     * @return string|null
      */
     protected function guessInverseRelation(): ?string
     {
@@ -89,7 +83,6 @@ trait SupportsInverseRelations
      * Set the inverse relation on all models in a collection.
      *
      * @param  \Illuminate\Database\Eloquent\Collection  $models
-     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function applyInverseRelationToCollection($models, ?Model $parent = null)
@@ -106,8 +99,6 @@ trait SupportsInverseRelations
     /**
      * Set the inverse relation on a model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Model
      */
     protected function applyInverseRelationToModel(Model $model, ?Model $parent = null)

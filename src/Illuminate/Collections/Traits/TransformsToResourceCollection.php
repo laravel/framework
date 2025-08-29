@@ -12,7 +12,6 @@ trait TransformsToResourceCollection
      * Create a new resource collection instance for the given resource.
      *
      * @param  class-string<\Illuminate\Http\Resources\Json\JsonResource>|null  $resourceClass
-     * @return \Illuminate\Http\Resources\Json\ResourceCollection
      *
      * @throws \Throwable
      */
@@ -28,7 +27,6 @@ trait TransformsToResourceCollection
     /**
      * Guess the resource collection for the items.
      *
-     * @return \Illuminate\Http\Resources\Json\ResourceCollection
      *
      * @throws \Throwable
      */

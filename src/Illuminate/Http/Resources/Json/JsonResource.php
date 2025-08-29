@@ -21,8 +21,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
     /**
      * The resource instance.
-     *
-     * @var mixed
      */
     public $resource;
 
@@ -51,15 +49,11 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
     /**
      * Whether to force wrapping even if the $wrap key exists in underlying resource data.
-     *
-     * @var bool
      */
     public static bool $forceWrapping = false;
 
     /**
      * Create a new resource instance.
-     *
-     * @param  mixed  $resource
      */
     public function __construct($resource)
     {
@@ -69,7 +63,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Create a new resource instance.
      *
-     * @param  mixed  ...$parameters
      * @return static
      */
     public static function make(...$parameters)
@@ -80,7 +73,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Create a new anonymous resource collection.
      *
-     * @param  mixed  $resource
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public static function collection($resource)
@@ -95,7 +87,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Create a new resource collection instance.
      *
-     * @param  mixed  $resource
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     protected static function newCollection($resource)
@@ -127,7 +118,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray(Request $request)
@@ -175,7 +165,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Get any additional data that should be returned with the resource array.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function with(Request $request)
@@ -186,7 +175,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Add additional meta data to the resource response.
      *
-     * @param  array  $data
      * @return $this
      */
     public function additional(array $data)
@@ -209,8 +197,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Customize the response for a request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\JsonResponse  $response
      * @return void
      */
     public function withResponse(Request $request, JsonResponse $response)
@@ -265,8 +251,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
     /**
      * Prepare the resource for JSON serialization.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

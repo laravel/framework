@@ -70,7 +70,6 @@ class SendQueuedNotifications implements ShouldQueue
      *
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  array|null  $channels
      */
     public function __construct($notifiables, $notification, ?array $channels = null)
     {
@@ -110,7 +109,6 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Send the notifications.
      *
-     * @param  \Illuminate\Notifications\ChannelManager  $manager
      * @return void
      */
     public function handle(ChannelManager $manager)
@@ -143,8 +141,6 @@ class SendQueuedNotifications implements ShouldQueue
 
     /**
      * Get the number of seconds before a released notification will be available.
-     *
-     * @return mixed
      */
     public function backoff()
     {

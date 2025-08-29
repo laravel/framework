@@ -42,7 +42,6 @@ class MessageSent
     /**
      * Marshal the object from its serialized data.
      *
-     * @param  array  $data
      * @return void
      */
     public function __unserialize(array $data)
@@ -58,7 +57,6 @@ class MessageSent
      * Dynamically get the original message.
      *
      * @param  string  $key
-     * @return mixed
      *
      * @throws \Exception
      */

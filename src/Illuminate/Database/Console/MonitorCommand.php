@@ -43,9 +43,6 @@ class MonitorCommand extends DatabaseInspectionCommand
 
     /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $connection
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      */
     public function __construct(ConnectionResolverInterface $connection, Dispatcher $events)
     {

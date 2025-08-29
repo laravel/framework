@@ -20,8 +20,6 @@ abstract class Grammar
 
     /**
      * Create a new grammar instance.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
      */
     public function __construct(Connection $connection)
     {
@@ -212,7 +210,6 @@ abstract class Grammar
     /**
      * Get the appropriate query parameter place-holder for a value.
      *
-     * @param  mixed  $value
      * @return string
      */
     public function parameter($value)
@@ -250,7 +247,6 @@ abstract class Grammar
     /**
      * Determine if the given value is a raw expression.
      *
-     * @param  mixed  $value
      * @return bool
      */
     public function isExpression($value)

@@ -12,7 +12,6 @@ class MySqlSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
@@ -34,7 +33,6 @@ class MySqlSchemaState extends SchemaState
     /**
      * Remove the auto-incrementing state from the given schema dump.
      *
-     * @param  string  $path
      * @return void
      */
     protected function removeAutoIncrementingState(string $path)
@@ -49,7 +47,6 @@ class MySqlSchemaState extends SchemaState
     /**
      * Append the migration data to the schema dump.
      *
-     * @param  string  $path
      * @return void
      */
     protected function appendMigrationData(string $path)
@@ -126,7 +123,6 @@ class MySqlSchemaState extends SchemaState
     /**
      * Get the base variables for a dump / load command.
      *
-     * @param  array  $config
      * @return array
      */
     protected function baseVariables(array $config)
@@ -147,10 +143,7 @@ class MySqlSchemaState extends SchemaState
     /**
      * Execute the given dump process.
      *
-     * @param  \Symfony\Component\Process\Process  $process
      * @param  callable  $output
-     * @param  array  $variables
-     * @param  int  $depth
      * @return \Symfony\Component\Process\Process
      */
     protected function executeDumpProcess(Process $process, $output, array $variables, int $depth = 0)

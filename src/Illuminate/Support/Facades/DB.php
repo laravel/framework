@@ -124,7 +124,6 @@ class DB extends Facade
      *
      * Prohibits: db:wipe, migrate:fresh, migrate:refresh, migrate:reset, and migrate:rollback
      *
-     * @param  bool  $prohibit
      * @return void
      */
     public static function prohibitDestructiveCommands(bool $prohibit = true)

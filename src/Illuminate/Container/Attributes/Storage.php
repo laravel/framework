@@ -19,8 +19,6 @@ class Storage implements ContextualAttribute
     /**
      * Resolve the storage disk.
      *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function resolve(self $attribute, Container $container)

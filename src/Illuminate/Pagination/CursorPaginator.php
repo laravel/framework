@@ -162,8 +162,6 @@ class CursorPaginator extends AbstractCursorPaginator implements Arrayable, Arra
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

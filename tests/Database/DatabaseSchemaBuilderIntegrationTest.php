@@ -14,8 +14,6 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
     /**
      * Bootstrap database.
-     *
-     * @return void
      */
     protected function setUp(): void
     {

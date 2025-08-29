@@ -32,8 +32,6 @@ class MariaDbConnection extends MySqlConnection
 
     /**
      * Get the server version for the connection.
-     *
-     * @return string
      */
     public function getServerVersion(): string
     {
@@ -77,8 +75,6 @@ class MariaDbConnection extends MySqlConnection
     /**
      * Get the schema state for the connection.
      *
-     * @param  \Illuminate\Filesystem\Filesystem|null  $files
-     * @param  callable|null  $processFactory
      * @return \Illuminate\Database\Schema\MariaDbSchemaState
      */
     public function getSchemaState(?Filesystem $files = null, ?callable $processFactory = null)

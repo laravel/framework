@@ -37,9 +37,6 @@ class CompilerEngine extends PhpEngine
 
     /**
      * Create a new compiler engine instance.
-     *
-     * @param  \Illuminate\View\Compilers\CompilerInterface  $compiler
-     * @param  \Illuminate\Filesystem\Filesystem|null  $files
      */
     public function __construct(CompilerInterface $compiler, ?Filesystem $files = null)
     {
@@ -52,7 +49,6 @@ class CompilerEngine extends PhpEngine
      * Get the evaluated contents of the view.
      *
      * @param  string  $path
-     * @param  array  $data
      * @return string
      *
      * @throws \Illuminate\View\ViewException
@@ -98,7 +94,6 @@ class CompilerEngine extends PhpEngine
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
      * @param  int  $obLevel
      * @return void
      *
@@ -121,7 +116,6 @@ class CompilerEngine extends PhpEngine
     /**
      * Get the exception message for an exception.
      *
-     * @param  \Throwable  $e
      * @return string
      */
     protected function getMessage(Throwable $e)

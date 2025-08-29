@@ -57,7 +57,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         app('events')
             ->shouldReceive('dispatch')
             ->times(2)
-            ->with(m::type(ModelsPruned::class));
+            ->with(m::type(ModelsPruned::class), [], false);
 
         collect(range(1, 5000))->map(function ($id) {
             return ['name' => 'foo'];
@@ -76,7 +76,7 @@ class EloquentMassPrunableTest extends DatabaseTestCase
         app('events')
             ->shouldReceive('dispatch')
             ->times(3)
-            ->with(m::type(ModelsPruned::class));
+            ->with(m::type(ModelsPruned::class), [], false);
 
         collect(range(1, 5000))->map(function ($id) {
             return ['deleted_at' => now()];

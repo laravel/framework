@@ -1515,7 +1515,6 @@ class RouteRegistrarTest extends TestCase
      * Assert that the last route has the given content.
      *
      * @param  string  $content
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function seeResponse($content, Request $request)

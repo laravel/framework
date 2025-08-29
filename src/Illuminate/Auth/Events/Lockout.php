@@ -15,8 +15,6 @@ class Lockout
 
     /**
      * Create a new event instance.
-     *
-     * @param  \Illuminate\Http\Request  $request
      */
     public function __construct(Request $request)
     {

@@ -11,8 +11,6 @@ class RedisTagSet extends TagSet
     /**
      * Add a reference entry to the tag set's underlying sorted set.
      *
-     * @param  string  $key
-     * @param  int|null  $ttl
      * @param  string  $updateWhen
      * @return void
      */

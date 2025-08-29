@@ -19,8 +19,6 @@ class Authenticated implements ContextualAttribute
     /**
      * Resolve the currently authenticated user.
      *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public static function resolve(self $attribute, Container $container)

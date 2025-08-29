@@ -23,8 +23,6 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
 
     /**
      * Create a new database presence verifier.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $db
      */
     public function __construct(ConnectionResolverInterface $db)
     {
@@ -39,7 +37,6 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      * @param  string  $value
      * @param  int|null  $excludeId
      * @param  string|null  $idColumn
-     * @param  array  $extra
      * @return int
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])
@@ -58,8 +55,6 @@ class DatabasePresenceVerifier implements DatabasePresenceVerifierInterface
      *
      * @param  string  $collection
      * @param  string  $column
-     * @param  array  $values
-     * @param  array  $extra
      * @return int
      */
     public function getMultiCount($collection, $column, array $values, array $extra = [])

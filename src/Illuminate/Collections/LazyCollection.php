@@ -222,8 +222,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Determine if an item exists in the enumerable.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -279,9 +277,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item is not contained in the enumerable.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function doesntContain($key, $operator = null, $value = null)
@@ -292,9 +287,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item is not contained in the enumerable, using strict comparison.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function doesntContainStrict($key, $operator = null, $value = null)
@@ -606,7 +598,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  mixed  $key
      * @return bool
      */
     public function has($key)
@@ -626,7 +617,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Determine if any of the keys exist in the collection.
      *
-     * @param  mixed  $key
      * @return bool
      */
     public function hasAny($key)
@@ -893,7 +883,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Multiply the items in the collection by the multiplier.
      *
-     * @param  int  $multiplier
      * @return static
      */
     public function multiply(int $multiplier)
@@ -1345,8 +1334,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return TValue
      *
      * @throws \Illuminate\Support\ItemNotFoundException
@@ -1370,8 +1357,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
      * @param  (callable(TValue, TKey): bool)|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return TValue
      *
      * @throws \Illuminate\Support\ItemNotFoundException
@@ -1632,7 +1617,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Take items in the collection until a given point in time.
      *
-     * @param  \DateTimeInterface  $timeout
      * @return static<TKey, TValue>
      */
     public function takeUntilTimeout(DateTimeInterface $timeout)
@@ -1871,8 +1855,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * Count the number of items in the collection.
-     *
-     * @return int
      */
     public function count(): int
     {

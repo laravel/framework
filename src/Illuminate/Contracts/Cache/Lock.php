@@ -8,7 +8,6 @@ interface Lock
      * Attempt to acquire the lock.
      *
      * @param  callable|null  $callback
-     * @return mixed
      */
     public function get($callback = null);
 
@@ -17,7 +16,6 @@ interface Lock
      *
      * @param  int  $seconds
      * @param  callable|null  $callback
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */

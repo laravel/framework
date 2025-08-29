@@ -225,8 +225,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Convert the case of a string.
      *
-     * @param  int  $mode
-     * @param  string|null  $encoding
      * @return static
      */
     public function convertCase(int $mode = MB_CASE_FOLD, ?string $encoding = 'UTF-8')
@@ -237,7 +235,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Replace consecutive instances of a given character with a single character.
      *
-     * @param  string  $character
      * @return static
      */
     public function deduplicate(string $character = ' ')
@@ -382,7 +379,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Determine if a given value is a valid URL.
      *
-     * @param  array  $protocols
      * @return bool
      */
     public function isUrl(array $protocols = [])
@@ -478,8 +474,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Convert GitHub flavored Markdown into HTML.
      *
-     * @param  array  $options
-     * @param  array  $extensions
      * @return static
      */
     public function markdown(array $options = [], array $extensions = [])
@@ -490,8 +484,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Convert inline Markdown into HTML.
      *
-     * @param  array  $options
-     * @param  array  $extensions
      * @return static
      */
     public function inlineMarkdown(array $options = [], array $extensions = [])
@@ -617,7 +609,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Call the given callback and return a new string.
      *
-     * @param  callable  $callback
      * @return static
      */
     public function pipe(callable $callback)
@@ -708,7 +699,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Repeat the string.
      *
-     * @param  int  $times
      * @return static
      */
     public function repeat(int $times)
@@ -1019,7 +1009,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param  array  $map
      * @return static
      */
     public function swap(array $map)
@@ -1030,7 +1019,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Take the first or last {$limit} characters.
      *
-     * @param  int  $limit
      * @return static
      */
     public function take(int $limit)
@@ -1389,7 +1377,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Hash the string using the given algorithm.
      *
-     * @param  string  $algorithm
      * @return static
      */
     public function hash(string $algorithm)
@@ -1400,7 +1387,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Encrypt the string.
      *
-     * @param  bool  $serialize
      * @return static
      */
     public function encrypt(bool $serialize = false)
@@ -1411,7 +1397,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Decrypt the string.
      *
-     * @param  bool  $serialize
      * @return static
      */
     public function decrypt(bool $serialize = false)
@@ -1422,7 +1407,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Dump the string.
      *
-     * @param  mixed  ...$args
      * @return $this
      */
     public function dump(...$args)
@@ -1515,8 +1499,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Convert the object to a string when JSON encoded.
-     *
-     * @return string
      */
     public function jsonSerialize(): string
     {
@@ -1525,9 +1507,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Determine if the given offset exists.
-     *
-     * @param  mixed  $offset
-     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -1536,9 +1515,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Get the value at the given offset.
-     *
-     * @param  mixed  $offset
-     * @return string
      */
     public function offsetGet(mixed $offset): string
     {
@@ -1547,9 +1523,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Set the value at the given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -1558,9 +1531,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
 
     /**
      * Unset the value at the given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
      */
     public function offsetUnset(mixed $offset): void
     {
@@ -1571,7 +1541,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Proxy dynamic properties onto methods.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {

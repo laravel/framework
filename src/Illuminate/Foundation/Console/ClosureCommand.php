@@ -36,7 +36,6 @@ class ClosureCommand extends Command
      * Create a new command instance.
      *
      * @param  string  $signature
-     * @param  \Closure  $callback
      */
     public function __construct($signature, Closure $callback)
     {
@@ -48,10 +47,6 @@ class ClosureCommand extends Command
 
     /**
      * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -116,7 +111,6 @@ class ClosureCommand extends Command
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

@@ -77,8 +77,6 @@ class VendorPublishCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {
@@ -190,7 +188,6 @@ class VendorPublishCommand extends Command
      * Publishes the assets for a tag.
      *
      * @param  string  $tag
-     * @return mixed
      */
     protected function publishTag($tag)
     {

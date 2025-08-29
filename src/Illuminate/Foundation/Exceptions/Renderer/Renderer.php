@@ -55,12 +55,6 @@ class Renderer
 
     /**
      * Creates a new exception renderer instance.
-     *
-     * @param  \Illuminate\Contracts\View\Factory  $viewFactory
-     * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
-     * @param  \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer  $htmlErrorRenderer
-     * @param  \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper  $bladeMapper
-     * @param  string  $basePath
      */
     public function __construct(
         Factory $viewFactory,
@@ -79,8 +73,6 @@ class Renderer
     /**
      * Render the given exception as an HTML string.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $throwable
      * @return string
      */
     public function render(Request $request, Throwable $throwable)

@@ -25,8 +25,6 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
 
     /**
      * Create a new scheduling strategy.
-     *
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      */
     public function __construct(Cache $cache)
     {
@@ -36,8 +34,6 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
     /**
      * Attempt to obtain a scheduling mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
      * @return bool
      */
     public function create(Event $event, DateTimeInterface $time)
@@ -58,8 +54,6 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
     /**
      * Determine if a scheduling mutex exists for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeInterface  $time
      * @return bool
      */
     public function exists(Event $event, DateTimeInterface $time)

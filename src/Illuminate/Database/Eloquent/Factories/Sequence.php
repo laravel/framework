@@ -29,8 +29,6 @@ class Sequence implements Countable
 
     /**
      * Create a new sequence instance.
-     *
-     * @param  mixed  ...$sequence
      */
     public function __construct(...$sequence)
     {
@@ -40,8 +38,6 @@ class Sequence implements Countable
 
     /**
      * Get the current count of the sequence items.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -50,8 +46,6 @@ class Sequence implements Countable
 
     /**
      * Get the next value in the sequence.
-     *
-     * @return mixed
      */
     public function __invoke()
     {

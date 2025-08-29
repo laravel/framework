@@ -20,7 +20,6 @@ abstract class AbstractHasher
      *
      * @param  string  $value
      * @param  string  $hashedValue
-     * @param  array  $options
      * @return bool
      */
     public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])

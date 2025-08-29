@@ -38,7 +38,6 @@ trait AsPivot
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
@@ -71,7 +70,6 @@ trait AsPivot
     /**
      * Create a new pivot model from raw values returned from a query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
@@ -224,7 +222,6 @@ trait AsPivot
     /**
      * Set the related model of the relationship.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $related
      * @return $this
      */
     public function setRelatedModel(?Model $related = null)
@@ -271,8 +268,6 @@ trait AsPivot
 
     /**
      * Get the queueable identity for the entity.
-     *
-     * @return mixed
      */
     public function getQueueableId()
     {

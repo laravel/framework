@@ -24,8 +24,6 @@ trait ManagesLayouts
 
     /**
      * The parent placeholder for the request.
-     *
-     * @var mixed
      */
     protected static $parentPlaceholder = [];
 
@@ -225,7 +223,6 @@ trait ManagesLayouts
      *
      * @param  string  $name
      * @param  string|null  $default
-     * @return mixed
      */
     public function getSection($name, $default = null)
     {

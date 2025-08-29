@@ -26,7 +26,6 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @template TFindDefault
      *
-     * @param  mixed  $key
      * @param  TFindDefault  $default
      * @return ($key is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? static : TModel|TFindDefault)
      */
@@ -54,7 +53,6 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Find a model in the collection by key or throw an exception.
      *
-     * @param  mixed  $key
      * @return TModel
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -282,7 +280,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a relationship path if it is not already eager loaded.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TModel>  $models
-     * @param  array  $path
      * @return void
      */
     protected function loadMissingRelation(self $models, array $path)
@@ -348,8 +345,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Determine if a key exists in the collection.
      *
      * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function contains($key, $operator = null, $value = null)
@@ -369,8 +364,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Determine if a key does not exist in the collection.
      *
      * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function doesntContain($key, $operator = null, $value = null)
@@ -706,8 +699,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TModel, TKey): bool)|TModel|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
      */
     public function partition($key, $operator = null, $value = null)

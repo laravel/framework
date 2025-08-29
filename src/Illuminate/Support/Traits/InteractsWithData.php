@@ -15,7 +15,6 @@ trait InteractsWithData
     /**
      * Retrieve all data from the instance.
      *
-     * @param  mixed  $keys
      * @return array
      */
     abstract public function all($keys = null);
@@ -24,8 +23,6 @@ trait InteractsWithData
      * Retrieve data from the instance.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     abstract protected function data($key = null, $default = null);
 
@@ -80,8 +77,6 @@ trait InteractsWithData
      * Apply the callback if the instance contains the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenHas($key, callable $callback, ?callable $default = null)
@@ -158,8 +153,6 @@ trait InteractsWithData
      * Apply the callback if the instance contains a non-empty value for the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenFilled($key, callable $callback, ?callable $default = null)
@@ -192,8 +185,6 @@ trait InteractsWithData
      * Apply the callback if the instance is missing the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenMissing($key, callable $callback, ?callable $default = null)
@@ -226,7 +217,6 @@ trait InteractsWithData
      * Retrieve data from the instance as a Stringable instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
      * @return \Illuminate\Support\Stringable
      */
     public function str($key, $default = null)
@@ -238,7 +228,6 @@ trait InteractsWithData
      * Retrieve data from the instance as a Stringable instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
      * @return \Illuminate\Support\Stringable
      */
     public function string($key, $default = null)
@@ -385,7 +374,6 @@ trait InteractsWithData
     /**
      * Get a subset containing the provided keys with values from the instance data.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function only($keys)
@@ -410,7 +398,6 @@ trait InteractsWithData
     /**
      * Get all of the data except for a specified array of items.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function except($keys)

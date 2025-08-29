@@ -62,11 +62,8 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
     /**
      * Create a new view instance.
      *
-     * @param  \Illuminate\View\Factory  $factory
-     * @param  \Illuminate\Contracts\View\Engine  $engine
      * @param  string  $view
      * @param  string  $path
-     * @param  mixed  $data
      */
     public function __construct(Factory $factory, Engine $engine, $view, $path, $data = [])
     {
@@ -94,7 +91,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
     /**
      * Get the evaluated contents for a given array of fragments or return all fragments.
      *
-     * @param  array|null  $fragments
      * @return string
      */
     public function fragments(?array $fragments = null)
@@ -124,7 +120,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Get the evaluated contents for a given array of fragments if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  array|null  $fragments
      * @return string
      */
     public function fragmentsIf($boolean, ?array $fragments = null)
@@ -149,7 +144,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
     /**
      * Get the string contents of the view.
      *
-     * @param  callable|null  $callback
      * @return string
      *
      * @throws \Throwable
@@ -244,7 +238,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Add a piece of data to the view.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function with($key, $value = null)
@@ -263,7 +256,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      *
      * @param  string  $key
      * @param  string  $view
-     * @param  array  $data
      * @return $this
      */
     public function nest($key, $view, array $data = [])
@@ -373,7 +365,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Determine if a piece of data is bound.
      *
      * @param  string  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -384,7 +375,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Get a piece of bound data to the view.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -395,8 +385,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Set a piece of data on the view.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -407,7 +395,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Unset a piece of data from the view.
      *
      * @param  string  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {
@@ -418,7 +405,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Get a piece of data from the view.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function &__get($key)
     {
@@ -429,7 +415,6 @@ class View implements ArrayAccess, Htmlable, Stringable, ViewContract
      * Set a piece of data on the view.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)

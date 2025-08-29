@@ -33,8 +33,6 @@ class ThrottleRequests
 
     /**
      * Create a new request throttler.
-     *
-     * @param  \Illuminate\Cache\RateLimiter  $limiter
      */
     public function __construct(RateLimiter $limiter)
     {
@@ -71,7 +69,6 @@ class ThrottleRequests
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @param  string  $prefix
@@ -106,9 +103,7 @@ class ThrottleRequests
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string  $limiterName
-     * @param  \Closure  $limiter
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
@@ -141,8 +136,6 @@ class ThrottleRequests
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  array  $limits
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
@@ -258,7 +251,6 @@ class ThrottleRequests
     /**
      * Add the limit header information to the given response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  int  $maxAttempts
      * @param  int  $remainingAttempts
      * @param  int|null  $retryAfter
@@ -279,7 +271,6 @@ class ThrottleRequests
      * @param  int  $maxAttempts
      * @param  int  $remainingAttempts
      * @param  int|null  $retryAfter
-     * @param  \Symfony\Component\HttpFoundation\Response|null  $response
      * @return array
      */
     protected function getHeaders($maxAttempts,
@@ -333,7 +324,6 @@ class ThrottleRequests
     /**
      * Specify whether rate limiter keys should be hashed.
      *
-     * @param  bool  $shouldHashKeys
      * @return void
      */
     public static function shouldHashKeys(bool $shouldHashKeys = true)

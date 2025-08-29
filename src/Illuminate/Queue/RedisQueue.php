@@ -68,7 +68,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Create a new Redis queue instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string|null  $connection
      * @param  int  $retryAfter
@@ -165,7 +164,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs
-     * @param  mixed  $data
      * @param  string|null  $queue
      * @return void
      */
@@ -196,9 +194,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * Push a new job onto the queue.
      *
      * @param  object|string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -218,8 +214,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
-     * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -236,9 +230,7 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  object|string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -259,7 +251,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $payload
      * @param  string|null  $queue
-     * @return mixed
      */
     protected function laterRaw($delay, $payload, $queue = null)
     {
@@ -275,7 +266,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $job
      * @param  string  $queue
-     * @param  mixed  $data
      * @return array
      */
     protected function createPayloadArray($job, $queue, $data = '')

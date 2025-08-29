@@ -95,8 +95,6 @@ class PendingProcess
 
     /**
      * Create a new pending process instance.
-     *
-     * @param  \Illuminate\Process\Factory  $factory
      */
     public function __construct(Factory $factory)
     {
@@ -119,7 +117,6 @@ class PendingProcess
     /**
      * Specify the working directory of the process.
      *
-     * @param  string  $path
      * @return $this
      */
     public function path(string $path)
@@ -132,7 +129,6 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds the process may run.
      *
-     * @param  int  $timeout
      * @return $this
      */
     public function timeout(int $timeout)
@@ -145,7 +141,6 @@ class PendingProcess
     /**
      * Specify the maximum number of seconds a process may go without returning output.
      *
-     * @param  int  $timeout
      * @return $this
      */
     public function idleTimeout(int $timeout)
@@ -170,7 +165,6 @@ class PendingProcess
     /**
      * Set the additional environment variables for the process.
      *
-     * @param  array  $environment
      * @return $this
      */
     public function env(array $environment)
@@ -208,7 +202,6 @@ class PendingProcess
     /**
      * Enable TTY mode for the process.
      *
-     * @param  bool  $tty
      * @return $this
      */
     public function tty(bool $tty = true)
@@ -221,7 +214,6 @@ class PendingProcess
     /**
      * Set the "proc_open" options that should be used when invoking the process.
      *
-     * @param  array  $options
      * @return $this
      */
     public function options(array $options)
@@ -235,7 +227,6 @@ class PendingProcess
      * Run the process.
      *
      * @param  array<array-key, string>|string|null  $command
-     * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
      *
      * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
@@ -265,7 +256,6 @@ class PendingProcess
      * Start the process in the background.
      *
      * @param  array<array-key, string>|string|null  $command
-     * @param  callable|null  $output
      * @return \Illuminate\Process\InvokedProcess
      *
      * @throws \RuntimeException
@@ -340,7 +330,6 @@ class PendingProcess
     /**
      * Specify the fake process result handlers for the pending process.
      *
-     * @param  array  $fakeHandlers
      * @return $this
      */
     public function withFakeHandlers(array $fakeHandlers)
@@ -353,7 +342,6 @@ class PendingProcess
     /**
      * Get the fake handler for the given command, if applicable.
      *
-     * @param  string  $command
      * @return \Closure|null
      */
     protected function fakeFor(string $command)
@@ -364,10 +352,6 @@ class PendingProcess
 
     /**
      * Resolve the given fake handler for a synchronous process.
-     *
-     * @param  string  $command
-     * @param  \Closure  $fake
-     * @return mixed
      */
     protected function resolveSynchronousFake(string $command, Closure $fake)
     {
@@ -394,9 +378,6 @@ class PendingProcess
     /**
      * Resolve the given fake handler for an asynchronous process.
      *
-     * @param  string  $command
-     * @param  callable|null  $output
-     * @param  \Closure  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
      *
      * @throws \LogicException
