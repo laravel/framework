@@ -16,13 +16,13 @@
                 <span class="ml-1">vendor frames</span>
 
                 <div class="flex flex-col ml-1 -mt-2" x-cloak x-show="includeVendorFrames">
-                    <x-laravel-exceptions-renderer::icons.chevron-down />
-                    <x-laravel-exceptions-renderer::icons.chevron-up />
+                    <x-laravel-exceptions-renderer::icons.chevron-down class="w-4 h-4 -mb-2"/>
+                    <x-laravel-exceptions-renderer::icons.chevron-up class="w-4 h-4 -mb-2"/>
                 </div>
 
                 <div class="flex flex-col ml-1 -mt-2" x-cloak x-show="! includeVendorFrames">
-                    <x-laravel-exceptions-renderer::icons.chevron-up />
-                    <x-laravel-exceptions-renderer::icons.chevron-down />
+                    <x-laravel-exceptions-renderer::icons.chevron-up class="w-4 h-4 -mb-2"/>
+                    <x-laravel-exceptions-renderer::icons.chevron-down class="w-4 h-4 -mb-2"/>
                 </div>
             </button>
         </div>
