@@ -676,6 +676,7 @@ class SupportArrTest extends TestCase
 
         $this->assertFalse(Arr::blank('foo'));
         $this->assertFalse(Arr::blank(['foo', null]));
+        $this->assertFalse(Arr::blank([null, 'foo']));
         $this->assertFalse(Arr::blank(['foo' => 'bar']));
         $this->assertFalse(Arr::blank(['foo' => 'bar', 'baz' => null]));
     }
@@ -684,6 +685,7 @@ class SupportArrTest extends TestCase
     {
         $this->assertTrue(Arr::filled('foo'));
         $this->assertTrue(Arr::filled(['foo', null]));
+        $this->assertTrue(Arr::filled([null, 'foo']));
         $this->assertTrue(Arr::filled(['foo' => 'bar']));
         $this->assertTrue(Arr::filled(['foo' => 'bar', 'baz' => null]));
 
