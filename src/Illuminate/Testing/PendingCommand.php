@@ -479,7 +479,6 @@ class PendingCommand
         return $exitCode;
     }
 
-
     /**
      * Debug the command.
      *
