@@ -387,7 +387,7 @@ abstract class Grammar extends BaseGrammar
         $commands = $this->getCommandsByName($blueprint, $name);
 
         if (count($commands) > 0) {
-            return array_last($commands);
+            return array_first($commands);
         }
     }
 

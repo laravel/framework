@@ -1186,11 +1186,11 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
-        $columns = $this->columnize(array_keys(array_last($values)));
+        $columns = $this->columnize(array_keys(array_first($values)));
 
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same number of parameter

@@ -301,7 +301,7 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
             return $this->macroCall($method, $parameters);
         }
 
-        $this->attributes[$method] = count($parameters) > 0 ? array_last($parameters) : true;
+        $this->attributes[$method] = count($parameters) > 0 ? array_first($parameters) : true;
 
         return $this;
     }

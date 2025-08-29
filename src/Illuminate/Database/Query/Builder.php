@@ -3158,7 +3158,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->sole([$column]);
 
-        return array_last($result);
+        return array_first($result);
     }
 
     /**
@@ -3781,7 +3781,7 @@ class Builder implements BuilderContract
             return true;
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
@@ -3818,7 +3818,7 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
@@ -3976,7 +3976,7 @@ class Builder implements BuilderContract
             return (int) $this->insert($values);
         }
 
-        if (! is_array(array_last($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
@@ -3987,7 +3987,7 @@ class Builder implements BuilderContract
         }
 
         if (is_null($update)) {
-            $update = array_keys(array_last($values));
+            $update = array_keys(array_first($values));
         }
 
         $this->applyBeforeQueryCallbacks();
