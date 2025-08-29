@@ -1,6 +1,25 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.26.3...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.26.4...12.x)
+
+## [v12.26.4](https://github.com/laravel/framework/compare/v12.26.3...v12.26.4) - 2025-08-29
+
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56792
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56794
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56795
+* [12.x] Add support for nested array notation within `loadMissing` by [@angus-mcritchie](https://github.com/angus-mcritchie) in https://github.com/laravel/framework/pull/56711
+* [12.x] Colocate Container build functions with the `SelfBuilding` interface by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56731
+* perf: optimize loop performance by pre-calculating array counts in Str::apa() and fileSize() methods by [@AmadulHaque](https://github.com/AmadulHaque) in https://github.com/laravel/framework/pull/56796
+* fix: Helper function secure_url not always returning a string by [@SOD96](https://github.com/SOD96) in https://github.com/laravel/framework/pull/56807
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56803
+* [12.x] Parse Redis "friendly" algorithm names into integers by [@mateusjatenee](https://github.com/mateusjatenee) in https://github.com/laravel/framework/pull/56800
+* [12.x] Remove [@return](https://github.com/return) tags from constructors by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56814
+* [12.x] Refactor duplicated logic in ReplacesAttributes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56813
+* [12.x] Use FQCN for [@mixin](https://github.com/mixin) annotation for consistency by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56811
+* [12.x] Remove leftover `method_exists` checks by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/56821
+* [12.x] Fix use array_first and array_last by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56820
+* Support enum in Collection -> keyBy() by [@zKoz210](https://github.com/zKoz210) in https://github.com/laravel/framework/pull/56786
+* Adds make:config command by [@inmanturbo](https://github.com/inmanturbo) in https://github.com/laravel/framework/pull/56819
 
 ## [v12.26.3](https://github.com/laravel/framework/compare/v12.26.2...v12.26.3) - 2025-08-27
 
