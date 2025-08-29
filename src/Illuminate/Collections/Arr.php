@@ -463,6 +463,28 @@ class Arr
     }
 
     /**
+     * Determine if the values in the array are "filled".
+     */
+    public static function filled($value)
+    {
+        return ! static::blank($value);
+    }
+
+    /**
+     * Determine if the values in the array are "blank".
+     */
+    public static function blank($value)
+    {
+        foreach (static::wrap($value) as $item) {
+            if (! blank($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
