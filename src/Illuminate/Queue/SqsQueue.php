@@ -217,7 +217,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getQueueableOptions($job, $queue): array
     {
-        if (! is_object($job) || ! str_ends_with($queue, '.fifo')) {
+        if (! is_object($job) || ! str_ends_with((string) $queue, '.fifo')) {
             return [];
         }
 
