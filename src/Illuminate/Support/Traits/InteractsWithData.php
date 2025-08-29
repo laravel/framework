@@ -372,6 +372,36 @@ trait InteractsWithData
     }
 
     /**
+     * Retrieve data from the instance as a model.
+     * 
+     * @template T of \Illuminate\Database\Eloquent\Model
+     * @param  string  $key
+     * @param  class-string<T>  $modelClass
+     * @return T|\Illuminate\Database\Eloquent\Collection<int, T>|null
+     */
+    public function find($key, $modelClass)
+    {
+        if ($this->isNotFilled($key)) {
+            return null;
+        }
+
+        return $modelClass::find($this->data($key));
+    }
+
+    /**
+     * Retrieve data from the instance as a model or fail.
+     * 
+     * @template T of \Illuminate\Database\Eloquent\Model
+     * @param  string  $key
+     * @param  class-string<T>  $modelClass
+     * @return T|\Illuminate\Database\Eloquent\Collection<int, T>
+     */
+    public function findOrFail($key, $modelClass)
+    {
+        return $modelClass::findOrFail($this->data($key));
+    }
+
+    /**
      * Retrieve data from the instance as a collection.
      *
      * @param  array|string|null  $key
