@@ -24,14 +24,14 @@ class ConfigMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $description = 'Create a new config';
+    protected $description = 'Create a new configuration file';
 
     /**
      * The type of file being generated.
      *
      * @var string
      */
-    protected $type = 'Config';
+    protected $type = 'Configuration';
 
     /**
      * The console command name aliases.
@@ -68,7 +68,7 @@ class ConfigMakeCommand extends GeneratorCommand
     protected function getOptions(): array
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the config even if it already exists'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the configuration file even if it already exists'],
         ];
     }
 
@@ -80,7 +80,7 @@ class ConfigMakeCommand extends GeneratorCommand
     protected function promptForMissingArgumentsUsing()
     {
         return [
-            'name' => 'What should the config be named?',
+            'name' => 'What should the configuration file be named?',
         ];
     }
 }
