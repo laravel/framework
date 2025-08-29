@@ -2834,8 +2834,12 @@ class EloquentTestPost extends Eloquent
 
     public function tags()
     {
-        return $this->morphToMany(EloquentTestTag::class, 'taggable', null, null, 'tag_id')->withPivot('taxonomy');
+        return $this->morphToMany(EloquentTestTag::class, 'taggable', Taggable::class, null, 'tag_id')->withPivot('taxonomy');
     }
+}
+
+class Taggable extends MorphPivot
+{
 }
 
 class EloquentTestTag extends Eloquent
