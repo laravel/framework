@@ -31,7 +31,7 @@ class ConfigMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $type = 'Configuration';
+    protected $type = 'Config';
 
     /**
      * The console command name aliases.
