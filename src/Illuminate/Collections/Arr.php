@@ -463,7 +463,10 @@ class Arr
     }
 
     /**
-     * Determine if the values in the array are "filled".
+     * Determine if any of the array values are "filled".
+     *
+     * @param  array  $array
+     * @return bool
      */
     public static function filled($value)
     {
@@ -471,7 +474,10 @@ class Arr
     }
 
     /**
-     * Determine if the values in the array are "blank".
+     * Determine if all the array values are "blank".
+     *
+     * @param  array  $array
+     * @return bool
      */
     public static function blank($value)
     {
