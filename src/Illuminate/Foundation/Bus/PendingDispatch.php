@@ -71,7 +71,7 @@ class PendingDispatch
      */
     public function onMessageGroup($messageGroup)
     {
-        $this->job->onMessageGroup($queue);
+        $this->job->onMessageGroup($messageGroup);
 
         return $this;
     }
