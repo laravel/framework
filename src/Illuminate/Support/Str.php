@@ -1510,6 +1510,18 @@ class Str
     {
         $title = $language ? static::ascii($title, $language) : $title;
 
+        // Handle camel, studly, and pascal case
+        if (static::isMatch('/(?<!\s)[A-Z]/', substr($title, 1))) {
+            // Convert abbreviations to lowercase for proper snake-casing
+            $title = preg_replace_callback(
+                '/\b[A-Z]{2,}\b/u',
+                fn ($matches) => static::lower($matches[0]),
+                $title
+            );
+
+            $title = static::snake($title);
+        }
+
         // Convert all dashes/underscores into separator
         $flip = $separator === '-' ? '_' : '-';
 
