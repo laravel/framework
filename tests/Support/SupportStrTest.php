@@ -516,6 +516,9 @@ class SupportStrTest extends TestCase
         $this->assertSame('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
+        $this->assertSame('there-is-faq-module-here', Str::slug('There is FAQ module here'));
+        $this->assertSame('method-name-in-camel-case', Str::slug('methodNameInCamelCase'));
+        $this->assertSame('class-name-in-pascal-case', Str::slug('ClassNameInPascalCase'));
     }
 
     public function testStrStart()
