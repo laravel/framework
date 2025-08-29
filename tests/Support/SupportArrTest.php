@@ -664,6 +664,38 @@ class SupportArrTest extends TestCase
         Arr::array($test_array, 'string');
     }
 
+    public function testBlank()
+    {
+        $this->assertTrue(Arr::blank(null));
+        $this->assertTrue(Arr::blank([null, '']));
+        $this->assertTrue(Arr::blank([]));
+        $this->assertTrue(Arr::blank([[]]));
+        $this->assertTrue(Arr::blank(['foo' => null]));
+        $this->assertTrue(Arr::blank(''));
+        $this->assertTrue(Arr::blank('  '));
+
+        $this->assertFalse(Arr::blank('foo'));
+        $this->assertFalse(Arr::blank(['foo', null]));
+        $this->assertFalse(Arr::blank(['foo' => 'bar']));
+        $this->assertFalse(Arr::blank(['foo' => 'bar', 'baz' => null]));
+    }
+
+    public function testFilled()
+    {
+        $this->assertTrue(Arr::filled('foo'));
+        $this->assertTrue(Arr::filled(['foo', null]));
+        $this->assertTrue(Arr::filled(['foo' => 'bar']));
+        $this->assertTrue(Arr::filled(['foo' => 'bar', 'baz' => null]));
+
+        $this->assertFalse(Arr::filled(null));
+        $this->assertFalse(Arr::filled([null, '']));
+        $this->assertFalse(Arr::filled([]));
+        $this->assertFalse(Arr::filled([[]]));
+        $this->assertFalse(Arr::filled(['foo' => null]));
+        $this->assertFalse(Arr::filled(''));
+        $this->assertFalse(Arr::filled('  '));
+    }
+
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];
