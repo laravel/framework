@@ -10,16 +10,16 @@ class AuthorizationException extends Exception
     /**
      * The response from the gate.
      *
-     * @var \Illuminate\Auth\Access\Response
+     * @var \Illuminate\Auth\Access\Response|null
      */
-    protected $response;
+    protected ?Response $response = null;
 
     /**
      * The HTTP response status code.
      *
      * @var int|null
      */
-    protected $status;
+    protected ?int $status = null;
 
     /**
      * Create a new authorization exception instance.
@@ -28,7 +28,7 @@ class AuthorizationException extends Exception
      * @param  mixed  $code
      * @param  \Throwable|null  $previous
      */
-    public function __construct($message = null, $code = null, ?Throwable $previous = null)
+    public function __construct(?string $message = null, mixed $code = null, ?Throwable $previous = null)
     {
         parent::__construct($message ?? 'This action is unauthorized.', 0, $previous);
 
@@ -36,13 +36,59 @@ class AuthorizationException extends Exception
     }
 
     /**
+     * Create a new authorization exception with a 403 status.
+     *
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return static
+     */
+    public static function forbidden(?string $message = null, mixed $code = null): static
+    {
+        return (new static($message, $code))->asForbidden();
+    }
+
+    /**
+     * Create a new authorization exception with a 404 status.
+     *
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return static
+     */
+    public static function notFound(?string $message = null, mixed $code = null): static
+    {
+        return (new static($message, $code))->asNotFound();
+    }
+
+    /**
+     * Create a new authorization exception with a 401 status.
+     *
+     * @param  string|null  $message
+     * @param  mixed  $code
+     * @return static
+     */
+    public static function unauthorized(?string $message = null, mixed $code = null): static
+    {
+        return (new static($message, $code))->asUnauthorized();
+    }
+
+    /**
      * Get the response from the gate.
      *
-     * @return \Illuminate\Auth\Access\Response
+     * @return \Illuminate\Auth\Access\Response|null
      */
-    public function response()
+    public function response(): ?Response
     {
         return $this->response;
+    }
+
+    /**
+     * Get the authorization message, preferring the response message if available.
+     *
+     * @return string
+     */
+    public function getAuthorizationMessage(): string
+    {
+        return $this->response?->message() ?? $this->getMessage();
     }
 
     /**
@@ -51,7 +97,7 @@ class AuthorizationException extends Exception
      * @param  \Illuminate\Auth\Access\Response  $response
      * @return $this
      */
-    public function setResponse($response)
+    public function setResponse(Response $response): static
     {
         $this->response = $response;
 
@@ -64,7 +110,7 @@ class AuthorizationException extends Exception
      * @param  int|null  $status
      * @return $this
      */
-    public function withStatus($status)
+    public function withStatus(?int $status): static
     {
         $this->status = $status;
 
@@ -76,9 +122,29 @@ class AuthorizationException extends Exception
      *
      * @return $this
      */
-    public function asNotFound()
+    public function asNotFound(): static
     {
         return $this->withStatus(404);
+    }
+
+    /**
+     * Set the HTTP response status code to 403.
+     *
+     * @return $this
+     */
+    public function asForbidden(): static
+    {
+        return $this->withStatus(403);
+    }
+
+    /**
+     * Set the HTTP response status code to 401.
+     *
+     * @return $this
+     */
+    public function asUnauthorized(): static
+    {
+        return $this->withStatus(401);
     }
 
     /**
@@ -86,7 +152,7 @@ class AuthorizationException extends Exception
      *
      * @return bool
      */
-    public function hasStatus()
+    public function hasStatus(): bool
     {
         return $this->status !== null;
     }
@@ -96,7 +162,7 @@ class AuthorizationException extends Exception
      *
      * @return int|null
      */
-    public function status()
+    public function status(): ?int
     {
         return $this->status;
     }
@@ -106,7 +172,7 @@ class AuthorizationException extends Exception
      *
      * @return \Illuminate\Auth\Access\Response
      */
-    public function toResponse()
+    public function toResponse(): Response
     {
         return Response::deny($this->message, $this->code)->withStatus($this->status);
     }
