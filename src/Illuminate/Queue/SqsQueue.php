@@ -202,7 +202,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             function ($payload, $queue, $delay) use ($job) {
                 return $this->pushRaw($payload, $queue, [
                     'DelaySeconds' => $this->secondsUntil($delay),
-                    ...$this->getQueueableOptions($job, $queue)
+                    ...$this->getQueueableOptions($job, $queue),
                 ]);
             }
         );
