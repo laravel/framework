@@ -1879,7 +1879,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
 
         // Test with Countable
-        $countable = new class () implements \Countable {
+        $countable = new class() implements \Countable {
             public function count(): int
             {
                 return 3;
