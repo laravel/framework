@@ -200,9 +200,40 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $queue,
             $delay,
             function ($payload, $queue, $delay) use ($job) {
-                return $this->pushRaw($payload, $queue, ['DelaySeconds' => $this->secondsUntil($delay), ...$this->getQueueableOptions($job, $queue)]);
+                return $this->pushRaw($payload, $queue, [
+                    'DelaySeconds' => $this->secondsUntil($delay),
+                    ...$this->getQueueableOptions($job, $queue)
+                ]);
             }
         );
+    }
+
+    /**
+     * Get the queueable options from the job.
+     *
+     * @param  mixed  $job
+     * @param  string|null  $queue
+     * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
+     */
+    protected function getQueueableOptions($job, $queue): array
+    {
+        if (! is_object($job) || ! str_ends_with($queue, '.fifo')) {
+            return [];
+        }
+
+        $transformToString = fn ($value) => strval($value);
+
+        $messageGroupId = transform($job->group ?? null, $transformToString);
+
+        $messageDeduplicationId = match (true) {
+            method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
+            default => (string) Str::orderedUuid(),
+        };
+
+        return array_filter([
+            'MessageGroupId' => $messageGroupId,
+            'MessageDeduplicationId' => $messageDeduplicationId,
+        ]);
     }
 
     /**
@@ -301,33 +332,5 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
     public function getSqs()
     {
         return $this->sqs;
-    }
-
-    /**
-     * Get queueable options from the job.
-     *
-     * @param  mixed  $job
-     * @param  string|null  $queue
-     * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
-     */
-    protected function getQueueableOptions($job, $queue): array
-    {
-        if (! (is_object($job) && str_ends_with($queue, '.fifo'))) {
-            return [];
-        }
-
-        $transformToString = fn ($value) => strval($value);
-
-        $messageGroupId = transform($job->messageGroup ?? null, fn ($messageGroup) => strval($messageGroup));
-
-        $messageDeduplicationId = match (true) {
-            method_exists($job, 'duplicateId') => transform($job->duplicateId(), $transformToString),
-            default => Str::orderedUuid()->toString(),
-        };
-
-        return array_filter([
-            'MessageGroupId' => $messageGroupId,
-            'MessageDeduplicationId' => $messageDeduplicationId,
-        ]);
     }
 }

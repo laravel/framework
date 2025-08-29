@@ -64,14 +64,16 @@ class PendingDispatch
     }
 
     /**
-     * Set the desired message group id for the job.
+     * Set the desired job "group".
      *
-     * @param  string  $messageGroup
+     * This feature is only supported by some queues, such as Amazon SQS.
+     *
+     * @param  \UnitEnum|string  $group
      * @return $this
      */
-    public function onMessageGroup($messageGroup)
+    public function onGroup($group)
     {
-        $this->job->onMessageGroup($messageGroup);
+        $this->job->onGroup($group);
 
         return $this;
     }

@@ -28,11 +28,11 @@ trait Queueable
     public $queue;
 
     /**
-     * The message group id the job should be sent to.
+     * The job "group" the job should be sent to.
      *
      * @var string|null
      */
-    public $messageGroup;
+    public $group;
 
     /**
      * The number of seconds before the job should be made available.
@@ -110,14 +110,16 @@ trait Queueable
     }
 
     /**
-     * Set the desired message group id for the job.
+     * Set the desired job "group".
      *
-     * @param  string  $messageGroup
+     * This feature is only supported by some queues, such as Amazon SQS.
+     *
+     * @param  \UnitEnum|string  $group
      * @return $this
      */
-    public function onMessageGroup($messageGroup)
+    public function onGroup($group)
     {
-        $this->messageGroup = enum_value($messageGroup);
+        $this->group = enum_value($group);
 
         return $this;
     }
