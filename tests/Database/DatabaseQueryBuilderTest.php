@@ -6893,6 +6893,40 @@ SQL;
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    public function testWhereBitwise()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBitwise('permissions', 4);
+        $this->assertSame('select * from "users" where permissions & ? > 0', $builder->toSql());
+        $this->assertEquals([4], $builder->getBindings());
+    }
+
+    public function testWhereBitwiseExact()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBitwiseExact('permissions', 15, 15);
+        $this->assertSame('select * from "users" where (permissions & ?) = ?', $builder->toSql());
+        $this->assertEquals([15, 15], $builder->getBindings());
+    }
+
+    public function testOrWhereBitwise()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereBitwise('permissions', 1)
+            ->orWhereBitwise('permissions', 2);
+        $this->assertSame('select * from "users" where permissions & ? > 0 or permissions & ? > 0', $builder->toSql());
+        $this->assertEquals([1, 2], $builder->getBindings());
+    }
+
+    public function testWhereNotBitwise()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotBitwise('permissions', 4);
+        $this->assertSame('select * from "users" where permissions & ? = 0', $builder->toSql());
+        $this->assertEquals([4], $builder->getBindings());
+    }
+
     public function testFrom()
     {
         $builder = $this->getBuilder();
