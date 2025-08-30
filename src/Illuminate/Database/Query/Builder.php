@@ -2432,6 +2432,70 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a bitwise "AND" clause to the query.
+     *
+     * @param  string  $column
+     * @param  int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereBitwise($column, $value, $boolean = 'and')
+    {
+        return $this->whereRaw("{$column} & ? > 0", [$value], $boolean);
+    }
+
+    /**
+     * Add a bitwise "AND" clause with exact match to the query.
+     *
+     * @param  string  $column
+     * @param  int  $mask
+     * @param  int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereBitwiseExact($column, $mask, $value, $boolean = 'and')
+    {
+        return $this->whereRaw("({$column} & ?) = ?", [$mask, $value], $boolean);
+    }
+
+    /**
+     * Add a bitwise "OR" clause to the query.
+     *
+     * @param  string  $column
+     * @param  int  $value
+     * @return $this
+     */
+    public function orWhereBitwise($column, $value)
+    {
+        return $this->whereBitwise($column, $value, 'or');
+    }
+
+    /**
+     * Add a bitwise "NOT" clause to the query.
+     *
+     * @param  string  $column
+     * @param  int  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotBitwise($column, $value, $boolean = 'and')
+    {
+        return $this->whereRaw("{$column} & ? = 0", [$value], $boolean);
+    }
+
+    /**
+     * Add a bitwise "OR NOT" clause to the query.
+     *
+     * @param  string  $column
+     * @param  int  $value
+     * @return $this
+     */
+    public function orWhereNotBitwise($column, $value)
+    {
+        return $this->whereNotBitwise($column, $value, 'or');
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups
