@@ -14,6 +14,11 @@ class TableGuesser
         '/.+_(to|from|in)_(\w+)$/',
     ];
 
+    const DROP_PATTERNS = [
+        '/^drop_(\w+)_table$/',
+        '/^drop_(\w+)$/',
+    ];
+
     /**
      * Attempt to guess the table name and "creation" status of the given migration.
      *
@@ -31,6 +36,12 @@ class TableGuesser
         foreach (self::CHANGE_PATTERNS as $pattern) {
             if (preg_match($pattern, $migration, $matches)) {
                 return [$matches[2], $create = false];
+            }
+        }
+
+        foreach (self::DROP_PATTERNS as $pattern) {
+            if (preg_match($pattern, $migration, $matches)) {
+                return [$matches[1], $create = false];
             }
         }
     }

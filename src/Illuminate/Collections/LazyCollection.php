@@ -288,6 +288,19 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if an item is not contained in the enumerable, using strict comparison.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContainStrict($key, $operator = null, $value = null)
+    {
+        return ! $this->containsStrict(...func_get_args());
+    }
+
+    /**
      * Cross join the given iterables, returning all possible permutations.
      *
      * @template TCrossJoinKey
@@ -777,12 +790,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             [$value, $key] = $this->explodePluckParameters($value, $key);
 
             foreach ($this as $item) {
-                $itemValue = data_get($item, $value);
+                $itemValue = $value instanceof Closure
+                    ? $value($item)
+                    : data_get($item, $value);
 
                 if (is_null($key)) {
                     yield $itemValue;
                 } else {
-                    $itemKey = data_get($item, $key);
+                    $itemKey = $key instanceof Closure
+                        ? $key($item)
+                        : data_get($item, $key);
 
                     if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                         $itemKey = (string) $itemKey;
@@ -1762,9 +1779,9 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
         $iterables = func_get_args();
 
         return new static(function () use ($iterables) {
-            $iterators = (new Collection($iterables))->map(function ($iterable) {
-                return $this->makeIterator($iterable);
-            })->prepend($this->getIterator());
+            $iterators = (new Collection($iterables))
+                ->map(fn ($iterable) => $this->makeIterator($iterable))
+                ->prepend($this->getIterator());
 
             while ($iterators->contains->valid()) {
                 yield new static($iterators->map->current());
@@ -1869,7 +1886,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = is_null($key) || is_array($key) || $key instanceof Closure ? $key : explode('.', $key);
 
         return [$value, $key];
     }

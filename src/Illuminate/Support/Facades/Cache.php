@@ -34,6 +34,7 @@ namespace Illuminate\Support\Facades;
  * @method static mixed sear(string $key, \Closure $callback)
  * @method static mixed rememberForever(string $key, \Closure $callback)
  * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
+ * @method static bool touch(string $key, \DateTimeInterface|\DateInterval|int|null $ttl = null)
  * @method static bool forget(string $key)
  * @method static bool delete(string $key)
  * @method static bool deleteMultiple(iterable $keys)

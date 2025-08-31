@@ -353,8 +353,12 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
     /**
      * Transform each item in the slice of items using a callback.
      *
-     * @param  callable  $callback
+     * @template TMapValue
+     *
+     * @param  callable(TValue, TKey): TMapValue  $callback
      * @return $this
+     *
+     * @phpstan-this-out static<TKey, TMapValue>
      */
     public function through(callable $callback)
     {
@@ -633,8 +637,8 @@ abstract class AbstractPaginator implements CanBeEscapedWhenCastToString, Htmlab
      */
     public static function useBootstrapThree()
     {
-        static::defaultView('pagination::default');
-        static::defaultSimpleView('pagination::simple-default');
+        static::defaultView('pagination::bootstrap-3');
+        static::defaultSimpleView('pagination::simple-bootstrap-3');
     }
 
     /**

@@ -97,6 +97,57 @@ class Queue extends Facade
     }
 
     /**
+     * Replace the bound instance with a fake that fakes all jobs except the given jobs.
+     *
+     * @param  string[]|string  $jobsToAllow
+     * @return \Illuminate\Support\Testing\Fakes\QueueFake
+     */
+    public static function fakeExcept($jobsToAllow)
+    {
+        return static::fake()->except($jobsToAllow);
+    }
+
+    /**
+     * Replace the bound instance with a fake during the given callable's execution.
+     *
+     * @param  callable  $callable
+     * @param  array  $jobsToFake
+     * @return mixed
+     */
+    public static function fakeFor(callable $callable, array $jobsToFake = [])
+    {
+        $originalQueueManager = static::getFacadeRoot();
+
+        static::fake($jobsToFake);
+
+        try {
+            return $callable();
+        } finally {
+            static::swap($originalQueueManager);
+        }
+    }
+
+    /**
+     * Replace the bound instance with a fake during the given callable's execution.
+     *
+     * @param  callable  $callable
+     * @param  array  $jobsToAllow
+     * @return mixed
+     */
+    public static function fakeExceptFor(callable $callable, array $jobsToAllow = [])
+    {
+        $originalQueueManager = static::getFacadeRoot();
+
+        static::fakeExcept($jobsToAllow);
+
+        try {
+            return $callable();
+        } finally {
+            static::swap($originalQueueManager);
+        }
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string

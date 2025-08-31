@@ -693,6 +693,7 @@ class Vite implements Htmlable
             'crossorigin' => $this->resolveStylesheetTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,
         ] : [
             'rel' => 'modulepreload',
+            'as' => 'script',
             'href' => $url,
             'nonce' => $this->nonce ?? false,
             'crossorigin' => $this->resolveScriptTagAttributes($src, $url, $chunk, $manifest)['crossorigin'] ?? false,

@@ -9,7 +9,7 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Console\WipeCommand;
 
 /**
- * @method static \Illuminate\Database\Connection connection(string|null $name = null)
+ * @method static \Illuminate\Database\Connection connection(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Database\ConnectionInterface build(array $config)
  * @method static string calculateDynamicConnectionName(array $config)
  * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
@@ -35,7 +35,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void useDefaultSchemaGrammar()
  * @method static void useDefaultPostProcessor()
  * @method static \Illuminate\Database\Schema\Builder getSchemaBuilder()
- * @method static \Illuminate\Database\Query\Builder table(\Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string $table, string|null $as = null)
+ * @method static \Illuminate\Database\Query\Builder table(\Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|\UnitEnum|string $table, string|null $as = null)
  * @method static \Illuminate\Database\Query\Builder query()
  * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)
  * @method static mixed scalar(string $query, array $bindings = [], bool $useReadPdo = true)
@@ -50,7 +50,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static int affectingStatement(string $query, array $bindings = [])
  * @method static bool unprepared(string $query)
  * @method static int|null threadCount()
- * @method static array pretend(\Closure $callback)
+ * @method static array[] pretend(\Closure $callback)
  * @method static mixed withoutPretending(\Closure $callback)
  * @method static void bindValues(\PDOStatement $statement, array $bindings)
  * @method static array prepareBindings(array $bindings)
@@ -93,7 +93,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \Illuminate\Database\Connection setTransactionManager(\Illuminate\Database\DatabaseTransactionsManager $manager)
  * @method static void unsetTransactionManager()
  * @method static bool pretending()
- * @method static array getQueryLog()
+ * @method static array[] getQueryLog()
  * @method static array getRawQueryLog()
  * @method static void flushQueryLog()
  * @method static void enableQueryLog()

@@ -224,6 +224,51 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertEquals(2, $store->decrement('bar'));
     }
 
+    public function testTouchExtendsTtl()
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
+    }
+
+    public function testTouchExtendsTtlOnPostgres(): void
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
+    }
+
+    public function testTouchExtendsTtlOnSqlite()
+    {
+        $ttl = 60;
+
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getSqliteMocks())->getMock();
+        $table = m::mock(stdClass::class);
+
+        $store->getConnection()->shouldReceive('table')->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(0);
+        $table->shouldReceive('where')->twice()->andReturn($table);
+        $table->shouldReceive('update')->once()->with(['expiration' => $ttl])->andReturn(1);
+
+        $this->assertTrue($store->touch('foo', $ttl));
+    }
+
     protected function getStore()
     {
         return new DatabaseStore(m::mock(Connection::class), 'table', 'prefix');

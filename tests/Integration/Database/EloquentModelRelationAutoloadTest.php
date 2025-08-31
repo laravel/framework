@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Database\EloquentModelRelationAutoloadTest;
 
 use DB;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,6 +14,13 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 {
     protected function afterRefreshingDatabase()
     {
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+            $table->string('status')->nullable();
+            $table->unsignedInteger('post_id')->nullable();
+        });
+
         Schema::create('posts', function (Blueprint $table) {
             $table->increments('id');
         });
@@ -214,6 +223,63 @@ class EloquentModelRelationAutoloadTest extends DatabaseTestCase
 
         DB::disableQueryLog();
     }
+
+    public function testRelationAutoloadWorksOnFactoryMake()
+    {
+        Model::automaticallyEagerLoadRelationships();
+
+        DB::enableQueryLog();
+
+        $tags = Tag::factory()->times(3)->make();
+
+        $post = Post::create();
+
+        $post->tags()->saveMany($tags);
+
+        $this->assertCount(7, DB::getQueryLog());
+
+        Model::automaticallyEagerLoadRelationships(false);
+
+        DB::disableQueryLog();
+    }
+}
+
+class TagFactory extends Factory
+{
+    protected $model = Tag::class;
+
+    public function definition()
+    {
+        return [];
+    }
+}
+
+class Tag extends Model
+{
+    use HasFactory;
+
+    public $timestamps = false;
+
+    protected $guarded = [];
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if ($model->post->shouldApplyStatus()) {
+                $model->status = 'Todo';
+            }
+        });
+    }
+
+    protected static function newFactory()
+    {
+        return TagFactory::new();
+    }
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
 }
 
 class Comment extends Model
@@ -242,6 +308,11 @@ class Post extends Model
 {
     public $timestamps = false;
 
+    public function shouldApplyStatus()
+    {
+        return false;
+    }
+
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
@@ -255,6 +326,11 @@ class Post extends Model
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
     }
 }
 

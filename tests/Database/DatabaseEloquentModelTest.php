@@ -10,7 +10,6 @@ use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -47,12 +46,13 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Database\stubs\TestCast;
+use Illuminate\Tests\Database\stubs\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
@@ -1495,6 +1495,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testMergeHiddenMergesHidden()
+    {
+        $model = new EloquentModelHiddenStub;
+
+        $hiddenCount = count($model->getHidden());
+        $this->assertContains('foo', $model->getHidden());
+
+        $model->mergeHidden(['bar']);
+        $this->assertCount($hiddenCount + 1, $model->getHidden());
+        $this->assertContains('bar', $model->getHidden());
+    }
+
     public function testVisible()
     {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
@@ -1502,6 +1514,18 @@ class DatabaseEloquentModelTest extends TestCase
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testMergeVisibleMergesVisible()
+    {
+        $model = new EloquentModelVisibleStub;
+
+        $visibleCount = count($model->getVisible());
+        $this->assertContains('foo', $model->getVisible());
+
+        $model->mergeVisible(['bar']);
+        $this->assertCount($visibleCount + 1, $model->getVisible());
+        $this->assertContains('bar', $model->getVisible());
     }
 
     public function testDynamicHidden()
@@ -1700,6 +1724,27 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['Foo' => 'bar']);
 
         Model::preventSilentlyDiscardingAttributes(false);
+    }
+
+    public function testGuardedWithFillableConfig(): void
+    {
+        $model = new EloquentModelStub;
+        $model::unguard();
+
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(Resolver::class));
+        $resolver->shouldReceive('connection')->andReturn($connection = m::mock(stdClass::class));
+        $connection->shouldReceive('getSchemaBuilder->getColumnListing')->andReturn(['name', 'age', 'foo']);
+
+        $model->guard([]);
+        $model->fillable(['name']);
+        $model->fill(['name' => 'Leto Atreides', 'age' => 51]);
+
+        self::assertSame(
+            ['name' => 'Leto Atreides', 'age' => 51],
+            $model->getAttributes(),
+        );
+
+        $model::reguard();
     }
 
     public function testUsesOverriddenHandlerWhenDiscardingAttributes()
@@ -2400,6 +2445,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals([], $model->toArray());
     }
 
+    public function testMergeAppendsMergesAppends()
+    {
+        $model = new EloquentModelAppendsStub;
+
+        $appendsCount = count($model->getAppends());
+        $this->assertEquals(['is_admin', 'camelCased', 'StudlyCased'], $model->getAppends());
+
+        $model->mergeAppends(['bar']);
+        $this->assertCount($appendsCount + 1, $model->getAppends());
+        $this->assertContains('bar', $model->getAppends());
+    }
+
     public function testGetMutatedAttributes()
     {
         $model = new EloquentModelGetMutatorsStub;
@@ -2821,6 +2878,17 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayHasKey('foo', $model->getCasts());
         $this->assertEquals($model->getCasts()['foo'], 'MyClass:myArgumentA');
         $this->assertEquals($model->getCasts()['bar'], 'MyClass:myArgumentA,myArgumentB');
+    }
+
+    public function testUnsetCastAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->asToObjectCast = TestValueObject::make([
+            'myPropertyA' => 'A',
+            'myPropertyB' => 'B',
+        ]);
+        unset($model->asToObjectCast);
+        $this->assertArrayNotHasKey('asToObjectCast', $model->getAttributes());
     }
 
     public function testUpdatingNonExistentModelFails()
@@ -3852,6 +3920,7 @@ class EloquentModelCastingStub extends Model
             'asCustomEnumArrayObjectAttribute' => AsEnumArrayObject::of(StringStatus::class),
             'singleElementInArrayAttribute' => [AsCollection::class],
             'duplicatedAttribute' => 'int',
+            'asToObjectCast' => TestCast::class,
         ];
     }
 
@@ -3885,6 +3954,18 @@ class EloquentModelDynamicHiddenStub extends Model
     {
         return ['age', 'id'];
     }
+}
+
+class EloquentModelVisibleStub extends Model
+{
+    protected $table = 'stub';
+    protected $visible = ['foo'];
+}
+
+class EloquentModelHiddenStub extends Model
+{
+    protected $table = 'stub';
+    protected $hidden = ['foo'];
 }
 
 class EloquentModelDynamicVisibleStub extends Model

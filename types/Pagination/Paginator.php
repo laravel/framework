@@ -49,3 +49,16 @@ $cursorPaginator->each(function ($post) {
 foreach ($cursorPaginator as $post) {
     assertType('Post', $post);
 }
+
+$throughPaginator = clone $cursorPaginator;
+$throughPaginator->through(function ($post, $key): array {
+    assertType('int', $key);
+    assertType('Post', $post);
+
+    return [
+        'id' => $key,
+        'post' => $post,
+    ];
+});
+
+assertType('Illuminate\Pagination\CursorPaginator<int, array{id: int, post: Post}>', $throughPaginator);

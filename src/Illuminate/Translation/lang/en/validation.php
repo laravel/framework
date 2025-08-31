@@ -48,6 +48,7 @@ return [
     'digits_between' => 'The :attribute field must be between :min and :max digits.',
     'dimensions' => 'The :attribute field has invalid image dimensions.',
     'distinct' => 'The :attribute field has a duplicate value.',
+    'doesnt_contain' => 'The :attribute field must not contain any of the following: :values.',
     'doesnt_end_with' => 'The :attribute field must not end with one of the following: :values.',
     'doesnt_start_with' => 'The :attribute field must not start with one of the following: :values.',
     'email' => 'The :attribute field must be a valid email address.',

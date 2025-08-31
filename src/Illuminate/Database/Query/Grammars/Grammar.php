@@ -468,6 +468,24 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "value between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereValueBetween(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(is_array($where['columns']) ? reset($where['columns']) : $where['columns'][0]);
+
+        $max = $this->wrap(is_array($where['columns']) ? end($where['columns']) : $where['columns'][1]);
+
+        return $this->parameter($where['value']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -1189,9 +1207,9 @@ class Grammar extends BaseGrammar
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same number of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = (new Collection($values))->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = (new Collection($values))
+            ->map(fn ($record) => '('.$this->parameterize($record).')')
+            ->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -1288,9 +1306,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileUpdateColumns(Builder $query, array $values)
     {
-        return (new Collection($values))->map(function ($value, $key) {
-            return $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+        return (new Collection($values))
+            ->map(fn ($value, $key) => $this->wrap($key).' = '.$this->parameter($value))
+            ->implode(', ');
     }
 
     /**

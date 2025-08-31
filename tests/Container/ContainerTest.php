@@ -3,6 +3,9 @@
 namespace Illuminate\Tests\Container;
 
 use Attribute;
+use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Scoped;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -740,6 +743,162 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
     }
 
+    public function testContainerSingletonAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $secondInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testContainerScopedAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerScopedAttribute::class);
+        $secondInstantiation = $container->get(ContainerScopedAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerScopedAttribute::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
+    public function testBindInterfaceToSingleton()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => true);
+        $firstInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testBindInterfaceToScoped()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test']);
+        $firstInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        // With a different environment
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test2']);
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertSame($firstInstantiation, $thirdInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
+    public function testWildcardBindingButNoEnvironmentResolveSetThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+        $container = new Container;
+
+        $instance = $container->make(WildcardOnlyInterface::class);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $instance);
+    }
+
+    public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('prod', $env));
+
+        $instance = $container->make(WildcardAndProdInterface::class);
+
+        $this->assertInstanceOf(ProdConcrete::class, $instance);
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('some_string', $env));
+        $instance = $container->make(WildcardAndProdInterface::class);
+        $this->assertInstanceOf(FallbackConcrete::class, $instance);
+    }
+
+    public function testCanPassAStringForEnvironmentEnvironment(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('cli', $env));
+
+        $instance = $container->make(CliOnlyInterface::class);
+
+        $this->assertInstanceOf(CliConcrete::class, $instance);
+    }
+
+    public function testAnEmptyEnvironmentListThrowsAnException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+        $container->make(EmptyEnvInterface::class);
+    }
+
+    public function testContainerBindingsTakePrecedence(): void
+    {
+        $container = new Container;
+        $container->bind(OverrideInterface::class, AltConcrete::class);
+
+        $instance = $container->make(OverrideInterface::class);
+
+        $this->assertInstanceOf(AltConcrete::class, $instance);
+    }
+
+    public function testFlushResetsEnvironmentResolverAndCheckedBindings(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', $environments));
+
+        $first = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(ProdConcrete::class, $first);
+
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn (array $environments) => in_array('dev', $environments));
+
+        $second = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(DevConcrete::class, $second);
+    }
+
+    public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => false);
+
+        $container->make(ProdEnvOnlyInterface::class);
+    }
+
+    public function testScopedSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsScoped::class);
+        $new = $container->make(IsScoped::class);
+
+        $this->assertSame($original, $new);
+        $container->forgetScopedInstances();
+        $this->assertNotSame($original, $container->make(IsScoped::class));
+    }
+
+    public function testSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsSingleton::class);
+        $new = $container->make(IsSingleton::class);
+
+        $this->assertSame($original, $new);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -898,4 +1057,117 @@ class ContainerCurrentResolvingConcrete
     ) {
         $this->currentlyResolving = $currentlyResolving;
     }
+}
+
+#[Singleton]
+class ContainerSingletonAttribute
+{
+}
+
+#[Scoped]
+class ContainerScopedAttribute
+{
+}
+
+#[Bind(ContainerSingletonAttribute::class, environments: ['foo', ContainerTestEnvironments::Bar])]
+interface ContainerBindSingletonTestInterface
+{
+}
+
+enum ContainerTestEnvironments: string
+{
+    case Bar = 'bar';
+}
+
+#[Bind(ContainerScopedAttribute::class, environments: ['test'])]
+#[Bind(ContainerScopedAttribute::class, environments: ['test2'])]
+interface ContainerBindScopedTestInterface
+{
+}
+
+#[Bind(WildcardConcrete::class)]
+interface WildcardOnlyInterface
+{
+}
+
+class WildcardConcrete implements WildcardOnlyInterface
+{
+}
+
+/*
+ * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
+ */
+#[Bind(FallbackConcrete::class)]
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface WildcardAndProdInterface
+{
+}
+
+class FallbackConcrete implements WildcardAndProdInterface
+{
+}
+class ProdConcrete implements WildcardAndProdInterface
+{
+}
+
+#[Bind(CliConcrete::class, environments: 'cli')]
+interface CliOnlyInterface
+{
+}
+
+class CliConcrete implements CliOnlyInterface
+{
+}
+
+#[Bind(BadConcrete::class, environments: [])]
+interface EmptyEnvInterface
+{
+}
+
+class BadConcrete implements EmptyEnvInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface ProdEnvOnlyInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+#[Bind(DevConcrete::class, environments: 'dev')]
+interface MultiEnvInterface
+{
+}
+
+class DevConcrete implements MultiEnvInterface
+{
+}
+
+#[Bind(OriginalConcrete::class)]
+interface OverrideInterface
+{
+}
+
+class OriginalConcrete implements OverrideInterface
+{
+}
+
+class AltConcrete implements OverrideInterface
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Scoped]
+interface IsScoped
+{
+}
+
+class IsScopedConcrete implements IsScoped
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Singleton]
+interface IsSingleton
+{
 }
