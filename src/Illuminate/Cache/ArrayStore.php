@@ -13,7 +13,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * The array of stored values.
      *
-     * @var array<string, array{expiresAt: float, value: mixed}>
+     * @var array<string, array{value: mixed, expiresAt: float}>
      */
     protected $storage = [];
 
@@ -45,7 +45,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      * Get all of the cached values and their expiration times.
      *
      * @param  bool  $unserialize
-     * @return array<string, array{expiresAt: float, value: mixed}>
+     * @return array<string, array{value: mixed, expiresAt: float}>
      */
     public function all($unserialize = true)
     {
@@ -57,8 +57,8 @@ class ArrayStore extends TaggableStore implements LockProvider
 
         foreach ($this->storage as $key => $data) {
             $storage[$key] = [
-                'expiresAt' => $data['expiresAt'],
                 'value' => unserialize($data['value']),
+                'expiresAt' => $data['expiresAt'],
             ];
         }
 
