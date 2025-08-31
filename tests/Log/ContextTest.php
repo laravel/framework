@@ -728,7 +728,6 @@ class ContextTest extends TestCase
         $this->assertSame(['a', 'b', 'c', 'd'], Context::get('foo'));
         $this->assertSame(['a', 'b', 'c', 'd'], Context::getHidden('bar'));
     }
-
 }
 
 enum Suit
