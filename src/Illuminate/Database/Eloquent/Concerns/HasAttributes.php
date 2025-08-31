@@ -792,11 +792,13 @@ trait HasAttributes
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
                 is_object($cast) => value(function () use ($cast, $attribute) {
-                    return $cast instanceof Stringable
-                        ? (string) $cast
-                        : throw new InvalidArgumentException(
-                            "The cast object for the {$attribute} attribute must implement Stringable."
-                        );
+                    if ($cast instanceof Stringable) {
+                        return (string) $cast;
+                    }
+
+                    throw new InvalidArgumentException(
+                        "The cast object for the {$attribute} attribute must implement Stringable."
+                    );
                 }),
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
