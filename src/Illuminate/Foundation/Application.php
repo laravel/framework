@@ -24,6 +24,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,6 +40,7 @@ use function Illuminate\Filesystem\join_paths;
 class Application extends Container implements ApplicationContract, CachesConfiguration, CachesRoutes, HttpKernelInterface
 {
     use Macroable;
+    use Conditionable;
 
     /**
      * The Laravel framework version.
