@@ -20,7 +20,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * The array of locks.
      *
-     * @var array
+     * @var array<string, array{owner: ?string, expiresAt: ?\Illuminate\Support\Carbon}>
      */
     public $locks = [];
 
