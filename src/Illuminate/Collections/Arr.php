@@ -105,15 +105,13 @@ class Arr
 
         foreach ($array as $values) {
             if ($values instanceof Collection) {
-                $values = $values->all();
-            } elseif (! is_array($values)) {
-                continue;
+                array_push($results, ...$values->all());
+            } elseif (is_array($values)) {
+                array_push($results, ...$values);
             }
-
-            $results[] = $values;
         }
 
-        return array_merge([], ...$results);
+        return $results;
     }
 
     /**
