@@ -698,6 +698,37 @@ class ContextTest extends TestCase
         Context::rememberHidden('foo', $closure);
         $this->assertSame(1, $closureRunCount);
     }
+
+    public function test_it_prepends_values_on_new_stack()
+    {
+        Context::prepend('foo', 'a');
+        Context::prepend('bar', 'b', 'c', 'a');
+
+        $this->assertSame(['a'], Context::get('foo'));
+        $this->assertSame(['b', 'c', 'a'], Context::get('bar'));
+    }
+
+    public function test_it_prepends_hidden_values_on_new_stack()
+    {
+        Context::prependHidden('foo', 'a');
+        Context::prependHidden('bar', 'b', 'c', 'a');
+
+        $this->assertSame(['a'], Context::getHidden('foo'));
+        $this->assertSame(['b', 'c', 'a'], Context::getHidden('bar'));
+    }
+
+    public function test_it_prepends_values_on_existing_stack()
+    {
+        Context::push('foo', 'b', 'c', 'd');
+        Context::prepend('foo', 'a');
+
+        Context::pushHidden('bar', 'b', 'c', 'd');
+        Context::prependHidden('bar', 'a');
+
+        $this->assertSame(['a', 'b', 'c', 'd'], Context::get('foo'));
+        $this->assertSame(['a', 'b', 'c', 'd'], Context::getHidden('bar'));
+    }
+
 }
 
 enum Suit

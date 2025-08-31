@@ -371,6 +371,29 @@ class Repository
     }
 
     /**
+     * Prepend the given values to the beginning of the key's stack.
+     *
+     * @param  string  $key
+     * @param  mixed  ...$values
+     * @return $this
+     *
+     * @throws \RuntimeException
+     */
+    public function prepend($key, ...$values)
+    {
+        if (! $this->isStackable($key)) {
+            throw new RuntimeException("Unable to prepend value onto context stack for key [{$key}].");
+        }
+
+        $this->data[$key] = [
+            ...$values,
+            ...$this->data[$key] ?? [],
+        ];
+
+        return $this;
+    }
+
+    /**
      * Pop the latest value from the key's stack.
      *
      * @param  string  $key
@@ -405,6 +428,29 @@ class Repository
         $this->hidden[$key] = [
             ...$this->hidden[$key] ?? [],
             ...$values,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Prepend the given hidden values to the beginning of the key's stack.
+     *
+     * @param  string  $key
+     * @param  mixed  ...$values
+     * @return $this
+     *
+     * @throws \RuntimeException
+     */
+    public function prependHidden($key, ...$values)
+    {
+        if (! $this->isHiddenStackable($key)) {
+            throw new RuntimeException("Unable to prepend value onto hidden context stack for key [{$key}].");
+        }
+
+        $this->hidden[$key] = [
+            ...$values,
+            ...$this->hidden[$key] ?? [],
         ];
 
         return $this;
