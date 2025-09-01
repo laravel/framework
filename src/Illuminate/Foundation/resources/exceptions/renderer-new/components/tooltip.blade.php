@@ -1,5 +1,5 @@
 <div
-    class="relative"
+    class="relative min-w-0"
     x-data="{
         open: false,
         timeout: null,
