@@ -319,7 +319,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
+     * @param  (callable(TValue, TKey): array-key|\UnitEnum)|string|null  $countBy
      * @return static<array-key, int>
      */
     public function countBy($countBy = null)
@@ -332,7 +332,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             $counts = [];
 
             foreach ($this as $key => $value) {
-                $group = $countBy($value, $key);
+                $group = enum_value($countBy($value, $key));
 
                 if (empty($counts[$group])) {
                     $counts[$group] = 0;

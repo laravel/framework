@@ -1266,7 +1266,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add nullable creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
@@ -1280,7 +1280,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation and update timestampTz columns to the table.
      *
      * Alias for self::timestampsTz().
      *

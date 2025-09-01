@@ -1860,6 +1860,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo baZ baz bar', $result);
     }
 
+    public function testPlural(): void
+    {
+        $this->assertSame('Laracon', Str::plural('Laracon', 1));
+        $this->assertSame('Laracons', Str::plural('Laracon', 3));
+        $this->assertSame('1,000 Laracons', Str::plural('Laracon', 1000, prependCount: true));
+    }
+
     public function testPluralPascal(): void
     {
         // Test basic functionality with default count
