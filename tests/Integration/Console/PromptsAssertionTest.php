@@ -19,7 +19,7 @@ use function Laravel\Prompts\textarea;
 
 class PromptsAssertionTest extends TestCase
 {
-    public function testAssertionForTextPrompt()
+    public function testAssertionForTextPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -41,7 +41,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Jane');
     }
 
-    public function testAssertionForPausePrompt()
+    public function testAssertionForPausePrompt(): void
     {
         $self = $this;
         $this->app[Kernel::class]->registerCommand(
@@ -67,7 +67,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsQuestion('Press any key to continue...', '');
     }
 
-    public function testAssertionForTextareaPrompt()
+    public function testAssertionForTextareaPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -89,7 +89,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Jane');
     }
 
-    public function testAssertionForSuggestPrompt()
+    public function testAssertionForSuggestPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -111,7 +111,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Joe');
     }
 
-    public function testAssertionForPasswordPrompt()
+    public function testAssertionForPasswordPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -133,7 +133,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('secret');
     }
 
-    public function testAssertionForConfirmPrompt()
+    public function testAssertionForConfirmPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -164,7 +164,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is John.');
     }
 
-    public function testAssertionForSelectPromptWithAList()
+    public function testAssertionForSelectPromptWithAList(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -189,7 +189,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is Jane.');
     }
 
-    public function testAssertionForSelectPromptWithAnAssociativeArray()
+    public function testAssertionForSelectPromptWithAnAssociativeArray(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -214,7 +214,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is jane.');
     }
 
-    public function testAlternativeAssertionForSelectPromptWithAnAssociativeArray()
+    public function testAlternativeAssertionForSelectPromptWithAnAssociativeArray(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -239,7 +239,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is jane.');
     }
 
-    public function testAssertionForRequiredMultiselectPrompt()
+    public function testAssertionForRequiredMultiselectPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -265,7 +265,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('You like John, Jane.');
     }
 
-    public function testAssertionForOptionalMultiselectPrompt()
+    public function testAssertionForOptionalMultiselectPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -299,7 +299,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('You like nobody.');
     }
 
-    public function testAssertionForSearchPrompt()
+    public function testAssertionForSearchPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -328,7 +328,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('Your name is Jane.');
     }
 
-    public function testAssertionForMultisearchPrompt()
+    public function testAssertionForMultisearchPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
@@ -366,7 +366,7 @@ class PromptsAssertionTest extends TestCase
             ->expectsOutput('You like nobody.');
     }
 
-    public function testAssertionForSelectPromptFollowedByMultisearchPrompt()
+    public function testAssertionForSelectPromptFollowedByMultisearchPrompt(): void
     {
         $this->app[Kernel::class]->registerCommand(
             new class extends Command
