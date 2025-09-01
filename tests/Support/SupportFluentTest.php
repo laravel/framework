@@ -6,7 +6,6 @@ use ArrayIterator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
