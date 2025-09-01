@@ -1,14 +1,26 @@
-@props(['code', 'grammar', 'theme' => 'one-dark-pro', 'withGutter' => false, 'startingLine' => 1, 'highlightedLine' => null])
+@props([
+    'code',
+    'grammar',
+    'theme' => 'one-dark-pro',
+    'withGutter' => false,
+    'startingLine' => 1,
+    'highlightedLine' => null,
+    'truncate' => false,
+])
 
 @use('Phiki\Phiki')
 @use('Phiki\Grammar\Grammar')
 @use('Phiki\Theme\Theme')
 @use('Phiki\Transformers\Decorations\LineDecoration')
+@use('Phiki\Transformers\Decorations\PreDecoration')
 
 @php
     $highlightedCode = (new Phiki)->codeToHtml($code, $grammar, $theme)
         ->withGutter($withGutter)
-        ->startingLine($startingLine);
+        ->startingLine($startingLine)
+        ->decoration(
+            PreDecoration::make()->class('bg-transparent!', $truncate ? ' truncate' : ''),
+        );
 
     if ($highlightedLine !== null) {
         $highlightedCode->decoration(
@@ -18,7 +30,7 @@
 @endphp
 
 <div
-    {{ $attributes->merge(['class' => '[&_pre]:bg-transparent!']) }}
+    {{ $attributes }}
 >
     {!! $highlightedCode !!}
 </div>
