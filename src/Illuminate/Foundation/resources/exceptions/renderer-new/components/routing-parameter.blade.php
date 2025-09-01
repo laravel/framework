@@ -3,7 +3,7 @@
 <div class="flex flex-col gap-3">
     <h2 class="text-lg font-semibold">Routing parameters</h2>
     @if ($routeParameters)
-    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] overflow-hidden p-5">
+    <div class="bg-white/[0.02] border border-white/5 rounded-md shadow-[0px_16px_32px_-8px_rgba(12,12,13,0.4)] overflow-x-auto p-5">
         <x-laravel-exceptions-renderer-new::syntax-highlight :code="$routeParameters" grammar="json" />
     </div>
     @else
