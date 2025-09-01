@@ -680,6 +680,17 @@ class Arr
     }
 
     /**
+     * Remove duplicate values from an array.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function unique($array)
+    {
+        return array_unique($array);
+    }
+
+    /**
      * Select an array of values from an array.
      *
      * @param  array  $array
