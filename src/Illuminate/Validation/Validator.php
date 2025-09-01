@@ -358,16 +358,6 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Flush the validator's global state.
-     *
-     * @return void
-     */
-    public static function flushState()
-    {
-        static::$placeholderHash = null;
-    }
-
-    /**
      * Parse the data array, converting dots and asterisks.
      *
      * @param  array  $data
@@ -1665,6 +1655,16 @@ class Validator implements ValidatorContract
         [$class, $method] = Str::parseCallback($callback, 'validate');
 
         return $this->container->make($class)->{$method}(...array_values($parameters));
+    }
+
+    /**
+     * Flush the validator's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$placeholderHash = null;
     }
 
     /**
