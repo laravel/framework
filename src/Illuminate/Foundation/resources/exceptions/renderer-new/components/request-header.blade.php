@@ -4,10 +4,20 @@
     <h2 class="text-lg font-semibold">Headers</h2>
     <div class="flex flex-col">
         @foreach ($headers as $key => $value)
-        <div class="flex items-center gap-2 h-10">
-            <div class="text-sm font-mono text-neutral-400">{{ $key }}</div>
-            <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-            <div class="text-sm font-mono max-w-[772px] overflow-hidden text-ellipsis">{{ $value }}</div>
+        <div class="flex max-w-full items-baseline gap-2 h-10 text-sm font-mono">
+            <div class="text-neutral-400 shrink-0">{{ $key }}</div>
+            <div class="min-w-6 grow h-3 border-b-2 border-dotted border-neutral-300 dark:border-white/20"></div>
+            <div class="min-w-0">
+                <x-laravel-exceptions-renderer-new::tooltip side="right">
+                    <x-slot:trigger>
+                        <div class="truncate">
+                            {{ $value }}
+                        </div>
+                    </x-slot>
+
+                    <span>{{ $value }}</span>
+                </x-laravel-exceptions-renderer-new::tooltip>
+            </div>
         </div>
         @endforeach
     </div>
