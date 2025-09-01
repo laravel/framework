@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
@@ -357,6 +358,27 @@ class PendingCommand
         $this->app->offsetUnset(OutputStyle::class);
 
         return $exitCode;
+    }
+
+    /**
+     * Debug the command.
+     *
+     * @return never
+     */
+    public function dd()
+    {
+        $consoleOutput = new OutputStyle(new ArrayInput($this->parameters), new ConsoleOutput());
+        $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $consoleOutput);
+
+        $streamOutput = $consoleOutput->getOutput()->getStream();
+        $output = stream_get_contents($streamOutput);
+
+        fclose($streamOutput);
+
+        dd([
+            'exitCode' => $exitCode,
+            'output' => $output,
+        ]);
     }
 
     /**
