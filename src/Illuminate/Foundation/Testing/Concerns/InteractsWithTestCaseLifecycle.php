@@ -187,8 +187,8 @@ trait InteractsWithTestCaseLifecycle
         TrimStrings::flushState();
         TrustProxies::flushState();
         TrustHosts::flushState();
-        Validator::flushState();
         ValidateCsrfToken::flushState();
+        Validator::flushState();
         WorkCommand::flushState();
 
         if ($this->callbackException) {
