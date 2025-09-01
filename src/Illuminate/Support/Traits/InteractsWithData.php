@@ -242,7 +242,7 @@ trait InteractsWithData
      * @param  mixed  $default
      * @return string
  */
-    public function string($key, $default = null)
+    public function string($key, $default = null): string
     {
         $value = $this->data($key, $default);
 
