@@ -8,7 +8,8 @@
     },
     "dependencies": {
         "alpinejs": "^3.14.9",
-        "tailwindcss": "^4.1.12"
+        "tailwindcss": "^4.1.12",
+        "tw-animate-css": "^1.3.7"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.1.12",
