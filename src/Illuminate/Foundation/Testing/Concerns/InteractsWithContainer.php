@@ -111,9 +111,10 @@ trait InteractsWithContainer
     /**
      * Register an empty handler for Vite in the container.
      *
+     * @param  \Closure(string, string|null):void|null  $assetCallback
      * @return $this
      */
-    protected function withoutVite()
+    protected function withoutVite($assetCallback = null)
     {
         if ($this->originalVite == null) {
             $this->originalVite = app(Vite::class);
@@ -121,10 +122,21 @@ trait InteractsWithContainer
 
         Facade::clearResolvedInstance(Vite::class);
 
-        $this->swap(Vite::class, new class extends Vite
+        $this->swap(Vite::class, new class($assetCallback) extends Vite
         {
+            public function __construct(
+                protected $assetCallback = null
+            ) {
+            }
+
             public function __invoke($entrypoints, $buildDirectory = null)
             {
+                if ($this->assetCallback) {
+                    foreach ((array) $entrypoints as $entrypoint) {
+                        ($this->assetCallback)($entrypoint, $buildDirectory);
+                    }
+                }
+
                 return new HtmlString('');
             }
 
@@ -185,16 +197,40 @@ trait InteractsWithContainer
 
             public function content($asset, $buildDirectory = null)
             {
+                if ($this->assetCallback) {
+                    ($this->assetCallback)($asset, $buildDirectory);
+                }
+
                 return '';
             }
 
             public function asset($asset, $buildDirectory = null)
             {
+                if ($this->assetCallback) {
+                    ($this->assetCallback)($asset, $buildDirectory);
+                }
+
                 return '';
             }
         });
 
         return $this;
+    }
+
+    /**
+     * Register an empty handler for Vite that validates asset existence.
+     *
+     * @return $this
+     */
+    protected function withoutViteStrict()
+    {
+        return $this->withoutVite(function ($asset) {
+            $path = resource_path($asset);
+
+            if (! file_exists($path)) {
+                throw new \InvalidArgumentException("Vite asset does not exist: {$asset} (resolved to: {$path})");
+            }
+        });
     }
 
     /**
@@ -214,19 +250,40 @@ trait InteractsWithContainer
     /**
      * Register an empty handler for Laravel Mix in the container.
      *
+     * @param  \Closure|null  $assetCallback
      * @return $this
      */
-    protected function withoutMix()
+    protected function withoutMix($assetCallback = null)
     {
         if ($this->originalMix == null) {
             $this->originalMix = app(Mix::class);
         }
 
-        $this->swap(Mix::class, function () {
+        $this->swap(Mix::class, function ($asset = null) use ($assetCallback) {
+            if ($assetCallback && $asset) {
+                $assetCallback($asset, null);
+            }
+
             return new HtmlString('');
         });
 
         return $this;
+    }
+
+    /**
+     * Register an empty handler for Laravel Mix that validates asset existence.
+     *
+     * @return $this
+     */
+    protected function withoutMixStrict()
+    {
+        return $this->withoutMix(function ($asset, $buildDirectory) {
+            $path = public_path($asset);
+
+            if (! file_exists($path)) {
+                throw new \InvalidArgumentException("Mix asset does not exist: {$asset} (resolved to: {$path})");
+            }
+        });
     }
 
     /**

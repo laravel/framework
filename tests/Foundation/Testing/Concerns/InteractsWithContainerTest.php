@@ -54,6 +54,81 @@ class InteractsWithContainerTest extends TestCase
         $this->assertSame($this, $instance);
     }
 
+    public function testWithoutViteWithCallbackExecutesCallbackOnInvoke()
+    {
+        $assets = [];
+
+        $this->withoutVite(function ($asset, $buildDirectory) use (&$assets) {
+            $assets[] = [$asset, $buildDirectory];
+        });
+
+        app(Vite::class)(['resources/js/app.js', 'resources/css/app.css'], 'build');
+
+        $this->assertEquals([
+            ['resources/js/app.js', 'build'],
+            ['resources/css/app.css', 'build'],
+        ], $assets);
+    }
+
+    public function testWithoutViteWithCallbackExecutesCallbackOnAssetMethod()
+    {
+        $assets = [];
+
+        $this->withoutVite(function ($asset, $buildDirectory) use (&$assets) {
+            $assets[] = [$asset, $buildDirectory];
+        });
+
+        app(Vite::class)->asset('resources/js/app.js', 'custom-build');
+
+        $this->assertEquals([
+            ['resources/js/app.js', 'custom-build'],
+        ], $assets);
+    }
+
+    public function testWithoutViteWithCallbackExecutesCallbackOnContentMethod()
+    {
+        $assets = [];
+
+        $this->withoutVite(function ($asset, $buildDirectory) use (&$assets) {
+            $assets[] = [$asset, $buildDirectory];
+        });
+
+        app(Vite::class)->content('resources/js/app.js', 'build');
+
+        $this->assertEquals([
+            ['resources/js/app.js', 'build'],
+        ], $assets);
+    }
+
+    public function testWithoutViteStrictThrowsForMissingAsset()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Vite asset does not exist: non-existent-file.js');
+
+        $this->withoutViteStrict();
+
+        app(Vite::class)(['non-existent-file.js']);
+    }
+
+    public function testWithoutViteStrictValidatesExistingAssets()
+    {
+        // Create a temporary asset file for testing
+        $assetPath = resource_path('temp-test-asset.js');
+        file_put_contents($assetPath, '// test asset');
+
+        try {
+            $this->withoutViteStrict();
+
+            // Should not throw for existing file
+            $result = app(Vite::class)(['temp-test-asset.js']);
+            $this->assertSame('', $result->toHtml());
+        } finally {
+            if (file_exists($assetPath)) {
+                unlink($assetPath);
+            }
+        }
+    }
+
     public function testWithoutMixBindsEmptyHandlerAndReturnsInstance()
     {
         $instance = $this->withoutMix();
@@ -72,6 +147,50 @@ class InteractsWithContainerTest extends TestCase
 
         $this->assertSame($handler, resolve(Mix::class));
         $this->assertSame($this, $instance);
+    }
+
+    public function testWithoutMixWithCallbackExecutesCallbackOnMixCall()
+    {
+        $assets = [];
+
+        $this->withoutMix(function ($asset, $buildDirectory) use (&$assets) {
+            $assets[] = [$asset, $buildDirectory];
+        });
+
+        mix('js/app.js');
+
+        $this->assertEquals([
+            ['js/app.js', null],
+        ], $assets);
+    }
+
+    public function testWithoutMixStrictThrowsForMissingAsset()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Mix asset does not exist: js/non-existent-file.js');
+
+        $this->withoutMixStrict();
+
+        mix('js/non-existent-file.js');
+    }
+
+    public function testWithoutMixStrictValidatesExistingAssets()
+    {
+        // Create a temporary asset file for testing
+        $assetPath = public_path('temp-test-asset.js');
+        file_put_contents($assetPath, '// test asset');
+
+        try {
+            $this->withoutMixStrict();
+
+            // Should not throw for existing file
+            $result = mix('temp-test-asset.js');
+            $this->assertSame('', (string) $result);
+        } finally {
+            if (file_exists($assetPath)) {
+                unlink($assetPath);
+            }
+        }
     }
 
     public function testWithoutDefer()
