@@ -14,7 +14,7 @@
 
 <x-laravel-exceptions-renderer-new::tooltip>
     <x-slot:trigger>
-        <span
+        <div
             {{ $attributes->merge(['class' => 'text-xs font-mono truncate text-violet-500 dark:text-violet-400']) }}
         >
             @if($class = $frame->class())
@@ -26,7 +26,7 @@
             @else
                 {{ $frame->source() }}
             @endif
-        </span>
+        </div>
     </x-slot>
 
     <span>{{ $source }}</span>

@@ -1,7 +1,7 @@
 @props(['frame'])
 
 <div
-    class="overflow-hidden rounded-lg border dark:border-white/10"
+    class="rounded-lg border dark:border-white/10"
     x-data="{ expanded: {{ $frame->isMain() ? 'true' : 'false' }} }"
     @expand-button-clicked="expanded = $event.detail.expanded"
 >
@@ -11,9 +11,13 @@
           <div class="size-2 rounded-full bg-neutral-400 dark:bg-neutral-400"></div>
         </div>
 
-        <div class="flex flex-1 items-center justify-between gap-6 overflow-hidden">
-            <x-laravel-exceptions-renderer-new::formatted-source :$frame />
-            <x-laravel-exceptions-renderer-new::file-with-line :file="$frame->file()" :line="$frame->line()" />
+        <div class="flex flex-1 items-center justify-between gap-6">
+            <div class="flex-shrink-0">
+                <x-laravel-exceptions-renderer-new::formatted-source :$frame />
+            </div>
+            <div class="flex-1 min-w-0">
+                <x-laravel-exceptions-renderer-new::file-with-line :file="$frame->file()" :line="$frame->line()" />
+            </div>
         </div>
 
         <x-laravel-exceptions-renderer-new::expand-button :expanded="$frame->isMain()" />
