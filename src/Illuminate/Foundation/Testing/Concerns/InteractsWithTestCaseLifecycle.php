@@ -33,10 +33,13 @@ use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Attributes\SetUp;
+use Illuminate\Testing\Attributes\TearDown;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Metadata\Annotation\Parser\Registry as PHPUnitRegistry;
+use ReflectionClass;
 use Throwable;
 
 trait InteractsWithTestCaseLifecycle
@@ -227,13 +230,16 @@ trait InteractsWithTestCaseLifecycle
             $this->setUpFaker();
         }
 
-        foreach ($uses as $trait) {
-            if (method_exists($this, $method = 'setUp'.class_basename($trait))) {
-                $this->{$method}();
+        $conventionalSetUpMethods = array_map(static fn ($trait) => 'setUp'.class_basename($trait), array_keys($uses));
+        $conventionalTearDownMethods = array_map(static fn ($trait) => 'tearDown'.class_basename($trait), array_keys($uses));
+
+        foreach ((new ReflectionClass($this::class))->getMethods() as $method) {
+            if (in_array($method->getName(), $conventionalSetUpMethods) || $method->getAttributes(SetUp::class) !== []) {
+                $method->invoke($this);
             }
 
-            if (method_exists($this, $method = 'tearDown'.class_basename($trait))) {
-                $this->beforeApplicationDestroyed(fn () => $this->{$method}());
+            if (in_array($method->getName(), $conventionalTearDownMethods) || $method->getAttributes(TearDown::class) !== []) {
+                $this->beforeApplicationDestroyed(fn () => $method->invoke($this));
             }
         }
 
