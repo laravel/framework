@@ -89,11 +89,11 @@ class RendererTest extends TestCase
         $this->app->forgetInstance(ExceptionRenderer::class);
         $this->assertFalse($this->app->bound(ExceptionRenderer::class));
 
-        $listener = \Mockery::mock(Listener::class);
+        $listener = Mockery::mock(Listener::class);
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, \Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -114,11 +114,11 @@ class RendererTest extends TestCase
 
         $this->assertTrue($this->app->bound(ExceptionRenderer::class));
 
-        $listener = \Mockery::mock(Listener::class);
+        $listener = Mockery::mock(Listener::class);
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, \Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -134,7 +134,7 @@ class RendererTest extends TestCase
         $listener->shouldReceive('registerListeners')->once();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, \Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
