@@ -3328,6 +3328,22 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGroupByAttributeWithEnumKey($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => TestEnum::A, 'url' => '1'],
+            ['name' => TestBackedEnum::A, 'url' => '1'],
+            ['name' => TestStringBackedEnum::A, 'url' => '2'],
+        ]);
+
+        $result = $data->groupBy('name');
+        $this->assertEquals(['A' => [$payload[0], $payload[2]], '1' => [$payload[1]]], $result->toArray());
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testGroupByCallable($collection)
     {
         $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
