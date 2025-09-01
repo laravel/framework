@@ -8,7 +8,7 @@
                 <div class="mb-2">
                     @if (config('app.editor'))
                         <a href="{{ $frame->editorHref() }}" class="text-blue-500 hover:underline">
-                            <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span><span class="font-mono text-xs">:{{ $frame->line() }}</span>
+                            <span class="wrap">{{ $frame->file() }}</span><span class="font-mono text-xs">:{{ $frame->line() }}</span>
                         </a>
                     @else
                         <span class="wrap text-gray-900 dark:text-gray-300">{{ $frame->file() }}</span><span class="font-mono text-xs">:{{ $frame->line() }}</span>
