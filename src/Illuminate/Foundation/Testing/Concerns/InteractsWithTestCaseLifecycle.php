@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Once;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Validator;
 use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
@@ -186,6 +187,7 @@ trait InteractsWithTestCaseLifecycle
         TrimStrings::flushState();
         TrustProxies::flushState();
         TrustHosts::flushState();
+        Validator::flushState();
         ValidateCsrfToken::flushState();
         WorkCommand::flushState();
 
