@@ -1,3 +1,5 @@
+@props(['side' => 'center'])
+
 <div
     class="relative min-w-0"
     x-data="{
@@ -20,7 +22,10 @@
     <div
         x-show="open"
         @class([
-            'absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-2 py-1',
+            'absolute bottom-full w-max px-2 py-1',
+            'left-0' => $side === 'left',
+            'left-1/2 transform -translate-x-1/2' => $side === 'center',
+            'right-0' => $side === 'right',
             'animate-in fade-in-0 zoom-in-95 z-50 overflow-hidden rounded-md border text-xs shadow-md backdrop-blur-md',
             'border-neutral-800 bg-neutral-900 text-white',
             'dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100',

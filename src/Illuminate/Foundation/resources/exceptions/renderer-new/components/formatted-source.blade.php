@@ -12,7 +12,7 @@
     }
 @endphp
 
-<x-laravel-exceptions-renderer-new::tooltip>
+<x-laravel-exceptions-renderer-new::tooltip side="left">
     <x-slot:trigger>
         <div
             {{ $attributes->merge(['class' => 'text-xs font-mono truncate text-violet-500 dark:text-violet-400']) }}
