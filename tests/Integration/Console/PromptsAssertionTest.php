@@ -43,7 +43,6 @@ class PromptsAssertionTest extends TestCase
 
     public function testAssertionForPausePrompt()
     {
-        $self = $this;
         $this->app[Kernel::class]->registerCommand(
             new class($this) extends Command
             {
