@@ -7,11 +7,11 @@
 >
     <div class="flex h-11 items-center gap-2.5 bg-white pr-2.5 pl-4 dark:bg-white/3">
         {{-- Dot --}}
-        <div class="flex size-3 items-center justify-center">
+        <div class="flex size-3 items-center justify-center flex-shrink-0">
           <div class="size-2 rounded-full bg-neutral-400 dark:bg-neutral-400"></div>
         </div>
 
-        <div class="flex flex-1 items-center justify-between gap-6">
+        <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
             <div class="flex-shrink-0">
                 <x-laravel-exceptions-renderer-new::formatted-source :$frame />
             </div>
@@ -20,7 +20,9 @@
             </div>
         </div>
 
-        <x-laravel-exceptions-renderer-new::expand-button :expanded="$frame->isMain()" />
+        <div class="flex-shrink-0">
+            <x-laravel-exceptions-renderer-new::expand-button :expanded="$frame->isMain()" />
+        </div>
     </div>
 
     @if($snippet = $frame->snippet())
