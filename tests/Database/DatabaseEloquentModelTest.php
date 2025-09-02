@@ -3448,7 +3448,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelToPrettyJson(): void
     {
-        $user = new EloquentModelStub(['name' => 'Mateus', 'active' => true]);
+        $user = new EloquentModelStub(['name' => 'Mateus', 'active' => true, 'number' => '123']);
         $results = $user->toPrettyJson();
         $expected = $user->toJson(JSON_PRETTY_PRINT);
 
@@ -3456,6 +3456,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame($expected, $results);
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
+
+        $results = $user->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"number": 123', $results);
     }
 
     public function testFillableWithMutators()
