@@ -66,13 +66,14 @@ class FoundationHelpersTest extends TestCase
         );
 
 
-        // Test returning true stops the loop.
+        // Test returning anything stops the loop
+
 
         $valueTwo = 0;
 
         repeat(function () use (&$valueTwo) {
                 if ($valueTwo >= 3) {
-                    return true;
+                    return false;
                 }
                 $valueTwo++;
         }, 5);

@@ -822,7 +822,7 @@ if (! function_exists('repeat')) {
     function repeat(callable $callback, $iterations)
     {
         while ($iterations > 0) {
-            if ($callback() === true) {
+            if ($callback() === false) {
                 break;
             }
             $iterations--;
