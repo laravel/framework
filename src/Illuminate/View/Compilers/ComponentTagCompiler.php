@@ -560,14 +560,14 @@ class ComponentTagCompiler
         /x";
 
         $value = preg_replace_callback($pattern, function ($matches) {
-            $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name'] ?: $matches['boundName']);
+            $name = $this->stripQuotes($matches['inlineName'] ?: $matches['name'] ?: $matches['boundName'] ?: 'slot');
 
             if (Str::contains($name, '-') && ! empty($matches['inlineName'])) {
                 $name = Str::camel($name);
             }
 
             // If the name was given as a simple string, we will wrap it in quotes as if it was bound for convenience...
-            if (! empty($matches['inlineName']) || ! empty($matches['name'])) {
+            if (empty($matches['boundName'])) {
                 $name = "'{$name}'";
             }
 
