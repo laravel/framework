@@ -1,6 +1,33 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.26.4...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.27.0...12.x)
+
+## [v12.27.0](https://github.com/laravel/framework/compare/v12.26.4...v12.27.0) - 2025-09-02
+
+* [12.x] Add prepend option for Str::plural() by [@caseydwyer](https://github.com/caseydwyer) in https://github.com/laravel/framework/pull/56802
+* [12.x] Fix multi-line embedded image replacement in mail views by [@iammursal](https://github.com/iammursal) in https://github.com/laravel/framework/pull/56828
+* [12.x] Add supports for SQS Fair Queue by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56763
+* [12.x] Support enum values in `Collection` `countBy` method by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56830
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56838
+* [12.x] Fix docblocks and all() method in ArrayStore for consistency by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56845
+* [12.x] Improve Grammar in ArrayLock by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56844
+* [12.x] Normalize comments for timestampsTz() and nullableTimestampsTz() by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56840
+* [12.x] Reduce meaningless intermediate variables by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56843
+* [12.x] Simpler and consistent `Arr::collapse()` by [@weshooper](https://github.com/weshooper) in https://github.com/laravel/framework/pull/56842
+* [12.x] Improving readability by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56847
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56850
+* [12.x] Remove extra space before line number in exception trace by [@mtbossa](https://github.com/mtbossa) in https://github.com/laravel/framework/pull/56863
+* [12.x] Remove unused variable by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56861
+* [12.x] Add support for `UnitEnum` in `Collection` `groupBy` method by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56857
+* [12.x] Add missing void return type to test methods by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56860
+* [12.x] Improve `countBy` docblock in `Collection` to allow for enum callback by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56856
+* [12.x] Improve `InteractsWithContainer` return types by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/56853
+* [12.x] Allow mass assignment for value object casting. by [@AbdelElrafa](https://github.com/AbdelElrafa) in https://github.com/laravel/framework/pull/56871
+* [12.x] Allows `APP_BASE_PATH` from `$_SERVER` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56868
+* [12.x] Fix typo in docblock by [@dwightwatson](https://github.com/dwightwatson) in https://github.com/laravel/framework/pull/56867
+* [12.x] Allow enums in other DatabaseManager methods by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56878
+* Add health score badge to README by [@jonathimer](https://github.com/jonathimer) in https://github.com/laravel/framework/pull/56875
+* [12.x] Let `toPrettyJson()` accepts options by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/56876
 
 ## [v12.26.4](https://github.com/laravel/framework/compare/v12.26.3...v12.26.4) - 2025-08-29
 
