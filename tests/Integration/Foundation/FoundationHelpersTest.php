@@ -52,6 +52,21 @@ class FoundationHelpersTest extends TestCase
         );
     }
 
+     public function testRepeat()
+    {
+        $value = 0;
+
+        repeat(function () use (&$value) {
+                $value++;
+        }, 5);
+
+        $this->assertEquals(
+            5,
+            $value
+        );
+
+    }
+
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()
     {
         $handler = new FakeHandler;

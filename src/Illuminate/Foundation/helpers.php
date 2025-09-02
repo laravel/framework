@@ -811,6 +811,23 @@ if (! function_exists('rescue')) {
     }
 }
 
+if (! function_exists('repeat')) {
+    /**
+     * Execute the given closure a given number of times.
+     *
+     * @param  callable(): void $callback
+     * @param  int  $iterations
+     * @return null
+     */
+    function repeat(callable $callback, $iterations)
+    {
+        while ($iterations > 0) {
+            $callback();
+            $iterations--;
+        }
+    }
+}
+
 if (! function_exists('resolve')) {
     /**
      * Resolve a service from the container.
