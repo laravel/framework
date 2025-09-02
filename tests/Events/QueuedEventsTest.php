@@ -36,6 +36,23 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
     }
 
+    public function testQueuedEventHandlersAreQueuedWithAttribute()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
+
+        $queue->shouldReceive('pushOn')->once()->with(null, m::type(CallQueuedListener::class));
+
+        $d->setQueueResolver(function () use ($queue) {
+            return $queue;
+        });
+
+        $d->listen('some.event', TestDispatcherQueuedHandlerWithAttribute::class.'@someMethod');
+        $d->dispatch('some.event', ['foo', 'bar']);
+    }
+
     public function testCustomizedQueuedEventHandlersAreQueued()
     {
         $d = new Dispatcher;
@@ -219,6 +236,15 @@ class QueuedEventsTest extends TestCase
 }
 
 class TestDispatcherQueuedHandler implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+#[\Illuminate\Container\Attributes\ShouldQueue]
+class TestDispatcherQueuedHandlerWithAttribute
 {
     public function handle()
     {
