@@ -890,10 +890,11 @@ if (! function_exists('secure_url')) {
      *
      * @param  string  $path
      * @param  mixed  $parameters
+     * @return string
      */
-    function secure_url($path, $parameters = []): string
+    function secure_url($path, $parameters = [])
     {
-        return url()->secure($path, $parameters);
+        return url($path, $parameters, true);
     }
 }
 
