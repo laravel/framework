@@ -65,6 +65,23 @@ class FoundationHelpersTest extends TestCase
             $value
         );
 
+
+        // Test returning true stops the loop.
+
+        $valueTwo = 0;
+
+        repeat(function () use (&$valueTwo) {
+                if ($valueTwo >= 3) {
+                    return true;
+                }
+                $valueTwo++;
+        }, 5);
+
+        $this->assertEquals(
+            3,
+            $valueTwo
+        );
+
     }
 
     public function testMixReportsExceptionWhenAssetIsMissingFromManifest()

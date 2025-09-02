@@ -815,14 +815,16 @@ if (! function_exists('repeat')) {
     /**
      * Execute the given closure a given number of times.
      *
-     * @param  callable(): void $callback
+     * @param  callable(): bool|void $callback
      * @param  int  $iterations
      * @return null
      */
     function repeat(callable $callback, $iterations)
     {
         while ($iterations > 0) {
-            $callback();
+            if ($callback() === true) {
+                break;
+            }
             $iterations--;
         }
     }
