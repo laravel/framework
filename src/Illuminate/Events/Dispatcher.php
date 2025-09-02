@@ -556,9 +556,14 @@ class Dispatcher implements DispatcherContract
     protected function handlerShouldBeQueued($class)
     {
         try {
-            return (new ReflectionClass($class))->implementsInterface(
-                ShouldQueue::class
-            );
+            $reflectionClass = new ReflectionClass($class);
+
+            $shouldQueueAttributes = $reflectionClass->getAttributes(\Illuminate\Container\Attributes\ShouldQueue::class);
+
+            $hasShouldQueueAttribute = !empty($shouldQueueAttributes);
+            $implementsShouldQueueInterface = $reflectionClass->implementsInterface(ShouldQueue::class);
+
+            return $hasShouldQueueAttribute || $implementsShouldQueueInterface;
         } catch (Exception) {
             return false;
         }
