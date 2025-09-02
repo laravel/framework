@@ -821,11 +821,10 @@ if (! function_exists('repeat')) {
      */
     function repeat(callable $callback, $iterations)
     {
-        while ($iterations > 0) {
-            if ($callback() === false) {
+        for ($i = 1; $i <= $iterations; $i++) {
+            if ($callback($i) === false) {
                 break;
             }
-            $iterations--;
         }
     }
 }

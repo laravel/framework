@@ -55,14 +55,25 @@ class FoundationHelpersTest extends TestCase
      public function testRepeat()
     {
         $value = 0;
+        $greatestIteration = null;
+        repeat(function ($iteration) use (&$value, &$greatestIteration) {
 
-        repeat(function () use (&$value) {
-                $value++;
+            $value++;
+             $this->assertEquals(
+            $value,
+            $iteration
+            );
+             $greatestIteration = $iteration;
         }, 5);
 
         $this->assertEquals(
             5,
             $value
+        );
+
+        $this->assertEquals(
+            5,
+            $greatestIteration
         );
 
 
