@@ -225,7 +225,7 @@ trait InteractsWithContainer
     protected function withoutViteStrict()
     {
         return $this->withoutVite(function ($asset) {
-            $path = resource_path($asset);
+            $path = base_path($asset);
 
             if (! file_exists($path)) {
                 throw new \InvalidArgumentException("Vite asset does not exist: {$asset} (resolved to: {$path})");

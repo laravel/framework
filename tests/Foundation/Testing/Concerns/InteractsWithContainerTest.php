@@ -103,11 +103,11 @@ class InteractsWithContainerTest extends TestCase
     public function testWithoutViteStrictThrowsForMissingAsset()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Vite asset does not exist: non-existent-file.js');
+        $this->expectExceptionMessage('Vite asset does not exist: resources/non-existent-file.js');
 
         $this->withoutViteStrict();
 
-        app(Vite::class)(['non-existent-file.js']);
+        app(Vite::class)(['resources/non-existent-file.js']);
     }
 
     public function testWithoutViteStrictValidatesExistingAssets()
@@ -120,7 +120,7 @@ class InteractsWithContainerTest extends TestCase
             $this->withoutViteStrict();
 
             // Should not throw for existing file
-            $result = app(Vite::class)(['temp-test-asset.js']);
+            $result = app(Vite::class)(['resources/temp-test-asset.js']);
             $this->assertSame('', $result->toHtml());
         } finally {
             if (file_exists($assetPath)) {
