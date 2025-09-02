@@ -71,7 +71,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             ], 'laravel-errors');
         }
 
-        if ($this->app->hasDebugModeEnabled() && ! app()->has(ExceptionRenderer::class)) {
+        if ($this->app->hasDebugModeEnabled() && ! $this->app->has(ExceptionRenderer::class)) {
             $this->app->make(Listener::class)->registerListeners(
                 $this->app->make(Dispatcher::class)
             );
