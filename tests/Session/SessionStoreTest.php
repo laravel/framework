@@ -607,7 +607,7 @@ class SessionStoreTest extends TestCase
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('get')->andReturn(null);
-        $result = $session->rememberFor('foo', function () {
+        $result = $session->rememberFor('foo', Carbon::now()->addMinutes(5), function () {
             return 'bar';
         });
         $this->assertSame('bar', $session->get('foo')['value']);
@@ -619,7 +619,7 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->put('key', [
             'value' => 'foo',
-            'expires_at' => Carbon::now()->addMinutes(5),
+            'expires_at' => Carbon::now()->addMinutes(5)->getTimestamp(),
         ]);
         $result = $session->rememberFor('key', Carbon::now()->addMinutes(5), function () {
             return 'bar';
