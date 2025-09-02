@@ -560,7 +560,7 @@ class Dispatcher implements DispatcherContract
 
             $shouldQueueAttributes = $reflectionClass->getAttributes(\Illuminate\Container\Attributes\ShouldQueue::class);
 
-            $hasShouldQueueAttribute = !empty($shouldQueueAttributes);
+            $hasShouldQueueAttribute = ! empty($shouldQueueAttributes);
             $implementsShouldQueueInterface = $reflectionClass->implementsInterface(ShouldQueue::class);
 
             return $hasShouldQueueAttribute || $implementsShouldQueueInterface;
