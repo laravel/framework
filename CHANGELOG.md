@@ -1,6 +1,14 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.45.2...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.45.3...11.x)
+
+## [v11.45.3](https://github.com/laravel/framework/compare/v11.45.2...v11.45.3) - 2025-09-02
+
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56649
+* [11.x] Fix exception page not preparing SQL bindings by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56651
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56849
+* [11.x] Chore: Decouple Str::random() from Validator by [@michaeldyrynda](https://github.com/michaeldyrynda) in https://github.com/laravel/framework/pull/56852
+* [11.x] Allow a wider range of `brick/math` versions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56890
 
 ## [v11.45.2](https://github.com/laravel/framework/compare/v11.45.1...v11.45.2) - 2025-08-13
 
