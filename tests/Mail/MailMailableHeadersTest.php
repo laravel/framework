@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailableHeadersTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $headers = new Headers(
             '434571BC.8070702@example.net',
