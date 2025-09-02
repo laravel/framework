@@ -32,8 +32,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
 
     /**
      * Create a new hasher instance.
-     *
-     * @param  array  $options
      */
     public function __construct(array $options = [])
     {
@@ -46,7 +44,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * Hash the given value.
      *
      * @param  string  $value
-     * @param  array  $options
      * @return string
      *
      * @throws \RuntimeException
@@ -73,7 +70,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      *
      * @param  string  $value
      * @param  string  $hashedValue
-     * @param  array  $options
      * @return bool
      *
      * @throws \RuntimeException
@@ -95,7 +91,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      * Check if the given hash has been hashed using the given options.
      *
      * @param  string  $hashedValue
-     * @param  array  $options
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
@@ -163,7 +158,6 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Extract the cost value from the options array.
      *
-     * @param  array  $options
      * @return int
      */
     protected function cost(array $options = [])

@@ -156,7 +156,6 @@ class MailManager implements FactoryContract
     /**
      * Create a new transport instance.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\TransportInterface
      *
      * @throws \InvalidArgumentException
@@ -183,7 +182,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony SMTP Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport
      */
     protected function createSmtpTransport(array $config)
@@ -211,8 +209,6 @@ class MailManager implements FactoryContract
     /**
      * Configure the additional SMTP driver options.
      *
-     * @param  \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport  $transport
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport
      */
     protected function configureSmtpTransport(EsmtpTransport $transport, array $config)
@@ -235,7 +231,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Sendmail Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\SendmailTransport
      */
     protected function createSendmailTransport(array $config)
@@ -248,7 +243,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Amazon SES Transport driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Mail\Transport\SesTransport
      */
     protected function createSesTransport(array $config)
@@ -270,7 +264,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Amazon SES V2 Transport driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Mail\Transport\SesV2Transport
      */
     protected function createSesV2Transport(array $config)
@@ -292,7 +285,6 @@ class MailManager implements FactoryContract
     /**
      * Add the SES credentials to the configuration array.
      *
-     * @param  array  $config
      * @return array
      */
     protected function addSesCredentials(array $config)
@@ -311,7 +303,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Resend Transport driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Mail\Transport\ResendTransprot
      */
     protected function createResendTransport(array $config)
@@ -334,7 +325,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Mailgun Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\TransportInterface
      */
     protected function createMailgunTransport(array $config)
@@ -356,7 +346,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Postmark Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkApiTransport
      */
     protected function createPostmarkTransport(array $config)
@@ -380,7 +369,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Failover Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\FailoverTransport
      */
     protected function createFailoverTransport(array $config)
@@ -391,7 +379,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Symfony Roundrobin Transport driver.
      *
-     * @param  array  $config
      * @return \Symfony\Component\Mailer\Transport\RoundRobinTransport
      */
     protected function createRoundrobinTransport(array $config)
@@ -404,7 +391,6 @@ class MailManager implements FactoryContract
      *
      * @template TClass of \Symfony\Component\Mailer\Transport\RoundRobinTransport
      *
-     * @param  array  $config
      * @param  class-string<TClass>  $class
      * @return TClass
      */
@@ -433,7 +419,6 @@ class MailManager implements FactoryContract
     /**
      * Create an instance of the Log Transport driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Mail\Transport\LogTransport
      */
     protected function createLogTransport(array $config)
@@ -478,8 +463,6 @@ class MailManager implements FactoryContract
      * Set a global address on the mailer by type.
      *
      * @param  \Illuminate\Mail\Mailer  $mailer
-     * @param  array  $config
-     * @param  string  $type
      * @return void
      */
     protected function setGlobalAddress($mailer, array $config, string $type)
@@ -494,7 +477,6 @@ class MailManager implements FactoryContract
     /**
      * Get the mail connection configuration.
      *
-     * @param  string  $name
      * @return array
      */
     protected function getConfig(string $name)
@@ -532,7 +514,6 @@ class MailManager implements FactoryContract
     /**
      * Set the default mail driver name.
      *
-     * @param  string  $name
      * @return void
      */
     public function setDefaultDriver(string $name)
@@ -561,7 +542,6 @@ class MailManager implements FactoryContract
      * Register a custom transport creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -611,7 +591,6 @@ class MailManager implements FactoryContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

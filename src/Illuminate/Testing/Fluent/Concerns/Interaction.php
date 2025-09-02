@@ -16,9 +16,6 @@ trait Interaction
 
     /**
      * Marks the property as interacted.
-     *
-     * @param  string  $key
-     * @return void
      */
     protected function interactsWith(string $key): void
     {
@@ -31,8 +28,6 @@ trait Interaction
 
     /**
      * Asserts that all properties have been interacted with.
-     *
-     * @return void
      */
     public function interacted(): void
     {
@@ -59,9 +54,6 @@ trait Interaction
 
     /**
      * Retrieve a prop within the current scope using "dot" notation.
-     *
-     * @param  string|null  $key
-     * @return mixed
      */
     abstract protected function prop(?string $key = null);
 }

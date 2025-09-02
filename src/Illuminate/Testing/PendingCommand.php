@@ -81,8 +81,6 @@ class PendingCommand
     /**
      * Create a new pending console command run.
      *
-     * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Contracts\Container\Container  $app
      * @param  string  $command
      * @param  array  $parameters
      */
@@ -225,7 +223,6 @@ class PendingCommand
      * @param  array  $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
      * @param  string  $tableStyle
-     * @param  array  $columnStyles
      * @return $this
      */
     public function expectsTable($headers, $rows, $tableStyle = 'default', array $columnStyles = [])

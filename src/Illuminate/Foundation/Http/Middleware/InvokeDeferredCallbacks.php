@@ -13,8 +13,6 @@ class InvokeDeferredCallbacks
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next)
@@ -25,8 +23,6 @@ class InvokeDeferredCallbacks
     /**
      * Invoke the deferred callbacks.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @return void
      */
     public function terminate(Request $request, Response $response)

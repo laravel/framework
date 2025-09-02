@@ -77,7 +77,6 @@ class NotificationSender
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
-     * @param  mixed  $notification
      * @return void
      */
     public function send($notifiables, $notification)
@@ -95,8 +94,6 @@ class NotificationSender
      * Send the given notification immediately.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
-     * @param  mixed  $notification
-     * @param  array|null  $channels
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
@@ -125,8 +122,6 @@ class NotificationSender
     /**
      * Get the notifiable's preferred locale for the notification.
      *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
      * @return string|null
      */
     protected function preferredLocale($notifiable, $notification)
@@ -141,9 +136,7 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable via a channel.
      *
-     * @param  mixed  $notifiable
      * @param  string  $id
-     * @param  mixed  $notification
      * @param  string  $channel
      * @return void
      *
@@ -185,8 +178,6 @@ class NotificationSender
     /**
      * Determines if the notification can be sent.
      *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
      * @param  string  $channel
      * @return bool
      */
@@ -205,7 +196,6 @@ class NotificationSender
     /**
      * Queue the given notification instances.
      *
-     * @param  mixed  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
      */
@@ -274,7 +264,6 @@ class NotificationSender
     /**
      * Format the notifiables into a Collection / array if necessary.
      *
-     * @param  mixed  $notifiables
      * @return \Illuminate\Database\Eloquent\Collection|array
      */
     protected function formatNotifiables($notifiables)

@@ -48,8 +48,6 @@ class RedisManager implements Factory
 
     /**
      * The Redis connections.
-     *
-     * @var mixed
      */
     protected $connections;
 
@@ -65,7 +63,6 @@ class RedisManager implements Factory
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  string  $driver
-     * @param  array  $config
      */
     public function __construct($app, $driver, array $config)
     {
@@ -141,7 +138,6 @@ class RedisManager implements Factory
     /**
      * Configure the given connection to prepare it for commands.
      *
-     * @param  \Illuminate\Redis\Connections\Connection  $connection
      * @param  string  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
@@ -179,7 +175,6 @@ class RedisManager implements Factory
     /**
      * Parse the Redis connection configuration.
      *
-     * @param  mixed  $config
      * @return array
      */
     protected function parseConnectionConfiguration($config)
@@ -255,7 +250,6 @@ class RedisManager implements Factory
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
      *
@@ -273,7 +267,6 @@ class RedisManager implements Factory
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

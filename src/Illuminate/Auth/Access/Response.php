@@ -23,8 +23,6 @@ class Response implements Arrayable, Stringable
 
     /**
      * The response code.
-     *
-     * @var mixed
      */
     protected $code;
 
@@ -40,7 +38,6 @@ class Response implements Arrayable, Stringable
      *
      * @param  bool  $allowed
      * @param  string|null  $message
-     * @param  mixed  $code
      */
     public function __construct($allowed, $message = '', $code = null)
     {
@@ -53,7 +50,6 @@ class Response implements Arrayable, Stringable
      * Create a new "allow" Response.
      *
      * @param  string|null  $message
-     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function allow($message = null, $code = null)
@@ -65,7 +61,6 @@ class Response implements Arrayable, Stringable
      * Create a new "deny" Response.
      *
      * @param  string|null  $message
-     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function deny($message = null, $code = null)
@@ -78,7 +73,6 @@ class Response implements Arrayable, Stringable
      *
      * @param  int  $status
      * @param  string|null  $message
-     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function denyWithStatus($status, $message = null, $code = null)
@@ -90,7 +84,6 @@ class Response implements Arrayable, Stringable
      * Create a new "deny" Response with a 404 HTTP status code.
      *
      * @param  string|null  $message
-     * @param  mixed  $code
      * @return \Illuminate\Auth\Access\Response
      */
     public static function denyAsNotFound($message = null, $code = null)
@@ -130,8 +123,6 @@ class Response implements Arrayable, Stringable
 
     /**
      * Get the response code / reason.
-     *
-     * @return mixed
      */
     public function code()
     {

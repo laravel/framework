@@ -53,7 +53,6 @@ class DatabaseJobRecord
      * Dynamically access the underlying job information.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {

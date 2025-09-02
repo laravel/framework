@@ -18,7 +18,6 @@ class JsonResponse extends BaseJsonResponse
     /**
      * Create a new JSON response instance.
      *
-     * @param  mixed  $data
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options
@@ -33,8 +32,6 @@ class JsonResponse extends BaseJsonResponse
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     #[\Override]
     public static function fromJsonString(?string $data = null, int $status = 200, array $headers = []): static
@@ -58,7 +55,6 @@ class JsonResponse extends BaseJsonResponse
      *
      * @param  bool  $assoc
      * @param  int  $depth
-     * @return mixed
      */
     public function getData($assoc = false, $depth = 512)
     {
@@ -67,8 +63,6 @@ class JsonResponse extends BaseJsonResponse
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     #[\Override]
     public function setData($data = []): static
@@ -114,8 +108,6 @@ class JsonResponse extends BaseJsonResponse
 
     /**
      * {@inheritdoc}
-     *
-     * @return static
      */
     #[\Override]
     public function setEncodingOptions($options): static

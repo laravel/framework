@@ -60,7 +60,6 @@ class Request implements ArrayAccess
      * Determine if the request has a given header.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function hasHeader($key, $value = null)
@@ -234,7 +233,6 @@ class Request implements ArrayAccess
     /**
      * Set the decoded data on the request.
      *
-     * @param  array  $data
      * @return $this
      */
     public function withData(array $data)
@@ -258,7 +256,6 @@ class Request implements ArrayAccess
      * Determine if the given offset exists.
      *
      * @param  string  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -269,7 +266,6 @@ class Request implements ArrayAccess
      * Get the value for a given offset.
      *
      * @param  string  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -280,8 +276,6 @@ class Request implements ArrayAccess
      * Set the value at the given offset.
      *
      * @param  string  $offset
-     * @param  mixed  $value
-     * @return void
      *
      * @throws \LogicException
      */
@@ -294,7 +288,6 @@ class Request implements ArrayAccess
      * Unset the value at the given offset.
      *
      * @param  string  $offset
-     * @return void
      *
      * @throws \LogicException
      */

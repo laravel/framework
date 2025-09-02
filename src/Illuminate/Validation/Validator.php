@@ -329,12 +329,6 @@ class Validator implements ValidatorContract
 
     /**
      * Create a new Validator instance.
-     *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      */
     public function __construct(
         Translator $translator,
@@ -359,7 +353,6 @@ class Validator implements ValidatorContract
     /**
      * Parse the data array, converting dots and asterisks.
      *
-     * @param  array  $data
      * @return array
      */
     public function parseData(array $data)
@@ -405,7 +398,6 @@ class Validator implements ValidatorContract
     /**
      * Replace the placeholders in the given string.
      *
-     * @param  string  $value
      * @return string
      */
     protected function replacePlaceholderInString(string $value)
@@ -420,7 +412,6 @@ class Validator implements ValidatorContract
     /**
      * Replace each field parameter dot placeholder with dot.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function replaceDotPlaceholderInParameters(array $parameters)
@@ -562,7 +553,6 @@ class Validator implements ValidatorContract
     /**
      * Run the validator's rules against its data.
      *
-     * @param  string  $errorBag
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -581,7 +571,6 @@ class Validator implements ValidatorContract
     /**
      * Get a validated input container for the validated input.
      *
-     * @param  array|null  $keys
      * @return \Illuminate\Support\ValidatedInput|array
      */
     public function safe(?array $keys = null)
@@ -741,7 +730,6 @@ class Validator implements ValidatorContract
     /**
      * Replace each field parameter which has an escaped dot with the dot placeholder.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function replaceDotInParameters(array $parameters)
@@ -754,8 +742,6 @@ class Validator implements ValidatorContract
     /**
      * Replace each field parameter which has asterisks with the given keys.
      *
-     * @param  array  $parameters
-     * @param  array  $keys
      * @return array
      */
     protected function replaceAsterisksInParameters(array $parameters, array $keys)
@@ -770,7 +756,6 @@ class Validator implements ValidatorContract
      *
      * @param  object|string  $rule
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     protected function isValidatable($rule, $attribute, $value)
@@ -790,7 +775,6 @@ class Validator implements ValidatorContract
      *
      * @param  object|string  $rule
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     protected function presentOrRuleIsImplicit($rule, $attribute, $value)
@@ -867,7 +851,6 @@ class Validator implements ValidatorContract
      * Validate an attribute using a custom rule object.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @param  \Illuminate\Contracts\Validation\Rule  $rule
      * @return void
      */
@@ -982,7 +965,6 @@ class Validator implements ValidatorContract
     /**
      * Add the given attribute to the list of excluded attributes.
      *
-     * @param  string  $attribute
      * @return void
      */
     protected function excludeAttribute(string $attribute)
@@ -1151,7 +1133,6 @@ class Validator implements ValidatorContract
     /**
      * Set the data under validation.
      *
-     * @param  array  $data
      * @return $this
      */
     public function setData(array $data)
@@ -1167,7 +1148,6 @@ class Validator implements ValidatorContract
      * Get the value of a given attribute.
      *
      * @param  string  $attribute
-     * @return mixed
      */
     public function getValue($attribute)
     {
@@ -1178,7 +1158,6 @@ class Validator implements ValidatorContract
      * Set the value of a given attribute.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return void
      */
     public function setValue($attribute, $value)
@@ -1213,7 +1192,6 @@ class Validator implements ValidatorContract
     /**
      * Set the validation rules.
      *
-     * @param  array  $rules
      * @return $this
      */
     public function setRules(array $rules)
@@ -1261,7 +1239,6 @@ class Validator implements ValidatorContract
      *
      * @param  string|array  $attribute
      * @param  string|array  $rules
-     * @param  callable  $callback
      * @return $this
      */
     public function sometimes($attribute, $rules, callable $callback)
@@ -1286,8 +1263,6 @@ class Validator implements ValidatorContract
     /**
      * Get the data that should be injected into the iteration of a wildcard "sometimes" callback.
      *
-     * @param  string  $attribute
-     * @param  bool  $removeLastSegmentOfAttribute
      * @return \Illuminate\Support\Fluent|mixed
      */
     private function dataForSometimesIteration(string $attribute, bool $removeLastSegmentOfAttribute)
@@ -1319,7 +1294,6 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom validator extensions.
      *
-     * @param  array  $extensions
      * @return void
      */
     public function addExtensions(array $extensions)
@@ -1336,7 +1310,6 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom implicit validator extensions.
      *
-     * @param  array  $extensions
      * @return void
      */
     public function addImplicitExtensions(array $extensions)
@@ -1351,7 +1324,6 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom dependent validator extensions.
      *
-     * @param  array  $extensions
      * @return void
      */
     public function addDependentExtensions(array $extensions)
@@ -1406,7 +1378,6 @@ class Validator implements ValidatorContract
     /**
      * Register an array of custom validator message replacers.
      *
-     * @param  array  $replacers
      * @return void
      */
     public function addReplacers(array $replacers)
@@ -1435,7 +1406,6 @@ class Validator implements ValidatorContract
     /**
      * Set the custom messages for the validator.
      *
-     * @param  array  $messages
      * @return $this
      */
     public function setCustomMessages(array $messages)
@@ -1448,7 +1418,6 @@ class Validator implements ValidatorContract
     /**
      * Set the custom attributes on the validator.
      *
-     * @param  array  $attributes
      * @return $this
      */
     public function setAttributeNames(array $attributes)
@@ -1461,7 +1430,6 @@ class Validator implements ValidatorContract
     /**
      * Add custom attributes to the validator.
      *
-     * @param  array  $attributes
      * @return $this
      */
     public function addCustomAttributes(array $attributes)
@@ -1474,7 +1442,6 @@ class Validator implements ValidatorContract
     /**
      * Set the callback that used to format an implicit attribute.
      *
-     * @param  callable|null  $formatter
      * @return $this
      */
     public function setImplicitAttributesFormatter(?callable $formatter = null)
@@ -1487,7 +1454,6 @@ class Validator implements ValidatorContract
     /**
      * Set the custom values on the validator.
      *
-     * @param  array  $values
      * @return $this
      */
     public function setValueNames(array $values)
@@ -1500,7 +1466,6 @@ class Validator implements ValidatorContract
     /**
      * Add the custom values for the validator.
      *
-     * @param  array  $customValues
      * @return $this
      */
     public function addCustomValues(array $customValues)
@@ -1513,7 +1478,6 @@ class Validator implements ValidatorContract
     /**
      * Set the fallback messages for the validator.
      *
-     * @param  array  $messages
      * @return void
      */
     public function setFallbackMessages(array $messages)
@@ -1545,7 +1509,6 @@ class Validator implements ValidatorContract
     /**
      * Set the Presence Verifier implementation.
      *
-     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
      * @return void
      */
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
@@ -1610,7 +1573,6 @@ class Validator implements ValidatorContract
     /**
      * Set the Translator implementation.
      *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
      * @return void
      */
     public function setTranslator(Translator $translator)
@@ -1621,7 +1583,6 @@ class Validator implements ValidatorContract
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)
@@ -1666,7 +1627,6 @@ class Validator implements ValidatorContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

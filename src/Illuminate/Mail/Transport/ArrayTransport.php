@@ -56,8 +56,6 @@ class ArrayTransport implements Stringable, TransportInterface
 
     /**
      * Get the string representation of the transport.
-     *
-     * @return string
      */
     public function __toString(): string
     {

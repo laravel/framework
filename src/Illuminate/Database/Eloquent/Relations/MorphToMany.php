@@ -123,7 +123,6 @@ class MorphToMany extends BelongsToMany
     /**
      * Get the pivot models that are currently attached, filtered by related model keys.
      *
-     * @param  mixed  $ids
      * @return \Illuminate\Support\Collection<int, TPivotModel>
      */
     protected function getCurrentlyAttachedPivotsForIds($ids = null)
@@ -149,7 +148,6 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new pivot model instance.
      *
-     * @param  array  $attributes
      * @param  bool  $exists
      * @return TPivotModel
      */

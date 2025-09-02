@@ -16,8 +16,6 @@ class ProcessPoolResults implements ArrayAccess
 
     /**
      * Create a new process pool result set.
-     *
-     * @param  array  $results
      */
     public function __construct(array $results)
     {
@@ -58,7 +56,6 @@ class ProcessPoolResults implements ArrayAccess
      * Determine if the given array offset exists.
      *
      * @param  int  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -69,7 +66,6 @@ class ProcessPoolResults implements ArrayAccess
      * Get the result at the given offset.
      *
      * @param  int  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -80,8 +76,6 @@ class ProcessPoolResults implements ArrayAccess
      * Set the result at the given offset.
      *
      * @param  int  $offset
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -92,7 +86,6 @@ class ProcessPoolResults implements ArrayAccess
      * Unset the result at the given offset.
      *
      * @param  int  $offset
-     * @return void
      */
     public function offsetUnset($offset): void
     {

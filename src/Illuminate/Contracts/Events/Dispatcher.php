@@ -33,8 +33,6 @@ interface Dispatcher
      * Dispatch an event until the first non-null response is returned.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
-     * @return mixed
      */
     public function until($event, $payload = []);
 
@@ -42,7 +40,6 @@ interface Dispatcher
      * Dispatch an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
      * @param  bool  $halt
      * @return array|null
      */

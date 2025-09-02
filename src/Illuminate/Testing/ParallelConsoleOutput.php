@@ -45,9 +45,6 @@ class ParallelConsoleOutput extends ConsoleOutput
      * Writes a message to the output.
      *
      * @param  string|iterable  $messages
-     * @param  bool  $newline
-     * @param  int  $options
-     * @return void
      */
     public function write($messages, bool $newline = false, int $options = 0): void
     {

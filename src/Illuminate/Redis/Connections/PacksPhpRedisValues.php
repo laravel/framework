@@ -84,9 +84,6 @@ trait PacksPhpRedisValues
 
     /**
      * Execute the given callback without serialization or compression when applicable.
-     *
-     * @param  callable  $callback
-     * @return mixed
      */
     public function withoutSerializationOrCompression(callable $callback)
     {
@@ -121,8 +118,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if serialization is enabled.
-     *
-     * @return bool
      */
     public function serialized(): bool
     {
@@ -132,8 +127,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if compression is enabled.
-     *
-     * @return bool
      */
     public function compressed(): bool
     {
@@ -143,8 +136,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if LZF compression is enabled.
-     *
-     * @return bool
      */
     public function lzfCompressed(): bool
     {
@@ -154,8 +145,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if ZSTD compression is enabled.
-     *
-     * @return bool
      */
     public function zstdCompressed(): bool
     {
@@ -165,8 +154,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if LZ4 compression is enabled.
-     *
-     * @return bool
      */
     public function lz4Compressed(): bool
     {
@@ -176,8 +163,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if the current PhpRedis extension version supports packing.
-     *
-     * @return bool
      */
     protected function supportsPacking(): bool
     {
@@ -190,8 +175,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if the current PhpRedis extension version supports LZF compression.
-     *
-     * @return bool
      */
     protected function supportsLzf(): bool
     {
@@ -204,8 +187,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if the current PhpRedis extension version supports Zstd compression.
-     *
-     * @return bool
      */
     protected function supportsZstd(): bool
     {
@@ -218,9 +199,6 @@ trait PacksPhpRedisValues
 
     /**
      * Determine if the PhpRedis extension version is at least the given version.
-     *
-     * @param  string  $version
-     * @return bool
      */
     protected function phpRedisVersionAtLeast(string $version): bool
     {

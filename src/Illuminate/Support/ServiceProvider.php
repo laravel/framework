@@ -95,7 +95,6 @@ abstract class ServiceProvider
     /**
      * Register a booting callback to be run before the "boot" method is called.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function booting(Closure $callback)
@@ -106,7 +105,6 @@ abstract class ServiceProvider
     /**
      * Register a booted callback to be run after the "boot" method is called.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function booted(Closure $callback)
@@ -222,7 +220,6 @@ abstract class ServiceProvider
      * Register the given view components with a custom prefix.
      *
      * @param  string  $prefix
-     * @param  array  $components
      * @return void
      */
     protected function loadViewComponentsAs($prefix, array $components)
@@ -312,8 +309,6 @@ abstract class ServiceProvider
     /**
      * Register migration paths to be published by the publish command.
      *
-     * @param  array  $paths
-     * @param  mixed  $groups
      * @return void
      */
     protected function publishesMigrations(array $paths, $groups = null)
@@ -328,8 +323,6 @@ abstract class ServiceProvider
     /**
      * Register paths to be published by the publish command.
      *
-     * @param  array  $paths
-     * @param  mixed  $groups
      * @return void
      */
     protected function publishes(array $paths, $groups = null)
@@ -461,7 +454,6 @@ abstract class ServiceProvider
     /**
      * Register the package's custom Artisan commands.
      *
-     * @param  mixed  $commands
      * @return void
      */
     public function commands($commands)
@@ -476,9 +468,6 @@ abstract class ServiceProvider
     /**
      * Register commands that should run on "optimize" or "optimize:clear".
      *
-     * @param  string|null  $optimize
-     * @param  string|null  $clear
-     * @param  string|null  $key
      * @return void
      */
     protected function optimizes(?string $optimize = null, ?string $clear = null, ?string $key = null)
@@ -546,8 +535,6 @@ abstract class ServiceProvider
     /**
      * Add the given provider to the application's provider bootstrap file.
      *
-     * @param  string  $provider
-     * @param  string  $path
      * @return bool
      */
     public static function addProviderToBootstrapFile(string $provider, ?string $path = null)

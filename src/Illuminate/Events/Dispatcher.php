@@ -92,8 +92,6 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Create a new event dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      */
     public function __construct(?ContainerContract $container = null)
     {
@@ -232,7 +230,6 @@ class Dispatcher implements DispatcherContract
      * Resolve the subscriber instance.
      *
      * @param  object|string  $subscriber
-     * @return mixed
      */
     protected function resolveSubscriber($subscriber)
     {
@@ -247,8 +244,6 @@ class Dispatcher implements DispatcherContract
      * Fire an event until the first non-null response is returned.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
-     * @return mixed
      */
     public function until($event, $payload = [])
     {
@@ -259,7 +254,6 @@ class Dispatcher implements DispatcherContract
      * Fire an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
      * @param  bool  $halt
      * @return array|null
      */
@@ -299,7 +293,6 @@ class Dispatcher implements DispatcherContract
      * Broadcast an event and call its listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
      * @param  bool  $halt
      * @return array|null
      */
@@ -337,8 +330,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Parse the given event and payload and prepare them for dispatching.
      *
-     * @param  mixed  $event
-     * @param  mixed  $payload
      * @return array
      */
     protected function parseEventAndPayload($event, $payload)
@@ -353,7 +344,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the payload has a broadcastable event.
      *
-     * @param  array  $payload
      * @return bool
      */
     protected function shouldBroadcast(array $payload)
@@ -366,7 +356,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Check if the event should be broadcasted by the condition.
      *
-     * @param  mixed  $event
      * @return bool
      */
     protected function broadcastWhen($event)
@@ -430,7 +419,6 @@ class Dispatcher implements DispatcherContract
      * Add the listeners for the event's interfaces to the given array.
      *
      * @param  string  $eventName
-     * @param  array  $listeners
      * @return array
      */
     protected function addInterfaceListeners($eventName, array $listeners = [])
@@ -449,7 +437,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Prepare the listeners for a given event.
      *
-     * @param  string  $eventName
      * @return \Closure[]
      */
     protected function prepareListeners(string $eventName)
@@ -587,7 +574,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event handler should be dispatched after all database transactions have committed.
      *
-     * @param  mixed  $listener
      * @return bool
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
@@ -600,7 +586,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a callable for dispatching a listener after database transactions.
      *
-     * @param  mixed  $listener
      * @param  string  $method
      * @return \Closure
      */
@@ -684,9 +669,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Propagate listener options to the job.
      *
-     * @param  mixed  $listener
      * @param  \Illuminate\Events\CallQueuedListener  $job
-     * @return mixed
      */
     protected function propagateListenerOptions($listener, $job)
     {
@@ -762,7 +745,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the queue resolver implementation.
      *
-     * @param  callable  $resolver
      * @return $this
      */
     public function setQueueResolver(callable $resolver)
@@ -785,7 +767,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  callable  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)
@@ -797,10 +778,6 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Execute the given callback while deferring events, then dispatch all deferred events.
-     *
-     * @param  callable  $callback
-     * @param  array|null  $events
-     * @return mixed
      */
     public function defer(callable $callback, ?array $events = null)
     {
@@ -832,7 +809,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event should be deferred.
      *
-     * @param  string  $event
      * @return bool
      */
     protected function shouldDeferEvent(string $event)

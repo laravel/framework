@@ -62,8 +62,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Create a new Artisan console application.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $laravel
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @param  string  $version
      */
     public function __construct(Container $laravel, Dispatcher $events, $version)
@@ -148,7 +146,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Run an Artisan console command by name.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
-     * @param  array  $parameters
      * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
      * @return int
      *
@@ -213,7 +210,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Add an array of commands to the console.
      *
      * @param  array<int, \Symfony\Component\Console\Command\Command>  $commands
-     * @return void
      */
     #[\Override]
     public function addCommands(array $commands): void
@@ -225,9 +221,6 @@ class Application extends SymfonyApplication implements ApplicationContract
 
     /**
      * Add a command to the console.
-     *
-     * @param  \Symfony\Component\Console\Command\Command  $command
-     * @return \Symfony\Component\Console\Command\Command|null
      */
     #[\Override]
     public function add(SymfonyCommand $command): ?SymfonyCommand
@@ -242,7 +235,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add the command to the parent instance.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
      * @return \Symfony\Component\Console\Command\Command
      */
     protected function addToParent(SymfonyCommand $command)
@@ -282,7 +274,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Resolve an array of commands through the application.
      *
-     * @param  mixed  $commands
      * @return $this
      */
     public function resolveCommands($commands)
@@ -312,8 +303,6 @@ class Application extends SymfonyApplication implements ApplicationContract
      * Get the default input definition for the application.
      *
      * This is used to add the --env option to every available command.
-     *
-     * @return \Symfony\Component\Console\Input\InputDefinition
      */
     #[\Override]
     protected function getDefaultInputDefinition(): InputDefinition

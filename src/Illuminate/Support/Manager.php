@@ -38,8 +38,6 @@ abstract class Manager
 
     /**
      * Create a new manager instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      */
     public function __construct(Container $container)
     {
@@ -58,7 +56,6 @@ abstract class Manager
      * Get a driver instance.
      *
      * @param  string|null  $driver
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -82,7 +79,6 @@ abstract class Manager
      * Create a new driver instance.
      *
      * @param  string  $driver
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -108,7 +104,6 @@ abstract class Manager
      * Call a custom driver creator.
      *
      * @param  string  $driver
-     * @return mixed
      */
     protected function callCustomCreator($driver)
     {
@@ -119,7 +114,6 @@ abstract class Manager
      * Register a custom driver creator Closure.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -152,7 +146,6 @@ abstract class Manager
     /**
      * Set the container instance used by the manager.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -179,7 +172,6 @@ abstract class Manager
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

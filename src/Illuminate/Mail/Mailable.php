@@ -218,9 +218,6 @@ class Mailable implements MailableContract, Renderable
 
     /**
      * Queue the message for sending.
-     *
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
-     * @return mixed
      */
     public function queue(Queue $queue)
     {
@@ -241,8 +238,6 @@ class Mailable implements MailableContract, Renderable
      * Deliver the queued message after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
-     * @return mixed
      */
     public function later($delay, Queue $queue)
     {
@@ -257,8 +252,6 @@ class Mailable implements MailableContract, Renderable
 
     /**
      * Make the queued mailable job instance.
-     *
-     * @return mixed
      */
     protected function newQueuedJob()
     {
@@ -769,7 +762,6 @@ class Mailable implements MailableContract, Renderable
     /**
      * Convert the given recipient into an object.
      *
-     * @param  mixed  $recipient
      * @return object
      */
     protected function normalizeRecipient($recipient)
@@ -877,7 +869,6 @@ class Mailable implements MailableContract, Renderable
      * Set the Markdown template for the message.
      *
      * @param  string  $view
-     * @param  array  $data
      * @return $this
      */
     public function markdown($view, array $data = [])
@@ -892,7 +883,6 @@ class Mailable implements MailableContract, Renderable
      * Set the view and view data for the message.
      *
      * @param  string  $view
-     * @param  array  $data
      * @return $this
      */
     public function view($view, array $data = [])
@@ -920,7 +910,6 @@ class Mailable implements MailableContract, Renderable
      * Set the plain text view for the message.
      *
      * @param  string  $textView
-     * @param  array  $data
      * @return $this
      */
     public function text($textView, array $data = [])
@@ -935,7 +924,6 @@ class Mailable implements MailableContract, Renderable
      * Set the view data for the message.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function with($key, $value = null)
@@ -953,7 +941,6 @@ class Mailable implements MailableContract, Renderable
      * Attach a file to the message.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -997,7 +984,6 @@ class Mailable implements MailableContract, Renderable
      * Determine if the mailable has the given attachment.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return bool
      */
     public function hasAttachment($file, array $options = [])
@@ -1058,7 +1044,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return $this
      */
     public function attachFromStorage($path, $name = null, array $options = [])
@@ -1072,7 +1057,6 @@ class Mailable implements MailableContract, Renderable
      * @param  string  $disk
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return $this
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
@@ -1094,7 +1078,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return bool
      */
     public function hasAttachmentFromStorage($path, $name = null, array $options = [])
@@ -1108,7 +1091,6 @@ class Mailable implements MailableContract, Renderable
      * @param  string  $disk
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return bool
      */
     public function hasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
@@ -1126,7 +1108,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -1144,7 +1125,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  array  $options
      * @return bool
      */
     public function hasAttachedData($data, $name, array $options = [])
@@ -1517,7 +1497,6 @@ class Mailable implements MailableContract, Renderable
      * Assert the mailable has the given attachment.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function assertHasAttachment($file, array $options = [])
@@ -1537,7 +1516,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  array  $options
      * @return $this
      */
     public function assertHasAttachedData($data, $name, array $options = [])
@@ -1557,7 +1535,6 @@ class Mailable implements MailableContract, Renderable
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return $this
      */
     public function assertHasAttachmentFromStorage($path, $name = null, array $options = [])
@@ -1578,7 +1555,6 @@ class Mailable implements MailableContract, Renderable
      * @param  string  $disk
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $options
      * @return $this
      */
     public function assertHasAttachmentFromStorageDisk($disk, $path, $name = null, array $options = [])
@@ -1855,7 +1831,6 @@ class Mailable implements MailableContract, Renderable
     /**
      * Register a callback to be called while building the view data.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function buildViewDataUsing(callable $callback)

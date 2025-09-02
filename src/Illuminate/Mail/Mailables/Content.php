@@ -55,12 +55,7 @@ class Content
     /**
      * Create a new content definition.
      *
-     * @param  string|null  $view
-     * @param  string|null  $html
-     * @param  string|null  $text
      * @param  string|null  $markdown
-     * @param  array  $with
-     * @param  string|null  $htmlString
      *
      * @named-arguments-supported
      */
@@ -77,7 +72,6 @@ class Content
     /**
      * Set the view for the message.
      *
-     * @param  string  $view
      * @return $this
      */
     public function view(string $view)
@@ -90,7 +84,6 @@ class Content
     /**
      * Set the view for the message.
      *
-     * @param  string  $view
      * @return $this
      */
     public function html(string $view)
@@ -101,7 +94,6 @@ class Content
     /**
      * Set the plain text view for the message.
      *
-     * @param  string  $view
      * @return $this
      */
     public function text(string $view)
@@ -114,7 +106,6 @@ class Content
     /**
      * Set the Markdown view for the message.
      *
-     * @param  string  $view
      * @return $this
      */
     public function markdown(string $view)
@@ -127,7 +118,6 @@ class Content
     /**
      * Set the pre-rendered HTML for the message.
      *
-     * @param  string  $html
      * @return $this
      */
     public function htmlString(string $html)
@@ -141,7 +131,6 @@ class Content
      * Add a piece of view data to the message.
      *
      * @param  array|string  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function with($key, $value = null)

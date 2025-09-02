@@ -14,7 +14,6 @@ class DynamoDbLock extends Lock
     /**
      * Create a new lock instance.
      *
-     * @param  \Illuminate\Cache\DynamoDbStore  $dynamo
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
@@ -66,8 +65,6 @@ class DynamoDbLock extends Lock
 
     /**
      * Returns the owner value written into the driver for this lock.
-     *
-     * @return mixed
      */
     protected function getCurrentOwner()
     {

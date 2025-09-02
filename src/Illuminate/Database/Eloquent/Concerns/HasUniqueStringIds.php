@@ -8,16 +8,11 @@ trait HasUniqueStringIds
 {
     /**
      * Generate a new unique key for the model.
-     *
-     * @return mixed
      */
     abstract public function newUniqueId();
 
     /**
      * Determine if given key is valid.
-     *
-     * @param  mixed  $value
-     * @return bool
      */
     abstract protected function isValidUniqueId($value): bool;
 
@@ -45,7 +40,6 @@ trait HasUniqueStringIds
      * Retrieve the model for a bound value.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>  $query
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Contracts\Database\Eloquent\Builder
      *
@@ -95,7 +89,6 @@ trait HasUniqueStringIds
     /**
      * Throw an exception for the given invalid unique ID.
      *
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return never
      *

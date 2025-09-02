@@ -11,8 +11,6 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 {
     /**
      * Bootstrap Eloquent.
-     *
-     * @return void
      */
     protected function setUp(): void
     {
@@ -55,8 +53,6 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 
     /**
      * Tear down the database schema.
-     *
-     * @return void
      */
     protected function tearDown(): void
     {

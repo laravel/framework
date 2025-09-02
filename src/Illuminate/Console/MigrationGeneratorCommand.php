@@ -17,8 +17,6 @@ abstract class MigrationGeneratorCommand extends Command
 
     /**
      * Create a new migration generator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {

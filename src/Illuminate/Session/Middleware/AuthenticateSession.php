@@ -26,8 +26,6 @@ class AuthenticateSession implements AuthenticatesSessions
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\Factory  $auth
      */
     public function __construct(AuthFactory $auth)
     {
@@ -38,8 +36,6 @@ class AuthenticateSession implements AuthenticatesSessions
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
     public function handle($request, Closure $next)
     {
@@ -119,7 +115,6 @@ class AuthenticateSession implements AuthenticatesSessions
     /**
      * Get the path the user should be redirected to when their session is not authenticated.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
     protected function redirectTo(Request $request)
@@ -132,7 +127,6 @@ class AuthenticateSession implements AuthenticatesSessions
     /**
      * Specify the callback that should be used to generate the redirect path.
      *
-     * @param  callable  $redirectToCallback
      * @return void
      */
     public static function redirectUsing(callable $redirectToCallback)

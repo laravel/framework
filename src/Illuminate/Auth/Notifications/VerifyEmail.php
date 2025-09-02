@@ -28,7 +28,6 @@ class VerifyEmail extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
      * @return array|string
      */
     public function via($notifiable)
@@ -39,7 +38,6 @@ class VerifyEmail extends Notification
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -71,7 +69,6 @@ class VerifyEmail extends Notification
     /**
      * Get the verification URL for the given notifiable.
      *
-     * @param  mixed  $notifiable
      * @return string
      */
     protected function verificationUrl($notifiable)

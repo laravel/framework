@@ -12,7 +12,6 @@ class RouteSignatureParameters
     /**
      * Extract the route action's signature parameters.
      *
-     * @param  array  $action
      * @param  array  $conditions
      * @return array
      */

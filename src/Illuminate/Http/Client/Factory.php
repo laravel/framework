@@ -89,8 +89,6 @@ class Factory
 
     /**
      * Create a new factory instance.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      */
     public function __construct(?Dispatcher $dispatcher = null)
     {
@@ -217,7 +215,6 @@ class Factory
     /**
      * Get an invokable object that returns a sequence of responses in order for use during stubbing.
      *
-     * @param  array  $responses
      * @return \Illuminate\Http\Client\ResponseSequence
      */
     public function sequence(array $responses = [])
@@ -544,7 +541,6 @@ class Factory
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

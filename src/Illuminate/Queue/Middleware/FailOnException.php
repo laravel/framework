@@ -50,9 +50,6 @@ class FailOnException
     /**
      * Mark the job as failed if an exception is thrown that passes a truth-test callback.
      *
-     * @param  mixed  $job
-     * @param  callable  $next
-     * @return mixed
      *
      * @throws Throwable
      */

@@ -8,7 +8,6 @@ class ApcWrapper
      * Get an item from the cache.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function get($key)
     {
@@ -21,7 +20,6 @@ class ApcWrapper
      * Store an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return array|bool
      */
@@ -34,7 +32,6 @@ class ApcWrapper
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|bool
      */
     public function increment($key, $value)
@@ -46,7 +43,6 @@ class ApcWrapper
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|bool
      */
     public function decrement($key, $value)

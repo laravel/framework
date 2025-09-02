@@ -54,7 +54,6 @@ class ViewErrorBag implements Countable, Stringable
      * Add a new MessageBag instance to the bags.
      *
      * @param  string  $key
-     * @param  \Illuminate\Contracts\Support\MessageBag  $bag
      * @return $this
      */
     public function put($key, MessageBagContract $bag)
@@ -76,8 +75,6 @@ class ViewErrorBag implements Countable, Stringable
 
     /**
      * Get the number of messages in the default bag.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -89,7 +86,6 @@ class ViewErrorBag implements Countable, Stringable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

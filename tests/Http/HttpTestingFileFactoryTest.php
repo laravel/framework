@@ -142,10 +142,6 @@ class HttpTestingFileFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @param  string  $driver
-     * @return bool
-     */
     private function isGDSupported(string $driver = 'GD Version'): bool
     {
         $gdInfo = gd_info();

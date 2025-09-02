@@ -23,8 +23,6 @@ class Manager
 
     /**
      * Create a new database capsule manager.
-     *
-     * @param  \Illuminate\Container\Container|null  $container
      */
     public function __construct(?Container $container = null)
     {
@@ -111,7 +109,6 @@ class Manager
     /**
      * Register a connection with the manager.
      *
-     * @param  array  $config
      * @param  string  $name
      * @return void
      */
@@ -179,7 +176,6 @@ class Manager
     /**
      * Set the event dispatcher instance to be used by connections.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public function setEventDispatcher(Dispatcher $dispatcher)
@@ -192,7 +188,6 @@ class Manager
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public static function __callStatic($method, $parameters)
     {

@@ -278,9 +278,6 @@ class CacheRepositoryTest extends TestCase
         ];
     }
 
-    /**
-     * @param  mixed  $duration
-     */
     #[DataProvider('dataProviderTestGetSeconds')]
     public function testGetSeconds($duration)
     {

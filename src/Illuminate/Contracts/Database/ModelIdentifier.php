@@ -15,8 +15,6 @@ class ModelIdentifier
      * The unique identifier of the model.
      *
      * This may be either a single ID or an array of IDs.
-     *
-     * @var mixed
      */
     public $id;
 
@@ -45,9 +43,6 @@ class ModelIdentifier
      * Create a new model identifier.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
-     * @param  mixed  $id
-     * @param  array  $relations
-     * @param  mixed  $connection
      */
     public function __construct($class, $id, array $relations, $connection)
     {

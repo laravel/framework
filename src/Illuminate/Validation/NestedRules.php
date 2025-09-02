@@ -15,8 +15,6 @@ class NestedRules implements CompilableRules
 
     /**
      * Create a new nested rule instance.
-     *
-     * @param  callable  $callback
      */
     public function __construct(callable $callback)
     {
@@ -27,9 +25,6 @@ class NestedRules implements CompilableRules
      * Compile the callback into an array of rules.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
-     * @param  mixed  $data
-     * @param  mixed  $context
      * @return \stdClass
      */
     public function compile($attribute, $value, $data = null, $context = null)

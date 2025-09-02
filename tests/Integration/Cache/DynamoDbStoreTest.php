@@ -106,7 +106,6 @@ class DynamoDbStoreTest extends TestCase
     /**
      * Determine if the given DynamoDB table exists.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $client
      * @param  string  $table
      * @return bool
      */

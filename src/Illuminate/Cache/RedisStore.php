@@ -48,7 +48,6 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $prefix
      * @param  string  $connection
      */
@@ -63,7 +62,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function get($key)
     {
@@ -79,7 +77,6 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
@@ -107,7 +104,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -123,7 +119,6 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -164,7 +159,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -181,7 +175,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int
      */
     public function increment($key, $value = 1)
@@ -193,7 +186,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int
      */
     public function decrement($key, $value = 1)
@@ -205,7 +197,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
@@ -286,7 +277,6 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Begin executing a new tags operation.
      *
-     * @param  mixed  $names
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names)
@@ -424,9 +414,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Prepare a value to be used with the Redis cache store when used by eval scripts.
      *
-     * @param  mixed  $value
      * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @return mixed
      */
     protected function pack($value, $connection)
     {
@@ -445,9 +433,6 @@ class RedisStore extends TaggableStore implements LockProvider
 
     /**
      * Serialize the value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function serialize($value)
     {
@@ -456,9 +441,6 @@ class RedisStore extends TaggableStore implements LockProvider
 
     /**
      * Determine if the given value should be stored as plain value.
-     *
-     * @param  mixed  $value
-     * @return bool
      */
     protected function shouldBeStoredWithoutSerialization($value): bool
     {
@@ -467,9 +449,6 @@ class RedisStore extends TaggableStore implements LockProvider
 
     /**
      * Unserialize the value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function unserialize($value)
     {
@@ -479,9 +458,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Handle connection specific considerations when a value needs to be serialized.
      *
-     * @param  mixed  $value
      * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @return mixed
      */
     protected function connectionAwareSerialize($value, $connection)
     {
@@ -495,9 +472,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Handle connection specific considerations when a value needs to be unserialized.
      *
-     * @param  mixed  $value
      * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @return mixed
      */
     protected function connectionAwareUnserialize($value, $connection)
     {

@@ -364,8 +364,6 @@ class BelongsToMany extends Relation
      * Set a where clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -380,7 +378,6 @@ class BelongsToMany extends Relation
      * Set a "where between" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -394,7 +391,6 @@ class BelongsToMany extends Relation
      * Set a "or where between" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $values
      * @return $this
      */
     public function orWherePivotBetween($column, array $values)
@@ -406,7 +402,6 @@ class BelongsToMany extends Relation
      * Set a "where pivot not between" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $values
      * @param  string  $boolean
      * @return $this
      */
@@ -419,7 +414,6 @@ class BelongsToMany extends Relation
      * Set a "or where not between" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  array  $values
      * @return $this
      */
     public function orWherePivotNotBetween($column, array $values)
@@ -431,7 +425,6 @@ class BelongsToMany extends Relation
      * Set a "where in" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -447,8 +440,6 @@ class BelongsToMany extends Relation
      * Set an "or where" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWherePivot($column, $operator = null, $value = null)
@@ -462,7 +453,6 @@ class BelongsToMany extends Relation
      * In addition, new pivot records will receive this value.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string, string>  $column
-     * @param  mixed  $value
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -490,7 +480,6 @@ class BelongsToMany extends Relation
      * Set an "or where in" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  mixed  $values
      * @return $this
      */
     public function orWherePivotIn($column, $values)
@@ -502,7 +491,6 @@ class BelongsToMany extends Relation
      * Set a "where not in" clause for a pivot table column.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $values
      * @param  string  $boolean
      * @return $this
      */
@@ -515,7 +503,6 @@ class BelongsToMany extends Relation
      * Set an "or where not in" clause for a pivot table column.
      *
      * @param  string  $column
-     * @param  mixed  $values
      * @return $this
      */
     public function orWherePivotNotIn($column, $values)
@@ -588,7 +575,6 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key or return a new instance of the related model.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
@@ -608,8 +594,6 @@ class BelongsToMany extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
     public function firstOrNew(array $attributes = [], array $values = [])
@@ -624,9 +608,6 @@ class BelongsToMany extends Relation
     /**
      * Get the first record matching the attributes. If the record is not found, create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -650,9 +631,6 @@ class BelongsToMany extends Relation
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -676,9 +654,6 @@ class BelongsToMany extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -696,7 +671,6 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
@@ -718,7 +692,6 @@ class BelongsToMany extends Relation
     /**
      * Find a sole related model by its primary key.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return TRelatedModel&object{pivot: TPivotModel}
      *
@@ -755,7 +728,6 @@ class BelongsToMany extends Relation
     /**
      * Find a related model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return (
      *     $id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>)
@@ -787,7 +759,6 @@ class BelongsToMany extends Relation
      *
      * @template TValue
      *
-     * @param  mixed  $id
      * @param  (\Closure(): TValue)|list<string>|string  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return (
@@ -823,8 +794,6 @@ class BelongsToMany extends Relation
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return (TRelatedModel&object{pivot: TPivotModel})|null
      */
@@ -926,7 +895,6 @@ class BelongsToMany extends Relation
     /**
      * Get the select columns for the relation query.
      *
-     * @param  array  $columns
      * @return array
      */
     protected function shouldSelect(array $columns = ['*'])
@@ -1015,7 +983,6 @@ class BelongsToMany extends Relation
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -1031,7 +998,6 @@ class BelongsToMany extends Relation
      * Chunk the results of a query by comparing numeric IDs.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -1045,7 +1011,6 @@ class BelongsToMany extends Relation
      * Chunk the results of a query by comparing IDs in descending order.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -1058,7 +1023,6 @@ class BelongsToMany extends Relation
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
@@ -1079,7 +1043,6 @@ class BelongsToMany extends Relation
      * Chunk the results of a query by comparing IDs in a given order.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @param  bool  $descending
@@ -1103,7 +1066,6 @@ class BelongsToMany extends Relation
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @return bool
      */
@@ -1320,7 +1282,6 @@ class BelongsToMany extends Relation
      * Save a new model and attach it to the parent model.
      *
      * @param  TRelatedModel  $model
-     * @param  array  $pivotAttributes
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -1337,7 +1298,6 @@ class BelongsToMany extends Relation
      * Save a new model without raising any events and attach it to the parent model.
      *
      * @param  TRelatedModel  $model
-     * @param  array  $pivotAttributes
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -1354,7 +1314,6 @@ class BelongsToMany extends Relation
      * @template TContainer of \Illuminate\Support\Collection<array-key, TRelatedModel>|array<array-key, TRelatedModel>
      *
      * @param  TContainer  $models
-     * @param  array  $pivotAttributes
      * @return TContainer
      */
     public function saveMany($models, array $pivotAttributes = [])
@@ -1374,7 +1333,6 @@ class BelongsToMany extends Relation
      * @template TContainer of \Illuminate\Support\Collection<array-key, TRelatedModel>|array<array-key, TRelatedModel>
      *
      * @param  TContainer  $models
-     * @param  array  $pivotAttributes
      * @return TContainer
      */
     public function saveManyQuietly($models, array $pivotAttributes = [])
@@ -1387,8 +1345,6 @@ class BelongsToMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
-     * @param  array  $joining
      * @param  bool  $touch
      * @return TRelatedModel&object{pivot: TPivotModel}
      */
@@ -1411,8 +1367,6 @@ class BelongsToMany extends Relation
     /**
      * Create an array of new instances of the related models.
      *
-     * @param  iterable  $records
-     * @param  array  $joinings
      * @return array<int, TRelatedModel&object{pivot: TPivotModel}>
      */
     public function createMany(iterable $records, array $joinings = [])
@@ -1445,7 +1399,6 @@ class BelongsToMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForSelfJoin(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -1510,8 +1463,6 @@ class BelongsToMany extends Relation
     /**
      * Specify that the pivot table has creation and update timestamps.
      *
-     * @param  mixed  $createdAt
-     * @param  mixed  $updatedAt
      * @return $this
      */
     public function withTimestamps($createdAt = null, $updatedAt = null)

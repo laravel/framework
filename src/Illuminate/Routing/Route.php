@@ -61,8 +61,6 @@ class Route
 
     /**
      * The controller instance.
-     *
-     * @var mixed
      */
     public $controller;
 
@@ -199,8 +197,6 @@ class Route
 
     /**
      * Run the route action and return the response.
-     *
-     * @return mixed
      */
     public function run()
     {
@@ -229,8 +225,6 @@ class Route
 
     /**
      * Run the route action and return the response.
-     *
-     * @return mixed
      */
     protected function runCallable()
     {
@@ -256,7 +250,6 @@ class Route
     /**
      * Run the route action and return the response.
      *
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -270,7 +263,6 @@ class Route
     /**
      * Get the controller instance for the route.
      *
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -333,7 +325,6 @@ class Route
     /**
      * Determine if the route matches a given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $includingMethod
      * @return bool
      */
@@ -371,7 +362,6 @@ class Route
     /**
      * Bind the route to a given request for execution.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
     public function bind(Request $request)
@@ -571,7 +561,6 @@ class Route
     /**
      * Set the binding fields for the route.
      *
-     * @param  array  $bindingFields
      * @return $this
      */
     public function setBindingFields(array $bindingFields)
@@ -625,7 +614,6 @@ class Route
      * Set a default value for the route.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function defaults($key, $value)
@@ -638,7 +626,6 @@ class Route
     /**
      * Set the default values for the route.
      *
-     * @param  array  $defaults
      * @return $this
      */
     public function setDefaults(array $defaults)
@@ -679,7 +666,6 @@ class Route
     /**
      * Set a list of regular expression requirements on the route.
      *
-     * @param  array  $wheres
      * @return $this
      */
     public function setWheres(array $wheres)
@@ -907,7 +893,6 @@ class Route
     /**
      * Determine whether the route's name matches the given patterns.
      *
-     * @param  mixed  ...$patterns
      * @return bool
      */
     public function named(...$patterns)
@@ -986,7 +971,6 @@ class Route
      * Get the action array or one of its properties for the route.
      *
      * @param  string|null  $key
-     * @return mixed
      */
     public function getAction($key = null)
     {
@@ -996,7 +980,6 @@ class Route
     /**
      * Set the action array for the route.
      *
-     * @param  array  $action
      * @return $this
      */
     public function setAction(array $action)
@@ -1134,8 +1117,6 @@ class Route
     /**
      * Get the statically provided controller middleware for the given class and method.
      *
-     * @param  string  $class
-     * @param  string  $method
      * @return array
      */
     protected function staticallyProvidedControllerMiddleware(string $class, string $method)
@@ -1347,7 +1328,6 @@ class Route
     /**
      * Set the router instance on the route.
      *
-     * @param  \Illuminate\Routing\Router  $router
      * @return $this
      */
     public function setRouter(Router $router)
@@ -1360,7 +1340,6 @@ class Route
     /**
      * Set the container instance on the route.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -1400,7 +1379,6 @@ class Route
      * Dynamically access route parameters.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {

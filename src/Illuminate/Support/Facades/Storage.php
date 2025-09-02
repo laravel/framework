@@ -91,7 +91,6 @@ class Storage extends Facade
      * Replace the given disk with a local testing disk.
      *
      * @param  string|null  $disk
-     * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function fake($disk = null, array $config = [])
@@ -117,7 +116,6 @@ class Storage extends Facade
      * Replace the given disk with a persistent local testing disk.
      *
      * @param  string|null  $disk
-     * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
@@ -133,9 +131,6 @@ class Storage extends Facade
 
     /**
      * Get the root path of the given disk.
-     *
-     * @param  string  $disk
-     * @return string
      */
     protected static function getRootPath(string $disk): string
     {
@@ -144,11 +139,6 @@ class Storage extends Facade
 
     /**
      * Assemble the configuration of the given disk.
-     *
-     * @param  string  $disk
-     * @param  array  $config
-     * @param  string  $root
-     * @return array
      */
     protected static function buildDiskConfiguration(string $disk, array $config, string $root): array
     {

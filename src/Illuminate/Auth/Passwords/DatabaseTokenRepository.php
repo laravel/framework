@@ -29,7 +29,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Create a new token record.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return string
      */
     public function create(CanResetPasswordContract $user)
@@ -51,7 +50,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Delete all existing reset tokens from the database.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return int
      */
     protected function deleteExisting(CanResetPasswordContract $user)
@@ -74,7 +72,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Determine if a token record exists and is valid.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @param  string  $token
      * @return bool
      */
@@ -103,7 +100,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Determine if the given user recently created a password reset token.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return bool
      */
     public function recentlyCreatedToken(CanResetPasswordContract $user)
@@ -135,7 +131,6 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
     /**
      * Delete a token record by user.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @return void
      */
     public function delete(CanResetPasswordContract $user)

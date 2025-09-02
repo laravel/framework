@@ -6,8 +6,6 @@ class Limit
 {
     /**
      * The rate limit signature key.
-     *
-     * @var mixed
      */
     public $key;
 
@@ -34,10 +32,6 @@ class Limit
 
     /**
      * Create a new limit instance.
-     *
-     * @param  mixed  $key
-     * @param  int  $maxAttempts
-     * @param  int  $decaySeconds
      */
     public function __construct($key = '', int $maxAttempts = 60, int $decaySeconds = 60)
     {
@@ -119,7 +113,6 @@ class Limit
     /**
      * Set the key of the rate limit.
      *
-     * @param  mixed  $key
      * @return $this
      */
     public function by($key)
@@ -132,7 +125,6 @@ class Limit
     /**
      * Set the callback that should generate the response when the limit is exceeded.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function response(callable $callback)

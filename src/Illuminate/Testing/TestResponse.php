@@ -249,7 +249,6 @@ class TestResponse implements ArrayAccess
      * Assert whether the response is redirecting back to the previous location and the session has the given errors.
      *
      * @param  string|array  $keys
-     * @param  mixed  $format
      * @param  string  $errorBag
      * @return $this
      */
@@ -280,7 +279,6 @@ class TestResponse implements ArrayAccess
      * Assert whether the response is redirecting to a given route.
      *
      * @param  \BackedEnum|string  $name
-     * @param  mixed  $parameters
      * @return $this
      */
     public function assertRedirectToRoute($name, $parameters = [])
@@ -301,7 +299,6 @@ class TestResponse implements ArrayAccess
      * Assert whether the response is redirecting to a given signed route.
      *
      * @param  \BackedEnum|string|null  $name
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return $this
      */
@@ -361,7 +358,6 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given header and equals the optional value.
      *
      * @param  string  $headerName
-     * @param  mixed  $value
      * @return $this
      */
     public function assertHeader($headerName, $value = null)
@@ -464,7 +460,6 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
-     * @param  mixed  $value
      * @return $this
      */
     public function assertPlainCookie($cookieName, $value = null)
@@ -478,7 +473,6 @@ class TestResponse implements ArrayAccess
      * Asserts that the response contains the given cookie and equals the optional value.
      *
      * @param  string  $cookieName
-     * @param  mixed  $value
      * @param  bool  $encrypted
      * @param  bool  $unserialize
      * @return $this
@@ -703,7 +697,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given strings are contained in order within the response.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -719,7 +712,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given HTML strings are contained in order within the response.
      *
-     * @param  array  $values
      * @return $this
      */
     public function assertSeeHtmlInOrder(array $values)
@@ -752,7 +744,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the given strings are contained in order within the response text.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -848,7 +839,6 @@ class TestResponse implements ArrayAccess
      * Assert that the expected value and type exists at the given path in the response.
      *
      * @param  string  $path
-     * @param  mixed  $expect
      * @return $this
      */
     public function assertJsonPath($path, $expect)
@@ -862,7 +852,6 @@ class TestResponse implements ArrayAccess
      * Assert that the given path in the response contains all of the expected values without looking at the order.
      *
      * @param  string  $path
-     * @param  array  $expect
      * @return $this
      */
     public function assertJsonPathCanonicalizing($path, array $expect)
@@ -875,7 +864,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has the exact given JSON.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertExactJson(array $data)
@@ -888,7 +876,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has the similar JSON as given.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertSimilarJson(array $data)
@@ -901,7 +888,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response contains the given JSON fragments.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertJsonFragments(array $data)
@@ -916,7 +902,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response contains the given JSON fragment.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertJsonFragment(array $data)
@@ -929,7 +914,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response does not contain the given JSON fragment.
      *
-     * @param  array  $data
      * @param  bool  $exact
      * @return $this
      */
@@ -943,7 +927,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response does not contain the exact JSON fragment.
      *
-     * @param  array  $data
      * @return $this
      */
     public function assertJsonMissingExact(array $data)
@@ -956,7 +939,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response does not contain the given path.
      *
-     * @param  string  $path
      * @return $this
      */
     public function assertJsonMissingPath(string $path)
@@ -969,8 +951,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has a given JSON structure.
      *
-     * @param  array|null  $structure
-     * @param  array|null  $responseData
      * @return $this
      */
     public function assertJsonStructure(?array $structure = null, ?array $responseData = null)
@@ -983,8 +963,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response has the exact JSON structure.
      *
-     * @param  array|null  $structure
-     * @param  array|null  $responseData
      * @return $this
      */
     public function assertExactJsonStructure(?array $structure = null, ?array $responseData = null)
@@ -997,7 +975,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
-     * @param  int  $count
      * @param  string|null  $key
      * @return $this
      */
@@ -1228,7 +1205,6 @@ class TestResponse implements ArrayAccess
      * Return the decoded response JSON.
      *
      * @param  string|null  $key
-     * @return mixed
      */
     public function json($key = null)
     {
@@ -1265,7 +1241,6 @@ class TestResponse implements ArrayAccess
      * Assert that the response view has a given piece of bound data.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function assertViewHas($key, $value = null)
@@ -1299,7 +1274,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the response view has a given list of bound data.
      *
-     * @param  array  $bindings
      * @return $this
      */
     public function assertViewHasAll(array $bindings)
@@ -1319,7 +1293,6 @@ class TestResponse implements ArrayAccess
      * Get a piece of data from the original view.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function viewData($key)
     {
@@ -1504,7 +1477,6 @@ class TestResponse implements ArrayAccess
      * Assert that the session has a given value.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function assertSessionHas($key, $value = null)
@@ -1530,7 +1502,6 @@ class TestResponse implements ArrayAccess
     /**
      * Assert that the session has a given list of values.
      *
-     * @param  array  $bindings
      * @return $this
      */
     public function assertSessionHasAll(array $bindings)
@@ -1550,7 +1521,6 @@ class TestResponse implements ArrayAccess
      * Assert that the session has a given value in the flashed input array.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function assertSessionHasInput($key, $value = null)
@@ -1585,7 +1555,6 @@ class TestResponse implements ArrayAccess
      * Assert that the session has the given errors.
      *
      * @param  string|array  $keys
-     * @param  mixed  $format
      * @param  string  $errorBag
      * @return $this
      */
@@ -1680,7 +1649,6 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $errorBag
      * @param  string|array  $keys
-     * @param  mixed  $format
      * @return $this
      */
     public function assertSessionHasErrorsIn($errorBag, $keys = [], $format = null)
@@ -1692,7 +1660,6 @@ class TestResponse implements ArrayAccess
      * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function assertSessionMissing($key, $value = null)
@@ -1876,7 +1843,6 @@ class TestResponse implements ArrayAccess
     /**
      * Set the previous exceptions on the response.
      *
-     * @param  \Illuminate\Support\Collection  $exceptions
      * @return $this
      */
     public function withExceptions(Collection $exceptions)
@@ -1890,7 +1856,6 @@ class TestResponse implements ArrayAccess
      * Dynamically access base response parameters.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {
@@ -1912,7 +1877,6 @@ class TestResponse implements ArrayAccess
      * Determine if the given offset exists.
      *
      * @param  string  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -1925,7 +1889,6 @@ class TestResponse implements ArrayAccess
      * Get the value for a given offset.
      *
      * @param  string  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -1938,8 +1901,6 @@ class TestResponse implements ArrayAccess
      * Set the value at the given offset.
      *
      * @param  string  $offset
-     * @param  mixed  $value
-     * @return void
      *
      * @throws \LogicException
      */
@@ -1952,7 +1913,6 @@ class TestResponse implements ArrayAccess
      * Unset the value at the given offset.
      *
      * @param  string  $offset
-     * @return void
      *
      * @throws \LogicException
      */
@@ -1966,7 +1926,6 @@ class TestResponse implements ArrayAccess
      *
      * @param  string  $method
      * @param  array  $args
-     * @return mixed
      */
     public function __call($method, $args)
     {

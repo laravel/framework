@@ -54,9 +54,7 @@ class RateLimited
     /**
      * Process the job.
      *
-     * @param  mixed  $job
      * @param  callable  $next
-     * @return mixed
      */
     public function handle($job, $next)
     {
@@ -86,10 +84,7 @@ class RateLimited
     /**
      * Handle a rate limited job.
      *
-     * @param  mixed  $job
      * @param  callable  $next
-     * @param  array  $limits
-     * @return mixed
      */
     protected function handleJob($job, $next, array $limits)
     {

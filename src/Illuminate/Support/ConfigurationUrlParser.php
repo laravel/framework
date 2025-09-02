@@ -144,9 +144,6 @@ class ConfigurationUrlParser
 
     /**
      * Convert string casted values to their native types.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function parseStringsToNativeTypes($value)
     {

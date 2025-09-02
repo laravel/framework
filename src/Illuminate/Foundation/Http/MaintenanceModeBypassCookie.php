@@ -10,7 +10,6 @@ class MaintenanceModeBypassCookie
     /**
      * Create a new maintenance mode bypass cookie.
      *
-     * @param  string  $key
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public static function create(string $key)
@@ -26,8 +25,6 @@ class MaintenanceModeBypassCookie
     /**
      * Determine if the given maintenance mode bypass cookie is valid.
      *
-     * @param  string  $cookie
-     * @param  string  $key
      * @return bool
      */
     public static function isValid(string $cookie, string $key)

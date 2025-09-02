@@ -40,7 +40,6 @@ abstract class Connection
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
-     * @param  \Closure  $callback
      * @param  string  $method
      * @return void
      */
@@ -70,8 +69,6 @@ abstract class Connection
 
     /**
      * Get the underlying Redis client.
-     *
-     * @return mixed
      */
     public function client()
     {
@@ -82,7 +79,6 @@ abstract class Connection
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
-     * @param  \Closure  $callback
      * @return void
      */
     public function subscribe($channels, Closure $callback)
@@ -94,7 +90,6 @@ abstract class Connection
      * Subscribe to a set of given channels with wildcards.
      *
      * @param  array|string  $channels
-     * @param  \Closure  $callback
      * @return void
      */
     public function psubscribe($channels, Closure $callback)
@@ -106,8 +101,6 @@ abstract class Connection
      * Run a command against the Redis database.
      *
      * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
      */
     public function command($method, array $parameters = [])
     {
@@ -127,7 +120,6 @@ abstract class Connection
     /**
      * Parse the command's parameters for event dispatching.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function parseParametersForEvent(array $parameters)
@@ -138,7 +130,6 @@ abstract class Connection
     /**
      * Fire the given event if possible.
      *
-     * @param  mixed  $event
      * @return void
      *
      * @deprecated since Laravel 11.x
@@ -151,7 +142,6 @@ abstract class Connection
     /**
      * Register a Redis command listener with the connection.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function listen(Closure $callback)
@@ -195,7 +185,6 @@ abstract class Connection
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function setEventDispatcher(Dispatcher $events)
@@ -218,7 +207,6 @@ abstract class Connection
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

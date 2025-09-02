@@ -231,7 +231,6 @@ class PendingRequest
     /**
      * Create a new HTTP Client instance.
      *
-     * @param  \Illuminate\Http\Client\Factory|null  $factory
      * @param  array  $middleware
      */
     public function __construct(?Factory $factory = null, $middleware = [])
@@ -259,7 +258,6 @@ class PendingRequest
     /**
      * Set the base URL for the pending request.
      *
-     * @param  string  $url
      * @return $this
      */
     public function baseUrl(string $url)
@@ -313,7 +311,6 @@ class PendingRequest
      * @param  string|array  $name
      * @param  string|resource  $contents
      * @param  string|null  $filename
-     * @param  array  $headers
      * @return $this
      */
     public function attach($name, $contents = '', $filename = null, array $headers = [])
@@ -351,7 +348,6 @@ class PendingRequest
     /**
      * Specify the body format of the request.
      *
-     * @param  string  $format
      * @return $this
      */
     public function bodyFormat(string $format)
@@ -364,7 +360,6 @@ class PendingRequest
     /**
      * Set the given query parameters in the request URI.
      *
-     * @param  array  $parameters
      * @return $this
      */
     public function withQueryParameters(array $parameters)
@@ -379,7 +374,6 @@ class PendingRequest
     /**
      * Specify the request's content type.
      *
-     * @param  string  $contentType
      * @return $this
      */
     public function contentType(string $contentType)
@@ -413,7 +407,6 @@ class PendingRequest
     /**
      * Add the given headers to the request.
      *
-     * @param  array  $headers
      * @return $this
      */
     public function withHeaders(array $headers)
@@ -429,7 +422,6 @@ class PendingRequest
      * Add the given header to the request.
      *
      * @param  string  $name
-     * @param  mixed  $value
      * @return $this
      */
     public function withHeader($name, $value)
@@ -440,7 +432,6 @@ class PendingRequest
     /**
      * Replace the given headers on the request.
      *
-     * @param  array  $headers
      * @return $this
      */
     public function replaceHeaders(array $headers)
@@ -453,8 +444,6 @@ class PendingRequest
     /**
      * Specify the basic authentication username and password for the request.
      *
-     * @param  string  $username
-     * @param  string  $password
      * @return $this
      */
     public function withBasicAuth(string $username, string $password)
@@ -522,7 +511,6 @@ class PendingRequest
     /**
      * Specify the URL parameters that can be substituted into the request URL.
      *
-     * @param  array  $parameters
      * @return $this
      */
     public function withUrlParameters(array $parameters = [])
@@ -535,8 +523,6 @@ class PendingRequest
     /**
      * Specify the cookies that should be included with the request.
      *
-     * @param  array  $cookies
-     * @param  string  $domain
      * @return $this
      */
     public function withCookies(array $cookies, string $domain)
@@ -551,7 +537,6 @@ class PendingRequest
     /**
      * Specify the maximum number of redirects to allow.
      *
-     * @param  int  $max
      * @return $this
      */
     public function maxRedirects(int $max)
@@ -601,7 +586,6 @@ class PendingRequest
     /**
      * Specify the timeout (in seconds) for the request.
      *
-     * @param  int|float  $seconds
      * @return $this
      */
     public function timeout(int|float $seconds)
@@ -614,7 +598,6 @@ class PendingRequest
     /**
      * Specify the connect timeout (in seconds) for the request.
      *
-     * @param  int|float  $seconds
      * @return $this
      */
     public function connectTimeout(int|float $seconds)
@@ -627,10 +610,6 @@ class PendingRequest
     /**
      * Specify the number of times the request should be attempted.
      *
-     * @param  array|int  $times
-     * @param  Closure|int  $sleepMilliseconds
-     * @param  callable|null  $when
-     * @param  bool  $throw
      * @return $this
      */
     public function retry(array|int $times, Closure|int $sleepMilliseconds = 0, ?callable $when = null, bool $throw = true)
@@ -646,7 +625,6 @@ class PendingRequest
     /**
      * Replace the specified options on the request.
      *
-     * @param  array  $options
      * @return $this
      */
     public function withOptions(array $options)
@@ -662,7 +640,6 @@ class PendingRequest
     /**
      * Add new middleware the client handler stack.
      *
-     * @param  callable  $middleware
      * @return $this
      */
     public function withMiddleware(callable $middleware)
@@ -675,7 +652,6 @@ class PendingRequest
     /**
      * Add new request middleware the client handler stack.
      *
-     * @param  callable  $middleware
      * @return $this
      */
     public function withRequestMiddleware(callable $middleware)
@@ -688,7 +664,6 @@ class PendingRequest
     /**
      * Add new response middleware the client handler stack.
      *
-     * @param  callable  $middleware
      * @return $this
      */
     public function withResponseMiddleware(callable $middleware)
@@ -714,7 +689,6 @@ class PendingRequest
     /**
      * Throw an exception if a server or client error occurs.
      *
-     * @param  callable|null  $callback
      * @return $this
      */
     public function throw(?callable $callback = null)
@@ -787,7 +761,6 @@ class PendingRequest
     /**
      * Issue a GET request to the given URL.
      *
-     * @param  string  $url
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      *
@@ -803,7 +776,6 @@ class PendingRequest
     /**
      * Issue a HEAD request to the given URL.
      *
-     * @param  string  $url
      * @param  array|string|null  $query
      * @return \Illuminate\Http\Client\Response
      *
@@ -819,7 +791,6 @@ class PendingRequest
     /**
      * Issue a POST request to the given URL.
      *
-     * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
@@ -835,7 +806,6 @@ class PendingRequest
     /**
      * Issue a PATCH request to the given URL.
      *
-     * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
@@ -851,7 +821,6 @@ class PendingRequest
     /**
      * Issue a PUT request to the given URL.
      *
-     * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
@@ -867,7 +836,6 @@ class PendingRequest
     /**
      * Issue a DELETE request to the given URL.
      *
-     * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
      * @return \Illuminate\Http\Client\Response
      *
@@ -883,7 +851,6 @@ class PendingRequest
     /**
      * Send a pool of asynchronous requests concurrently.
      *
-     * @param  callable  $callback
      * @return array<array-key, \Illuminate\Http\Client\Response>
      */
     public function pool(callable $callback)
@@ -902,9 +869,6 @@ class PendingRequest
     /**
      * Send the request to the given URL.
      *
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
      * @return \Illuminate\Http\Client\Response
      *
      * @throws \Exception
@@ -990,7 +954,6 @@ class PendingRequest
     /**
      * Substitute the URL parameters in the given URL.
      *
-     * @param  string  $url
      * @return string
      */
     protected function expandUrlParameters(string $url)
@@ -1001,7 +964,6 @@ class PendingRequest
     /**
      * Parse the given HTTP options and set the appropriate additional options.
      *
-     * @param  array  $options
      * @return array
      */
     protected function parseHttpOptions(array $options)
@@ -1036,7 +998,6 @@ class PendingRequest
     /**
      * Parse multi-part form data.
      *
-     * @param  array  $data
      * @return array|array[]
      */
     protected function parseMultipartBodyFormat(array $data)
@@ -1064,10 +1025,6 @@ class PendingRequest
     /**
      * Send an asynchronous request to the given URL.
      *
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
-     * @param  int  $attempt
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
     protected function makePromise(string $method, string $url, array $options = [], int $attempt = 1)
@@ -1107,7 +1064,6 @@ class PendingRequest
      * @param  string  $url
      * @param  array  $options
      * @param  int  $attempt
-     * @return mixed
      */
     protected function handlePromiseResponse(Response|ConnectionException|TransferException $response, $method, $url, $options, $attempt)
     {
@@ -1159,9 +1115,6 @@ class PendingRequest
     /**
      * Send a request either synchronously or asynchronously.
      *
-     * @param  string  $method
-     * @param  string  $url
-     * @param  array  $options
      * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Exception
@@ -1193,7 +1146,6 @@ class PendingRequest
      *
      * @param  string  $method
      * @param  string  $url
-     * @param  array  $options
      * @return array
      */
     protected function parseRequestData($method, $url, array $options)
@@ -1226,7 +1178,6 @@ class PendingRequest
     /**
      * Normalize the given request options.
      *
-     * @param  array  $options
      * @return array
      */
     protected function normalizeRequestOptions(array $options)
@@ -1245,7 +1196,6 @@ class PendingRequest
     /**
      * Populate the given response with additional data.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
      * @return \Illuminate\Http\Client\Response
      */
     protected function populateResponse(Response $response)
@@ -1429,7 +1379,6 @@ class PendingRequest
      * Execute the "before sending" callbacks.
      *
      * @param  \GuzzleHttp\Psr7\RequestInterface  $request
-     * @param  array  $options
      * @return \GuzzleHttp\Psr7\RequestInterface
      */
     public function runBeforeSendingCallbacks($request, array $options)
@@ -1545,7 +1494,6 @@ class PendingRequest
     /**
      * Toggle asynchronicity in requests.
      *
-     * @param  bool  $async
      * @return $this
      */
     public function async(bool $async = true)
@@ -1580,7 +1528,6 @@ class PendingRequest
     /**
      * Dispatch the ResponseReceived event if a dispatcher is available.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
      * @return void
      */
     protected function dispatchResponseReceivedEvent(Response $response)
@@ -1595,8 +1542,6 @@ class PendingRequest
     /**
      * Dispatch the ConnectionFailed event if a dispatcher is available.
      *
-     * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\ConnectionException  $exception
      * @return void
      */
     protected function dispatchConnectionFailedEvent(Request $request, ConnectionException $exception)
@@ -1634,7 +1579,6 @@ class PendingRequest
     /**
      * Handle the given connection exception.
      *
-     * @param  \GuzzleHttp\Exception\ConnectException  $e
      * @return void
      */
     protected function marshalConnectionException(ConnectException $e)
@@ -1655,7 +1599,6 @@ class PendingRequest
     /**
      * Handle the given request exception.
      *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
      */
     protected function marshalRequestExceptionWithoutResponse(RequestException $e)
@@ -1676,7 +1619,6 @@ class PendingRequest
     /**
      * Handle the given request exception.
      *
-     * @param  \GuzzleHttp\Exception\RequestException  $e
      * @return void
      */
     protected function marshalRequestExceptionWithResponse(RequestException $e)
@@ -1694,7 +1636,6 @@ class PendingRequest
     /**
      * Set the client instance.
      *
-     * @param  \GuzzleHttp\Client  $client
      * @return $this
      */
     public function setClient(Client $client)

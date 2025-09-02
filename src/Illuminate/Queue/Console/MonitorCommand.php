@@ -45,9 +45,6 @@ class MonitorCommand extends Command
 
     /**
      * Create a new queue monitor command.
-     *
-     * @param  \Illuminate\Contracts\Queue\Factory  $manager
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      */
     public function __construct(Factory $manager, Dispatcher $events)
     {
@@ -119,7 +116,6 @@ class MonitorCommand extends Command
     /**
      * Display the queue sizes in the console.
      *
-     * @param  \Illuminate\Support\Collection  $queues
      * @return void
      */
     protected function displaySizes(Collection $queues)
@@ -145,7 +141,6 @@ class MonitorCommand extends Command
     /**
      * Fire the monitoring events.
      *
-     * @param  \Illuminate\Support\Collection  $queues
      * @return void
      */
     protected function dispatchEvents(Collection $queues)

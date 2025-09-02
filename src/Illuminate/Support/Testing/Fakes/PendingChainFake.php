@@ -18,8 +18,6 @@ class PendingChainFake extends PendingChain
     /**
      * Create a new pending chain instance.
      *
-     * @param  \Illuminate\Support\Testing\Fakes\BusFake  $bus
-     * @param  mixed  $job
      * @param  array  $chain
      */
     public function __construct(BusFake $bus, $job, $chain)

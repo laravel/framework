@@ -24,8 +24,6 @@ class AblyBroadcaster extends Broadcaster
 
     /**
      * Create a new broadcaster instance.
-     *
-     * @param  \Ably\AblyRest  $ably
      */
     public function __construct(AblyRest $ably)
     {
@@ -36,7 +34,6 @@ class AblyBroadcaster extends Broadcaster
      * Authenticate the incoming request for a given channel.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -59,8 +56,6 @@ class AblyBroadcaster extends Broadcaster
      * Return the valid authentication response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  mixed  $result
-     * @return mixed
      */
     public function validAuthenticationResponse($request, $result)
     {
@@ -115,9 +110,7 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
      * @param  string  $event
-     * @param  array  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException
@@ -141,7 +134,6 @@ class AblyBroadcaster extends Broadcaster
      * Build an Ably message object for broadcasting.
      *
      * @param  string  $event
-     * @param  array  $payload
      * @return \Ably\Models\Message
      */
     protected function buildAblyMessage($event, array $payload = [])
@@ -184,7 +176,6 @@ class AblyBroadcaster extends Broadcaster
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
      * @return array
      */
     protected function formatChannels(array $channels)

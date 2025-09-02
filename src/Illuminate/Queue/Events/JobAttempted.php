@@ -20,8 +20,6 @@ class JobAttempted
 
     /**
      * Determine if the job completed with failing or an unhandled exception occurring.
-     *
-     * @return bool
      */
     public function successful(): bool
     {

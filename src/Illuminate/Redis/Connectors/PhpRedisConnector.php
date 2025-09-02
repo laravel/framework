@@ -18,8 +18,6 @@ class PhpRedisConnector implements Connector
     /**
      * Create a new connection.
      *
-     * @param  array  $config
-     * @param  array  $options
      * @return \Illuminate\Redis\Connections\PhpRedisConnection
      */
     public function connect(array $config, array $options)
@@ -42,9 +40,6 @@ class PhpRedisConnector implements Connector
     /**
      * Create a new clustered PhpRedis connection.
      *
-     * @param  array  $config
-     * @param  array  $clusterOptions
-     * @param  array  $options
      * @return \Illuminate\Redis\Connections\PhpRedisClusterConnection
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options)
@@ -59,7 +54,6 @@ class PhpRedisConnector implements Connector
     /**
      * Build a single cluster seed string from an array.
      *
-     * @param  array  $server
      * @return string
      */
     protected function buildClusterConnectionString(array $server)
@@ -70,7 +64,6 @@ class PhpRedisConnector implements Connector
     /**
      * Create the Redis client instance.
      *
-     * @param  array  $config
      * @return \Redis
      *
      * @throws \LogicException
@@ -150,7 +143,6 @@ class PhpRedisConnector implements Connector
      * Establish a connection with the Redis host.
      *
      * @param  \Redis  $client
-     * @param  array  $config
      * @return void
      */
     protected function establishConnection($client, array $config)
@@ -179,8 +171,6 @@ class PhpRedisConnector implements Connector
     /**
      * Create a new redis cluster instance.
      *
-     * @param  array  $servers
-     * @param  array  $options
      * @return \RedisCluster
      */
     protected function createRedisClusterInstance(array $servers, array $options)
@@ -231,7 +221,6 @@ class PhpRedisConnector implements Connector
     /**
      * Format the host using the scheme if available.
      *
-     * @param  array  $options
      * @return string
      */
     protected function formatHost(array $options)

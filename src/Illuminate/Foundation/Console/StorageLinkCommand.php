@@ -66,10 +66,6 @@ class StorageLinkCommand extends Command
 
     /**
      * Determine if the provided path is a symlink that can be removed.
-     *
-     * @param  string  $link
-     * @param  bool  $force
-     * @return bool
      */
     protected function isRemovableSymlink(string $link, bool $force): bool
     {

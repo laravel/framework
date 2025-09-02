@@ -3778,8 +3778,6 @@ class ValidationValidatorTest extends TestCase
     }
 
     /**
-     * @param  mixed  $input
-     * @param  mixed  $allowed
      * @param  bool  $passes
      */
     #[DataProvider('multipleOfDataProvider')]

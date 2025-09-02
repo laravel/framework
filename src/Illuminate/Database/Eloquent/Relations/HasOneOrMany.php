@@ -53,7 +53,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create and return an un-saved instance of the related model.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function make(array $attributes = [])
@@ -170,10 +169,8 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the value of a relationship by one or many type.
      *
-     * @param  array  $dictionary
      * @param  string  $key
      * @param  string  $type
-     * @return mixed
      */
     protected function getRelationValue(array $dictionary, $key, $type)
     {
@@ -200,7 +197,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Find a model by its primary key or return a new instance of the related model.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
      */
@@ -218,8 +214,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrNew(array $attributes = [], array $values = [])
@@ -236,8 +230,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Get the first record matching the attributes. If the record is not found, create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
@@ -252,8 +244,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function createOrFirst(array $attributes = [], array $values = [])
@@ -268,8 +258,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function updateOrCreate(array $attributes, array $values = [])
@@ -284,7 +272,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array  $values
      * @param  array|string  $uniqueBy
      * @param  array|null  $update
      * @return int
@@ -359,7 +346,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function create(array $attributes = [])
@@ -376,7 +362,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model without raising any events to the parent model.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function createQuietly(array $attributes = [])
@@ -387,7 +372,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function forceCreate(array $attributes = [])
@@ -400,7 +384,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a new instance of the related model with mass assignment without raising model events.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function forceCreateQuietly(array $attributes = [])
@@ -411,7 +394,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a Collection of new instances of the related model.
      *
-     * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
      */
     public function createMany(iterable $records)
@@ -428,7 +410,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a Collection of new instances of the related model without raising any events to the parent model.
      *
-     * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
      */
     public function createManyQuietly(iterable $records)
@@ -439,7 +420,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a Collection of new instances of the related model, allowing mass-assignment.
      *
-     * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
      */
     public function forceCreateMany(iterable $records)
@@ -456,7 +436,6 @@ abstract class HasOneOrMany extends Relation
     /**
      * Create a Collection of new instances of the related model, allowing mass-assignment and without raising any events to the parent model.
      *
-     * @param  iterable  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>
      */
     public function forceCreateManyQuietly(iterable $records)
@@ -500,7 +479,6 @@ abstract class HasOneOrMany extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -554,8 +532,6 @@ abstract class HasOneOrMany extends Relation
 
     /**
      * Get the key value of the parent's local key.
-     *
-     * @return mixed
      */
     public function getParentKey()
     {

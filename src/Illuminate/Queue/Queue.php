@@ -57,8 +57,6 @@ abstract class Queue
      *
      * @param  string  $queue
      * @param  string  $job
-     * @param  mixed  $data
-     * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
     {
@@ -71,8 +69,6 @@ abstract class Queue
      * @param  string  $queue
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed  $data
-     * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
@@ -83,7 +79,6 @@ abstract class Queue
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs
-     * @param  mixed  $data
      * @param  string|null  $queue
      * @return void
      */
@@ -99,7 +94,6 @@ abstract class Queue
      *
      * @param  \Closure|string|object  $job
      * @param  string  $queue
-     * @param  mixed  $data
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return string
      *
@@ -133,7 +127,6 @@ abstract class Queue
      *
      * @param  string|object  $job
      * @param  string  $queue
-     * @param  mixed  $data
      * @return array
      */
     protected function createPayloadArray($job, $queue, $data = '')
@@ -204,9 +197,6 @@ abstract class Queue
 
     /**
      * Get the maximum number of attempts for an object-based queue handler.
-     *
-     * @param  mixed  $job
-     * @return mixed
      */
     public function getJobTries($job)
     {
@@ -223,9 +213,6 @@ abstract class Queue
 
     /**
      * Get the backoff for an object-based queue handler.
-     *
-     * @param  mixed  $job
-     * @return mixed
      */
     public function getJobBackoff($job)
     {
@@ -244,9 +231,6 @@ abstract class Queue
 
     /**
      * Get the expiration timestamp for an object-based queue handler.
-     *
-     * @param  mixed  $job
-     * @return mixed
      */
     public function getJobExpiration($job)
     {
@@ -281,7 +265,6 @@ abstract class Queue
      *
      * @param  string  $job
      * @param  string  $queue
-     * @param  mixed  $data
      * @return array
      */
     protected function createStringPayload($job, $queue, $data)
@@ -319,7 +302,6 @@ abstract class Queue
      * Create the given payload using any registered payload hooks.
      *
      * @param  string  $queue
-     * @param  array  $payload
      * @return array
      */
     protected function withCreatePayloadHooks($queue, array $payload)
@@ -341,7 +323,6 @@ abstract class Queue
      * @param  string|null  $queue
      * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @param  callable  $callback
-     * @return mixed
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback)
     {
@@ -465,7 +446,6 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)

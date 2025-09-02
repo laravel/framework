@@ -31,7 +31,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
     /**
      * Create a new SES V2 transport instance.
      *
-     * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
      */
     public function __construct(SesV2Client $ses, $options = [])
@@ -135,7 +134,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
     /**
      * Set the transmission options being used by the transport.
      *
-     * @param  array  $options
      * @return array
      */
     public function setOptions(array $options)
@@ -145,8 +143,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
 
     /**
      * Get the string representation of the transport.
-     *
-     * @return string
      */
     public function __toString(): string
     {

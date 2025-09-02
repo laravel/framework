@@ -65,7 +65,6 @@ class EventListCommand extends Command
     /**
      * Display events and their listeners in JSON.
      *
-     * @param  \Illuminate\Support\Collection  $events
      * @return void
      */
     protected function displayJson(Collection $events)
@@ -83,7 +82,6 @@ class EventListCommand extends Command
     /**
      * Display the events and their listeners for the CLI.
      *
-     * @param  \Illuminate\Support\Collection  $events
      * @return void
      */
     protected function displayForCli(Collection $events)
@@ -187,7 +185,6 @@ class EventListCommand extends Command
     /**
      * Get a displayable string representation of a Closure listener.
      *
-     * @param  \Closure  $rawListener
      * @return string
      */
     protected function stringifyClosure(Closure $rawListener)

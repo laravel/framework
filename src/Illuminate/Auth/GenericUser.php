@@ -15,8 +15,6 @@ class GenericUser implements UserContract
 
     /**
      * Create a new generic User object.
-     *
-     * @param  array  $attributes
      */
     public function __construct(array $attributes)
     {
@@ -35,8 +33,6 @@ class GenericUser implements UserContract
 
     /**
      * Get the unique identifier for the user.
-     *
-     * @return mixed
      */
     public function getAuthIdentifier()
     {
@@ -98,7 +94,6 @@ class GenericUser implements UserContract
      * Dynamically access the user's attributes.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {
@@ -109,7 +104,6 @@ class GenericUser implements UserContract
      * Dynamically set an attribute on the user.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)

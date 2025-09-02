@@ -67,7 +67,6 @@ trait InteractsWithContainer
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
      * @return \Mockery\MockInterface
      */
     protected function mock($abstract, ?Closure $mock = null)
@@ -79,7 +78,6 @@ trait InteractsWithContainer
      * Mock a partial instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
      * @return \Mockery\MockInterface
      */
     protected function partialMock($abstract, ?Closure $mock = null)
@@ -91,7 +89,6 @@ trait InteractsWithContainer
      * Spy an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure|null  $mock
      * @return \Mockery\MockInterface
      */
     protected function spy($abstract, ?Closure $mock = null)

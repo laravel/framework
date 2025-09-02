@@ -75,8 +75,6 @@ interface Session
      * Get an item from the session.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function get($key, $default = null);
 
@@ -84,8 +82,6 @@ interface Session
      * Get the value of a given key and then forget it.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function pull($key, $default = null);
 
@@ -93,7 +89,6 @@ interface Session
      * Put a key / value pair or array of key / value pairs in the session.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return void
      */
     public function put($key, $value = null);
@@ -101,8 +96,6 @@ interface Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function flash(string $key, $value = true);
@@ -125,7 +118,6 @@ interface Session
      * Remove an item from the session, returning its value.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function remove($key);
 

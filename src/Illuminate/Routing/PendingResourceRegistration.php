@@ -47,10 +47,8 @@ class PendingResourceRegistration
     /**
      * Create a new pending resource registration instance.
      *
-     * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      */
     public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
     {
@@ -63,7 +61,6 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function only($methods)
@@ -76,7 +73,6 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  mixed  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function except($methods)
@@ -143,7 +139,6 @@ class PendingResourceRegistration
     /**
      * Add middleware to the resource routes.
      *
-     * @param  mixed  $middleware
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function middleware($middleware)
@@ -231,7 +226,6 @@ class PendingResourceRegistration
     /**
      * Add "where" constraints to the resource routes.
      *
-     * @param  mixed  $wheres
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function where($wheres)
@@ -270,7 +264,6 @@ class PendingResourceRegistration
     /**
      * Indicate that the resource routes should be scoped using the given binding fields.
      *
-     * @param  array  $fields
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function scoped(array $fields = [])
@@ -283,7 +276,6 @@ class PendingResourceRegistration
     /**
      * Define which routes should allow "trashed" models to be retrieved when resolving implicit model bindings.
      *
-     * @param  array  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function withTrashed(array $methods = [])

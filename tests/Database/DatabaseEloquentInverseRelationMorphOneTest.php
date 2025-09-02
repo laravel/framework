@@ -15,8 +15,6 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 {
     /**
      * Setup the database schema.
-     *
-     * @return void
      */
     protected function setUp(): void
     {
@@ -48,8 +46,6 @@ class DatabaseEloquentInverseRelationMorphOneTest extends TestCase
 
     /**
      * Tear down the database schema.
-     *
-     * @return void
      */
     protected function tearDown(): void
     {

@@ -128,9 +128,6 @@ class Kernel implements KernelContract
 
     /**
      * Create a new console kernel instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      */
     public function __construct(Application $app, Dispatcher $events)
     {
@@ -270,7 +267,6 @@ class Kernel implements KernelContract
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -328,7 +324,6 @@ class Kernel implements KernelContract
      * Register a Closure based command with the application.
      *
      * @param  string  $signature
-     * @param  \Closure  $callback
      * @return \Illuminate\Foundation\Console\ClosureCommand
      */
     public function command($signature, Closure $callback)
@@ -380,10 +375,6 @@ class Kernel implements KernelContract
 
     /**
      * Extract the command class name from the given file path.
-     *
-     * @param  \SplFileInfo  $file
-     * @param  string  $namespace
-     * @return string
      */
     protected function commandClassFromFile(SplFileInfo $file, string $namespace): string
     {
@@ -409,7 +400,6 @@ class Kernel implements KernelContract
      * Run an Artisan console command by name.
      *
      * @param  \Symfony\Component\Console\Command\Command|string  $command
-     * @param  array  $parameters
      * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
      * @return int
      *
@@ -430,7 +420,6 @@ class Kernel implements KernelContract
      * Queue the given console command.
      *
      * @param  string  $command
-     * @param  array  $parameters
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = [])
@@ -563,7 +552,6 @@ class Kernel implements KernelContract
     /**
      * Set the Artisan commands provided by the application.
      *
-     * @param  array  $commands
      * @return $this
      */
     public function addCommands(array $commands)
@@ -576,7 +564,6 @@ class Kernel implements KernelContract
     /**
      * Set the paths that should have their Artisan commands automatically discovered.
      *
-     * @param  array  $paths
      * @return $this
      */
     public function addCommandPaths(array $paths)
@@ -589,7 +576,6 @@ class Kernel implements KernelContract
     /**
      * Set the paths that should have their Artisan "routes" automatically discovered.
      *
-     * @param  array  $paths
      * @return $this
      */
     public function addCommandRoutePaths(array $paths)
@@ -612,7 +598,6 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     protected function reportException(Throwable $e)
@@ -624,7 +609,6 @@ class Kernel implements KernelContract
      * Render the given exception.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Throwable  $e
      * @return void
      */
     protected function renderException($output, Throwable $e)

@@ -117,7 +117,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the view for the mail message.
      *
      * @param  array|string  $view
-     * @param  array  $data
      * @return $this
      */
     public function view($view, array $data = [])
@@ -134,7 +133,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the plain text view for the mail message.
      *
      * @param  string  $textView
-     * @param  array  $data
      * @return $this
      */
     public function text($textView, array $data = [])
@@ -149,7 +147,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * Set the Markdown template for the notification.
      *
      * @param  string  $view
-     * @param  array  $data
      * @return $this
      */
     public function markdown($view, array $data = [])
@@ -260,7 +257,6 @@ class MailMessage extends SimpleMessage implements Renderable
      * Attach a file to the message.
      *
      * @param  string|\Illuminate\Contracts\Mail\Attachable|\Illuminate\Mail\Attachment  $file
-     * @param  array  $options
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -302,7 +298,6 @@ class MailMessage extends SimpleMessage implements Renderable
      *
      * @param  string  $data
      * @param  string  $name
-     * @param  array  $options
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -381,7 +376,6 @@ class MailMessage extends SimpleMessage implements Renderable
     /**
      * Determine if the given "address" is actually an array of addresses.
      *
-     * @param  mixed  $address
      * @return bool
      */
     protected function arrayOfAddresses($address)

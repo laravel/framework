@@ -11,8 +11,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 {
     /**
      * All of the deferred callbacks.
-     *
-     * @var array
      */
     protected array $callbacks = [];
 
@@ -28,8 +26,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Invoke the deferred callbacks.
-     *
-     * @return void
      */
     public function invoke(): void
     {
@@ -38,9 +34,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Invoke the deferred callbacks if the given truth test evaluates to true.
-     *
-     * @param  \Closure|null  $when
-     * @return void
      */
     public function invokeWhen(?Closure $when = null): void
     {
@@ -59,9 +52,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Remove any deferred callbacks with the given name.
-     *
-     * @param  string  $name
-     * @return void
      */
     public function forget(string $name): void
     {
@@ -90,9 +80,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Determine if the collection has a callback with the given key.
-     *
-     * @param  mixed  $offset
-     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -103,9 +90,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Get the callback with the given key.
-     *
-     * @param  mixed  $offset
-     * @return mixed
      */
     public function offsetGet(mixed $offset): mixed
     {
@@ -116,10 +100,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Set the callback with the given key.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
@@ -132,9 +112,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Remove the callback with the given key from the collection.
-     *
-     * @param  mixed  $offset
-     * @return void
      */
     public function offsetUnset(mixed $offset): void
     {
@@ -145,8 +122,6 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
 
     /**
      * Determine how many callbacks are in the collection.
-     *
-     * @return int
      */
     public function count(): int
     {

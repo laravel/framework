@@ -116,9 +116,6 @@ class Kernel implements KernelContract
 
     /**
      * Create a new HTTP kernel instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
      */
     public function __construct(Application $app, Router $router)
     {
@@ -554,7 +551,6 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     protected function reportException(Throwable $e)
@@ -566,7 +562,6 @@ class Kernel implements KernelContract
      * Render the exception to a response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderException($request, Throwable $e)
@@ -587,7 +582,6 @@ class Kernel implements KernelContract
     /**
      * Set the application's global middleware.
      *
-     * @param  array  $middleware
      * @return $this
      */
     public function setGlobalMiddleware(array $middleware)
@@ -612,7 +606,6 @@ class Kernel implements KernelContract
     /**
      * Set the application's middleware groups.
      *
-     * @param  array  $groups
      * @return $this
      */
     public function setMiddlewareGroups(array $groups)
@@ -649,7 +642,6 @@ class Kernel implements KernelContract
     /**
      * Set the application's route middleware aliases.
      *
-     * @param  array  $aliases
      * @return $this
      */
     public function setMiddlewareAliases(array $aliases)
@@ -664,7 +656,6 @@ class Kernel implements KernelContract
     /**
      * Set the application's middleware priority.
      *
-     * @param  array  $priority
      * @return $this
      */
     public function setMiddlewarePriority(array $priority)
@@ -689,7 +680,6 @@ class Kernel implements KernelContract
     /**
      * Set the Laravel application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return $this
      */
     public function setApplication(Application $app)

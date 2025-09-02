@@ -33,8 +33,6 @@ class ResponseSequence
 
     /**
      * Create a new response sequence.
-     *
-     * @param  array  $responses
      */
     public function __construct(array $responses)
     {
@@ -45,8 +43,6 @@ class ResponseSequence
      * Push a response to the sequence.
      *
      * @param  string|array|null  $body
-     * @param  int  $status
-     * @param  array  $headers
      * @return $this
      */
     public function push($body = null, int $status = 200, array $headers = [])
@@ -59,8 +55,6 @@ class ResponseSequence
     /**
      * Push a response with the given status code to the sequence.
      *
-     * @param  int  $status
-     * @param  array  $headers
      * @return $this
      */
     public function pushStatus(int $status, array $headers = [])
@@ -73,9 +67,6 @@ class ResponseSequence
     /**
      * Push a response with the contents of a file as the body to the sequence.
      *
-     * @param  string  $filePath
-     * @param  int  $status
-     * @param  array  $headers
      * @return $this
      */
     public function pushFile(string $filePath, int $status = 200, array $headers = [])
@@ -103,7 +94,6 @@ class ResponseSequence
     /**
      * Push a response to the sequence.
      *
-     * @param  mixed  $response
      * @return $this
      */
     public function pushResponse($response)
@@ -151,7 +141,6 @@ class ResponseSequence
      * Get the next response in the sequence.
      *
      * @param  \Illuminate\Http\Client\Request  $request
-     * @return mixed
      *
      * @throws \OutOfBoundsException
      */

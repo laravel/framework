@@ -226,8 +226,6 @@ trait EnumeratesValues
      * Alias for the "contains" method.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function some($key, $operator = null, $value = null)
@@ -238,7 +236,6 @@ trait EnumeratesValues
     /**
      * Dump the given arguments and terminate execution.
      *
-     * @param  mixed  ...$args
      * @return never
      */
     public function dd(...$args)
@@ -249,7 +246,6 @@ trait EnumeratesValues
     /**
      * Dump the items.
      *
-     * @param  mixed  ...$args
      * @return $this
      */
     public function dump(...$args)
@@ -295,8 +291,6 @@ trait EnumeratesValues
      * Determine if all items pass the given truth test.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return bool
      */
     public function every($key, $operator = null, $value = null)
@@ -320,8 +314,6 @@ trait EnumeratesValues
      * Get the first item by the given key value pair.
      *
      * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return TValue|null
      */
     public function firstWhere($key, $operator = null, $value = null)
@@ -462,7 +454,6 @@ trait EnumeratesValues
      * Get the min value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
      */
     public function min($callback = null)
     {
@@ -477,7 +468,6 @@ trait EnumeratesValues
      * Get the max value of a given key.
      *
      * @param  (callable(TValue):mixed)|string|null  $callback
-     * @return mixed
      */
     public function max($callback = null)
     {
@@ -508,8 +498,6 @@ trait EnumeratesValues
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return static<int<0, 1>, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null)
@@ -527,7 +515,6 @@ trait EnumeratesValues
      * Calculate the percentage of items that pass a given truth test.
      *
      * @param  (callable(TValue, TKey): bool)  $callback
-     * @param  int  $precision
      * @return float|null
      */
     public function percentage(callable $callback, int $precision = 2)
@@ -619,8 +606,6 @@ trait EnumeratesValues
      * Filter items by the given key value pair.
      *
      * @param  callable|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return static
      */
     public function where($key, $operator = null, $value = null)
@@ -654,7 +639,6 @@ trait EnumeratesValues
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return static
      */
     public function whereStrict($key, $value)
@@ -797,7 +781,6 @@ trait EnumeratesValues
      * Pass the collection through a series of callable pipes and return the result.
      *
      * @param  array<callable>  $callbacks
-     * @return mixed
      */
     public function pipeThrough($callbacks)
     {
@@ -831,8 +814,6 @@ trait EnumeratesValues
     /**
      * Reduce the collection to multiple aggregate values.
      *
-     * @param  callable  $callback
-     * @param  mixed  ...$initial
      * @return array
      *
      * @throws \UnexpectedValueException
@@ -1045,7 +1026,6 @@ trait EnumeratesValues
      * Dynamically access collection proxies.
      *
      * @param  string  $key
-     * @return mixed
      *
      * @throws \Exception
      */
@@ -1061,7 +1041,6 @@ trait EnumeratesValues
     /**
      * Results array of items from Collection or Arrayable.
      *
-     * @param  mixed  $items
      * @return array<TKey, TValue>
      */
     protected function getArrayableItems($items)
@@ -1076,7 +1055,6 @@ trait EnumeratesValues
      *
      * @param  callable|string  $key
      * @param  string|null  $operator
-     * @param  mixed  $value
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator = null, $value = null)
@@ -1133,7 +1111,6 @@ trait EnumeratesValues
     /**
      * Determine if the given value is callable, but not a string.
      *
-     * @param  mixed  $value
      * @return bool
      */
     protected function useAsCallable($value)
@@ -1159,7 +1136,6 @@ trait EnumeratesValues
     /**
      * Make a function to check an item's equality.
      *
-     * @param  mixed  $value
      * @return \Closure(mixed): bool
      */
     protected function equality($value)
@@ -1170,7 +1146,6 @@ trait EnumeratesValues
     /**
      * Make a function using another function, by negating its result.
      *
-     * @param  \Closure  $callback
      * @return \Closure
      */
     protected function negate(Closure $callback)

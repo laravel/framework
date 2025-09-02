@@ -19,10 +19,6 @@ class Context implements ContextualAttribute
 
     /**
      * Resolve the context value.
-     *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
      */
     public static function resolve(self $attribute, Container $container): mixed
     {

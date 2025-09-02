@@ -34,9 +34,6 @@ class Pool
 
     /**
      * Create a new process pool.
-     *
-     * @param  \Illuminate\Process\Factory  $factory
-     * @param  callable  $callback
      */
     public function __construct(Factory $factory, callable $callback)
     {
@@ -47,7 +44,6 @@ class Pool
     /**
      * Add a process to the pool with a key.
      *
-     * @param  string  $key
      * @return \Illuminate\Process\PendingProcess
      */
     public function as(string $key)
@@ -60,7 +56,6 @@ class Pool
     /**
      * Start all of the processes in the pool.
      *
-     * @param  callable|null  $output
      * @return \Illuminate\Process\InvokedProcessPool
      */
     public function start(?callable $output = null)

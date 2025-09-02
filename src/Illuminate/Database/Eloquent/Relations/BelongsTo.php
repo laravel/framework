@@ -248,7 +248,6 @@ class BelongsTo extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -318,8 +317,6 @@ class BelongsTo extends Relation
 
     /**
      * Get the key value of the child's foreign key.
-     *
-     * @return mixed
      */
     public function getParentKey()
     {
@@ -361,7 +358,6 @@ class BelongsTo extends Relation
      * Get the value of the model's foreign key.
      *
      * @param  TDeclaringModel  $model
-     * @return mixed
      */
     protected function getForeignKeyFrom(Model $model)
     {

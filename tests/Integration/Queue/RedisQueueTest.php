@@ -91,8 +91,6 @@ class RedisQueueTest extends TestCase
     }
 
     /**
-     * @param  mixed  $driver
-     *
      * @throws \Exception
      */
     #[DataProvider('redisDriverProvider')]

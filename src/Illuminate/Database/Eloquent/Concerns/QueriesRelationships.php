@@ -432,8 +432,6 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function whereRelation($relation, $column, $operator = null, $value = null)
@@ -452,8 +450,6 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string  $relation
      * @param  \Closure|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function withWhereRelation($relation, $column, $operator = null, $value = null)
@@ -473,8 +469,6 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
@@ -495,8 +489,6 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function whereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
@@ -517,8 +509,6 @@ trait QueriesRelationships
      *
      * @param  \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string  $relation
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereDoesntHaveRelation($relation, $column, $operator = null, $value = null)
@@ -540,8 +530,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
      * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function whereMorphRelation($relation, $types, $column, $operator = null, $value = null)
@@ -559,8 +547,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
      * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereMorphRelation($relation, $types, $column, $operator = null, $value = null)
@@ -578,8 +564,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
      * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function whereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
@@ -597,8 +581,6 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string  $relation
      * @param  string|array<int, string>  $types
      * @param  (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return $this
      */
     public function orWhereMorphDoesntHaveRelation($relation, $types, $column, $operator = null, $value = null)
@@ -835,7 +817,6 @@ trait QueriesRelationships
     /**
      * Add subselect queries to include an aggregate value for a relationship.
      *
-     * @param  mixed  $relations
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $function
      * @return $this
@@ -952,7 +933,6 @@ trait QueriesRelationships
     /**
      * Add subselect queries to count the relations.
      *
-     * @param  mixed  $relations
      * @return $this
      */
     public function withCount($relations)
@@ -1067,11 +1047,6 @@ trait QueriesRelationships
 
     /**
      * Updates the table name for any columns with a new qualified name.
-     *
-     * @param  array  $wheres
-     * @param  string  $from
-     * @param  string  $to
-     * @return array
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
@@ -1087,7 +1062,6 @@ trait QueriesRelationships
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean

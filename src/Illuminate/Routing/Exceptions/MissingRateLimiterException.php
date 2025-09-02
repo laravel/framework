@@ -9,7 +9,6 @@ class MissingRateLimiterException extends Exception
     /**
      * Create a new exception for invalid named rate limiter.
      *
-     * @param  string  $limiter
      * @return static
      */
     public static function forLimiter(string $limiter)
@@ -20,7 +19,6 @@ class MissingRateLimiterException extends Exception
     /**
      * Create a new exception for an invalid rate limiter based on a model property.
      *
-     * @param  string  $limiter
      * @param  class-string  $model
      * @return static
      */

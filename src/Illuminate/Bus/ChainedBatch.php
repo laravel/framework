@@ -16,29 +16,21 @@ class ChainedBatch implements ShouldQueue
 
     /**
      * The collection of batched jobs.
-     *
-     * @var \Illuminate\Support\Collection
      */
     public Collection $jobs;
 
     /**
      * The name of the batch.
-     *
-     * @var string
      */
     public string $name;
 
     /**
      * The batch options.
-     *
-     * @var array
      */
     public array $options;
 
     /**
      * Create a new chained batch instance.
-     *
-     * @param  \Illuminate\Bus\PendingBatch  $batch
      */
     public function __construct(PendingBatch $batch)
     {
@@ -50,9 +42,6 @@ class ChainedBatch implements ShouldQueue
 
     /**
      * Prepare any nested batches within the given collection of jobs.
-     *
-     * @param  \Illuminate\Support\Collection  $jobs
-     * @return \Illuminate\Support\Collection
      */
     public static function prepareNestedBatches(Collection $jobs): Collection
     {
@@ -110,7 +99,6 @@ class ChainedBatch implements ShouldQueue
     /**
      * Move the remainder of the chain to a "finally" batch callback.
      *
-     * @param  \Illuminate\Bus\PendingBatch  $batch
      * @return \Illuminate\Bus\PendingBatch
      */
     protected function attachRemainderOfChainToEndOfBatch(PendingBatch $batch)

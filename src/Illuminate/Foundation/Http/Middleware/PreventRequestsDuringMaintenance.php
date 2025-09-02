@@ -37,8 +37,6 @@ class PreventRequestsDuringMaintenance
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      */
     public function __construct(Application $app)
     {
@@ -49,8 +47,6 @@ class PreventRequestsDuringMaintenance
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \ErrorException
@@ -113,7 +109,6 @@ class PreventRequestsDuringMaintenance
      * Determine if the incoming request has a maintenance mode bypass cookie.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $data
      * @return bool
      */
     protected function hasValidBypassCookie($request, array $data)
@@ -129,7 +124,6 @@ class PreventRequestsDuringMaintenance
     /**
      * Redirect the user to their intended destination with a maintenance mode bypass cookie.
      *
-     * @param  string  $secret
      * @return \Illuminate\Http\RedirectResponse
      */
     protected function bypassResponse(string $secret)

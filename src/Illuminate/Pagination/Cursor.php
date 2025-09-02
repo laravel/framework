@@ -26,7 +26,6 @@ class Cursor implements Arrayable
     /**
      * Create a new cursor instance.
      *
-     * @param  array  $parameters
      * @param  bool  $pointsToNextItems
      */
     public function __construct(array $parameters, $pointsToNextItems = true)
@@ -38,7 +37,6 @@ class Cursor implements Arrayable
     /**
      * Get the given parameter from the cursor.
      *
-     * @param  string  $parameterName
      * @return string|null
      *
      * @throws \UnexpectedValueException
@@ -55,7 +53,6 @@ class Cursor implements Arrayable
     /**
      * Get the given parameters from the cursor.
      *
-     * @param  array  $parameterNames
      * @return array
      */
     public function parameters(array $parameterNames)

@@ -42,11 +42,6 @@ class Exception
 
     /**
      * Creates a new exception renderer instance.
-     *
-     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
-     * @param  string  $basePath
      */
     public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
     {

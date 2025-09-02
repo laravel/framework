@@ -71,7 +71,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Create a new database store.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
      * @param  string  $prefix
      * @param  string  $lockTable
@@ -98,7 +97,6 @@ class DatabaseStore implements LockProvider, Store
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function get($key)
     {
@@ -158,7 +156,6 @@ class DatabaseStore implements LockProvider, Store
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -170,7 +167,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -195,7 +191,6 @@ class DatabaseStore implements LockProvider, Store
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -255,7 +250,6 @@ class DatabaseStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  int|float  $value
-     * @param  \Closure  $callback
      * @return int|false
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
@@ -311,7 +305,6 @@ class DatabaseStore implements LockProvider, Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
@@ -377,7 +370,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @param  array  $keys
      * @return bool
      */
     protected function forgetMany(array $keys)
@@ -393,8 +385,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all expired items from the given set from the cache.
      *
-     * @param  array  $keys
-     * @param  bool  $prefixed
      * @return bool
      */
     protected function forgetManyIfExpired(array $keys, bool $prefixed = false)
@@ -505,7 +495,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Serialize the given value.
      *
-     * @param  mixed  $value
      * @return string
      */
     protected function serialize($value)
@@ -525,7 +514,6 @@ class DatabaseStore implements LockProvider, Store
      * Unserialize the given value.
      *
      * @param  string  $value
-     * @return mixed
      */
     protected function unserialize($value)
     {

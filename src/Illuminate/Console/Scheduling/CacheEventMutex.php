@@ -24,8 +24,6 @@ class CacheEventMutex implements EventMutex, CacheAware
 
     /**
      * Create a new overlapping strategy.
-     *
-     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      */
     public function __construct(Cache $cache)
     {
@@ -35,7 +33,6 @@ class CacheEventMutex implements EventMutex, CacheAware
     /**
      * Attempt to obtain an event mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return bool
      */
     public function create(Event $event)
@@ -54,7 +51,6 @@ class CacheEventMutex implements EventMutex, CacheAware
     /**
      * Determine if an event mutex exists for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return bool
      */
     public function exists(Event $event)
@@ -71,7 +67,6 @@ class CacheEventMutex implements EventMutex, CacheAware
     /**
      * Clear the event mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
     public function forget(Event $event)

@@ -61,7 +61,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Create a new store instance.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $table
      * @param  string  $keyAttribute
      * @param  string  $valueAttribute
@@ -89,7 +88,6 @@ class DynamoDbStore implements LockProvider, Store
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function get($key)
     {
@@ -125,7 +123,6 @@ class DynamoDbStore implements LockProvider, Store
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
@@ -175,7 +172,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Determine if the given item is expired.
      *
-     * @param  array  $item
      * @param  \DateTimeInterface|null  $expiration
      * @return bool
      */
@@ -191,7 +187,6 @@ class DynamoDbStore implements LockProvider, Store
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -218,7 +213,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -259,7 +253,6 @@ class DynamoDbStore implements LockProvider, Store
      * Store an item in the cache if the key doesn't exist.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
@@ -305,7 +298,6 @@ class DynamoDbStore implements LockProvider, Store
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|false
      */
     public function increment($key, $value = 1)
@@ -350,7 +342,6 @@ class DynamoDbStore implements LockProvider, Store
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return int|false
      */
     public function decrement($key, $value = 1)
@@ -395,7 +386,6 @@ class DynamoDbStore implements LockProvider, Store
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
@@ -475,9 +465,6 @@ class DynamoDbStore implements LockProvider, Store
 
     /**
      * Serialize the value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function serialize($value)
     {
@@ -486,9 +473,6 @@ class DynamoDbStore implements LockProvider, Store
 
     /**
      * Unserialize the value.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function unserialize($value)
     {
@@ -506,7 +490,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Get the DynamoDB type for the given value.
      *
-     * @param  mixed  $value
      * @return string
      */
     protected function type($value)

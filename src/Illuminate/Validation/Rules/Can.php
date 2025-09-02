@@ -33,7 +33,6 @@ class Can implements Rule, ValidatorAwareRule
      * Constructor.
      *
      * @param  string  $ability
-     * @param  array  $arguments
      */
     public function __construct($ability, array $arguments = [])
     {
@@ -45,7 +44,6 @@ class Can implements Rule, ValidatorAwareRule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

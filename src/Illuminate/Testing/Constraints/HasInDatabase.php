@@ -32,7 +32,6 @@ class HasInDatabase extends Constraint
     /**
      * Create a new constraint instance.
      *
-     * @param  \Illuminate\Database\Connection  $database
      * @param  array<string, mixed>  $data
      */
     public function __construct(Connection $database, array $data)
@@ -46,7 +45,6 @@ class HasInDatabase extends Constraint
      * Check if the data is found in the given table.
      *
      * @param  string  $table
-     * @return bool
      */
     public function matches($table): bool
     {
@@ -59,7 +57,6 @@ class HasInDatabase extends Constraint
      * Get the description of the failure.
      *
      * @param  string  $table
-     * @return string
      */
     public function failureDescription($table): string
     {
@@ -109,7 +106,6 @@ class HasInDatabase extends Constraint
      * Get a string representation of the object.
      *
      * @param  int  $options
-     * @return string
      */
     public function toString($options = 0): string
     {

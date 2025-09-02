@@ -80,8 +80,6 @@ trait InteractsWithTestCaseLifecycle
      * Setup the test environment.
      *
      * @internal
-     *
-     * @return void
      */
     protected function setUpTheTestEnvironment(): void
     {
@@ -108,8 +106,6 @@ trait InteractsWithTestCaseLifecycle
      * Clean up the testing environment before the next test.
      *
      * @internal
-     *
-     * @return void
      */
     protected function tearDownTheTestEnvironment(): void
     {
@@ -260,7 +256,6 @@ trait InteractsWithTestCaseLifecycle
     /**
      * Register a callback to be run after the application is created.
      *
-     * @param  callable  $callback
      * @return void
      */
     public function afterApplicationCreated(callable $callback)
@@ -275,7 +270,6 @@ trait InteractsWithTestCaseLifecycle
     /**
      * Register a callback to be run before the application is destroyed.
      *
-     * @param  callable  $callback
      * @return void
      */
     protected function beforeApplicationDestroyed(callable $callback)

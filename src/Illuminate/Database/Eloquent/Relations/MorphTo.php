@@ -305,7 +305,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relations to load for a given morph type.
      *
-     * @param  array  $with
      * @return $this
      */
     public function morphWith(array $with)
@@ -320,7 +319,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relationship counts to load for a given morph type.
      *
-     * @param  array  $withCount
      * @return $this
      */
     public function morphWithCount(array $withCount)
@@ -335,7 +333,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify constraints on the query for a given morph type.
      *
-     * @param  array  $callbacks
      * @return $this
      */
     public function constrain(array $callbacks)
@@ -429,7 +426,6 @@ class MorphTo extends BelongsTo
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

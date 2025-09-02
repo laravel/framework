@@ -8,10 +8,6 @@ class Benchmark
 {
     /**
      * Measure a callable or array of callables over the given number of iterations.
-     *
-     * @param  \Closure|array  $benchmarkables
-     * @param  int  $iterations
-     * @return array|float
      */
     public static function measure(Closure|array $benchmarkables, int $iterations = 1): array|float
     {
@@ -53,10 +49,6 @@ class Benchmark
 
     /**
      * Measure a callable or array of callables over the given number of iterations, then dump and die.
-     *
-     * @param  \Closure|array  $benchmarkables
-     * @param  int  $iterations
-     * @return never
      */
     public static function dd(Closure|array $benchmarkables, int $iterations = 1): never
     {

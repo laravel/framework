@@ -25,8 +25,6 @@ class ReportableHandler
 
     /**
      * Create a new reportable handler instance.
-     *
-     * @param  callable  $callback
      */
     public function __construct(callable $callback)
     {
@@ -36,7 +34,6 @@ class ReportableHandler
     /**
      * Invoke the handler.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     public function __invoke(Throwable $e)
@@ -53,7 +50,6 @@ class ReportableHandler
     /**
      * Determine if the callback handles the given exception.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     public function handles(Throwable $e)

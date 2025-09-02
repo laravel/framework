@@ -14,7 +14,6 @@ class Reflector
     /**
      * This is a PHP 7.4 compatible implementation of is_callable.
      *
-     * @param  mixed  $var
      * @param  bool  $syntaxOnly
      * @return bool
      */

@@ -59,7 +59,6 @@ class TestComponent implements Stringable
     /**
      * Assert that the given strings are contained in order within the rendered component.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -91,7 +90,6 @@ class TestComponent implements Stringable
     /**
      * Assert that the given strings are contained in order within the rendered component text.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -150,7 +148,6 @@ class TestComponent implements Stringable
      * Dynamically access properties on the underlying component.
      *
      * @param  string  $attribute
-     * @return mixed
      */
     public function __get($attribute)
     {
@@ -162,7 +159,6 @@ class TestComponent implements Stringable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

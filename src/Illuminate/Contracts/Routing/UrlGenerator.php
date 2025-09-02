@@ -14,7 +14,6 @@ interface UrlGenerator
     /**
      * Get the URL for the previous request.
      *
-     * @param  mixed  $fallback
      * @return string
      */
     public function previous($fallback = false);
@@ -23,7 +22,6 @@ interface UrlGenerator
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
-     * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
      */
@@ -51,7 +49,6 @@ interface UrlGenerator
      * Get the URL to a named route.
      *
      * @param  string  $name
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      *
@@ -63,7 +60,6 @@ interface UrlGenerator
      * Create a signed route URL for a named route.
      *
      * @param  string  $name
-     * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
      * @return string
@@ -88,7 +84,6 @@ interface UrlGenerator
      *
      * @param  string  $path
      * @param  array  $query
-     * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
      */
@@ -98,7 +93,6 @@ interface UrlGenerator
      * Get the URL to a controller action.
      *
      * @param  string|array  $action
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      */

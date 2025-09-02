@@ -31,7 +31,6 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * Create a new contextual binding builder.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  string|array  $concrete
      */
     public function __construct(Container $container, $concrete)
@@ -85,7 +84,6 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      * Specify the configuration item to bind as a primitive.
      *
      * @param  string  $key
-     * @param  mixed  $default
      * @return void
      */
     public function giveConfig($key, $default = null)

@@ -21,8 +21,6 @@ class ValidatedInput implements ValidatedData
 
     /**
      * Create a new validated input container.
-     *
-     * @param  array  $input
      */
     public function __construct(array $input)
     {
@@ -32,7 +30,6 @@ class ValidatedInput implements ValidatedData
     /**
      * Merge the validated input with the given array of additional data.
      *
-     * @param  array  $items
      * @return static
      */
     public function merge(array $items)
@@ -43,7 +40,6 @@ class ValidatedInput implements ValidatedData
     /**
      * Get the raw, underlying input array.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -65,8 +61,6 @@ class ValidatedInput implements ValidatedData
      * Retrieve data from the instance.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     protected function data($key = null, $default = null)
     {
@@ -87,8 +81,6 @@ class ValidatedInput implements ValidatedData
      * Retrieve an input item from the validated inputs.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function input($key = null, $default = null)
     {
@@ -100,7 +92,6 @@ class ValidatedInput implements ValidatedData
     /**
      * Dump the validated inputs items and end the script.
      *
-     * @param  mixed  ...$keys
      * @return never
      */
     public function dd(...$keys)
@@ -113,7 +104,6 @@ class ValidatedInput implements ValidatedData
     /**
      * Dump the items.
      *
-     * @param  mixed  $keys
      * @return $this
      */
     public function dump($keys = [])
@@ -139,7 +129,6 @@ class ValidatedInput implements ValidatedData
      * Dynamically access input data.
      *
      * @param  string  $name
-     * @return mixed
      */
     public function __get($name)
     {
@@ -150,8 +139,6 @@ class ValidatedInput implements ValidatedData
      * Dynamically set input data.
      *
      * @param  string  $name
-     * @param  mixed  $value
-     * @return mixed
      */
     public function __set($name, $value)
     {
@@ -181,9 +168,6 @@ class ValidatedInput implements ValidatedData
 
     /**
      * Determine if an item exists at an offset.
-     *
-     * @param  mixed  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -192,9 +176,6 @@ class ValidatedInput implements ValidatedData
 
     /**
      * Get an item at a given offset.
-     *
-     * @param  mixed  $key
-     * @return mixed
      */
     public function offsetGet($key): mixed
     {
@@ -203,10 +184,6 @@ class ValidatedInput implements ValidatedData
 
     /**
      * Set the item at a given offset.
-     *
-     * @param  mixed  $key
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -221,7 +198,6 @@ class ValidatedInput implements ValidatedData
      * Unset the item at a given offset.
      *
      * @param  string  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {

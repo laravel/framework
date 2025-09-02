@@ -45,7 +45,6 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Create a new file view loader instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string[]  $paths
      * @param  string[]|null  $extensions
      */

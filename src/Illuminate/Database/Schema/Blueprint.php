@@ -95,9 +95,7 @@ class Blueprint
     /**
      * Create a new schema blueprint.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
-     * @param  \Closure|null  $callback
      */
     public function __construct(Connection $connection, $table, ?Closure $callback = null)
     {
@@ -176,7 +174,6 @@ class Blueprint
      *
      * @deprecated Will be removed in a future Laravel version.
      *
-     * @param  array  $names
      * @return \Illuminate\Support\Collection
      */
     protected function commandsNamed(array $names)
@@ -407,7 +404,6 @@ class Blueprint
     /**
      * Indicate that the given columns should be dropped.
      *
-     * @param  mixed  $columns
      * @return \Illuminate\Support\Fluent
      */
     public function dropColumn($columns)
@@ -1099,7 +1095,6 @@ class Blueprint
      * Create a new enum column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function enum($column, array $allowed)
@@ -1113,7 +1108,6 @@ class Blueprint
      * Create a new set column on the table.
      *
      * @param  string  $column
-     * @param  array  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function set($column, array $allowed)
@@ -1734,7 +1728,6 @@ class Blueprint
      * Create a default index name for the table.
      *
      * @param  string  $type
-     * @param  array  $columns
      * @return string
      */
     protected function createIndexName($type, array $columns)
@@ -1757,7 +1750,6 @@ class Blueprint
      *
      * @param  string  $type
      * @param  string  $name
-     * @param  array  $parameters
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function addColumn($type, $name, array $parameters = [])
@@ -1794,7 +1786,6 @@ class Blueprint
      * Add the columns from the callback after the given column.
      *
      * @param  string  $column
-     * @param  \Closure  $callback
      * @return void
      */
     public function after($column, Closure $callback)
@@ -1829,7 +1820,6 @@ class Blueprint
      * Add a new command to the blueprint.
      *
      * @param  string  $name
-     * @param  array  $parameters
      * @return \Illuminate\Support\Fluent
      */
     protected function addCommand($name, array $parameters = [])
@@ -1843,7 +1833,6 @@ class Blueprint
      * Create a new Fluent command.
      *
      * @param  string  $name
-     * @param  array  $parameters
      * @return \Illuminate\Support\Fluent
      */
     protected function createCommand($name, array $parameters = [])
@@ -1895,8 +1884,6 @@ class Blueprint
 
     /**
      * Determine if the blueprint has state.
-     *
-     * @return bool
      */
     private function hasState(): bool
     {

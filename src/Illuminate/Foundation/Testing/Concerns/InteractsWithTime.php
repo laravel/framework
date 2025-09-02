@@ -11,7 +11,6 @@ trait InteractsWithTime
      * Freeze time.
      *
      * @param  callable|null  $callback
-     * @return mixed
      */
     public function freezeTime($callback = null)
     {
@@ -24,7 +23,6 @@ trait InteractsWithTime
      * Freeze time at the beginning of the current second.
      *
      * @param  callable|null  $callback
-     * @return mixed
      */
     public function freezeSecond($callback = null)
     {
@@ -49,7 +47,6 @@ trait InteractsWithTime
      *
      * @param  \DateTimeInterface|\Closure|\Illuminate\Support\Carbon|string|bool|null  $date
      * @param  callable|null  $callback
-     * @return mixed
      */
     public function travelTo($date, $callback = null)
     {

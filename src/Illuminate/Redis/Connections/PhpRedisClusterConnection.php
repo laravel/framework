@@ -23,9 +23,7 @@ class PhpRedisClusterConnection extends PhpRedisConnection
     /**
      * Scan all keys based on the given options.
      *
-     * @param  mixed  $cursor
      * @param  array  $options
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

@@ -43,8 +43,6 @@ class EncryptCookies
 
     /**
      * Create a new CookieGuard instance.
-     *
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      */
     public function __construct(EncrypterContract $encrypter)
     {
@@ -66,7 +64,6 @@ class EncryptCookies
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle($request, Closure $next)
@@ -77,7 +74,6 @@ class EncryptCookies
     /**
      * Decrypt the cookies on the request.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return \Symfony\Component\HttpFoundation\Request
      */
     protected function decrypt(Request $request)
@@ -102,7 +98,6 @@ class EncryptCookies
     /**
      * Validate and remove the cookie value prefix from the value.
      *
-     * @param  string  $key
      * @param  string  $value
      * @return string|array|null
      */
@@ -116,8 +111,6 @@ class EncryptCookies
     /**
      * Validate and remove the cookie value prefix from all values of an array.
      *
-     * @param  string  $key
-     * @param  array  $value
      * @return array
      */
     protected function validateArray(string $key, array $value)
@@ -148,7 +141,6 @@ class EncryptCookies
     /**
      * Decrypt an array based cookie.
      *
-     * @param  array  $cookie
      * @return array
      */
     protected function decryptArray(array $cookie)
@@ -171,7 +163,6 @@ class EncryptCookies
     /**
      * Encrypt the cookies on an outgoing response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function encrypt(Response $response)
@@ -196,8 +187,6 @@ class EncryptCookies
     /**
      * Duplicate a cookie with a new value.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie  $cookie
-     * @param  mixed  $value
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     protected function duplicate(Cookie $cookie, $value)

@@ -101,8 +101,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Get an attribute from the fluent instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function value($key, $default = null)
     {
@@ -117,7 +115,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Get the value of the given key as a new Fluent instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
      * @return static
      */
     public function scope($key, $default = null)
@@ -130,7 +127,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
     /**
      * Get all of the attributes from the fluent instance.
      *
-     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -154,8 +150,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Get data from the fluent instance.
      *
      * @param  string  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     protected function data($key = null, $default = null)
     {
@@ -215,8 +209,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
 
     /**
      * Determine if the fluent instance is empty.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -225,8 +217,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
 
     /**
      * Determine if the fluent instance is not empty.
-     *
-     * @return bool
      */
     public function isNotEmpty(): bool
     {
@@ -237,7 +227,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Determine if the given offset exists.
      *
      * @param  TKey  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -260,7 +249,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      *
      * @param  TKey  $offset
      * @param  TValue  $value
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -271,7 +259,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Unset the value at the given offset.
      *
      * @param  TKey  $offset
-     * @return void
      */
     public function offsetUnset($offset): void
     {
