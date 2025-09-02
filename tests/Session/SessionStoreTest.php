@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Session;
 use Illuminate\Cookie\CookieJar;
 use Illuminate\Session\CookieSessionHandler;
 use Illuminate\Session\Store;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
@@ -16,9 +17,18 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::parse(self::getTestDate()));
+    }
+
     protected function tearDown(): void
     {
         m::close();
+
+        Carbon::setTestNow(null);
     }
 
     public function testSessionIsLoadedFromHandler()
@@ -593,6 +603,39 @@ class SessionStoreTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
+    public function testRememberForMethodCallsPutAndReturnsDefault()
+    {
+        $session = $this->getSession();
+        $session->getHandler()->shouldReceive('get')->andReturn(null);
+        $result = $session->rememberFor('foo', function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $session->get('foo')['value']);
+        $this->assertSame('bar', $result);
+    }
+
+    public function testRememberForMethodReturnsPreviousValueIfItAlreadySets()
+    {
+        $session = $this->getSession();
+        $session->put('key', [
+            'value' => 'foo',
+            'expires_at' => Carbon::now()->addMinutes(5),
+        ]);
+        $result = $session->rememberFor('key', Carbon::now()->addMinutes(5), function () {
+            return 'bar';
+        });
+        $this->assertSame('foo', $session->get('key')['value']);
+        $this->assertSame('foo', $result);
+
+        $session = $this->getSession();
+        $session->put('key', 'foo');
+        $result = $session->rememberFor('key', Carbon::now()->addMinutes(5), function () {
+            return 'bar';
+        });
+        $this->assertSame('bar', $session->get('key')['value']);
+        $this->assertSame('bar', $result);
+    }
+
     public function testValidationErrorsCanBeSerializedAsJson()
     {
         $session = $this->getSession('json');
@@ -697,5 +740,10 @@ class SessionStoreTest extends TestCase
     public function getSessionName()
     {
         return 'name';
+    }
+
+    protected static function getTestDate()
+    {
+        return '2030-07-25 12:13:14 UTC';
     }
 }
