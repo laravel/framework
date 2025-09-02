@@ -987,11 +987,12 @@ trait EnumeratesValues
     /**
      * Get the collection of items as pretty print formatted JSON.
      *
+     * @param  int  $options
      * @return string
      */
-    public function toPrettyJson()
+    public function toPrettyJson(int $options = 0)
     {
-        return $this->toJson(JSON_PRETTY_PRINT);
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
     }
 
     /**
