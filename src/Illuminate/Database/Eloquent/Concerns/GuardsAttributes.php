@@ -216,7 +216,7 @@ trait GuardsAttributes
      */
     protected function isGuardableColumn($key)
     {
-        if ($this->hasSetMutator($key) || $this->hasAttributeSetMutator($key)) {
+        if ($this->hasSetMutator($key) || $this->hasAttributeSetMutator($key) || $this->isClassCastable($key)) {
             return true;
         }
 
