@@ -25,42 +25,42 @@ class ConsoleApplicationTest extends TestCase
         parent::setUp();
     }
 
-    public function testArtisanCallUsingCommandName()
+    public function testArtisanCallUsingCommandName(): void
     {
         $this->artisan('foo:bar', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function testArtisanCallUsingCommandNameAliases()
+    public function testArtisanCallUsingCommandNameAliases(): void
     {
         $this->artisan('app:foobar', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function testArtisanCallUsingCommandClass()
+    public function testArtisanCallUsingCommandClass(): void
     {
         $this->artisan(FooCommandStub::class, [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function testArtisanCallUsingCommandNameUsingAsCommandAttribute()
+    public function testArtisanCallUsingCommandNameUsingAsCommandAttribute(): void
     {
         $this->artisan('zonda', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function testArtisanCallUsingCommandNameAliasesUsingAsCommandAttribute()
+    public function testArtisanCallUsingCommandNameAliasesUsingAsCommandAttribute(): void
     {
         $this->artisan('app:zonda', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
-    public function testArtisanCallNow()
+    public function testArtisanCallNow(): void
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
@@ -69,7 +69,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
-    public function testArtisanWithMockCallAfterCallNow()
+    public function testArtisanWithMockCallAfterCallNow(): void
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
@@ -83,7 +83,7 @@ class ConsoleApplicationTest extends TestCase
         $mock->assertExitCode(0);
     }
 
-    public function testArtisanInstantiateScheduleWhenNeed()
+    public function testArtisanInstantiateScheduleWhenNeed(): void
     {
         $this->assertFalse($this->app->resolved(Schedule::class));
 
@@ -96,7 +96,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertTrue($this->app->resolved(Schedule::class));
     }
 
-    public function testArtisanQueue()
+    public function testArtisanQueue(): void
     {
         Queue::fake();
 

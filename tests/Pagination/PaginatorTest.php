@@ -85,7 +85,7 @@ class PaginatorTest extends TestCase
 
     public function testPaginatorToPrettyJson()
     {
-        $p = new Paginator(['item1', 'item2', 'item3'], 3, 1);
+        $p = new Paginator(['item/1', 'item/2', 'item/3'], 3, 1);
         $results = $p->toPrettyJson();
         $expected = $p->toJson(JSON_PRETTY_PRINT);
 
@@ -93,5 +93,11 @@ class PaginatorTest extends TestCase
         $this->assertSame($expected, $results);
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('item\/1', $results);
+
+        $results = $p->toPrettyJson(JSON_UNESCAPED_SLASHES);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('item/1', $results);
     }
 }

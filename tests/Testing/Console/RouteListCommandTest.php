@@ -100,10 +100,9 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
-    #[IgnorePhpunitDeprecations]
     public function testRouteCanBeFilteredByName()
     {
-        // $this->withoutDeprecationHandling();
+        $this->withoutDeprecationHandling();
 
         $this->router->get('/', function () {
             //

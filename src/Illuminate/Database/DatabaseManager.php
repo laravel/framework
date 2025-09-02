@@ -92,9 +92,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function connection($name = null)
     {
-        $name = enum_value($name) ?: $this->getDefaultConnection();
-
-        [$database, $type] = $this->parseConnectionName($name);
+        [$database, $type] = $this->parseConnectionName($name = enum_value($name) ?? $this->getDefaultConnection());
 
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
@@ -141,7 +139,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Get a database connection instance from the given configuration.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @param  array  $config
      * @param  bool  $force
      * @return \Illuminate\Database\ConnectionInterface
@@ -149,7 +147,7 @@ class DatabaseManager implements ConnectionResolverInterface
     public function connectUsing(string $name, array $config, bool $force = false)
     {
         if ($force) {
-            $this->purge($name);
+            $this->purge($name = enum_value($name));
         }
 
         if (isset($this->connections[$name])) {
@@ -173,8 +171,6 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function parseConnectionName($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
-
         return Str::endsWith($name, ['::read', '::write'])
             ? explode('::', $name, 2)
             : [$name, null];
@@ -217,8 +213,6 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function configuration($name)
     {
-        $name = $name ?: $this->getDefaultConnection();
-
         $connections = $this->app['config']['database.connections'];
 
         $config = $this->dynamicConnectionConfigurations[$name] ?? Arr::get($connections, $name);
@@ -299,14 +293,12 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database and remove from local cache.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function purge($name = null)
     {
-        $name = $name ?: $this->getDefaultConnection();
-
-        $this->disconnect($name);
+        $this->disconnect($name = enum_value($name) ?? $this->getDefaultConnection());
 
         unset($this->connections[$name]);
     }
@@ -314,12 +306,12 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Disconnect from the given database.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return void
      */
     public function disconnect($name = null)
     {
-        if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
+        if (isset($this->connections[$name = enum_value($name) ?? $this->getDefaultConnection()])) {
             $this->connections[$name]->disconnect();
         }
     }
@@ -327,12 +319,12 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Reconnect to the given database.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Database\Connection
      */
     public function reconnect($name = null)
     {
-        $this->disconnect($name = $name ?: $this->getDefaultConnection());
+        $this->disconnect($name = enum_value($name) ?? $this->getDefaultConnection());
 
         if (! isset($this->connections[$name])) {
             return $this->connection($name);
@@ -344,7 +336,7 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Set the default database connection for the callback execution.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @param  callable  $callback
      * @return mixed
      */
@@ -352,7 +344,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $previousName = $this->getDefaultConnection();
 
-        $this->setDefaultConnection($name);
+        $this->setDefaultConnection($name = enum_value($name));
 
         try {
             return $callback();
