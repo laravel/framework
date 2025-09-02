@@ -1533,13 +1533,7 @@ class PendingRequest
             return true;
         }
 
-        foreach ($this->allowedStrayRequestUrls as $pattern) {
-            if (Str::is($pattern, $url)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->allowedStrayRequestUrls, fn ($pattern) => Str::is($pattern, $url));
     }
 
     /**

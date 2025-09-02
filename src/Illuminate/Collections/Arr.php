@@ -533,21 +533,11 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (! $array) {
+        if (! $array || $keys === []) {
             return false;
         }
 
-        if ($keys === []) {
-            return false;
-        }
-
-        foreach ($keys as $key) {
-            if (static::has($array, $key)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($keys, fn ($key) => static::has($array, $key));
     }
 
     /**

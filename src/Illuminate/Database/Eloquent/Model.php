@@ -477,13 +477,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return true;
         }
 
-        foreach (static::$ignoreOnTouch as $ignoredClass) {
-            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(static::$ignoreOnTouch, function ($ignoredClass) use ($class) {
+            return $class === $ignoredClass || is_subclass_of($class, $ignoredClass);
+        });
     }
 
     /**

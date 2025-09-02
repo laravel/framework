@@ -221,12 +221,8 @@ trait HasTimestamps
     {
         $class ??= static::class;
 
-        foreach (static::$ignoreTimestampsOn as $ignoredClass) {
-            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(static::$ignoreTimestampsOn, function ($ignoredClass) use ($class) {
+            return $class === $ignoredClass || is_subclass_of($class, $ignoredClass);
+        });
     }
 }

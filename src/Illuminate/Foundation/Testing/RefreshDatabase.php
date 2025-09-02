@@ -34,13 +34,7 @@ trait RefreshDatabase
      */
     protected function usingInMemoryDatabases()
     {
-        foreach ($this->connectionsToTransact() as $name) {
-            if ($this->usingInMemoryDatabase($name)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->connectionsToTransact(), fn ($name) => $this->usingInMemoryDatabase($name));
     }
 
     /**

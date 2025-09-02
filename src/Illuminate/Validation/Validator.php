@@ -523,14 +523,9 @@ class Validator implements ValidatorContract
      */
     protected function shouldBeExcluded($attribute)
     {
-        foreach ($this->excludeAttributes as $excludeAttribute) {
-            if ($attribute === $excludeAttribute ||
-                Str::startsWith($attribute, $excludeAttribute.'.')) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->excludeAttributes, function ($excludeAttribute) use ($attribute) {
+            return $attribute === $excludeAttribute || Str::startsWith($attribute, $excludeAttribute.'.');
+        });
     }
 
     /**

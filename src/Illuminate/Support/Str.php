@@ -401,15 +401,11 @@ class Str
 
         if (! is_iterable($needles)) {
             $needles = (array) $needles;
+        } elseif (! is_array($needles)) {
+            $needles = Arr::from($needles);
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_ends_with($haystack, $needle));
     }
 
     /**
@@ -1637,15 +1633,11 @@ class Str
 
         if (! is_iterable($needles)) {
             $needles = [$needles];
+        } elseif (! is_array($needles)) {
+            $needles = Arr::from($needles);
         }
 
-        foreach ($needles as $needle) {
-            if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($needles, fn ($needle) => (string) $needle !== '' && str_starts_with($haystack, $needle));
     }
 
     /**
