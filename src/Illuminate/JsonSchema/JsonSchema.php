@@ -17,10 +17,8 @@ class JsonSchema
 {
     /**
      * Dynamically pass static methods to the schema instance.
-     *
-     * @return Type
      */
-    public static function __callStatic(string $name, mixed $arguments)
+    public static function __callStatic(string $name, mixed $arguments): Type
     {
         return (new JsonSchemaTypeFactory)->$name(...$arguments);
     }
