@@ -1055,7 +1055,7 @@ class Blueprint
      * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function float($column, $precision = 53)
+    public function float($column, $precision = null)
     {
         $precision ??= Builder::$defaultFloatPrecision;
 

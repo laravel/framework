@@ -744,6 +744,19 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" float(5) not null', $statements[0]);
+
+        Builder::$defaultFloatPrecision = 10;
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->float('foo');
+        $statements = $blueprint->toSql();
+
+        try {
+            $this->assertCount(1, $statements);
+            $this->assertSame('alter table "users" add column "foo" float(10) not null', $statements[0]);
+        } finally {
+            Builder::$defaultFloatPrecision = 53;
+        }
     }
 
     public function testAddingDouble()
@@ -764,6 +777,21 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add column "foo" decimal(5, 2) not null', $statements[0]);
+
+        Builder::$defaultDecimalTotal = 19;
+        Builder::$defaultDecimalPlaces = 4;
+
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->decimal('foo');
+        $statements = $blueprint->toSql();
+
+        try {
+            $this->assertCount(1, $statements);
+            $this->assertSame('alter table "users" add column "foo" decimal(19, 4) not null', $statements[0]);
+        } finally {
+            Builder::$defaultDecimalTotal = 8;
+            Builder::$defaultDecimalPlaces = 2;
+        }
     }
 
     public function testAddingBoolean()
