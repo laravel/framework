@@ -14,11 +14,6 @@ use stdClass;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');

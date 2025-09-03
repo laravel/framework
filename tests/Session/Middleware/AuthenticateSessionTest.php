@@ -13,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class AuthenticateSessionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     public function test_handle_without_session()
     {
         $request = new Request;

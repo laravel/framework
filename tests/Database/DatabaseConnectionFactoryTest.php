@@ -41,11 +41,6 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->setAsGlobal();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testConnectionCanBeCreated()
     {
         $this->assertInstanceOf(PDO::class, $this->db->getConnection()->getPdo());

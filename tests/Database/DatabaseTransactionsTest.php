@@ -56,8 +56,6 @@ class DatabaseTransactionsTest extends TestCase
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
         }
-
-        m::close();
     }
 
     public function testTransactionIsRecordedAndCommitted()

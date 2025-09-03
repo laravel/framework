@@ -271,7 +271,5 @@ class PruneCommandTest extends TestCase
         parent::tearDown();
 
         Application::setInstance(null);
-
-        m::close();
     }
 }

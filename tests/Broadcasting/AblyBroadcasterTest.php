@@ -30,8 +30,6 @@ class AblyBroadcasterTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-
-        m::close();
     }
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()

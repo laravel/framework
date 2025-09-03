@@ -11,11 +11,6 @@ use SessionHandlerInterface;
 
 class EncryptedSessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSessionIsProperlyEncrypted()
     {
         $session = $this->getSession();

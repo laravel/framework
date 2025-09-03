@@ -105,7 +105,5 @@ class TestDatabasesTest extends TestCase
         DB::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
-
-        m::close();
     }
 }

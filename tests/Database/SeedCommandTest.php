@@ -138,8 +138,6 @@ class SeedCommandTest extends TestCase
         SeedCommand::prohibit(false);
 
         Model::unsetEventDispatcher();
-
-        m::close();
     }
 }
 

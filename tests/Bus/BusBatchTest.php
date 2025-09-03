@@ -77,8 +77,6 @@ class BusBatchTest extends TestCase
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');
-
-        m::close();
     }
 
     public function test_jobs_can_be_added_to_the_batch()

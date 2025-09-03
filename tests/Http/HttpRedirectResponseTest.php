@@ -15,11 +15,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHeaderOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');

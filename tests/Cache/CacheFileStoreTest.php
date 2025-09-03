@@ -129,7 +129,6 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
         $result = $store->put('foo', 'baz', 10);
         $this->assertTrue($result);
-        m::close();
     }
 
     public function testStoreItemDirectoryProperlySetsPermissions()
@@ -154,7 +153,6 @@ class CacheFileStoreTest extends TestCase
 
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);
-        m::close();
     }
 
     public function testForeversAreStoredWithHighTimestamp()

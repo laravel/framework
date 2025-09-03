@@ -47,7 +47,6 @@ class ValidationValidatorTest extends TestCase
         parent::tearDown();
 
         Carbon::setTestNow(null);
-        m::close();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()

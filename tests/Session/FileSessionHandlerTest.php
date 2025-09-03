@@ -25,11 +25,6 @@ class FileSessionHandlerTest extends TestCase
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);
     }
 
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     public function test_open()
     {
         $this->assertTrue($this->sessionHandler->open('/path/to/sessions', 'session_name'));

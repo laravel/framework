@@ -19,11 +19,6 @@ use Throwable;
 
 class ConsoleApplicationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);

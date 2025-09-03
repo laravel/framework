@@ -15,11 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;

@@ -24,8 +24,6 @@ class FoundationFormRequestTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $this->mocks = [];
     }
 

@@ -24,7 +24,6 @@ class DatabaseEloquentHasManyCreateOrFirstTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
-        Mockery::close();
     }
 
     public function testCreateOrFirstMethodCreatesNewRecord(): void

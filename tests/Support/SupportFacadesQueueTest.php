@@ -32,8 +32,6 @@ class SupportFacadesQueueTest extends TestCase
     {
         Queue::clearResolvedInstances();
         Queue::setFacadeApplication(null);
-
-        m::close();
     }
 
     public function testFakeFor()

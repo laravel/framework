@@ -12,11 +12,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testAlert()
     {
         $output = new BufferedOutput();

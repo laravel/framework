@@ -14,11 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoRedis()
     {
         $uuid = Str::uuid();

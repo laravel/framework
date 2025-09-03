@@ -11,11 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class EventsDispatcherTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicEventExecution()
     {
         unset($_SERVER['__event.test']);

@@ -16,11 +16,6 @@ use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     #[DataProvider('pushJobsDataProvider')]
     public function testPushProperlyPushesJobOntoDatabase($uuid, $job, $displayNameStartsWith, $jobStartsWith)
     {

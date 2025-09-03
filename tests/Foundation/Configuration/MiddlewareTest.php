@@ -25,8 +25,6 @@ class MiddlewareTest extends TestCase
     {
         parent::tearDown();
 
-        Mockery::close();
-
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();

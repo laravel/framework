@@ -30,8 +30,6 @@ abstract class AbstractBladeTestCase extends TestCase
         Component::forgetComponentsResolver();
         Component::forgetFactory();
 
-        m::close();
-
         parent::tearDown();
     }
 

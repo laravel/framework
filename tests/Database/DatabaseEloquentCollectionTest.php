@@ -63,7 +63,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('comments');
-        m::close();
     }
 
     public function testAddingItemsToCollection()
