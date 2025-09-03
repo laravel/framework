@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.27.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.27.1...12.x)
+
+## [v12.27.1](https://github.com/laravel/framework/compare/v12.27.0...v12.27.1) - 2025-09-02
+
+* [12.x] Allow a wider range of `brick/math` versions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56891
+* [12.x] Fix secure_url() breaking changes by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56885
 
 ## [v12.27.0](https://github.com/laravel/framework/compare/v12.26.4...v12.27.0) - 2025-09-02
 
