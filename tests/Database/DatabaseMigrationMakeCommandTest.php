@@ -66,6 +66,22 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'CreateFoo']);
     }
 
+    public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsKebabCase()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()
+            ->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'foo', true)
+            ->andReturn(__DIR__.'/migrations/2025_09_03_110457_create_foo.php');
+
+        $this->runCommand($command, ['name' => 'create-foo']);
+    }
+
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
         $command = new MigrateMakeCommand(
