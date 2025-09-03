@@ -847,6 +847,10 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     protected function concatPathToUrl($url, $path)
     {
+        if (empty($url) || empty($path)) {
+            return $url ?: $path;
+        }
+
         return rtrim($url, '/').'/'.ltrim($path, '/');
     }
 
