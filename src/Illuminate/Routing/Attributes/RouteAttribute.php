@@ -5,7 +5,7 @@ namespace Illuminate\Routing\Attributes;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-abstract class RouteAttribute
+class RouteAttribute
 {
     /**
      * @param  string  $path
