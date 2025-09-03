@@ -2,6 +2,8 @@
 
 namespace Illuminate\JsonSchema;
 
+use RuntimeException;
+
 class Serializer
 {
     /**
@@ -28,7 +30,7 @@ class Serializer
             Types\StringType::class => 'string',
             Types\BooleanType::class => 'boolean',
             Types\ArrayType::class => 'array',
-            default => throw new \RuntimeException('Unsupported ['.get_class($type).'] type.'),
+            default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
         };
 
         $attributes = array_filter($attributes, static function (mixed $value, string $key) {
