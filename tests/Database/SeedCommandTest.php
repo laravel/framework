@@ -10,6 +10,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelTimestamps;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Events\NullDispatcher;
@@ -104,6 +105,48 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
+    public function testWithoutModelTimestamps()
+    {
+        $input = new ArrayInput([
+            '--force' => true,
+            '--database' => 'sqlite',
+            '--class' => UserWithoutModelTimestampsSeeder::class,
+        ]);
+        $output = new NullOutput;
+        $outputStyle = new OutputStyle($input, $output);
+
+        $instance = new UserWithoutModelTimestampsSeeder();
+
+        $seeder = m::mock($instance);
+        $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
+        $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
+
+        $resolver = m::mock(ConnectionResolverInterface::class);
+        $resolver->shouldReceive('getDefaultConnection')->once();
+        $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
+
+        $container = m::mock(Container::class);
+        $container->shouldReceive('call');
+        $container->shouldReceive('environment')->once()->andReturn('testing');
+        $container->shouldReceive('runningUnitTests')->andReturn('true');
+        $container->shouldReceive('make')->with(UserWithoutModelTimestampsSeeder::class)->andReturn($seeder);
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
+            $outputStyle
+        );
+        $container->shouldReceive('make')->with(Factory::class, m::any())->andReturn(
+            new Factory($outputStyle)
+        );
+
+        $command = new SeedCommand($resolver);
+        $command->setLaravel($container);
+
+        // call run to set up IO, then fire manually.
+        $command->run($input, $output);
+        $command->handle();
+
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
+    }
+
     public function testProhibitable()
     {
         $input = new ArrayInput([]);
@@ -150,5 +193,15 @@ class UserWithoutModelEventsSeeder extends Seeder
     public function run()
     {
         Assert::assertInstanceOf(NullDispatcher::class, Model::getEventDispatcher());
+    }
+}
+
+class UserWithoutModelTimestampsSeeder extends Seeder
+{
+    use WithoutModelTimestamps;
+
+    public function run()
+    {
+        Assert::assertTrue(Model::isIgnoringTimestamps());
     }
 }

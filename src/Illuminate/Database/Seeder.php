@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelTimestamps;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
@@ -192,6 +193,10 @@ abstract class Seeder
 
         if (isset($uses[WithoutModelEvents::class])) {
             $callback = $this->withoutModelEvents($callback);
+        }
+
+        if (isset($uses[WithoutModelTimestamps::class])) {
+            $callback = $this->withoutModelTimestamps($callback);
         }
 
         return $callback();
