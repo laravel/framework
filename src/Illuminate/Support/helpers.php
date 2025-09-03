@@ -170,10 +170,10 @@ if (! function_exists('filled')) {
 
 if (! function_exists('fluent')) {
     /**
-    * Create a Fluent object from the given value.
-    *
-    * @param  null|object|iterable  $value
-    */
+     * Create a Fluent object from the given value.
+     *
+     * @param  null|object|iterable  $value
+     */
     function fluent($value = null): Fluent
     {
       return new Fluent($value ?? []);
