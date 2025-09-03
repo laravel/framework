@@ -73,7 +73,7 @@ class Serializer
     /**
      * Determine if the given type is required.
      */
-    private static function isRequired(Types\Type $type): bool
+    protected static function isRequired(Types\Type $type): bool
     {
         $attributes = (fn () => get_object_vars($type))->call($type);
 
