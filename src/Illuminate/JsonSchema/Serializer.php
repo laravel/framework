@@ -44,7 +44,6 @@ class Serializer
             if (count($attributes['properties']) === 0) {
                 unset($attributes['properties']);
             } else {
-
                 $required = array_keys(array_filter(
                     // @phpstan-ignore-next-line
                     $attributes['properties'],
