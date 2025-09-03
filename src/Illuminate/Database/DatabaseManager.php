@@ -92,7 +92,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function connection($name = null)
     {
-        [$database, $type] = $this->parseConnectionName($name = enum_value($name) ?? $this->getDefaultConnection());
+        [$database, $type] = $this->parseConnectionName($name = enum_value($name) ?: $this->getDefaultConnection());
 
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
@@ -298,7 +298,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function purge($name = null)
     {
-        $this->disconnect($name = enum_value($name) ?? $this->getDefaultConnection());
+        $this->disconnect($name = enum_value($name) ?: $this->getDefaultConnection());
 
         unset($this->connections[$name]);
     }
@@ -311,7 +311,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function disconnect($name = null)
     {
-        if (isset($this->connections[$name = enum_value($name) ?? $this->getDefaultConnection()])) {
+        if (isset($this->connections[$name = enum_value($name) ?: $this->getDefaultConnection()])) {
             $this->connections[$name]->disconnect();
         }
     }
@@ -324,7 +324,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function reconnect($name = null)
     {
-        $this->disconnect($name = enum_value($name) ?? $this->getDefaultConnection());
+        $this->disconnect($name = enum_value($name) ?: $this->getDefaultConnection());
 
         if (! isset($this->connections[$name])) {
             return $this->connection($name);
