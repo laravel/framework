@@ -1,6 +1,28 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.27.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.28.0...12.x)
+
+## [v12.28.0](https://github.com/laravel/framework/compare/v12.27.1...v12.28.0) - 2025-09-03
+
+* [11.x] Correct how base options for missing config files are preloaded by [@u01jmg3](https://github.com/u01jmg3) in https://github.com/laravel/framework/pull/56216
+* [11.x] backport #56235 by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/56236
+* [11.x] Consistent use of `mb_split()` to split strings into words by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56617
+* [11.x] `CacheSchedulingMutex` should use lock connection by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56614
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56630
+* [11.x] Update `orchestra/testbench-core` deps by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56636
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56649
+* [11.x] Fix exception page not preparing SQL bindings by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56651
+* [11.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56849
+* [11.x] Chore: Decouple Str::random() from Validator by [@michaeldyrynda](https://github.com/michaeldyrynda) in https://github.com/laravel/framework/pull/56852
+* [11.x] Allow a wider range of `brick/math` versions by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/56890
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56894
+* [12.x] Switch back to ternaries in `DatabaseManager` to allow for empty named connections by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56906
+* [12.x] Update config/database.php to match the latest skeleton configuration by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56905
+* Update fluent() helper by [@tanthammar](https://github.com/tanthammar) in https://github.com/laravel/framework/pull/56900
+* [12.x] Add method to retrieve the command on InvokedProcess by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/56886
+* [12.x] provide a default slot name when compiling by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56883
+* [12.x] Allow enums on model connection property and methods by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/56896
+* [12.x] Adds internal class by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/framework/pull/56903
 
 ## [v12.27.1](https://github.com/laravel/framework/compare/v12.27.0...v12.27.1) - 2025-09-02
 
