@@ -99,7 +99,7 @@ return [
             'search_path' => 'public',
             'sslmode' => env('PGSQL_SSL_MODE', 'prefer'),
             'sslcert' => env('PGSQL_SSL_CERT'),
-            'sslkey'  => env('PGSQL_SSL_KEY'),
+            'sslkey' => env('PGSQL_SSL_KEY'),
             'sslrootcert' => env('PGSQL_SSL_ROOT_CERT'),
         ],
 
