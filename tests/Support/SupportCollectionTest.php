@@ -805,6 +805,9 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([1, 5, 1, 5, 5, 1]);
         $this->assertEquals([1 => 3, 5 => 3], $c->countBy()->all());
+
+        $c = new $collection([StaffEnum::James, StaffEnum::Joe, StaffEnum::Taylor]);
+        $this->assertEquals(['James' => 1, 'Joe' => 1, 'Taylor' => 1], $c->countBy()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -815,6 +818,12 @@ class SupportCollectionTest extends TestCase
             ['key' => 'b'], ['key' => 'b'], ['key' => 'b'],
         ]);
         $this->assertEquals(['a' => 4, 'b' => 3], $c->countBy('key')->all());
+
+        $c = new $collection([
+            ['key' => TestBackedEnum::A],
+            ['key' => TestBackedEnum::B], ['key' => TestBackedEnum::B],
+        ]);
+        $this->assertEquals([1 => 1, 2 => 2], $c->countBy('key')->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -829,6 +838,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([true => 2, false => 3], $c->countBy(function ($i) {
             return $i % 2 === 0;
         })->all());
+
+        $c = new $collection(['A', 'A', 'B', 'A']);
+        $this->assertEquals(['A' => 3, 'B' => 1], $c->countBy(static fn ($i) => TestStringBackedEnum::from($i))->all());
     }
 
     public function testAdd()
@@ -3310,6 +3322,22 @@ class SupportCollectionTest extends TestCase
 
         $result = $data->groupBy('name');
         $this->assertEquals(['Laravel' => [$payload[0], $payload[1]], 'Framework' => [$payload[2]]], $result->toArray());
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupByAttributeWithEnumKey($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => TestEnum::A, 'url' => '1'],
+            ['name' => TestBackedEnum::A, 'url' => '1'],
+            ['name' => TestStringBackedEnum::A, 'url' => '2'],
+        ]);
+
+        $result = $data->groupBy('name');
+        $this->assertEquals(['A' => [$payload[0], $payload[2]], '1' => [$payload[1]]], $result->toArray());
 
         $result = $data->groupBy('url');
         $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());

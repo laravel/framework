@@ -28,6 +28,13 @@ trait Queueable
     public $queue;
 
     /**
+     * The job "group" the job should be sent to.
+     *
+     * @var string|null
+     */
+    public $group;
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
@@ -98,6 +105,21 @@ trait Queueable
     public function onQueue($queue)
     {
         $this->queue = enum_value($queue);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired job "group".
+     *
+     * This feature is only supported by some queues, such as Amazon SQS.
+     *
+     * @param  \UnitEnum|string  $group
+     * @return $this
+     */
+    public function onGroup($group)
+    {
+        $this->group = enum_value($group);
 
         return $this;
     }

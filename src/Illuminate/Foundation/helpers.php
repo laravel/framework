@@ -890,8 +890,9 @@ if (! function_exists('secure_url')) {
      *
      * @param  string  $path
      * @param  mixed  $parameters
+     * @return string
      */
-    function secure_url($path, $parameters = []): string
+    function secure_url($path, $parameters = [])
     {
         return url($path, $parameters, true);
     }
@@ -941,8 +942,9 @@ if (! function_exists('to_action')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
      */
-    function to_action($action, $parameters = [], $status = 302, $headers = []): RedirectResponse
+    function to_action($action, $parameters = [], $status = 302, $headers = [])
     {
         return redirect()->action($action, $parameters, $status, $headers);
     }
@@ -956,8 +958,9 @@ if (! function_exists('to_route')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
      */
-    function to_route($route, $parameters = [], $status = 302, $headers = []): RedirectResponse
+    function to_route($route, $parameters = [], $status = 302, $headers = [])
     {
         return redirect()->route($route, $parameters, $status, $headers);
     }

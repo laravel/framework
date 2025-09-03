@@ -3,13 +3,12 @@
 namespace Illuminate\Database\Concerns;
 
 use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
 /**
- * @mixin Connection
+ * @mixin \Illuminate\Database\Connection
  */
 trait ManagesTransactions
 {

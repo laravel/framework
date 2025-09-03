@@ -629,11 +629,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Get the plural form of an English word.
      *
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return static
      */
-    public function plural($count = 2)
+    public function plural($count = 2, $prependCount = false)
     {
-        return new static(Str::plural($this->value, $count));
+        return new static(Str::plural($this->value, $count, $prependCount));
     }
 
     /**

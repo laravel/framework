@@ -261,6 +261,7 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
+        $container->add('baz', '123');
         $results = $container->toPrettyJson();
         $expected = $container->toJson(JSON_PRETTY_PRINT);
 
@@ -268,6 +269,13 @@ class SupportMessageBagTest extends TestCase
         $this->assertSame($expected, $results);
         $this->assertStringContainsString("\n", $results);
         $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"123"', $results);
+
+        $results = $container->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('123', $results);
+        $this->assertStringNotContainsString('"123"', $results);
     }
 
     public function testCountReturnsCorrectValue()
