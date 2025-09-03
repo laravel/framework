@@ -22,7 +22,6 @@ class JsonSchema implements Rule
 
     /**
      * Create a new JSON schema validation rule.
-     *
      */
     public function __construct(Schema $schema)
     {
