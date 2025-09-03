@@ -810,7 +810,7 @@ class Blueprint
      */
     public function char($column, $length = null)
     {
-        $length = ! is_null($length) ? $length : Builder::$defaultStringLength;
+        $length ??= Builder::$defaultStringLength;
 
         return $this->addColumn('char', $column, compact('length'));
     }
@@ -824,7 +824,7 @@ class Blueprint
      */
     public function string($column, $length = null)
     {
-        $length = $length ?: Builder::$defaultStringLength;
+        $length ??= Builder::$defaultStringLength;
 
         return $this->addColumn('string', $column, compact('length'));
     }
@@ -1052,11 +1052,13 @@ class Blueprint
      * Create a new float column on the table.
      *
      * @param  string  $column
-     * @param  int  $precision
+     * @param  int|null  $precision
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function float($column, $precision = 53)
     {
+        $precision ??= Builder::$defaultFloatPrecision;
+
         return $this->addColumn('float', $column, compact('precision'));
     }
 
@@ -1075,12 +1077,15 @@ class Blueprint
      * Create a new decimal column on the table.
      *
      * @param  string  $column
-     * @param  int  $total
-     * @param  int  $places
+     * @param  int|null  $total
+     * @param  int|null  $places
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function decimal($column, $total = 8, $places = 2)
+    public function decimal($column, $total = null, $places = null)
     {
+        $total ??= Builder::$defaultDecimalTotal;
+        $places ??= Builder::$defaultDecimalPlaces;
+
         return $this->addColumn('decimal', $column, compact('total', 'places'));
     }
 

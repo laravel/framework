@@ -54,6 +54,21 @@ class Builder
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * The default decimal total for migrations.
+     */
+    public static ?int $defaultDecimalTotal = 8;
+
+    /**
+     * The default decimal places for migrations.
+     */
+    public static ?int $defaultDecimalPlaces = 2;
+
+    /**
+     * The default float precision for migrations.
+     */
+    public static ?int $defaultFloatPrecision = 53;
+
+    /**
      * Create a new database Schema manager.
      *
      * @param  \Illuminate\Database\Connection  $connection
