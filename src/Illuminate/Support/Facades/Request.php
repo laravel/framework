@@ -92,7 +92,7 @@ namespace Illuminate\Support\Facades;
  * @method static string getRealMethod()
  * @method static string|null getMimeType(string $format)
  * @method static string[] getMimeTypes(string $format)
- * @method static string|null getFormat(string|null $mimeType, bool $subtypeFallback = false)
+ * @method static string|null getFormat(string|null $mimeType, bool $subtypeFallback = null)
  * @method static void setFormat(string|null $format, string|string[] $mimeTypes)
  * @method static string|null getRequestFormat(string|null $default = 'html')
  * @method static void setRequestFormat(string|null $format)
