@@ -40,15 +40,12 @@ class Serializer
         }, ARRAY_FILTER_USE_BOTH);
 
         if ($type instanceof Types\ObjectType) {
-            // @phpstan-ignore-next-line
             if (count($attributes['properties']) === 0) {
                 unset($attributes['properties']);
             } else {
 
                 $required = array_keys(array_filter(
-                    // @phpstan-ignore-next-line
                     $attributes['properties'],
-                    // @phpstan-ignore-next-line
                     static fn (Types\Type $property) => static::isRequired($property),
                 ));
 
@@ -57,9 +54,7 @@ class Serializer
                 }
 
                 $attributes['properties'] = array_map(
-                    // @phpstan-ignore-next-line
                     static fn (Types\Type $property) => Serializer::serialize($property),
-                    // @phpstan-ignore-next-line
                     $attributes['properties'],
                 );
             }

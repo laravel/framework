@@ -22,7 +22,6 @@ class JsonSchema
      */
     public static function __callStatic(string $name, mixed $arguments)
     {
-        // @phpstan-ignore-next-line
         return (new JsonSchemaTypeFactory)->$name(...$arguments);
     }
 }
