@@ -24,12 +24,12 @@ class Serializer
         $attributes = (fn () => get_object_vars($type))->call($type);
 
         $attributes['type'] = match (get_class($type)) {
-            Types\ObjectType::class => 'object',
+            Types\ArrayType::class => 'array',
+            Types\BooleanType::class => 'boolean',
             Types\IntegerType::class => 'integer',
             Types\NumberType::class => 'number',
+            Types\ObjectType::class => 'object',
             Types\StringType::class => 'string',
-            Types\BooleanType::class => 'boolean',
-            Types\ArrayType::class => 'array',
             default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
         };
 
@@ -55,7 +55,7 @@ class Serializer
                 }
 
                 $attributes['properties'] = array_map(
-                    static fn (Types\Type $property) => Serializer::serialize($property),
+                    static fn (Types\Type $property) => static::serialize($property),
                     $attributes['properties'],
                 );
             }
@@ -63,7 +63,7 @@ class Serializer
 
         if ($type instanceof Types\ArrayType) {
             if (isset($attributes['items']) && $attributes['items'] instanceof Types\Type) {
-                $attributes['items'] = Serializer::serialize($attributes['items']);
+                $attributes['items'] = static::serialize($attributes['items']);
             }
         }
 

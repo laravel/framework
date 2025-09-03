@@ -21,6 +21,22 @@ class JsonSchemaTypeFactory extends JsonSchema
     }
 
     /**
+     * Create a new array property instance.
+     */
+    public function array(): Types\ArrayType
+    {
+        return new Types\ArrayType;
+    }
+
+    /**
+     * Create a new string property instance.
+     */
+    public function string(): Types\StringType
+    {
+        return new Types\StringType;
+    }
+
+    /**
      * Create a new integer property instance.
      */
     public function integer(): Types\IntegerType
@@ -37,26 +53,10 @@ class JsonSchemaTypeFactory extends JsonSchema
     }
 
     /**
-     * Create a new string property instance.
-     */
-    public function string(): Types\StringType
-    {
-        return new Types\StringType;
-    }
-
-    /**
      * Create a new boolean property instance.
      */
     public function boolean(): Types\BooleanType
     {
         return new Types\BooleanType;
-    }
-
-    /**
-     * Create a new array property instance.
-     */
-    public function array(): Types\ArrayType
-    {
-        return new Types\ArrayType;
     }
 }

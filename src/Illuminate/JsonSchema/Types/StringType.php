@@ -15,12 +15,12 @@ class StringType extends Type
     protected ?int $maxLength = null;
 
     /**
-     * A regular expression a string instance must match.
+     * A regular expression the value must match.
      */
     protected ?string $pattern = null;
 
     /**
-     * Sets the minimum length (inclusive).
+     * Set the minimum length (inclusive).
      */
     public function min(int $value): static
     {
@@ -30,7 +30,7 @@ class StringType extends Type
     }
 
     /**
-     * Sets the maximum length (inclusive).
+     * Set the maximum length (inclusive).
      */
     public function max(int $value): static
     {
@@ -40,7 +40,7 @@ class StringType extends Type
     }
 
     /**
-     * Sets the pattern the value must satisfy.
+     * Set the pattern the value must satisfy.
      */
     public function pattern(string $value): static
     {
@@ -50,7 +50,7 @@ class StringType extends Type
     }
 
     /**
-     * Sets the type's default value.
+     * Set the type's default value.
      */
     public function default(string $value): static
     {

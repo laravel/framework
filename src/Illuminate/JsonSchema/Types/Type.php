@@ -35,7 +35,7 @@ abstract class Type extends JsonSchema
     protected ?array $enum = null;
 
     /**
-     * Marks the type as required.
+     * Indicate that the type is required.
      */
     public function required(): static
     {
@@ -45,7 +45,7 @@ abstract class Type extends JsonSchema
     }
 
     /**
-     * Sets the type's title.
+     * Set the type's title.
      */
     public function title(string $value): static
     {
@@ -55,7 +55,7 @@ abstract class Type extends JsonSchema
     }
 
     /**
-     * Sets the type's description.
+     * Set the type's description.
      */
     public function description(string $value): static
     {
@@ -71,7 +71,7 @@ abstract class Type extends JsonSchema
      */
     public function enum(array $values): static
     {
-        // Keep order and allow complex values (arrays/objects) without forcing uniqueness
+        // Keep order and allow complex values (arrays/objects) without forcing uniqueness...
         $this->enum = array_values($values);
 
         return $this;

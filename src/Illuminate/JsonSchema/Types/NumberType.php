@@ -15,7 +15,7 @@ class NumberType extends Type
     protected int|float|null $maximum = null;
 
     /**
-     * Sets the minimum value (inclusive).
+     * Set the minimum value (inclusive).
      */
     public function min(int|float $value): static
     {
@@ -25,7 +25,7 @@ class NumberType extends Type
     }
 
     /**
-     * Sets the maximum value (inclusive).
+     * Set the maximum value (inclusive).
      */
     public function max(int|float $value): static
     {
@@ -35,7 +35,7 @@ class NumberType extends Type
     }
 
     /**
-     * Sets the type's default value.
+     * Set the type's default value.
      */
     public function default(int|float $value): static
     {

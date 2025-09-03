@@ -30,7 +30,7 @@ class ObjectType extends Type
     }
 
     /**
-     * Sets the type's default value.
+     * Set the type's default value.
      *
      * @param  array<string, mixed>  $value
      */

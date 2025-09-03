@@ -20,7 +20,7 @@ class ArrayType extends Type
     protected ?Type $items = null;
 
     /**
-     * Sets the minimum number of items (inclusive).
+     * Set the minimum number of items (inclusive).
      */
     public function min(int $value): static
     {
@@ -30,7 +30,7 @@ class ArrayType extends Type
     }
 
     /**
-     * Sets the maximum number of items (inclusive).
+     * Set the maximum number of items (inclusive).
      */
     public function max(int $value): static
     {
@@ -40,7 +40,7 @@ class ArrayType extends Type
     }
 
     /**
-     * Sets the schema for array items.
+     * Set the schema for array items.
      */
     public function items(Type $type): static
     {
@@ -50,7 +50,7 @@ class ArrayType extends Type
     }
 
     /**
-     * Sets the type's default value.
+     * Set the type's default value.
      *
      * @param  array<int, mixed>  $value
      */
