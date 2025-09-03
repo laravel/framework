@@ -47,7 +47,7 @@ class ThrottleRequests
      * @param  string  $name
      * @return string
      */
-    public static function using($name)
+    public static function using($name): string
     {
         return static::class.':'.$name;
     }
@@ -62,7 +62,7 @@ class ThrottleRequests
      *
      * @named-arguments-supported
      */
-    public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    public static function with($maxAttempts = 60, $decayMinutes = 1, $prefix = ''): string
     {
         return static::class.':'.implode(',', func_get_args());
     }
@@ -179,7 +179,7 @@ class ThrottleRequests
      *
      * @throws \Illuminate\Routing\Exceptions\MissingRateLimiterException
      */
-    protected function resolveMaxAttempts($request, $maxAttempts)
+    protected function resolveMaxAttempts($request, $maxAttempts): int
     {
         if (str_contains($maxAttempts, '|')) {
             $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
@@ -209,7 +209,7 @@ class ThrottleRequests
      *
      * @throws \RuntimeException
      */
-    protected function resolveRequestSignature($request)
+    protected function resolveRequestSignature($request): string
     {
         if ($user = $request->user()) {
             return $this->formatIdentifier($user->getAuthIdentifier());
