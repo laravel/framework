@@ -436,6 +436,7 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
             'numbers' => $this->numbers,
             'symbols' => $this->symbols,
             'uncompromised' => $this->uncompromised,
+            'different' => $this->different,
             'compromisedThreshold' => $this->compromisedThreshold,
             'customRules' => $this->customRules,
         ];
