@@ -34,6 +34,28 @@ class RouteCollectionTest extends TestCase
         $this->assertCount(1, $this->routeCollection);
     }
 
+    public function testRouteCanBeRemoved()
+    {
+        $route = new Route('GET', 'foo', [
+            'uses' => 'FooController@index',
+            'as' => 'foo_index',
+            'controller' => 'FooController@index',
+        ]);
+
+        $this->routeCollection->add($route);
+        $this->assertCount(1, $this->routeCollection);
+        $this->assertSame($route, $this->routeCollection->getByName('foo_index'));
+        $this->assertSame($route, $this->routeCollection->getRoutes()[0]);
+        $this->assertSame($route, $this->routeCollection->getByAction('FooController@index'));
+
+        $this->routeCollection->remove($route);
+
+        $this->assertCount(0, $this->routeCollection);
+        $this->assertNull($this->routeCollection->getByName('foo_index'));
+        $this->assertEmpty($this->routeCollection->getRoutes());
+        $this->assertNull($this->routeCollection->getByAction('FooController@index'));
+    }
+
     public function testRouteCollectionAddReturnsTheRoute()
     {
         $outputRoute = $this->routeCollection->add($inputRoute = new Route('GET', 'foo', [
