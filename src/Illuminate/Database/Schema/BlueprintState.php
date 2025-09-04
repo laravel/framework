@@ -53,6 +53,13 @@ class BlueprintState
     private $foreignKeys;
 
     /**
+     * The check constraints.
+     *
+     * @var \Illuminate\Support\Fluent[]
+     */
+    private $checkConstraints;
+
+    /**
      * Create a new blueprint state instance.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -103,6 +110,11 @@ class BlueprintState
             'onUpdate' => $foreignKey['on_update'],
             'onDelete' => $foreignKey['on_delete'],
         ]))->all();
+
+        $this->checkConstraints = (new Collection($schema->getCheckConstraints($table)))->map(fn ($constraint) => new Fluent([
+            'constraint' => $constraint['name'],
+            'expression' => new Expression(Str::unwrap($constraint['definition'], '(', ')')),
+        ]))->all();
     }
 
     /**
@@ -143,6 +155,16 @@ class BlueprintState
     public function getForeignKeys()
     {
         return $this->foreignKeys;
+    }
+
+    /**
+     * Get the check constraints.
+     *
+     * @return \Illuminate\Support\Fluent[]
+     */
+    public function getCheckConstraints()
+    {
+        return $this->checkConstraints;
     }
 
     /*
@@ -224,6 +246,10 @@ class BlueprintState
                 $this->foreignKeys[] = $command;
                 break;
 
+            case 'check':
+                $this->checkConstraints[] = $command;
+                break;
+
             case 'dropPrimary':
                 $this->primaryKey = null;
                 break;
@@ -239,6 +265,13 @@ class BlueprintState
             case 'dropForeign':
                 $this->foreignKeys = array_values(
                     array_filter($this->foreignKeys, fn ($fk) => $fk->columns !== $command->columns)
+                );
+
+                break;
+
+            case 'dropCheck':
+                $this->checkConstraints = array_values(
+                    array_filter($this->checkConstraints, fn ($constraint) => $constraint->constraint !== $command->constraint)
                 );
 
                 break;

@@ -33,7 +33,7 @@ class SQLiteGrammar extends Grammar
      */
     public function getAlterCommands()
     {
-        $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign'];
+        $alterCommands = ['change', 'primary', 'dropPrimary', 'foreign', 'dropForeign', 'check', 'dropCheck'];
 
         if (version_compare($this->connection->getServerVersion(), '3.35', '<')) {
             $alterCommands[] = 'dropColumn';
@@ -230,12 +230,13 @@ class SQLiteGrammar extends Grammar
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('%s table %s (%s%s%s)',
+        return sprintf('%s table %s (%s%s%s%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
             $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
-            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
+            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary')),
+            $this->addCheckConstraints($this->getCommandsByName($blueprint, 'check')),
         );
     }
 
@@ -300,6 +301,21 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Get the check constraint syntax for a table creation statement.
+     *
+     * @param  \Illuminate\Support\Fluent[]  $constraints
+     * @return string|null
+     */
+    protected function addCheckConstraints($constraints)
+    {
+        return (new Collection($constraints))->reduce(fn ($sql, $constraint) => $sql.sprintf(
+            ',%s check (%s)',
+            $constraint->constraint ? ' constraint '.$this->wrap($constraint->constraint) : '',
+            $this->getValue($constraint->expression)
+        ), '');
+    }
+
+    /**
      * Compile alter table commands for adding columns.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -358,11 +374,12 @@ class SQLiteGrammar extends Grammar
 
         return array_filter(array_merge([
             $foreignKeyConstraintsEnabled ? $this->compileDisableForeignKeyConstraints() : null,
-            sprintf('create table %s (%s%s%s)',
+            sprintf('create table %s (%s%s%s%s)',
                 $tempTable,
                 implode(', ', $columns),
                 $this->addForeignKeys($blueprint->getState()->getForeignKeys()),
-                $autoIncrementColumn ? '' : $this->addPrimaryKeys($blueprint->getState()->getPrimaryKey())
+                $autoIncrementColumn ? '' : $this->addPrimaryKeys($blueprint->getState()->getPrimaryKey()),
+                $this->addCheckConstraints($blueprint->getState()->getCheckConstraints())
             ),
             sprintf('insert into %s (%s) select %s from %s', $tempTable, $columnNames, $columnNames, $table),
             sprintf('drop table %s', $table),
@@ -448,6 +465,18 @@ class SQLiteGrammar extends Grammar
      * @return string|null
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
+    {
+        // Handled on table creation or alteration...
+    }
+
+    /**
+     * Compile a check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileCheck(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation or alteration...
     }
@@ -605,6 +634,18 @@ class SQLiteGrammar extends Grammar
             throw new RuntimeException('This database driver does not support dropping foreign keys by name.');
         }
 
+        // Handled on table alteration...
+    }
+
+    /**
+     * Compile a drop check constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileDropCheck(Blueprint $blueprint, Fluent $command)
+    {
         // Handled on table alteration...
     }
 
@@ -870,11 +911,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf(
-            'varchar check ("%s" in (%s))',
-            $column->name,
-            $this->quoteString($column->allowed)
-        );
+        return 'varchar';
     }
 
     /**

@@ -760,11 +760,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf(
-            'nvarchar(255) check ("%s" in (%s))',
-            $column->name,
-            $this->quoteString($column->allowed)
-        );
+        return 'nvarchar(255)';
     }
 
     /**
