@@ -96,4 +96,28 @@ class SQLiteProcessor extends Processor
             ];
         }, $results);
     }
+
+    /**
+     * Process the results of a check constraints query.
+     *
+     * @param  list<array<string, mixed>>  $results
+     * @param  string  $sql
+     * @param  list<string>  $columns
+     * @return list<array{name: string|null, columns: list<string>, definition: string}>
+     */
+    public function processCheckConstraints($results, ?string $sql = '', array $columns = [])
+    {
+        preg_match_all(
+            '/(?:constraint\s+"?([^"\s]+)"?)?\s+check\s*(\((?:[^()]+|\((?:[^()]+|\([^()]*\))*\))*\))/i',
+            $sql ?? '',
+            $matches,
+            PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL
+        );
+
+        return array_map(fn (array $match) => [
+            'name' => $match[1],
+            'columns' => array_values(array_filter($columns, fn (string $column) => str_contains($match[2], $column))),
+            'definition' => $match[2],
+        ], $matches);
+    }
 }

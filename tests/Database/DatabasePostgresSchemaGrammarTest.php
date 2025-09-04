@@ -783,9 +783,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(2, $statements);
-        $this->assertSame('alter table "users" add column "role" varchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
-        $this->assertSame('alter table "users" add column "status" varchar(255) check ("status" in (\'bar\')) not null', $statements[1]);
+        $this->assertCount(4, $statements);
+        $this->assertSame('alter table "users" add column "role" varchar(255) not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "status" varchar(255) not null', $statements[1]);
+        $this->assertSame('alter table "users" add constraint "users_role_check" check ("role" in (\'member\', \'admin\'))', $statements[2]);
+        $this->assertSame('alter table "users" add constraint "users_status_check" check ("status" in (\'bar\'))', $statements[3]);
     }
 
     public function testAddingDate()
