@@ -26,6 +26,13 @@ class Limit
     public $decaySeconds;
 
     /**
+     * Whether to only record a hit after a successful response.
+     *
+     * @var bool
+     */
+    public $onSuccess = false;
+
+    /**
      * The response generator callback.
      *
      * @var callable
@@ -125,6 +132,19 @@ class Limit
     public function by($key)
     {
         $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * Set whether to only record a hit after a successful response.
+     *
+     * @param  bool  $onSuccess
+     * @return $this
+     */
+    public function onSuccess(bool $onSuccess = true)
+    {
+        $this->onSuccess = $onSuccess;
 
         return $this;
     }
