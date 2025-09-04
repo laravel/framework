@@ -7,8 +7,10 @@
     x-data="{ expanded: false }"
     @expand-button-clicked="expanded = $event.detail.expanded"
 >
-    <div class="flex h-11 cursor-pointer items-center gap-2.5 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2">
+    <div class="flex h-11 cursor-pointer items-center gap-3 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2">
         {{-- Folder --}}
+        <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
+        <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-emerald-500" x-show="expanded" />
 
         <div class="flex-1 font-mono text-xs leading-3 text-neutral-600 dark:text-neutral-400">
             {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
