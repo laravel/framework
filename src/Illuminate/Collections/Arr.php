@@ -442,7 +442,7 @@ class Arr
         }
 
         if (static::exists($array, $key)) {
-            return $array[$key]; 
+            return $array[$key];
         }
 
         if (! str_contains($key, '.')) {
