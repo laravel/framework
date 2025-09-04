@@ -1645,13 +1645,11 @@ trait ValidatesAttributes
      */
     public function validateJsonSchema($attribute, $value, $parameters): bool
     {
-        if (! isset($parameters[0]) || ! $parameters[0] instanceof Type) {
+        if (! ($parameters[0] ?? null) instanceof Type) {
             throw new InvalidArgumentException('The json_schema rule requires a JsonSchema Type instance.');
         }
 
-        $rule = new JsonSchemaRule($parameters[0]);
-
-        return $rule->passes($attribute, $value);
+        return (new JsonSchemaRule($parameters[0]))->passes($attribute, $value);
     }
 
     /**
