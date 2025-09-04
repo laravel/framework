@@ -137,4 +137,27 @@ class DatabaseSchemaBuilderTest extends TestCase
 
         $this->assertTrue(collect($columns)->contains(fn ($column) => $column['name'] === 'item_id' && $column['nullable']));
     }
+
+    public function testGetCheckConstraints()
+    {
+        DB::statement(<<<SQL
+            CREATE TABLE products (
+                id INT PRIMARY KEY,
+                status VARCHAR(255) CHECK ("status" in ('pending', 'processing', 'shipped', 'delivered')),
+                product_name VARCHAR(255) CHECK (LENGTH(product_name) > 0),
+                price DECIMAL(8,2) CONSTRAINT positive_price CHECK (price > 0),
+                discount_percent INT CHECK (discount_percent >= 0 AND discount_percent <= 100),
+                CONSTRAINT price_discount_check CHECK (price * (1 - discount_percent/100.0) > 0)
+            )
+        SQL);
+
+        $constraints = Schema::getCheckConstraints('products');
+
+        $this->assertCount(5, $constraints);
+        $this->assertContains(['name' => null, 'columns' => ['status'], 'definition' => "(\"status\" in ('pending', 'processing', 'shipped', 'delivered'))"], $constraints);
+        $this->assertContains(['name' => null, 'columns' => ['product_name'], 'definition' => '(LENGTH(product_name) > 0)'], $constraints);
+        $this->assertContains(['name' => 'positive_price', 'columns' => ['price'], 'definition' => '(price > 0)'], $constraints);
+        $this->assertContains(['name' => null, 'columns' => ['discount_percent'], 'definition' => '(discount_percent >= 0 AND discount_percent <= 100)'], $constraints);
+        $this->assertContains(['name' => 'price_discount_check', 'columns' => ['price', 'discount_percent'], 'definition' => '(price * (1 - discount_percent/100.0) > 0)'], $constraints);
+    }
 }

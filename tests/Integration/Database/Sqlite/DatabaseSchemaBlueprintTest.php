@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Database\Sqlite;
 
 use Closure;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -507,6 +508,57 @@ class DatabaseSchemaBlueprintTest extends TestCase
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign('something');
         });
+    }
+
+    public function testAddCheckConstraintWorks()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function ($table) {
+                $table->create();
+                $table->string('c1')->check('c1 > 10');
+                $table->check('c1 > 20');
+                $table->check('c1 > 30', 'foo');
+                $table->check(new Expression('c1 > 40'));
+                $table->check(new Expression('c1 > 50'), 'foo');
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'create table "users" ("c1" varchar not null, '
+            .'check (c1 > 20), '
+            .'constraint "foo" check (c1 > 30), '
+            .'check (c1 > 40), '
+            .'constraint "foo" check (c1 > 50), '
+            .'constraint "users_c1_check" check (c1 > 10))',
+        ], $getSql('SQLite'));
+
+        DB::connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('e1');
+            $table->check('e1 > 10', 'foo');
+        });
+
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function ($table) {
+                $table->enum('e2', ['v3', 'v4']);
+                $table->integer('c1')->check('c1 > 10');
+                $table->dropCheck('foo');
+                $table->enum('e1', ['v1', 'v2'])->change();
+                $table->check(new Expression('c1 > 20'), 'foo');
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table "users" add column "e2" varchar not null',
+            'alter table "users" add column "c1" integer not null',
+            'create table "__temp__users" ("e1" varchar not null, "e2" varchar not null, "c1" integer not null, '
+                .'constraint "foo" check (c1 > 20), '
+                .'constraint "users_e2_check" check ("e2" in (\'v3\', \'v4\')), '
+                .'constraint "users_c1_check" check (c1 > 10), '
+                .'constraint "users_e1_check" check ("e1" in (\'v1\', \'v2\')))',
+            'insert into "__temp__users" ("e1", "e2", "c1") select "e1", "e2", "c1" from "users"',
+            'drop table "users"',
+            'alter table "__temp__users" rename to "users"',
+        ], $getSql('SQLite'));
     }
 
     protected function getBlueprint(

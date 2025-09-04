@@ -564,6 +564,84 @@ class SchemaBuilderTest extends DatabaseTestCase
         ));
     }
 
+    public function testTableWithCheckConstraints()
+    {
+        if ($this->driver === 'mysql' && version_compare(DB::getServerVersion(), '8.0.19', '<')) {
+            $this->markTestSkipped('This test requires MySQL >= 8.0.19');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('c1')->check('c1 > 100');
+            $table->integer('c2');
+            $table->enum('c3', ['foo', 'bar', 'baz']);
+            $table->check('c1 > 0 and c2 < 0', 'my_constraint');
+        });
+
+        $constraints = Schema::getCheckConstraints('test');
+
+        $this->assertCount($this->driver === 'mysql' ? 2 : 3, $constraints);
+        $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
+            'mysql' => '(`c1` > 100)',
+            'sqlsrv' => '([c1]>(100))',
+            default => '(c1 > 100)',
+        }], $constraints);
+        $this->assertContains(['name' => 'my_constraint', 'columns' => ['c1', 'c2'], 'definition' => match ($this->driver) {
+            'mysql' => '((`c1` > 0) and (`c2` < 0))',
+            'pgsql' => '(c1 > 0 AND c2 < 0)',
+            'sqlsrv' => '([c1]>(0) AND [c2]<(0))',
+            default => '(c1 > 0 and c2 < 0)',
+        }], $constraints);
+
+        if ($this->driver !== 'mysql') {
+            $this->assertContains(['name' => 'test_c3_check', 'columns' => ['c3'], 'definition' => match ($this->driver) {
+                'pgsql' => "(c3::text = ANY (ARRAY['foo'::character varying, 'bar'::character varying, 'baz'::character varying]::text[]))",
+                'sqlsrv' => "([c3]=N'baz' OR [c3]=N'bar' OR [c3]=N'foo')",
+                default => '("c3" in (\'foo\', \'bar\', \'baz\'))',
+            }], $constraints);
+        }
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->dropCheck('my_constraint');
+            $table->integer('c4')->check('c4 < 100');
+            $table->enum('c2', ['v1', 'v2'])->change();
+            $table->check('c1 > 0 and c4 > 0', 'unsigned_columns');
+        });
+
+        $constraints = Schema::getCheckConstraints('test');
+
+        $this->assertCount($this->driver === 'mysql' ? 3 : 5, $constraints);
+        $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
+            'mysql' => '(`c1` > 100)',
+            'sqlsrv' => '([c1]>(100))',
+            default => '(c1 > 100)',
+        }], $constraints);
+        $this->assertContains(['name' => 'unsigned_columns', 'columns' => ['c1', 'c4'], 'definition' => match ($this->driver) {
+            'mysql' => '((`c1` > 0) and (`c4` > 0))',
+            'pgsql' => '(c1 > 0 AND c4 > 0)',
+            'sqlsrv' => '([c1]>(0) AND [c4]>(0))',
+            default => '(c1 > 0 and c4 > 0)',
+        }], $constraints);
+        $this->assertContains(['name' => 'test_c4_check', 'columns' => ['c4'], 'definition' => match ($this->driver) {
+            'mysql' => '(`c4` < 100)',
+            'sqlsrv' => '([c4]<(100))',
+            default => '(c4 < 100)',
+        }], $constraints);
+
+        if ($this->driver !== 'mysql') {
+            $this->assertContains(['name' => 'test_c3_check', 'columns' => ['c3'], 'definition' => match ($this->driver) {
+                'pgsql' => "(c3::text = ANY (ARRAY['foo'::character varying, 'bar'::character varying, 'baz'::character varying]::text[]))",
+                'sqlsrv' => "([c3]=N'baz' OR [c3]=N'bar' OR [c3]=N'foo')",
+                default => '("c3" in (\'foo\', \'bar\', \'baz\'))',
+            }], $constraints);
+
+            $this->assertContains(['name' => 'test_c2_check', 'columns' => ['c2'], 'definition' => match ($this->driver) {
+                'pgsql' => "(c2::text = ANY (ARRAY['v1'::character varying, 'v2'::character varying]::text[]))",
+                'sqlsrv' => "([c2]=N'v2' OR [c2]=N'v1')",
+                default => '("c2" in (\'v1\', \'v2\'))',
+            }], $constraints);
+        }
+    }
+
     #[RequiresDatabase('mariadb')]
     public function testSystemVersionedTables()
     {

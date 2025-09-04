@@ -565,14 +565,29 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testAddingEnum()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $builder = mock(SQLiteBuilder::class)
+            ->makePartial()
+            ->shouldReceive('getColumns')->andReturn([])
+            ->shouldReceive('getIndexes')->andReturn([])
+            ->shouldReceive('getForeignKeys')->andReturn([])
+            ->shouldReceive('getCheckConstraints')->andReturn([])
+            ->getMock();
+
+        $connection = $this->getConnection(builder: $builder);
+        $connection->shouldReceive('scalar')->with('pragma foreign_keys')->andReturn(false);
+
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->enum('role', ['member', 'admin']);
         $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(2, $statements);
-        $this->assertSame('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
-        $this->assertSame('alter table "users" add column "status" varchar check ("status" in (\'bar\')) not null', $statements[1]);
+        $this->assertCount(6, $statements);
+        $this->assertSame('alter table "users" add column "role" varchar not null', $statements[0]);
+        $this->assertSame('alter table "users" add column "status" varchar not null', $statements[1]);
+        $this->assertSame('create table "__temp__users" ("role" varchar not null, "status" varchar not null, constraint "users_role_check" check ("role" in (\'member\', \'admin\')), constraint "users_status_check" check ("status" in (\'bar\')))', $statements[2]);
+        $this->assertSame('insert into "__temp__users" ("role", "status") select "role", "status" from "users"', $statements[3]);
+        $this->assertSame('drop table "users"', $statements[4]);
+        $this->assertSame('alter table "__temp__users" rename to "users"', $statements[5]);
     }
 
     public function testAddingJson()
@@ -1088,6 +1103,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])
+            ->shouldReceive('getCheckConstraints')->andReturn([])
             ->getMock();
 
         $connection = $this->getConnection(builder: $builder);
@@ -1116,6 +1132,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])
+            ->shouldReceive('getCheckConstraints')->andReturn([])
             ->getMock();
 
         $connection = $this->getConnection(builder: $builder);
@@ -1164,6 +1181,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
             ->shouldReceive('getColumns')->andReturn([])
             ->shouldReceive('getIndexes')->andReturn([])
             ->shouldReceive('getForeignKeys')->andReturn([])
+            ->shouldReceive('getCheckConstraints')->andReturn([])
             ->getMock();
     }
 }

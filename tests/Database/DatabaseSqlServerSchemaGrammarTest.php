@@ -602,9 +602,11 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(2, $statements);
-        $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
-        $this->assertSame('alter table "users" add "status" nvarchar(255) check ("status" in (N\'bar\')) not null', $statements[1]);
+        $this->assertCount(4, $statements);
+        $this->assertSame('alter table "users" add "role" nvarchar(255) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "status" nvarchar(255) not null', $statements[1]);
+        $this->assertSame('alter table "users" add constraint "users_role_check" check ("role" in (N\'member\', N\'admin\'))', $statements[2]);
+        $this->assertSame('alter table "users" add constraint "users_status_check" check ("status" in (N\'bar\'))', $statements[3]);
     }
 
     public function testAddingJson()
