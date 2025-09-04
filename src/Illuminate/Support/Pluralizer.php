@@ -87,6 +87,14 @@ class Pluralizer
      */
     protected static function matchCase($value, $comparison)
     {
+        // Check if the comparison string is all uppercase.
+        // If it is, we apply `ucfirst` to the pluralized value
+        // to ensure it becomes "CDs" instead of "CDS".
+        if ($comparison === mb_strtoupper($comparison)) {
+            return ucfirst(mb_strtolower($value));
+        }
+
+        // The old logic for other cases remains the same.
         $functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
 
         foreach ($functions as $function) {
