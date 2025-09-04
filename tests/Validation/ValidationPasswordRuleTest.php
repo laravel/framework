@@ -413,6 +413,7 @@ class ValidationPasswordRuleTest extends TestCase
             'numbers' => true,
             'symbols' => true,
             'uncompromised' => false,
+            'different' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
         ]);
@@ -427,6 +428,7 @@ class ValidationPasswordRuleTest extends TestCase
             'numbers' => false,
             'symbols' => false,
             'uncompromised' => false,
+            'different' => false,
             'compromisedThreshold' => 0,
             'customRules' => [],
         ]);
