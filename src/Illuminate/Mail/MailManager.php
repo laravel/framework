@@ -427,7 +427,7 @@ class MailManager implements FactoryContract
                 : $this->createSymfonyTransport($config);
         }
 
-        return new $class($transports, $config['retry_after'] ?? 60);
+        return new $class($transports, $config['retry_after'] ?? 60, $this->app->make(LoggerInterface::class));
     }
 
     /**
