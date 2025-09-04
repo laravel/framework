@@ -140,7 +140,7 @@ class DatabaseSchemaBuilderTest extends TestCase
 
     public function testGetCheckConstraints()
     {
-        DB::statement(<<<SQL
+        DB::statement(<<<'SQL'
             CREATE TABLE products (
                 id INT PRIMARY KEY,
                 status VARCHAR(255) CHECK ("status" in ('pending', 'processing', 'shipped', 'delivered')),

@@ -579,20 +579,20 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $constraints = Schema::getCheckConstraints('test');
 
-        $this->assertCount($this->driver === 'mysql' ? 2 : 3, $constraints);
+        $this->assertCount(in_array($this->driver, ['mysql', 'mariadb']) ? 2 : 3, $constraints);
         $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
-            'mysql' => '(`c1` > 100)',
+            'mysql', 'mariadb' => '(`c1` > 100)',
             'sqlsrv' => '([c1]>(100))',
             default => '(c1 > 100)',
         }], $constraints);
         $this->assertContains(['name' => 'my_constraint', 'columns' => ['c1', 'c2'], 'definition' => match ($this->driver) {
-            'mysql' => '((`c1` > 0) and (`c2` < 0))',
+            'mysql', 'mariadb' => '((`c1` > 0) and (`c2` < 0))',
             'pgsql' => '(c1 > 0 AND c2 < 0)',
             'sqlsrv' => '([c1]>(0) AND [c2]<(0))',
             default => '(c1 > 0 and c2 < 0)',
         }], $constraints);
 
-        if ($this->driver !== 'mysql') {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
             $this->assertContains(['name' => 'test_c3_check', 'columns' => ['c3'], 'definition' => match ($this->driver) {
                 'pgsql' => "(c3::text = ANY (ARRAY['foo'::character varying, 'bar'::character varying, 'baz'::character varying]::text[]))",
                 'sqlsrv' => "([c3]=N'baz' OR [c3]=N'bar' OR [c3]=N'foo')",
@@ -609,25 +609,25 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $constraints = Schema::getCheckConstraints('test');
 
-        $this->assertCount($this->driver === 'mysql' ? 3 : 5, $constraints);
+        $this->assertCount(in_array($this->driver, ['mysql', 'mariadb']) ? 3 : 5, $constraints);
         $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
-            'mysql' => '(`c1` > 100)',
+            'mysql', 'mariadb' => '(`c1` > 100)',
             'sqlsrv' => '([c1]>(100))',
             default => '(c1 > 100)',
         }], $constraints);
         $this->assertContains(['name' => 'unsigned_columns', 'columns' => ['c1', 'c4'], 'definition' => match ($this->driver) {
-            'mysql' => '((`c1` > 0) and (`c4` > 0))',
+            'mysql', 'mariadb' => '((`c1` > 0) and (`c4` > 0))',
             'pgsql' => '(c1 > 0 AND c4 > 0)',
             'sqlsrv' => '([c1]>(0) AND [c4]>(0))',
             default => '(c1 > 0 and c4 > 0)',
         }], $constraints);
         $this->assertContains(['name' => 'test_c4_check', 'columns' => ['c4'], 'definition' => match ($this->driver) {
-            'mysql' => '(`c4` < 100)',
+            'mysql', 'mariadb' => '(`c4` < 100)',
             'sqlsrv' => '([c4]<(100))',
             default => '(c4 < 100)',
         }], $constraints);
 
-        if ($this->driver !== 'mysql') {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
             $this->assertContains(['name' => 'test_c3_check', 'columns' => ['c3'], 'definition' => match ($this->driver) {
                 'pgsql' => "(c3::text = ANY (ARRAY['foo'::character varying, 'bar'::character varying, 'baz'::character varying]::text[]))",
                 'sqlsrv' => "([c3]=N'baz' OR [c3]=N'bar' OR [c3]=N'foo')",
