@@ -97,7 +97,7 @@ class JsonSchema implements Rule
         $keyword = $error->keyword();
         $dataPath = implode('.', $error->data()->path() ?? []);
 
-        return  $dataPath !== '' ?
+        return $dataPath !== '' ?
             "Validation failed at '$dataPath': $keyword" :
             "Validation failed: $keyword";
     }
