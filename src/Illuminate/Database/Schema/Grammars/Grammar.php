@@ -7,6 +7,7 @@ use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -313,9 +314,39 @@ abstract class Grammar extends BaseGrammar
      */
     public function compileDropCheck(Blueprint $blueprint, Fluent $command)
     {
-        return sprintf('alter table %s drop constraint %s',
+        if ($command->constraint) {
+            $command->constraints = [$command->constraint];
+            $command->constraint = null;
+
+            return $this->compileDropConstraints($blueprint, $command);
+        }
+
+        $columns = $command->columns;
+        $command->columns = null;
+        sort($columns);
+
+        $command->constraints = (new Collection($this->connection->getSchemaBuilder()->getCheckConstraints($blueprint->getTable())))
+            ->filter(function (array $checkConstraint) use ($columns) {
+                sort($checkConstraint['columns']);
+
+                return $checkConstraint['columns'] === $columns;
+            })->pluck('name')->all();
+
+        return $this->compileDropConstraints($blueprint, $command);
+    }
+
+    /**
+     * Compile a drop constraints command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileDropConstraints(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s %s',
             $this->wrapTable($blueprint),
-            $this->wrap($command->constraint)
+            implode(', ', $this->prefixArray('drop constraint', $this->wrapArray($command->constraints)))
         );
     }
 

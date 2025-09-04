@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
@@ -576,12 +577,12 @@ class Blueprint
     /**
      * Indicate that the given check constraint should be dropped.
      *
-     * @param  string  $name
+     * @param  string|string[]  $nameOrColumns
      * @return \Illuminate\Support\Fluent
      */
-    public function dropCheck(string $name): Fluent
+    public function dropCheck(string|array $nameOrColumns): Fluent
     {
-        return $this->addCommand('dropCheck', ['constraint' => $name]);
+        return $this->addCommand('dropCheck', [(is_array($nameOrColumns) ? 'columns' : 'constraint') => $nameOrColumns]);
     }
 
     /**
@@ -772,12 +773,16 @@ class Blueprint
      * Specify a check constraint for the table.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
-     * @param  string|null  $name
+     * @param  string|string[]|null  $nameOrColumns
      * @return \Illuminate\Support\Fluent
      */
-    public function check(Expression|string $expression, ?string $name = null): Fluent
+    public function check(ExpressionContract|string $expression, string|array|null $nameOrColumns = null): Fluent
     {
-        return $this->addCommand('check', ['expression' => $expression, 'constraint' => $name]);
+        if (is_array($nameOrColumns)) {
+            $nameOrColumns = $this->createIndexName('check', $nameOrColumns);
+        }
+
+        return $this->addCommand('check', ['expression' => $expression, 'constraint' => $nameOrColumns]);
     }
 
     /**

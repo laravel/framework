@@ -647,6 +647,37 @@ class SchemaBuilderTest extends DatabaseTestCase
         }
     }
 
+    public function testDropCheckByColumns()
+    {
+        if ($this->driver === 'mysql' && version_compare(DB::getServerVersion(), '8.0.19', '<')) {
+            $this->markTestSkipped('This test requires MySQL >= 8.0.19');
+        }
+
+        Schema::create('test', function (Blueprint $table) {
+            $table->integer('c1')->check('c1 > 0');
+            $table->integer('c2')->check('c2 > 0');
+            $table->integer('c3')->check('c3 > 0');
+            $table->integer('c4')->check('c4 > 0');
+
+            $table->check('c1 < 100', 'c1_less_than_100');
+            $table->check('c3 < 100 and c2 < 100', ['c3', 'c2']);
+            $table->check('c4 < 100', 'c4_less_than_100');
+        });
+
+        $constraints = Schema::getCheckConstraints('test');
+        $this->assertCount(7, $constraints);
+
+        Schema::table('test', function (Blueprint $table) {
+            $table->dropCheck(['c1']);
+            $table->dropCheck(['c2']);
+            $table->dropCheck(['c3']);
+            $table->dropCheck(['c2', 'c3']);
+        });
+
+        $constraints = Schema::getCheckConstraints('test');
+        $this->assertCount(2, $constraints);
+    }
+
     #[RequiresDatabase('mariadb')]
     public function testSystemVersionedTables()
     {

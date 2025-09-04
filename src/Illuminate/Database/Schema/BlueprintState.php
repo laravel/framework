@@ -113,6 +113,7 @@ class BlueprintState
 
         $this->checkConstraints = (new Collection($schema->getCheckConstraints($table)))->map(fn ($constraint) => new Fluent([
             'constraint' => $constraint['name'],
+            'columns' => $constraint['columns'],
             'expression' => new Expression(Str::unwrap($constraint['definition'], '(', ')')),
         ]))->all();
     }
@@ -214,6 +215,10 @@ class BlueprintState
                     $foreignKey->columns = str_replace($command->from, $command->to, $foreignKey->columns);
                 }
 
+                foreach ($this->checkConstraints as $checkConstraint) {
+                    $checkConstraint->columns = str_replace($command->from, $command->to, $checkConstraint->columns);
+                }
+
                 break;
 
             case 'dropColumn':
@@ -270,8 +275,24 @@ class BlueprintState
                 break;
 
             case 'dropCheck':
+                if ($command->constraint) {
+                    $this->checkConstraints = array_values(
+                        array_filter($this->checkConstraints, fn ($constraint) => $constraint->constraint !== $command->constraint)
+                    );
+
+                    break;
+                }
+
+                $commandColumns = $command->columns;
+                sort($commandColumns);
+
                 $this->checkConstraints = array_values(
-                    array_filter($this->checkConstraints, fn ($constraint) => $constraint->constraint !== $command->constraint)
+                    array_filter($this->checkConstraints, function ($constraint) use ($commandColumns) {
+                        $constraintColumns = $constraint->columns;
+                        sort($constraintColumns);
+
+                        return $constraintColumns !== $commandColumns;
+                    })
                 );
 
                 break;

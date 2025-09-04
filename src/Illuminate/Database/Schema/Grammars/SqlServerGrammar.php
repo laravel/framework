@@ -504,6 +504,21 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a drop constraints command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string|null
+     */
+    public function compileDropConstraints(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s drop constraint %s',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->wrapArray($command->constraints))
+        );
+    }
+
+    /**
      * Compile a rename table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
