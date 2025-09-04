@@ -79,7 +79,7 @@ class RouteCollection extends AbstractRouteCollection
         // If the route has a name, we will add it to the name look-up table, so that we
         // will quickly be able to find the route associated with a name and not have
         // to iterate through every route every time we need to find a named route.
-        if ($name = $route->getName()) {
+        if (($name = $route->getName()) && ! array_key_exists($name, $this->nameList)) {
             $this->nameList[$name] = $route;
         }
 
@@ -88,7 +88,7 @@ class RouteCollection extends AbstractRouteCollection
         // processing a request and easily generate URLs to the given controllers.
         $action = $route->getAction();
 
-        if (isset($action['controller'])) {
+        if (($controller = $action['controller'] ?? null) && ! array_key_exists($controller, $this->actionList)) {
             $this->addToActionList($action, $route);
         }
     }
@@ -117,8 +117,8 @@ class RouteCollection extends AbstractRouteCollection
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
-            if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
+            if (($name = $route->getName()) && ! array_key_exists($name, $this->nameList)) {
+                $this->nameList[$name] = $route;
             }
         }
     }
@@ -135,7 +135,7 @@ class RouteCollection extends AbstractRouteCollection
         $this->actionList = [];
 
         foreach ($this->allRoutes as $route) {
-            if (isset($route->getAction()['controller'])) {
+            if (($controller = $route->getAction()['controller'] ?? null) && ! array_key_exists($controller, $this->actionList)) {
                 $this->addToActionList($route->getAction(), $route);
             }
         }

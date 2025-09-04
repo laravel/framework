@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use ArrayIterator;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Artisan;
 use Orchestra\Testbench\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -92,6 +94,45 @@ class CompiledRouteCollectionTest extends TestCase
 
         $this->assertSame($action, Arr::except($routeIndex->getAction(), 'as'));
         $this->assertSame($action, Arr::except($route->getAction(), 'as'));
+    }
+
+    public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForActions()
+    {
+        @unlink(__DIR__.'/fixtures/cache/routes-v7.php');
+        $this->app->useBootstrapPath(__DIR__.'/fixtures');
+        $app = (static function () {
+            $refresh = true;
+
+            return require __DIR__.'/fixtures/app.php';
+        })();
+        $app['router']->get('/foo/{bar}', ['FooController', 'show']);
+        $app['router']->get('/foo/{bar}/{baz}', ['FooController', 'show']);
+        $app['router']->getRoutes()->refreshActionLookups();
+
+        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
+
+        $this->artisan('route:cache')->assertExitCode(0);
+        require __DIR__.'/fixtures/cache/routes-v7.php';
+
+        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
+
+        unlink(__DIR__.'/fixtures/cache/routes-v7.php');
+    }
+
+    public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForNames()
+    {
+        @unlink(__DIR__.'/fixtures/cache/routes-v7.php');
+        $this->app->useBootstrapPath(__DIR__.'/fixtures');
+        $app = (static function () {
+            $refresh = true;
+
+            return require __DIR__.'/fixtures/app.php';
+        })();
+        $app['router']->get('/foo/{bar}', ['FooController', 'show'])->name('foo.show');
+        $app['router']->get('/foo/{bar}/{baz}', ['FooController', 'show'])->name('foo.show');
+        $app['router']->getRoutes()->refreshNameLookups();
+
+        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByName('foo.show')->uri);
     }
 
     public function testRouteCollectionCanGetIterator()
