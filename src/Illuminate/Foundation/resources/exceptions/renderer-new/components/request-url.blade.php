@@ -15,7 +15,7 @@
     }"
     class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2"
 >
-    <div class="flex items-center gap-3 min-w-0">
+    <div class="flex items-center gap-3 min-w-0 w-full">
         <div class="bg-blue-600 rounded h-[25px] px-2 flex-shrink-0">
             <span class="text-[13px] font-mono">{{ $request->method() }}</span>
         </div>
@@ -36,6 +36,7 @@
             </x-laravel-exceptions-renderer-new::tooltip>
         </div>
         <button
+            x-cloak
             @click="copyToClipboard()"
             class="bg-white/[0.05] rounded-md w-6 h-6 flex flex-shrink-0 items-center justify-center cursor-pointer transition-colors hover:bg-white/10"
         >
