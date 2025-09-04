@@ -20,6 +20,7 @@
         {{ $trigger }}
     </div>
     <div
+        x-cloak
         x-show="open"
         @class([
             'absolute bottom-full w-max px-2 py-1',

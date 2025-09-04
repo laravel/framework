@@ -1,2 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
+[x-cloak] {
+    display: none !important;
+}

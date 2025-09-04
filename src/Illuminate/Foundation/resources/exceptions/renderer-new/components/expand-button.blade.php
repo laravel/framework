@@ -1,6 +1,7 @@
 @props(['expanded' => false])
 
 <button
+    x-cloak
     x-data="{ expanded: {{ $expanded ? 'true' : 'false' }} }"
     type="button"
     class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border dark:border-white/8"
