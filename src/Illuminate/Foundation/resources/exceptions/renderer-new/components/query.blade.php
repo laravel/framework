@@ -78,10 +78,8 @@
 >
     <div class="flex items-center justify-between p-2">
         <div class="flex items-center gap-2.5">
-            <div class="bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
+            <div class="border border-white/5 bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
+                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-emerald-500" />
             </div>
             <h3 class="text-base font-semibold">Queries</h3>
         </div>
@@ -97,9 +95,7 @@
             x-show="Math.floor({{ $index }} / perPage) === (currentPage - 1)"
         >
             <div class="flex items-center gap-2 shrink-0">
-                <svg class="w-3 h-3 text-neutral-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
-                </svg>
+                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500" />
                 <span class="text-neutral-400">{{ $connectionName }}</span>
             </div>
             <div class="min-w-0 flex-1">
