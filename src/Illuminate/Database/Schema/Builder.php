@@ -449,6 +449,25 @@ class Builder
     }
 
     /**
+     * Get the check constraints for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getCheckConstraints($table)
+    {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processCheckConstraints(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileCheckConstraints($schema, $table)
+            )
+        );
+    }
+
+    /**
      * Modify a table on the schema.
      *
      * @param  string  $table

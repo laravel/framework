@@ -197,6 +197,32 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the check constraints.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheckConstraints($schema, $table)
+    {
+        return sprintf(
+            'select cc.name as name, '
+            ."string_agg(col.name, ',') within group (order by col.column_id) as columns, "
+            .'cc.definition as definition '
+            .'from sys.check_constraints as cc '
+            .'join sys.tables as tbl on cc.parent_object_id = tbl.object_id '
+            .'join sys.schemas as scm on tbl.schema_id = scm.schema_id '
+            .'left join sys.columns as col on tbl.object_id = col.object_id '
+            ."where tbl.name = %s and scm.name = %s and cc.definition like concat('%%[[]', col.name, ']%%') "
+            .'group by cc.name, cc.definition',
+            $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'schema_name()',
+        );
+    }
+
+    /**
      * Compile a create table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

@@ -165,6 +165,20 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the query to determine the check constraints.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheckConstraints($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving check constraints.');
+    }
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

@@ -228,6 +228,33 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the check constraints.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheckConstraints($schema, $table)
+    {
+        return sprintf(
+            'select c.conname as name, '
+            ."string_agg(la.attname, ',' order by conseq.ord) as columns, "
+            .'right(pg_get_constraintdef(c.oid, true), -6) as definition '
+            .'from pg_constraint c '
+            .'join pg_class tc on c.conrelid = tc.oid '
+            .'join pg_namespace tn on tn.oid = tc.relnamespace '
+            .'join lateral unnest(c.conkey) with ordinality as conseq(num, ord) on true '
+            .'join pg_attribute la on la.attrelid = c.conrelid and la.attnum = conseq.num '
+            ."where c.contype = 'c' and tc.relname = %s and tn.nspname = %s "
+            .'group by c.conname, c.oid',
+            $this->quoteString($table),
+            $schema ? $this->quoteString($schema) : 'current_schema()'
+        );
+    }
+
+    /**
      * Compile a create table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

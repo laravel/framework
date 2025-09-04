@@ -89,6 +89,22 @@ class SQLiteBuilder extends Builder
         );
     }
 
+    /** @inheritDoc */
+    public function getCheckConstraints($table)
+    {
+        $columns = $this->getColumnListing($table);
+
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processCheckConstraints(
+            [],
+            $this->connection->scalar($this->grammar->compileSqlCreateStatement($schema, $table)),
+            $columns
+        );
+    }
+
     /**
      * Drop all tables from the database.
      *
