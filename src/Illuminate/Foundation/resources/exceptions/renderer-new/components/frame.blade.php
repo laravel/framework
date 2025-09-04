@@ -5,7 +5,7 @@
     x-data="{ expanded: {{ $frame->isMain() ? 'true' : 'false' }} }"
     @expand-button-clicked="expanded = $event.detail.expanded"
 >
-    <div class="flex h-11 items-center gap-2.5 bg-white pr-2.5 pl-4 dark:bg-white/3">
+    <div class="flex h-11 items-center gap-3 bg-white pr-2.5 pl-4 dark:bg-white/3">
         {{-- Dot --}}
         <div class="flex size-3 items-center justify-center flex-shrink-0">
           <div class="size-2 rounded-full bg-neutral-400 dark:bg-neutral-400"></div>
