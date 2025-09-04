@@ -121,18 +121,11 @@ class CompiledRouteCollectionTest extends TestCase
 
     public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForNames()
     {
-        @unlink(__DIR__.'/fixtures/cache/routes-v7.php');
-        $this->app->useBootstrapPath(__DIR__.'/fixtures');
-        $app = (static function () {
-            $refresh = true;
+        $this->router->get('/foo/{bar}', ['FooController', 'show'])->name('foo.show');
+        $this->router->get('/foo/{bar}/{baz}', ['FooController', 'show'])->name('foo.show');
+        $this->router->getRoutes()->refreshNameLookups();
 
-            return require __DIR__.'/fixtures/app.php';
-        })();
-        $app['router']->get('/foo/{bar}', ['FooController', 'show'])->name('foo.show');
-        $app['router']->get('/foo/{bar}/{baz}', ['FooController', 'show'])->name('foo.show');
-        $app['router']->getRoutes()->refreshNameLookups();
-
-        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByName('foo.show')->uri);
+        $this->assertSame('foo/{bar}', $this->router->getRoutes()->getByName('foo.show')->uri);
     }
 
     public function testRouteCollectionCanGetIterator()
