@@ -581,12 +581,14 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertCount(in_array($this->driver, ['mysql', 'mariadb']) ? 2 : 3, $constraints);
         $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
-            'mysql', 'mariadb' => '(`c1` > 100)',
+            'mysql' => '(`c1` > 100)',
+            'mariadb' => '`c1` > 100',
             'sqlsrv' => '([c1]>(100))',
             default => '(c1 > 100)',
         }], $constraints);
         $this->assertContains(['name' => 'my_constraint', 'columns' => ['c1', 'c2'], 'definition' => match ($this->driver) {
-            'mysql', 'mariadb' => '((`c1` > 0) and (`c2` < 0))',
+            'mysql' => '((`c1` > 0) and (`c2` < 0))',
+            'mariadb' => '`c1` > 0 and `c2` < 0',
             'pgsql' => '(c1 > 0 AND c2 < 0)',
             'sqlsrv' => '([c1]>(0) AND [c2]<(0))',
             default => '(c1 > 0 and c2 < 0)',
@@ -611,18 +613,21 @@ class SchemaBuilderTest extends DatabaseTestCase
 
         $this->assertCount(in_array($this->driver, ['mysql', 'mariadb']) ? 3 : 5, $constraints);
         $this->assertContains(['name' => 'test_c1_check', 'columns' => ['c1'], 'definition' => match ($this->driver) {
-            'mysql', 'mariadb' => '(`c1` > 100)',
+            'mysql' => '(`c1` > 100)',
+            'mariadb' => '`c1` > 100',
             'sqlsrv' => '([c1]>(100))',
             default => '(c1 > 100)',
         }], $constraints);
         $this->assertContains(['name' => 'unsigned_columns', 'columns' => ['c1', 'c4'], 'definition' => match ($this->driver) {
-            'mysql', 'mariadb' => '((`c1` > 0) and (`c4` > 0))',
+            'mysql' => '((`c1` > 0) and (`c4` > 0))',
+            'mariadb' => '`c1` > 0 and `c4` > 0',
             'pgsql' => '(c1 > 0 AND c4 > 0)',
             'sqlsrv' => '([c1]>(0) AND [c4]>(0))',
             default => '(c1 > 0 and c4 > 0)',
         }], $constraints);
         $this->assertContains(['name' => 'test_c4_check', 'columns' => ['c4'], 'definition' => match ($this->driver) {
-            'mysql', 'mariadb' => '(`c4` < 100)',
+            'mysql' => '(`c4` < 100)',
+            'mariadb' => '`c4` < 100',
             'sqlsrv' => '([c4]<(100))',
             default => '(c4 < 100)',
         }], $constraints);
