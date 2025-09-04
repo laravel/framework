@@ -154,9 +154,9 @@ class Processor
             $result = (object) $result;
 
             return [
-                'name' => $result->name,
+                'name' => $result->name ?? null,
                 'columns' => explode(',', $result->columns ?? ''),
-                'definition' => $result->definition ?? null,
+                'definition' => $result->definition,
             ];
         }, $results);
     }
