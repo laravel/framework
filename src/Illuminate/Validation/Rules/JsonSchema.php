@@ -5,16 +5,12 @@ namespace Illuminate\Validation\Rules;
 use Exception;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\JsonSchema\JsonSchema as Schema;
+use JsonException;
 use Opis\JsonSchema\Errors\ValidationError;
 use Opis\JsonSchema\Validator;
 
 class JsonSchema implements Rule
 {
-    /**
-     * The JSON schema instance.
-     */
-    protected Schema $schema;
-
     /**
      * The validation error message.
      */
@@ -23,9 +19,8 @@ class JsonSchema implements Rule
     /**
      * Create a new JSON schema validation rule.
      */
-    public function __construct(Schema $schema)
+    public function __construct(protected Schema $schema)
     {
-        $this->schema = $schema;
     }
 
     /**
@@ -41,27 +36,31 @@ class JsonSchema implements Rule
         // Normalize the data to what Opis expects
         $data = $this->normalizeData($value);
 
-        if ($data === null && $this->errorMessage) {
+        if ($data === null && $this->errorMessage !== null) {
             return false;
         }
 
         try {
-            $validator = new Validator;
-            $schemaString = $this->schema->toString();
-            $result = $validator->validate($data, $schemaString);
+            $result = (new Validator)->validate($data, $this->schema->toString());
 
-            if (! $result->isValid()) {
-                $this->errorMessage = $this->formatValidationError($result->error());
-
-                return false;
+            if ($result->isValid()) {
+                return true;
             }
 
-            return true;
+            $this->errorMessage = $this->formatValidationError($result->error());
         } catch (Exception $e) {
             $this->errorMessage = "Schema validation error: {$e->getMessage()}";
-
-            return false;
         }
+
+        return false;
+    }
+
+    /**
+     * Get the validation error message.
+     */
+    public function message(): string
+    {
+        return $this->errorMessage ?? 'The :attribute does not match the required schema.';
     }
 
     /**
@@ -72,46 +71,34 @@ class JsonSchema implements Rule
      */
     protected function normalizeData($value)
     {
-        if (is_string($value)) {
-            $decoded = json_decode($value);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->errorMessage = 'Invalid JSON format: '.json_last_error_msg();
-
-                return null;
-            }
-
-            return $decoded;
-        }
-
         if (is_array($value) || is_object($value)) {
             // Convert to JSON and back to ensure proper object/array structure for Opis
             return json_decode(json_encode($value, JSON_FORCE_OBJECT), false);
         }
 
-        return $value;
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        try {
+            return json_decode($value, false, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $e) {
+            $this->errorMessage = "Invalid JSON format: {$e->getMessage()}";
+
+            return null;
+        }
     }
 
     /**
      * Format the validation error message.
      */
-    protected function formatValidationError(?ValidationError $error): string
+    protected function formatValidationError(ValidationError $error): string
     {
         $keyword = $error->keyword();
         $dataPath = implode('.', $error->data()->path() ?? []);
 
-        if ($dataPath) {
-            return "Validation failed at '{$dataPath}': {$keyword}";
-        }
-
-        return "Validation failed: {$keyword}";
-    }
-
-    /**
-     * Get the validation error message.
-     */
-    public function message(): string
-    {
-        return $this->errorMessage ?? 'The :attribute does not match the required schema.';
+        return  $dataPath !== '' ?
+            "Validation failed at '$dataPath': $keyword" :
+            "Validation failed: $keyword";
     }
 }
