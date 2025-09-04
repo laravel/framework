@@ -143,6 +143,28 @@ class QueryBuilderTest extends DatabaseTestCase
         Schema::drop('accounting');
     }
 
+    public function testIncrementTreatsNullAsZeroWhenEnabled()
+    {
+        Schema::create('accounting', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('wallet')->nullable();
+        });
+
+        DB::table('accounting')->insert([
+            ['wallet' => null],
+        ]);
+
+        // Default: null + 1 => null
+        DB::table('accounting')->increment('wallet');
+        $this->assertNull(DB::table('accounting')->value('wallet'));
+
+        // With treatNullAsZero => COALESCE(wallet, 0) + 1 => 1
+        DB::table('accounting')->increment('wallet', 1, [], true);
+        $this->assertEquals(1, DB::table('accounting')->value('wallet'));
+
+        Schema::drop('accounting');
+    }
+
     public function testSole()
     {
         $expected = ['id' => '1', 'title' => 'Foo Post'];

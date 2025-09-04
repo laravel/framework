@@ -4010,17 +4010,19 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  float|int  $amount
+     * @param  array  $extra
+     * @param  bool  $treatNullAsZero  Whether to treat NULL values as 0 before incrementing.
      * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
-    public function increment($column, $amount = 1, array $extra = [])
+    public function increment($column, $amount = 1, array $extra = [], bool $treatNullAsZero = false)
     {
         if (! is_numeric($amount)) {
             throw new InvalidArgumentException('Non-numeric value passed to increment method.');
         }
 
-        return $this->incrementEach([$column => $amount], $extra);
+        return $this->incrementEach([$column => $amount], $extra, $treatNullAsZero);
     }
 
     /**
@@ -4028,11 +4030,11 @@ class Builder implements BuilderContract
      *
      * @param  array<string, float|int|numeric-string>  $columns
      * @param  array<string, mixed>  $extra
+     * @param  bool  $treatNullAsZero  Whether to treat NULL values as 0 before incrementing.
      * @return int<0, max>
-     *
      * @throws \InvalidArgumentException
      */
-    public function incrementEach(array $columns, array $extra = [])
+    public function incrementEach(array $columns, array $extra = [], bool $treatNullAsZero = false)
     {
         foreach ($columns as $column => $amount) {
             if (! is_numeric($amount)) {
@@ -4041,7 +4043,12 @@ class Builder implements BuilderContract
                 throw new InvalidArgumentException('Non-associative array passed to incrementEach method.');
             }
 
-            $columns[$column] = $this->raw("{$this->grammar->wrap($column)} + $amount");
+            $wrapped = $this->grammar->wrap($column);
+
+            $columns[$column] = $this->raw(
+                $treatNullAsZero ? "COALESCE({$wrapped}, 0) + {$amount}"
+                : "{$wrapped} + {$amount}"
+            );
         }
 
         return $this->update(array_merge($columns, $extra));
