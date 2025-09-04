@@ -446,7 +446,7 @@ class Arr
         }
 
         if (! str_contains($key, '.')) {
-            return $array[$key] ?? value($default);
+            return value($default);
         }
 
         foreach (explode('.', $key) as $segment) {
