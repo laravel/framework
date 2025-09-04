@@ -156,17 +156,39 @@ class ValidationPasswordRuleTest extends TestCase
             'password' => $hashed,
         ]);
 
-        $guard = new class($user) {
+        $guard = new class($user)
+        {
             public $user;
-            public function __construct($user) { $this->user = $user; }
-            public function check() { return $this->user !== null; }
-            public function user() { return $this->user; }
+
+            public function __construct($user)
+            {
+                $this->user = $user;
+            }
+
+            public function check()
+            {
+                return $this->user !== null;
+            }
+
+            public function user()
+            {
+                return $this->user;
+            }
         };
 
-        $auth = new class($guard) {
+        $auth = new class($guard)
+        {
             public $guard;
-            public function __construct($guard) { $this->guard = $guard; }
-            public function guard($name = null) { return $this->guard; }
+
+            public function __construct($guard)
+            {
+                $this->guard = $guard;
+            }
+
+            public function guard($name = null)
+            {
+                return $this->guard;
+            }
         };
 
         Container::getInstance()->instance('auth', $auth);
