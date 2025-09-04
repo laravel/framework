@@ -48,6 +48,15 @@ interface MessageBag extends Arrayable, Countable
     public function first($key = null, $format = null);
 
     /**
+     * Get the first message from the bag for given list of keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $format
+     * @return string
+     */
+    public function firstFrom($keys, $format = null);
+
+    /**
      * Get all of the messages from the bag for a given key.
      *
      * @param  string  $key

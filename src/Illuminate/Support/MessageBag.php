@@ -189,6 +189,26 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     }
 
     /**
+     * Get the first message from the bag for given list of keys.
+     *
+     * @param  array  $keys
+     * @param  string|null  $format
+     * @return string
+     */
+    public function firstFrom($keys, $format = null)
+    {
+        foreach ($keys as $key) {
+            $message = $this->first($key, $format);
+
+            if ($message !== '') {
+                return $message;
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Get all of the messages from the message bag for a given key.
      *
      * @param  string  $key
