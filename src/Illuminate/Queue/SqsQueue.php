@@ -225,10 +225,6 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $messageGroup = $job->messageGroup ?? null;
 
-        if (is_null($messageGroup) && isset($job->group) && is_string($job->group)) {
-            $messageGroup = $job->group;
-        }
-
         $messageGroupId = transform($messageGroup, $transformToString);
 
         $messageDeduplicationId = match (true) {
