@@ -229,6 +229,20 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
+    public function testForbidNonRuleAttributesAddsProhibitedErrors()
+    {
+        $payload = ['name' => 'adam', 'should-not-be-here' => '1'];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestProhibitUnknownStub::class);
+
+        /** @var \Illuminate\Validation\ValidationException $e */
+        $e = $this->catchException(ValidationException::class, function () use ($request) {
+            $request->validateResolved();
+        });
+
+        $this->assertArrayHasKey('should-not-be-here', $e->errors());
+    }
+
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
@@ -493,6 +507,21 @@ class InjectedDependency
 
 class FoundationTestFormRequestWithoutRulesMethod extends FormRequest
 {
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestProhibitUnknownStub extends FormRequest
+{
+    protected $forbidNonRuleAttributes = true;
+
+    public function rules()
+    {
+        return ['name' => 'required'];
+    }
+
     public function authorize()
     {
         return true;
