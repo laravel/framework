@@ -32,7 +32,7 @@ trait Queueable
      *
      * @var string|null
      */
-    public $group;
+    public $messageGroup;
 
     /**
      * The number of seconds before the job should be made available.
@@ -114,12 +114,12 @@ trait Queueable
      *
      * This feature is only supported by some queues, such as Amazon SQS.
      *
-     * @param  \UnitEnum|string  $group
+     * @param  \UnitEnum|string  $messageGroup
      * @return $this
      */
-    public function onGroup($group)
+    public function onGroup($messageGroup)
     {
-        $this->group = enum_value($group);
+        $this->messageGroup = enum_value($messageGroup);
 
         return $this;
     }

@@ -68,12 +68,12 @@ class PendingDispatch
      *
      * This feature is only supported by some queues, such as Amazon SQS.
      *
-     * @param  \UnitEnum|string  $group
+     * @param  \UnitEnum|string  $messageGroup
      * @return $this
      */
-    public function onGroup($group)
+    public function onGroup($messageGroup)
     {
-        $this->job->onGroup($group);
+        $this->job->onGroup($messageGroup);
 
         return $this;
     }

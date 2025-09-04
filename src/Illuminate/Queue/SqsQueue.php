@@ -223,7 +223,13 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $transformToString = fn ($value) => strval($value);
 
-        $messageGroupId = transform($job->group ?? null, $transformToString);
+        $messageGroup = $job->messageGroup ?? null;
+
+        if (is_null($messageGroup) && isset($job->group) && is_string($job->group)) {
+            $messageGroup = $job->group;
+        }
+
+        $messageGroupId = transform($messageGroup, $transformToString);
 
         $messageDeduplicationId = match (true) {
             method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
