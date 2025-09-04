@@ -10,6 +10,7 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
 
 class FormRequest extends Request implements ValidatesWhenResolved
@@ -73,6 +74,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $validator;
 
     /**
+     * When true, any input keys not present in the validation rules will cause a validation error.
+     *
+     * @var bool
+     */
+    protected $forbidNonRuleAttributes = false;
+
+    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -128,6 +136,21 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $validator->setRules(
                 $this->filterPrecognitiveRules($validator->getRulesWithoutPlaceholders())
             );
+        }
+
+        if ($this->forbidNonRuleAttributes) {
+            $validator->after(function ($validator) {
+                if ($validator instanceof \Illuminate\Validation\Validator) {
+                    $dataKeys = array_keys(Arr::dot($validator->attributes()));
+                    $allowedKeys = array_keys($validator->getRules());
+
+                    $unknownKeys = array_diff($dataKeys, $allowedKeys);
+
+                    foreach ($unknownKeys as $attribute) {
+                        $validator->addFailure($attribute, 'prohibited');
+                    }
+                }
+            });
         }
 
         return $validator;
