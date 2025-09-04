@@ -37,9 +37,10 @@ class Pluralizer
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $isAcronym
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $isAcronym = false)
     {
         if (is_countable($count)) {
             $count = count($count);
@@ -47,6 +48,11 @@ class Pluralizer
 
         if ((int) abs($count) === 1 || static::uncountable($value) || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
             return $value;
+        }
+
+        // Maintainer's suggested fix: Handle pluralization for acronyms explicitly.
+        if ($isAcronym && $value === mb_strtoupper($value)) {
+            return ucfirst(mb_strtolower($value));
         }
 
         $plural = static::inflector()->pluralize($value);
@@ -87,14 +93,6 @@ class Pluralizer
      */
     protected static function matchCase($value, $comparison)
     {
-        // Check if the comparison string is all uppercase.
-        // If it is, we apply `ucfirst` to the pluralized value
-        // to ensure it becomes "CDs" instead of "CDS".
-        if ($comparison === mb_strtoupper($comparison)) {
-            return ucfirst(mb_strtolower($value));
-        }
-
-        // The old logic for other cases remains the same.
         $functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
 
         foreach ($functions as $function) {
