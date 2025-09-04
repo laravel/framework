@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Auth\GenericUser;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -141,6 +143,39 @@ class ValidationPasswordRuleTest extends TestCase
             '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
             'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
         ]);
+    }
+
+    public function testDifferent()
+    {
+        Container::getInstance()->instance('hash', new BcryptHasher);
+
+        $hashed = Container::getInstance()->make('hash')->make('old-secret');
+
+        $user = new GenericUser([
+            'id' => 1,
+            'password' => $hashed,
+        ]);
+
+        $guard = new class($user) {
+            public $user;
+            public function __construct($user) { $this->user = $user; }
+            public function check() { return $this->user !== null; }
+            public function user() { return $this->user; }
+        };
+
+        $auth = new class($guard) {
+            public $guard;
+            public function __construct($guard) { $this->guard = $guard; }
+            public function guard($name = null) { return $this->guard; }
+        };
+
+        Container::getInstance()->instance('auth', $auth);
+
+        $this->fails(Password::min(3)->different(), ['old-secret'], [
+            'validation.password.different',
+        ]);
+
+        $this->passes(Password::min(3)->different(), ['new-secret']);
     }
 
     public function testMessagesOrder()

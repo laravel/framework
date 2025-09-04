@@ -80,6 +80,20 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     protected $uncompromised = false;
 
     /**
+     * If the password should not be the same as the current password.
+     *
+     * @var bool
+     */
+    protected $different = false;
+
+    /**
+     * The guard that should be used to retrieve the current password for the user.
+     *
+     * @var string|null
+     */
+    protected $guard = null;
+
+    /**
      * The number of times a password can appear in data leaks before being considered compromised.
      *
      * @var int
@@ -286,6 +300,21 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Makes the password require a different value than the current password of the authenticated user.
+     *
+     * @param  string  $guard
+     * @return $this
+     */
+    public function different($guard = null)
+    {
+        $this->different = true;
+
+        $this->guard = $guard;
+
+        return $this;
+    }
+
+    /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
      * @param  \Closure|string|array  $rules
@@ -338,6 +367,18 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
 
             if ($this->numbers && ! preg_match('/\pN/u', $value)) {
                 $validator->addFailure($attribute, 'password.numbers');
+            }
+
+            if ($this->different) {
+                $auth = Container::getInstance()->make('auth')->guard($this->guard);
+
+                if ($auth->check()) {
+                    $currentPassword = $auth->user()->getAuthPassword();
+
+                    if (Container::getInstance()->make('hash')->check($value, $currentPassword)) {
+                        $validator->addFailure($attribute, 'password.different');
+                    }
+                }
             }
         });
 
