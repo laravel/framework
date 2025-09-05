@@ -278,7 +278,7 @@ class PendingRequest
     public function connection(string $connection)
     {
         return tap($this, function () use ($connection) {
-            $config = config("services.{$connection}") 
+            $config = config("services.{$connection}")
                 ?: throw new \InvalidArgumentException("Connection [{$connection}] is not defined.");
 
             foreach ($config as $key => $value) {

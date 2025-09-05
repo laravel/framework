@@ -58,9 +58,9 @@ class HttpClientTest extends TestCase
         ]);
 
         Http::fake();
-        
+
         $response = Http::connection('github')->get('/user');
-        
+
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.github.com/user' &&
                    $request->hasHeader('Authorization', 'Bearer test-token') &&
