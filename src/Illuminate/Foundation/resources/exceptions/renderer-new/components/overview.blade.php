@@ -15,10 +15,10 @@
         <div class="flex items-center gap-2 h-10">
             <div class="text-sm font-mono text-neutral-400 uppercase">STATUS CODE</div>
             <div class="flex-1 h-3 border-b-2 border-dotted border-white/20"></div>
-            <div class="bg-rose-500 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-1.5">
+            <x-laravel-exceptions-renderer-new::badge type="error" variant="solid">
                 <x-laravel-exceptions-renderer-new::icons.alert class="w-2.5 h-2.5" />
-                <span class="text-[13px] font-mono text-neutral-300">500</span>
-            </div>
+                500
+            </x-laravel-exceptions-renderer-new::badge>
         </div>
         <!-- Method Row -->
         <div class="flex items-center gap-2 h-10">

@@ -19,12 +19,12 @@
                 <span class="text-neutral-300">{{ PHP_VERSION }}</span>
             </div>
         </div>
-        <div class="text-white bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-1.5">
+        <x-laravel-exceptions-renderer-new::badge type="error">
             <x-laravel-exceptions-renderer-new::icons.alert class="w-2.5 h-2.5" />
-            <span class="text-[13px] font-mono">UNHANDLED</span>
-        </div>
-        <div class="text-rose-100 bg-rose-950 border border-rose-900 rounded-md h-6 flex items-center gap-1.5 px-1.5">
-            <span class="text-[13px] font-mono">CODE {{ $exception->code() }}</span>
-        </div>
+            UNHANDLED
+        </x-laravel-exceptions-renderer-new::badge>
+        <x-laravel-exceptions-renderer-new::badge type="error" variant="solid">
+            CODE {{ $exception->code() }}
+        </x-laravel-exceptions-renderer-new::badge>
     </div>
 </div>
