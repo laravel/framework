@@ -51,7 +51,7 @@ trait ManagesFrequencies
      *
      * @param  string  $startTime
      * @param  string  $endTime
-     * @return \Closure
+     * @return (\Closure(): bool)
      */
     private function inTimeInterval($startTime, $endTime)
     {
