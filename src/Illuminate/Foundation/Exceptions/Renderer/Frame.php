@@ -184,7 +184,7 @@ class Frame
         return $this->previous;
     }
 
-     /**
+    /**
      * Mark this frame as the main frame.
      *
      * @return void
