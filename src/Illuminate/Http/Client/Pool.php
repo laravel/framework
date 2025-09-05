@@ -46,6 +46,13 @@ class Pool
     protected $catchCallback = null;
 
     /**
+     * The callback to run if all the requests from the pool succeeded.
+     *
+     * @var \Closure|null
+     */
+    protected $thenCallback = null;
+
+    /**
      * Create a new requests pool.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -139,5 +146,26 @@ class Pool
     public function catchCallback(): ?Closure
     {
         return $this->catchCallback;
+    }
+
+    /**
+     * Register a callback to run after all the requests from the pool succeed.
+     *
+     * @param  Closure  $callback
+     * @return void
+     */
+    public function then(Closure $callback)
+    {
+        $this->thenCallback = $callback;
+    }
+
+    /**
+     * Retrieve the then callback in the pool.
+     *
+     * @return \Closure|null
+     */
+    public function thenCallback(): ?Closure
+    {
+        return $this->thenCallback;
     }
 }

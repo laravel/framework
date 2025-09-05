@@ -3858,6 +3858,63 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['third'], $catchCallbacks['third']);
     }
 
+    public function testPoolThenHookIsCalled(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+        ]);
+
+        $thenCallback = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use (&$thenCallback) {
+            $pool->then(function (array $results) use (&$thenCallback) {
+                $thenCallback = $results;
+            });
+
+            return [
+                $pool->as('first')->get('https://200.com'),
+                $pool->as('second')->get('https://201.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+
+        $this->assertCount(2, $thenCallback);
+        $this->assertArrayHasKey('first', $thenCallback);
+        $this->assertArrayHasKey('second', $thenCallback);
+
+        $this->assertSame($responses['first'], $thenCallback['first']);
+        $this->assertSame($responses['second'], $thenCallback['second']);
+    }
+
+    public function testPoolThenHookIsNotCalled(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $thenCallback = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use (&$thenCallback) {
+            $pool->then(function (array $results) use (&$thenCallback) {
+                $thenCallback = $results;
+            });
+
+            return [
+                $pool->as('first')->get('https://200.com'),
+                $pool->as('second')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(500, $responses['second']->status());
+
+        $this->assertCount(0, $thenCallback);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
