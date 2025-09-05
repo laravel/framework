@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 
+use function Illuminate\Support\enum_value;
+
 class DynamicComponent extends Component
 {
     /**
