@@ -119,9 +119,9 @@
         <!-- First Button -->
         <button
             @click="first()"
+            class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
             :disabled="!hasPrevious"
-            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed'"
-            class="flex items-center justify-center w-8 h-8 rounded-md transition-colors"
+            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
         >
             <x-laravel-exceptions-renderer-new::icons.chevrons-left class="w-3 h-3" />
         </button>
@@ -129,9 +129,9 @@
         <!-- Previous Button -->
         <button
             @click="previous()"
+            class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
+            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasPrevious"
-            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed'"
-            class="flex items-center justify-center w-8 h-8 rounded-md transition-colors"
         >
             <x-laravel-exceptions-renderer-new::icons.chevron-left class="w-3 h-3" />
         </button>
@@ -145,8 +145,8 @@
                 <template x-if="page.type === 'page'">
                     <button
                         @click="goToPage(page.value)"
+                        class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors"
                         :class="currentPage === page.value ? 'bg-blue-600 text-white' : 'text-neutral-300 hover:text-white hover:bg-white/[0.05]'"
-                        class="flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors"
                         x-text="page.value"
                     ></button>
                 </template>
@@ -156,9 +156,9 @@
         <!-- Next Button -->
         <button
             @click="next()"
+            class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
+            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
-            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed'"
-            class="flex items-center justify-center w-8 h-8 rounded-md transition-colors"
         >
             <x-laravel-exceptions-renderer-new::icons.chevron-right class="w-3 h-3" />
         </button>
@@ -166,9 +166,9 @@
         <!-- Last Button -->
         <button
             @click="last()"
+            class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
+            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
-            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed'"
-            class="flex items-center justify-center w-8 h-8 rounded-md transition-colors"
         >
             <x-laravel-exceptions-renderer-new::icons.chevrons-right class="w-3 h-3" />
         </button>
