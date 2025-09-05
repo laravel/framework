@@ -11,6 +11,6 @@
         @endif
     </div>
     <div class="flex-1 min-w-0">
-        <x-laravel-exceptions-renderer-new::file-with-line :file="$frame->file()" :line="$frame->line()" class="text-xs" />
+        <x-laravel-exceptions-renderer-new::file-with-line :$frame class="text-xs" />
     </div>
 </div>
