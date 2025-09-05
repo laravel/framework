@@ -270,6 +270,34 @@ class PendingRequest
     }
 
     /**
+     * Configure the pending request using a named connection configuration.
+     *
+     * @param  string  $connection
+     * @return $this
+     */
+    public function connection(string $connection)
+    {
+        return tap($this, function () use ($connection) {
+            $config = config("services.{$connection}") 
+                ?: throw new \InvalidArgumentException("Connection [{$connection}] is not defined.");
+
+            foreach ($config as $key => $value) {
+                match ($key) {
+                    'base_url' => $this->baseUrl($value),
+                    'timeout' => $this->timeout($value),
+                    'connect_timeout' => $this->connectTimeout($value),
+                    'headers' => $this->withHeaders($value),
+                    'token' => $this->withToken($value),
+                    'basic_auth' => $this->withBasicAuth($value['username'], $value['password']),
+                    'digest_auth' => $this->withDigestAuth($value['username'], $value['password']),
+                    'ntlm_auth' => $this->withNtlmAuth($value['username'], $value['password']),
+                    default => null,
+                };
+            }
+        });
+    }
+
+    /**
      * Attach a raw body to the request.
      *
      * @param  \Psr\Http\Message\StreamInterface|string  $content
