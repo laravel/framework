@@ -890,10 +890,21 @@ class PendingRequest
     {
         $results = [];
 
-        $requests = tap(new Pool($this->factory), $callback)->getRequests();
+        $pool = tap(new Pool($this->factory), $callback);
+        $requests = $pool->getRequests();
+        $progressCallback = $pool->progressCallback();
+        $success = 0;
 
         foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+            $result = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+            $results[$key] = $result;
+
+            if ($result instanceof Response && $result->successful()) {
+                $success++;
+                if ($progressCallback !== null) {
+                    $progressCallback($key, $result);
+                }
+            }
         }
 
         return $results;

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use GuzzleHttp\Utils;
 
 /**
@@ -29,6 +30,13 @@ class Pool
      * @var array<array-key, \Illuminate\Http\Client\PendingRequest>
      */
     protected $pool = [];
+
+    /**
+     * The callback to run after a request from the pool succeeds.
+     *
+     * @var \Closure|null
+     */
+    protected $progressCallback = null;
 
     /**
      * Create a new requests pool.
@@ -82,5 +90,26 @@ class Pool
     public function __call($method, $parameters)
     {
         return $this->pool[] = $this->asyncRequest()->$method(...$parameters);
+    }
+
+    /**
+     * Register a callback to run after a request from the pool succeeds.
+     *
+     * @param  Closure  $callback
+     * @return void
+     */
+    public function progress(Closure $callback)
+    {
+        $this->progressCallback = $callback;
+    }
+
+    /**
+     * Retrieve the progress callback in the pool.
+     *
+     * @return \Closure|null
+     */
+    public function progressCallback(): ?Closure
+    {
+        return $this->progressCallback;
     }
 }

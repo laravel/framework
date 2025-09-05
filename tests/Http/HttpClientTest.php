@@ -3789,6 +3789,41 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(PendingRequest::class, $factory->createPendingRequest());
     }
 
+    public function testPoolProgressHook(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $progressCallbacks = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use (&$progressCallbacks) {
+            $pool->progress(function (int|string $key, Response $response) use (&$progressCallbacks) {
+                $progressCallbacks[$key] = $response;
+            });
+
+            return [
+                $pool->as('first')->get('https://200.com'),
+                $pool->as('second')->get('https://201.com'),
+                $pool->as('third')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+        $this->assertSame(500, $responses['third']->status());
+
+        $this->assertCount(2, $progressCallbacks);
+        $this->assertArrayHasKey('first', $progressCallbacks);
+        $this->assertArrayHasKey('second', $progressCallbacks);
+        $this->assertArrayNotHasKey('third', $progressCallbacks);
+
+        $this->assertSame($responses['first'], $progressCallbacks['first']);
+        $this->assertSame($responses['second'], $progressCallbacks['second']);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
