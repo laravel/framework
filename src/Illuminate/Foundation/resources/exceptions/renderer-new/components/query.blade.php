@@ -99,13 +99,12 @@
                 <span class="text-neutral-400">{{ $connectionName }}</span>
             </div>
             <div class="min-w-0 flex-1">
-                <x-laravel-exceptions-renderer-new::tooltip side="left">
-                    <x-slot:trigger>
-                        <x-laravel-exceptions-renderer-new::syntax-highlight :code="$sql" grammar="sql" truncate />
-                    </x-slot>
-
-                    <span>{{ $sql }}</span>
-                </x-laravel-exceptions-renderer-new::tooltip>
+                <x-laravel-exceptions-renderer-new::syntax-highlight
+                    :code="$sql"
+                    grammar="sql"
+                    truncate
+                    data-tippy-content="{{ $sql }}"
+                />
             </div>
             <div class="text-neutral-200 text-right flex-shrink-0">{{ $time }}ms</div>
         </div>

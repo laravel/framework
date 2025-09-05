@@ -12,22 +12,18 @@
     }
 @endphp
 
-<x-laravel-exceptions-renderer-new::tooltip side="left">
-    <x-slot:trigger>
-        <div
-            {{ $attributes->merge(['class' => 'text-xs font-mono truncate text-violet-500 dark:text-violet-400']) }}
-        >
-            @if($class = $frame->class())
-                {{ $class }}{{--
-                --}}@if($frame->previous()){{--
-                    --}}{{ '->' . $frame->previous()->callable() }}{{--
-                --}}@endif{{--
-                --}}<span class="text-orange-400 dark:text-orange-300 opacity-50">()</span>
-            @else
-                {{ $frame->source() }}
-            @endif
-        </div>
-    </x-slot>
-
-    <span>{{ $source }}</span>
-</x-laravel-exceptions-renderer-new::tooltip>
+<div
+    {{ $attributes->merge(['class' => 'truncate font-mono text-xs text-violet-500 dark:text-violet-400']) }}
+>
+    <span data-tippy-content="{{ $source }}">
+        @if ($class = $frame->class())
+            {{ $class }}{{--
+            --}}@if($frame->previous()){{--
+                --}}{{ '->' . $frame->previous()->callable() }}{{--
+            --}}@endif{{--
+            --}}<span class="text-orange-400 dark:text-orange-300 opacity-50">()</span>
+        @else
+            {{ $frame->source() }}
+        @endif
+    </span>
+</div>
