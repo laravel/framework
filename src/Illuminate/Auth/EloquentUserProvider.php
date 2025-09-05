@@ -105,7 +105,6 @@ class EloquentUserProvider implements UserProvider
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param  array  $credentials
      * @return (\Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model)|null
      */
     public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
@@ -142,7 +141,6 @@ class EloquentUserProvider implements UserProvider
      * Validate a user against the given credentials.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
      * @return bool
      */
     public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
@@ -162,8 +160,6 @@ class EloquentUserProvider implements UserProvider
      * Rehash the user's password if required and supported.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable&\Illuminate\Database\Eloquent\Model  $user
-     * @param  array  $credentials
-     * @param  bool  $force
      * @return void
      */
     public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)

@@ -35,8 +35,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * The name of the guard. Typically "web".
      *
      * Corresponds to guard name in authentication configuration.
-     *
-     * @var string
      */
     public readonly string $name;
 
@@ -255,7 +253,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Log a user into the application without sessions or cookies.
      *
-     * @param  array  $credentials
      * @return bool
      */
     public function once(array $credentials = [])
@@ -295,7 +292,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Validate a user's credentials.
      *
-     * @param  array  $credentials
      * @return bool
      */
     public function validate(array $credentials = [])

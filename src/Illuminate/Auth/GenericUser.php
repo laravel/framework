@@ -15,8 +15,6 @@ class GenericUser implements UserContract
 
     /**
      * Create a new generic User object.
-     *
-     * @param  array  $attributes
      */
     public function __construct(array $attributes)
     {
