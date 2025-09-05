@@ -39,6 +39,13 @@ class Pool
     protected $progressCallback = null;
 
     /**
+     * The callback to run after a request from the pool fails.
+     *
+     * @var \Closure|null
+     */
+    protected $catchCallback = null;
+
+    /**
      * Create a new requests pool.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -111,5 +118,26 @@ class Pool
     public function progressCallback(): ?Closure
     {
         return $this->progressCallback;
+    }
+
+    /**
+     * Register a callback to run after a request from the pool fails.
+     *
+     * @param  Closure  $callback
+     * @return void
+     */
+    public function catch(Closure $callback)
+    {
+        $this->catchCallback = $callback;
+    }
+
+    /**
+     * Retrieve the catch callback in the pool.
+     *
+     * @return \Closure|null
+     */
+    public function catchCallback(): ?Closure
+    {
+        return $this->catchCallback;
     }
 }

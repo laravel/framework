@@ -893,6 +893,7 @@ class PendingRequest
         $pool = tap(new Pool($this->factory), $callback);
         $requests = $pool->getRequests();
         $progressCallback = $pool->progressCallback();
+        $catchCallback = $pool->catchCallback();
         $success = 0;
 
         foreach ($requests as $key => $item) {
@@ -904,6 +905,13 @@ class PendingRequest
                 if ($progressCallback !== null) {
                     $progressCallback($key, $result);
                 }
+            }
+
+            if (
+                (($result instanceof Response && $result->failed()) || $result instanceof RequestException)
+                && $catchCallback !== null
+            ) {
+                $catchCallback($key, $result);
             }
         }
 
