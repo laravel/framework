@@ -3,11 +3,17 @@
 @use('Illuminate\Support\Str')
 
 <div
-    class="group rounded-lg border bg-white dark:border-white/5 dark:bg-white/5"
     x-data="{ expanded: false }"
-    @expand-button-clicked="expanded = $event.detail.expanded"
+    class="group rounded-lg border"
+    :class="{
+        'bg-white dark:border-white/5 dark:bg-white/5': expanded,
+        'border-dashed border-neutral-300 bg-neutral-50 opacity-90 dark:border-white/10 dark:bg-white/1': !expanded,
+    }"
 >
-    <div class="flex h-11 cursor-pointer items-center gap-3 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2">
+    <div
+        class="flex h-11 cursor-pointer items-center gap-3 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2"
+        @click="expanded = !expanded"
+    >
         {{-- Folder --}}
         <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
         <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-emerald-500" x-show="expanded" />
@@ -16,7 +22,18 @@
             {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
         </div>
 
-        <x-laravel-exceptions-renderer-new::expand-button :expanded="false" />
+        <button
+            x-cloak
+            type="button"
+            class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border dark:border-white/8 group-hover:text-emerald-500"
+            :class="{
+                'text-emerald-500 dark:bg-white/5': expanded,
+                'text-neutral-500 dark:bg-white/3': !expanded,
+            }"
+        >
+            <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />
+            <x-laravel-exceptions-renderer-new::icons.chevrons-up-down x-show="!expanded" />
+        </button>
     </div>
 
     <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5" x-show="expanded">

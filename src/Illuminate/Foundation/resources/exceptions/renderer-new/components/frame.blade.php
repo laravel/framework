@@ -1,11 +1,22 @@
 @props(['frame'])
 
 <div
-    class="rounded-lg border dark:border-white/10"
-    x-data="{ expanded: {{ $frame->isMain() ? 'true' : 'false' }} }"
-    @expand-button-clicked="expanded = $event.detail.expanded"
+    x-data="{
+        expanded: {{ $frame->isMain() ? 'true' : 'false' }},
+        hasCode: {{ $frame->snippet() ? 'true' : 'false' }}
+    }"
+    class="group rounded-lg border"
+    :class="expanded ? 'dark:border-white/10' : 'dark:border-white/5'"
 >
-    <div class="flex h-11 items-center gap-3 bg-white pr-2.5 pl-4 dark:bg-white/3">
+    <div
+        class="flex h-11 items-center gap-3 bg-white pr-2.5 pl-4 dark:bg-white/3"
+        :class="{
+            'cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 hover:[&_svg]:stroke-emerald-500': hasCode,
+            'dark:bg-white/5': expanded,
+            'dark:bg-white/3': !expanded
+        }"
+        @click="hasCode && (expanded = !expanded)"
+    >
         {{-- Dot --}}
         <div class="flex size-3 items-center justify-center flex-shrink-0">
           <div class="size-2 rounded-full bg-neutral-400 dark:bg-neutral-400"></div>
@@ -21,7 +32,18 @@
         </div>
 
         <div class="flex-shrink-0">
-            <x-laravel-exceptions-renderer-new::expand-button :expanded="$frame->isMain()" />
+            <button
+                x-cloak
+                type="button"
+                class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border dark:border-white/8 group-hover:text-emerald-500"
+                :class="{
+                    'text-emerald-500 dark:bg-white/5': expanded,
+                    'text-neutral-500 dark:bg-white/3': !expanded,
+                }"
+            >
+                <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />
+                <x-laravel-exceptions-renderer-new::icons.chevrons-up-down x-show="!expanded" />
+            </button>
         </div>
     </div>
 
