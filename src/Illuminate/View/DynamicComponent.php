@@ -38,7 +38,7 @@ class DynamicComponent extends Component
      */
     public function __construct(BackedEnum|string $component)
     {
-        $this->component = $component instanceof BackedEnum ? $component->value : $component;
+        $this->component = (string) enum_value($component);
     }
 
     /**
