@@ -37,9 +37,10 @@ class Pluralizer
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $isAcronym
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $isAcronym = false)
     {
         if (is_countable($count)) {
             $count = count($count);
@@ -49,8 +50,14 @@ class Pluralizer
             return $value;
         }
 
-        $plural = static::inflector()->pluralize($value);
+        // Final fix as per maintainer's suggestion:
+        // Use an optional flag to explicitly handle acronyms.
+        if ($isAcronym) {
+            $acronym = mb_strtoupper($value);
+            return $acronym . (str_ends_with($acronym, 'S') ? '' : 's');
+        }
 
+        $plural = static::inflector()->pluralize($value);
         return static::matchCase($plural, $value);
     }
 
@@ -63,7 +70,6 @@ class Pluralizer
     public static function singular($value)
     {
         $singular = static::inflector()->singularize($value);
-
         return static::matchCase($singular, $value);
     }
 
@@ -88,13 +94,11 @@ class Pluralizer
     protected static function matchCase($value, $comparison)
     {
         $functions = ['mb_strtolower', 'mb_strtoupper', 'ucfirst', 'ucwords'];
-
         foreach ($functions as $function) {
             if ($function($comparison) === $comparison) {
                 return $function($value);
             }
         }
-
         return $value;
     }
 
@@ -108,7 +112,6 @@ class Pluralizer
         if (is_null(static::$inflector)) {
             static::$inflector = InflectorFactory::createForLanguage(static::$language)->build();
         }
-
         return static::$inflector;
     }
 
@@ -121,7 +124,6 @@ class Pluralizer
     public static function useLanguage(string $language)
     {
         static::$language = $language;
-
         static::$inflector = null;
     }
 }
