@@ -895,6 +895,7 @@ class PendingRequest
         $progressCallback = $pool->progressCallback();
         $catchCallback = $pool->catchCallback();
         $thenCallback = $pool->thenCallback();
+        $finallyCallback = $pool->finallyCallback();
         $success = 0;
 
         foreach ($requests as $key => $item) {
@@ -918,6 +919,10 @@ class PendingRequest
 
         if ($success === count($requests) && $thenCallback !== null) {
             $thenCallback($results);
+        }
+
+        if ($finallyCallback !== null) {
+            $finallyCallback($results);
         }
 
         return $results;

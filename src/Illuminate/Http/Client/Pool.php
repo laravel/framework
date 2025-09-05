@@ -53,6 +53,13 @@ class Pool
     protected $thenCallback = null;
 
     /**
+     * The callback to run after all the requests from the pool finish.
+     *
+     * @var \Closure|null
+     */
+    protected $finallyCallback = null;
+
+    /**
      * Create a new requests pool.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -167,5 +174,26 @@ class Pool
     public function thenCallback(): ?Closure
     {
         return $this->thenCallback;
+    }
+
+    /**
+     * Register a callback to run after all the requests from the pool finish.
+     *
+     * @param  Closure  $callback
+     * @return void
+     */
+    public function finally(Closure $callback)
+    {
+        $this->finallyCallback = $callback;
+    }
+
+    /**
+     * Retrieve the finally callback in the pool.
+     *
+     * @return \Closure|null
+     */
+    public function finallyCallback(): ?Closure
+    {
+        return $this->finallyCallback;
     }
 }

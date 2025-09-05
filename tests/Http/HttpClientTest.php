@@ -3915,6 +3915,68 @@ class HttpClientTest extends TestCase
         $this->assertCount(0, $thenCallback);
     }
 
+    public function testPoolFinallyHookIsCalledWithoutErrors(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+        ]);
+
+        $finallyCallback = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use (&$finallyCallback) {
+            $pool->finally(function (array $results) use (&$finallyCallback) {
+                $finallyCallback = $results;
+            });
+
+            return [
+                $pool->as('first')->get('https://200.com'),
+                $pool->as('second')->get('https://201.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+
+        $this->assertCount(2, $finallyCallback);
+        $this->assertArrayHasKey('first', $finallyCallback);
+        $this->assertArrayHasKey('second', $finallyCallback);
+
+        $this->assertSame($responses['first'], $finallyCallback['first']);
+        $this->assertSame($responses['second'], $finallyCallback['second']);
+    }
+
+    public function testPoolFinallyHookIsCalledWithErrors(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $finallyCallback = [];
+
+        $responses = $this->factory->pool(function (Pool $pool) use (&$finallyCallback) {
+            $pool->finally(function (array $results) use (&$finallyCallback) {
+                $finallyCallback = $results;
+            });
+
+            return [
+                $pool->as('first')->get('https://200.com'),
+                $pool->as('second')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(500, $responses['second']->status());
+
+        $this->assertCount(2, $finallyCallback);
+        $this->assertArrayHasKey('first', $finallyCallback);
+        $this->assertArrayHasKey('second', $finallyCallback);
+
+        $this->assertSame($responses['first'], $finallyCallback['first']);
+        $this->assertSame($responses['second'], $finallyCallback['second']);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
