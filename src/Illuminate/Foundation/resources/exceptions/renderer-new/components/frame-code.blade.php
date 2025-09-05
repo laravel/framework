@@ -10,5 +10,6 @@
         :with-gutter="true"
         :starting-line="max(1, $highlightedLine - 5)"
         :highlighted-line="min(5, $highlightedLine - 1)"
+        class="overflow-x-auto"
     />
 </div>

@@ -9,6 +9,7 @@
     "dependencies": {
         "alpinejs": "^3.14.9",
         "tailwindcss": "^4.1.12",
+        "tippy.js": "^6.3.7",
         "tw-animate-css": "^1.3.7"
     },
     "devDependencies": {
