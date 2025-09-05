@@ -2,6 +2,7 @@
 
 namespace Illuminate\View;
 
+use BackedEnum;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -33,11 +34,11 @@ class DynamicComponent extends Component
     /**
      * Create a new component instance.
      *
-     * @param  string  $component
+     * @param  \BackedEnum|string  $component
      */
-    public function __construct(string $component)
+    public function __construct(BackedEnum|string $component)
     {
-        $this->component = $component;
+        $this->component = $component instanceof BackedEnum ? $component->value : $component;
     }
 
     /**
