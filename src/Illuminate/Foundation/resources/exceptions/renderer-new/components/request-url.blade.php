@@ -16,10 +16,10 @@
     class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2"
 >
     <div class="flex items-center gap-3 min-w-0 w-full">
-        <div class="text-white bg-rose-600 border border-rose-500 rounded-md h-6 flex items-center gap-1.5 px-1.5">
+        <x-laravel-exceptions-renderer-new::badge type="error" variant="solid">
             <x-laravel-exceptions-renderer-new::icons.globe class="w-2.5 h-2.5" />
-            <span class="text-[13px] font-mono">{{ $request->method() }}</span>
-        </div>
+            {{ $request->method() }}
+        </x-laravel-exceptions-renderer-new::badge>
         <div class="min-w-0 flex-1">
             <x-laravel-exceptions-renderer-new::tooltip side="left">
                 <x-slot:trigger>
