@@ -96,6 +96,10 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerFakerGenerator()
     {
+        if (! class_exists(FakerGenerator::class)) {
+            return;
+        }
+
         $this->app->singleton(FakerGenerator::class, function ($app, $parameters) {
             $locale = $parameters['locale'] ?? $app['config']->get('app.faker_locale', 'en_US');
 
