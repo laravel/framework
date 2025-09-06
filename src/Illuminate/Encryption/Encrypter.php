@@ -380,9 +380,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
      * Re-encrypt the given payload using the current primary key.
      *
      * @param  string  $payload
-     * @param bool $unserialize
+     * @param  bool $unserialize
      * @return string
-     *
      */
     public function reEncrypt(string $payload, bool $unserialize = true): string
     {

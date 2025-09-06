@@ -304,5 +304,4 @@ class EncrypterTest extends TestCase
         $this->assertNotSame($payload, $newPayload);
         $this->assertSame($originalData, $newEncrypter->decrypt($newPayload));
     }
-
 }
