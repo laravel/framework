@@ -78,6 +78,8 @@ trait Authenticatable
         if (! empty($this->getRememberTokenName())) {
             return (string) $this->{$this->getRememberTokenName()};
         }
+
+        return null;
     }
 
     /**

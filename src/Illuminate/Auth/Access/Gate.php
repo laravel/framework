@@ -572,6 +572,8 @@ class Gate implements GateContract
                 return $result;
             }
         }
+
+        return null;
     }
 
     /**
@@ -837,12 +839,14 @@ class Gate implements GateContract
         }
 
         if (! is_callable([$policy, $method])) {
-            return;
+            return null;
         }
 
         if ($this->canBeCalledWithUser($user, $policy, $method)) {
             return $policy->{$method}($user, ...$arguments);
         }
+
+        return null;
     }
 
     /**

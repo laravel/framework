@@ -116,6 +116,8 @@ class Authenticate implements AuthenticatesRequests
         if (static::$redirectToCallback) {
             return call_user_func(static::$redirectToCallback, $request);
         }
+
+        return null;
     }
 
     /**
