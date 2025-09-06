@@ -24,7 +24,7 @@ class AuthenticationException extends Exception
     /**
      * The callback that should be used to generate the authentication redirect path.
      *
-     * @var callable
+     * @var callable(Request): string|null
      */
     protected static $redirectToCallback;
 
@@ -56,7 +56,6 @@ class AuthenticationException extends Exception
     /**
      * Get the path the user should be redirected to.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
     public function redirectTo(Request $request)
@@ -73,7 +72,7 @@ class AuthenticationException extends Exception
     /**
      * Specify the callback that should be used to generate the redirect path.
      *
-     * @param  callable  $redirectToCallback
+     * @param  callable(Request $request): string|null  $redirectToCallback
      * @return void
      */
     public static function redirectUsing(callable $redirectToCallback)

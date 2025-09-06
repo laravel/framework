@@ -14,7 +14,7 @@ class RequestGuard implements Guard
     /**
      * The guard callback.
      *
-     * @var callable
+     * @var callable(Request, UserProvider|null): \Illuminate\Contracts\Auth\Authenticatable|null
      */
     protected $callback;
 
@@ -28,9 +28,7 @@ class RequestGuard implements Guard
     /**
      * Create a new authentication guard.
      *
-     * @param  callable  $callback
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\UserProvider|null  $provider
+     * @param  callable(Request, UserProvider|null): \Illuminate\Contracts\Auth\Authenticatable|null  $callback
      */
     public function __construct(callable $callback, Request $request, ?UserProvider $provider = null)
     {
@@ -61,7 +59,6 @@ class RequestGuard implements Guard
     /**
      * Validate a user's credentials.
      *
-     * @param  array  $credentials
      * @return bool
      */
     public function validate(#[\SensitiveParameter] array $credentials = [])
@@ -74,7 +71,6 @@ class RequestGuard implements Guard
     /**
      * Set the current request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
     public function setRequest(Request $request)
