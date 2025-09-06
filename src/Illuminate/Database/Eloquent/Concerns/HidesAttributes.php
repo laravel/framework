@@ -12,11 +12,25 @@ trait HidesAttributes
     protected $hidden = [];
 
     /**
+     * The attributes that should be globally hidden for serialization on all models.
+     *
+     * @var array<string>
+     */
+    protected static array $globalHidden = [];
+
+    /**
      * The attributes that should be visible in serialization.
      *
      * @var array<string>
      */
     protected $visible = [];
+
+    /**
+     * The attributes that should be globally visible for serialization on all models.
+     *
+     * @var array<string>
+     */
+    protected static array $globalVisible = [];
 
     /**
      * Get the hidden attributes for the model.
@@ -25,6 +39,8 @@ trait HidesAttributes
      */
     public function getHidden()
     {
+        $this->mergeHidden(static::$globalHidden);
+
         return $this->hidden;
     }
 
@@ -61,6 +77,8 @@ trait HidesAttributes
      */
     public function getVisible()
     {
+        $this->mergeVisible(static::$globalVisible);
+
         return $this->visible;
     }
 
@@ -146,5 +164,27 @@ trait HidesAttributes
     public function makeHiddenIf($condition, $attributes)
     {
         return value($condition, $this) ? $this->makeHidden($attributes) : $this;
+    }
+
+    /**
+     * Set the globally hidden attributes for all models.
+     *
+     * @param array<string> $hidden
+     * @return void
+     */
+    public static function setGloballyHidden(array $hidden): void
+    {
+        static::$globalHidden = $hidden;
+    }
+
+    /**
+     * Set the globally visible attributes for all models.
+     *
+     * @param array<string> $visible
+     * @return void
+     */
+    public static function setGloballyVisible(array $visible): void
+    {
+        static::$globalVisible = $visible;
     }
 }

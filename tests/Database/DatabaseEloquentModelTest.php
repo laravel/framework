@@ -78,6 +78,8 @@ class DatabaseEloquentModelTest extends TestCase
         Carbon::setTestNow(null);
 
         Model::unsetEventDispatcher();
+        Model::setGloballyHidden([]);
+        Model::setGloballyVisible([]);
         Carbon::resetToStringFormat();
     }
 
@@ -1514,6 +1516,18 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testGloballyHidden()
+    {
+        Model::setGloballyHidden(['id']);
+
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setHidden(['age']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+        $this->assertArrayNotHasKey('id', $array);
+    }
+
     public function testMergeHiddenMergesHidden()
     {
         $model = new EloquentModelHiddenStub;
@@ -1530,6 +1544,17 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
         $model->setVisible(['name', 'id']);
+        $array = $model->toArray();
+        $this->assertArrayHasKey('name', $array);
+        $this->assertArrayNotHasKey('age', $array);
+    }
+
+    public function testGloballyVisible()
+    {
+        Model::setGloballyVisible(['id']);
+
+        $model = new EloquentModelStub(['name' => 'foo', 'age' => 'bar', 'id' => 'baz']);
+        $model->setVisible(['name']);
         $array = $model->toArray();
         $this->assertArrayHasKey('name', $array);
         $this->assertArrayNotHasKey('age', $array);
