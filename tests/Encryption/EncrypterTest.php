@@ -269,4 +269,40 @@ class EncrypterTest extends TestCase
         $enc = new Encrypter(str_repeat('x', 16));
         $enc->decrypt(base64_encode(json_encode($payload)));
     }
+
+    public function testReEncrypt(): void
+    {
+        $oldKey = str_repeat('b', 16);
+        $newKey = str_repeat('a', 16);
+
+        $oldEncrypter = new Encrypter($oldKey);
+        $payload = $oldEncrypter->encryptString('secret-value');
+
+        $e = new Encrypter($newKey);
+        $e->previousKeys([$oldKey]);
+        $newPayload = $e->reEncrypt($payload, false);
+
+        $this->assertNotSame($payload, $newPayload);
+        $this->assertSame('secret-value', $e->decryptString($newPayload));
+    }
+
+    public function testReEncryptWithUnserialize(): void
+    {
+        $oldKey = str_repeat('b', 16);
+        $newKey = str_repeat('a', 16);
+
+        $oldEncrypter = new Encrypter($oldKey);
+
+        $originalData = ['user_id' => 42, 'role' => 'admin'];
+        $payload = $oldEncrypter->encrypt($originalData);
+
+        $newEncrypter = new Encrypter($newKey);
+        $newEncrypter->previousKeys([$oldKey]);
+
+        $newPayload = $newEncrypter->reEncrypt($payload);
+
+        $this->assertNotSame($payload, $newPayload);
+        $this->assertSame($originalData, $newEncrypter->decrypt($newPayload));
+    }
+
 }

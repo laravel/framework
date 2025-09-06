@@ -6,6 +6,7 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\StringEncrypter;
+use InvalidArgumentException;
 use RuntimeException;
 
 class Encrypter implements EncrypterContract, StringEncrypter
@@ -373,5 +374,32 @@ class Encrypter implements EncrypterContract, StringEncrypter
         $this->previousKeys = $keys;
 
         return $this;
+    }
+
+    /**
+     * Re-encrypt the given payload using the current primary key.
+     *
+     * @param  string  $payload
+     * @param bool $unserialize
+     * @return string
+     *
+     */
+    public function reEncrypt(string $payload, bool $unserialize = true): string
+    {
+        if (empty($payload)) {
+            throw new InvalidArgumentException('Payload cannot be empty.');
+        }
+
+        try {
+            $decrypted = $this->decrypt($payload, $unserialize);
+        } catch (DecryptException $e) {
+            throw new DecryptException(
+                'Failed to re-encrypt, unable to decrypt payload.',
+                0,
+                $e
+            );
+        }
+
+        return $this->encrypt($decrypted, $unserialize);
     }
 }
