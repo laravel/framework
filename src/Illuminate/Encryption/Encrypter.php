@@ -385,7 +385,7 @@ class Encrypter implements EncrypterContract, StringEncrypter
      */
     public function reEncrypt(string $payload, bool $unserialize = true): string
     {
-        if (empty($payload)) {
+        if ($payload === '') {
             throw new InvalidArgumentException('Payload cannot be empty.');
         }
 
