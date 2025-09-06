@@ -76,6 +76,8 @@ trait GuardHelpers
         if ($this->user()) {
             return $this->user()->getAuthIdentifier();
         }
+
+        return null;
     }
 
     /**

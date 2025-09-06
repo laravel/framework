@@ -74,7 +74,7 @@ class EloquentUserProvider implements UserProvider
         )->first();
 
         if (! $retrievedModel) {
-            return;
+            return null;
         }
 
         $rememberToken = $retrievedModel->getRememberToken();
@@ -117,7 +117,7 @@ class EloquentUserProvider implements UserProvider
         );
 
         if (empty($credentials)) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.

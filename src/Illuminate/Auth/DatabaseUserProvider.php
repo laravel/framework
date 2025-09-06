@@ -106,7 +106,7 @@ class DatabaseUserProvider implements UserProvider
         );
 
         if (empty($credentials)) {
-            return;
+            return null;
         }
 
         // First we will add each credential element to the query as a where clause.
@@ -143,6 +143,8 @@ class DatabaseUserProvider implements UserProvider
         if (! is_null($user)) {
             return new GenericUser((array) $user);
         }
+
+        return null;
     }
 
     /**
