@@ -245,7 +245,7 @@ class Builder implements BuilderContract
     /**
      * Remove all except passed registered global scopes.
      *
-     * @param  array|string  $scopes
+     * @param  array  $scopes
      * @return $this
      */
     public function withoutGlobalScopesExcept(array $scopes = [])
