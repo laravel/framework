@@ -49,7 +49,8 @@ class SupportActionTest extends TestCase
         {
             public function __construct(
                 private readonly string $value = 'default'
-            ) {}
+            ) {
+            }
 
             public function handle(): string
             {
@@ -69,7 +70,8 @@ class SupportActionTest extends TestCase
             public function __construct(
                 private readonly string $name = '',
                 private readonly int $age = 0
-            ) {}
+            ) {
+            }
 
             public function handle(): array
             {
@@ -104,7 +106,8 @@ class SupportActionTest extends TestCase
         {
             public function __construct(
                 public readonly string $value = 'default'
-            ) {}
+            ) {
+            }
 
             public function handle(): string
             {
@@ -221,7 +224,8 @@ class SupportActionTest extends TestCase
         {
             public function __construct(
                 private readonly string $condition = 'some-condition'
-            ) {}
+            ) {
+            }
 
             public function handle(): string
             {
