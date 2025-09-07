@@ -104,8 +104,8 @@ class Factory
 
         foreach ($callback as $command => $handler) {
             $this->fakeHandlers[is_numeric($command) ? '*' : $command] = $handler instanceof Closure
-                    ? $handler
-                    : fn () => $handler;
+                ? $handler
+                : fn () => $handler;
         }
 
         return $this;
@@ -205,9 +205,9 @@ class Factory
     {
         $callback = is_string($callback) ? fn ($process) => $process->command === $callback : $callback;
 
-        $count = (new Collection($this->recorded))->filter(function ($pair) use ($callback) {
-            return $callback($pair[0], $pair[1]);
-        })->count();
+        $count = (new Collection($this->recorded))
+            ->filter(fn ($pair) => $callback($pair[0], $pair[1]))
+            ->count();
 
         PHPUnit::assertSame(
             $times, $count,

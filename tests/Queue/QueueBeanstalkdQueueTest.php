@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Queue\BeanstalkdQueue;
 use Illuminate\Queue\Jobs\BeanstalkdJob;
@@ -38,6 +39,9 @@ class QueueBeanstalkdQueueTest extends TestCase
     {
         $uuid = Str::uuid();
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         Str::createUuidsUsing(function () use ($uuid) {
             return $uuid;
         });
@@ -46,13 +50,14 @@ class QueueBeanstalkdQueueTest extends TestCase
         $pheanstalk = $this->queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with(m::type(TubeName::class));
         $pheanstalk->shouldReceive('useTube')->once()->with(m::type(TubeName::class));
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]), 1024, 0, 60);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]), 1024, 0, 60);
 
         $this->queue->push('foo', ['data'], 'stack');
         $this->queue->push('foo', ['data']);
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -64,17 +69,21 @@ class QueueBeanstalkdQueueTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $this->setQueue('default', 60);
         $pheanstalk = $this->queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with(m::type(TubeName::class));
         $pheanstalk->shouldReceive('useTube')->once()->with(m::type(TubeName::class));
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]), Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk::DEFAULT_TTR);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 5]), Pheanstalk::DEFAULT_PRIORITY, 5, Pheanstalk::DEFAULT_TTR);
 
         $this->queue->later(5, 'foo', ['data'], 'stack');
         $this->queue->later(5, 'foo', ['data']);
 
         $this->container->shouldHaveReceived('bound')->with('events')->times(4);
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 

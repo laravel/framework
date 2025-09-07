@@ -99,6 +99,15 @@ interface Session
     public function put($key, $value = null);
 
     /**
+     * Flash a key / value pair to the session.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function flash(string $key, $value = true);
+
+    /**
      * Get the CSRF token value.
      *
      * @return string

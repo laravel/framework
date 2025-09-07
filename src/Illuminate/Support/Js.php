@@ -31,7 +31,6 @@ class Js implements Htmlable, Stringable
      * @param  mixed  $data
      * @param  int|null  $flags
      * @param  int  $depth
-     * @return void
      *
      * @throws \JsonException
      */
@@ -69,6 +68,13 @@ class Js implements Htmlable, Stringable
     {
         if ($data instanceof self) {
             return $data->toHtml();
+        }
+
+        if ($data instanceof Htmlable &&
+            ! $data instanceof Arrayable &&
+            ! $data instanceof Jsonable &&
+            ! $data instanceof JsonSerializable) {
+            $data = $data->toHtml();
         }
 
         if ($data instanceof UnitEnum) {

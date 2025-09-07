@@ -13,7 +13,6 @@ class Exceptions
      * Create a new exception handling configuration instance.
      *
      * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
-     * @return void
      */
     public function __construct(public Handler $handler)
     {
@@ -147,6 +146,19 @@ class Exceptions
         foreach (Arr::wrap($class) as $exceptionClass) {
             $this->handler->dontReport($exceptionClass);
         }
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param  (\Closure(\Throwable): bool)  $dontReportWhen
+     * @return $this
+     */
+    public function dontReportWhen(Closure $dontReportWhen)
+    {
+        $this->handler->dontReportWhen($dontReportWhen);
 
         return $this;
     }

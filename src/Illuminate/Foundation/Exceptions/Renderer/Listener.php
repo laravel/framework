@@ -28,7 +28,7 @@ class Listener
      */
     public function registerListeners(Dispatcher $events)
     {
-        $events->listen(QueryExecuted::class, [$this, 'onQueryExecuted']);
+        $events->listen(QueryExecuted::class, $this->onQueryExecuted(...));
 
         $events->listen([JobProcessing::class, JobProcessed::class], function () {
             $this->queries = [];

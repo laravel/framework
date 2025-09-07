@@ -2,6 +2,7 @@
 
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Http\Request;
 
 use function PHPStan\Testing\assertType;
 
@@ -17,3 +18,5 @@ assertType('Closure(): Illuminate\Config\Repository', $container->factory(Reposi
 
 assertType('mixed', $container->make('foo'));
 assertType('Illuminate\Config\Repository', $container->make(Repository::class));
+
+assertType('Illuminate\Http\Request', $container->instance('request', Request::capture()));

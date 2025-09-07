@@ -60,4 +60,10 @@ function test(Builder $query, EloquentBuilder $userQuery): void
         assertType('object', $users);
         assertType('int', $page);
     });
+    assertType('Illuminate\Database\Query\Builder', $query->pipe(function () {
+        //
+    }));
+    assertType('Illuminate\Database\Query\Builder', $query->pipe(fn () => null));
+    assertType('Illuminate\Database\Query\Builder', $query->pipe(fn ($query) => $query));
+    assertType('5', $query->pipe(fn ($query) => 5));
 }

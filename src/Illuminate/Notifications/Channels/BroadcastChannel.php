@@ -21,7 +21,6 @@ class BroadcastChannel
      * Create a new broadcast channel.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
      */
     public function __construct(Dispatcher $events)
     {

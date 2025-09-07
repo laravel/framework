@@ -24,7 +24,6 @@ class SentMessage
      * Create a new SentMessage instance.
      *
      * @param  \Symfony\Component\Mailer\SentMessage  $sentMessage
-     * @return void
      */
     public function __construct(SymfonySentMessage $sentMessage)
     {

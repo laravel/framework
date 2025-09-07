@@ -23,7 +23,7 @@ class SchemaStateTest extends TestCase
     {
         parent::setUp();
 
-        remote('migrate:install')->mustRun();
+        remote('migrate:install');
     }
 
     protected function tearDown(): void

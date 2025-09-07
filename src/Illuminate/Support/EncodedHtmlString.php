@@ -27,7 +27,6 @@ class EncodedHtmlString extends HtmlString
      *
      * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $html
      * @param  bool  $doubleEncode
-     * @return void
      */
     public function __construct($html = '', protected bool $doubleEncode = true)
     {

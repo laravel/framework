@@ -28,7 +28,6 @@ class HandleCors
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  \Fruitcake\Cors\CorsService  $cors
-     * @return void
      */
     public function __construct(Container $container, CorsService $cors)
     {

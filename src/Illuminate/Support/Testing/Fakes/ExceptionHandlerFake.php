@@ -39,7 +39,6 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
      *
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @param  list<class-string<\Throwable>>  $exceptions
-     * @return void
      */
     public function __construct(
         protected ExceptionHandler $handler,
@@ -73,7 +72,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
 
         if (is_string($exception)) {
             Assert::assertTrue(
-                in_array($exception, array_map('get_class', $this->reported), true),
+                in_array($exception, array_map(get_class(...), $this->reported), true),
                 $message,
             );
 
@@ -135,7 +134,7 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
             $this->reported,
             sprintf(
                 'The following exceptions were reported: %s.',
-                implode(', ', array_map('get_class', $this->reported)),
+                implode(', ', array_map(get_class(...), $this->reported)),
             ),
         );
     }
@@ -247,6 +246,16 @@ class ExceptionHandlerFake implements ExceptionHandler, Fake
         }
 
         return $this;
+    }
+
+    /**
+     * Get the exceptions that have been reported.
+     *
+     * @return list<\Throwable>
+     */
+    public function reported()
+    {
+        return $this->reported;
     }
 
     /**

@@ -35,7 +35,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      * @param  \Redis  $client
      * @param  callable|null  $connector
      * @param  array  $config
-     * @return void
      */
     public function __construct($client, ?callable $connector = null, array $config = [])
     {
@@ -531,7 +530,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            if (Str::contains($e->getMessage(), ['went away', 'socket', 'read error on connection', 'Connection lost'])) {
+            if (Str::contains($e->getMessage(), ['went away', 'socket', 'Error while reading', 'read error on connection', 'Connection lost'])) {
                 $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
             }
 

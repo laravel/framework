@@ -18,7 +18,7 @@ class MorphPivot extends Pivot
      *
      * Explicitly define this so it's not included in saved attributes.
      *
-     * @var string
+     * @var class-string
      */
     protected $morphClass;
 
@@ -100,7 +100,7 @@ class MorphPivot extends Pivot
     /**
      * Set the morph class for the pivot.
      *
-     * @param  string  $morphClass
+     * @param  class-string  $morphClass
      * @return \Illuminate\Database\Eloquent\Relations\MorphPivot
      */
     public function setMorphClass($morphClass)

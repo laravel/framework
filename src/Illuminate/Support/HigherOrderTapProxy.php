@@ -15,7 +15,6 @@ class HigherOrderTapProxy
      * Create a new tap proxy instance.
      *
      * @param  mixed  $target
-     * @return void
      */
     public function __construct($target)
     {

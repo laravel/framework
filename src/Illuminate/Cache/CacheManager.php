@@ -41,7 +41,6 @@ class CacheManager implements FactoryContract
      * Create a new Cache manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -70,6 +69,25 @@ class CacheManager implements FactoryContract
     public function driver($driver = null)
     {
         return $this->store($driver);
+    }
+
+    /**
+     * Get a memoized cache driver instance.
+     *
+     * @param  string|null  $driver
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function memo($driver = null)
+    {
+        $driver = $driver ?: $this->getDefaultDriver();
+
+        if (! $this->app->bound($bindingKey = "cache.__memoized:{$driver}")) {
+            $this->app->scoped($bindingKey, fn () => $this->repository(
+                new MemoizedStore($driver, $this->store($driver)), ['events' => false]
+            ));
+        }
+
+        return $this->app->make($bindingKey);
     }
 
     /**
@@ -332,7 +350,7 @@ class CacheManager implements FactoryContract
      */
     public function refreshEventDispatcher()
     {
-        array_map([$this, 'setEventDispatcher'], $this->stores);
+        array_map($this->setEventDispatcher(...), $this->stores);
     }
 
     /**
@@ -419,6 +437,9 @@ class CacheManager implements FactoryContract
      *
      * @param  string  $driver
      * @param  \Closure  $callback
+     *
+     * @param-closure-this  $this  $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)

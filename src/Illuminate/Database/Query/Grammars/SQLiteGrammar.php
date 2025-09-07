@@ -161,8 +161,8 @@ class SQLiteGrammar extends Grammar
     protected function compileIndexHint(Builder $query, $indexHint)
     {
         return $indexHint->type === 'force'
-                ? "indexed by {$indexHint->index}"
-                : '';
+            ? "indexed by {$indexHint->index}"
+            : '';
     }
 
     /**
@@ -289,15 +289,17 @@ class SQLiteGrammar extends Grammar
     {
         $jsonGroups = $this->groupJsonColumnsForUpdate($values);
 
-        return (new Collection($values))->reject(function ($value, $key) {
-            return $this->isJsonSelector($key);
-        })->merge($jsonGroups)->map(function ($value, $key) use ($jsonGroups) {
-            $column = last(explode('.', $key));
+        return (new Collection($values))
+            ->reject(fn ($value, $key) => $this->isJsonSelector($key))
+            ->merge($jsonGroups)
+            ->map(function ($value, $key) use ($jsonGroups) {
+                $column = last(explode('.', $key));
 
-            $value = isset($jsonGroups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
+                $value = isset($jsonGroups[$key]) ? $this->compileJsonPatch($column, $value) : $this->parameter($value);
 
-            return $this->wrap($column).' = '.$value;
-        })->implode(', ');
+                return $this->wrap($column).' = '.$value;
+            })
+            ->implode(', ');
     }
 
     /**
@@ -439,8 +441,12 @@ class SQLiteGrammar extends Grammar
      */
     public function compileTruncate(Builder $query)
     {
+        [$schema, $table] = $query->getConnection()->getSchemaBuilder()->parseSchemaAndTable($query->from);
+
+        $schema = $schema ? $this->wrapValue($schema).'.' : '';
+
         return [
-            'delete from sqlite_sequence where name = ?' => [$this->getTablePrefix().$query->from],
+            'delete from '.$schema.'sqlite_sequence where name = ?' => [$query->getConnection()->getTablePrefix().$table],
             'delete from '.$this->wrapTable($query->from) => [],
         ];
     }

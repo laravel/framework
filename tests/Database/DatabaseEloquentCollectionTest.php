@@ -14,6 +14,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
+use function Orchestra\Testbench\phpunit_version_compare;
+
 class DatabaseEloquentCollectionTest extends TestCase
 {
     /**
@@ -579,6 +581,8 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
         $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
         $this->assertEquals(BaseCollection::class, get_class($b->flip()));
+        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', '=', 'bar')));
+        $this->assertEquals(BaseCollection::class, get_class($a->partition('foo', 'bar')));
     }
 
     public function testMakeVisibleRemovesHiddenAndIncludesVisible()
@@ -701,7 +705,12 @@ class DatabaseEloquentCollectionTest extends TestCase
         $user = EloquentTestUserModel::with('articles')->first();
         $user->articles->loadExists('comments');
         $commentsExists = $user->articles->pluck('comments_exists')->toArray();
-        $this->assertContainsOnly('bool', $commentsExists);
+
+        if (phpunit_version_compare('11.5.0', '<')) {
+            $this->assertContainsOnly('bool', $commentsExists);
+        } else {
+            $this->assertContainsOnlyBool($commentsExists);
+        }
     }
 
     public function testWithNonScalarKey()
@@ -721,6 +730,26 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $this->assertCount(1, $collection->except([$fooKey]));
         $this->assertSame($bar, $collection->except($fooKey)->first());
+    }
+
+    public function testPluck()
+    {
+        $model1 = (new TestEloquentCollectionModel)->forceFill(['id' => 1, 'name' => 'John', 'country' => 'US']);
+        $model2 = (new TestEloquentCollectionModel)->forceFill(['id' => 2, 'name' => 'Jane', 'country' => 'NL']);
+        $model3 = (new TestEloquentCollectionModel)->forceFill(['id' => 3, 'name' => 'Taylor', 'country' => 'US']);
+
+        $c = new Collection;
+
+        $c->push($model1)->push($model2)->push($model3);
+
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('id'));
+        $this->assertEquals([1, 2, 3], $c->pluck('id')->all());
+
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('id', 'id'));
+        $this->assertEquals([1 => 1, 2 => 2, 3 => 3], $c->pluck('id', 'id')->all());
+        $this->assertInstanceOf(BaseCollection::class, $c->pluck('test'));
+
+        $this->assertEquals(['John (US)', 'Jane (NL)', 'Taylor (US)'], $c->pluck(fn (TestEloquentCollectionModel $model) => "{$model->name} ({$model->country})")->all());
     }
 
     /**

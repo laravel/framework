@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
@@ -70,7 +71,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             ], 'laravel-errors');
         }
 
-        if ($this->app->hasDebugModeEnabled()) {
+        if ($this->app->hasDebugModeEnabled() && ! $this->app->has(ExceptionRenderer::class)) {
             $this->app->make(Listener::class)->registerListeners(
                 $this->app->make(Dispatcher::class)
             );
@@ -210,13 +211,11 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $this->app->scoped(DeferredCallbackCollection::class);
 
         $this->app['events']->listen(function (CommandFinished $event) {
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => app()->runningInConsole() && ($event->exitCode === 0 || $callback->always)
-            );
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => app()->runningInConsole() && ($event->exitCode === 0 || $callback->always));
         });
 
         $this->app['events']->listen(function (JobAttempted $event) {
-            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => $event->connectionName !== 'sync' && ($event->successful() || $callback->always)
-            );
+            app(DeferredCallbackCollection::class)->invokeWhen(fn ($callback) => $event->connectionName !== 'sync' && ($event->successful() || $callback->always));
         });
     }
 

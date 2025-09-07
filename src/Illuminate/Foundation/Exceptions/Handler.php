@@ -73,6 +73,13 @@ class Handler implements ExceptionHandlerContract
     protected $dontReport = [];
 
     /**
+     * The callbacks that inspect exceptions to determine if they should be reported.
+     *
+     * @var array
+     */
+    protected $dontReportCallbacks = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var \Illuminate\Foundation\Exceptions\ReportableHandler[]
@@ -184,7 +191,6 @@ class Handler implements ExceptionHandlerContract
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {
@@ -278,6 +284,23 @@ class Handler implements ExceptionHandlerContract
     public function dontReport(array|string $exceptions)
     {
         return $this->ignore($exceptions);
+    }
+
+    /**
+     * Register a callback to determine if an exception should not be reported.
+     *
+     * @param  (callable(\Throwable): bool)  $dontReportWhen
+     * @return $this
+     */
+    public function dontReportWhen(callable $dontReportWhen)
+    {
+        if (! $dontReportWhen instanceof Closure) {
+            $dontReportWhen = Closure::fromCallable($dontReportWhen);
+        }
+
+        $this->dontReportCallbacks[] = $dontReportWhen;
+
+        return $this;
     }
 
     /**
@@ -414,6 +437,12 @@ class Handler implements ExceptionHandlerContract
             return true;
         }
 
+        foreach ($this->dontReportCallbacks as $dontReportCallback) {
+            if ($dontReportCallback($e) === true) {
+                return true;
+            }
+        }
+
         return rescue(fn () => with($this->throttle($e), function ($throttle) use ($e) {
             if ($throttle instanceof Unlimited || $throttle === null) {
                 return false;
@@ -424,7 +453,7 @@ class Handler implements ExceptionHandlerContract
             }
 
             return ! $this->container->make(RateLimiter::class)->attempt(
-                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? md5($key) : $key),
+                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? hash('xxh128', $key) : $key),
                 $throttle->maxAttempts,
                 fn () => true,
                 $throttle->decaySeconds
@@ -483,10 +512,14 @@ class Handler implements ExceptionHandlerContract
         $exceptions = Arr::wrap($exceptions);
 
         $this->dontReport = (new Collection($this->dontReport))
-            ->reject(fn ($ignored) => in_array($ignored, $exceptions))->values()->all();
+            ->reject(fn ($ignored) => in_array($ignored, $exceptions))
+            ->values()
+            ->all();
 
         $this->internalDontReport = (new Collection($this->internalDontReport))
-            ->reject(fn ($ignored) => in_array($ignored, $exceptions))->values()->all();
+            ->reject(fn ($ignored) => in_array($ignored, $exceptions))
+            ->values()
+            ->all();
 
         return $this;
     }
@@ -702,8 +735,8 @@ class Handler implements ExceptionHandlerContract
     protected function renderExceptionResponse($request, Throwable $e)
     {
         return $this->shouldReturnJson($request, $e)
-                    ? $this->prepareJsonResponse($request, $e)
-                    : $this->prepareResponse($request, $e);
+            ? $this->prepareJsonResponse($request, $e)
+            : $this->prepareResponse($request, $e);
     }
 
     /**
@@ -716,8 +749,8 @@ class Handler implements ExceptionHandlerContract
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         return $this->shouldReturnJson($request, $exception)
-                    ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest($exception->redirectTo($request) ?? route('login'));
+            ? response()->json(['message' => $exception->getMessage()], 401)
+            : redirect()->guest($exception->redirectTo($request) ?? route('login'));
     }
 
     /**
@@ -734,8 +767,8 @@ class Handler implements ExceptionHandlerContract
         }
 
         return $this->shouldReturnJson($request, $e)
-                    ? $this->invalidJson($request, $e)
-                    : $this->invalid($request, $e);
+            ? $this->invalidJson($request, $e)
+            : $this->invalid($request, $e);
     }
 
     /**

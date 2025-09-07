@@ -48,7 +48,6 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  int  $timeToRun
      * @param  int  $blockFor
      * @param  bool  $dispatchAfterCommit
-     * @return void
      */
     public function __construct(
         $pheanstalk,
@@ -72,7 +71,56 @@ class BeanstalkdQueue extends Queue implements QueueContract
      */
     public function size($queue = null)
     {
-        return (int) $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
+        $stats = $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)));
+
+        return $stats->currentJobsReady
+            + $stats->currentJobsDelayed
+            + $stats->currentJobsReserved;
+    }
+
+    /**
+     * Get the number of pending jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function pendingSize($queue = null)
+    {
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReady;
+    }
+
+    /**
+     * Get the number of delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function delayedSize($queue = null)
+    {
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsDelayed;
+    }
+
+    /**
+     * Get the number of reserved jobs.
+     *
+     * @param  string|null  $queue
+     * @return int
+     */
+    public function reservedSize($queue = null)
+    {
+        return $this->pheanstalk->statsTube(new TubeName($this->getQueue($queue)))->currentJobsReserved;
+    }
+
+    /**
+     * Get the creation timestamp of the oldest pending job, excluding delayed jobs.
+     *
+     * @param  string|null  $queue
+     * @return int|null
+     */
+    public function creationTimeOfOldestPendingJob($queue = null)
+    {
+        // Not supported by Beanstalkd...
+        return null;
     }
 
     /**
@@ -126,7 +174,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         return $this->enqueueUsing(
             $job,
-            $this->createPayload($job, $this->getQueue($queue), $data),
+            $this->createPayload($job, $this->getQueue($queue), $data, $delay),
             $queue,
             $delay,
             function ($payload, $queue, $delay) {

@@ -119,7 +119,6 @@ class Kernel implements KernelContract
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Routing\Router  $router
-     * @return void
      */
     public function __construct(Application $app, Router $router)
     {

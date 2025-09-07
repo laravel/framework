@@ -13,7 +13,7 @@ if (! function_exists('collect')) {
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    function collect($value = [])
+    function collect($value = []): Collection
     {
         return new Collection($value);
     }
@@ -77,9 +77,9 @@ if (! function_exists('data_get')) {
             $segment = match ($segment) {
                 '\*' => '*',
                 '\{first}' => '{first}',
-                '{first}' => array_key_first(is_array($target) ? $target : (new Collection($target))->all()),
+                '{first}' => array_key_first(Arr::from($target)),
                 '\{last}' => '{last}',
-                '{last}' => array_key_last(is_array($target) ? $target : (new Collection($target))->all()),
+                '{last}' => array_key_last(Arr::from($target)),
                 default => $segment,
             };
 
@@ -203,7 +203,7 @@ if (! function_exists('head')) {
      */
     function head($array)
     {
-        return reset($array);
+        return empty($array) ? false : array_first($array);
     }
 }
 
@@ -216,7 +216,7 @@ if (! function_exists('last')) {
      */
     function last($array)
     {
-        return end($array);
+        return empty($array) ? false : array_last($array);
     }
 }
 
@@ -248,6 +248,8 @@ if (! function_exists('when')) {
      */
     function when($condition, $value, $default = null)
     {
+        $condition = $condition instanceof Closure ? $condition() : $condition;
+
         if ($condition) {
             return value($value, $condition);
         }

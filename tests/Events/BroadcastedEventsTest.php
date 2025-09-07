@@ -62,6 +62,92 @@ class BroadcastedEventsTest extends TestCase
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }
+
+    public function testBroadcastWithMultipleChannels()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $broadcast = m::mock(BroadcastFactory::class);
+        $broadcast->shouldReceive('queue')->once();
+        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+
+        $event = new class implements ShouldBroadcast
+        {
+            public function broadcastOn()
+            {
+                return ['channel-1', 'channel-2'];
+            }
+        };
+
+        $d->dispatch($event);
+    }
+
+    public function testBroadcastWithCustomConnectionName()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $broadcast = m::mock(BroadcastFactory::class);
+        $broadcast->shouldReceive('queue')->once();
+        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+
+        $event = new class implements ShouldBroadcast
+        {
+            public $connection = 'custom-connection';
+
+            public function broadcastOn()
+            {
+                return ['test-channel'];
+            }
+        };
+
+        $d->dispatch($event);
+    }
+
+    public function testBroadcastWithCustomEventName()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $broadcast = m::mock(BroadcastFactory::class);
+        $broadcast->shouldReceive('queue')->once();
+        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+
+        $event = new class implements ShouldBroadcast
+        {
+            public function broadcastOn()
+            {
+                return ['test-channel'];
+            }
+
+            public function broadcastAs()
+            {
+                return 'custom-event-name';
+            }
+        };
+
+        $d->dispatch($event);
+    }
+
+    public function testBroadcastWithCustomPayload()
+    {
+        $d = new Dispatcher($container = m::mock(Container::class));
+        $broadcast = m::mock(BroadcastFactory::class);
+        $broadcast->shouldReceive('queue')->once();
+        $container->shouldReceive('make')->once()->with(BroadcastFactory::class)->andReturn($broadcast);
+
+        $event = new class implements ShouldBroadcast
+        {
+            public $customData = 'test-data';
+
+            public function broadcastOn()
+            {
+                return ['test-channel'];
+            }
+
+            public function broadcastWith()
+            {
+                return ['custom' => $this->customData];
+            }
+        };
+
+        $d->dispatch($event);
+    }
 }
 
 class BroadcastEvent implements ShouldBroadcast

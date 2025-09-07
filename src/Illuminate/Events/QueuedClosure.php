@@ -49,7 +49,6 @@ class QueuedClosure
      * Create a new queued closure event listener resolver.
      *
      * @param  \Closure  $closure
-     * @return void
      */
     public function __construct(Closure $closure)
     {

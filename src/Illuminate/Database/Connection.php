@@ -25,6 +25,8 @@ use PDO;
 use PDOStatement;
 use RuntimeException;
 
+use function Illuminate\Support\enum_value;
+
 class Connection implements ConnectionInterface
 {
     use DetectsConcurrencyErrors,
@@ -36,14 +38,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var \PDO|\Closure
+     * @var \PDO|(\Closure(): \PDO)
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var \PDO|\Closure
+     * @var \PDO|(\Closure(): \PDO)
      */
     protected $readPdo;
 
@@ -78,7 +80,7 @@ class Connection implements ConnectionInterface
     /**
      * The reconnector instance for the connection.
      *
-     * @var callable
+     * @var (callable(\Illuminate\Database\Connection): mixed)
      */
     protected $reconnector;
 
@@ -148,7 +150,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the queries run against the connection.
      *
-     * @var array
+     * @var array{query: string, bindings: array, time: float|null}[]
      */
     protected $queryLog = [];
 
@@ -169,7 +171,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the registered query duration handlers.
      *
-     * @var array
+     * @var array{has_run: bool, handler: (callable(\Illuminate\Database\Connection, class-string<\Illuminate\Database\Events\QueryExecuted>): mixed)}[]
      */
     protected $queryDurationHandlers = [];
 
@@ -190,7 +192,7 @@ class Connection implements ConnectionInterface
     /**
      * All of the callbacks that should be invoked before a query is executed.
      *
-     * @var \Closure[]
+     * @var (\Closure(string, array, \Illuminate\Database\Connection): mixed)[]
      */
     protected $beforeExecutingCallbacks = [];
 
@@ -204,11 +206,10 @@ class Connection implements ConnectionInterface
     /**
      * Create a new database connection instance.
      *
-     * @param  \PDO|\Closure  $pdo
+     * @param  \PDO|(\Closure(): \PDO)  $pdo
      * @param  string  $database
      * @param  string  $tablePrefix
      * @param  array  $config
-     * @return void
      */
     public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
@@ -248,9 +249,7 @@ class Connection implements ConnectionInterface
      */
     protected function getDefaultQueryGrammar()
     {
-        ($grammar = new QueryGrammar)->setConnection($this);
-
-        return $grammar;
+        return new QueryGrammar($this);
     }
 
     /**
@@ -310,13 +309,13 @@ class Connection implements ConnectionInterface
     /**
      * Begin a fluent query against a database table.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $table
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|\UnitEnum|string  $table
      * @param  string|null  $as
      * @return \Illuminate\Database\Query\Builder
      */
     public function table($table, $as = null)
     {
-        return $this->query()->from($table, $as);
+        return $this->query()->from(enum_value($table), $as);
     }
 
     /**
@@ -370,7 +369,7 @@ class Connection implements ConnectionInterface
             throw new MultipleColumnsSelectedException;
         }
 
-        return reset($record);
+        return array_first($record);
     }
 
     /**
@@ -639,8 +638,8 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
-     * @return array
+     * @param  (\Closure(\Illuminate\Database\Connection): mixed)  $callback
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     public function pretend(Closure $callback)
     {
@@ -682,8 +681,8 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback in "dry run" mode.
      *
-     * @param  \Closure  $callback
-     * @return array
+     * @param  (\Closure(): array{query: string, bindings: array, time: float|null}[])  $callback
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     protected function withFreshQueryLog($callback)
     {
@@ -877,7 +876,7 @@ class Connection implements ConnectionInterface
      * Register a callback to be invoked when the connection queries for longer than a given amount of time.
      *
      * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
-     * @param  callable  $handler
+     * @param  (callable(\Illuminate\Database\Connection, class-string<\Illuminate\Database\Events\QueryExecuted>): mixed)  $handler
      * @return void
      */
     public function whenQueryingForLongerThan($threshold, $handler)
@@ -1308,7 +1307,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the reconnect instance on the connection.
      *
-     * @param  callable  $reconnector
+     * @param  (callable(\Illuminate\Database\Connection): mixed)  $reconnector
      * @return $this
      */
     public function setReconnector(callable $reconnector)
@@ -1472,6 +1471,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Run the statement to start a new transaction.
+     *
+     * @return void
+     */
+    protected function executeBeginTransactionStatement()
+    {
+        $this->getPdo()->beginTransaction();
+    }
+
+    /**
      * Set the transaction manager instance on the connection.
      *
      * @param  \Illuminate\Database\DatabaseTransactionsManager  $manager
@@ -1507,7 +1516,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the connection query log.
      *
-     * @return array
+     * @return array{query: string, bindings: array, time: float|null}[]
      */
     public function getQueryLog()
     {
@@ -1626,41 +1635,26 @@ class Connection implements ConnectionInterface
     {
         $this->tablePrefix = $prefix;
 
-        $this->getQueryGrammar()->setTablePrefix($prefix);
-
         return $this;
-    }
-
-    /**
-     * Set the table prefix and return the grammar.
-     *
-     * @template TGrammar of \Illuminate\Database\Grammar
-     *
-     * @param  TGrammar  $grammar
-     * @return TGrammar
-     */
-    public function withTablePrefix(Grammar $grammar)
-    {
-        $grammar->setTablePrefix($this->tablePrefix);
-
-        return $grammar;
     }
 
     /**
      * Execute the given callback without table prefix.
      *
      * @param  \Closure  $callback
-     * @return void
+     * @return mixed
      */
-    public function withoutTablePrefix(Closure $callback): void
+    public function withoutTablePrefix(Closure $callback): mixed
     {
         $tablePrefix = $this->getTablePrefix();
 
         $this->setTablePrefix('');
 
-        $callback($this);
-
-        $this->setTablePrefix($tablePrefix);
+        try {
+            return $callback($this);
+        } finally {
+            $this->setTablePrefix($tablePrefix);
+        }
     }
 
     /**

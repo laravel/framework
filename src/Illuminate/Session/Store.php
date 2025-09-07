@@ -69,7 +69,6 @@ class Store implements Session
      * @param  \SessionHandlerInterface  $handler
      * @param  string|null  $id
      * @param  string  $serialization
-     * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, $id = null, $serialization = 'php')
     {
@@ -495,7 +494,7 @@ class Store implements Session
     /**
      * Reflash a subset of the current flash data.
      *
-     * @param  array|mixed  $keys
+     * @param  mixed  $keys
      * @return void
      */
     public function keep($keys = null)

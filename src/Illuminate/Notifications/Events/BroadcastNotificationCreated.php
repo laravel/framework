@@ -15,39 +15,17 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     use Queueable, SerializesModels;
 
     /**
-     * The notifiable entity who received the notification.
-     *
-     * @var mixed
-     */
-    public $notifiable;
-
-    /**
-     * The notification instance.
-     *
-     * @var \Illuminate\Notifications\Notification
-     */
-    public $notification;
-
-    /**
-     * The notification data.
-     *
-     * @var array
-     */
-    public $data = [];
-
-    /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  array  $data
-     * @return void
+     * @param  mixed  $notifiable  The notifiable entity who received the notification.
+     * @param  \Illuminate\Notifications\Notification  $notification  The notification instance.
+     * @param  array  $data  The notification data.
      */
-    public function __construct($notifiable, $notification, $data)
-    {
-        $this->data = $data;
-        $this->notifiable = $notifiable;
-        $this->notification = $notification;
+    public function __construct(
+        public $notifiable,
+        public $notification,
+        public $data = [],
+    ) {
     }
 
     /**
@@ -118,8 +96,8 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastType()
     {
         return method_exists($this->notification, 'broadcastType')
-                    ? $this->notification->broadcastType()
-                    : get_class($this->notification);
+            ? $this->notification->broadcastType()
+            : get_class($this->notification);
     }
 
     /**
@@ -130,7 +108,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastAs()
     {
         return method_exists($this->notification, 'broadcastAs')
-                ? $this->notification->broadcastAs()
-                : __CLASS__;
+            ? $this->notification->broadcastAs()
+            : __CLASS__;
     }
 }

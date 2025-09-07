@@ -80,7 +80,6 @@ class Sleep
      * Create a new class instance.
      *
      * @param  int|float|\DateInterval  $duration
-     * @return void
      */
     public function __construct($duration)
     {
@@ -429,29 +428,37 @@ class Sleep
      */
     public static function assertSequence($sequence)
     {
-        static::assertSleptTimes(count($sequence));
+        try {
+            static::assertSleptTimes(count($sequence));
 
-        (new Collection($sequence))
-            ->zip(static::$sequence)
-            ->eachSpread(function (?Sleep $expected, CarbonInterval $actual) {
-                if ($expected === null) {
-                    return;
+            (new Collection($sequence))
+                ->zip(static::$sequence)
+                ->eachSpread(function (?Sleep $expected, CarbonInterval $actual) {
+                    if ($expected === null) {
+                        return;
+                    }
+
+                    PHPUnit::assertTrue(
+                        $expected->shouldNotSleep()->duration->equalTo($actual),
+                        vsprintf('Expected sleep duration of [%s] but actually slept for [%s].', [
+                            $expected->duration->cascade()->forHumans([
+                                'options' => 0,
+                                'minimumUnit' => 'microsecond',
+                            ]),
+                            $actual->cascade()->forHumans([
+                                'options' => 0,
+                                'minimumUnit' => 'microsecond',
+                            ]),
+                        ])
+                    );
+                });
+        } finally {
+            foreach ($sequence as $expected) {
+                if ($expected instanceof self) {
+                    $expected->shouldNotSleep();
                 }
-
-                PHPUnit::assertTrue(
-                    $expected->shouldNotSleep()->duration->equalTo($actual),
-                    vsprintf('Expected sleep duration of [%s] but actually slept for [%s].', [
-                        $expected->duration->cascade()->forHumans([
-                            'options' => 0,
-                            'minimumUnit' => 'microsecond',
-                        ]),
-                        $actual->cascade()->forHumans([
-                            'options' => 0,
-                            'minimumUnit' => 'microsecond',
-                        ]),
-                    ])
-                );
-            });
+            }
+        }
     }
 
     /**

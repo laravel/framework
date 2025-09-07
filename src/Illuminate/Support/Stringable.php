@@ -27,7 +27,6 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Create a new instance of the class.
      *
      * @param  string  $value
-     * @return void
      */
     public function __construct($value = '')
     {
@@ -269,6 +268,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntEndWith($needles)
+    {
+        return Str::doesntEndWith($this->value, $needles);
+    }
+
+    /**
      * Determine if the string is an exact match with the given value.
      *
      * @param  \Illuminate\Support\Stringable|string  $value
@@ -372,21 +382,23 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Determine if a given value is a valid URL.
      *
+     * @param  array  $protocols
      * @return bool
      */
-    public function isUrl()
+    public function isUrl(array $protocols = [])
     {
-        return Str::isUrl($this->value);
+        return Str::isUrl($this->value, $protocols);
     }
 
     /**
      * Determine if a given string is a valid UUID.
      *
+     * @param  int<0, 8>|'max'|null  $version
      * @return bool
      */
-    public function isUuid()
+    public function isUuid($version = null)
     {
-        return Str::isUuid($this->value);
+        return Str::isUuid($this->value, $version);
     }
 
     /**
@@ -617,11 +629,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Get the plural form of an English word.
      *
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return static
      */
-    public function plural($count = 2)
+    public function plural($count = 2, $prependCount = false)
     {
-        return new static(Str::plural($this->value, $count));
+        return new static(Str::plural($this->value, $count, $prependCount));
     }
 
     /**
@@ -934,6 +947,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public function doesntStartWith($needles)
+    {
+        return Str::doesntStartWith($this->value, $needles);
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @return static
@@ -1145,6 +1169,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Execute the given callback if the string doesn't end with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntEndWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntEndWith($needles), $callback, $default);
+    }
+
+    /**
      * Execute the given callback if the string is an exact match with the given value.
      *
      * @param  string  $value
@@ -1230,6 +1267,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function whenStartsWith($needles, $callback, $default = null)
     {
         return $this->when($this->startsWith($needles), $callback, $default);
+    }
+
+    /**
+     * Execute the given callback if the string doesn't start with a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
+    public function whenDoesntStartWith($needles, $callback, $default = null)
+    {
+        return $this->when($this->doesntStartWith($needles), $callback, $default);
     }
 
     /**
@@ -1337,6 +1387,39 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Hash the string using the given algorithm.
+     *
+     * @param  string  $algorithm
+     * @return static
+     */
+    public function hash(string $algorithm)
+    {
+        return new static(hash($algorithm, $this->value));
+    }
+
+    /**
+     * Encrypt the string.
+     *
+     * @param  bool  $serialize
+     * @return static
+     */
+    public function encrypt(bool $serialize = false)
+    {
+        return new static(encrypt($this->value, $serialize));
+    }
+
+    /**
+     * Decrypt the string.
+     *
+     * @param  bool  $serialize
+     * @return static
+     */
+    public function decrypt(bool $serialize = false)
+    {
+        return new static(decrypt($this->value, $serialize));
+    }
+
+    /**
      * Dump the string.
      *
      * @param  mixed  ...$args
@@ -1418,6 +1501,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         }
 
         return Date::createFromFormat($format, $this->value, $tz);
+    }
+
+    /**
+     * Get the underlying string value as a Uri instance.
+     *
+     * @return \Illuminate\Support\Uri
+     */
+    public function toUri()
+    {
+        return Uri::of($this->value);
     }
 
     /**

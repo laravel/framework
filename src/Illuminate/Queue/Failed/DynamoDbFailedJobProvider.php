@@ -38,7 +38,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
      * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
-     * @return void
      */
     public function __construct(DynamoDbClient $dynamo, $applicationName, $table)
     {
@@ -110,20 +109,21 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
             'ScanIndexForward' => false,
         ]);
 
-        return (new Collection($results['Items']))->sortByDesc(function ($result) {
-            return (int) $result['failed_at']['N'];
-        })->map(function ($result) {
-            return (object) [
-                'id' => $result['uuid']['S'],
-                'connection' => $result['connection']['S'],
-                'queue' => $result['queue']['S'],
-                'payload' => $result['payload']['S'],
-                'exception' => $result['exception']['S'],
-                'failed_at' => Carbon::createFromTimestamp(
-                    (int) $result['failed_at']['N'], date_default_timezone_get()
-                )->format(DateTimeInterface::ISO8601),
-            ];
-        })->all();
+        return (new Collection($results['Items']))
+            ->sortByDesc(fn ($result) => (int) $result['failed_at']['N'])
+            ->map(function ($result) {
+                return (object) [
+                    'id' => $result['uuid']['S'],
+                    'connection' => $result['connection']['S'],
+                    'queue' => $result['queue']['S'],
+                    'payload' => $result['payload']['S'],
+                    'exception' => $result['exception']['S'],
+                    'failed_at' => Carbon::createFromTimestamp(
+                        (int) $result['failed_at']['N'], date_default_timezone_get()
+                    )->format(DateTimeInterface::ISO8601),
+                ];
+            })
+            ->all();
     }
 
     /**

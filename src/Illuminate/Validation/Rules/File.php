@@ -118,11 +118,12 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Limit the uploaded file to only image types.
      *
+     * @param  bool  $allowSvg
      * @return ImageFile
      */
-    public static function image()
+    public static function image($allowSvg = false)
     {
-        return new ImageFile();
+        return new ImageFile($allowSvg);
     }
 
     /**
@@ -216,6 +217,8 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             return $size;
         }
 
+        $size = strtolower(trim($size));
+
         $value = floatval($size);
 
         return round(match (true) {
@@ -277,7 +280,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
         $rules = array_merge($rules, $this->buildMimetypes());
 
         if (! empty($this->allowedExtensions)) {
-            $rules[] = 'extensions:'.implode(',', array_map('strtolower', $this->allowedExtensions));
+            $rules[] = 'extensions:'.implode(',', array_map(strtolower(...), $this->allowedExtensions));
         }
 
         $rules[] = match (true) {

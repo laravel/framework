@@ -47,7 +47,6 @@ class ModelInspector
      * Create a new model inspector instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct(Application $app)
     {
@@ -387,7 +386,7 @@ class ModelInspector
      *
      * @param  array<string, mixed>  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed|null
+     * @return mixed
      */
     protected function getColumnDefault($column, $model)
     {

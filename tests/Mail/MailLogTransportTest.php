@@ -14,7 +14,7 @@ use Symfony\Component\Mime\Email;
 
 class MailLogTransportTest extends TestCase
 {
-    public function testGetLogTransportWithConfiguredChannel()
+    public function testGetLogTransportWithConfiguredChannel(): void
     {
         $this->app['config']->set('mail.driver', 'log');
 
@@ -36,7 +36,7 @@ class MailLogTransportTest extends TestCase
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
     }
 
-    public function testItDecodesTheMessageBeforeLogging()
+    public function testItDecodesTheMessageBeforeLogging(): void
     {
         $message = (new Message(new Email))
             ->from('noreply@example.com', 'no-reply')
@@ -60,7 +60,7 @@ class MailLogTransportTest extends TestCase
         $this->assertStringContainsString('https://example.com/reset-password=5e113c71a4c210aff04b3fa66f1b1299', $actualLoggedValue);
     }
 
-    public function testItOnlyDecodesQuotedPrintablePartsOfTheMessageBeforeLogging()
+    public function testItOnlyDecodesQuotedPrintablePartsOfTheMessageBeforeLogging(): void
     {
         $message = (new Message(new Email))
             ->from('noreply@example.com', 'no-reply')
@@ -86,7 +86,7 @@ class MailLogTransportTest extends TestCase
         $this->assertStringContainsString('filename=attachment.txt', $actualLoggedValue);
     }
 
-    public function testGetLogTransportWithPsrLogger()
+    public function testGetLogTransportWithPsrLogger(): void
     {
         $this->app['config']->set('mail.driver', 'log');
 

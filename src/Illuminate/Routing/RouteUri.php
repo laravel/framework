@@ -23,7 +23,6 @@ class RouteUri
      *
      * @param  string  $uri
      * @param  array  $bindingFields
-     * @return void
      */
     public function __construct(string $uri, array $bindingFields = [])
     {

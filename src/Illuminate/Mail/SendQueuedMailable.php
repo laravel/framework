@@ -52,7 +52,6 @@ class SendQueuedMailable
      * Create a new job instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
-     * @return void
      */
     public function __construct(MailableContract $mailable)
     {

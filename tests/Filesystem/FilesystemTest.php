@@ -650,6 +650,19 @@ class FilesystemTest extends TestCase
         $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
     }
 
+    public function testLastModifiedReturnsTimestamp()
+    {
+        $path = self::$tempDir.'/timestamp.txt';
+        file_put_contents($path, 'test content');
+
+        $filesystem = new Filesystem;
+        $timestamp = $filesystem->lastModified($path);
+
+        $this->assertIsInt($timestamp);
+        $this->assertGreaterThan(0, $timestamp);
+        $this->assertEquals(filemtime($path), $timestamp);
+    }
+
     /**
      * @param  string  $file
      * @return int
@@ -660,5 +673,43 @@ class FilesystemTest extends TestCase
         $filePerms = substr(sprintf('%o', $filePerms), -3);
 
         return (int) base_convert($filePerms, 8, 10);
+    }
+
+    public function testFileCreationAndContentVerification()
+    {
+        $files = new Filesystem;
+
+        $testContent = 'This is a test file content';
+        $filePath = self::$tempDir.'/test.txt';
+
+        $files->put($filePath, $testContent);
+
+        $this->assertTrue($files->exists($filePath));
+        $this->assertSame($testContent, $files->get($filePath));
+        $this->assertEquals(strlen($testContent), $files->size($filePath));
+    }
+
+    public function testDirectoryOperationsWithSubdirectories()
+    {
+        $files = new Filesystem;
+
+        $dirPath = self::$tempDir.'/test_dir';
+        $subDirPath = $dirPath.'/sub_dir';
+
+        $this->assertTrue($files->makeDirectory($dirPath));
+        $this->assertTrue($files->isDirectory($dirPath));
+
+        $this->assertTrue($files->makeDirectory($subDirPath));
+        $this->assertTrue($files->isDirectory($subDirPath));
+
+        $filePath = $subDirPath.'/test.txt';
+        $files->put($filePath, 'test content');
+
+        $this->assertTrue($files->exists($filePath));
+
+        $allFiles = $files->allFiles($dirPath);
+
+        $this->assertCount(1, $allFiles);
+        $this->assertEquals('test.txt', $allFiles[0]->getFilename());
     }
 }

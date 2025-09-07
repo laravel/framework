@@ -101,7 +101,13 @@ class ServeCommand extends Command
                 return false;
             }
 
-            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
+            if ($workers > 1 &&
+                ! $this->option('no-reload') &&
+                ! (int) env('LARAVEL_SAIL', 0)) {
+                return false;
+            }
+
+            return $workers;
         });
 
         parent::initialize($input, $output);
@@ -335,7 +341,7 @@ class ServeCommand extends Command
                 } elseif ((new Stringable($line))->contains(' Closing')) {
                     $requestPort = static::getRequestPortFromLine($line);
 
-                    if (empty($this->requestsPool[$requestPort])) {
+                    if (empty($this->requestsPool[$requestPort]) || count($this->requestsPool[$requestPort] ?? []) !== 3) {
                         $this->requestsPool[$requestPort] = [
                             $this->getDateFromLine($line),
                             false,

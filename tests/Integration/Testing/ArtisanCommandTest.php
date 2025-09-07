@@ -55,6 +55,16 @@ class ArtisanCommandTest extends TestCase
         Artisan::command('contains', function () {
             $this->line('My name is Taylor Otwell');
         });
+
+        Artisan::command('new-england', function () {
+            $this->line('The region of New England consists of the following states:');
+            $this->info('Connecticut');
+            $this->info('Maine');
+            $this->info('Massachusetts');
+            $this->info('New Hampshire');
+            $this->info('Rhode Island');
+            $this->info('Vermont');
+        });
     }
 
     public function test_console_command_that_passes()
@@ -273,6 +283,27 @@ class ArtisanCommandTest extends TestCase
                 ->expectsOutputToContain('Otwell Taylor')
                 ->assertExitCode(0);
         });
+    }
+
+    public function test_pending_command_can_be_tapped()
+    {
+        $newEngland = [
+            'Connecticut',
+            'Maine',
+            'Massachusetts',
+            'New Hampshire',
+            'Rhode Island',
+            'Vermont',
+        ];
+
+        $this->artisan('new-england')
+            ->expectsOutput('The region of New England consists of the following states:')
+            ->tap(function ($command) use ($newEngland) {
+                foreach ($newEngland as $state) {
+                    $command->expectsOutput($state);
+                }
+            })
+            ->assertExitCode(0);
     }
 
     /**

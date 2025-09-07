@@ -39,8 +39,8 @@ class MorphMany extends MorphOneOrMany
     public function getResults()
     {
         return ! is_null($this->getParentKey())
-                ? $this->query->get()
-                : $this->related->newCollection();
+            ? $this->query->get()
+            : $this->related->newCollection();
     }
 
     /** @inheritDoc */

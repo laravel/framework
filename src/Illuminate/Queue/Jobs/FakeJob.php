@@ -2,9 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Support\Str;
 
-class FakeJob extends Job
+class FakeJob extends Job implements JobContract
 {
     /**
      * The number of seconds the released job was delayed.

@@ -319,6 +319,37 @@ class ValidationForEachTest extends TestCase
         ], $v->getMessageBag()->toArray());
     }
 
+    public function testForEachWithEmptyAndNullValues()
+    {
+        $data = [
+            'items' => [
+                ['discounts' => null],
+                ['discounts' => []],
+                ['discounts' => [null]],
+            ],
+        ];
+
+        $rules = [
+            'items.*' => Rule::forEach(function () {
+                return [
+                    'discounts' => 'required|array',
+                    'discounts.*' => 'required|array',
+                ];
+            }),
+        ];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $data, $rules);
+        $this->assertFalse($v->passes());
+        $this->assertEquals(
+            [
+                'items.0.discounts' => ['validation.required'],
+                'items.1.discounts' => ['validation.required'],
+                'items.2.discounts.0' => ['validation.required'],
+            ],
+            $v->getMessageBag()->toArray()
+        );
+    }
+
     public function getIlluminateArrayTranslator()
     {
         return new Translator(

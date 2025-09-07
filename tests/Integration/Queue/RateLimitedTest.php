@@ -138,6 +138,18 @@ class RateLimitedTest extends TestCase
         $this->assertJobWasReleased(NonAdminTestJob::class);
     }
 
+    public function testRateLimitedJobsCanBeSkippedOnLimitReachedAndReleasedAfter()
+    {
+        $rateLimiter = $this->app->make(RateLimiter::class);
+
+        $rateLimiter->for('test', function ($job) {
+            return Limit::perHour(1);
+        });
+
+        $this->assertJobRanSuccessfully(RateLimitedReleaseAfterTestJob::class);
+        $this->assertJobWasReleasedAfter(RateLimitedReleaseAfterTestJob::class, 60);
+    }
+
     public function testMiddlewareSerialization()
     {
         $rateLimited = new RateLimited('limiterName');
@@ -182,6 +194,25 @@ class RateLimitedTest extends TestCase
 
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('release')->once();
+        $job->shouldReceive('isReleased')->andReturn(true);
+        $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+
+        $instance->call($job, [
+            'command' => serialize($command = new $class),
+        ]);
+
+        $this->assertFalse($class::$handled);
+    }
+
+    protected function assertJobWasReleasedAfter($class, $releaseAfter)
+    {
+        $class::$handled = false;
+        $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
+
+        $job = m::mock(Job::class);
+
+        $job->shouldReceive('hasFailed')->once()->andReturn(false);
+        $job->shouldReceive('release')->once()->withArgs([$releaseAfter]);
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
 
@@ -338,6 +369,14 @@ class RateLimitedDontReleaseTestJob extends RateLimitedTestJob
     public function middleware()
     {
         return [(new RateLimited('test'))->dontRelease()];
+    }
+}
+
+class RateLimitedReleaseAfterTestJob extends RateLimitedTestJob
+{
+    public function middleware()
+    {
+        return [(new RateLimited('test'))->releaseAfter(60)];
     }
 }
 

@@ -97,7 +97,6 @@ class PendingProcess
      * Create a new pending process instance.
      *
      * @param  \Illuminate\Process\Factory  $factory
-     * @return void
      */
     public function __construct(Factory $factory)
     {
@@ -299,8 +298,8 @@ class PendingProcess
         $command = $command ?? $this->command;
 
         $process = is_iterable($command)
-                ? new Process($command, null, $this->environment)
-                : Process::fromShellCommandline((string) $command, null, $this->environment);
+            ? new Process($command, null, $this->environment)
+            : Process::fromShellCommandline((string) $command, null, $this->environment);
 
         $process->setWorkingDirectory((string) ($this->path ?? getcwd()));
         $process->setTimeout($this->timeout);
@@ -400,7 +399,7 @@ class PendingProcess
      * @param  \Closure  $fake
      * @return \Illuminate\Process\FakeInvokedProcess
      *
-     * @throw \LogicException
+     * @throws \LogicException
      */
     protected function resolveAsynchronousFake(string $command, ?callable $output, Closure $fake)
     {

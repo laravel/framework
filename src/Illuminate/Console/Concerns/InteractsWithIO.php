@@ -19,8 +19,6 @@ trait InteractsWithIO
      * The console components factory.
      *
      * @var \Illuminate\Console\View\Components\Factory
-     *
-     * @internal This property is not meant to be used or overwritten outside the framework.
      */
     protected $components;
 
@@ -208,7 +206,7 @@ trait InteractsWithIO
      * @param  string  $question
      * @param  array  $choices
      * @param  string|int|null  $default
-     * @param  mixed|null  $attempts
+     * @param  mixed  $attempts
      * @param  bool  $multiple
      * @return string|array
      */

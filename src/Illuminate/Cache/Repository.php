@@ -6,6 +6,9 @@ use ArrayAccess;
 use BadMethodCallException;
 use Closure;
 use DateTimeInterface;
+use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushFailed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\ForgettingKey;
@@ -69,7 +72,6 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @param  \Illuminate\Contracts\Cache\Store  $store
      * @param  array  $config
-     * @return void
      */
     public function __construct(Store $store, array $config = [])
     {
@@ -142,9 +144,11 @@ class Repository implements ArrayAccess, CacheContract
     {
         $this->event(new RetrievingManyKeys($this->getName(), $keys));
 
-        $values = $this->store->many((new Collection($keys))->map(function ($value, $key) {
-            return is_string($key) ? $key : $value;
-        })->values()->all());
+        $values = $this->store->many((new Collection($keys))
+            ->map(fn ($value, $key) => is_string($key) ? $key : $value)
+            ->values()
+            ->all()
+        );
 
         return (new Collection($values))
             ->map(fn ($value, $key) => $this->handleManyResult($keys, $key, $value))
@@ -479,9 +483,10 @@ class Repository implements ArrayAccess, CacheContract
      * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
      * @param  (callable(): TCacheValue)  $callback
      * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  bool  $alwaysDefer
      * @return TCacheValue
      */
-    public function flexible($key, $ttl, $callback, $lock = null)
+    public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
     {
         [
             $key => $value,
@@ -516,7 +521,7 @@ class Repository implements ArrayAccess, CacheContract
             });
         };
 
-        defer($refresh, "illuminate:cache:flexible:{$key}");
+        defer($refresh, "illuminate:cache:flexible:{$key}", $alwaysDefer);
 
         return $value;
     }
@@ -575,13 +580,23 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function clear(): bool
     {
-        return $this->store->flush();
+        $this->event(new CacheFlushing($this->getName()));
+
+        $result = $this->store->flush();
+
+        if ($result) {
+            $this->event(new CacheFlushed($this->getName()));
+        } else {
+            $this->event(new CacheFlushFailed($this->getName()));
+        }
+
+        return $result;
     }
 
     /**
      * Begin executing a new tags operation if the store supports it.
      *
-     * @param  array|mixed  $names
+     * @param  mixed  $names
      * @return \Illuminate\Cache\TaggedCache
      *
      * @throws \BadMethodCallException

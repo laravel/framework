@@ -8,8 +8,10 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', false)]
 class RouteListCommandTest extends TestCase
 {
     use InteractsWithDeprecationHandling;

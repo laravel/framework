@@ -16,12 +16,12 @@
     "require": {
         "php": "^8.2",
         "ext-hash": "*",
-        "illuminate/collections": "^11.0",
-        "illuminate/contracts": "^11.0",
-        "illuminate/http": "^11.0",
-        "illuminate/macroable": "^11.0",
-        "illuminate/queue": "^11.0",
-        "illuminate/support": "^11.0"
+        "illuminate/collections": "^12.0",
+        "illuminate/contracts": "^12.0",
+        "illuminate/http": "^12.0",
+        "illuminate/macroable": "^12.0",
+        "illuminate/queue": "^12.0",
+        "illuminate/support": "^12.0"
     },
     "autoload": {
         "psr-4": {
@@ -30,13 +30,13 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "11.x-dev"
+            "dev-master": "12.x-dev"
         }
     },
     "suggest": {
-        "illuminate/console": "Required to use the auth:clear-resets command (^11.0).",
-        "illuminate/queue": "Required to fire login / logout events (^11.0).",
-        "illuminate/session": "Required to use the session based guard (^11.0)."
+        "illuminate/console": "Required to use the auth:clear-resets command (^12.0).",
+        "illuminate/queue": "Required to fire login / logout events (^12.0).",
+        "illuminate/session": "Required to use the session based guard (^12.0)."
     },
     "config": {
         "sort-packages": true

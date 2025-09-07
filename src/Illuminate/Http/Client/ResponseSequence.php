@@ -35,7 +35,6 @@ class ResponseSequence
      * Create a new response sequence.
      *
      * @param  array  $responses
-     * @return void
      */
     public function __construct(array $responses)
     {

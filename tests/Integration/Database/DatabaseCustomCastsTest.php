@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsStringable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Fluent;
 use Illuminate\Support\Stringable;
 
 class DatabaseCustomCastsTest extends DatabaseTestCase
@@ -151,6 +153,68 @@ class DatabaseCustomCastsTest extends DatabaseTestCase
             $model->array_object_json->toArray()
         );
     }
+
+    public function test_as_collection_with_map_into()
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::of(Fluent::class),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(Fluent::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
+
+    public function test_as_custom_collection_with_map_into()
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::using(CustomCollection::class, Fluent::class),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(CustomCollection::class, $model->collection);
+        $this->assertInstanceOf(Fluent::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
+
+    public function test_as_collection_with_map_callback(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::of([FluentWithCallback::class, 'make']),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
+
+    public function test_as_custom_collection_with_map_callback(): void
+    {
+        $model = new TestEloquentModelWithCustomCasts();
+        $model->mergeCasts([
+            'collection' => AsCollection::using(CustomCollection::class, [FluentWithCallback::class, 'make']),
+        ]);
+
+        $model->setRawAttributes([
+            'collection' => json_encode([['foo' => 'bar']]),
+        ]);
+
+        $this->assertInstanceOf(CustomCollection::class, $model->collection);
+        $this->assertInstanceOf(FluentWithCallback::class, $model->collection->first());
+        $this->assertSame('bar', $model->collection->first()->foo);
+    }
 }
 
 class TestEloquentModelWithCustomCasts extends Model
@@ -196,4 +260,16 @@ class TestEloquentModelWithCustomCastsNullable extends Model
         'collection' => AsCollection::class,
         'stringable' => AsStringable::class,
     ];
+}
+
+class FluentWithCallback extends Fluent
+{
+    public static function make($attributes = [])
+    {
+        return new static($attributes);
+    }
+}
+
+class CustomCollection extends Collection
+{
 }

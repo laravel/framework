@@ -29,7 +29,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -64,7 +64,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -112,7 +112,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -150,7 +150,7 @@ jobs:
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -178,7 +178,16 @@ jobs:
   beanstalkd:
     runs-on: ubuntu-24.04
 
-    name: Beanstalkd Driver
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - php: 8.2
+            pheanstalk: 5
+          - php: 8.3
+            pheanstalk: 7
+
+    name: Beanstalkd Driver (pda/pheanstalk:^${{ matrix.pheanstalk }})
 
     steps:
       - name: Checkout code
@@ -194,20 +203,20 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
 
       - name: Set Framework version
-        run: composer config version "11.x-dev"
+        run: composer config version "12.x-dev"
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress --with="pda/pheanstalk:^${{ matrix.pheanstalk }}"
 
       - name: Daemonize beanstalkd
         run: ./beanstalkd-1.13/beanstalkd &

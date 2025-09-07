@@ -215,7 +215,11 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
-            "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
+            sprintf(
+                "Expected [{$notification}] to be sent {$expectedCount} %s, but was sent {$actualCount} %s.",
+                Str::plural('time', $expectedCount),
+                Str::plural('time', $actualCount)
+            )
         );
     }
 
@@ -279,13 +283,13 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification] ?? [];
+        return $this->notifications[get_class($notifiable)][(string) $notifiable->getKey()][$notification] ?? [];
     }
 
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Support\Collection|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
@@ -297,7 +301,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Support\Collection|mixed  $notifiables
      * @param  mixed  $notification
      * @param  array|null  $channels
      * @return void
@@ -326,7 +330,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 continue;
             }
 
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
+            $this->notifications[get_class($notifiable)][(string) $notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $this->serializeAndRestore && $notification instanceof ShouldQueue
                     ? $this->serializeAndRestoreNotification($notification)
                     : $notification,

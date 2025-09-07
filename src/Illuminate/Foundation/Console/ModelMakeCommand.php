@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'make:model')]
@@ -47,7 +48,15 @@ class ModelMakeCommand extends GeneratorCommand
     public function handle()
     {
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            if (! $this->alreadyExists($this->getNameInput())) {
+                return false;
+            }
+
+            if (! confirm('Do you want to generate additional components for the model?')) {
+                return false;
+            } else {
+                $this->afterPromptingForMissingArguments($this->input, $this->output);
+            }
         }
 
         if ($this->option('all')) {
@@ -211,8 +220,8 @@ class ModelMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**

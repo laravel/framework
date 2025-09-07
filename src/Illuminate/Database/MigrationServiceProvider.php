@@ -82,6 +82,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
 
             return new Migrator($repository, $app['db'], $app['files'], $app['events']);
         });
+
+        $this->app->bind(Migrator::class, fn ($app) => $app['migrator']);
     }
 
     /**
@@ -220,7 +222,7 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     public function provides()
     {
         return array_merge([
-            'migrator', 'migration.repository', 'migration.creator',
+            'migrator', 'migration.repository', 'migration.creator', Migrator::class,
         ], array_values($this->commands));
     }
 }

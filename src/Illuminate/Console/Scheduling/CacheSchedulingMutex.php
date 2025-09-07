@@ -27,7 +27,6 @@ class CacheSchedulingMutex implements SchedulingMutex, CacheAware
      * Create a new scheduling strategy.
      *
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
-     * @return void
      */
     public function __construct(Cache $cache)
     {

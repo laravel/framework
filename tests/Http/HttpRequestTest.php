@@ -804,6 +804,9 @@ class HttpRequestTest extends TestCase
 
         $this->assertNull($request->enum('doesnt_exist', TestEnumBacked::class));
 
+        $this->assertEquals(TestEnumBacked::test, $request->enum('invalid_enum_value', TestEnumBacked::class, TestEnumBacked::test));
+        $this->assertEquals(TestEnumBacked::test, $request->enum('missing_key', TestEnumBacked::class, TestEnumBacked::test));
+
         $this->assertEquals(TestEnumBacked::test, $request->enum('valid_enum_value', TestEnumBacked::class));
 
         $this->assertNull($request->enum('invalid_enum_value', TestEnumBacked::class));
@@ -1067,6 +1070,16 @@ class HttpRequestTest extends TestCase
         $request->mergeIfMissing($merge);
         $this->assertSame('Taylor', $request->input('name'));
         $this->assertSame(1, $request->input('boolean_setting'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.last_name' => 'Otwell'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Otwell', $request->input('user.last_name'));
+
+        $request = Request::create('/', 'GET', ['user' => ['first_name' => 'Taylor', 'email' => 'taylor@laravel.com']]);
+        $merge = ['user.first_name' => 'John'];
+        $request->mergeIfMissing($merge);
+        $this->assertSame('Taylor', $request->input('user.first_name'));
     }
 
     public function testReplaceMethod()

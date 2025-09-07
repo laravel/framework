@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/collections": "^11.0",
-        "illuminate/contracts": "^11.0",
-        "illuminate/macroable": "^11.0",
-        "illuminate/support": "^11.0",
-        "symfony/finder": "^7.0.3"
+        "illuminate/collections": "^12.0",
+        "illuminate/contracts": "^12.0",
+        "illuminate/macroable": "^12.0",
+        "illuminate/support": "^12.0",
+        "symfony/finder": "^7.2.0"
     },
     "autoload": {
         "psr-4": {
@@ -31,21 +31,21 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "11.x-dev"
+            "dev-master": "12.x-dev"
         }
     },
     "suggest": {
         "ext-fileinfo": "Required to use the Filesystem class.",
         "ext-ftp": "Required to use the Flysystem FTP driver.",
         "ext-hash": "Required to use the Filesystem class.",
-        "illuminate/http": "Required for handling uploaded files (^7.0).",
+        "illuminate/http": "Required for handling uploaded files (^12.0).",
         "league/flysystem": "Required to use the Flysystem local driver (^3.25.1).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.25.1).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.25.1).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^7.0).",
-        "symfony/mime": "Required to enable support for guessing extensions (^7.0)."
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^7.2).",
+        "symfony/mime": "Required to enable support for guessing extensions (^7.2)."
     },
     "config": {
         "sort-packages": true

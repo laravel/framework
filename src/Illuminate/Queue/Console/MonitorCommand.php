@@ -19,7 +19,8 @@ class MonitorCommand extends Command
      */
     protected $signature = 'queue:monitor
                        {queues : The names of the queues to monitor}
-                       {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}';
+                       {--max=1000 : The maximum number of jobs that can be on the queue before an event is dispatched}
+                       {--json : Output the queue size as JSON}';
 
     /**
      * The console command description.
@@ -47,7 +48,6 @@ class MonitorCommand extends Command
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
      */
     public function __construct(Factory $manager, Dispatcher $events)
     {
@@ -66,7 +66,15 @@ class MonitorCommand extends Command
     {
         $queues = $this->parseQueues($this->argument('queues'));
 
-        $this->displaySizes($queues);
+        if ($this->option('json')) {
+            $this->output->writeln((new Collection($queues))->map(function ($queue) {
+                return array_merge($queue, [
+                    'status' => str_contains($queue['status'], 'ALERT') ? 'ALERT' : 'OK',
+                ]);
+            })->toJson());
+        } else {
+            $this->displaySizes($queues);
+        }
 
         $this->dispatchEvents($queues);
     }
@@ -91,6 +99,18 @@ class MonitorCommand extends Command
                 'connection' => $connection,
                 'queue' => $queue,
                 'size' => $size = $this->manager->connection($connection)->size($queue),
+                'pending' => method_exists($this->manager->connection($connection), 'pendingSize')
+                    ? $this->manager->connection($connection)->pendingSize($queue)
+                    : null,
+                'delayed' => method_exists($this->manager->connection($connection), 'delayedSize')
+                    ? $this->manager->connection($connection)->delayedSize($queue)
+                    : null,
+                'reserved' => method_exists($this->manager->connection($connection), 'reservedSize')
+                    ? $this->manager->connection($connection)->reservedSize($queue)
+                    : null,
+                'oldest_pending' => method_exists($this->manager->connection($connection), 'oldestPending')
+                    ? $this->manager->connection($connection)->creationTimeOfOldestPendingJob($queue)
+                    : null,
                 'status' => $size >= $this->option('max') ? '<fg=yellow;options=bold>ALERT</>' : '<fg=green;options=bold>OK</>',
             ];
         });
@@ -113,6 +133,10 @@ class MonitorCommand extends Command
             $status = '['.$queue['size'].'] '.$queue['status'];
 
             $this->components->twoColumnDetail($name, $status);
+            $this->components->twoColumnDetail('Pending jobs', $queue['pending'] ?? 'N/A');
+            $this->components->twoColumnDetail('Delayed jobs', $queue['delayed'] ?? 'N/A');
+            $this->components->twoColumnDetail('Reserved jobs', $queue['reserved'] ?? 'N/A');
+            $this->line('');
         });
 
         $this->newLine();

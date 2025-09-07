@@ -30,7 +30,6 @@ class SchemaLoaded
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
-     * @return void
      */
     public function __construct($connection, $path)
     {

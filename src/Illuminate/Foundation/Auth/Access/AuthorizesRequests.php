@@ -13,7 +13,7 @@ trait AuthorizesRequests
      * Authorize a given action for the current user.
      *
      * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -30,7 +30,7 @@ trait AuthorizesRequests
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
      * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -46,7 +46,7 @@ trait AuthorizesRequests
      * Guesses the ability's name if it wasn't provided.
      *
      * @param  mixed  $ability
-     * @param  mixed|array  $arguments
+     * @param  mixed  $arguments
      * @return array
      */
     protected function parseAbilityAndArguments($ability, $arguments)
@@ -108,7 +108,7 @@ trait AuthorizesRequests
     /**
      * Get the map of resource methods to ability names.
      *
-     * @return array
+     * @return array<string, string>
      */
     protected function resourceAbilityMap()
     {
@@ -126,7 +126,7 @@ trait AuthorizesRequests
     /**
      * Get the list of resource methods which do not have model parameters.
      *
-     * @return array
+     * @return list<string>
      */
     protected function resourceMethodsWithoutModels()
     {

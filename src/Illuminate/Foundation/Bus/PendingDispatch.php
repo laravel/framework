@@ -31,7 +31,6 @@ class PendingDispatch
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
-     * @return void
      */
     public function __construct($job)
     {
@@ -60,6 +59,21 @@ class PendingDispatch
     public function onQueue($queue)
     {
         $this->job->onQueue($queue);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired job "group".
+     *
+     * This feature is only supported by some queues, such as Amazon SQS.
+     *
+     * @param  \UnitEnum|string  $group
+     * @return $this
+     */
+    public function onGroup($group)
+    {
+        $this->job->onGroup($group);
 
         return $this;
     }

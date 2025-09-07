@@ -21,7 +21,6 @@ class CallableDispatcher implements CallableDispatcherContract
      * Create a new callable dispatcher instance.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @return void
      */
     public function __construct(Container $container)
     {

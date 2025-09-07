@@ -16,19 +16,19 @@ class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
+    /** {@inheritdoc} */
+    #[\Override]
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            $this->setUpRedis();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->tearDownRedis();
+        });
+
         parent::setUp();
-
-        $this->setUpRedis();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->tearDownRedis();
-        m::close();
     }
 
     public function testCacheTtl(): void

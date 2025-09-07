@@ -123,7 +123,7 @@ class Grammar extends BaseGrammar
      * Compile an aggregated select clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $aggregate
+     * @param  array{function: string, columns: array<\Illuminate\Contracts\Database\Query\Expression|string>}  $aggregate
      * @return string
      */
     protected function compileAggregate(Builder $query, $aggregate)
@@ -430,9 +430,9 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $min = $this->parameter(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+        $min = $this->parameter(is_array($where['values']) ? array_first($where['values']) : $where['values'][0]);
 
-        $max = $this->parameter(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+        $max = $this->parameter(is_array($where['values']) ? array_last($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
@@ -448,11 +448,29 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        $min = $this->wrap(is_array($where['values']) ? reset($where['values']) : $where['values'][0]);
+        $min = $this->wrap(is_array($where['values']) ? array_first($where['values']) : $where['values'][0]);
 
-        $max = $this->wrap(is_array($where['values']) ? end($where['values']) : $where['values'][1]);
+        $max = $this->wrap(is_array($where['values']) ? array_last($where['values']) : $where['values'][1]);
 
         return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
+    }
+
+    /**
+     * Compile a "value between" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereValueBetween(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $min = $this->wrap(is_array($where['columns']) ? array_first($where['columns']) : $where['columns'][0]);
+
+        $max = $this->wrap(is_array($where['columns']) ? array_last($where['columns']) : $where['columns'][1]);
+
+        return $this->parameter($where['value']).' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -1168,18 +1186,18 @@ class Grammar extends BaseGrammar
             return "insert into {$table} default values";
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
-        $columns = $this->columnize(array_keys(reset($values)));
+        $columns = $this->columnize(array_keys(array_first($values)));
 
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same number of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = (new Collection($values))->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = (new Collection($values))
+            ->map(fn ($record) => '('.$this->parameterize($record).')')
+            ->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -1203,7 +1221,7 @@ class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return string
      */
     public function compileInsertGetId(Builder $query, $values, $sequence)
@@ -1276,9 +1294,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileUpdateColumns(Builder $query, array $values)
     {
-        return (new Collection($values))->map(function ($value, $key) {
-            return $this->wrap($key).' = '.$this->parameter($value);
-        })->implode(', ');
+        return (new Collection($values))
+            ->map(fn ($value, $key) => $this->wrap($key).' = '.$this->parameter($value))
+            ->implode(', ');
     }
 
     /**

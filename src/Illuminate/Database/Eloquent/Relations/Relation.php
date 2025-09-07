@@ -88,7 +88,6 @@ abstract class Relation implements BuilderContract
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  TDeclaringModel  $parent
-     * @return void
      */
     public function __construct(Builder $query, Model $parent)
     {
@@ -172,8 +171,8 @@ abstract class Relation implements BuilderContract
     public function getEager()
     {
         return $this->eagerKeysWereEmpty
-                    ? $this->query->getModel()->newCollection()
-                    : $this->get();
+            ? $this->related->newCollection()
+            : $this->get();
     }
 
     /**
@@ -187,7 +186,7 @@ abstract class Relation implements BuilderContract
      */
     public function sole($columns = ['*'])
     {
-        $result = $this->take(2)->get($columns);
+        $result = $this->limit(2)->get($columns);
 
         $count = $result->count();
 
@@ -261,7 +260,7 @@ abstract class Relation implements BuilderContract
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -424,9 +423,9 @@ abstract class Relation implements BuilderContract
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-                    && in_array($model->getKeyType(), ['int', 'integer'])
-                        ? 'whereIntegerInRaw'
-                        : 'whereIn';
+            && in_array($model->getKeyType(), ['int', 'integer'])
+                ? 'whereIntegerInRaw'
+                : 'whereIn';
     }
 
     /**
@@ -477,7 +476,8 @@ abstract class Relation implements BuilderContract
 
         if (is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
-                            ? $map + static::$morphMap : $map;
+                ? $map + static::$morphMap
+                : $map;
         }
 
         return static::$morphMap;

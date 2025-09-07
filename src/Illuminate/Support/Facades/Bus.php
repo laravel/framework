@@ -12,16 +12,19 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static mixed dispatchSync(mixed $command, mixed $handler = null)
  * @method static mixed dispatchNow(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Batch|null findBatch(string $batchId)
- * @method static \Illuminate\Bus\PendingBatch batch(\Illuminate\Support\Collection|array|mixed $jobs)
- * @method static \Illuminate\Foundation\Bus\PendingChain chain(\Illuminate\Support\Collection|array $jobs)
+ * @method static \Illuminate\Bus\PendingBatch batch(\Illuminate\Support\Collection|mixed $jobs)
+ * @method static \Illuminate\Foundation\Bus\PendingChain chain(\Illuminate\Support\Collection|array|null $jobs = null)
  * @method static bool hasCommandHandler(mixed $command)
- * @method static bool|mixed getCommandHandler(mixed $command)
+ * @method static mixed getCommandHandler(mixed $command)
  * @method static mixed dispatchToQueue(mixed $command)
  * @method static void dispatchAfterResponse(mixed $command, mixed $handler = null)
  * @method static \Illuminate\Bus\Dispatcher pipeThrough(array $pipes)
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
+ * @method static \Illuminate\Bus\Dispatcher withDispatchingAfterResponses()
+ * @method static \Illuminate\Bus\Dispatcher withoutDispatchingAfterResponses()
  * @method static \Illuminate\Support\Testing\Fakes\BusFake except(array|string $jobsToDispatch)
  * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
+ * @method static void assertDispatchedOnce(string|\Closure $command, int $times = null)
  * @method static void assertDispatchedTimes(string|\Closure $command, int $times = 1)
  * @method static void assertNotDispatched(string|\Closure $command, callable|null $callback = null)
  * @method static void assertNothingDispatched()
@@ -66,8 +69,8 @@ class Bus extends Facade
     public static function fake($jobsToFake = [], ?BatchRepository $batchRepository = null)
     {
         $actualDispatcher = static::isFake()
-                ? static::getFacadeRoot()->dispatcher
-                : static::getFacadeRoot();
+            ? static::getFacadeRoot()->dispatcher
+            : static::getFacadeRoot();
 
         return tap(new BusFake($actualDispatcher, $jobsToFake, $batchRepository), function ($fake) {
             static::swap($fake);
@@ -77,7 +80,7 @@ class Bus extends Facade
     /**
      * Dispatch the given chain of jobs.
      *
-     * @param  array|mixed  $jobs
+     * @param  mixed  $jobs
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public static function dispatchChain($jobs)

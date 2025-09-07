@@ -21,6 +21,8 @@ use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Contracts\Filesystem\Filesystem
  * @mixin \Illuminate\Filesystem\FilesystemAdapter
@@ -52,7 +54,6 @@ class FilesystemManager implements FactoryContract
      * Create a new filesystem manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -73,12 +74,12 @@ class FilesystemManager implements FactoryContract
     /**
      * Get a filesystem instance.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function disk($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value($name) ?: $this->getDefaultDriver();
 
         return $this->disks[$name] = $this->get($name);
     }
@@ -298,7 +299,16 @@ class FilesystemManager implements FactoryContract
         return $this->build(tap(
             is_string($config['disk']) ? $this->getConfig($config['disk']) : $config['disk'],
             function (&$parent) use ($config) {
-                $parent['prefix'] = $config['prefix'];
+                if (empty($parent['prefix'])) {
+                    $parent['prefix'] = $config['prefix'];
+                } else {
+                    $separator = $parent['directory_separator'] ?? DIRECTORY_SEPARATOR;
+
+                    $parentPrefix = rtrim($parent['prefix'], $separator);
+                    $scopedPrefix = ltrim($config['prefix'], $separator);
+
+                    $parent['prefix'] = "{$parentPrefix}{$separator}{$scopedPrefix}";
+                }
 
                 if (isset($config['visibility'])) {
                     $parent['visibility'] = $config['visibility'];

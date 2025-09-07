@@ -29,7 +29,7 @@ class HasManyThrough extends HasOneOrManyThrough
             $this->farParent,
             $this->throughParent,
             $this->getFirstKeyName(),
-            $this->secondKey,
+            $this->getForeignKeyName(),
             $this->getLocalKeyName(),
             $this->getSecondLocalKeyName(),
         ));
@@ -68,7 +68,7 @@ class HasManyThrough extends HasOneOrManyThrough
     public function getResults()
     {
         return ! is_null($this->farParent->{$this->localKey})
-                ? $this->get()
-                : $this->related->newCollection();
+            ? $this->get()
+            : $this->related->newCollection();
     }
 }

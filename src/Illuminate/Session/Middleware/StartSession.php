@@ -33,7 +33,6 @@ class StartSession
      *
      * @param  \Illuminate\Session\SessionManager  $manager
      * @param  callable|null  $cacheFactoryResolver
-     * @return void
      */
     public function __construct(SessionManager $manager, ?callable $cacheFactoryResolver = null)
     {
@@ -79,8 +78,8 @@ class StartSession
         }
 
         $lockFor = $request->route() && $request->route()->locksFor()
-                        ? $request->route()->locksFor()
-                        : $this->manager->defaultRouteBlockLockSeconds();
+            ? $request->route()->locksFor()
+            : $this->manager->defaultRouteBlockLockSeconds();
 
         $lock = $this->cache($this->manager->blockDriver())
             ->lock('session:'.$session->getId(), $lockFor)
@@ -89,8 +88,8 @@ class StartSession
         try {
             $lock->block(
                 ! is_null($request->route()->waitsFor())
-                        ? $request->route()->waitsFor()
-                        : $this->manager->defaultRouteBlockWaitSeconds()
+                    ? $request->route()->waitsFor()
+                    : $this->manager->defaultRouteBlockWaitSeconds()
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
@@ -266,7 +265,7 @@ class StartSession
         $config = $this->manager->getSessionConfig();
 
         return $config['expire_on_close'] ? 0 : Date::instance(
-            Carbon::now()->addRealMinutes($config['lifetime'])
+            Carbon::now()->addMinutes((int) $config['lifetime'])
         );
     }
 

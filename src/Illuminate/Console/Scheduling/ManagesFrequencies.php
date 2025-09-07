@@ -5,6 +5,8 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 trait ManagesFrequencies
 {
     /**
@@ -345,7 +347,7 @@ trait ManagesFrequencies
         $segments = explode(':', $time);
 
         return $this->hourBasedSchedule(
-            count($segments) === 2 ? (int) $segments[1] : '0',
+            count($segments) >= 2 ? (int) $segments[1] : '0',
             (int) $segments[0]
         );
     }
@@ -499,7 +501,7 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run weekly on a given day and time.
      *
-     * @param  array|mixed  $dayOfWeek
+     * @param  mixed  $dayOfWeek
      * @param  string  $time
      * @return $this
      */
@@ -626,7 +628,7 @@ trait ManagesFrequencies
     /**
      * Set the days of the week the command should run on.
      *
-     * @param  array|mixed  $days
+     * @param  mixed  $days
      * @return $this
      */
     public function days($days)
@@ -639,12 +641,12 @@ trait ManagesFrequencies
     /**
      * Set the timezone the date should be evaluated on.
      *
-     * @param  \DateTimeZone|string  $timezone
+     * @param  \UnitEnum|\DateTimeZone|string  $timezone
      * @return $this
      */
     public function timezone($timezone)
     {
-        $this->timezone = $timezone;
+        $this->timezone = enum_value($timezone);
 
         return $this;
     }
@@ -653,7 +655,7 @@ trait ManagesFrequencies
      * Splice the given value into the given position of the expression.
      *
      * @param  int  $position
-     * @param  string  $value
+     * @param  string|int  $value
      * @return $this
      */
     protected function spliceIntoPosition($position, $value)

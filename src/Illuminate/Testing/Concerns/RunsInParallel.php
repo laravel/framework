@@ -54,7 +54,6 @@ trait RunsInParallel
      *
      * @param  \ParaTest\Runners\PHPUnit\Options|\ParaTest\Options  $options
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
      */
     public function __construct($options, OutputInterface $output)
     {

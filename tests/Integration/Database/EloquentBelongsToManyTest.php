@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -15,13 +16,6 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     protected function afterRefreshingDatabase()
     {
         Schema::create('users', function (Blueprint $table) {
@@ -342,6 +336,49 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(0, $post->tags);
     }
 
+    public function testDetachMethodWithCustomPivot()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+        $tag2 = Tag::create(['name' => Str::random()]);
+        $tag3 = Tag::create(['name' => Str::random()]);
+        $tag4 = Tag::create(['name' => Str::random()]);
+        $tag5 = Tag::create(['name' => Str::random()]);
+        Tag::create(['name' => Str::random()]);
+        Tag::create(['name' => Str::random()]);
+
+        $post->tagsWithCustomPivot()->attach(Tag::all());
+
+        $this->assertEquals(Tag::pluck('name'), $post->tags->pluck('name'));
+
+        $post->tagsWithCustomPivot()->detach($tag->id);
+        $post->load('tagsWithCustomPivot');
+        $this->assertEquals(
+            Tag::whereNotIn('id', [$tag->id])->pluck('name'),
+            $post->tagsWithCustomPivot->pluck('name')
+        );
+
+        $post->tagsWithCustomPivot()->detach([$tag2->id, $tag3->id]);
+        $post->load('tagsWithCustomPivot');
+        $this->assertEquals(
+            Tag::whereNotIn('id', [$tag->id, $tag2->id, $tag3->id])->pluck('name'),
+            $post->tagsWithCustomPivot->pluck('name')
+        );
+
+        $post->tagsWithCustomPivot()->detach(new Collection([$tag4, $tag5]));
+        $post->load('tagsWithCustomPivot');
+        $this->assertEquals(
+            Tag::whereNotIn('id', [$tag->id, $tag2->id, $tag3->id, $tag4->id, $tag5->id])->pluck('name'),
+            $post->tagsWithCustomPivot->pluck('name')
+        );
+
+        $this->assertCount(2, $post->tagsWithCustomPivot);
+        $post->tagsWithCustomPivot()->detach();
+        $post->load('tagsWithCustomPivot');
+        $this->assertCount(0, $post->tagsWithCustomPivot);
+    }
+
     public function testFirstMethod()
     {
         $post = Post::create(['title' => Str::random()]);
@@ -418,6 +455,29 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertCount(2, $post->tags()->findMany([$tag->id, $tag2->id]));
         $this->assertCount(0, $post->tags()->findMany(new Collection));
         $this->assertCount(2, $post->tags()->findMany(new Collection([$tag->id, $tag2->id])));
+    }
+
+    public function testFindSoleMethod()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        $tag = Tag::create(['name' => Str::random()]);
+
+        $post->tags()->attach($tag);
+
+        $this->assertEquals($tag->id, $post->tags()->findSole($tag->id)->id);
+
+        $this->assertEquals($tag->id, $post->tags()->findSole($tag)->id);
+
+        // Test with no records
+        $post->tags()->detach($tag);
+
+        try {
+            $post->tags()->findSole($tag);
+            $this->fail('Expected RecordsNotFoundException was not thrown.');
+        } catch (RecordsNotFoundException $e) {
+            $this->assertTrue(true);
+        }
     }
 
     public function testFindOrFailMethod()
@@ -847,6 +907,27 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             Tag::whereIn('id', [$tag->id, $tag2->id])->pluck('name'),
             $post->load('tags')->tags->pluck('name')
         );
+    }
+
+    public function testSyncMethodWithEmptyValueDoesNotQueryWhenDetachingDisabled()
+    {
+        $post = Post::create(['title' => Str::random()]);
+
+        DB::enableQueryLog();
+
+        foreach ([collect(), [], null] as $value) {
+            $result = $post->tags()->sync($value, false);
+
+            $this->assertEquals([
+                'attached' => [],
+                'detached' => [],
+                'updated' => [],
+            ], $result);
+        }
+
+        $this->assertEmpty(DB::getQueryLog());
+
+        DB::disableQueryLog();
     }
 
     public function testToggleMethod()

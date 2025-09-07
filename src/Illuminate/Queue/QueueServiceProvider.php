@@ -216,6 +216,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->forgetScopedInstances();
 
                 Facade::clearResolvedInstances();
+
+                memory_reset_peak_usage();
             };
 
             return new Worker(

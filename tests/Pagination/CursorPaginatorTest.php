@@ -101,7 +101,7 @@ class CursorPaginatorTest extends TestCase
     {
         $cursor = new Cursor(['id' => 25], true);
 
-        $p = new CursorPaginator(Collection::make(), 25, $cursor, [
+        $p = new CursorPaginator(new Collection, 25, $cursor, [
             'path' => 'http://website.com/test',
             'cursorName' => 'cursor',
             'parameters' => ['id'],
@@ -118,6 +118,33 @@ class CursorPaginatorTest extends TestCase
             'prev_cursor' => null,
             'prev_page_url' => null,
         ], $p->toArray());
+    }
+
+    public function testCursorPaginatorToJson()
+    {
+        $paginator = new CursorPaginator([['id' => 1], ['id' => 2], ['id' => 3], ['id' => 4]], 2, null);
+        $results = $paginator->toJson();
+        $expected = json_encode($paginator->toArray());
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+    }
+
+    public function testCursorPaginatorToPrettyJson()
+    {
+        $paginator = new CursorPaginator([['id' => '1'], ['id' => '2'], ['id' => '3'], ['id' => '4']], 2, null);
+        $results = $paginator->toPrettyJson();
+        $expected = $paginator->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+
+        $results = $paginator->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"id": 1', $results);
     }
 
     protected function getCursor($params, $isNext = true)

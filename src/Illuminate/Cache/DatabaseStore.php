@@ -76,7 +76,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $prefix
      * @param  string  $lockTable
      * @param  array  $lockLottery
-     * @return void
+     * @param  int  $defaultLockTimeoutInSeconds
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -170,6 +170,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -445,7 +446,30 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
-     * Specify the name of the connection that should be used to manage locks.
+     * Set the underlying database connection.
+     *
+     * @param  \Illuminate\Database\ConnectionInterface  $connection
+     * @return $this
+     */
+    public function setConnection($connection)
+    {
+        $this->connection = $connection;
+
+        return $this;
+    }
+
+    /**
+     * Get the connection used to manage locks.
+     *
+     * @return \Illuminate\Database\ConnectionInterface
+     */
+    public function getLockConnection()
+    {
+        return $this->lockConnection;
+    }
+
+    /**
+     * Specify the connection that should be used to manage locks.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return $this

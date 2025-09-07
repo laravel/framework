@@ -4,9 +4,15 @@ namespace Illuminate\Support;
 
 use ArgumentCountError;
 use ArrayAccess;
+use Closure;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
+use JsonSerializable;
 use Random\Randomizer;
+use Traversable;
+use WeakMap;
 
 class Arr
 {
@@ -21,6 +27,21 @@ class Arr
     public static function accessible($value)
     {
         return is_array($value) || $value instanceof ArrayAccess;
+    }
+
+    /**
+     * Determine whether the given value is arrayable.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function arrayable($value)
+    {
+        return is_array($value)
+            || $value instanceof Arrayable
+            || $value instanceof Traversable
+            || $value instanceof Jsonable
+            || $value instanceof JsonSerializable;
     }
 
     /**
@@ -41,6 +62,38 @@ class Arr
     }
 
     /**
+     * Get an array item from an array using "dot" notation.
+     */
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be an array, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get a boolean item from an array using "dot" notation.
+     */
+    public static function boolean(ArrayAccess|array $array, string|int|null $key, ?bool $default = null): bool
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a boolean, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  iterable  $array
@@ -52,12 +105,10 @@ class Arr
 
         foreach ($array as $values) {
             if ($values instanceof Collection) {
-                $values = $values->all();
-            } elseif (! is_array($values)) {
-                continue;
+                $results[] = $values->all();
+            } elseif (is_array($values)) {
+                $results[] = $values;
             }
-
-            $results[] = $values;
         }
 
         return array_merge([], ...$results);
@@ -112,13 +163,19 @@ class Arr
     {
         $results = [];
 
-        foreach ($array as $key => $value) {
-            if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
-            } else {
-                $results[$prepend.$key] = $value;
+        $flatten = function ($data, $prefix) use (&$results, &$flatten): void {
+            foreach ($data as $key => $value) {
+                $newKey = $prefix.$key;
+
+                if (is_array($value) && ! empty($value)) {
+                    $flatten($value, $newKey.'.');
+                } else {
+                    $results[$newKey] = $value;
+                }
             }
-        }
+        };
+
+        $flatten($array, $prepend);
 
         return $results;
     }
@@ -197,6 +254,10 @@ class Arr
                 return value($default);
             }
 
+            if (is_array($array)) {
+                return array_first($array);
+            }
+
             foreach ($array as $item) {
                 return $item;
             }
@@ -204,13 +265,9 @@ class Arr
             return value($default);
         }
 
-        foreach ($array as $key => $value) {
-            if ($callback($value, $key)) {
-                return $value;
-            }
-        }
+        $key = array_find_key($array, $callback);
 
-        return value($default);
+        return $key !== null ? $array[$key] : value($default);
     }
 
     /**
@@ -228,7 +285,7 @@ class Arr
     public static function last($array, ?callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? value($default) : array_last($array);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
@@ -281,6 +338,22 @@ class Arr
     }
 
     /**
+     * Get a float item from an array using "dot" notation.
+     */
+    public static function float(ArrayAccess|array $array, string|int|null $key, ?float $default = null): float
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_float($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a float, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
@@ -322,6 +395,32 @@ class Arr
 
             unset($array[array_shift($parts)]);
         }
+    }
+
+    /**
+     * Get the underlying array of items from the given argument.
+     *
+     * @template TKey of array-key = array-key
+     * @template TValue = mixed
+     *
+     * @param  array<TKey, TValue>|Enumerable<TKey, TValue>|Arrayable<TKey, TValue>|WeakMap<object, TValue>|Traversable<TKey, TValue>|Jsonable|JsonSerializable|object  $items
+     * @return ($items is WeakMap ? list<TValue> : array<TKey, TValue>)
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function from($items)
+    {
+        return match (true) {
+            is_array($items) => $items,
+            $items instanceof Enumerable => $items->all(),
+            $items instanceof Arrayable => $items->toArray(),
+            $items instanceof WeakMap => iterator_to_array($items, false),
+            $items instanceof Traversable => iterator_to_array($items),
+            $items instanceof Jsonable => json_decode($items->toJson(), true),
+            $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
+            is_object($items) => (array) $items,
+            default => throw new InvalidArgumentException('Items cannot be represented by a scalar value.'),
+        };
     }
 
     /**
@@ -396,6 +495,30 @@ class Arr
     }
 
     /**
+     * Determine if all keys exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function hasAll($array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (! $array || $keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (! static::has($array, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if any of the keys exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
@@ -425,6 +548,46 @@ class Arr
         }
 
         return false;
+    }
+
+    /**
+     * Determine if all items pass the given truth test.
+     *
+     * @param  iterable  $array
+     * @param  (callable(mixed, array-key): bool)  $callback
+     * @return bool
+     */
+    public static function every($array, callable $callback)
+    {
+        return array_all($array, $callback);
+    }
+
+    /**
+     * Determine if some items pass the given truth test.
+     *
+     * @param  iterable  $array
+     * @param  (callable(mixed, array-key): bool)  $callback
+     * @return bool
+     */
+    public static function some($array, callable $callback)
+    {
+        return array_any($array, $callback);
+    }
+
+    /**
+     * Get an integer item from an array using "dot" notation.
+     */
+    public static function integer(ArrayAccess|array $array, string|int|null $key, ?int $default = null): int
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_int($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be an integer, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
     }
 
     /**
@@ -472,7 +635,7 @@ class Arr
         }
 
         if (count($array) === 1) {
-            return end($array);
+            return array_last($array);
         }
 
         $finalItem = array_pop($array);
@@ -546,8 +709,8 @@ class Arr
      * Pluck an array of values from an array.
      *
      * @param  iterable  $array
-     * @param  string|array|int|null  $value
-     * @param  string|array|null  $key
+     * @param  string|array|int|Closure|null  $value
+     * @param  string|array|Closure|null  $key
      * @return array
      */
     public static function pluck($array, $value, $key = null)
@@ -557,7 +720,9 @@ class Arr
         [$value, $key] = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
-            $itemValue = data_get($item, $value);
+            $itemValue = $value instanceof Closure
+                ? $value($item)
+                : data_get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
@@ -565,7 +730,9 @@ class Arr
             if (is_null($key)) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = data_get($item, $key);
+                $itemKey = $key instanceof Closure
+                    ? $key($item)
+                    : data_get($item, $key);
 
                 if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                     $itemKey = (string) $itemKey;
@@ -581,15 +748,15 @@ class Arr
     /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param  string|array  $value
-     * @param  string|array|null  $key
+     * @param  string|array|Closure  $value
+     * @param  string|array|Closure|null  $key
      * @return array
      */
     protected static function explodePluckParameters($value, $key)
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = is_null($key) || is_array($key) || $key instanceof Closure ? $key : explode('.', $key);
 
         return [$value, $key];
     }
@@ -797,6 +964,23 @@ class Arr
     }
 
     /**
+     * Push an item into an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $values
+     * @return array
+     */
+    public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
+    {
+        $target = static::array($array, $key, []);
+
+        array_push($target, ...$values);
+
+        return static::set($array, $key, $target);
+    }
+
+    /**
      * Shuffle the given array and return the result.
      *
      * @param  array  $array
@@ -805,6 +989,34 @@ class Arr
     public static function shuffle($array)
     {
         return (new Randomizer)->shuffleArray($array);
+    }
+
+    /**
+     * Get the first item in the array, but only if exactly one item exists. Otherwise, throw an exception.
+     *
+     * @param  array  $array
+     * @param  (callable(mixed, array-key): array)|null  $callback
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     * @throws \Illuminate\Support\MultipleItemsFoundException
+     */
+    public static function sole($array, ?callable $callback = null)
+    {
+        if ($callback) {
+            $array = static::where($array, $callback);
+        }
+
+        $count = count($array);
+
+        if ($count === 0) {
+            throw new ItemNotFoundException;
+        }
+
+        if ($count > 1) {
+            throw new MultipleItemsFoundException($count);
+        }
+
+        return static::first($array);
     }
 
     /**
@@ -849,12 +1061,12 @@ class Arr
 
         if (! array_is_list($array)) {
             $descending
-                    ? krsort($array, $options)
-                    : ksort($array, $options);
+                ? krsort($array, $options)
+                : ksort($array, $options);
         } else {
             $descending
-                    ? rsort($array, $options)
-                    : sort($array, $options);
+                ? rsort($array, $options)
+                : sort($array, $options);
         }
 
         return $array;
@@ -873,9 +1085,25 @@ class Arr
     }
 
     /**
+     * Get a string item from an array using "dot" notation.
+     */
+    public static function string(ArrayAccess|array $array, string|int|null $key, ?string $default = null): string
+    {
+        $value = Arr::get($array, $key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Array value for key [%s] must be a string, %s found.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Conditionally compile classes from an array into a CSS class list.
      *
-     * @param  array  $array
+     * @param  array|string  $array
      * @return string
      */
     public static function toCssClasses($array)
@@ -898,7 +1126,7 @@ class Arr
     /**
      * Conditionally compile styles from an array into a style list.
      *
-     * @param  array  $array
+     * @param  array|string  $array
      * @return string
      */
     public static function toCssStyles($array)
@@ -940,6 +1168,32 @@ class Arr
     public static function reject($array, callable $callback)
     {
         return static::where($array, fn ($value, $key) => ! $callback($value, $key));
+    }
+
+    /**
+     * Partition the array into two arrays using the given callback.
+     *
+     * @template TKey of array-key
+     * @template TValue of mixed
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return array<int<0, 1>, array<TKey, TValue>>
+     */
+    public static function partition($array, callable $callback)
+    {
+        $passed = [];
+        $failed = [];
+
+        foreach ($array as $key => $item) {
+            if ($callback($item, $key)) {
+                $passed[$key] = $item;
+            } else {
+                $failed[$key] = $item;
+            }
+        }
+
+        return [$passed, $failed];
     }
 
     /**

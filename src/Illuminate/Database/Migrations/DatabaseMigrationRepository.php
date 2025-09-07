@@ -32,7 +32,6 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
      *
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  string  $table
-     * @return void
      */
     public function __construct(Resolver $resolver, $table)
     {
@@ -65,7 +64,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
 
         return $query->orderBy('batch', 'desc')
             ->orderBy('migration', 'desc')
-            ->take($steps)->get()->all();
+            ->limit($steps)
+            ->get()
+            ->all();
     }
 
     /**

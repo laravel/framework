@@ -85,7 +85,7 @@ class ScheduleListCommand extends Command
      */
     private function getCronExpressionSpacing($events)
     {
-        $rows = $events->map(fn ($event) => array_map('mb_strlen', preg_split("/\s+/", $event->expression)));
+        $rows = $events->map(fn ($event) => array_map(mb_strlen(...), preg_split("/\s+/", $event->expression)));
 
         return (new Collection($rows[0] ?? []))->keys()->map(fn ($key) => $rows->max($key))->all();
     }
@@ -190,8 +190,8 @@ class ScheduleListCommand extends Command
     private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
     {
         return $this->option('next')
-                    ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
-                    : $events;
+            ? $events->sortBy(fn ($event) => $this->getNextDueDateForEvent($event, $timezone))
+            : $events;
     }
 
     /**

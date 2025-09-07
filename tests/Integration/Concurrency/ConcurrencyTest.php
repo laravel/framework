@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Support\Facades\Concurrency;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 
 #[RequiresOperatingSystem('Linux|DAR')]
@@ -52,6 +53,39 @@ PHP);
         ]);
     }
 
+    public function testOutputIsMappedToArrayInput()
+    {
+        $input = [
+            'first' => fn () => 1 + 1,
+            'second' => fn () => 2 + 2,
+        ];
+
+        $processOutput = Concurrency::driver('process')->run($input);
+
+        $this->assertIsArray($processOutput);
+        $this->assertArrayHasKey('first', $processOutput);
+        $this->assertArrayHasKey('second', $processOutput);
+
+        $syncOutput = Concurrency::driver('sync')->run($input);
+
+        $this->assertIsArray($syncOutput);
+        $this->assertArrayHasKey('first', $syncOutput);
+        $this->assertArrayHasKey('second', $syncOutput);
+
+        /** As of now, the spatie/fork package is not included by default.
+         * $forkOutput = Concurrency::driver('fork')->run([
+         * 'first' => fn() => 1 + 1,
+         * 'second' => fn() => 2 + 2,
+         * ]);.
+         *
+         * $this->assertIsArray($forkOutput);
+         * $this->assertArrayHasKey('first', $forkOutput);
+         * $this->assertArrayHasKey('second', $forkOutput);
+         * $this->assertEquals(2, $forkOutput['first']);
+         * $this->assertEquals(4, $forkOutput['second']);
+         */
+    }
+
     public function testRunHandlerProcessErrorWithDefaultExceptionWithoutParam()
     {
         $this->expectException(Exception::class);
@@ -85,6 +119,42 @@ PHP);
                 'Invalid payload'
             ),
         ]);
+    }
+
+    public static function getConcurrencyDrivers(): array
+    {
+        return [
+            ['sync'],
+            ['process'],
+            // spatie/fork package is not included by default
+            // ['fork'],
+        ];
+    }
+
+    #[DataProvider('getConcurrencyDrivers')]
+    public function testRunPreservesCallbackOrder(string $driver)
+    {
+        [$first, $second, $third] = Concurrency::driver($driver)->run([
+            function () {
+                usleep(1000000);
+
+                return 'first';
+            },
+            function () {
+                usleep(500000);
+
+                return 'second';
+            },
+            function () {
+                usleep(200000);
+
+                return 'third';
+            },
+        ]);
+
+        $this->assertEquals('first', $first);
+        $this->assertEquals('second', $second);
+        $this->assertEquals('third', $third);
     }
 }
 

@@ -12,12 +12,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\HigherOrderCollectionProxy;
-use InvalidArgumentException;
 use JsonSerializable;
-use Traversable;
 use UnexpectedValueException;
 use UnitEnum;
-use WeakMap;
 
 use function Illuminate\Support\enum_value;
 
@@ -177,6 +174,19 @@ trait EnumeratesValues
         return static::range(1, $number)
             ->unless($callback == null)
             ->map($callback);
+    }
+
+    /**
+     * Create a new collection by decoding a JSON string.
+     *
+     * @param  string  $json
+     * @param  int  $depth
+     * @param  int  $flags
+     * @return static<TKey, TValue>
+     */
+    public static function fromJson($json, $depth = 512, $flags = 0)
+    {
+        return new static(json_decode($json, true, $depth, $flags));
     }
 
     /**
@@ -414,7 +424,7 @@ trait EnumeratesValues
     {
         $groups = $this->mapToDictionary($callback);
 
-        return $groups->map([$this, 'make']);
+        return $groups->map($this->make(...));
     }
 
     /**
@@ -459,7 +469,7 @@ trait EnumeratesValues
         $callback = $this->valueRetriever($callback);
 
         return $this->map(fn ($value) => $callback($value))
-            ->filter(fn ($value) => ! is_null($value))
+            ->reject(fn ($value) => is_null($value))
             ->reduce(fn ($result, $value) => is_null($result) || $value < $result ? $value : $result);
     }
 
@@ -473,7 +483,7 @@ trait EnumeratesValues
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(fn ($value) => ! is_null($value))->reduce(function ($result, $item) use ($callback) {
+        return $this->reject(fn ($value) => is_null($value))->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
             return is_null($result) || $value > $result ? $value : $result;
@@ -498,26 +508,17 @@ trait EnumeratesValues
      * Partition the collection into two arrays using the given callback or key.
      *
      * @param  (callable(TValue, TKey): bool)|TValue|string  $key
-     * @param  TValue|string|null  $operator
-     * @param  TValue|null  $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return static<int<0, 1>, static<TKey, TValue>>
      */
     public function partition($key, $operator = null, $value = null)
     {
-        $passed = [];
-        $failed = [];
-
         $callback = func_num_args() === 1
-                ? $this->valueRetriever($key)
-                : $this->operatorForWhere(...func_get_args());
+            ? $this->valueRetriever($key)
+            : $this->operatorForWhere(...func_get_args());
 
-        foreach ($this as $key => $item) {
-            if ($callback($item, $key)) {
-                $passed[$key] = $item;
-            } else {
-                $failed[$key] = $item;
-            }
-        }
+        [$passed, $failed] = Arr::partition($this->getIterator(), $callback);
 
         return new static([new static($passed), new static($failed)]);
     }
@@ -544,8 +545,10 @@ trait EnumeratesValues
     /**
      * Get the sum of the given values.
      *
-     * @param  (callable(TValue): mixed)|string|null  $callback
-     * @return mixed
+     * @template TReturnType
+     *
+     * @param  (callable(TValue): TReturnType)|string|null  $callback
+     * @return ($callback is callable ? TReturnType : mixed)
      */
     public function sum($callback = null)
     {
@@ -982,6 +985,17 @@ trait EnumeratesValues
     }
 
     /**
+     * Get the collection of items as pretty print formatted JSON.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toPrettyJson(int $options = 0)
+    {
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
+    }
+
+    /**
      * Get a CachingIterator instance.
      *
      * @param  int  $flags
@@ -1000,8 +1014,8 @@ trait EnumeratesValues
     public function __toString()
     {
         return $this->escapeWhenCastingToString
-                    ? e($this->toJson())
-                    : $this->toJson();
+            ? e($this->toJson())
+            : $this->toJson();
     }
 
     /**
@@ -1053,20 +1067,9 @@ trait EnumeratesValues
      */
     protected function getArrayableItems($items)
     {
-        if (is_array($items)) {
-            return $items;
-        }
-
-        return match (true) {
-            $items instanceof WeakMap => throw new InvalidArgumentException('Collections can not be created using instances of WeakMap.'),
-            $items instanceof Enumerable => $items->all(),
-            $items instanceof Arrayable => $items->toArray(),
-            $items instanceof Traversable => iterator_to_array($items),
-            $items instanceof Jsonable => json_decode($items->toJson(), true),
-            $items instanceof JsonSerializable => (array) $items->jsonSerialize(),
-            $items instanceof UnitEnum => [$items],
-            default => (array) $items,
-        };
+        return is_null($items) || is_scalar($items) || $items instanceof UnitEnum
+            ? Arr::wrap($items)
+            : Arr::from($items);
     }
 
     /**

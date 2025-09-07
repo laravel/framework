@@ -2,10 +2,12 @@
 
 namespace Illuminate\Tests\Foundation\Bootstrap;
 
+use Closure;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class LoadConfigurationTest extends TestCase
 {
@@ -16,6 +18,19 @@ class LoadConfigurationTest extends TestCase
         (new LoadConfiguration)->bootstrap($app);
 
         $this->assertSame('Laravel', $app['config']['app.name']);
+    }
+
+    public function testSetsEnvironmentResolver()
+    {
+        $app = new Application();
+        $this->assertNull((new ReflectionClass($app))->getProperty('environmentResolver')->getValue($app));
+
+        (new LoadConfiguration)->bootstrap($app);
+
+        $this->assertInstanceOf(
+            Closure::class,
+            (new ReflectionClass($app))->getProperty('environmentResolver')->getValue($app)
+        );
     }
 
     public function testDontLoadBaseConfiguration()

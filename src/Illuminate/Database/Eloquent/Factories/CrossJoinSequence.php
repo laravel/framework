@@ -10,7 +10,6 @@ class CrossJoinSequence extends Sequence
      * Create a new cross join sequence instance.
      *
      * @param  array  ...$sequences
-     * @return void
      */
     public function __construct(...$sequences)
     {

@@ -171,7 +171,7 @@ class SupportTestingQueueFakeTest extends TestCase
             $this->fake->assertPushed(JobStub::class, 1);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.', $e->getMessage());
+            $this->assertStringContainsString('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 time.', $e->getMessage());
         }
 
         $this->fake->assertPushed(JobStub::class, 2);

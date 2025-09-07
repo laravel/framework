@@ -330,27 +330,11 @@ class HandleExceptions
      */
     public static function flushHandlersState(?TestCase $testCase = null)
     {
-        while (true) {
-            $previousHandler = set_exception_handler(static fn () => null);
-
-            restore_exception_handler();
-
-            if ($previousHandler === null) {
-                break;
-            }
-
+        while (get_exception_handler() !== null) {
             restore_exception_handler();
         }
 
-        while (true) {
-            $previousHandler = set_error_handler(static fn () => null);
-
-            restore_error_handler();
-
-            if ($previousHandler === null) {
-                break;
-            }
-
+        while (get_error_handler() !== null) {
             restore_error_handler();
         }
 
