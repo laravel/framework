@@ -210,6 +210,18 @@ class Application extends SymfonyApplication implements ApplicationContract
     }
 
     /**
+     * Alias for addCommand() since Symfony's add() method was deprecated.
+     *
+     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @return \Symfony\Component\Console\Command\Command|null
+     */
+    #[\Override]
+    public function add(SymfonyCommand $command): ?SymfonyCommand
+    {
+        return $this->addCommand($command);
+    }
+
+    /**
      * Add a command to the console.
      *
      * @param  \Symfony\Component\Console\Command\Command|callable  $command
