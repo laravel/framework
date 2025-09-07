@@ -2042,6 +2042,30 @@ class Str
     }
 
     /**
+     * Clip a string in the middle if it exceeds the given length.
+     *
+     * For example, "SuperLongFileName.ext" with a max of 15 would become
+     * "SuperL…ame.ext".
+     *
+     * This is useful for displaying long identifiers (filenames, hashes, etc.)
+     * while keeping both the beginning and end visible.
+     *
+     * @param  string  $value
+     * @param  int  $max
+     * @param  string  $ellipsis
+     * @return string
+     */
+    public static function clipMiddle(string $value, int $max = 40, string $ellipsis = '…'): string
+    {
+        $len = mb_strlen($value, 'UTF-8');
+        if ($len <= $max) return $value;
+        $keep = max(1, $max - mb_strlen($ellipsis, 'UTF-8'));
+        $front = (int) floor($keep / 2);
+        $back  = $keep - $front;
+        return mb_substr($value, 0, $front) . $ellipsis . mb_substr($value, -$back);
+    }
+
+    /**
      * Remove all strings from the casing caches.
      *
      * @return void

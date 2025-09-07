@@ -1652,6 +1652,13 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
+
+    public function testClipMiddle()
+    {
+        $this->assertSame('SuperL…ame.ext', Str::clipMiddle('SuperLongFileName.ext', 15));
+
+        $this->assertSame('😀…😀', Str::clipMiddle('😀😀😀😀😀', 3));
+    }
 }
 
 class StringableObjectStub
