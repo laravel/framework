@@ -169,7 +169,7 @@ trait HidesAttributes
     /**
      * Set the globally hidden attributes for all models.
      *
-     * @param  array<string> $hidden
+     * @param  array<string>  $hidden
      * @return void
      */
     public static function setGloballyHidden(array $hidden): void
@@ -180,7 +180,7 @@ trait HidesAttributes
     /**
      * Set the globally visible attributes for all models.
      *
-     * @param  array<string> $visible
+     * @param  array<string>  $visible
      * @return void
      */
     public static function setGloballyVisible(array $visible): void
