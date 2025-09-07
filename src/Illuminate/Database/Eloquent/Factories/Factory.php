@@ -953,10 +953,14 @@ abstract class Factory
     /**
      * Get a new Faker instance.
      *
-     * @return \Faker\Generator
+     * @return \Faker\Generator|null
      */
     protected function withFaker()
     {
+        if (! class_exists(Generator::class)) {
+            return;
+        }
+
         return Container::getInstance()->make(Generator::class);
     }
 
