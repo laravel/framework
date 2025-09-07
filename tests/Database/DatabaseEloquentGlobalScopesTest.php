@@ -108,6 +108,18 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
+    public function testAllGlobalScopesCanBeRemovedExceptSpecified()
+    {
+        $model = new EloquentClosureGlobalScopesTestModel;
+        $query = $model->newQuery()->withoutGlobalScopesExcept(['active_scope']);
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopesExcept(['active_scope']);
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
     public function testGlobalScopesWithOrWhereConditionsAreNested()
     {
         $model = new EloquentClosureGlobalScopesWithOrTestModel;
