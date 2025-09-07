@@ -144,10 +144,8 @@ class PhpRedisConnector implements Connector
                 $client->setOption(Redis::OPT_COMPRESSION_LEVEL, $config['compression_level']);
             }
 
-            if (
-                defined('Redis::OPT_PACK_IGNORE_NUMBERS') &&
-                array_key_exists('pack_ignore_numbers', $config)
-            ) {
+            if (defined('Redis::OPT_PACK_IGNORE_NUMBERS') &&
+                array_key_exists('pack_ignore_numbers', $config)) {
                 $client->setOption(Redis::OPT_PACK_IGNORE_NUMBERS, $config['pack_ignore_numbers']);
             }
         });
