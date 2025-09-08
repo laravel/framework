@@ -42,7 +42,7 @@ trait TransformsToResource
     /**
      * Guess the resource class name for the model.
      *
-     * @return array<class-string<\Illuminate\Http\Resources\Json\JsonResource>>
+     * @return array{class-string<\Illuminate\Http\Resources\Json\JsonResource>, class-string<\Illuminate\Http\Resources\Json\JsonResource>}
      */
     public static function guessResourceName(): array
     {
