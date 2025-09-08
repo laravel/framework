@@ -8,7 +8,6 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
@@ -125,6 +124,10 @@ class RouteListCommandTest extends TestCase
     {
         $this->withoutDeprecationHandling();
 
+        RouteListCommand::resolveTerminalWidthUsing(function () {
+            return 82;
+        });
+
         $this->router->get('/', function () {
             //
         });
@@ -137,7 +140,7 @@ class RouteListCommandTest extends TestCase
                 '  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
             )->expectsOutput('')
             ->expectsOutput(
-                '                                                  Showing [1] routes'
+                '                                                              Showing [1] routes'
             )
             ->expectsOutput('');
     }
@@ -157,15 +160,6 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('')
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Facade::setFacadeApplication(null);
-
-        RouteListCommand::resolveTerminalWidthUsing(null);
     }
 }
 

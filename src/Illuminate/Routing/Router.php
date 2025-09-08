@@ -509,7 +509,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function mergeWithLastGroup($new, $prependExistingPrefix = true)
     {
-        return RouteGroup::merge($new, end($this->groupStack), $prependExistingPrefix);
+        return RouteGroup::merge($new, array_last($this->groupStack), $prependExistingPrefix);
     }
 
     /**
@@ -535,7 +535,7 @@ class Router implements BindingRegistrar, RegistrarContract
     public function getLastGroupPrefix()
     {
         if ($this->hasGroupStack()) {
-            $last = end($this->groupStack);
+            $last = array_last($this->groupStack);
 
             return $last['prefix'] ?? '';
         }
@@ -640,7 +640,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function prependGroupNamespace($class)
     {
-        $group = end($this->groupStack);
+        $group = array_last($this->groupStack);
 
         return isset($group['namespace']) && ! str_starts_with($class, '\\') && ! str_starts_with($class, $group['namespace'])
             ? $group['namespace'].'\\'.$class
@@ -655,7 +655,7 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function prependGroupController($class)
     {
-        $group = end($this->groupStack);
+        $group = array_last($this->groupStack);
 
         if (! isset($group['controller'])) {
             return $class;
