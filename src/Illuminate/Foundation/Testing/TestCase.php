@@ -58,6 +58,7 @@ abstract class TestCase extends BaseTestCase
         $result = null;
 
         try {
+            // @phpstan-ignore-next-line
             $result = parent::runTest();
         } catch (Throwable $e) {
             if (! is_null(static::$latestResponse)) {
