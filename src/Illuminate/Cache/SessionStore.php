@@ -15,7 +15,7 @@ class SessionStore extends TaggableStore implements LockProvider
      *
      * @var \Illuminate\Session\Store
      */
-    protected $session;
+    public $session;
 
     /**
      * Indicates if values are serialized within the store.
@@ -45,12 +45,12 @@ class SessionStore extends TaggableStore implements LockProvider
     public function all($unserialize = true)
     {
         if ($unserialize === false || $this->serializesValues === false) {
-            return $this->storage;
+            return $this->session->get('_storage', []);
         }
 
         $storage = [];
 
-        foreach ($this->storage as $key => $data) {
+        foreach ($this->session->get('_storage', []) as $key => $data) {
             $storage[$key] = [
                 'value' => unserialize($data['value']),
                 'expiresAt' => $data['expiresAt'],
@@ -72,7 +72,7 @@ class SessionStore extends TaggableStore implements LockProvider
             return;
         }
 
-        $item = $this->storage[$key];
+        $item = $this->session->get("_storage.{$key}");
 
         $expiresAt = $item['expiresAt'] ?? 0;
 
@@ -95,10 +95,10 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        $this->storage[$key] = [
+        $this->session->put("_storage.{$key}", [
             'value' => $this->serializeValue($value),
             'expiresAt' => $this->calculateExpiration($seconds),
-        ];
+        ]);
 
         return true;
     }
@@ -116,7 +116,7 @@ class SessionStore extends TaggableStore implements LockProvider
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
                 $value = $this->serializeValue($incremented);
 
-                $this->storage[$key]['value'] = $value;
+                $this->session->put("_storage.{$key}.value", $value);
             });
         }
 
@@ -157,8 +157,8 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        if (array_key_exists($key, $this->storage)) {
-            unset($this->storage[$key]);
+        if ($this->session->has("_storage.{$key}")) {
+            $this->session->forget("_storage.{$key}");
 
             return true;
         }
@@ -173,7 +173,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function flush()
     {
-        $this->storage = [];
+        $this->session->put('_storage', []);
 
         return true;
     }
