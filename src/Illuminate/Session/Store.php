@@ -6,8 +6,8 @@ use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -19,7 +19,7 @@ use stdClass;
 
 class Store implements Session
 {
-    use Macroable, InteractsWithTime;
+    use Macroable;
 
     /**
      * The session ID.
@@ -77,6 +77,16 @@ class Store implements Session
         $this->name = $name;
         $this->handler = $handler;
         $this->serialization = $serialization;
+    }
+
+    /**
+     * Manage the session cache store.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function cache()
+    {
+        return Cache::store('session');
     }
 
     /**
@@ -409,28 +419,6 @@ class Store implements Session
     }
 
     /**
-     * Get an item from the session, or store the default value for a given time.
-     *
-     * @param  string  $key
-     * @param  \Closure|\DateTimeInterface|\DateInterval|int|null  $ttl
-     * @param  \Closure  $callback
-     * @return mixed
-     */
-    public function rememberFor($key, $ttl, Closure $callback)
-    {
-        if (! $this->checkIfDataExpired($value = $this->get($key))) {
-            return $value['value'];
-        }
-
-        return tap($callback(), function ($value) use ($key, $ttl) {
-            $this->put($key, [
-                'value' => $value,
-                'expires_at' => $this->availableAt($ttl),
-            ]);
-        });
-    }
-
-    /**
      * Push a value onto a session array.
      *
      * @param  string  $key
@@ -549,21 +537,6 @@ class Store implements Session
     protected function removeFromOldFlashData(array $keys)
     {
         $this->put('_flash.old', array_diff($this->get('_flash.old', []), $keys));
-    }
-
-    /**
-     * Check if the session data has expired.
-     *
-     * @param  array  $data
-     * @return bool
-     */
-    protected function checkIfDataExpired($data)
-    {
-        if (! $data) {
-            return true;
-        }
-
-        return ($data['expires_at'] ?? 0) < $this->currentTime();
     }
 
     /**

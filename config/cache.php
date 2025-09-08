@@ -38,6 +38,11 @@ return [
             'serialize' => false,
         ],
 
+        'session' => [
+            'driver' => 'session',
+            'serialize' => false,
+        ],
+
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_CACHE_CONNECTION'),

@@ -6,23 +6,16 @@ use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
-class ArrayStore extends TaggableStore implements LockProvider
+class SessionStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
-     * The array of stored values.
+     * The session instance.
      *
-     * @var array<string, array{value: mixed, expiresAt: float}>
+     * @var \Illuminate\Session\Store
      */
-    protected $storage = [];
-
-    /**
-     * The array of locks.
-     *
-     * @var array<string, array{owner: ?string, expiresAt: ?\Illuminate\Support\Carbon}>
-     */
-    public $locks = [];
+    protected $session;
 
     /**
      * Indicates if values are serialized within the store.
@@ -32,12 +25,14 @@ class ArrayStore extends TaggableStore implements LockProvider
     protected $serializesValues;
 
     /**
-     * Create a new Array store.
+     * Create a new Session store.
      *
+     * @param  \Illuminate\Session\Store  $session
      * @param  bool  $serializesValues
      */
-    public function __construct($serializesValues = false)
+    public function __construct($session, $serializesValues = false)
     {
+        $this->session = $session;
         $this->serializesValues = $serializesValues;
     }
 
@@ -247,7 +242,7 @@ class ArrayStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new ArrayLock($this, $name, $seconds, $owner);
+        return new SessionLock($this, $name, $seconds, $owner);
     }
 
     /**

@@ -177,9 +177,14 @@ class CacheManager implements FactoryContract
      */
     protected function createFileDriver(array $config)
     {
+        $store = new FileStore(
+            $this->app['files'],
+            $config['path'],
+            $config['permission'] ?? null,
+        );
+
         return $this->repository(
-            (new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null))
-                ->setLockDirectory($config['lock_path'] ?? null),
+            $store->setLockDirectory($config['lock_path'] ?? null),
             $config
         );
     }
@@ -212,6 +217,23 @@ class CacheManager implements FactoryContract
     protected function createNullDriver()
     {
         return $this->repository(new NullStore, []);
+    }
+
+    /**
+     * Create an instance of the session cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createSessionDriver(array $config)
+    {
+        $session = $this->app['session'] ?? null;
+
+        if (! $session) {
+            throw new InvalidArgumentException('Session store requires session manager to be set.');
+        }
+
+        return $this->repository(new SessionStore($session, $config['serialize'] ?? false), $config);
     }
 
     /**
