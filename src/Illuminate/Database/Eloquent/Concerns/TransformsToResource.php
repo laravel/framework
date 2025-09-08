@@ -78,7 +78,7 @@ trait TransformsToResource
     /**
      * Get the resource class from the class attribute.
      *
-     * @param  class-string<*>  $class
+     * @param  class-string<\Illuminate\Http\Resources\Json\JsonResource>  $class
      * @return class-string<*>|null
      */
     protected function resolveResourceFromAttribute(string $class): ?string
