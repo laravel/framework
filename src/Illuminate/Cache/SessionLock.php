@@ -58,7 +58,7 @@ class SessionLock extends Lock
      */
     protected function exists()
     {
-        return $this->store->session->has("_locks.{$this->name}");
+        return $this->store->session->exists("_locks.{$this->name}");
     }
 
     /**

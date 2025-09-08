@@ -68,7 +68,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        if (! isset($this->storage[$key])) {
+        if ($this->session->missing("_storage.{$key}")) {
             return;
         }
 
@@ -157,7 +157,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        if ($this->session->has("_storage.{$key}")) {
+        if ($this->session->exists("_storage.{$key}")) {
             $this->session->forget("_storage.{$key}");
 
             return true;
