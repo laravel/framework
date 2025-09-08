@@ -1,7 +1,7 @@
 @props([
     'code',
     'grammar',
-    'theme' => 'one-dark-pro',
+    'theme' => 'dark-plus',
     'withGutter' => false,
     'startingLine' => 1,
     'highlightedLine' => null,
