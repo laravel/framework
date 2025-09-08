@@ -109,6 +109,31 @@ class DatabaseTransactionsManagerTest extends TestCase
         $this->assertCount(1, $manager->getPendingTransactions()[2]->getCallbacks());
     }
 
+    public function testCallbacksRunInFifoOrder()
+    {
+        $manager = (new DatabaseTransactionsManager);
+
+        $order = [];
+
+        $manager->begin('default', 1);
+
+        $manager->addCallback(function () use (&$order) {
+            $order[] = 1;
+        });
+
+        $manager->addCallback(function () use (&$order) {
+            $order[] = 2;
+        });
+
+        $manager->addCallback(function () use (&$order) {
+            $order[] = 3;
+        });
+
+        $manager->commit('default', 1, 0);
+
+        $this->assertSame([1, 2, 3], $order);
+    }
+
     public function testCommittingTransactionsExecutesCallbacks()
     {
         $callbacks = [];
