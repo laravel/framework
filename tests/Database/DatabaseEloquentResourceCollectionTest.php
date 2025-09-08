@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceCollectionTestResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceCollectionTestModel;
 use PHPUnit\Framework\TestCase;
 
@@ -43,9 +44,4 @@ class DatabaseEloquentResourceCollectionTest extends TestCase
 
         $this->assertInstanceOf(JsonResource::class, $resource);
     }
-}
-
-class EloquentResourceCollectionTestResource extends JsonResource
-{
-    //
 }

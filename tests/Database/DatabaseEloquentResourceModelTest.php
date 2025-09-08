@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
 use PHPUnit\Framework\TestCase;
@@ -59,9 +59,4 @@ class DatabaseEloquentResourceModelTest extends TestCase
             'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel',
         ], $model::guessResourceName());
     }
-}
-
-class EloquentResourceTestJsonResource extends JsonResource
-{
-    //
 }
