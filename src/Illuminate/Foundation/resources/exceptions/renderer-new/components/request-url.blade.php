@@ -13,14 +13,14 @@
             }
         }
     }"
-    class="backdrop-blur-[6px] bg-white/[0.04] border border-white/5 rounded-lg flex items-center justify-between p-2"
+    class="backdrop-blur-[6px] bg-white dark:bg-white/[4%] border border-neutral-200 dark:border-white/10 rounded-lg flex items-center justify-between p-2"
 >
     <div class="flex items-center gap-3 w-full">
         <x-laravel-exceptions-renderer-new::badge type="error" variant="solid">
             <x-laravel-exceptions-renderer-new::icons.globe class="w-2.5 h-2.5" />
             {{ $request->method() }}
         </x-laravel-exceptions-renderer-new::badge>
-        <div class="flex-1 text-sm font-light truncate">
+        <div class="flex-1 text-sm font-light truncate text-neutral-950 dark:text-white">
             <span data-tippy-content="{{ $request->fullUrl() }}">
                 {{ $request->fullUrl() }}
             </span>
@@ -28,7 +28,10 @@
         <button
             x-cloak
             @click="copyToClipboard()"
-            class="bg-white/5 rounded-md w-6 h-6 flex flex-shrink-0 items-center justify-center cursor-pointer transition-colors hover:bg-white/10"
+            @class([
+                "rounded-md w-6 h-6 flex flex-shrink-0 items-center justify-center cursor-pointer border transition-colors duration-200 ease-in-out",
+                "bg-white/5 border-neutral-200 hover:bg-neutral-50 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10",
+            ])
         >
             <x-laravel-exceptions-renderer-new::icons.copy class="w-3 h-3 text-neutral-400" x-show="!copied" />
             <x-laravel-exceptions-renderer-new::icons.check class="w-3 h-3 text-emerald-500" x-show="copied" />

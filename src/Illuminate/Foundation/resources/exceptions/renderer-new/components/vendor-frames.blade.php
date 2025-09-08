@@ -4,7 +4,7 @@
 
 <div
     x-data="{ expanded: false }"
-    class="group rounded-lg border"
+    class="group rounded-lg border border-neutral-200"
     :class="{
         'bg-white dark:border-white/5 dark:bg-white/5': expanded,
         'border-dashed border-neutral-300 bg-neutral-50 opacity-90 dark:border-white/10 dark:bg-white/1': !expanded,
@@ -16,7 +16,7 @@
     >
         {{-- Folder --}}
         <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
-        <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-emerald-500" x-show="expanded" />
+        <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-blue-500 dark:text-emerald-500" x-show="expanded" />
 
         <div class="flex-1 font-mono text-xs leading-3 text-neutral-600 dark:text-neutral-400">
             {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
@@ -25,10 +25,10 @@
         <button
             x-cloak
             type="button"
-            class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border dark:border-white/8 group-hover:text-emerald-500"
+            class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md dark:border dark:border-white/8 group-hover:text-blue-500 group-hover:dark:text-emerald-500"
             :class="{
-                'text-emerald-500 dark:bg-white/5': expanded,
-                'text-neutral-500 dark:bg-white/3': !expanded,
+                'text-blue-500 dark:text-emerald-500 dark:bg-white/5': expanded,
+                'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
             }"
         >
             <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />

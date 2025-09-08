@@ -5,7 +5,7 @@
         expanded: {{ $frame->isMain() ? 'true' : 'false' }},
         hasCode: {{ $frame->snippet() ? 'true' : 'false' }}
     }"
-    class="group rounded-lg border"
+    class="group rounded-lg border border-neutral-200"
     :class="expanded ? 'dark:border-white/10' : 'dark:border-white/5'"
 >
     <div
@@ -19,7 +19,7 @@
     >
         {{-- Dot --}}
         <div class="flex size-3 items-center justify-center flex-shrink-0">
-          <div class="size-2 rounded-full bg-neutral-400 dark:bg-neutral-400"></div>
+          <div class="size-2 rounded-full bg-rose-500 dark:bg-neutral-400"></div>
         </div>
 
         <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
@@ -35,10 +35,10 @@
             <button
                 x-cloak
                 type="button"
-                class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border dark:border-white/8 group-hover:text-emerald-500"
+                class="flex h-6 w-6 cursor-pointer items-center justify-center rounded-md dark:border dark:border-white/8 group-hover:text-blue-500 group-hover:dark:text-emerald-500"
                 :class="{
-                    'text-emerald-500 dark:bg-white/5': expanded,
-                    'text-neutral-500 dark:bg-white/3': !expanded,
+                    'text-blue-500 dark:text-emerald-500 dark:bg-white/5': expanded,
+                    'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
                 }"
             >
                 <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />

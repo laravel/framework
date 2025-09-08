@@ -1,7 +1,7 @@
 @props(['queries'])
 
 <div
-    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-white/[1%] border border-neutral-800 rounded-xl p-[10px]"]) }}
+    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px]"]) }}
     x-data="{
         totalQueries: {{ count($queries) }},
         currentPage: 1,
@@ -78,12 +78,12 @@
 >
     <div class="flex items-center justify-between p-2">
         <div class="flex items-center gap-2.5">
-            <div class="border border-white/5 bg-neutral-800 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-emerald-500" />
+            <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-white/5 rounded-md w-6 h-6 flex items-center justify-center p-1">
+                <x-laravel-exceptions-renderer-new::icons.database class="w-2.5 h-2.5 text-blue-500 dark:text-emerald-500" />
             </div>
             <h3 class="text-base font-semibold">Queries</h3>
         </div>
-        <div x-show="totalQueries > 0" class="text-sm text-neutral-400">
+        <div x-show="totalQueries > 0" class="text-sm text-neutral-500 dark:text-neutral-400">
             <span x-text="`${((currentPage - 1) * perPage) + 1}-${Math.min(currentPage * perPage, totalQueries)} of ${totalQueries}`"></span>
         </div>
     </div>
@@ -91,12 +91,12 @@
     <div class="flex flex-col gap-1">
         @forelse ($queries as $index => ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
         <div
-            class="bg-white/[0.03] rounded-md h-10 flex items-center gap-4 px-4 text-xs font-mono"
+            class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center gap-4 px-4 text-xs font-mono shadow-sm"
             x-show="Math.floor({{ $index }} / perPage) === (currentPage - 1)"
         >
             <div class="flex items-center gap-2 shrink-0">
-                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500" />
-                <span class="text-neutral-400">{{ $connectionName }}</span>
+                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                <span class="text-neutral-500 dark:text-neutral-400">{{ $connectionName }}</span>
             </div>
             <div class="min-w-0 flex-1">
                 <x-laravel-exceptions-renderer-new::syntax-highlight
@@ -106,7 +106,7 @@
                     data-tippy-content="{{ $sql }}"
                 />
             </div>
-            <div class="text-neutral-200 text-right flex-shrink-0">{{ $time }}ms</div>
+            <div class="text-neutral-500 dark:text-neutral-200 text-right flex-shrink-0">{{ $time }}ms</div>
         </div>
         @empty
         <x-laravel-exceptions-renderer-new::empty-state message="No queries executed" />

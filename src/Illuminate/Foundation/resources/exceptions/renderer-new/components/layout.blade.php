@@ -14,8 +14,8 @@
 
     {!! Renderer::css() !!}
 </head>
-<body class="bg-neutral-900 font-sans antialiased overflow-x-hidden text-white">
-    <div class="min-h-dvh bg-neutral-900">
+<body class="font-sans antialiased overflow-x-hidden bg-neutral-50 dark:bg-neutral-900 dark:text-white">
+    <div class="min-h-dvh">
         {{ $slot }}
     </div>
 
