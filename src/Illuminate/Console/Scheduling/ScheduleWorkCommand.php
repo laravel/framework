@@ -19,9 +19,8 @@ class ScheduleWorkCommand extends Command
      * @var string
      */
     protected $signature = 'schedule:work
-        {--whisper : Do not output message indicating that no jobs were ready to run}
         {--run-output-file= : The file to direct <info>schedule:run</info> output to}
-    ';
+        {--whisper : Do not output message indicating that no jobs were ready to run}';
 
     /**
      * The console command description.
