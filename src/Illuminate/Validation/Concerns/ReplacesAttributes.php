@@ -356,7 +356,7 @@ trait ReplacesAttributes
      */
     protected function replaceMimetypes($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return $this->replaceExtensions($message, $attribute, $rule, $parameters);
     }
 
     /**
@@ -370,7 +370,7 @@ trait ReplacesAttributes
      */
     protected function replaceMimes($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return $this->replaceExtensions($message, $attribute, $rule, $parameters);
     }
 
     /**
