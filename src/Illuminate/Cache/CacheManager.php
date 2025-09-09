@@ -341,7 +341,7 @@ class CacheManager implements FactoryContract
                 $this->setEventDispatcher($repository);
             }
 
-            if ($config['store'] === 'session' && method_exists($repository, 'setPrefix')) {
+            if (($config['store'] ?? 'ondemand') === 'session' && method_exists($repository, 'setPrefix')) {
                 $session = $this->getSession();
 
                 $repository->setPrefix($session->getId());
