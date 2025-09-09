@@ -186,6 +186,8 @@ class SupportLazyCollectionTest extends TestCase
 
         $mock = m::mock(LazyCollection::class.'[now]');
 
+        $timedOutWith = [null, null];
+
         $results = $mock
             ->times(10)
             ->tap(function ($collection) use ($mock, $timeout) {
@@ -200,10 +202,13 @@ class SupportLazyCollectionTest extends TestCase
                         $timeout->getTimestamp()
                     );
             })
-            ->takeUntilTimeout($timeout)
+            ->takeUntilTimeout($timeout, function ($value, $key) use (&$timedOutWith) {
+                $timedOutWith = [$value, $key];
+            })
             ->all();
 
         $this->assertSame([1, 2], $results);
+        $this->assertSame([2, 1], $timedOutWith);
 
         m::close();
     }
