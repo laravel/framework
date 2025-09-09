@@ -1890,6 +1890,61 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testTokensCanRemoveCharacters()
+    {
+        $text = "foo=1, bar=2";
+        $result = Str::tokens($text, remove: ['=', ',']);
+        $this->assertEquals(['foo1', 'bar2'], $result->all());
+    }
+
+    public function testTokensCanReplaceCharacters()
+    {
+        $text = "hello_user test@example.com";
+        $result = Str::tokens($text, replace: ['_' => '-', '@' => '[at]']);
+        $this->assertEquals(['hello-user', 'test[at]example.com'], $result->all());
+    }
+
+    public function testTokensCanIgnoreTokens()
+    {
+        $text = "ignoreme keepme";
+        $result = Str::tokens($text, ignore: ['ignoreme']);
+        $this->assertEquals(['keepme'], $result->all());
+    }
+
+    public function testTokensCanMatchExactTokens()
+    {
+        $text = "red green blue";
+        $result = Str::tokens($text, match: ['green']);
+        $this->assertEquals(['green'], $result->all());
+    }
+
+    public function testTokensCanMatchWithWildcard()
+    {
+        $text = "email@example.com test@example.org";
+        $result = Str::tokens($text, match: ['*example.com']);
+        $this->assertEquals(['email@example.com'], $result->all());
+    }
+
+    public function testTokensCanParseLogEntry()
+    {
+        $text = "2025-09-09 12:30:01, ERROR: User john_doe@example.com failed login attempt from IP=192.168.1.10.";
+
+        $result = Str::tokens(
+            $text,
+            remove: ['=', '.', ','],
+            replace: ['_' => '-', '@' => '[at]'],
+            ignore: ['2025-09-09', '12:30:01'],
+            match: ['*[at]examplecom', 'IP*']
+        );
+
+        $this->assertEquals(
+            ['john-doe[at]examplecom', 'IP192168110'],
+            $result->all()
+        );
+    }
+
+
 }
 
 class StringableObjectStub
