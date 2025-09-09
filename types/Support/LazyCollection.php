@@ -753,7 +753,7 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->takeUnti
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->takeUntilTimeout(new DateTime()));
 assertType('Illuminate\Support\LazyCollection<int, User>', $collection->takeUntilTimeout(new DateTime(), function ($user, $int) {
     assertType('User|null', $user);
-   // assertType('int|null', $int);
+    // assertType('int|null', $int);
 }));
 
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->takeWhile(1));
