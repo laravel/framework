@@ -309,7 +309,7 @@ class Validator implements ValidatorContract
     /**
      * The current random hash for the validator.
      *
-     * @var string
+     * @var string|null
      */
     protected static $placeholderHash;
 

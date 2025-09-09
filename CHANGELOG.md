@@ -1,6 +1,15 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.28.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.28.1...12.x)
+
+## [v12.28.1](https://github.com/laravel/framework/compare/v12.28.0...v12.28.1) - 2025-09-04
+
+* [12.x] Rename `group` to `messageGroup` property by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/56919
+* Fix PHP_CLI_SERVER_WORKERS inside laravel/sail by [@akyrey](https://github.com/akyrey) in https://github.com/laravel/framework/pull/56923
+* Allow RouteRegistrar to be Macroable by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/56921
+* [12.x] Fix SesV2Transport docblock by [@dwightwatson](https://github.com/dwightwatson) in https://github.com/laravel/framework/pull/56917
+* [12.x] Prevent unnecessary query logging on exceptions with a custom renderer by [@luanfreitasdev](https://github.com/luanfreitasdev) in https://github.com/laravel/framework/pull/56874
+* [12.x] Reduce meaningless intermediate variables by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56927
 
 ## [v12.28.0](https://github.com/laravel/framework/compare/v12.27.1...v12.28.0) - 2025-09-03
 
