@@ -733,10 +733,10 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Create a new chain of queueable jobs.
      *
-     * @param  \Illuminate\Support\Collection|array  $jobs
+     * @param  \Illuminate\Support\Collection|array|null  $jobs
      * @return \Illuminate\Foundation\Bus\PendingChain
      */
-    public function chain($jobs)
+    public function chain($jobs = null)
     {
         $jobs = Collection::wrap($jobs);
         $jobs = ChainedBatch::prepareNestedBatches($jobs);

@@ -28,13 +28,13 @@ class ValidatorTest extends DatabaseTestCase
         User::create(['uuid' => (string) Str::uuid(), 'first_name' => 'Jim']);
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $validator = $this->getValidator(['first_name' => ['John', 'Taylor']], ['first_name' => 'exists:users']);
         $this->assertFalse($validator->passes());
     }
 
-    public function testUnique()
+    public function testUnique(): void
     {
         $validator = $this->getValidator(['first_name' => 'John'], ['first_name' => 'unique:'.User::class]);
         $this->assertFalse($validator->passes());
@@ -46,7 +46,7 @@ class ValidatorTest extends DatabaseTestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function testUniqueWithCustomModelKey()
+    public function testUniqueWithCustomModelKey(): void
     {
         $_SERVER['CUSTOM_MODEL_KEY_NAME'] = 'uuid';
 
@@ -70,7 +70,7 @@ class ValidatorTest extends DatabaseTestCase
         unset($_SERVER['CUSTOM_MODEL_KEY_NAME']);
     }
 
-    public function testImplicitAttributeFormatting()
+    public function testImplicitAttributeFormatting(): void
     {
         $translator = new Translator(new ArrayLoader, 'en');
         $translator->addLines(['validation.string' => ':attribute must be a string!'], 'en');

@@ -116,7 +116,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     public function upsert(array $values, $uniqueBy, $update = null)
     {
-        if (! empty($values) && ! is_array(reset($values))) {
+        if (! empty($values) && ! is_array(array_first($values))) {
             $values = [$values];
         }
 

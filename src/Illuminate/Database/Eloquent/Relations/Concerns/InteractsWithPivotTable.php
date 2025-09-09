@@ -596,7 +596,7 @@ trait InteractsWithPivotTable
     /**
      * Set the columns on the pivot table to retrieve.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return $this
      */
     public function withPivot($columns)

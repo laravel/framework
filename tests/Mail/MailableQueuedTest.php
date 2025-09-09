@@ -24,7 +24,7 @@ class MailableQueuedTest extends TestCase
         m::close();
     }
 
-    public function testQueuedMailableSent()
+    public function testQueuedMailableSent(): void
     {
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
@@ -38,7 +38,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
-    public function testQueuedMailableWithAttachmentSent()
+    public function testQueuedMailableWithAttachmentSent(): void
     {
         $queueFake = new QueueFake(new Application);
         $mailer = $this->getMockBuilder(Mailer::class)
@@ -57,7 +57,7 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
     }
 
-    public function testQueuedMailableWithAttachmentFromDiskSent()
+    public function testQueuedMailableWithAttachmentFromDiskSent(): void
     {
         $app = new Application;
         $container = Container::getInstance();

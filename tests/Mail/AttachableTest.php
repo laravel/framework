@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class AttachableTest extends TestCase
 {
-    public function testItCanHaveMacroConstructors()
+    public function testItCanHaveMacroConstructors(): void
     {
         Attachment::macro('fromInvoice', function ($name) {
             return Attachment::fromData(fn () => 'pdf content', $name);
@@ -36,7 +36,7 @@ class AttachableTest extends TestCase
         ], $mailable->rawAttachments[0]);
     }
 
-    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithPath()
+    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithPath(): void
     {
         Attachment::macro('size', function () {
             return 99;
@@ -73,7 +73,7 @@ class AttachableTest extends TestCase
         ], $notification->pathArgs);
     }
 
-    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithArgs()
+    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithArgs(): void
     {
         Attachment::macro('size', function () {
             return 99;
@@ -111,7 +111,7 @@ class AttachableTest extends TestCase
         ], $notification->dataArgs);
     }
 
-    public function testFromUrlMethod()
+    public function testFromUrlMethod(): void
     {
         $mailable = new class extends Mailable
         {
@@ -140,7 +140,7 @@ class AttachableTest extends TestCase
         ], $mailable->attachments[0]);
     }
 
-    public function testFromUploadedFileMethod()
+    public function testFromUploadedFileMethod(): void
     {
         $mailable = new class extends Mailable
         {

@@ -94,7 +94,7 @@ class ArrayLock extends Lock
     }
 
     /**
-     * Releases this lock in disregard of ownership.
+     * Releases this lock regardless of ownership.
      *
      * @return void
      */

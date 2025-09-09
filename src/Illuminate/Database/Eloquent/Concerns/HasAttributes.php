@@ -41,6 +41,7 @@ use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use Stringable;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
@@ -790,6 +791,15 @@ trait HasAttributes
     {
         foreach ($casts as $attribute => $cast) {
             $casts[$attribute] = match (true) {
+                is_object($cast) => value(function () use ($cast, $attribute) {
+                    if ($cast instanceof Stringable) {
+                        return (string) $cast;
+                    }
+
+                    throw new InvalidArgumentException(
+                        "The cast object for the {$attribute} attribute must implement Stringable."
+                    );
+                }),
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
                         return $cast[0];

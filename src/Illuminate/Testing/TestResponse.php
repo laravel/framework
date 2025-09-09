@@ -1757,15 +1757,18 @@ class TestResponse implements ArrayAccess
     {
         $content = $this->content();
 
-        return json_validate($content)
-            ? $this->ddJson($key)
-            : dd($content);
+        if (json_validate($content)) {
+            $this->ddJson($key);
+        }
+
+        dd($content);
     }
 
     /**
      * Dump the JSON payload from the response and end the script.
      *
      * @param  string|null  $key
+     * @return never
      */
     public function ddJson($key = null)
     {

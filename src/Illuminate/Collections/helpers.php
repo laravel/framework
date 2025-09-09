@@ -13,7 +13,7 @@ if (! function_exists('collect')) {
      * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>|null  $value
      * @return \Illuminate\Support\Collection<TKey, TValue>
      */
-    function collect($value = [])
+    function collect($value = []): Collection
     {
         return new Collection($value);
     }
@@ -203,7 +203,7 @@ if (! function_exists('head')) {
      */
     function head($array)
     {
-        return reset($array);
+        return empty($array) ? false : array_first($array);
     }
 }
 
@@ -216,7 +216,7 @@ if (! function_exists('last')) {
      */
     function last($array)
     {
-        return end($array);
+        return empty($array) ? false : array_last($array);
     }
 }
 

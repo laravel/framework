@@ -81,7 +81,7 @@ class HasInDatabase extends Constraint
 
         $similarResults = $query->where(
             array_key_first($this->data),
-            $this->data[array_key_first($this->data)]
+            array_first($this->data),
         )->select(array_keys($this->data))->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {

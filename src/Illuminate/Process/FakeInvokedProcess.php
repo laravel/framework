@@ -80,6 +80,16 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Get the command line for the process.
+     *
+     * @return string
+     */
+    public function command()
+    {
+        return $this->command;
+    }
+
+    /**
      * Send a signal to the process.
      *
      * @param  int  $signal

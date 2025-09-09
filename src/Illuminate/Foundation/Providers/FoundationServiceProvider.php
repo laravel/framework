@@ -8,6 +8,7 @@ use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Contracts\Foundation\MaintenanceMode as MaintenanceModeContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\ConnectionInterface;
@@ -70,7 +71,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             ], 'laravel-errors');
         }
 
-        if ($this->app->hasDebugModeEnabled()) {
+        if ($this->app->hasDebugModeEnabled() && ! $this->app->has(ExceptionRenderer::class)) {
             $this->app->make(Listener::class)->registerListeners(
                 $this->app->make(Dispatcher::class)
             );

@@ -1222,7 +1222,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key)|string|null  $countBy
+     * @param  (callable(TValue, TKey): array-key|\UnitEnum)|string|null  $countBy
      * @return static<array-key, int>
      */
     public function countBy($countBy = null);
@@ -1268,6 +1268,15 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return string
      */
     public function toJson($options = 0);
+
+    /**
+     * Get the collection of items as pretty print formatted JSON.
+     *
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toPrettyJson(int $options = 0);
 
     /**
      * Get a CachingIterator instance.

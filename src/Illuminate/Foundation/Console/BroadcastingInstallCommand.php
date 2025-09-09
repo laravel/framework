@@ -341,7 +341,7 @@ class BroadcastingInstallCommand extends Command
             file_put_contents($filePath, $newContents);
         } else {
             // Add Echo configuration after the last import...
-            $lastImport = end($matches[0]);
+            $lastImport = array_last($matches[0]);
 
             $positionOfLastImport = strrpos($contents, $lastImport);
 

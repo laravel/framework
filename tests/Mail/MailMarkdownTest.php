@@ -16,7 +16,7 @@ class MailMarkdownTest extends TestCase
         m::close();
     }
 
-    public function testRenderFunctionReturnsHtml()
+    public function testRenderFunctionReturnsHtml(): void
     {
         $viewFactory = m::mock(Factory::class);
         $engineResolver = m::mock(EngineResolver::class);
@@ -40,7 +40,7 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderFunctionReturnsHtmlWithCustomTheme()
+    public function testRenderFunctionReturnsHtmlWithCustomTheme(): void
     {
         $viewFactory = m::mock(Factory::class);
         $engineResolver = m::mock(EngineResolver::class);
@@ -65,7 +65,7 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
+    public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix(): void
     {
         $viewFactory = m::mock(Factory::class);
         $engineResolver = m::mock(EngineResolver::class);
@@ -90,7 +90,7 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderTextReturnsText()
+    public function testRenderTextReturnsText(): void
     {
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);
@@ -104,7 +104,7 @@ class MailMarkdownTest extends TestCase
         $this->assertSame('text', $result);
     }
 
-    public function testParseReturnsParsedMarkdown()
+    public function testParseReturnsParsedMarkdown(): void
     {
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);

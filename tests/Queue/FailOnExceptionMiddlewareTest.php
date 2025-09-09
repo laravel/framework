@@ -98,9 +98,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
 
 class FailOnExceptionMiddlewareTestJob implements ShouldQueue
 {
-    use InteractsWithQueue;
-    use Queueable;
-    use Dispatchable;
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     public static array $_middleware = [];
 

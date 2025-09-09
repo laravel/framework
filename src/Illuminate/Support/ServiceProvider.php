@@ -461,7 +461,7 @@ abstract class ServiceProvider
     /**
      * Register the package's custom Artisan commands.
      *
-     * @param  array|mixed  $commands
+     * @param  mixed  $commands
      * @return void
      */
     public function commands($commands)

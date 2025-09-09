@@ -79,6 +79,18 @@ class SendingMarkdownMailTest extends TestCase
         EOT, $email);
     }
 
+    public function testEmbedMultilineImage()
+    {
+        Mail::to('test@mail.com')->send($mailable = new EmbedMultilineMailable());
+
+        $html = html_entity_decode($mailable->render());
+
+        $this->assertStringContainsString('Embed multiline content: <img', $html);
+        $this->assertStringContainsString('alt="multiline image"', $html);
+        $this->assertStringContainsString('data:image/png;base64', $html);
+        $this->assertStringNotContainsString('cid:foo.jpg', $html);
+    }
+
     public function testMessageAsPublicPropertyMayBeDefinedAsViewData()
     {
         Mail::to('test@mail.com')->send($mailable = new MessageAsPublicPropertyMailable());
@@ -186,6 +198,23 @@ class EmbedMailable extends Mailable
     {
         return new Content(
             markdown: 'embed',
+        );
+    }
+}
+
+class EmbedMultilineMailable extends Mailable
+{
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My basic title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'embed-multiline',
         );
     }
 }

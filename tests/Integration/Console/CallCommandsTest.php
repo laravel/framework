@@ -31,7 +31,7 @@ class CallCommandsTest extends TestCase
     #[TestWith(['test:a'])]
     #[TestWith(['test:b'])]
     #[TestWith(['test:c'])]
-    public function testItCanCallCommands(string $command)
+    public function testItCanCallCommands(string $command): void
     {
         $this->artisan($command)->assertSuccessful();
     }

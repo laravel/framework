@@ -42,7 +42,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
         $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
     }
 
-    public function testAssertRedirectToSignedRouteWithoutRouteName()
+    public function testAssertRedirectToSignedRouteWithoutRouteName(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
@@ -52,7 +52,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
             ->assertRedirectToSignedRoute();
     }
 
-    public function testAssertRedirectToSignedRouteWithRouteName()
+    public function testAssertRedirectToSignedRouteWithRouteName(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route'));
@@ -62,7 +62,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
             ->assertRedirectToSignedRoute('signed-route');
     }
 
-    public function testAssertRedirectToSignedRouteWithRouteNameAndParams()
+    public function testAssertRedirectToSignedRouteWithRouteNameAndParams(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->signedRoute('signed-route-with-param', 'hello'));
@@ -85,7 +85,7 @@ class AssertRedirectToSignedRouteTest extends TestCase
             ]);
     }
 
-    public function testAssertRedirectToSignedRouteWithRouteNameToTemporarySignedRoute()
+    public function testAssertRedirectToSignedRouteWithRouteNameToTemporarySignedRoute(): void
     {
         $this->router->get('test-route', function () {
             return new RedirectResponse($this->urlGenerator->temporarySignedRoute('signed-route', 60));

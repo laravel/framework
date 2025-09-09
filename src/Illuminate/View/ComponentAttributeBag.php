@@ -42,7 +42,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Get all the attribute values.
      *
-     * @param  array|mixed|null  $keys
+     * @param  mixed  $keys
      * @return array
      */
     public function all($keys = null)
@@ -115,7 +115,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Exclude the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param  mixed  $keys
      * @return static
      */
     public function except($keys)
@@ -182,7 +182,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Only include the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param  mixed  $keys
      * @return static
      */
     public function onlyProps($keys)
@@ -193,7 +193,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Exclude the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param  mixed  $keys
      * @return static
      */
     public function exceptProps($keys)
@@ -204,7 +204,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Conditionally merge classes into the attribute bag.
      *
-     * @param  mixed|array  $classList
+     * @param  mixed  $classList
      * @return static
      */
     public function class($classList)
@@ -217,7 +217,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     /**
      * Conditionally merge styles into the attribute bag.
      *
-     * @param  mixed|array  $styleList
+     * @param  mixed  $styleList
      * @return static
      */
     public function style($styleList)

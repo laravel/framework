@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class UsePusherChannelsNamesTest extends TestCase
 {
     #[DataProvider('channelsProvider')]
-    public function testChannelNameNormalization($requestChannelName, $normalizedName, $_)
+    public function testChannelNameNormalization($requestChannelName, $normalizedName, $guarded)
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 
@@ -44,7 +44,7 @@ class UsePusherChannelsNamesTest extends TestCase
     }
 
     #[DataProvider('channelsProvider')]
-    public function testIsGuardedChannel($requestChannelName, $_, $guarded)
+    public function testIsGuardedChannel($requestChannelName, $normalizedName, $guarded)
     {
         $broadcaster = new FakeBroadcasterUsingPusherChannelsNames;
 

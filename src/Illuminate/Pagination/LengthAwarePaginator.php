@@ -242,4 +242,16 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     {
         return json_encode($this->jsonSerialize(), $options);
     }
+
+    /**
+     * Convert the object to pretty print formatted JSON.
+     *
+     * @params int $options
+     *
+     * @return string
+     */
+    public function toPrettyJson(int $options = 0)
+    {
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
+    }
 }

@@ -80,7 +80,7 @@ class Bus extends Facade
     /**
      * Dispatch the given chain of jobs.
      *
-     * @param  array|mixed  $jobs
+     * @param  mixed  $jobs
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public static function dispatchChain($jobs)

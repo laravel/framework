@@ -14,7 +14,7 @@ class FileValidationTest extends TestCase
     #[TestWith(['.'])]
     #[TestWith(['*'])]
     #[TestWith(['__asterisk__'])]
-    public function test_it_can_validate_attribute_as_array(string $attribute)
+    public function test_it_can_validate_attribute_as_array(string $attribute): void
     {
         $file = UploadedFile::fake()->create('laravel.png', 1, 'image/png');
 
@@ -33,7 +33,7 @@ class FileValidationTest extends TestCase
     #[TestWith(['.'])]
     #[TestWith(['*'])]
     #[TestWith(['__asterisk__'])]
-    public function test_it_can_validate_attribute_as_array_when_validation_should_fails(string $attribute)
+    public function test_it_can_validate_attribute_as_array_when_validation_should_fails(string $attribute): void
     {
         $file = UploadedFile::fake()->create('laravel.php', 1, 'image/php');
 

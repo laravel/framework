@@ -386,7 +386,7 @@ class ModelInspector
      *
      * @param  array<string, mixed>  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed|null
+     * @return mixed
      */
     protected function getColumnDefault($column, $model)
     {

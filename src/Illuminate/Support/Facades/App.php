@@ -113,7 +113,7 @@ namespace Illuminate\Support\Facades;
  * @method static void scopedIf(\Closure|string $abstract, \Closure|string|null $concrete = null)
  * @method static void extend(string $abstract, \Closure $closure)
  * @method static mixed instance(string $abstract, mixed $instance)
- * @method static void tag(array|string $abstracts, array|mixed $tags)
+ * @method static void tag(array|string $abstracts, mixed $tags)
  * @method static iterable tagged(string $tag)
  * @method static void alias(string $abstract, string $alias)
  * @method static mixed rebinding(string $abstract, \Closure $callback)

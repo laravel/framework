@@ -7,7 +7,7 @@ use Symfony\Component\Mailer\Transport\FailoverTransport;
 
 class MailFailoverTransportTest extends TestCase
 {
-    public function testGetFailoverTransportWithConfiguredTransports()
+    public function testGetFailoverTransportWithConfiguredTransports(): void
     {
         $this->app['config']->set('mail.default', 'failover');
 
@@ -34,7 +34,7 @@ class MailFailoverTransportTest extends TestCase
         $this->assertInstanceOf(FailoverTransport::class, $transport);
     }
 
-    public function testGetFailoverTransportWithLaravel6StyleMailConfiguration()
+    public function testGetFailoverTransportWithLaravel6StyleMailConfiguration(): void
     {
         $this->app['config']->set('mail.driver', 'failover');
 

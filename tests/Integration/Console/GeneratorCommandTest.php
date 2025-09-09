@@ -16,7 +16,7 @@ class GeneratorCommandTest extends TestCase
         'tests/Feature/fixtures.php/SomeTest.php',
     ];
 
-    public function testItChopsPhpExtension()
+    public function testItChopsPhpExtension(): void
     {
         $this->artisan('make:command', ['name' => 'FooCommand.php'])
             ->assertExitCode(0);
@@ -28,7 +28,7 @@ class GeneratorCommandTest extends TestCase
         ], 'app/Console/Commands/FooCommand.php');
     }
 
-    public function testItChopsPhpExtensionFromMakeViewCommands()
+    public function testItChopsPhpExtensionFromMakeViewCommands(): void
     {
         $this->artisan('make:view', ['name' => 'foo.php'])
             ->assertExitCode(0);
@@ -36,7 +36,7 @@ class GeneratorCommandTest extends TestCase
         $this->assertFilenameExists('resources/views/foo/php.blade.php');
     }
 
-    public function testItOnlyChopsPhpExtensionFromFilename()
+    public function testItOnlyChopsPhpExtensionFromFilename(): void
     {
         $this->artisan('make:test', ['name' => 'fixtures.php/SomeTest'])
             ->assertExitCode(0);
@@ -49,7 +49,7 @@ class GeneratorCommandTest extends TestCase
     }
 
     #[DataProvider('reservedNamesDataProvider')]
-    public function testItCannotGenerateClassUsingReservedName($given)
+    public function testItCannotGenerateClassUsingReservedName($given): void
     {
         $this->artisan('make:command', ['name' => $given])
             ->expectsOutputToContain('The name "'.$given.'" is reserved by PHP.')

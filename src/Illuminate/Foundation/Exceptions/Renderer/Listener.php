@@ -67,7 +67,7 @@ class Listener
             'connectionName' => $event->connectionName,
             'time' => $event->time,
             'sql' => $event->sql,
-            'bindings' => $event->bindings,
+            'bindings' => $event->connection->prepareBindings($event->bindings),
         ];
     }
 }

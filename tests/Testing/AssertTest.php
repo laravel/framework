@@ -22,7 +22,7 @@ class AssertTest extends TestCase
         ]);
     }
 
-    public function testArraySubsetMayFail()
+    public function testArraySubsetMayFail(): void
     {
         $this->expectException(ExpectationFailedException::class);
 
@@ -37,7 +37,7 @@ class AssertTest extends TestCase
         ]);
     }
 
-    public function testArraySubsetWithStrict()
+    public function testArraySubsetWithStrict(): void
     {
         Assert::assertArraySubset([
             'string' => 'string',
@@ -49,7 +49,7 @@ class AssertTest extends TestCase
         ], true);
     }
 
-    public function testArraySubsetWithStrictMayFail()
+    public function testArraySubsetWithStrictMayFail(): void
     {
         $this->expectException(ExpectationFailedException::class);
 
@@ -63,7 +63,7 @@ class AssertTest extends TestCase
         ], true);
     }
 
-    public function testArraySubsetMayFailIfArrayIsNotArray()
+    public function testArraySubsetMayFailIfArrayIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -77,7 +77,7 @@ class AssertTest extends TestCase
         ]);
     }
 
-    public function testArraySubsetMayFailIfSubsetIsNotArray()
+    public function testArraySubsetMayFailIfSubsetIsNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
