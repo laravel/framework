@@ -186,7 +186,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $mock = m::mock(LazyCollection::class.'[now]');
 
-        $timedOutWith = [null, null];
+        $timedOutWith = [];
 
         $results = $mock
             ->times(10)
