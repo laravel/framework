@@ -258,22 +258,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertTrue($wannabeOwner->acquire());
     }
 
-    public function testValuesAreNotStoredByReference()
-    {
-        $store = new SessionStore($this->getSession(), true);
-        $object = new stdClass;
-        $object->foo = true;
-
-        $store->put('object', $object, 10);
-        $object->bar = true;
-
-        $retrievedObject = $store->get('object');
-
-        $this->assertTrue($retrievedObject->foo);
-        $this->assertFalse(property_exists($retrievedObject, 'bar'));
-    }
-
-    public function testValuesAreStoredByReferenceIfSerializationIsDisabled()
+    public function testValuesAreStoredByReference()
     {
         $store = new SessionStore($this->getSession());
         $object = new stdClass;
@@ -335,39 +320,12 @@ class CacheSessionStoreTest extends TestCase
     {
         Carbon::setTestNow(Carbon::now());
 
-        $store = new SessionStore($this->getSession(), false);
+        $store = new SessionStore($this->getSession());
         $store->put('foo', 'bar', 10);
 
         $this->assertEquals([
             'foo' => ['value' => 'bar', 'expiresAt' => Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000],
         ], $store->all());
-    }
-
-    public function testCanGetAllWhenSerialized()
-    {
-        Carbon::setTestNow(Carbon::now());
-
-        $store = new SessionStore($this->getSession(), true);
-        $store->put('foo', 'bar', 10);
-        $this->assertEquals([
-            'foo' => ['value' => 'bar', 'expiresAt' => $expiresAt = (Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000)],
-        ], $store->all());
-
-        // Now let's put a serializable value in there
-        $store->forget('foo');
-        $store->put('foo', Carbon::now(), 10);
-
-        $this->assertEquals([
-            'foo' => [
-                'value' => Carbon::now(),
-                'expiresAt' => $expiresAt,
-            ],
-        ], $store->all());
-
-        $this->assertEquals(
-            serialize(Carbon::now()),
-            $store->all(false)['foo']['value']
-        );
     }
 
     public function getSession()

@@ -5,13 +5,6 @@ namespace Illuminate\Contracts\Session;
 interface Session
 {
     /**
-     * Get the cache store.
-     *
-     * @return \Illuminate\Contracts\Cache\Repository
-     */
-    public function cache();
-
-    /**
      * Get the name of the session.
      *
      * @return string

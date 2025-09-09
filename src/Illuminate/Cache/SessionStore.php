@@ -13,51 +13,28 @@ class SessionStore extends TaggableStore implements LockProvider
     /**
      * The session instance.
      *
-     * @var \Illuminate\Session\Store
+     * @var \Illuminate\Contracts\Session\Session
      */
     public $session;
 
     /**
-     * Indicates if values are serialized within the store.
-     *
-     * @var bool
-     */
-    protected $serializesValues;
-
-    /**
      * Create a new Session store.
      *
-     * @param  \Illuminate\Session\Store  $session
-     * @param  bool  $serializesValues
+     * @param  \Illuminate\Contracts\Session\Session  $session
      */
-    public function __construct($session, $serializesValues = false)
+    public function __construct($session)
     {
         $this->session = $session;
-        $this->serializesValues = $serializesValues;
     }
 
     /**
      * Get all of the cached values and their expiration times.
      *
-     * @param  bool  $unserialize
      * @return array<string, array{value: mixed, expiresAt: float}>
      */
-    public function all($unserialize = true)
+    public function all()
     {
-        if ($unserialize === false || $this->serializesValues === false) {
-            return $this->session->get('_storage', []);
-        }
-
-        $storage = [];
-
-        foreach ($this->session->get('_storage', []) as $key => $data) {
-            $storage[$key] = [
-                'value' => unserialize($data['value']),
-                'expiresAt' => $data['expiresAt'],
-            ];
-        }
-
-        return $storage;
+        return $this->session->get('_storage', []);
     }
 
     /**
@@ -68,7 +45,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        if ($this->session->missing("_storage.{$key}")) {
+        if (! $this->session->exists("_storage.{$key}")) {
             return;
         }
 
@@ -82,7 +59,7 @@ class SessionStore extends TaggableStore implements LockProvider
             return;
         }
 
-        return $this->unserializeValue($item['value']);
+        return $item['value'];
     }
 
     /**
@@ -96,7 +73,7 @@ class SessionStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         $this->session->put("_storage.{$key}", [
-            'value' => $this->serializeValue($value),
+            'value' => $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ]);
 
@@ -114,9 +91,7 @@ class SessionStore extends TaggableStore implements LockProvider
     {
         if (! is_null($existing = $this->get($key))) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
-                $value = $this->serializeValue($incremented);
-
-                $this->session->put("_storage.{$key}.value", $value);
+                $this->session->put("_storage.{$key}.value", $incremented);
             });
         }
 
@@ -208,28 +183,6 @@ class SessionStore extends TaggableStore implements LockProvider
     protected function toTimestamp($seconds)
     {
         return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
-    }
-
-    /**
-     * Serialize the given value if necessary.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function serializeValue($value)
-    {
-        return $this->serializesValues ? serialize($value) : $value;
-    }
-
-    /**
-     * Unserialize the given value if necessary.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function unserializeValue($value)
-    {
-        return $this->serializesValues ? unserialize($value) : $value;
     }
 
     /**

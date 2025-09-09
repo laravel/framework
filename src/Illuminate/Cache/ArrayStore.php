@@ -87,7 +87,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             return;
         }
 
-        return $this->unserializeValue($item['value']);
+        return $this->serializesValues ? unserialize($item['value']) : $item['value'];
     }
 
     /**
@@ -101,7 +101,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         $this->storage[$key] = [
-            'value' => $this->serializeValue($value),
+            'value' => $this->serializesValues ? serialize($value) : $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -119,7 +119,7 @@ class ArrayStore extends TaggableStore implements LockProvider
     {
         if (! is_null($existing = $this->get($key))) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
-                $value = $this->serializeValue($incremented);
+                $value = $this->serializesValues ? serialize($incremented) : $incremented;
 
                 $this->storage[$key]['value'] = $value;
             });
@@ -213,28 +213,6 @@ class ArrayStore extends TaggableStore implements LockProvider
     protected function toTimestamp($seconds)
     {
         return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
-    }
-
-    /**
-     * Serialize the given value if necessary.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function serializeValue($value)
-    {
-        return $this->serializesValues ? serialize($value) : $value;
-    }
-
-    /**
-     * Unserialize the given value if necessary.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    protected function unserializeValue($value)
-    {
-        return $this->serializesValues ? unserialize($value) : $value;
     }
 
     /**
