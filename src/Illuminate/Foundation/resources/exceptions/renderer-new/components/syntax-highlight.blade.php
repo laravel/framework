@@ -11,6 +11,7 @@
 @use('Phiki\Phiki')
 @use('Phiki\Grammar\Grammar')
 @use('Phiki\Theme\Theme')
+@use('Phiki\Transformers\Decorations\GutterDecoration')
 @use('Phiki\Transformers\Decorations\LineDecoration')
 @use('Phiki\Transformers\Decorations\PreDecoration')
 
@@ -20,11 +21,12 @@
         ->startingLine($startingLine)
         ->decoration(
             PreDecoration::make()->class('bg-transparent!', $truncate ? ' truncate' : ''),
+            GutterDecoration::make()->class('mr-6 text-neutral-500 dark:text-neutral-600'),
         );
 
     if ($highlightedLine !== null) {
         $highlightedCode->decoration(
-            LineDecoration::forLine($highlightedLine)->class('dark:bg-rose-700/30!'),
+            LineDecoration::forLine($highlightedLine)->class('bg-rose-200! [&_.line-number]:dark:text-white! dark:bg-rose-900!'),
         );
     }
 @endphp
