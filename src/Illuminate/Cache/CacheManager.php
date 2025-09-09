@@ -222,13 +222,14 @@ class CacheManager implements FactoryContract
      */
     protected function createSessionDriver(array $config)
     {
-        $store = new SessionStore(
-            $this->getSession(),
-            $config['lock_prefix'] ?? '_lock',
-            $config['cache_prefix'] ?? '_cache',
+        return $this->repository(
+            new SessionStore(
+                $this->getSession(),
+                $config['lock_prefix'] ?? '_lock',
+                $config['cache_prefix'] ?? '_cache',
+            ),
+            $config
         );
-
-        return $this->repository($store, $config);
     }
 
     /**

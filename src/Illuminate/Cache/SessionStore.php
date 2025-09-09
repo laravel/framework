@@ -11,6 +11,27 @@ class SessionStore extends TaggableStore implements LockProvider
     use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
+     * The session instance.
+     *
+     * @var \Illuminate\Contracts\Session\Session
+     */
+    public $session;
+
+    /**
+     * The prefix for locks.
+     *
+     * @var string
+     */
+    public $lockPrefix;
+
+    /**
+     * The prefix for cache items.
+     *
+     * @var string
+     */
+    public $cachePrefix;
+
+    /**
      * Create a new Session store.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
@@ -18,10 +39,13 @@ class SessionStore extends TaggableStore implements LockProvider
      * @param  string  $cachePrefix
      */
     public function __construct(
-        public $session,
-        public $lockPrefix = '_lock',
-        public $cachePrefix = '_cache',
+        $session,
+        $lockPrefix = '_lock',
+        $cachePrefix = '_cache',
     ) {
+        $this->session = $session;
+        $this->lockPrefix = $lockPrefix;
+        $this->cachePrefix = $cachePrefix;
     }
 
     /**
