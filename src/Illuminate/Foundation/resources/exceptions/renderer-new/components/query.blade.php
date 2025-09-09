@@ -1,7 +1,7 @@
 @props(['queries'])
 
 <div
-    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px]"]) }}
+    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px] shadow-sm"]) }}
     x-data="{
         totalQueries: {{ min(count($queries), 100) }},
         currentPage: 1,
@@ -126,7 +126,7 @@
             @click="first()"
             class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
             :disabled="!hasPrevious"
-            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
+            :class="hasPrevious ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
         >
             <x-laravel-exceptions-renderer-new::icons.chevrons-left class="w-3 h-3" />
         </button>
@@ -135,7 +135,7 @@
         <button
             @click="previous()"
             class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
-            :class="hasPrevious ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
+            :class="hasPrevious ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasPrevious"
         >
             <x-laravel-exceptions-renderer-new::icons.chevron-left class="w-3 h-3" />
@@ -151,7 +151,7 @@
                     <button
                         @click="goToPage(page.value)"
                         class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors"
-                        :class="currentPage === page.value ? 'bg-blue-600 text-white' : 'text-neutral-300 hover:text-white hover:bg-white/[0.05]'"
+                        :class="currentPage === page.value ? 'bg-blue-600 text-white' : 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5'"
                         x-text="page.value"
                     ></button>
                 </template>
@@ -162,7 +162,7 @@
         <button
             @click="next()"
             class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
-            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
+            :class="hasNext ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
         >
             <x-laravel-exceptions-renderer-new::icons.chevron-right class="w-3 h-3" />
@@ -172,7 +172,7 @@
         <button
             @click="last()"
             class="cursor-pointer flex items-center justify-center w-8 h-8 rounded-md transition-colors"
-            :class="hasNext ? 'text-neutral-300 hover:text-white hover:bg-white/[0.05]' : 'text-neutral-600 cursor-not-allowed!'"
+            :class="hasNext ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
         >
             <x-laravel-exceptions-renderer-new::icons.chevrons-right class="w-3 h-3" />

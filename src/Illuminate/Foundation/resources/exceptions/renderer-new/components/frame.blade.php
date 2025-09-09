@@ -5,11 +5,11 @@
         expanded: {{ $frame->isMain() ? 'true' : 'false' }},
         hasCode: {{ $frame->snippet() ? 'true' : 'false' }}
     }"
-    class="group rounded-lg border border-neutral-200"
+    class="group rounded-lg border border-neutral-200 shadow-sm"
     :class="expanded ? 'dark:border-white/10' : 'dark:border-white/5'"
 >
     <div
-        class="flex h-11 items-center gap-3 bg-white pr-2.5 pl-4 overflow-x-auto dark:bg-white/3"
+        class="flex h-11 items-center gap-3 bg-white rounded-lg pr-2.5 pl-4 overflow-x-auto dark:bg-white/3"
         :class="{
             'cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 hover:[&_svg]:stroke-emerald-500': hasCode,
             'dark:bg-white/5': expanded,

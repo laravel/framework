@@ -6,7 +6,7 @@
     x-data="{ expanded: false }"
     class="group rounded-lg border border-neutral-200"
     :class="{
-        'bg-white dark:border-white/5 dark:bg-white/5': expanded,
+        'bg-white dark:border-white/5 dark:bg-white/5 shadow-sm': expanded,
         'border-dashed border-neutral-300 bg-neutral-50 opacity-90 dark:border-white/10 dark:bg-white/1': !expanded,
     }"
 >
@@ -17,7 +17,7 @@
         <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
         <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-blue-500 dark:text-emerald-500" x-show="expanded" />
 
-        <div class="flex-1 font-mono text-xs leading-3 text-neutral-600 dark:text-neutral-400">
+        <div class="flex-1 font-mono text-xs leading-3 text-neutral-900 dark:text-neutral-400">
             {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
         </div>
 
