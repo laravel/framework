@@ -35,7 +35,7 @@
         x-cloak
         @class([
             "text-sm rounded-md border px-3 h-8 flex items-center gap-2 transition-colors duration-200 ease-in-out cursor-pointer",
-            "[&_svg]:text-neutral-400 hover:text-neutral-900 dark:hover:text-white bg-white/50 dark:bg-white/3 border-neutral-200 dark:border-white/8 text-neutral-600 dark:text-neutral-400 active:bg-neutral-100 hover:bg-white hover:border-blue-500 hover:[&_svg]:text-blue-600 dark:hover:[&_svg]:text-white dark:hover:bg-neutral-700 dark:hover:border-white/10 dark:active:bg-neutral-700",
+            "text-neutral-600 dark:text-neutral-400 bg-white/5 border-neutral-200 hover:bg-neutral-100 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10",
         ])
         @click="copyToClipboard()"
     >
