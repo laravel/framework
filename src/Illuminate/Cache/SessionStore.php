@@ -11,20 +11,17 @@ class SessionStore extends TaggableStore implements LockProvider
     use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
-     * The session instance.
-     *
-     * @var \Illuminate\Contracts\Session\Session
-     */
-    public $session;
-
-    /**
      * Create a new Session store.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  string  $lockPrefix
+     * @param  string  $cachePrefix
      */
-    public function __construct($session)
-    {
-        $this->session = $session;
+    public function __construct(
+        public $session,
+        public $lockPrefix = '_lock',
+        public $cachePrefix = '_cache',
+    ) {
     }
 
     /**
@@ -34,7 +31,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function all()
     {
-        return $this->session->get('_storage', []);
+        return $this->session->get($this->cachePrefix, []);
     }
 
     /**
@@ -45,15 +42,15 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        if (! $this->session->exists("_storage.{$key}")) {
+        if (! $this->session->exists($this->itemKey($key))) {
             return;
         }
 
-        $item = $this->session->get("_storage.{$key}");
+        $item = $this->session->get($this->itemKey($key));
 
         $expiresAt = $item['expiresAt'] ?? 0;
 
-        if ($expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt) {
+        if ($this->isExpired($expiresAt)) {
             $this->forget($key);
 
             return;
@@ -72,9 +69,9 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        $this->session->put("_storage.{$key}", [
+        $this->session->put($this->itemKey($key), [
             'value' => $value,
-            'expiresAt' => $this->calculateExpiration($seconds),
+            'expiresAt' => $this->toTimestamp($seconds),
         ]);
 
         return true;
@@ -91,7 +88,7 @@ class SessionStore extends TaggableStore implements LockProvider
     {
         if (! is_null($existing = $this->get($key))) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
-                $this->session->put("_storage.{$key}.value", $incremented);
+                $this->session->put($this->itemKey("{$key}.value"), $incremented);
             });
         }
 
@@ -132,8 +129,8 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        if ($this->session->exists("_storage.{$key}")) {
-            $this->session->forget("_storage.{$key}");
+        if ($this->session->exists($this->itemKey($key))) {
+            $this->session->forget($this->itemKey($key));
 
             return true;
         }
@@ -148,7 +145,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function flush()
     {
-        $this->session->put('_storage', []);
+        $this->session->put($this->cachePrefix, []);
 
         return true;
     }
@@ -164,14 +161,24 @@ class SessionStore extends TaggableStore implements LockProvider
     }
 
     /**
-     * Get the expiration time of the key.
+     * Get the cache key prefix.
      *
-     * @param  int  $seconds
-     * @return float
+     * @return string
      */
-    protected function calculateExpiration($seconds)
+    public function itemKey($key)
     {
-        return $this->toTimestamp($seconds);
+        return "{$this->cachePrefix}.{$key}";
+    }
+
+    /**
+     * Determine if the given expiration time is expired.
+     *
+     * @param  int|float  $expiresAt
+     * @return bool
+     */
+    protected function isExpired($expiresAt)
+    {
+        return $expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt;
     }
 
     /**
@@ -195,6 +202,8 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
+        $name = "{$this->lockPrefix}.{$name}";
+
         return new SessionLock($this, $name, $seconds, $owner);
     }
 

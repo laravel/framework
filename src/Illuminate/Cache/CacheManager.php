@@ -222,13 +222,13 @@ class CacheManager implements FactoryContract
      */
     protected function createSessionDriver(array $config)
     {
-        $session = $this->app['session'] ?? null;
+        $store = new SessionStore(
+            $this->getSession(),
+            $config['lock_prefix'] ?? '_lock',
+            $config['cache_prefix'] ?? '_cache',
+        );
 
-        if (! $session) {
-            throw new InvalidArgumentException('Session store requires session manager to be set.');
-        }
-
-        return $this->repository(new SessionStore($session, $config['serialize'] ?? false), $config);
+        return $this->repository($store, $config);
     }
 
     /**
@@ -340,6 +340,12 @@ class CacheManager implements FactoryContract
             if ($config['events'] ?? true) {
                 $this->setEventDispatcher($repository);
             }
+
+            if ($config['store'] === 'session' && method_exists($repository, 'setPrefix')) {
+                $session = $this->getSession();
+
+                $repository->setPrefix($session->getId());
+            }
         });
     }
 
@@ -379,6 +385,24 @@ class CacheManager implements FactoryContract
     protected function getPrefix(array $config)
     {
         return $config['prefix'] ?? $this->app['config']['cache.prefix'];
+    }
+
+    /**
+     * Get the session store implementation.
+     *
+     * @return \Illuminate\Contracts\Session\Session
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getSession()
+    {
+        $session = $this->app['session'] ?? null;
+
+        if (! $session) {
+            throw new InvalidArgumentException('Session store requires session manager to be set.');
+        }
+
+        return $session;
     }
 
     /**

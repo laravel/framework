@@ -35,7 +35,7 @@ class SessionLock extends Lock
      */
     public function acquire()
     {
-        $expiration = $this->store->session->get("_locks.{$this->name}.expiresAt");
+        $expiration = $this->store->session->get("{$this->name}.expiresAt");
 
         $expiration ??= Carbon::now()->addSecond();
 
@@ -43,7 +43,7 @@ class SessionLock extends Lock
             return false;
         }
 
-        $this->store->session->put("_locks.{$this->name}", [
+        $this->store->session->put($this->name, [
             'owner' => $this->owner,
             'expiresAt' => $this->seconds === 0 ? null : Carbon::now()->addSeconds($this->seconds),
         ]);
@@ -58,7 +58,7 @@ class SessionLock extends Lock
      */
     protected function exists()
     {
-        return $this->store->session->exists("_locks.{$this->name}");
+        return $this->store->session->exists($this->name);
     }
 
     /**
@@ -92,7 +92,7 @@ class SessionLock extends Lock
             return null;
         }
 
-        return $this->store->session->get("_locks.{$this->name}.owner");
+        return $this->store->session->get("{$this->name}.owner");
     }
 
     /**
@@ -102,6 +102,6 @@ class SessionLock extends Lock
      */
     public function forceRelease()
     {
-        $this->store->session->forget("_locks.{$this->name}");
+        $this->store->session->forget($this->name);
     }
 }
