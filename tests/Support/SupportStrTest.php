@@ -1943,7 +1943,6 @@ class SupportStrTest extends TestCase
             $result->all()
         );
     }
-
 }
 
 class StringableObjectStub
