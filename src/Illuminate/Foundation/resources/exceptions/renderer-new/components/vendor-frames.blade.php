@@ -14,7 +14,6 @@
         class="flex h-11 cursor-pointer items-center gap-3 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2"
         @click="expanded = !expanded"
     >
-        {{-- Folder --}}
         <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
         <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-blue-500 dark:text-emerald-500" x-show="expanded" />
 

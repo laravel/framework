@@ -3,7 +3,7 @@
 <div
     {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px]"]) }}
     x-data="{
-        totalQueries: {{ count($queries) }},
+        totalQueries: {{ min(count($queries), 100) }},
         currentPage: 1,
         perPage: 10,
         get totalPages() {
@@ -83,13 +83,19 @@
             </div>
             <h3 class="text-base font-semibold">Queries</h3>
         </div>
-        <div x-show="totalQueries > 0" class="text-sm text-neutral-500 dark:text-neutral-400">
+        <div x-show="totalQueries > 0" class="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
             <span x-text="`${((currentPage - 1) * perPage) + 1}-${Math.min(currentPage * perPage, totalQueries)} of ${totalQueries}`"></span>
+            @if (count($queries) > 100)
+                <x-laravel-exceptions-renderer-new::icons.info
+                    class="w-3 h-3 text-blue-500 dark:text-emerald-500"
+                    data-tippy-content="Only the first 100 queries are shown"
+                />
+            @endif
         </div>
     </div>
 
     <div class="flex flex-col gap-1">
-        @forelse ($queries as $index => ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
+        @forelse (array_slice($queries, 0, 100) as $index => ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
         <div
             class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center gap-4 px-4 text-xs font-mono shadow-sm"
             x-show="Math.floor({{ $index }} / perPage) === (currentPage - 1)"
