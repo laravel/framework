@@ -11,15 +11,29 @@ class SessionStore implements Store
     use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
+     * The prefix for cache items.
+     *
+     * @var string
+     */
+    public $prefix;
+
+    /**
+     * The session instance.
+     *
+     * @var \Illuminate\Contracts\Session\Session
+     */
+    public $session;
+
+    /**
      * Create a new Session store.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  string  $prefix
      */
-    public function __construct(
-        public $session,
-        public $prefix = '_cache',
-    ) {
+    public function __construct($session, $prefix = '_cache')
+    {
+        $this->prefix = $prefix;
+        $this->session = $session;
     }
 
     /**
