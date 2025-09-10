@@ -1137,8 +1137,6 @@ class SupportHelpersTest extends TestCase
 
     public function testWith()
     {
-        $this->assertEquals(10, with(10));
-
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));

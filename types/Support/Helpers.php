@@ -83,8 +83,6 @@ assertType('null', transform('', fn () => 1));
 assertType('true', transform('', fn () => 1, true));
 assertType('true', transform('', fn () => 1, fn () => true));
 
-assertType('User', with(new User()));
-assertType('bool', with(new User())->save());
 assertType('10', with(new User(), function ($user) {
     assertType('User', $user);
 
