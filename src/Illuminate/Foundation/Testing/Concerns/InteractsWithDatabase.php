@@ -285,7 +285,7 @@ trait InteractsWithDatabase
      * Get the database connection.
      *
      * @param  string|null  $connection
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string|null  $table
      * @return \Illuminate\Database\Connection
      */
     protected function getConnection($connection = null, $table = null)
