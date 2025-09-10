@@ -41,6 +41,7 @@ namespace Illuminate\Support\Facades;
  * @method static void reflash()
  * @method static void keep(mixed $keys = null)
  * @method static void flashInput(array $value)
+ * @method static \Illuminate\Contracts\Cache\Repository cache()
  * @method static mixed remove(string $key)
  * @method static void forget(string|array $keys)
  * @method static void flush()
