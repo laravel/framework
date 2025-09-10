@@ -51,6 +51,11 @@ class Pipeline implements PipelineContract
     protected $finally;
 
     /**
+     * The catch callback to be executed after an exception is thrown.
+     */
+    protected ?Closure $catch = null;
+
+    /**
      * Indicates whether to wrap the pipeline in a database transaction.
      *
      * @var string|null|\UnitEnum|false
@@ -122,7 +127,6 @@ class Pipeline implements PipelineContract
     /**
      * Run the pipeline with a final destination callback.
      *
-     * @param  \Closure  $destination
      * @return mixed
      */
     public function then(Closure $destination)
@@ -157,7 +161,6 @@ class Pipeline implements PipelineContract
     /**
      * Set a final callback to be executed after the pipeline ends regardless of the outcome.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function finally(Closure $callback)
@@ -168,9 +171,20 @@ class Pipeline implements PipelineContract
     }
 
     /**
+     * Set a catch callback to be executed after an exception is thrown.
+     *
+     * @return $this
+     */
+    public function catch(Closure $callback)
+    {
+        $this->catch = $callback;
+
+        return $this;
+    }
+
+    /**
      * Get the final piece of the Closure onion.
      *
-     * @param  \Closure  $destination
      * @return \Closure
      */
     protected function prepareDestination(Closure $destination)
@@ -288,7 +302,6 @@ class Pipeline implements PipelineContract
     /**
      * Set the container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)
@@ -313,13 +326,16 @@ class Pipeline implements PipelineContract
      * Handle the given exception.
      *
      * @param  mixed  $passable
-     * @param  \Throwable  $e
      * @return mixed
      *
      * @throws \Throwable
      */
     protected function handleException($passable, Throwable $e)
     {
-        throw $e;
+        if (is_null($this->catch)) {
+            throw $e;
+        }
+
+        call_user_func_array($this->catch, [$e, $passable]);
     }
 }
