@@ -1959,5 +1959,4 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $resultSelector($outerItem, $matchingGroup->values());
         });
     }
-
 }

@@ -2010,5 +2010,4 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             return $resultSelector($outerItem, $matchingGroup->values());
         });
     }
-
 }
