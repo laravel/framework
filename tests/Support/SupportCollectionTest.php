@@ -2439,10 +2439,12 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testImplodeModels($collection)
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
         $model->setAttribute('email', 'foo');
-        $modelTwo = new class extends Model {
+        $modelTwo = new class extends Model
+        {
         };
         $modelTwo->setAttribute('email', 'bar');
         $data = new $collection([$model, $modelTwo]);
@@ -5809,6 +5811,116 @@ class SupportCollectionTest extends TestCase
         $collection = new $collection([]);
 
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupJoinWithBasicData($collection)
+    {
+        $users = new $collection([
+            ['id' => 1, 'name' => 'Ahmed'],
+            ['id' => 2, 'name' => 'Sara'],
+        ]);
+
+        $orders = [
+            ['user_id' => 1, 'order' => 'Laptop'],
+            ['user_id' => 1, 'order' => 'Phone'],
+            ['user_id' => 2, 'order' => 'Tablet'],
+        ];
+
+        $result = $users->groupJoin(
+            $orders,
+            fn ($user) => $user['id'],
+            fn ($order) => $order['user_id'],
+            fn ($user, $orders) => [
+                'user' => $user['name'],
+                'orders' => $orders->pluck('order')->all(),
+            ]
+        );
+
+        $this->assertEquals([
+            ['user' => 'Ahmed', 'orders' => ['Laptop', 'Phone']],
+            ['user' => 'Sara',  'orders' => ['Tablet']],
+        ], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupJoinReturnsEmptyInnerWhenNoMatches($collection)
+    {
+        $users = new $collection([
+            ['id' => 1, 'name' => 'Ahmed'],
+            ['id' => 2, 'name' => 'Sara'],
+        ]);
+
+        $orders = [
+            ['user_id' => 99, 'order' => 'Ghost Order'],
+        ];
+
+        $result = $users->groupJoin(
+            $orders,
+            fn ($user) => $user['id'],
+            fn ($order) => $order['user_id'],
+            fn ($user, $orders) => [
+                'user' => $user['name'],
+                'orders' => $orders->pluck('order')->all(),
+            ]
+        );
+
+        $this->assertEquals([
+            ['user' => 'Ahmed', 'orders' => []],
+            ['user' => 'Sara',  'orders' => []],
+        ], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupJoinCanHandleEmptyOuterCollection($collection)
+    {
+        $users = new $collection([]);
+
+        $orders = [
+            ['user_id' => 1, 'order' => 'Laptop'],
+        ];
+
+        $result = $users->groupJoin(
+            $orders,
+            fn ($user) => $user['id'],
+            fn ($order) => $order['user_id'],
+            fn ($user, $orders) => [
+                'user' => $user['name'],
+                'orders' => $orders->pluck('order')->all(),
+            ]
+        );
+
+        $this->assertEquals([], $result->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testGroupJoinWithNestedData($collection)
+    {
+        $categories = new $collection([
+            ['id' => 10, 'name' => 'Electronics'],
+            ['id' => 20, 'name' => 'Clothing'],
+        ]);
+
+        $products = [
+            ['category_id' => 10, 'product' => 'Laptop'],
+            ['category_id' => 10, 'product' => 'Phone'],
+            ['category_id' => 20, 'product' => 'T-Shirt'],
+        ];
+
+        $result = $categories->groupJoin(
+            $products,
+            fn ($category) => $category['id'],
+            fn ($product) => $product['category_id'],
+            fn ($category, $products) => [
+                'category' => $category['name'],
+                'products' => $products->pluck('product')->all(),
+            ]
+        );
+
+        $this->assertEquals([
+            ['category' => 'Electronics', 'products' => ['Laptop', 'Phone']],
+            ['category' => 'Clothing',    'products' => ['T-Shirt']],
+        ], $result->all());
     }
 
     /**

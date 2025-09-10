@@ -1982,4 +1982,33 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
             ? Sleep::usleep($microseconds)
             : usleep($microseconds);
     }
+
+    /**
+     * Perform a group join between this collection (outer) and another (inner).
+     *
+     * @template TOuterKey
+     * @template TInnerKey
+     * @template TResult
+     *
+     * @param  \Illuminate\Support\Collection|iterable  $inner
+     * @param  callable(TValue): TOuterKey  $outerKeySelector
+     * @param  callable(mixed): TInnerKey  $innerKeySelector
+     * @param  callable(TValue, \Illuminate\Support\Collection): TResult  $resultSelector
+     * @return static<int, TResult>
+     */
+    public function groupJoin(iterable $inner, callable $outerKeySelector, callable $innerKeySelector, callable $resultSelector)
+    {
+        $inner = collect($inner);
+
+        return $this->map(function ($outerItem) use ($inner, $outerKeySelector, $innerKeySelector, $resultSelector) {
+            $outerKey = $outerKeySelector($outerItem);
+
+            $matchingGroup = $inner->filter(function ($innerItem) use ($outerKey, $innerKeySelector) {
+                return $innerKeySelector($innerItem) == $outerKey;
+            });
+
+            return $resultSelector($outerItem, $matchingGroup->values());
+        });
+    }
+
 }
