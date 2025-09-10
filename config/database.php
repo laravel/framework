@@ -38,12 +38,11 @@ return [
             'prefix' => '',
             'prefix_indexes' => null,
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-            'pragmas' => [
-                'busy_timeout' => null,
-                'journal_mode' => null,
-                'synchronous' => null,
-                'transaction_mode' => 'DEFERRED',
-            ],
+            'busy_timeout' => null,
+            'journal_mode' => null,
+            'synchronous' => null,
+            'transaction_mode' => 'DEFERRED',
+            'pragmas' => [],
         ],
 
         'mysql' => [
