@@ -926,6 +926,41 @@ class Route
     }
 
     /**
+     * Get the label of the route instance.
+     *
+     * @return string|null
+     */
+    public function getLabel()
+    {
+        return $this->action['label'] ?? null;
+    }
+
+    /**
+     * Add or change the route label.
+     *
+     * @param  \BackedEnum|string  $name
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function label($label)
+    {
+        if (! isset($this->action['as'])) {
+            throw new \LogicException(
+                'Cannot set a route label without a route name. Use ->name() before ->label().'
+            );
+        }
+
+        if ($label instanceof BackedEnum && ! is_string($label = $label->value)) {
+            throw new InvalidArgumentException('Enum must be string backed.');
+        }
+
+        $this->action['label'] = $label;
+
+        return $this;
+    }
+
+    /**
      * Set the handler for the route.
      *
      * @param  \Closure|array|string  $action

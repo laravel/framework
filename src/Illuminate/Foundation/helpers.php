@@ -872,6 +872,30 @@ if (! function_exists('route')) {
     }
 }
 
+if (! function_exists('routeLabel')) {
+    /**
+     * Get the label of a named route.
+     *
+     * @param  \BackedEnum|string  $name
+     * @return string|null
+     */
+    function routeLabel($name): ?string
+    {
+        if ($name instanceof BackedEnum) {
+            $name = $name->value;
+        }
+
+        $route = app('router')->getRoutes()->getByName($name);
+
+        if (! $route) {
+            return null; // route not found at all
+        }
+
+        // Prefer label, but fall back to route name
+        return $route->getLabel() ?? $route->getName();
+    }
+}
+
 if (! function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
