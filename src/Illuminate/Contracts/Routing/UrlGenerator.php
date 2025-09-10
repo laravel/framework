@@ -73,6 +73,17 @@ interface UrlGenerator
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true);
 
     /**
+     * Create a signed URL for a raw url.
+     *
+     * @param  string  $url
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function signedUrl($url, $expiration = null);
+
+    /**
      * Create a temporary signed route URL for a named route.
      *
      * @param  string  $name

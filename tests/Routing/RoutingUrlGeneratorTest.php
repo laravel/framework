@@ -9,6 +9,7 @@ use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -936,6 +937,99 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertTrue($url3->hasValidSignature($firstRequest));
         $this->assertTrue($url3->hasValidSignature($secondRequest));
+    }
+
+    public function testSignedUrlWithRawUrl()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $signedUrl = $url->signedUrl('http://www.foo.com/test');
+        $this->assertStringContainsString('signature=', $signedUrl);
+
+        $request = Request::create($signedUrl);
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($signedUrl.'&tampered=true');
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedUrlWithExistingQueryParameters()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $signedUrl = $url->signedUrl('http://www.foo.com/test?param1=value1&param2=value2');
+        $this->assertStringContainsString('signature=', $signedUrl);
+        $this->assertStringContainsString('param1=value1', $signedUrl);
+        $this->assertStringContainsString('param2=value2', $signedUrl);
+
+        $request = Request::create($signedUrl);
+        $this->assertTrue($url->hasValidSignature($request));
+    }
+
+    public function testSignedUrlWithExpiration()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        Carbon::setTestNow(Carbon::create(2025, 1, 1));
+        $signedUrl = $url->signedUrl('http://www.foo.com/test', now()->addMinutes(5));
+        $this->assertStringContainsString('signature=', $signedUrl);
+        $this->assertStringContainsString('expires=', $signedUrl);
+
+        $request = Request::create($signedUrl);
+        $this->assertTrue($url->hasValidSignature($request));
+
+        Carbon::setTestNow(Carbon::create(2025, 1, 1)->addMinutes(10));
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedUrlWithReservedSignatureParameter()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        $url->signedUrl('http://www.foo.com/test?signature=tampered');
+    }
+
+    public function testSignedUrlWithReservedExpiresParameter()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('reserved');
+
+        $url->signedUrl('http://www.foo.com/test?expires=123456', now()->addMinutes(5));
     }
 
     public function testMissingNamedRouteResolution()

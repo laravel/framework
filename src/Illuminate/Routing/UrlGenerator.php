@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
@@ -376,6 +377,40 @@ class UrlGenerator implements UrlGeneratorContract
                 is_array($key) ? $key[0] : $key
             ),
         ], $absolute);
+    }
+
+    /**
+     * Create a signed URL for a raw url.
+     *
+     * @param  string  $url
+     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function signedUrl($url, $expiration = null)
+    {
+        $uri = Uri::of($url);
+
+        $parameters = $uri->query()->all();
+
+        $this->ensureSignedRouteParametersAreNotReserved($parameters);
+
+        if ($expiration) {
+            $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
+        }
+
+        ksort($parameters);
+
+        $key = call_user_func($this->keyResolver);
+
+        return $uri->replaceQuery($parameters + [
+            'signature' => hash_hmac(
+                'sha256',
+                $uri->replaceQuery($parameters),
+                is_array($key) ? $key[0] : $key
+            ),
+        ])->value();
     }
 
     /**
