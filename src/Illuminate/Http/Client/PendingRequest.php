@@ -646,7 +646,7 @@ class PendingRequest
     /**
      * Replace the specified options on the request.
      *
-     * @param  array  $options
+     * @param  array<'cookies'|'form_params'|'headers'|'json'|'multipart'|'query', mixed>  $options
      * @return $this
      */
     public function withOptions(array $options)
@@ -1333,7 +1333,7 @@ class PendingRequest
     /**
      * Build the before sending handler.
      *
-     * @return \Closure
+     * @return (\Closure(callable): callable)
      */
     public function buildBeforeSendingHandler()
     {
@@ -1347,7 +1347,7 @@ class PendingRequest
     /**
      * Build the recorder handler.
      *
-     * @return \Closure
+     * @return (\Closure(callable): callable)
      */
     public function buildRecorderHandler()
     {
@@ -1370,7 +1370,7 @@ class PendingRequest
     /**
      * Build the stub handler.
      *
-     * @return \Closure
+     * @return (\Closure(callable): callable)
      */
     public function buildStubHandler()
     {
@@ -1407,7 +1407,7 @@ class PendingRequest
      * Get the sink stub handler callback.
      *
      * @param  string  $sink
-     * @return \Closure
+     * @return (\Closure(\Illuminate\Http\Client\Response): void)
      */
     protected function sinkStubHandler($sink)
     {
