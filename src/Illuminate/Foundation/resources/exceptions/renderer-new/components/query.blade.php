@@ -97,18 +97,19 @@
     <div class="flex flex-col gap-1">
         @forelse (array_slice($queries, 0, 100) as $index => ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
         <div
-            class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center gap-4 px-4 text-xs font-mono shadow-sm"
+            class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center justify-between gap-4 px-4 text-xs font-mono shadow-sm"
             x-show="Math.floor({{ $index }} / perPage) === (currentPage - 1)"
         >
-            <div class="flex items-center gap-2 shrink-0">
-                <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
-                <span class="text-neutral-500 dark:text-neutral-400">{{ $connectionName }}</span>
-            </div>
-            <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2 truncate">
+                <div class="flex items-center gap-2">
+                    <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                    <span class="text-neutral-500 dark:text-neutral-400">{{ $connectionName }}</span>
+                </div>
                 <x-laravel-exceptions-renderer-new::syntax-highlight
                     :code="$sql"
                     grammar="sql"
                     truncate
+                    class="min-w-0"
                     data-tippy-content="{{ $sql }}"
                 />
             </div>
