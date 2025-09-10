@@ -311,6 +311,29 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
+    public function testPipelineCatch()
+    {
+        $pipeTwo = function ($piped, $next) {
+            throw new Exception('Message');
+        };
+
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class, $pipeTwo])
+            ->catch(function (Exception $exception, $piped) {
+                $_SERVER['__test.pipe.catch'] = $exception->getMessage();
+            })
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame(null, $result);
+        $this->assertSame('foo', $_SERVER['__test.pipe.one']);
+        $this->assertSame('Message', $_SERVER['__test.pipe.catch']);
+
+        unset($_SERVER['__test.pipe.one'], $_SERVER['__test.pipe.catch']);
+    }
+
     public function testPipelineFinally()
     {
         $pipeTwo = function ($piped, $next) {
