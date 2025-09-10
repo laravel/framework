@@ -321,7 +321,7 @@ class CacheManager implements FactoryContract
         return $this->repository(
             new SessionStore(
                 $this->getSession(),
-                $config['key'] ?? 'cache',
+                $config['key'] ?? '_cache',
             ),
             $config
         );
