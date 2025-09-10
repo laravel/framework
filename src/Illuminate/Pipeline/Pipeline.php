@@ -173,6 +173,7 @@ class Pipeline implements PipelineContract
     /**
      * Set a catch callback to be executed after an exception is thrown.
      *
+     * @param (\Closure(\Throwable, mixed): void) $callback
      * @return $this
      */
     public function catch(Closure $callback)
