@@ -2,50 +2,24 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
-class SessionStore extends TaggableStore implements LockProvider
+class SessionStore implements Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
-
-    /**
-     * The session instance.
-     *
-     * @var \Illuminate\Contracts\Session\Session
-     */
-    public $session;
-
-    /**
-     * The prefix for locks.
-     *
-     * @var string
-     */
-    public $lockPrefix;
-
-    /**
-     * The prefix for cache items.
-     *
-     * @var string
-     */
-    public $cachePrefix;
 
     /**
      * Create a new Session store.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
-     * @param  string  $lockPrefix
-     * @param  string  $cachePrefix
+     * @param  string  $prefix
      */
     public function __construct(
-        $session,
-        $lockPrefix = '_lock',
-        $cachePrefix = '_cache',
+        public $session,
+        public $prefix = '_cache',
     ) {
-        $this->session = $session;
-        $this->lockPrefix = $lockPrefix;
-        $this->cachePrefix = $cachePrefix;
     }
 
     /**
@@ -55,7 +29,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function all()
     {
-        return $this->session->get($this->cachePrefix, []);
+        return $this->session->get($this->prefix, []);
     }
 
     /**
@@ -169,7 +143,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function flush()
     {
-        $this->session->put($this->cachePrefix, []);
+        $this->session->put($this->prefix, []);
 
         return true;
     }
@@ -181,7 +155,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function getPrefix()
     {
-        return '';
+        return $this->prefix;
     }
 
     /**
@@ -191,7 +165,7 @@ class SessionStore extends TaggableStore implements LockProvider
      */
     public function itemKey($key)
     {
-        return "{$this->cachePrefix}.{$key}";
+        return "{$this->prefix}.{$key}";
     }
 
     /**
@@ -214,32 +188,5 @@ class SessionStore extends TaggableStore implements LockProvider
     protected function toTimestamp($seconds)
     {
         return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
-    }
-
-    /**
-     * Get a lock instance.
-     *
-     * @param  string  $name
-     * @param  int  $seconds
-     * @param  string|null  $owner
-     * @return \Illuminate\Contracts\Cache\Lock
-     */
-    public function lock($name, $seconds = 0, $owner = null)
-    {
-        $name = "{$this->lockPrefix}.{$name}";
-
-        return new SessionLock($this, $name, $seconds, $owner);
-    }
-
-    /**
-     * Restore a lock instance using the owner identifier.
-     *
-     * @param  string  $name
-     * @param  string  $owner
-     * @return \Illuminate\Contracts\Cache\Lock
-     */
-    public function restoreLock($name, $owner)
-    {
-        return $this->lock($name, 0, $owner);
     }
 }

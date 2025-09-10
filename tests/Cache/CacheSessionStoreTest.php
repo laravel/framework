@@ -20,7 +20,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testItemsCanBeSetAndRetrieved()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $result = $store->put('foo', 'bar', 10);
         $this->assertTrue($result);
         $this->assertSame('bar', $store->get('foo'));
@@ -28,7 +28,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testCacheTtl(): void
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
 
         Carbon::setTestNow('2000-01-01 00:00:00.500'); // 500 milliseconds past
         $store->put('hello', 'world', 1);
@@ -42,7 +42,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
             'fizz' => 'buz',
@@ -62,7 +62,7 @@ class CacheSessionStoreTest extends TestCase
     {
         Carbon::setTestNow(Carbon::now());
 
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
 
         $store->put('foo', 'bar', 10);
         Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
@@ -74,7 +74,7 @@ class CacheSessionStoreTest extends TestCase
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(SessionStore::class)
-            ->setConstructorArgs([$this->getSession()])
+            ->setConstructorArgs([self::getSession()])
             ->onlyMethods(['put'])
             ->getMock();
         $mock->expects($this->once())
@@ -86,7 +86,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testValuesCanBeIncremented()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
         $result = $store->increment('foo');
         $this->assertEquals(2, $result);
@@ -99,7 +99,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testValuesGetCastedByIncrementOrDecrement()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', '1', 10);
         $result = $store->increment('foo');
         $this->assertEquals(2, $result);
@@ -113,7 +113,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testIncrementNonNumericValues()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 'I am string', 10);
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
@@ -122,7 +122,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testNonExistingKeysCanBeIncremented()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $result = $store->increment('foo');
         $this->assertEquals(1, $result);
         $this->assertEquals(1, $store->get('foo'));
@@ -136,7 +136,7 @@ class CacheSessionStoreTest extends TestCase
     {
         Carbon::setTestNow(Carbon::now());
 
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
 
         $store->put('foo', 999, 10);
         Carbon::setTestNow(Carbon::now()->addSeconds(10)->addSecond());
@@ -147,7 +147,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testValuesCanBeDecremented()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 1, 10);
         $result = $store->decrement('foo');
         $this->assertEquals(0, $result);
@@ -160,7 +160,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testItemsCanBeRemoved()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
         $this->assertTrue($store->forget('foo'));
         $this->assertNull($store->get('foo'));
@@ -169,7 +169,7 @@ class CacheSessionStoreTest extends TestCase
 
     public function testItemsCanBeFlushed()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
         $store->put('baz', 'boom', 10);
         $result = $store->flush();
@@ -180,87 +180,22 @@ class CacheSessionStoreTest extends TestCase
 
     public function testCacheKey()
     {
-        $store = new SessionStore($this->getSession());
-        $this->assertEmpty($store->getPrefix());
+        $store = new SessionStore(self::getSession());
+        $this->assertEquals('_cache', $store->getPrefix());
+
+        $store = new SessionStore(self::getSession(), 'custom_prefix');
+        $this->assertEquals('custom_prefix', $store->getPrefix());
     }
 
-    public function testCannotAcquireLockTwice()
+    public function testItemKey()
     {
-        $store = new SessionStore($this->getSession());
-        $lock = $store->lock('foo', 10);
-
-        $this->assertTrue($lock->acquire());
-        $this->assertFalse($lock->acquire());
-    }
-
-    public function testCanAcquireLockAgainAfterExpiry()
-    {
-        Carbon::setTestNow(Carbon::now());
-
-        $store = new SessionStore($this->getSession());
-        $lock = $store->lock('foo', 10);
-        $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addSeconds(10));
-
-        $this->assertTrue($lock->acquire());
-    }
-
-    public function testLockExpirationLowerBoundary()
-    {
-        Carbon::setTestNow(Carbon::now());
-
-        $store = new SessionStore($this->getSession());
-        $lock = $store->lock('foo', 10);
-        $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addSeconds(10)->subMicrosecond());
-
-        $this->assertFalse($lock->acquire());
-    }
-
-    public function testLockWithNoExpirationNeverExpires()
-    {
-        $store = new SessionStore($this->getSession());
-        $lock = $store->lock('foo');
-        $lock->acquire();
-        Carbon::setTestNow(Carbon::now()->addYears(100));
-
-        $this->assertFalse($lock->acquire());
-    }
-
-    public function testCanAcquireLockAfterRelease()
-    {
-        $store = new SessionStore($this->getSession());
-        $lock = $store->lock('foo', 10);
-        $lock->acquire();
-
-        $this->assertTrue($lock->release());
-        $this->assertTrue($lock->acquire());
-    }
-
-    public function testAnotherOwnerCannotReleaseLock()
-    {
-        $store = new SessionStore($this->getSession());
-        $owner = $store->lock('foo', 10);
-        $wannabeOwner = $store->lock('foo', 10);
-        $owner->acquire();
-
-        $this->assertFalse($wannabeOwner->release());
-    }
-
-    public function testAnotherOwnerCanForceReleaseALock()
-    {
-        $store = new SessionStore($this->getSession());
-        $owner = $store->lock('foo', 10);
-        $wannabeOwner = $store->lock('foo', 10);
-        $owner->acquire();
-        $wannabeOwner->forceRelease();
-
-        $this->assertTrue($wannabeOwner->acquire());
+        $store = new SessionStore(self::getSession(), 'custom_prefix');
+        $this->assertEquals('custom_prefix.foo', $store->itemKey('foo'));
     }
 
     public function testValuesAreStoredByReference()
     {
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $object = new stdClass;
         $object->foo = true;
 
@@ -273,54 +208,11 @@ class CacheSessionStoreTest extends TestCase
         $this->assertTrue($retrievedObject->bar);
     }
 
-    public function testReleasingLockAfterAlreadyForceReleasedByAnotherOwnerFails()
-    {
-        $store = new SessionStore($this->getSession());
-        $owner = $store->lock('foo', 10);
-        $wannabeOwner = $store->lock('foo', 10);
-        $owner->acquire();
-        $wannabeOwner->forceRelease();
-
-        $this->assertFalse($wannabeOwner->release());
-    }
-
-    public function testOwnerStatusCanBeCheckedAfterRestoringLock()
-    {
-        $store = new SessionStore($this->getSession());
-        $firstLock = $store->lock('foo', 10);
-
-        $this->assertTrue($firstLock->get());
-        $owner = $firstLock->owner();
-
-        $secondLock = $store->restoreLock('foo', $owner);
-        $this->assertTrue($secondLock->isOwnedByCurrentProcess());
-    }
-
-    public function testOtherOwnerDoesNotOwnLockAfterRestore()
-    {
-        $store = new SessionStore($this->getSession());
-        $firstLock = $store->lock('foo', 10);
-
-        $this->assertTrue($firstLock->get());
-
-        $secondLock = $store->restoreLock('foo', 'other_owner');
-
-        $this->assertFalse($secondLock->isOwnedByCurrentProcess());
-    }
-
-    public function testRestoringNonExistingLockDoesNotOwnAnything()
-    {
-        $store = new SessionStore($this->getSession());
-        $firstLock = $store->restoreLock('foo', 'owner');
-
-        $this->assertFalse($firstLock->isOwnedByCurrentProcess());
-    }
-
     public function testCanGetAll()
     {
         Carbon::setTestNow(Carbon::now());
 
-        $store = new SessionStore($this->getSession());
+        $store = new SessionStore(self::getSession());
         $store->put('foo', 'bar', 10);
 
         $this->assertEquals([
@@ -328,7 +220,7 @@ class CacheSessionStoreTest extends TestCase
         ], $store->all());
     }
 
-    public function getSession()
+    protected static function getSession()
     {
         return new Store(
             name: 'name',

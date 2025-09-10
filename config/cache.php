@@ -40,8 +40,7 @@ return [
 
         'session' => [
             'driver' => 'session',
-            'lock_prefix' => env('SESSION_LOCK_PREFIX', '_lock'),
-            'cache_prefix' => env('SESSION_CACHE_PREFIX', '_cache'),
+            'prefix' => env('SESSION_CACHE_PREFIX', '_cache'),
         ],
 
         'database' => [
