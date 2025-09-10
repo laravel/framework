@@ -1788,6 +1788,10 @@ trait HasAttributes
             return false;
         }
 
+        if (is_subclass_of($castType, Castable::class)) {
+            return false;
+        }
+
         return enum_exists($castType);
     }
 
