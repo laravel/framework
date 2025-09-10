@@ -876,7 +876,7 @@ class Connection implements ConnectionInterface
      * Register a callback to be invoked when the connection queries for longer than a given amount of time.
      *
      * @param  \DateTimeInterface|\Carbon\CarbonInterval|float|int  $threshold
-     * @param  (callable(\Illuminate\Database\Connection, class-string<\Illuminate\Database\Events\QueryExecuted>): mixed)  $handler
+     * @param  (callable(\Illuminate\Database\Connection, \Illuminate\Database\Events\QueryExecuted): mixed)  $handler
      * @return void
      */
     public function whenQueryingForLongerThan($threshold, $handler)
