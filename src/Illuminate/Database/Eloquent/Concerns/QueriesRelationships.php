@@ -837,7 +837,7 @@ trait QueriesRelationships
      *
      * @param  mixed  $relations
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
-     * @param  string  $function
+     * @param  string|null  $function
      * @return $this
      */
     public function withAggregate($relations, $column, $function = null)
