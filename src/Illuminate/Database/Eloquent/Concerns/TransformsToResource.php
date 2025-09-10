@@ -33,6 +33,7 @@ trait TransformsToResource
     protected function guessResource(): JsonResource
     {
         $resourceClass = $this->resolveResourceFromAttribute(static::class);
+
         if ($resourceClass !== null && class_exists($resourceClass)) {
             return $resourceClass::make($this);
         }
