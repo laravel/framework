@@ -102,15 +102,15 @@ class HandleExceptions
 
         $options = static::$app['config']->get('logging.deprecations') ?? [];
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
-            if ($options['trace'] ?? false) {
-                $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
-            } else {
-                $log->warning(sprintf('%s in %s on line %s',
-                    $message, $file, $line
-                ));
-            }
-        });
+        $log = $logger->channel('deprecations');
+
+        if ($options['trace'] ?? false) {
+            $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
+        } else {
+            $log->warning(sprintf('%s in %s on line %s',
+                $message, $file, $line
+            ));
+        }
     }
 
     /**
@@ -132,21 +132,21 @@ class HandleExceptions
      */
     protected function ensureDeprecationLoggerIsConfigured()
     {
-        with(static::$app['config'], function ($config) {
-            if ($config->get('logging.channels.deprecations')) {
-                return;
-            }
+        $config = static::$app['config'];
 
-            $this->ensureNullLogDriverIsConfigured();
+        if ($config->get('logging.channels.deprecations')) {
+            return;
+        }
 
-            if (is_array($options = $config->get('logging.deprecations'))) {
-                $driver = $options['channel'] ?? 'null';
-            } else {
-                $driver = $options ?? 'null';
-            }
+        $this->ensureNullLogDriverIsConfigured();
 
-            $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
-        });
+        if (is_array($options = $config->get('logging.deprecations'))) {
+            $driver = $options['channel'] ?? 'null';
+        } else {
+            $driver = $options ?? 'null';
+        }
+
+        $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
     }
 
     /**
@@ -156,16 +156,16 @@ class HandleExceptions
      */
     protected function ensureNullLogDriverIsConfigured()
     {
-        with(static::$app['config'], function ($config) {
-            if ($config->get('logging.channels.null')) {
-                return;
-            }
+        $config = static::$app['config'];
 
-            $config->set('logging.channels.null', [
-                'driver' => 'monolog',
-                'handler' => NullHandler::class,
-            ]);
-        });
+        if ($config->get('logging.channels.null')) {
+            return;
+        }
+
+        $config->set('logging.channels.null', [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ]);
     }
 
     /**
