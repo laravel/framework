@@ -32,7 +32,7 @@ trait Queueable
      *
      * @var string|null
      */
-    public $group;
+    public $messageGroup;
 
     /**
      * The number of seconds before the job should be made available.
@@ -119,7 +119,7 @@ trait Queueable
      */
     public function onGroup($group)
     {
-        $this->group = enum_value($group);
+        $this->messageGroup = enum_value($group);
 
         return $this;
     }

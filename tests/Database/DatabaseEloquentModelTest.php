@@ -56,6 +56,7 @@ use Illuminate\Tests\Database\stubs\TestValueObject;
 use InvalidArgumentException;
 use LogicException;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -1313,6 +1314,23 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->shouldReceive('getConnectionName')->once()->andReturn('somethingElse');
         $resolver->shouldReceive('connection')->once()->with('somethingElse')->andReturn('bar');
+
+        $this->assertSame('bar', $model->getConnection());
+    }
+
+    #[TestWith(['Foo'])]
+    #[TestWith([ConnectionName::Foo])]
+    #[TestWith([ConnectionNameBacked::Foo])]
+    public function testConnectionEnums(string|\UnitEnum $connectionName)
+    {
+        EloquentModelStub::setConnectionResolver($resolver = m::mock(ConnectionResolverInterface::class));
+        $model = new EloquentModelStub;
+
+        $retval = $model->setConnection($connectionName);
+        $this->assertEquals($retval, $model);
+        $this->assertSame('Foo', $model->getConnectionName());
+
+        $resolver->shouldReceive('connection')->once()->with('Foo')->andReturn('bar');
 
         $this->assertSame('bar', $model->getConnection());
     }
@@ -4431,4 +4449,16 @@ class StringableCastBuilder implements NativeStringable
     {
         return $this->cast;
     }
+}
+
+enum ConnectionName
+{
+    case Foo;
+    case Bar;
+}
+
+enum ConnectionNameBacked: string
+{
+    case Foo = 'Foo';
+    case Bar = 'Bar';
 }
