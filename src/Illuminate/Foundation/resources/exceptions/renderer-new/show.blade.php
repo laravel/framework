@@ -35,7 +35,7 @@
 
     <x-laravel-exceptions-renderer-new::separator />
 
-    <x-laravel-exceptions-renderer-new::section-container>
+    <x-laravel-exceptions-renderer-new::section-container class="pb-0 sm:pb-0">
         <x-laravel-exceptions-renderer-new::laravel-ascii-spotlight />
     </x-laravel-exceptions-renderer-new::section-container>
 </x-laravel-exceptions-renderer-new::layout>
