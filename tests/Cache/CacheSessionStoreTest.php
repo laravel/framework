@@ -181,10 +181,7 @@ class CacheSessionStoreTest extends TestCase
     public function testCacheKey()
     {
         $store = new SessionStore(self::getSession());
-        $this->assertEquals('_cache', $store->getPrefix());
-
-        $store = new SessionStore(self::getSession(), 'custom_prefix');
-        $this->assertEquals('custom_prefix', $store->getPrefix());
+        $this->assertEmpty($store->getPrefix());
     }
 
     public function testItemKey()

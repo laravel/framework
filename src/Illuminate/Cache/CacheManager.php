@@ -321,7 +321,7 @@ class CacheManager implements FactoryContract
         return $this->repository(
             new SessionStore(
                 $this->getSession(),
-                $this->getPrefix($config),
+                $config['key'] ?? 'cache',
             ),
             $config
         );
@@ -358,8 +358,6 @@ class CacheManager implements FactoryContract
             if ($config['events'] ?? true) {
                 $this->setEventDispatcher($repository);
             }
-
-            $this->applySessionPrefixIfNeeded($repository, $config);
         });
     }
 
@@ -414,31 +412,6 @@ class CacheManager implements FactoryContract
         }
 
         return ['driver' => 'null'];
-    }
-
-    /**
-     * Apply a session-based prefix to the cache store if needed.
-     *
-     * @param  \Illuminate\Cache\Repository  $repository
-     * @param  array  $config
-     * @return void
-     */
-    protected function applySessionPrefixIfNeeded($repository, $config)
-    {
-        if (($config['store'] ?? 'ondemand') !== 'session') {
-            return;
-        }
-
-        $store = $repository->getStore();
-
-        if (! method_exists($store, 'setPrefix')) {
-            return;
-        }
-
-        $prefix = $store->getPrefix();
-        $sessionId = $this->getSession()->getId();
-
-        $store->setPrefix("{$prefix}_{$sessionId}_");
     }
 
     /**

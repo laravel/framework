@@ -8,9 +8,7 @@ use Illuminate\Cache\NullStore;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Redis\Factory;
 use Illuminate\Events\Dispatcher as Event;
-use Illuminate\Session\Store;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -321,35 +319,9 @@ class CacheManagerTest extends TestCase
         $this->assertNull($repoWithoutEvents->getEventDispatcher());
     }
 
-    public function testConcatSessionIdToPrefix()
-    {
-        $session = m::mock(Store::class);
-        $session->shouldReceive('getId')->andReturn('my_session_id');
-
-        $userConfig = [
-            'cache' => [
-                'stores' => [
-                    'session' => [
-                        'driver' => 'redis',
-                    ],
-                ],
-                'prefix' => 'laravel_cache',
-            ],
-        ];
-
-        $app = $this->getApp($userConfig);
-        $app->singleton('session', fn () => $session);
-
-        $cacheManager = new CacheManager($app);
-        $store = $cacheManager->store('session');
-
-        $this->assertSame('laravel_cache_my_session_id_', $store->getStore()->getPrefix());
-    }
-
     protected function getApp(array $userConfig)
     {
         $app = new Container;
-        $app->singleton('redis', fn () => m::mock(Factory::class));
         $app->singleton('config', fn () => new Repository($userConfig));
 
         return $app;
