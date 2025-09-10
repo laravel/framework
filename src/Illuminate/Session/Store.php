@@ -80,16 +80,6 @@ class Store implements Session
     }
 
     /**
-     * Manage the session cache store.
-     *
-     * @return \Illuminate\Contracts\Cache\Repository
-     */
-    public function cache()
-    {
-        return Cache::store('session');
-    }
-
-    /**
      * Start the session, reading the data from a handler.
      *
      * @return bool
@@ -548,6 +538,16 @@ class Store implements Session
     public function flashInput(array $value)
     {
         $this->flash('_old_input', $value);
+    }
+
+    /**
+     * Get the session cache instance.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function cache()
+    {
+        return Cache::store('session');
     }
 
     /**

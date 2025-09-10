@@ -25,7 +25,7 @@ class SessionStore implements Store
     public $session;
 
     /**
-     * Create a new Session store.
+     * Create a new session cache store.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  string  $prefix
@@ -72,6 +72,17 @@ class SessionStore implements Store
     }
 
     /**
+     * Determine if the given expiration time is expired.
+     *
+     * @param  int|float  $expiresAt
+     * @return bool
+     */
+    protected function isExpired($expiresAt)
+    {
+        return $expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt;
+    }
+
+    /**
      * Store an item in the cache for a given number of seconds.
      *
      * @param  string  $key
@@ -87,6 +98,17 @@ class SessionStore implements Store
         ]);
 
         return true;
+    }
+
+    /**
+     * Get the UNIX timestamp, with milliseconds, for the given number of seconds in the future.
+     *
+     * @param  int  $seconds
+     * @return float
+     */
+    protected function toTimestamp($seconds)
+    {
+        return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
     }
 
     /**
@@ -167,9 +189,9 @@ class SessionStore implements Store
      *
      * @return string
      */
-    public function getPrefix()
+    public function itemKey($key)
     {
-        return $this->prefix;
+        return "{$this->prefix}.{$key}";
     }
 
     /**
@@ -177,30 +199,8 @@ class SessionStore implements Store
      *
      * @return string
      */
-    public function itemKey($key)
+    public function getPrefix()
     {
-        return "{$this->prefix}.{$key}";
-    }
-
-    /**
-     * Determine if the given expiration time is expired.
-     *
-     * @param  int|float  $expiresAt
-     * @return bool
-     */
-    protected function isExpired($expiresAt)
-    {
-        return $expiresAt !== 0 && (Carbon::now()->getPreciseTimestamp(3) / 1000) >= $expiresAt;
-    }
-
-    /**
-     * Get the UNIX timestamp, with milliseconds, for the given number of seconds in the future.
-     *
-     * @param  int  $seconds
-     * @return float
-     */
-    protected function toTimestamp($seconds)
-    {
-        return $seconds > 0 ? (Carbon::now()->getPreciseTimestamp(3) / 1000) + $seconds : 0;
+        return $this->prefix;
     }
 }
