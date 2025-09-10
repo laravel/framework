@@ -36,6 +36,6 @@
     <x-laravel-exceptions-renderer-new::separator />
 
     <x-laravel-exceptions-renderer-new::section-container>
-        <x-laravel-exceptions-renderer-new::icons.laravel-ascii />
+        <x-laravel-exceptions-renderer-new::laravel-ascii-spotlight />
     </x-laravel-exceptions-renderer-new::section-container>
 </x-laravel-exceptions-renderer-new::layout>
