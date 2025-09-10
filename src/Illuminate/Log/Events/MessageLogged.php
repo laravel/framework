@@ -14,7 +14,7 @@ class MessageLogged
     public function __construct(
         public $level,
         public $message,
-        public array $context = []
+        public array $context = [],
     ) {
     }
 }
