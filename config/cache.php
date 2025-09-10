@@ -40,7 +40,7 @@ return [
 
         'session' => [
             'driver' => 'session',
-            'key' => env('SESSION_CACHE_KEY', 'cache'),
+            'key' => env('SESSION_CACHE_KEY', '_cache'),
         ],
 
         'database' => [
