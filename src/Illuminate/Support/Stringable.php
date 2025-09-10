@@ -1045,7 +1045,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function trim($characters = null)
@@ -1056,7 +1056,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Left trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function ltrim($characters = null)
@@ -1067,7 +1067,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Right trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function rtrim($characters = null)
