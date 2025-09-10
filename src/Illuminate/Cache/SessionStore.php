@@ -30,7 +30,7 @@ class SessionStore implements Store
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  string  $key
      */
-    public function __construct($session, $key = 'cache')
+    public function __construct($session, $key = '_cache')
     {
         $this->key = $key;
         $this->session = $session;
