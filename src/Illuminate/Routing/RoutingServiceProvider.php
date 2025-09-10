@@ -134,7 +134,6 @@ class RoutingServiceProvider extends ServiceProvider
     {
         $this->app->bind(ServerRequestInterface::class, function ($app) {
             if (class_exists(PsrHttpFactory::class)) {
-
                 $illuminateRequest = $app->make('request');
                 $request = (new PsrHttpFactory)->createRequest($illuminateRequest);
 

@@ -174,7 +174,6 @@ class Batch implements Arrayable, JsonSerializable
                     ->allOnQueue($this->options['queue'] ?? null)
                     ->allOnConnection($this->options['connection'] ?? null)
                     ->chain($chain->slice(1)->values()->all());
-
             } else {
                 $job->withBatchId($this->id);
 

@@ -212,11 +212,11 @@ class Attachment
         ];
 
         return $this->attachWith(
-                fn ($path) => [$path, ['as' => $this->as, 'mime' => $this->mime]],
-                fn ($data) => [$data(), ['as' => $this->as, 'mime' => $this->mime]],
-            ) === $attachment->attachWith(
-                fn ($path) => [$path, $newOptions],
-                fn ($data) => [$data(), $newOptions],
-            );
+            fn ($path) => [$path, ['as' => $this->as, 'mime' => $this->mime]],
+            fn ($data) => [$data(), ['as' => $this->as, 'mime' => $this->mime]],
+        ) === $attachment->attachWith(
+            fn ($path) => [$path, $newOptions],
+            fn ($data) => [$data(), $newOptions],
+        );
     }
 }

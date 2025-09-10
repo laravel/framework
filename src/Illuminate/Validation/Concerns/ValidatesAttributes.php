@@ -472,11 +472,9 @@ trait ValidatesAttributes
         $this->requireParameterCount(2, $parameters, 'between');
 
         try {
-
             $size = BigNumber::of($this->getSize($attribute, $value));
 
             return $size->isGreaterThanOrEqualTo($this->trim($parameters[0])) && $size->isLessThanOrEqualTo($this->trim($parameters[1]));
-
         } catch (MathException) {
             return false;
         }
