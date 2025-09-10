@@ -225,7 +225,7 @@ trait InteractsWithDatabase
      */
     public function expectsDatabaseQueryCount($expected, $connection = null)
     {
-        with($this->getConnection($connection), function ($connectionInstance) use ($expected, $connection) {
+        (function ($connectionInstance) use ($expected, $connection) {
             $actual = 0;
 
             $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
@@ -241,7 +241,7 @@ trait InteractsWithDatabase
                     "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
                 );
             });
-        });
+        })($this->getConnection($connection));
 
         return $this;
     }

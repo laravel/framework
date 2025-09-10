@@ -506,7 +506,7 @@ class Vite implements Htmlable
                 ->reject(fn ($attributes) => isset($this->preloadedAssets[$attributes['href']])))
             ->unique('href')
             ->values()
-            ->pipe(fn ($assets) => with(Js::from($assets), fn ($assets) => match ($this->prefetchStrategy) {
+            ->pipe(fn ($assets) => (fn ($assets) => match ($this->prefetchStrategy) {
                 'waterfall' => new HtmlString($base.<<<HTML
 
                     <script{$this->nonceAttribute()}>
@@ -570,7 +570,7 @@ class Vite implements Htmlable
                          }))
                     </script>
                     HTML),
-            }));
+            })(Js::from($assets)));
     }
 
     /**

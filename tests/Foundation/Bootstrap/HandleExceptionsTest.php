@@ -29,9 +29,9 @@ class HandleExceptionsTest extends TestCase
     protected function handleExceptions()
     {
         return tap(new HandleExceptions(), function ($instance) {
-            with(new ReflectionClass($instance), function ($reflection) use ($instance) {
+            (function ($reflection) use ($instance) {
                 $reflection->getProperty('app')->setValue($instance, $this->app);
-            });
+            })(new ReflectionClass($instance));
         });
     }
 
@@ -381,11 +381,11 @@ class HandleExceptionsTest extends TestCase
     {
         $instance = $this->handleExceptions();
 
-        $appResolver = fn () => with(new ReflectionClass($instance), function ($reflection) use ($instance) {
+        $appResolver = fn () => (function ($reflection) use ($instance) {
             $property = $reflection->getProperty('app');
 
             return $property->getValue($instance);
-        });
+        })(new ReflectionClass($instance));
 
         $this->assertNotNull($appResolver());
 
@@ -398,11 +398,11 @@ class HandleExceptionsTest extends TestCase
     {
         $instance = $this->handleExceptions();
 
-        $appResolver = fn () => with(new ReflectionClass($instance), function ($reflection) use ($instance) {
+        $appResolver = fn () => (function ($reflection) use ($instance) {
             $property = $reflection->getProperty('app');
 
             return $property->getValue($instance);
-        });
+        })(new ReflectionClass($instance));
 
         $this->assertSame($this->app, $appResolver());
 

@@ -125,11 +125,11 @@ class DocsCommand extends Command
      */
     protected function openUrl()
     {
-        with($this->url(), function ($url) {
+        (function ($url) {
             $this->components->info("Opening the docs to: <fg=yellow>{$url}</>");
 
             $this->open($url);
-        });
+        })($this->url());
     }
 
     /**
@@ -145,9 +145,9 @@ class DocsCommand extends Command
             ]);
         }
 
-        return with($this->page(), function ($page) {
+        return (function ($page) {
             return trim("https://laravel.com/docs/{$this->version()}/{$page}#{$this->section($page)}", '#/');
-        });
+        })($this->page());
     }
 
     /**
@@ -157,7 +157,7 @@ class DocsCommand extends Command
      */
     protected function page()
     {
-        return with($this->resolvePage(), function ($page) {
+        return (function ($page) {
             if ($page === null) {
                 $this->components->warn('Unable to determine the page you are trying to visit.');
 
@@ -165,7 +165,7 @@ class DocsCommand extends Command
             }
 
             return $page;
-        });
+        })($this->resolvePage());
     }
 
     /**
@@ -441,11 +441,11 @@ class DocsCommand extends Command
      */
     protected function refreshDocs()
     {
-        with($this->fetchDocs(), function ($response) {
+        (function ($response) {
             if ($response->successful()) {
                 $this->cache->put("artisan.docs.{{$this->version()}}.index", $response->collect(), CarbonInterval::months(2));
             }
-        });
+        })($this->fetchDocs());
     }
 
     /**

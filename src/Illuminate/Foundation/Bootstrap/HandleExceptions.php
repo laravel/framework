@@ -102,7 +102,7 @@ class HandleExceptions
 
         $options = static::$app['config']->get('logging.deprecations') ?? [];
 
-        with($logger->channel('deprecations'), function ($log) use ($message, $file, $line, $level, $options) {
+        (function ($log) use ($message, $file, $line, $level, $options) {
             if ($options['trace'] ?? false) {
                 $log->warning((string) new ErrorException($message, 0, $level, $file, $line));
             } else {
@@ -110,7 +110,7 @@ class HandleExceptions
                     $message, $file, $line
                 ));
             }
-        });
+        })($logger->channel('deprecations'));
     }
 
     /**
@@ -132,7 +132,7 @@ class HandleExceptions
      */
     protected function ensureDeprecationLoggerIsConfigured()
     {
-        with(static::$app['config'], function ($config) {
+        (function ($config) {
             if ($config->get('logging.channels.deprecations')) {
                 return;
             }
@@ -146,7 +146,7 @@ class HandleExceptions
             }
 
             $config->set('logging.channels.deprecations', $config->get("logging.channels.{$driver}"));
-        });
+        })(static::$app['config']);
     }
 
     /**
@@ -156,7 +156,7 @@ class HandleExceptions
      */
     protected function ensureNullLogDriverIsConfigured()
     {
-        with(static::$app['config'], function ($config) {
+        (function ($config) {
             if ($config->get('logging.channels.null')) {
                 return;
             }
@@ -165,7 +165,7 @@ class HandleExceptions
                 'driver' => 'monolog',
                 'handler' => NullHandler::class,
             ]);
-        });
+        })(static::$app['config']);
     }
 
     /**

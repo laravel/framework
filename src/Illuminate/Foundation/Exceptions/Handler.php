@@ -443,7 +443,7 @@ class Handler implements ExceptionHandlerContract
             }
         }
 
-        return rescue(fn () => with($this->throttle($e), function ($throttle) use ($e) {
+        return rescue(fn () => (function ($throttle) use ($e) {
             if ($throttle instanceof Unlimited || $throttle === null) {
                 return false;
             }
@@ -453,12 +453,12 @@ class Handler implements ExceptionHandlerContract
             }
 
             return ! $this->container->make(RateLimiter::class)->attempt(
-                with($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class, fn ($key) => $this->hashThrottleKeys ? hash('xxh128', $key) : $key),
+                (fn ($key) => $this->hashThrottleKeys ? hash('xxh128', $key) : $key)($throttle->key ?: 'illuminate:foundation:exceptions:'.$e::class),
                 $throttle->maxAttempts,
                 fn () => true,
                 $throttle->decaySeconds
             );
-        }), rescue: false, report: false);
+        })($this->throttle($e)), rescue: false, report: false);
     }
 
     /**
