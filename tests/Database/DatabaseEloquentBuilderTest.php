@@ -2483,7 +2483,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo', null);
 
         $builder->oldest();
     }
@@ -2494,7 +2494,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at');
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at', null);
 
         $builder->oldest();
     }
@@ -2504,9 +2504,41 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo', null);
 
         $builder->oldest('foo');
+    }
+
+    public function testOldestWithLimitAndCreatedAtColumn()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo', 1);
+
+        $builder->oldest(limit: 1);
+    }
+
+    public function testOldestWithLimitWithoutCreatedAtColumn()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at', 1);
+
+        $builder->oldest(limit: 1);
+    }
+
+    public function testOldestWithExplicitColumnAndLimit()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('my_timestamp', 1);
+
+        $builder->oldest('my_timestamp', 1);
     }
 
     public function testUpdate()

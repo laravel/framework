@@ -2113,6 +2113,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->oldest('updated_at');
         $this->assertSame('select * from "users" order by "updated_at" asc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->oldest(limit: 1);
+        $this->assertSame('select * from "users" order by "created_at" asc limit 1', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->oldest('updated_at', 1);
+        $this->assertSame('select * from "users" order by "updated_at" asc limit 1', $builder->toSql());
     }
 
     public function testInRandomOrderMySql()
