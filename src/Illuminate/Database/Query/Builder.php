@@ -2724,7 +2724,11 @@ class Builder implements BuilderContract
      */
     public function latest($column = 'created_at', $limit = null)
     {
-        return $this->orderBy($column, 'desc')->limit($limit);
+        if (! is_null($limit)) {
+            $this->limit($limit);
+        }
+
+        return $this->orderBy($column, 'desc');
     }
 
     /**
@@ -2736,7 +2740,11 @@ class Builder implements BuilderContract
      */
     public function oldest($column = 'created_at', $limit = null)
     {
-        return $this->orderBy($column, 'asc')->limit($limit);
+        if (! is_null($limit)) {
+            $this->limit($limit);
+        }
+
+        return $this->orderBy($column, 'asc');
     }
 
     /**
