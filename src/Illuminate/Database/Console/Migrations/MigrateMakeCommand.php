@@ -8,6 +8,8 @@ use Illuminate\Support\Composer;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
+use function Illuminate\Filesystem\join_paths;
+
 #[AsCommand(name: 'make:migration')]
 class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
@@ -63,7 +65,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
@@ -92,10 +94,18 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
             [$table, $create] = TableGuesser::guess($name);
         }
 
+        if ($this->migrationExists($name)) {
+            $this->components->error('Migration '.$name.' already exists.');
+
+            return 1;
+        }
+
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
+
+        return 0;
     }
 
     /**
@@ -145,5 +155,18 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         return [
             'name' => ['What should the migration be named?', 'E.g. create_flights_table'],
         ];
+    }
+
+    /**
+     * Determine whether a migration with the given name already exists.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function migrationExists(string $name): bool
+    {
+        return count(glob(
+            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_'.$name.'.php')
+        )) !== 0;
     }
 }
