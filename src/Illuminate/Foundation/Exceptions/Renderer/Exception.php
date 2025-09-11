@@ -92,20 +92,6 @@ class Exception
     }
 
     /**
-     * Get the first "non-vendor" frame index.
-     *
-     * @return int
-     */
-    public function defaultFrame()
-    {
-        $key = array_search(false, array_map(function (Frame $frame) {
-            return $frame->isFromVendor();
-        }, $this->frames()->all()));
-
-        return $key === false ? 0 : $key;
-    }
-
-    /**
      * Get the exception's frames.
      *
      * @return \Illuminate\Support\Collection<int, Frame>
