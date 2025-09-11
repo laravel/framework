@@ -2419,7 +2419,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo', null);
 
         $builder->latest();
     }
@@ -2430,7 +2430,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at', null);
 
         $builder->latest();
     }
@@ -2440,9 +2440,41 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo', null);
 
         $builder->latest('foo');
+    }
+
+    public function testLatestWithLimitAndCreatedAtColumn()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo', 5);
+
+        $builder->latest(limit: 5);
+    }
+
+    public function testLatestWithLimitWithoutCreatedAtColumn()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at', 7);
+
+        $builder->latest(limit: 7);
+    }
+
+    public function testLatestWithExplicitColumnAndLimit()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('my_timestamp', 3);
+
+        $builder->latest('my_timestamp', 3);
     }
 
     public function testOldestWithoutColumnWithCreatedAt()

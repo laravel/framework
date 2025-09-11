@@ -2090,6 +2090,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->latest('updated_at');
         $this->assertSame('select * from "users" order by "updated_at" desc', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->latest(limit: 1);
+        $this->assertSame('select * from "users" order by "created_at" desc limit 1', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->latest('updated_at', 1);
+        $this->assertSame('select * from "users" order by "updated_at" desc limit 1', $builder->toSql());
     }
 
     public function testOldest()
