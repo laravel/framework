@@ -5,7 +5,11 @@
         $source = $class;
 
         if ($previous = $frame->previous()) {
-            $source .= "->{$previous->callable()}()";
+            $source .= $previous->type();
+            $source .= $previous->callable();
+            $source .= '<span class="text-orange-400 dark:text-orange-300 opacity-50">(';
+            $source .= implode(', ', $previous->args());
+            $source .= ')</span>';
         }
     } else {
         $source = $frame->source();
@@ -15,15 +19,5 @@
 <div
     {{ $attributes->merge(['class' => 'truncate font-mono text-xs text-violet-500 dark:text-violet-400']) }}
 >
-    <span data-tippy-content="{{ $source }}">
-        @if ($class = $frame->class())
-            {{ $class }}{{--
-            --}}@if($frame->previous()){{--
-                --}}{{ '->' . $frame->previous()->callable() }}{{--
-            --}}@endif{{--
-            --}}<span class="text-orange-400 dark:text-orange-300 opacity-50">()</span>
-        @else
-            {{ $frame->source() }}
-        @endif
-    </span>
+    <span data-tippy-content="{{ $source }}">{!! $source !!}</span>
 </div>

@@ -56,7 +56,7 @@ class Frame
      *
      * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  array<string, string>  $classMap
-     * @param  array{file: string, line: int, class?: string, type?: string, function?: string}  $frame
+     * @param  array{file: string, line: int, class?: string, type?: string, function?: string, args?: array}  $frame
      * @param  string  $basePath
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Frame|null  $previous
      */
@@ -111,7 +111,11 @@ class Frame
      */
     public function file()
     {
-        return str_replace($this->basePath.'/', '', $this->frame['file']);
+        return match (true) {
+            ! isset($this->frame['file']) => '[internal function]',
+            ! is_string($this->frame['file']) => '[unknown file]',
+            default => str_replace($this->basePath.'/', '', $this->frame['file']),
+        };
     }
 
     /**
@@ -131,6 +135,16 @@ class Frame
     }
 
     /**
+     * Get the frame's type.
+     *
+     * @return string
+     */
+    public function type()
+    {
+        return $this->frame['type'];
+    }
+
+    /**
      * Get the frame's function or method.
      *
      * @return string
@@ -141,6 +155,27 @@ class Frame
             ! empty($this->frame['function']) => $this->frame['function'],
             default => 'throw',
         };
+    }
+
+    /**
+     * Get the frame's arguments.
+     *
+     * @return array
+     */
+    public function args()
+    {
+        if (! isset($this->frame['args']) || ! is_array($this->frame['args']) || count($this->frame['args']) === 0) {
+            return [];
+        }
+
+        return array_map(static function ($argument) {
+            [$key, $value] = $argument;
+            
+            return match ($key) {
+                'object' => "{$key}({$value})",
+                default => $key,
+            };
+        }, $this->frame['args']);
     }
 
     /**

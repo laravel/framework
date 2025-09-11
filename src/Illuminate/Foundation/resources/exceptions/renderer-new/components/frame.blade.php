@@ -23,12 +23,8 @@
         </div>
 
         <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
-            <div class="flex-shrink-0">
-                <x-laravel-exceptions-renderer-new::formatted-source :$frame />
-            </div>
-            <div class="flex-1 min-w-0">
-                <x-laravel-exceptions-renderer-new::file-with-line :$frame />
-            </div>
+            <x-laravel-exceptions-renderer-new::formatted-source :$frame />
+            <x-laravel-exceptions-renderer-new::file-with-line :$frame />
         </div>
 
         <div class="flex-shrink-0">
