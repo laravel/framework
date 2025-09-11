@@ -25,6 +25,7 @@
         "illuminate/support": "^13.0",
         "symfony/http-foundation": "^7.4.0|^8.0.0",
         "symfony/http-kernel": "^7.4.0|^8.0.0",
+        "symfony/polyfill-php85": "^1.33",
         "symfony/mime": "^7.4.0|^8.0.0"
     },
     "autoload": {

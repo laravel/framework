@@ -64,6 +64,21 @@ class PendingDispatch
     }
 
     /**
+     * Set the desired job "group".
+     *
+     * This feature is only supported by some queues, such as Amazon SQS.
+     *
+     * @param  \UnitEnum|string  $group
+     * @return $this
+     */
+    public function onGroup($group)
+    {
+        $this->job->onGroup($group);
+
+        return $this;
+    }
+
+    /**
      * Set the desired connection for the chain.
      *
      * @param  \BackedEnum|string|null  $connection

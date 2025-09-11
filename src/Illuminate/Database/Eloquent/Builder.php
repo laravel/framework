@@ -311,6 +311,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Exclude the given models from the query results.
+     *
+     * @param  iterable|mixed  $models
+     * @return static
+     */
+    public function except($models)
+    {
+        return $this->whereKeyNot(
+            $models instanceof Model
+                ? $models->getKey()
+                : Collection::wrap($models)->modelKeys()
+        );
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression  $column
@@ -495,7 +510,7 @@ class Builder implements BuilderContract
             return [];
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
@@ -1122,7 +1137,7 @@ class Builder implements BuilderContract
         // Next we will set the limit and offset for this query so that when we get the
         // results we get the proper section of results. Then, we'll create the full
         // paginator instances for these results with the given page and per page.
-        $this->skip(($page - 1) * $perPage)->take($perPage + 1);
+        $this->offset(($page - 1) * $perPage)->limit($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
@@ -1253,12 +1268,12 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
         if (is_null($update)) {
-            $update = array_keys(reset($values));
+            $update = array_keys(array_first($values));
         }
 
         return $this->toBase()->upsert(
@@ -1354,7 +1369,7 @@ class Builder implements BuilderContract
 
         $segments = preg_split('/\s+as\s+/i', $this->query->from);
 
-        $qualifiedColumn = end($segments).'.'.$column;
+        $qualifiedColumn = array_last($segments).'.'.$column;
 
         $values[$qualifiedColumn] = Arr::get($values, $qualifiedColumn, $values[$column]);
 

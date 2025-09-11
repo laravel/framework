@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * @method array validate(array $rules, ...$params)
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  * @method bool hasValidSignature(bool $absolute = true)
+ * @method bool hasValidRelativeSignature()
+ * @method bool hasValidSignatureWhileIgnoring($ignoreQuery = [], $absolute = true)
+ * @method bool hasValidRelativeSignatureWhileIgnoring($ignoreQuery = [])
  */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {

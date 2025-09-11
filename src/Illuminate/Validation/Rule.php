@@ -144,7 +144,7 @@ class Rule
     /**
      * Get a required_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\RequiredIf
      */
     public static function requiredIf($callback)
@@ -155,7 +155,7 @@ class Rule
     /**
      * Get a exclude_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\ExcludeIf
      */
     public static function excludeIf($callback)
@@ -166,7 +166,7 @@ class Rule
     /**
      * Get a prohibited_if rule builder instance.
      *
-     * @param  callable|bool  $callback
+     * @param  (\Closure(): bool)|bool  $callback
      * @return \Illuminate\Validation\Rules\ProhibitedIf
      */
     public static function prohibitedIf($callback)
@@ -250,7 +250,7 @@ class Rule
     /**
      * Get an "any of" rule builder instance.
      *
-     * @param  array
+     * @param  array  $rules
      * @return \Illuminate\Validation\Rules\AnyOf
      *
      * @throws \InvalidArgumentException
@@ -273,6 +273,21 @@ class Rule
         }
 
         return new Rules\Contains(is_array($values) ? $values : func_get_args());
+    }
+
+    /**
+     * Get a "does not contain" rule builder instance.
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable|\BackedEnum|\UnitEnum|array|string  $values
+     * @return \Illuminate\Validation\Rules\DoesntContain
+     */
+    public static function doesntContain($values)
+    {
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        return new Rules\DoesntContain(is_array($values) ? $values : func_get_args());
     }
 
     /**

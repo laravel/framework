@@ -341,7 +341,7 @@ class BroadcastingInstallCommand extends Command
             file_put_contents($filePath, $newContents);
         } else {
             // Add Echo configuration after the last import...
-            $lastImport = end($matches[0]);
+            $lastImport = array_last($matches[0]);
 
             $positionOfLastImport = strrpos($contents, $lastImport);
 
@@ -367,9 +367,7 @@ class BroadcastingInstallCommand extends Command
             return;
         }
 
-        $install = confirm('Would you like to install Laravel Reverb?', default: true);
-
-        if (! $install) {
+        if (! confirm('Would you like to install Laravel Reverb?', default: true)) {
             return;
         }
 

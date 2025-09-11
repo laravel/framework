@@ -18,7 +18,7 @@ trait Matching
      * @param  mixed|\Closure  $expected
      * @return $this
      */
-    public function where(string $key, $expected): self
+    public function where(string $key, $expected): static
     {
         $this->has($key);
 
@@ -56,7 +56,7 @@ trait Matching
      * @param  mixed|\Closure  $expected
      * @return $this
      */
-    public function whereNot(string $key, $expected): self
+    public function whereNot(string $key, $expected): static
     {
         $this->has($key);
 
@@ -98,7 +98,7 @@ trait Matching
      * @param  string  $key
      * @return $this
      */
-    public function whereNull(string $key): self
+    public function whereNull(string $key): static
     {
         $this->has($key);
 
@@ -121,7 +121,7 @@ trait Matching
      * @param  string  $key
      * @return $this
      */
-    public function whereNotNull(string $key): self
+    public function whereNotNull(string $key): static
     {
         $this->has($key);
 
@@ -144,7 +144,7 @@ trait Matching
      * @param  array  $bindings
      * @return $this
      */
-    public function whereAll(array $bindings): self
+    public function whereAll(array $bindings): static
     {
         foreach ($bindings as $key => $value) {
             $this->where($key, $value);
@@ -160,7 +160,7 @@ trait Matching
      * @param  string|array  $expected
      * @return $this
      */
-    public function whereType(string $key, $expected): self
+    public function whereType(string $key, $expected): static
     {
         $this->has($key);
 
@@ -185,7 +185,7 @@ trait Matching
      * @param  array  $bindings
      * @return $this
      */
-    public function whereAllType(array $bindings): self
+    public function whereAllType(array $bindings): static
     {
         foreach ($bindings as $key => $value) {
             $this->whereType($key, $value);

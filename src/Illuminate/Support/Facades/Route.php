@@ -16,6 +16,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [], int|array $status = 200, array $headers = [])
  * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, array|string|callable|null $action = null)
  * @method static void resources(array $resources, array $options = [])
+ * @method static void softDeletableResources(array $resources, array $options = [])
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
  * @method static void apiResources(array $resources, array $options = [])
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = [])

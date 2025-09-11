@@ -17,6 +17,8 @@ use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 
 abstract class Queue
 {
@@ -167,9 +169,17 @@ abstract class Queue
             'createdAt' => Carbon::now()->getTimestamp(),
         ]);
 
-        $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
-            ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
-            : serialize(clone $job);
+        try {
+            $command = $this->jobShouldBeEncrypted($job) && $this->container->bound(Encrypter::class)
+                ? $this->container[Encrypter::class]->encrypt(serialize(clone $job))
+                : serialize(clone $job);
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                sprintf('Failed to serialize job of type [%s]: %s', get_class($job), $e->getMessage()),
+                0,
+                $e
+            );
+        }
 
         return array_merge($payload, [
             'data' => array_merge($payload['data'], [
@@ -372,7 +382,7 @@ abstract class Queue
     protected function shouldDispatchAfterCommit($job)
     {
         if ($job instanceof ShouldQueueAfterCommit) {
-            return true;
+            return ! (isset($job->afterCommit) && $job->afterCommit === false);
         }
 
         if (! $job instanceof Closure && is_object($job) && isset($job->afterCommit)) {

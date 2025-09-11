@@ -370,12 +370,20 @@ class Str
      * Replace consecutive instances of a given character with a single character in the given string.
      *
      * @param  string  $string
-     * @param  string  $character
+     * @param  array<string>|string  $characters
      * @return string
      */
-    public static function deduplicate(string $string, string $character = ' ')
+    public static function deduplicate(string $string, array|string $characters = ' ')
     {
-        return preg_replace('/'.preg_quote($character, '/').'+/u', $character, $string);
+        if (is_string($characters)) {
+            return preg_replace('/'.preg_quote($characters, '/').'+/u', $characters, $string);
+        }
+
+        return array_reduce(
+            $characters,
+            fn ($carry, $character) => preg_replace('/'.preg_quote($character, '/').'+/u', $character, $carry),
+            $string
+        );
     }
 
     /**
@@ -402,6 +410,18 @@ class Str
         }
 
         return false;
+    }
+
+    /**
+     * Determine if a given string doesn't end with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function doesntEndWith($haystack, $needles)
+    {
+        return ! static::endsWith($haystack, $needles);
     }
 
     /**
@@ -556,7 +576,7 @@ class Str
             return false;
         }
 
-        return json_validate($value);
+        return json_validate($value, 512);
     }
 
     /**
@@ -606,7 +626,7 @@ class Str
      * Determine if a given value is a valid UUID.
      *
      * @param  mixed  $value
-     * @param  int<0, 8>|'max'|null  $version
+     * @param  int<0, 8>|'nil'|'max'|null  $version
      * @return bool
      */
     public static function isUuid($value, $version = null)
@@ -963,11 +983,12 @@ class Str
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $prependCount = false)
     {
-        return Pluralizer::plural($value, $count);
+        return ($prependCount ? Number::format($count).' ' : '').Pluralizer::plural($value, $count);
     }
 
     /**
@@ -1404,7 +1425,7 @@ class Str
      */
     public static function headline($value)
     {
-        $parts = explode(' ', $value);
+        $parts = mb_split('\s+', $value);
 
         $parts = count($parts) > 1
             ? array_map(static::title(...), $parts)
@@ -1437,9 +1458,10 @@ class Str
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
-        $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
+        $words = mb_split('\s+', $value);
+        $wordCount = count($words);
 
-        for ($i = 0; $i < count($words); $i++) {
+        for ($i = 0; $i < $wordCount; $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
 
             if (str_contains($lowercaseWord, '-')) {
@@ -1627,6 +1649,18 @@ class Str
     }
 
     /**
+     * Determine if a given string doesn't start with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|iterable<string>  $needles
+     * @return bool
+     */
+    public static function doesntStartWith($haystack, $needles)
+    {
+        return ! static::startsWith($haystack, $needles);
+    }
+
+    /**
      * Convert a value to studly caps case.
      *
      * @param  string  $value
@@ -1640,7 +1674,7 @@ class Str
             return static::$studlyCache[$key];
         }
 
-        $words = explode(' ', static::replace(['-', '_'], ' ', $value));
+        $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
 
         $studlyWords = array_map(fn ($word) => static::ucfirst($word), $words);
 
