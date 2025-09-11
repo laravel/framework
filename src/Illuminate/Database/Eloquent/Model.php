@@ -1801,6 +1801,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Convert the model instance to pretty print formatted JSON.
+     *
+     * @param  int  $options
+     * @return string
+     *
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+     */
+    public function toPrettyJson(int $options = 0)
+    {
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
+    }
+
+    /**
      * Convert the object into something JSON serializable.
      *
      * @return mixed

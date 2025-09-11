@@ -6,7 +6,7 @@ use Illuminate\Broadcasting\PendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
@@ -169,9 +169,9 @@ if (! function_exists('auth')) {
      * Get the available auth instance.
      *
      * @param  string|null  $guard
-     * @return ($guard is null ? \Illuminate\Contracts\Auth\Factory : \Illuminate\Contracts\Auth\StatefulGuard)
+     * @return ($guard is null ? \Illuminate\Contracts\Auth\Factory : \Illuminate\Contracts\Auth\Guard)
      */
-    function auth($guard = null): AuthFactory|StatefulGuard
+    function auth($guard = null): AuthFactory|Guard
     {
         if (is_null($guard)) {
             return app(AuthFactory::class);
@@ -224,7 +224,7 @@ if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast($event = null): PendingBroadcast
     {
@@ -237,7 +237,7 @@ if (! function_exists('broadcast_if')) {
      * Begin broadcasting an event if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast_if($boolean, $event = null): PendingBroadcast
     {
@@ -254,7 +254,7 @@ if (! function_exists('broadcast_unless')) {
      * Begin broadcasting an event unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed|null  $event
+     * @param  mixed  $event
      */
     function broadcast_unless($boolean, $event = null): PendingBroadcast
     {
@@ -294,7 +294,7 @@ if (! function_exists('cache')) {
             );
         }
 
-        return app('cache')->put(key($key), reset($key), ttl: $default);
+        return app('cache')->put(key($key), array_first($key), ttl: $default);
     }
 }
 
@@ -397,7 +397,7 @@ if (! function_exists('csrf_token')) {
      *
      * @throws \RuntimeException
      */
-    function csrf_token(): string
+    function csrf_token(): ?string
     {
         $session = app('session');
 
@@ -498,8 +498,9 @@ if (! function_exists('event')) {
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
+     * @return array|null
      */
-    function event(...$args): ?array
+    function event(...$args)
     {
         return app('events')->dispatch(...$args);
     }
@@ -630,8 +631,9 @@ if (! function_exists('old')) {
      *
      * @param  string|null  $key
      * @param  \Illuminate\Database\Eloquent\Model|string|array|null  $default
+     * @return string|array|null
      */
-    function old($key = null, $default = null): string|array|null
+    function old($key = null, $default = null)
     {
         return app('request')->old($key, $default);
     }
@@ -888,8 +890,9 @@ if (! function_exists('secure_url')) {
      *
      * @param  string  $path
      * @param  mixed  $parameters
+     * @return string
      */
-    function secure_url($path, $parameters = []): string
+    function secure_url($path, $parameters = [])
     {
         return url($path, $parameters, true);
     }
@@ -939,8 +942,9 @@ if (! function_exists('to_action')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
      */
-    function to_action($action, $parameters = [], $status = 302, $headers = []): RedirectResponse
+    function to_action($action, $parameters = [], $status = 302, $headers = [])
     {
         return redirect()->action($action, $parameters, $status, $headers);
     }
@@ -954,8 +958,9 @@ if (! function_exists('to_route')) {
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
+     * @return \Illuminate\Http\RedirectResponse
      */
-    function to_route($route, $parameters = [], $status = 302, $headers = []): RedirectResponse
+    function to_route($route, $parameters = [], $status = 302, $headers = [])
     {
         return redirect()->route($route, $parameters, $status, $headers);
     }

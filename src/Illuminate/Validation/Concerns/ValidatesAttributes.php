@@ -625,7 +625,7 @@ trait ValidatesAttributes
 
         foreach ($parameters as $format) {
             try {
-                $date = DateTime::createFromFormat('!'.$format, $value);
+                $date = DateTime::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'));
 
                 if ($date && $date->format($format) == $value) {
                     return true;

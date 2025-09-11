@@ -983,11 +983,12 @@ class Str
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $prependCount = false)
     {
-        return Pluralizer::plural($value, $count);
+        return ($prependCount ? Number::format($count).' ' : '').Pluralizer::plural($value, $count);
     }
 
     /**
@@ -1458,8 +1459,9 @@ class Str
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
         $words = mb_split('\s+', $value);
+        $wordCount = count($words);
 
-        for ($i = 0; $i < count($words); $i++) {
+        for ($i = 0; $i < $wordCount; $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
 
             if (str_contains($lowercaseWord, '-')) {

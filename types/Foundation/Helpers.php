@@ -9,7 +9,7 @@ assertType('mixed', app('foo'));
 assertType('Illuminate\Config\Repository', app(Repository::class));
 
 assertType('Illuminate\Contracts\Auth\Factory', auth());
-assertType('Illuminate\Contracts\Auth\StatefulGuard', auth('foo'));
+assertType('Illuminate\Contracts\Auth\Guard', auth('foo'));
 
 assertType('Illuminate\Cache\CacheManager', cache());
 assertType('bool', cache(['foo' => 'bar'], 42));

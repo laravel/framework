@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 class CommandDurationThresholdTest extends TestCase
 {
-    public function testItCanHandleExceedingCommandDuration()
+    public function testItCanHandleExceedingCommandDuration(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -33,7 +33,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function testItDoesntCallWhenExactlyThresholdDuration()
+    public function testItDoesntCallWhenExactlyThresholdDuration(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -54,7 +54,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertFalse($called);
     }
 
-    public function testItProvidesArgsToHandler()
+    public function testItProvidesArgsToHandler(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -75,7 +75,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertSame(21, $args[2]);
     }
 
-    public function testItCanExceedThresholdWhenSpecifyingDurationAsMilliseconds()
+    public function testItCanExceedThresholdWhenSpecifyingDurationAsMilliseconds(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -96,7 +96,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertTrue($called);
     }
 
-    public function testItCanStayUnderThresholdWhenSpecifyingDurationAsMilliseconds()
+    public function testItCanStayUnderThresholdWhenSpecifyingDurationAsMilliseconds(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -117,7 +117,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertFalse($called);
     }
 
-    public function testItCanExceedThresholdWhenSpecifyingDurationAsDateTime()
+    public function testItCanExceedThresholdWhenSpecifyingDurationAsDateTime(): void
     {
         retry(2, function () {
             Carbon::setTestNow(Carbon::now());
@@ -143,7 +143,7 @@ class CommandDurationThresholdTest extends TestCase
         }, 500);
     }
 
-    public function testItCanStayUnderThresholdWhenSpecifyingDurationAsDateTime()
+    public function testItCanStayUnderThresholdWhenSpecifyingDurationAsDateTime(): void
     {
         Carbon::setTestNow(Carbon::now());
         $kernel = $this->app[Kernel::class];
@@ -164,7 +164,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertFalse($called);
     }
 
-    public function testItClearsStartTimeAfterHandlingCommand()
+    public function testItClearsStartTimeAfterHandlingCommand(): void
     {
         $kernel = $this->app[Kernel::class];
         $kernel->command('foo', fn () => null);
@@ -179,7 +179,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertNull($kernel->commandStartedAt());
     }
 
-    public function testUsesTheConfiguredDateTimezone()
+    public function testUsesTheConfiguredDateTimezone(): void
     {
         Config::set('app.timezone', 'UTC');
         $startedAt = null;
@@ -199,7 +199,7 @@ class CommandDurationThresholdTest extends TestCase
         $this->assertSame('Australia/Melbourne', $startedAt->timezone->getName());
     }
 
-    public function testItHandlesCallingTerminateWithoutHandle()
+    public function testItHandlesCallingTerminateWithoutHandle(): void
     {
         $this->app[Kernel::class]->terminate(new StringInput('foo'), 21);
 

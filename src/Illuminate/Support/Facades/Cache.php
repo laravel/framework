@@ -38,7 +38,7 @@ namespace Illuminate\Support\Facades;
  * @method static bool delete(string $key)
  * @method static bool deleteMultiple(iterable $keys)
  * @method static bool clear()
- * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
+ * @method static \Illuminate\Cache\TaggedCache tags(mixed $names)
  * @method static string|null getName()
  * @method static bool supportsTags()
  * @method static int|null getDefaultCacheTime()

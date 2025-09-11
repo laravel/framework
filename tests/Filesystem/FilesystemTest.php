@@ -14,6 +14,8 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
+use function Orchestra\Testbench\terminate;
+
 class FilesystemTest extends TestCase
 {
     private static $tempDir;
@@ -547,7 +549,7 @@ class FilesystemTest extends TestCase
                 $files->put(self::$tempDir.'/file.txt', $content, true);
                 $read = $files->get(self::$tempDir.'/file.txt', true);
 
-                exit(strlen($read) === strlen($content) ? 1 : 0);
+                terminate($this, strlen($read) === strlen($content) ? 1 : 0);
             }
         }
 
