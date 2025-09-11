@@ -23,7 +23,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--fullpath : Output the full path of the migration (Deprecated)}';
+        {--fullpath : Output the full path of the migration (Deprecated)}
+        {--check-duplicate : Prevent duplicate migration creation}';
 
     /**
      * The console command description.
@@ -75,9 +76,14 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         $name = Str::snake(trim($this->input->getArgument('name')));
 
         if ($this->migrationExists($name)) {
-            $this->components->error('Migration already exists.');
+            $message = 'Migration already exists.';
 
-            return 1;
+            if ($this->option('check-duplicate')) {
+                $this->components->error($message);
+                return 1;
+            }
+
+            $this->components->warn($message . ' Make sure the name is unique if needed.');
         }
 
         $table = $this->input->getOption('table');
