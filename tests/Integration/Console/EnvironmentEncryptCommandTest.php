@@ -24,7 +24,7 @@ class EnvironmentEncryptCommandTest extends TestCase
         File::swap($this->filesystem);
     }
 
-    public function testItFailsWithInvalidCipherFails()
+    public function testItFailsWithInvalidCipherFails(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -39,7 +39,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsUsingCipherWithInvalidKey()
+    public function testItFailsUsingCipherWithInvalidKey(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -53,7 +53,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItGeneratesTheCorrectFileWhenUsingEnvironment()
+    public function testItGeneratesTheCorrectFileWhenUsingEnvironment(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -71,7 +71,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env.production.encrypted'), m::any());
     }
 
-    public function testItGeneratesTheCorrectFileWhenNotUsingEnvironment()
+    public function testItGeneratesTheCorrectFileWhenNotUsingEnvironment(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -90,7 +90,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env.encrypted'), m::any());
     }
 
-    public function testItFailsWhenEnvironmentFileCannotBeFound()
+    public function testItFailsWhenEnvironmentFileCannotBeFound(): void
     {
         $this->filesystem->shouldReceive('exists')->andReturn(false);
 
@@ -100,7 +100,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItFailsWhenEncryptionFileExists()
+    public function testItFailsWhenEncryptionFileExists(): void
     {
         $this->filesystem->shouldReceive('exists')->andReturn(true);
 
@@ -110,7 +110,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(1);
     }
 
-    public function testItGeneratesTheEncryptionFileWhenForcing()
+    public function testItGeneratesTheEncryptionFileWhenForcing(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -128,7 +128,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env.encrypted'), m::any());
     }
 
-    public function testItEncryptsWithGivenKeyAndDisplaysIt()
+    public function testItEncryptsWithGivenKeyAndDisplaysIt(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -144,7 +144,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testItEncryptsWithGivenGeneratedBase64KeyAndDisplaysIt()
+    public function testItEncryptsWithGivenGeneratedBase64KeyAndDisplaysIt(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -162,7 +162,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-    public function testItCanRemoveTheOriginalFile()
+    public function testItCanRemoveTheOriginalFile(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()
@@ -183,7 +183,7 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->with(base_path('.env'));
     }
 
-    public function testItEncryptsWithInteractivelyGivenKeyAndDisplaysIt()
+    public function testItEncryptsWithInteractivelyGivenKeyAndDisplaysIt(): void
     {
         $this->filesystem->shouldReceive('exists')
             ->once()

@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 
 class RequestValidationTest extends TestCase
 {
-    public function testValidateMacro()
+    public function testValidateMacro(): void
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
 
@@ -17,7 +17,7 @@ class RequestValidationTest extends TestCase
         $this->assertSame(['name' => 'Taylor'], $validated);
     }
 
-    public function testValidateMacroWhenItFails()
+    public function testValidateMacroWhenItFails(): void
     {
         $this->expectException(ValidationException::class);
 
@@ -26,7 +26,7 @@ class RequestValidationTest extends TestCase
         $request->validate(['name' => 'string']);
     }
 
-    public function testValidateWithBagMacro()
+    public function testValidateWithBagMacro(): void
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
 
@@ -35,7 +35,7 @@ class RequestValidationTest extends TestCase
         $this->assertSame(['name' => 'Taylor'], $validated);
     }
 
-    public function testValidateWithBagMacroWhenItFails()
+    public function testValidateWithBagMacroWhenItFails(): void
     {
         $request = Request::create('/', 'GET', ['name' => null]);
 
