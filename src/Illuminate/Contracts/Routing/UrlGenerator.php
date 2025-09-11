@@ -81,7 +81,7 @@ interface UrlGenerator
      *
      * @throws \InvalidArgumentException
      */
-    public function signedUrl($url, $expiration = null);
+    public function signed($url, $expiration = null);
 
     /**
      * Create a temporary signed route URL for a named route.
