@@ -2586,7 +2586,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return array
      */
-    public function __sleep()
+    public function __serialize()
     {
         $this->mergeAttributesFromCachedCasts();
 
@@ -2595,7 +2595,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
 
-        return array_keys(get_object_vars($this));
+        return get_object_vars($this);
     }
 
     /**

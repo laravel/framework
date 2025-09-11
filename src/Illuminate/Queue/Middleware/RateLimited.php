@@ -147,11 +147,11 @@ class RateLimited
      *
      * @return array
      */
-    public function __sleep()
+    public function __unserialize(array $data)
     {
         return [
-            'limiterName',
-            'shouldRelease',
+            'limiterName' => $this->limiterName,
+            'shouldRelease' => $this->shouldRelease,
         ];
     }
 
