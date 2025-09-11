@@ -64,7 +64,7 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      */
-    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = []): array
     {
         $value = Arr::get($array, $key, $default);
 
