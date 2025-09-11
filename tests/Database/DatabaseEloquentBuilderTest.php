@@ -2472,9 +2472,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('my_timestamp', 3);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('updated_at', 3);
 
-        $builder->latest('my_timestamp', 3);
+        $builder->latest('updated_at', 3);
     }
 
     public function testOldestWithoutColumnWithCreatedAt()
@@ -2536,9 +2536,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('oldest')->once()->with('my_timestamp', 1);
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('updated_at', 1);
 
-        $builder->oldest('my_timestamp', 1);
+        $builder->oldest('updated_at', 1);
     }
 
     public function testUpdate()
