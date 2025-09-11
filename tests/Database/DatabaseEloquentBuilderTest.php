@@ -2451,9 +2451,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('foo', 5);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo', 1);
 
-        $builder->latest(limit: 5);
+        $builder->latest(limit: 1);
     }
 
     public function testLatestWithLimitWithoutCreatedAtColumn()
@@ -2462,9 +2462,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at', 7);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at', 1);
 
-        $builder->latest(limit: 7);
+        $builder->latest(limit: 1);
     }
 
     public function testLatestWithExplicitColumnAndLimit()
@@ -2472,9 +2472,9 @@ class DatabaseEloquentBuilderTest extends TestCase
         $model = $this->getMockModel();
         $builder = $this->getBuilder()->setModel($model);
 
-        $builder->getQuery()->shouldReceive('latest')->once()->with('updated_at', 3);
+        $builder->getQuery()->shouldReceive('latest')->once()->with('updated_at', 1);
 
-        $builder->latest('updated_at', 3);
+        $builder->latest('updated_at', 1);
     }
 
     public function testOldestWithoutColumnWithCreatedAt()
