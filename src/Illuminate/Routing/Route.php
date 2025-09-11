@@ -951,7 +951,9 @@ class Route
             );
         }
 
-        if ($label instanceof BackedEnum && ! is_string($label = $label->value)) {
+        $label = enum_value($label);
+
+        if (! is_string($label)) {
             throw new InvalidArgumentException('Enum must be string backed.');
         }
 

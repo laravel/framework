@@ -882,7 +882,7 @@ if (! function_exists('routeLabel')) {
     function routeLabel($name): ?string
     {
         if ($name instanceof BackedEnum) {
-            $name = $name->value;
+            $name = enum_value($name);
         }
 
         $route = app('router')->getRoutes()->getByName($name);
@@ -892,7 +892,7 @@ if (! function_exists('routeLabel')) {
         }
 
         // Prefer label, but fall back to route name
-        return $route->getLabel() ?? $route->getName();
+        return $route->getLabel() ?? $name;
     }
 }
 
