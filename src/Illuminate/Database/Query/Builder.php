@@ -2724,6 +2724,13 @@ class Builder implements BuilderContract
      */
     public function latest($column = 'created_at', $limit = null)
     {
+        // If only one integer argument is passed, treat it as the limit and default the column to 'created_at'.
+        // This allows calling "latest(11)" instead of "latest('created_at', 11)" or "latest(limit: 11)"
+        if (is_null($limit) && is_int($column)) {
+            $limit = $column;
+            $column = 'created_at';
+        }
+
         if (! is_null($limit)) {
             $this->limit($limit);
         }
@@ -2740,6 +2747,13 @@ class Builder implements BuilderContract
      */
     public function oldest($column = 'created_at', $limit = null)
     {
+        // If only one integer argument is passed, treat it as the limit and default the column to 'created_at'.
+        // This allows calling "oldest(11)" instead of "oldest('created_at', 11)" or "oldest(limit: 11)"
+        if (is_null($limit) && is_int($column)) {
+            $limit = $column;
+            $column = 'created_at';
+        }
+
         if (! is_null($limit)) {
             $this->limit($limit);
         }
