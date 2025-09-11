@@ -395,7 +395,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsSpecificErrorViewIfExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->with('errors::502')->andReturn(true);
 
         $this->container->instance(ViewFactory::class, $viewFactory);
@@ -413,7 +413,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsFallbackErrorViewIfExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->once()->with('errors::502')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::5xx')->andReturn(true);
 
@@ -432,7 +432,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testItReturnsNullIfNoErrorViewExists()
     {
-        $viewFactory = m::mock(stdClass::class);
+        $viewFactory = m::mock(ViewFactory::class);
         $viewFactory->shouldReceive('exists')->once()->with('errors::404')->andReturn(false);
         $viewFactory->shouldReceive('exists')->once()->with('errors::4xx')->andReturn(false);
 

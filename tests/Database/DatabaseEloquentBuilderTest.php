@@ -1727,6 +1727,64 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder->toSql(), $result);
     }
 
+    public function testHasNestedWithMorphTo()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $connection = $this->mockConnectionForModel($model, '');
+
+        $morphToKey = $model->morph()->getMorphType();
+
+        $connection->shouldReceive('select')->once()->andReturn([
+            [$morphToKey => EloquentBuilderTestModelFarRelatedStub::class],
+            [$morphToKey => EloquentBuilderTestModelOtherFarRelatedStub::class],
+        ]);
+
+        $builder = $model->orWhereHasMorph('morph', [EloquentBuilderTestModelFarRelatedStub::class], function ($q) {
+            $q->has('baz');
+        })->orWhereHasMorph('morph', [EloquentBuilderTestModelOtherFarRelatedStub::class], function ($q) {
+            $q->has('baz');
+        });
+
+        $results = $model->has('morph.baz')->toSql();
+
+        // we need to adjust the expected builder because some parathesis are added,
+        // which doesn't impact the behavior of the test.
+
+        $builderSql = $builder->toSql();
+        $builderSql = str_replace(')))) or ((', '))) or (', $builderSql);
+
+        $this->assertSame($builderSql, $results);
+    }
+
+    public function testHasNestedWithMorphToAndMultipleSubRelations()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $connection = $this->mockConnectionForModel($model, '');
+
+        $morphToKey = $model->morph()->getMorphType();
+
+        $connection->shouldReceive('select')->once()->andReturn([
+            [$morphToKey => EloquentBuilderTestModelFarRelatedStub::class],
+            [$morphToKey => EloquentBuilderTestModelOtherFarRelatedStub::class],
+        ]);
+
+        $builder = $model->orWhereHasMorph('morph', [EloquentBuilderTestModelFarRelatedStub::class], function ($q) {
+            $q->has('baz.bam');
+        })->orWhereHasMorph('morph', [EloquentBuilderTestModelOtherFarRelatedStub::class], function ($q) {
+            $q->has('baz.bam');
+        });
+
+        $results = $model->has('morph.baz.bam')->toSql();
+
+        // we need to adjust the expected builder because some parathesis are added,
+        // which doesn't impact the behavior of the test.
+
+        $builderSql = $builder->toSql();
+        $builderSql = str_replace(')))) or ((', '))) or (', $builderSql);
+
+        $this->assertSame($builderSql, $results);
+    }
+
     public function testOrHasNested()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -2282,6 +2340,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         });
     }
 
+    public function testExceptMethodWithModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', m::on(function ($argument) {
+            return $argument === '1';
+        }));
+
+        $builder->except(new class extends Model
+        {
+            protected $attributes = ['id' => 1];
+        });
+    }
+
+    public function testExceptMethodWithCollectionOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = new Collection([
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ]);
+
+        $builder->except($models);
+    }
+
+    public function testExceptMethodWithArrayOfModel()
+    {
+        $model = new EloquentBuilderTestStubStringPrimaryKey;
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, m::on(function ($argument) {
+            return $argument === [1, 2];
+        }));
+
+        $models = [
+            new class extends Model
+            {
+                protected $attributes = ['id' => 1];
+            },
+            new class extends Model
+            {
+                protected $attributes = ['id' => 2];
+            },
+        ];
+
+        $builder->except($models);
+    }
+
     public function testWhereIn()
     {
         $model = new EloquentBuilderTestNestedStub;
@@ -2683,6 +2805,8 @@ class DatabaseEloquentBuilderTest extends TestCase
         $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
         $class = get_class($model);
         $class::setConnectionResolver($resolver);
+
+        return $connection;
     }
 
     protected function getBuilder()
@@ -2835,6 +2959,11 @@ class EloquentBuilderTestModelCloseRelatedStub extends Model
     {
         return $this->hasMany(EloquentBuilderTestModelFarRelatedStub::class);
     }
+
+    public function bam()
+    {
+        return $this->hasMany(EloquentBuilderTestModelOtherFarRelatedStub::class);
+    }
 }
 
 class EloquentBuilderTestModelFarRelatedStub extends Model
@@ -2847,6 +2976,29 @@ class EloquentBuilderTestModelFarRelatedStub extends Model
             'related_id',
             'self_id',
         );
+    }
+
+    public function baz()
+    {
+        return $this->belongsTo(EloquentBuilderTestModelCloseRelatedStub::class);
+    }
+}
+
+class EloquentBuilderTestModelOtherFarRelatedStub extends Model
+{
+    public function roles()
+    {
+        return $this->belongsToMany(
+            EloquentBuilderTestModelParentStub::class,
+            'user_role',
+            'related_id',
+            'self_id',
+        );
+    }
+
+    public function baz()
+    {
+        return $this->belongsTo(EloquentBuilderTestModelCloseRelatedStub::class);
     }
 }
 

@@ -16,6 +16,9 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -92,9 +95,16 @@ abstract class Factory
     protected $expandRelationships = true;
 
     /**
+     * The relationships that should not be automatically created.
+     *
+     * @var array
+     */
+    protected $excludeRelationships = [];
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
-     * @var string|null
+     * @var \UnitEnum|string|null
      */
     protected $connection;
 
@@ -149,9 +159,10 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $for
      * @param  \Illuminate\Support\Collection|null  $afterMaking
      * @param  \Illuminate\Support\Collection|null  $afterCreating
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool|null  $expandRelationships
+     * @param  array  $excludeRelationships
      */
     public function __construct(
         $count = null,
@@ -162,7 +173,8 @@ abstract class Factory
         ?Collection $afterCreating = null,
         $connection = null,
         ?Collection $recycle = null,
-        ?bool $expandRelationships = null
+        ?bool $expandRelationships = null,
+        array $excludeRelationships = [],
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -174,6 +186,7 @@ abstract class Factory
         $this->recycle = $recycle ?? new Collection;
         $this->faker = $this->withFaker();
         $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
+        $this->excludeRelationships = $excludeRelationships;
     }
 
     /**
@@ -505,8 +518,11 @@ abstract class Factory
     protected function expandAttributes(array $definition)
     {
         return (new Collection($definition))
-            ->map($evaluateRelations = function ($attribute) {
+            ->map($evaluateRelations = function ($attribute, $key) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
+                    $attribute = null;
+                } elseif ($attribute instanceof self &&
+                    array_intersect([$attribute->modelName(), $key], $this->excludeRelationships)) {
                     $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
@@ -522,7 +538,7 @@ abstract class Factory
                     $attribute = $attribute($definition);
                 }
 
-                $attribute = $evaluateRelations($attribute);
+                $attribute = $evaluateRelations($attribute, $key);
 
                 $definition[$key] = $attribute;
 
@@ -774,11 +790,12 @@ abstract class Factory
     /**
      * Indicate that related parent models should not be created.
      *
+     * @param  array<string|class-string<Model>>  $parents
      * @return static
      */
-    public function withoutParents()
+    public function withoutParents($parents = [])
     {
-        return $this->newInstance(['expandRelationships' => false]);
+        return $this->newInstance(! $parents ? ['expandRelationships' => false] : ['excludeRelationships' => $parents]);
     }
 
     /**
@@ -788,16 +805,16 @@ abstract class Factory
      */
     public function getConnectionName()
     {
-        return $this->connection;
+        return enum_value($this->connection);
     }
 
     /**
      * Specify the database connection that should be used to generate models.
      *
-     * @param  string  $connection
+     * @param  \UnitEnum|string  $connection
      * @return static
      */
-    public function connection(string $connection)
+    public function connection(UnitEnum|string $connection)
     {
         return $this->newInstance(['connection' => $connection]);
     }
@@ -820,6 +837,7 @@ abstract class Factory
             'connection' => $this->connection,
             'recycle' => $this->recycle,
             'expandRelationships' => $this->expandRelationships,
+            'excludeRelationships' => $this->excludeRelationships,
         ], $arguments)));
     }
 
@@ -935,10 +953,14 @@ abstract class Factory
     /**
      * Get a new Faker instance.
      *
-     * @return \Faker\Generator
+     * @return \Faker\Generator|null
      */
     protected function withFaker()
     {
+        if (! class_exists(Generator::class)) {
+            return;
+        }
+
         return Container::getInstance()->make(Generator::class);
     }
 

@@ -6,12 +6,14 @@ use Closure;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Throwable;
 
 class Pipeline implements PipelineContract
 {
     use Conditionable;
+    use Macroable;
 
     /**
      * The container implementation.
@@ -51,9 +53,9 @@ class Pipeline implements PipelineContract
     /**
      * Indicates whether to wrap the pipeline in a database transaction.
      *
-     * @var bool
+     * @var string|null|\UnitEnum|false
      */
-    protected $withinTransactions = false;
+    protected $withinTransaction = false;
 
     /**
      * Create a new class instance.
@@ -81,7 +83,7 @@ class Pipeline implements PipelineContract
     /**
      * Set the array of pipes.
      *
-     * @param  array|mixed  $pipes
+     * @param  mixed  $pipes
      * @return $this
      */
     public function through($pipes)
@@ -94,7 +96,7 @@ class Pipeline implements PipelineContract
     /**
      * Push additional pipes onto the pipeline.
      *
-     * @param  array|mixed  $pipes
+     * @param  mixed  $pipes
      * @return $this
      */
     public function pipe($pipes)
@@ -130,8 +132,8 @@ class Pipeline implements PipelineContract
         );
 
         try {
-            return $this->withinTransactions
-                ? $this->getContainer()->make('db')->transaction(fn () => $pipeline($this->passable))
+            return $this->withinTransaction !== false
+                ? $this->getContainer()->make('db')->connection($this->withinTransaction)->transaction(fn () => $pipeline($this->passable))
                 : $pipeline($this->passable);
         } finally {
             if ($this->finally) {
@@ -257,12 +259,12 @@ class Pipeline implements PipelineContract
     /**
      * Execute each pipeline step within a database transaction.
      *
-     * @param  bool  $withinTransactions
+     * @param  string|null|\UnitEnum|false  $withinTransaction
      * @return $this
      */
-    public function withinTransactions(bool $withinTransactions = true)
+    public function withinTransaction($withinTransaction = null)
     {
-        $this->withinTransactions = $withinTransactions;
+        $this->withinTransaction = $withinTransaction;
 
         return $this;
     }

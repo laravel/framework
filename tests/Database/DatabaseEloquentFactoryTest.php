@@ -533,6 +533,39 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertSame(3, $value);
     }
 
+    public function test_sequence_with_has_many_relationship()
+    {
+        $users = FactoryTestUserFactory::times(2)
+            ->sequence(
+                ['name' => 'Abigail Otwell'],
+                ['name' => 'Taylor Otwell'],
+            )
+            ->has(
+                FactoryTestPostFactory::times(3)
+                    ->state(['title' => 'Post'])
+                    ->sequence(function ($sequence, $attributes, $user) {
+                        return ['title' => $user->name.' '.$attributes['title'].' '.($sequence->index % 3 + 1)];
+                    }),
+                'posts'
+            )
+            ->create();
+
+        $this->assertCount(2, FactoryTestUser::all());
+        $this->assertCount(6, FactoryTestPost::all());
+        $this->assertCount(3, FactoryTestUser::latest()->first()->posts);
+        $this->assertEquals(
+            FactoryTestPost::orderBy('title')->pluck('title')->all(),
+            [
+                'Abigail Otwell Post 1',
+                'Abigail Otwell Post 2',
+                'Abigail Otwell Post 3',
+                'Taylor Otwell Post 1',
+                'Taylor Otwell Post 2',
+                'Taylor Otwell Post 3',
+            ]
+        );
+    }
+
     public function test_cross_join_sequences()
     {
         $assert = function ($users) {
@@ -830,6 +863,36 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->make();
 
         $this->assertNull($post->user_id);
+    }
+
+    public function test_can_disable_relationships_explicitly_by_model_name()
+    {
+        $comment = FactoryTestCommentFactory::new()
+            ->withoutParents([FactoryTestUser::class])
+            ->make();
+
+        $this->assertNull($comment->user_id);
+        $this->assertNotNull($comment->commentable->id);
+    }
+
+    public function test_can_disable_relationships_explicitly_by_attribute_name()
+    {
+        $comment = FactoryTestCommentFactory::new()
+            ->withoutParents(['user_id'])
+            ->make();
+
+        $this->assertNull($comment->user_id);
+        $this->assertNotNull($comment->commentable->id);
+    }
+
+    public function test_can_disable_relationships_explicitly_by_both_attribute_name_and_model_name()
+    {
+        $comment = FactoryTestCommentFactory::new()
+            ->withoutParents(['user_id', FactoryTestPost::class])
+            ->make();
+
+        $this->assertNull($comment->user_id);
+        $this->assertNull($comment->commentable->id);
     }
 
     public function test_can_default_to_without_parents()

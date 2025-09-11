@@ -188,7 +188,7 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
      * @return void
      */
     public function failed(?Throwable $e = null): void

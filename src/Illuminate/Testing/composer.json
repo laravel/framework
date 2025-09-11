@@ -19,7 +19,8 @@
         "illuminate/collections": "^12.0",
         "illuminate/contracts": "^12.0",
         "illuminate/macroable": "^12.0",
-        "illuminate/support": "^12.0"
+        "illuminate/support": "^12.0",
+        "symfony/polyfill-php83": "^1.33"
     },
     "autoload": {
         "psr-4": {

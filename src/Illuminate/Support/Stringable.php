@@ -629,11 +629,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * Get the plural form of an English word.
      *
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return static
      */
-    public function plural($count = 2)
+    public function plural($count = 2, $prependCount = false)
     {
-        return new static(Str::plural($this->value, $count));
+        return new static(Str::plural($this->value, $count, $prependCount));
     }
 
     /**
@@ -1044,7 +1045,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function trim($characters = null)
@@ -1055,7 +1056,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Left trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function ltrim($characters = null)
@@ -1066,7 +1067,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Right trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param  string|null  $characters
      * @return static
      */
     public function rtrim($characters = null)

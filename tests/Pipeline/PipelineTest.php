@@ -262,7 +262,7 @@ class PipelineTest extends TestCase
 
         (new Pipeline)->send('data')
             ->through(PipelineTestPipeOne::class)
-            ->withinTransactions()
+            ->withinTransaction()
             ->then(function ($piped) {
                 return $piped;
             });

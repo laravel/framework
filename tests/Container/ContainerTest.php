@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -875,6 +876,44 @@ class ContainerTest extends TestCase
         $container->make(ProdEnvOnlyInterface::class);
     }
 
+    public function testScopedSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsScoped::class);
+        $new = $container->make(IsScoped::class);
+
+        $this->assertSame($original, $new);
+        $container->forgetScopedInstances();
+        $this->assertNotSame($original, $container->make(IsScoped::class));
+    }
+
+    public function testSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsSingleton::class);
+        $new = $container->make(IsSingleton::class);
+
+        $this->assertSame($original, $new);
+    }
+
+    public function testWithFactoryHasDependency()
+    {
+        $container = new Container;
+        $_SERVER['__withFactory.email'] = 'taylor@laravel.com';
+        $_SERVER['__withFactory.userId'] = 999;
+
+        $container->bind(RequestDtoDependencyContract::class, RequestDtoDependency::class);
+        $r = $container->make(RequestDto::class);
+
+        $this->assertInstanceOf(RequestDto::class, $r);
+        $this->assertEquals(999, $r->userId);
+        $this->assertEquals('taylor@laravel.com', $r->email);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -1130,4 +1169,51 @@ class OriginalConcrete implements OverrideInterface
 
 class AltConcrete implements OverrideInterface
 {
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Scoped]
+interface IsScoped
+{
+}
+
+class IsScopedConcrete implements IsScoped
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Singleton]
+interface IsSingleton
+{
+}
+
+class RequestDto implements SelfBuilding
+{
+    public function __construct(
+        public readonly int $userId,
+        public readonly string $email,
+    ) {
+    }
+
+    public static function newInstance(RequestDtoDependencyContract $dependency): self
+    {
+        return new self(
+            $dependency->userId,
+            $_SERVER['__withFactory.email'],
+        );
+    }
+}
+
+interface RequestDtoDependencyContract
+{
+}
+
+class RequestDtoDependency implements RequestDtoDependencyContract
+{
+    public int $userId;
+
+    public function __construct()
+    {
+        $this->userId = $_SERVER['__withFactory.userId'];
+    }
 }

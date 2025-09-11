@@ -654,6 +654,19 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testToPrettyJsonEncodesTheJsonSerializeResult($collection)
+    {
+        $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
+        $c->expects($this->once())->method('jsonSerialize')->willReturn(['foo' => 'bar', 'baz' => 'qux']);
+        $results = $c->toPrettyJson();
+        $expected = json_encode(['foo' => 'bar', 'baz' => 'qux'], JSON_PRETTY_PRINT);
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCastingToStringJsonEncodesTheToArrayResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();
@@ -792,6 +805,9 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([1, 5, 1, 5, 5, 1]);
         $this->assertEquals([1 => 3, 5 => 3], $c->countBy()->all());
+
+        $c = new $collection([StaffEnum::James, StaffEnum::Joe, StaffEnum::Taylor]);
+        $this->assertEquals(['James' => 1, 'Joe' => 1, 'Taylor' => 1], $c->countBy()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -802,6 +818,12 @@ class SupportCollectionTest extends TestCase
             ['key' => 'b'], ['key' => 'b'], ['key' => 'b'],
         ]);
         $this->assertEquals(['a' => 4, 'b' => 3], $c->countBy('key')->all());
+
+        $c = new $collection([
+            ['key' => TestBackedEnum::A],
+            ['key' => TestBackedEnum::B], ['key' => TestBackedEnum::B],
+        ]);
+        $this->assertEquals([1 => 1, 2 => 2], $c->countBy('key')->all());
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -816,6 +838,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([true => 2, false => 3], $c->countBy(function ($i) {
             return $i % 2 === 0;
         })->all());
+
+        $c = new $collection(['A', 'A', 'B', 'A']);
+        $this->assertEquals(['A' => 3, 'B' => 1], $c->countBy(static fn ($i) => TestStringBackedEnum::from($i))->all());
     }
 
     public function testAdd()
@@ -3303,6 +3328,22 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testGroupByAttributeWithEnumKey($collection)
+    {
+        $data = new $collection($payload = [
+            ['name' => TestEnum::A, 'url' => '1'],
+            ['name' => TestBackedEnum::A, 'url' => '1'],
+            ['name' => TestStringBackedEnum::A, 'url' => '2'],
+        ]);
+
+        $result = $data->groupBy('name');
+        $this->assertEquals(['A' => [$payload[0], $payload[2]], '1' => [$payload[1]]], $result->toArray());
+
+        $result = $data->groupBy('url');
+        $this->assertEquals(['1' => [$payload[0], $payload[1]], '2' => [$payload[2]]], $result->toArray());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testGroupByCallable($collection)
     {
         $data = new $collection([['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1'], ['rating' => 2, 'url' => '2']]);
@@ -3645,6 +3686,54 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($c->doesntContain(function ($value) {
             return is_null($value);
         }));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testDoesntContainStrict($collection)
+    {
+        $c = new $collection([1, 3, 5, '02']);
+
+        $this->assertFalse($c->doesntContainStrict(1));
+        $this->assertTrue($c->doesntContainStrict('1'));
+        $this->assertTrue($c->doesntContainStrict(2));
+        $this->assertFalse($c->doesntContainStrict('02'));
+        $this->assertTrue($c->doesntContainStrict('2'));
+        $this->assertTrue($c->doesntContainStrict(true));
+        $this->assertFalse($c->doesntContainStrict(function ($value) {
+            return $value < 5;
+        }));
+        $this->assertTrue($c->doesntContainStrict(function ($value) {
+            return $value > 5;
+        }));
+
+        $c = new $collection([0]);
+        $this->assertFalse($c->doesntContainStrict(0));
+        $this->assertTrue($c->doesntContainStrict('0'));
+
+        $this->assertTrue($c->doesntContainStrict(false));
+        $this->assertTrue($c->doesntContainStrict(null));
+
+        $c = new $collection([1, null]);
+        $this->assertFalse($c->doesntContainStrict(null));
+        $this->assertTrue($c->doesntContainStrict(0));
+        $this->assertTrue($c->doesntContainStrict(false));
+
+        $c = new $collection([['v' => 1], ['v' => 3], ['v' => '04'], ['v' => 5]]);
+
+        $this->assertFalse($c->doesntContainStrict('v', 1));
+        $this->assertTrue($c->doesntContainStrict('v', 2));
+        $this->assertTrue($c->doesntContainStrict('v', '1'));
+        $this->assertTrue($c->doesntContainStrict('v', 4));
+        $this->assertFalse($c->doesntContainStrict('v', '04'));
+        $this->assertTrue($c->doesntContainStrict('v', '4'));
+
+        $c = new $collection(['date', 'class', (object) ['foo' => 50], '']);
+
+        $this->assertFalse($c->doesntContainStrict('date'));
+        $this->assertFalse($c->doesntContainStrict('class'));
+        $this->assertTrue($c->doesntContainStrict('foo'));
+        $this->assertTrue($c->doesntContainStrict(null));
+        $this->assertFalse($c->doesntContainStrict(''));
     }
 
     #[DataProvider('collectionClassProvider')]
