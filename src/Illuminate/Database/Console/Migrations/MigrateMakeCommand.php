@@ -74,6 +74,12 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // to be freshly created so we can create the appropriate migrations.
         $name = Str::snake(trim($this->input->getArgument('name')));
 
+        if ($this->migrationExists($name)) {
+            $this->components->error('Migration already exists.');
+
+            return 1;
+        }
+
         $table = $this->input->getOption('table');
 
         $create = $this->input->getOption('create') ?: false;
@@ -92,12 +98,6 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // of creating migrations that create new tables for the application.
         if (! $table) {
             [$table, $create] = TableGuesser::guess($name);
-        }
-
-        if ($this->migrationExists($name)) {
-            $this->components->error('Migration already exists.');
-
-            return 1;
         }
 
         // Now we are ready to write the migration out to disk. Once we've written
