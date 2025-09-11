@@ -69,6 +69,23 @@ class CacheArrayStoreTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function testTouchExtendsTtl(): void
+    {
+        $key = 'key';
+        $value = 'value';
+
+        $store = new ArrayStore;
+
+        Carbon::setTestNow($now = Carbon::now());
+
+        $store->put($key, $value, 30);
+        $store->touch($key, 60);
+
+        Carbon::setTestNow($now->addSeconds(45));
+
+        $this->assertSame($value, $store->get($key));
+    }
+
     public function testStoreItemForeverProperlyStoresInArray()
     {
         $mock = $this->getMockBuilder(ArrayStore::class)->onlyMethods(['put'])->getMock();
@@ -324,5 +341,44 @@ class CacheArrayStoreTest extends TestCase
         $firstLock = $store->restoreLock('foo', 'owner');
 
         $this->assertFalse($firstLock->isOwnedByCurrentProcess());
+    }
+
+    public function testCanGetAll()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new ArrayStore(false);
+        $store->put('foo', 'bar', 10);
+
+        $this->assertEquals([
+            'foo' => ['value' => 'bar', 'expiresAt' => Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000],
+        ], $store->all());
+    }
+
+    public function testCanGetAllWhenSerialized()
+    {
+        Carbon::setTestNow(Carbon::now());
+
+        $store = new ArrayStore(true);
+        $store->put('foo', 'bar', 10);
+        $this->assertEquals([
+            'foo' => ['value' => 'bar', 'expiresAt' => $expiresAt = (Carbon::now()->addSeconds(10)->getPreciseTimestamp(3) / 1000)],
+        ], $store->all());
+
+        // Now let's put a serializable value in there
+        $store->forget('foo');
+        $store->put('foo', Carbon::now(), 10);
+
+        $this->assertEquals([
+            'foo' => [
+                'value' => Carbon::now(),
+                'expiresAt' => $expiresAt,
+            ],
+        ], $store->all());
+
+        $this->assertEquals(
+            serialize(Carbon::now()),
+            $store->all(false)['foo']['value']
+        );
     }
 }

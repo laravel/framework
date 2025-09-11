@@ -249,6 +249,18 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        return (bool) $this->connection()->expire($this->getPrefix().$key, (int) max(1, $seconds));
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
@@ -286,7 +298,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Begin executing a new tags operation.
      *
-     * @param  array|mixed  $names
+     * @param  mixed  $names
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names)

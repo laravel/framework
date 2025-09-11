@@ -13,9 +13,9 @@ if (! function_exists('Illuminate\Support\defer')) {
      * @param  callable|null  $callback
      * @param  string|null  $name
      * @param  bool  $always
-     * @return \Illuminate\Support\Defer\DeferredCallback
+     * @return ($callback is null ? \Illuminate\Support\Defer\DeferredCallbackCollection : \Illuminate\Support\Defer\DeferredCallback)
      */
-    function defer(?callable $callback = null, ?string $name = null, bool $always = false)
+    function defer(?callable $callback = null, ?string $name = null, bool $always = false): DeferredCallback|DeferredCallbackCollection
     {
         if ($callback === null) {
             return app(DeferredCallbackCollection::class);
@@ -31,10 +31,8 @@ if (! function_exists('Illuminate\Support\defer')) {
 if (! function_exists('Illuminate\Support\php_binary')) {
     /**
      * Determine the PHP Binary.
-     *
-     * @return string
      */
-    function php_binary()
+    function php_binary(): string
     {
         return (new PhpExecutableFinder)->find(false) ?: 'php';
     }
@@ -43,10 +41,8 @@ if (! function_exists('Illuminate\Support\php_binary')) {
 if (! function_exists('Illuminate\Support\artisan_binary')) {
     /**
      * Determine the proper Artisan executable.
-     *
-     * @return string
      */
-    function artisan_binary()
+    function artisan_binary(): string
     {
         return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }

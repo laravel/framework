@@ -148,6 +148,18 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
+     * Assert if an event was dispatched exactly once.
+     *
+     * @param  string  $event
+     * @param  int  $times
+     * @return void
+     */
+    public function assertDispatchedOnce($event)
+    {
+        $this->assertDispatchedTimes($event, 1);
+    }
+
+    /**
      * Assert if an event was dispatched a number of times.
      *
      * @param  string  $event
@@ -160,7 +172,11 @@ class EventFake implements Dispatcher, Fake
 
         PHPUnit::assertSame(
             $times, $count,
-            "The expected [{$event}] event was dispatched {$count} times instead of {$times} times."
+            sprintf(
+                "The expected [{$event}] event was dispatched {$count} %s instead of {$times} %s.",
+                Str::plural('time', $count),
+                Str::plural('time', $times)
+            )
         );
     }
 

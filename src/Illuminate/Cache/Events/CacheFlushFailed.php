@@ -22,7 +22,7 @@ class CacheFlushFailed
      * Create a new event instance.
      *
      * @param  string|null  $storeName
-     * @return void
+     * @param  array  $tags
      */
     public function __construct($storeName, array $tags = [])
     {

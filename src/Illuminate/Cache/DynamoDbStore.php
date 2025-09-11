@@ -429,6 +429,43 @@ class DynamoDbStore implements LockProvider, Store
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     *
+     * @throws DynamoDbException
+     */
+    public function touch($key, $seconds)
+    {
+        try {
+            $this->dynamo->updateItem([
+                'TableName' => $this->table,
+                'Key' => [$this->keyAttribute => ['S' => $this->getPrefix().$key]],
+                'UpdateExpression' => 'SET #expiry = :expiry',
+                'ConditionExpression' => 'attribute_exists(#key) AND #expiry > :now',
+                'ExpressionAttributeNames' => [
+                    '#key' => $this->keyAttribute,
+                    '#expiry' => $this->expirationAttribute,
+                ],
+                'ExpressionAttributeValues' => [
+                    ':expiry' => ['N' => (string) $this->toTimestamp($seconds)],
+                    ':now' => ['N' => (string) $this->currentTime()],
+                ],
+            ]);
+        } catch (DynamoDbException $e) {
+            if (str_contains($e->getMessage(), 'ConditionalCheckFailed')) {
+                return false;
+            }
+
+            throw $e;
+        }
+
+        return true;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key

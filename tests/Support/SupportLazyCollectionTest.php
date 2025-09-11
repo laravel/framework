@@ -447,4 +447,51 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertEquals($expected, $dotted->all());
     }
+
+    public function testWithHeartbeat()
+    {
+        $start = Carbon::create(2000, 1, 1);
+        $after2Minutes = $start->copy()->addMinutes(2);
+        $after5Minutes = $start->copy()->addMinutes(5);
+        $after7Minutes = $start->copy()->addMinutes(7);
+        $after11Minutes = $start->copy()->addMinutes(11);
+
+        Carbon::setTestNow($start);
+
+        $output = new Collection();
+
+        $numbers = LazyCollection::range(1, 10)
+
+            // Move the clock to possibly trigger the heartbeat...
+            ->tapEach(fn ($number) => Carbon::setTestNow(
+                match ($number) {
+                    3 => $after2Minutes,
+                    4 => $after5Minutes,
+                    6 => $after7Minutes,
+                    9 => $after11Minutes,
+                    default => Carbon::now(),
+                }
+            ))
+
+            // Push the current date to `output` when heartbeat is triggered...
+            ->withHeartbeat(Duration::minutes(5), fn () => $output[] = Carbon::now())
+
+            // Push every number onto `output` as it's enumerated...
+            ->tapEach(fn ($number) => $output[] = $number)->all();
+
+        $this->assertEquals(range(1, 10), $numbers);
+
+        $this->assertEquals(
+            [
+                1, 2, 3,
+                $after5Minutes,
+                4, 5, 6, 7, 8,
+                $after11Minutes,
+                9, 10,
+            ],
+            $output->all(),
+        );
+
+        Carbon::setTestNow();
+    }
 }

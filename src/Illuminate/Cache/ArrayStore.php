@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
@@ -13,14 +14,14 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * The array of stored values.
      *
-     * @var array
+     * @var array<string, array{value: mixed, expiresAt: float}>
      */
     protected $storage = [];
 
     /**
      * The array of locks.
      *
-     * @var array
+     * @var array<string, array{owner: ?string, expiresAt: ?\Illuminate\Support\Carbon}>
      */
     public $locks = [];
 
@@ -39,6 +40,30 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function __construct($serializesValues = false)
     {
         $this->serializesValues = $serializesValues;
+    }
+
+    /**
+     * Get all of the cached values and their expiration times.
+     *
+     * @param  bool  $unserialize
+     * @return array<string, array{value: mixed, expiresAt: float}>
+     */
+    public function all($unserialize = true)
+    {
+        if ($unserialize === false || $this->serializesValues === false) {
+            return $this->storage;
+        }
+
+        $storage = [];
+
+        foreach ($this->storage as $key => $data) {
+            $storage[$key] = [
+                'value' => unserialize($data['value']),
+                'expiresAt' => $data['expiresAt'],
+            ];
+        }
+
+        return $storage;
     }
 
     /**
@@ -128,6 +153,28 @@ class ArrayStore extends TaggableStore implements LockProvider
     public function forever($key, $value)
     {
         return $this->put($key, $value, 0);
+    }
+
+    /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $item['expiresAt'] = $this->calculateExpiration($seconds);
+
+        $this->storage = array_merge($this->storage, [$key => $item]);
+
+        return true;
     }
 
     /**

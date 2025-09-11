@@ -363,7 +363,7 @@ trait BuildsQueries
      */
     public function first($columns = ['*'])
     {
-        return $this->take(1)->get($columns)->first();
+        return $this->limit(1)->get($columns)->first();
     }
 
     /**
@@ -395,7 +395,7 @@ trait BuildsQueries
      */
     public function sole($columns = ['*'])
     {
-        $result = $this->take(2)->get($columns);
+        $result = $this->limit(2)->get($columns);
 
         $count = $result->count();
 

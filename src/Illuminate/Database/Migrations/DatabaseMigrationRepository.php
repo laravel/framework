@@ -64,7 +64,9 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
 
         return $query->orderBy('batch', 'desc')
             ->orderBy('migration', 'desc')
-            ->take($steps)->get()->all();
+            ->limit($steps)
+            ->get()
+            ->all();
     }
 
     /**

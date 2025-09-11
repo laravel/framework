@@ -17,13 +17,14 @@
     "require": {
         "php": "^8.3",
         "ext-pdo": "*",
-        "brick/math": "^0.11|^0.12|^0.13",
+        "brick/math": "^0.11|^0.12|^0.13|^0.14",
         "illuminate/collections": "^13.0",
         "illuminate/container": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
-        "laravel/serializable-closure": "^1.3|^2.0"
+        "laravel/serializable-closure": "^1.3|^2.0",
+        "symfony/polyfill-php85": "^1.33"
     },
     "autoload": {
         "psr-4": {

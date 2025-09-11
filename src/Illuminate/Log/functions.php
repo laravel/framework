@@ -10,7 +10,7 @@ if (! function_exists('Illuminate\Log\log')) {
      * @param  array  $context
      * @return ($message is null ? \Illuminate\Log\LogManager : null)
      */
-    function log($message = null, array $context = [])
+    function log($message = null, array $context = []): ?LogManager
     {
         return logger($message, $context);
     }

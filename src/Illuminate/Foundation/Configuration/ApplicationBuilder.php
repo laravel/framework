@@ -418,6 +418,25 @@ class ApplicationBuilder
     }
 
     /**
+     * Register an array of scoped singleton container bindings to be bound when the application is booting.
+     *
+     * @param  array  $scopedSingletons
+     * @return $this
+     */
+    public function withScopedSingletons(array $scopedSingletons)
+    {
+        return $this->registered(function ($app) use ($scopedSingletons) {
+            foreach ($scopedSingletons as $abstract => $concrete) {
+                if (is_string($abstract)) {
+                    $app->scoped($abstract, $concrete);
+                } else {
+                    $app->scoped($concrete);
+                }
+            }
+        });
+    }
+
+    /**
      * Register a callback to be invoked when the application's service providers are registered.
      *
      * @param  callable  $callback

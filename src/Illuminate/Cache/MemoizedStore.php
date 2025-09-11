@@ -108,6 +108,7 @@ class MemoizedStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
+     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -193,6 +194,20 @@ class MemoizedStore implements LockProvider, Store
         }
 
         return $this->repository->resoreLock(...func_get_args());
+    }
+
+    /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        unset($this->cache[$this->prefix($key)]);
+
+        return $this->repository->touch($key, $seconds);
     }
 
     /**

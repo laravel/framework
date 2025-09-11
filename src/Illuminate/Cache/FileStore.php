@@ -239,6 +239,24 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $payload = $this->getPayload($this->getPrefix().$key);
+
+        if (is_null($payload['data'])) {
+            return false;
+        }
+
+        return $this->put($key, $payload['data'], $seconds);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
