@@ -23,8 +23,8 @@
         </div>
 
         <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
-            <x-laravel-exceptions-renderer-new::formatted-source :$frame />
-            <x-laravel-exceptions-renderer-new::file-with-line :$frame />
+            <x-laravel-exceptions-renderer::formatted-source :$frame />
+            <x-laravel-exceptions-renderer::file-with-line :$frame />
         </div>
 
         <div class="flex-shrink-0">
@@ -37,13 +37,13 @@
                     'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
                 }"
             >
-                <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />
-                <x-laravel-exceptions-renderer-new::icons.chevrons-up-down x-show="!expanded" />
+                <x-laravel-exceptions-renderer::icons.chevrons-down-up x-show="expanded" />
+                <x-laravel-exceptions-renderer::icons.chevrons-up-down x-show="!expanded" />
             </button>
         </div>
     </div>
 
     @if($snippet = $frame->snippet())
-        <x-laravel-exceptions-renderer-new::frame-code :code="$snippet" :highlightedLine="$frame->line()" x-show="expanded" />
+        <x-laravel-exceptions-renderer::frame-code :code="$snippet" :highlightedLine="$frame->line()" x-show="expanded" />
     @endif
 </div>

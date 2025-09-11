@@ -16,7 +16,7 @@
                 spotlight.y +
                 'px, black 0%, transparent ' + (isDark ? '600px' : '400px') + ');'
         ">
-        <x-laravel-exceptions-renderer-new::icons.laravel-ascii />
+        <x-laravel-exceptions-renderer::icons.laravel-ascii />
     </div>
-    <x-laravel-exceptions-renderer-new::icons.laravel-ascii />
+    <x-laravel-exceptions-renderer::icons.laravel-ascii />
 </div>

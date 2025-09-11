@@ -14,8 +14,8 @@
         class="flex h-11 cursor-pointer items-center gap-3 rounded-lg pr-2.5 pl-4 hover:bg-white/50 dark:hover:bg-white/2"
         @click="expanded = !expanded"
     >
-        <x-laravel-exceptions-renderer-new::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
-        <x-laravel-exceptions-renderer-new::icons.folder-open class="w-3 h-3 text-blue-500 dark:text-emerald-500" x-show="expanded" />
+        <x-laravel-exceptions-renderer::icons.folder class="w-3 h-3 text-neutral-400" x-show="!expanded" x-cloak />
+        <x-laravel-exceptions-renderer::icons.folder-open class="w-3 h-3 text-blue-500 dark:text-emerald-500" x-show="expanded" />
 
         <div class="flex-1 font-mono text-xs leading-3 text-neutral-900 dark:text-neutral-400">
             {{ count($frames)}} vendor {{ Str::plural('frame', count($frames))}}
@@ -30,15 +30,15 @@
                 'text-neutral-500 dark:text-neutral-500 dark:bg-white/3': !expanded,
             }"
         >
-            <x-laravel-exceptions-renderer-new::icons.chevrons-down-up x-show="expanded" />
-            <x-laravel-exceptions-renderer-new::icons.chevrons-up-down x-show="!expanded" />
+            <x-laravel-exceptions-renderer::icons.chevrons-down-up x-show="expanded" />
+            <x-laravel-exceptions-renderer::icons.chevrons-up-down x-show="!expanded" />
         </button>
     </div>
 
     <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5" x-show="expanded">
         @foreach ($frames as $frame)
             <div class="flex flex-col divide-y divide-neutral-100 border-t border-neutral-100 dark:divide-white/5 dark:border-white/5">
-                <x-laravel-exceptions-renderer-new::vendor-frame :$frame />
+                <x-laravel-exceptions-renderer::vendor-frame :$frame />
             </div>
         @endforeach
     </div>

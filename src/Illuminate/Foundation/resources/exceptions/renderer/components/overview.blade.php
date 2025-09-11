@@ -15,16 +15,16 @@
         <div class="flex items-center gap-2 h-10">
             <div class="text-sm font-mono text-neutral-500 dark:text-neutral-400 uppercase">STATUS CODE</div>
             <div class="flex-1 h-3 border-b-2 border-dotted border-neutral-300 dark:border-white/20"></div>
-            <x-laravel-exceptions-renderer-new::badge type="error" variant="solid">
-                <x-laravel-exceptions-renderer-new::icons.alert class="w-2.5 h-2.5" />
+            <x-laravel-exceptions-renderer::badge type="error" variant="solid">
+                <x-laravel-exceptions-renderer::icons.alert class="w-2.5 h-2.5" />
                 500
-            </x-laravel-exceptions-renderer-new::badge>
+            </x-laravel-exceptions-renderer::badge>
         </div>
         <!-- Method Row -->
         <div class="flex items-center gap-2 h-10">
             <div class="text-sm font-mono text-neutral-500 dark:text-neutral-400 uppercase">METHOD</div>
             <div class="flex-1 h-3 border-b-2 border-dotted border-neutral-300 dark:border-white/20"></div>
-            <x-laravel-exceptions-renderer-new::http-method method="{{ $request->method() }}" />
+            <x-laravel-exceptions-renderer::http-method method="{{ $request->method() }}" />
         </div>
     </div>
 </div>

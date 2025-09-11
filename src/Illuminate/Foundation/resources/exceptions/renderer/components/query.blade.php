@@ -79,14 +79,14 @@
     <div class="flex items-center justify-between p-2">
         <div class="flex items-center gap-2.5">
             <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-white/5 rounded-md w-6 h-6 flex items-center justify-center p-1">
-                <x-laravel-exceptions-renderer-new::icons.database class="w-2.5 h-2.5 text-blue-500 dark:text-emerald-500" />
+                <x-laravel-exceptions-renderer::icons.database class="w-2.5 h-2.5 text-blue-500 dark:text-emerald-500" />
             </div>
             <h3 class="text-base font-semibold">Queries</h3>
         </div>
         <div x-show="totalQueries > 0" class="text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
             <span x-text="`${((currentPage - 1) * perPage) + 1}-${Math.min(currentPage * perPage, totalQueries)} of ${totalQueries}`"></span>
             @if (count($queries) > 100)
-                <x-laravel-exceptions-renderer-new::icons.info
+                <x-laravel-exceptions-renderer::icons.info
                     class="w-3 h-3 text-blue-500 dark:text-emerald-500"
                     data-tippy-content="Only the first 100 queries are shown"
                 />
@@ -102,10 +102,10 @@
         >
             <div class="flex items-center gap-2 truncate">
                 <div class="flex items-center gap-2">
-                    <x-laravel-exceptions-renderer-new::icons.database class="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
+                    <x-laravel-exceptions-renderer::icons.database class="w-3 h-3 text-neutral-500 dark:text-neutral-400" />
                     <span class="text-neutral-500 dark:text-neutral-400">{{ $connectionName }}</span>
                 </div>
-                <x-laravel-exceptions-renderer-new::syntax-highlight
+                <x-laravel-exceptions-renderer::syntax-highlight
                     :code="$sql"
                     grammar="sql"
                     truncate
@@ -116,7 +116,7 @@
             <div class="text-neutral-500 dark:text-neutral-200 text-right flex-shrink-0">{{ $time }}ms</div>
         </div>
         @empty
-        <x-laravel-exceptions-renderer-new::empty-state message="No queries executed" />
+        <x-laravel-exceptions-renderer::empty-state message="No queries executed" />
         @endforelse
     </div>
 
@@ -129,7 +129,7 @@
             :disabled="!hasPrevious"
             :class="hasPrevious ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
         >
-            <x-laravel-exceptions-renderer-new::icons.chevrons-left class="w-3 h-3" />
+            <x-laravel-exceptions-renderer::icons.chevrons-left class="w-3 h-3" />
         </button>
 
         <!-- Previous Button -->
@@ -139,7 +139,7 @@
             :class="hasPrevious ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasPrevious"
         >
-            <x-laravel-exceptions-renderer-new::icons.chevron-left class="w-3 h-3" />
+            <x-laravel-exceptions-renderer::icons.chevron-left class="w-3 h-3" />
         </button>
 
         <!-- Page Numbers -->
@@ -166,7 +166,7 @@
             :class="hasNext ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
         >
-            <x-laravel-exceptions-renderer-new::icons.chevron-right class="w-3 h-3" />
+            <x-laravel-exceptions-renderer::icons.chevron-right class="w-3 h-3" />
         </button>
 
         <!-- Last Button -->
@@ -176,7 +176,7 @@
             :class="hasNext ? 'text-neutral-500 dark:text-neutral-300 hover:bg-neutral-200 hover:dark:text-white hover:dark:bg-white/5' : 'text-neutral-600 cursor-not-allowed!'"
             :disabled="!hasNext"
         >
-            <x-laravel-exceptions-renderer-new::icons.chevrons-right class="w-3 h-3" />
+            <x-laravel-exceptions-renderer::icons.chevrons-right class="w-3 h-3" />
         </button>
     </div>
 </div>

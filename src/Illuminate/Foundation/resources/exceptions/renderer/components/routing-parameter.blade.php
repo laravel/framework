@@ -4,9 +4,9 @@
     <h2 class="text-lg font-semibold">Routing parameters</h2>
     @if ($routeParameters)
     <div class="bg-white/[2%] border border-neutral-200 dark:border-neutral-800 rounded-md overflow-x-auto p-5 text-sm font-mono shadow-sm">
-        <x-laravel-exceptions-renderer-new::syntax-highlight :code="$routeParameters" grammar="json" />
+        <x-laravel-exceptions-renderer::syntax-highlight :code="$routeParameters" grammar="json" />
     </div>
     @else
-    <x-laravel-exceptions-renderer-new::empty-state message="No routing parameters" />
+    <x-laravel-exceptions-renderer::empty-state message="No routing parameters" />
     @endif
 </div>

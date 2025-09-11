@@ -39,8 +39,8 @@
         ])
         @click="copyToClipboard()"
     >
-        <x-laravel-exceptions-renderer-new::icons.copy class="w-3 h-3" x-show="!copied" />
-        <x-laravel-exceptions-renderer-new::icons.check class="w-3 h-3 text-emerald-500" x-show="copied" />
+        <x-laravel-exceptions-renderer::icons.copy class="w-3 h-3" x-show="!copied" />
+        <x-laravel-exceptions-renderer::icons.check class="w-3 h-3 text-emerald-500" x-show="copied" />
         <span x-text="copied ? 'Copied to clipboard' : 'Copy as Markdown'"></span>
     </button>
 </div>

@@ -14,7 +14,7 @@
     }
 @endphp
 
-<x-laravel-exceptions-renderer-new::syntax-highlight
+<x-laravel-exceptions-renderer::syntax-highlight
     :code="$source"
     grammar="php"
     truncate

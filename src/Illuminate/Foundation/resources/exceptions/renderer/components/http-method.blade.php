@@ -10,7 +10,7 @@ $type = match ($method) {
 };
 @endphp
 
-<x-laravel-exceptions-renderer-new::badge type="{{ $type }}">
-    <x-laravel-exceptions-renderer-new::icons.globe class="w-2.5 h-2.5" />
+<x-laravel-exceptions-renderer::badge type="{{ $type }}">
+    <x-laravel-exceptions-renderer::icons.globe class="w-2.5 h-2.5" />
     {{ $method }}
-</x-laravel-exceptions-renderer-new::badge>
+</x-laravel-exceptions-renderer::badge>

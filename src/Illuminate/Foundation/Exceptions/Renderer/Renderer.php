@@ -16,7 +16,7 @@ class Renderer
      *
      * @var string
      */
-    protected const DIST = __DIR__.'/../../resources/exceptions/renderer-new/dist/';
+    protected const DIST = __DIR__.'/../../resources/exceptions/renderer/dist/';
 
     /**
      * The view factory instance.
@@ -95,7 +95,7 @@ class Renderer
             'exception' => $exception,
         ])->render();
 
-        return $this->viewFactory->make('laravel-exceptions-renderer-new::show', [
+        return $this->viewFactory->make('laravel-exceptions-renderer::show', [
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
