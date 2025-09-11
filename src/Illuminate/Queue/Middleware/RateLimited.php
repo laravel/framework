@@ -160,7 +160,7 @@ class RateLimited
      *
      * @return void
      */
-    public function __wakeup()
+    public function __unserialize(array $data)
     {
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
     }

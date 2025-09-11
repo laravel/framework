@@ -2603,7 +2603,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return void
      */
-    public function __wakeup()
+    public function __unserialize(array $data)
     {
         $this->bootIfNotBooted();
 
