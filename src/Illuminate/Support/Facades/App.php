@@ -53,7 +53,7 @@ namespace Illuminate\Support\Facades;
  * @method static void loadDeferredProviders()
  * @method static void loadDeferredProvider(string $service)
  * @method static void registerDeferredProvider(string $provider, string|null $service = null)
- * @method static object|mixed make(string $abstract, array $parameters = [])
+ * @method static ($abstract is class-string<TClass> ? TClass : mixed) make(string|class-string<TClass> $abstract, array $parameters = [])
  * @method static bool bound(string $abstract)
  * @method static bool isBooted()
  * @method static void boot()
