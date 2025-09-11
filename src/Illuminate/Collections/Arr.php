@@ -77,7 +77,7 @@ class Arr
     {
         $value = Arr::get($array, $key, $default);
 
-        if ($throwOnNotFound && $value === $default && ! Arr::has($array, $key)) {
+        if ($throwOnNotFound && ! Arr::has($array, $key)) {
             throw new ItemNotFoundException(
                 sprintf('Array key [%s] not found.', $key)
             );
