@@ -66,7 +66,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return self::SUCCESS|self::FAILURE|self::INVALID
      */
     public function handle()
     {
@@ -76,14 +76,15 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         $name = Str::snake(trim($this->input->getArgument('name')));
 
         if ($this->migrationExists($name)) {
-            $message = 'Migration already exists.';
+            $message = 'Migration '.$name.' already exists.';
 
             if ($this->option('check-duplicate')) {
                 $this->components->error($message);
-                return 1;
+
+                return self::FAILURE;
             }
 
-            $this->components->warn($message . ' Make sure the name is unique if needed.');
+            $this->components->warn($message.' Make sure the name is unique if needed.');
         }
 
         $table = $this->input->getOption('table');
@@ -111,7 +112,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // make sure that the migrations are registered by the class loaders.
         $this->writeMigration($name, $table, $create);
 
-        return 0;
+        return self::SUCCESS;
     }
 
     /**
@@ -172,7 +173,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected function migrationExists(string $name): bool
     {
         return count(glob(
-            join_paths($this->laravel->databasePath('migrations'), '*_*_*_*_'.$name.'.php')
+            join_paths($this->getMigrationPath(), '*_*_*_*_'.$name.'.php')
         )) !== 0;
     }
 }
