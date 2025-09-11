@@ -1101,6 +1101,22 @@ class Route
     }
 
     /**
+     * Specify that the "AuthorizeAny" middleware should be applied to the route.
+     *
+     * @param  array  $abilities
+     * @param  array|string  $models
+     * @return $this
+     */
+    public function canAny(array $abilities, $models = [])
+    {
+        $abilities = array_map('Illuminate\Support\enum_value', $abilities);
+
+        return empty($models)
+            ? $this->middleware(['can.any:'.implode('|', $abilities)])
+            : $this->middleware(['can.any:'.implode('|', $abilities).','.implode(',', Arr::wrap($models))]);
+    }
+
+    /**
      * Get the middleware for the route's controller.
      *
      * @return array

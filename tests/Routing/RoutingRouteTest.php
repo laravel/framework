@@ -2221,6 +2221,24 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
+    public function testRouteCanAnyMiddlewareCanBeAssigned()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middleware(['foo'])->canAny(['create', 'update'], Route::class);
+
+        $this->assertEquals([
+            'foo',
+            'can.any:create|update,Illuminate\Routing\Route',
+        ], $route->middleware());
+
+        $route = new Route(['GET'], '/', []);
+        $route->canAny(['create', 'update']);
+
+        $this->assertEquals([
+            'can.any:create|update',
+        ], $route->middleware());
+    }
+
     public function testItDispatchesEventsWhilePreparingRequest()
     {
         $events = new Dispatcher;
