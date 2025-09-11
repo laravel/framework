@@ -95,7 +95,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         }
 
         if ($this->migrationExists($name)) {
-            $this->components->error('Migration '.$name.' already exists.');
+            $this->components->error('Migration already exists.');
 
             return 1;
         }
