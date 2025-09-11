@@ -2719,11 +2719,12 @@ class Builder implements BuilderContract
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  int  $limit
      * @return $this
      */
-    public function latest($column = 'created_at')
+    public function latest($column = 'created_at', $limit = null)
     {
-        return $this->orderBy($column, 'desc');
+        return $this->orderBy($column, 'desc')->limit($limit);
     }
 
     /**

@@ -426,15 +426,16 @@ class Builder implements BuilderContract
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  int  $limit
      * @return $this
      */
-    public function latest($column = null)
+    public function latest($column = null, $limit = null)
     {
         if (is_null($column)) {
             $column = $this->model->getCreatedAtColumn() ?? 'created_at';
         }
 
-        $this->query->latest($column);
+        $this->query->latest($column, $limit);
 
         return $this;
     }
