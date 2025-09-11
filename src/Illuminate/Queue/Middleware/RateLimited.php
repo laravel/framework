@@ -147,7 +147,7 @@ class RateLimited
      *
      * @return array
      */
-    public function __unserialize(array $data)
+    public function __serialize()
     {
         return [
             'limiterName' => $this->limiterName,

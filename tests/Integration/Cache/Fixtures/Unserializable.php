@@ -6,7 +6,7 @@ use Exception;
 
 class Unserializable
 {
-    public function __unserialize(array $data)
+    public function __serialize()
     {
         throw new Exception('Not serializable');
     }
