@@ -57,6 +57,8 @@ class WipeCommand extends Command
             $this->components->info('Dropped all types successfully.');
         }
 
+        $this->flushDatabaseConnection($database);
+
         return 0;
     }
 
@@ -97,6 +99,17 @@ class WipeCommand extends Command
         $this->laravel['db']->connection($database)
             ->getSchemaBuilder()
             ->dropAllTypes();
+    }
+
+    /**
+     * Flush the given database connection.
+     *
+     * @param  string  $database
+     * @return void
+     */
+    protected function flushDatabaseConnection($database)
+    {
+        $this->laravel['db']->connection($database)->disconnect();
     }
 
     /**

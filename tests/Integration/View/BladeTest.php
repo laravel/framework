@@ -207,6 +207,13 @@ class BladeTest extends TestCase
 </div>', trim($content));
     }
 
+    public function test_no_name_passed_to_slot_uses_default_name()
+    {
+        $content = Blade::render('<x-link href="#"><x-slot>default slot</x-slot></x-link>');
+
+        $this->assertSame('<a href="#">default slot</a>', trim($content));
+    }
+
     public function testViewCacheCommandHandlesConfiguredBladeExtensions()
     {
         View::addExtension('sh', 'blade');

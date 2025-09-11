@@ -1540,6 +1540,63 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a where between columns statement using a value to the query.
+     *
+     * @param  mixed  $value
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereValueBetween($value, array $columns, $boolean = 'and', $not = false)
+    {
+        $type = 'valueBetween';
+
+        $this->wheres[] = compact('type', 'value', 'columns', 'boolean', 'not');
+
+        $this->addBinding($value, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an or where between columns statement using a value to the query.
+     *
+     * @param  mixed  $value
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @return $this
+     */
+    public function orWhereValueBetween($value, array $columns)
+    {
+        return $this->whereValueBetween($value, $columns, 'or');
+    }
+
+    /**
+     * Add a where not between columns statement using a value to the query.
+     *
+     * @param  mixed  $value
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereValueNotBetween($value, array $columns, $boolean = 'and')
+    {
+        return $this->whereValueBetween($value, $columns, $boolean, true);
+    }
+
+    /**
+     * Add an or where not between columns statement using a value to the query.
+     *
+     * @param  mixed  $value
+     * @param  array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string}  $columns
+     * @return $this
+     */
+    public function orWhereValueNotBetween($value, array $columns)
+    {
+        return $this->whereValueNotBetween($value, $columns, 'or');
+    }
+
+    /**
      * Add an "or where not null" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -3123,7 +3180,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->first([$column]);
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? array_first($result) : null;
     }
 
     /**
@@ -3135,7 +3192,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->selectRaw($expression, $bindings)->first();
 
-        return count($result) > 0 ? reset($result) : null;
+        return count($result) > 0 ? array_first($result) : null;
     }
 
     /**
@@ -3151,7 +3208,7 @@ class Builder implements BuilderContract
     {
         $result = (array) $this->sole([$column]);
 
-        return reset($result);
+        return array_first($result);
     }
 
     /**
@@ -3316,7 +3373,7 @@ class Builder implements BuilderContract
      * Get the count of the total records for the paginator.
      *
      * @param  array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @return int
+     * @return int<0, max>
      */
     public function getCountForPagination($columns = ['*'])
     {
@@ -3606,7 +3663,7 @@ class Builder implements BuilderContract
      * Retrieve the "count" result of the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
-     * @return int
+     * @return int<0, max>
      */
     public function count($columns = '*')
     {
@@ -3753,7 +3810,7 @@ class Builder implements BuilderContract
             return true;
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         }
 
@@ -3782,7 +3839,7 @@ class Builder implements BuilderContract
     /**
      * Insert new records into the database while ignoring errors.
      *
-     * @return int
+     * @return int<0, max>
      */
     public function insertOrIgnore(array $values)
     {
@@ -3790,7 +3847,7 @@ class Builder implements BuilderContract
             return 0;
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
@@ -3864,7 +3921,7 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @return int
+     * @return int<0, max>
      */
     public function update(array $values)
     {
@@ -3948,7 +4005,7 @@ class Builder implements BuilderContract
             return (int) $this->insert($values);
         }
 
-        if (! is_array(reset($values))) {
+        if (! is_array(array_first($values))) {
             $values = [$values];
         } else {
             foreach ($values as $key => $value) {
@@ -3959,7 +4016,7 @@ class Builder implements BuilderContract
         }
 
         if (is_null($update)) {
-            $update = array_keys(reset($values));
+            $update = array_keys(array_first($values));
         }
 
         $this->applyBeforeQueryCallbacks();
@@ -3982,7 +4039,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -4000,7 +4057,7 @@ class Builder implements BuilderContract
      *
      * @param  array<string, float|int|numeric-string>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -4024,7 +4081,7 @@ class Builder implements BuilderContract
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */
@@ -4042,7 +4099,7 @@ class Builder implements BuilderContract
      *
      * @param  array<string, float|int|numeric-string>  $columns
      * @param  array<string, mixed>  $extra
-     * @return int
+     * @return int<0, max>
      *
      * @throws \InvalidArgumentException
      */

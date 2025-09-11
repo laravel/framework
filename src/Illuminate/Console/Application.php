@@ -147,7 +147,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Run an Artisan console command by name.
      *
-     * @param  string  $command
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $parameters
      * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
      * @return int
@@ -170,7 +170,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Parse the incoming Artisan command and its input.
      *
-     * @param  string  $command
+     * @param  \Symfony\Component\Console\Command\Command|string  $command
      * @param  array  $parameters
      * @return array
      */
@@ -178,6 +178,10 @@ class Application extends SymfonyApplication implements ApplicationContract
     {
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $callingClass = true;
+
+            if (is_object($command)) {
+                $command = get_class($command);
+            }
 
             $command = $this->laravel->make($command)->getName();
         }
@@ -203,6 +207,18 @@ class Application extends SymfonyApplication implements ApplicationContract
         return $this->lastOutput && method_exists($this->lastOutput, 'fetch')
             ? $this->lastOutput->fetch()
             : '';
+    }
+
+    /**
+     * Alias for addCommand() since Symfony's add() method was deprecated.
+     *
+     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @return \Symfony\Component\Console\Command\Command|null
+     */
+    #[\Override]
+    public function add(SymfonyCommand $command): ?SymfonyCommand
+    {
+        return $this->addCommand($command);
     }
 
     /**
@@ -276,7 +292,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Resolve an array of commands through the application.
      *
-     * @param  array|mixed  $commands
+     * @param  mixed  $commands
      * @return $this
      */
     public function resolveCommands($commands)

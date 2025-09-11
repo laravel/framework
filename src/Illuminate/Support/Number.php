@@ -80,8 +80,8 @@ class Number
     /**
      * Parse a string into a float according to the specified locale.
      *
-     * @param  string  $string  The string to parse
-     * @param  string|null  $locale  The locale to use
+     * @param  string  $string
+     * @param  string|null  $locale
      * @return float|false
      */
     public static function parseFloat(string $string, ?string $locale = null): float
@@ -207,7 +207,9 @@ class Number
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < count($units) - 1); $i++) {
+        $unitCount = count($units);
+
+        for ($i = 0; ($bytes / 1024) > 0.9 && ($i < $unitCount - 1); $i++) {
             $bytes /= 1024;
         }
 
@@ -234,7 +236,7 @@ class Number
      * @param  int  $precision
      * @param  int|null  $maxPrecision
      * @param  bool  $abbreviate
-     * @return false|string
+     * @return string|false
      */
     public static function forHumans(int|float $number, int $precision = 0, ?int $maxPrecision = null, bool $abbreviate = false)
     {
@@ -353,7 +355,11 @@ class Number
 
         static::useLocale($locale);
 
-        return tap($callback(), fn () => static::useLocale($previousLocale));
+        try {
+            return $callback();
+        } finally {
+            static::useLocale($previousLocale);
+        }
     }
 
     /**
@@ -369,7 +375,11 @@ class Number
 
         static::useCurrency($currency);
 
-        return tap($callback(), fn () => static::useCurrency($previousCurrency));
+        try {
+            return $callback();
+        } finally {
+            static::useCurrency($previousCurrency);
+        }
     }
 
     /**
@@ -418,6 +428,8 @@ class Number
      * Ensure the "intl" PHP extension is installed.
      *
      * @return void
+     *
+     * @throws \RuntimeException
      */
     protected static function ensureIntlExtensionIsInstalled()
     {

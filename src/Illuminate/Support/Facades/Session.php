@@ -39,7 +39,7 @@ namespace Illuminate\Support\Facades;
  * @method static void flash(string $key, mixed $value = true)
  * @method static void now(string $key, mixed $value)
  * @method static void reflash()
- * @method static void keep(array|mixed $keys = null)
+ * @method static void keep(mixed $keys = null)
  * @method static void flashInput(array $value)
  * @method static mixed remove(string $key)
  * @method static void forget(string|array $keys)

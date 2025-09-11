@@ -11,6 +11,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\ConfigurationUrlParser;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
  */
@@ -75,12 +77,12 @@ class RedisManager implements Factory
     /**
      * Get a Redis connection by name.
      *
-     * @param  string|null  $name
+     * @param  \UnitEnum|string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
     {
-        $name = $name ?: 'default';
+        $name = enum_value($name) ?: 'default';
 
         if (isset($this->connections[$name])) {
             return $this->connections[$name];

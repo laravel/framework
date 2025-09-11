@@ -346,7 +346,7 @@ class Factory implements FactoryContract
      * Add a piece of shared data to the environment.
      *
      * @param  array|string  $key
-     * @param  mixed|null  $value
+     * @param  mixed  $value
      * @return mixed
      */
     public function share($key, $value = null)

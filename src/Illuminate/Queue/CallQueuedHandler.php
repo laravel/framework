@@ -115,11 +115,20 @@ class CallQueuedHandler
             throw new Exception('Job is incomplete class: '.json_encode($command));
         }
 
+        $lockReleased = false;
+
         return (new Pipeline($this->container))->send($command)
             ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
-            ->then(function ($command) use ($job) {
+            ->finally(function ($command) use (&$lockReleased) {
+                if (! $lockReleased && $command instanceof ShouldBeUniqueUntilProcessing && ! $command->job->isReleased()) {
+                    $this->ensureUniqueJobLockIsReleased($command);
+                }
+            })
+            ->then(function ($command) use ($job, &$lockReleased) {
                 if ($command instanceof ShouldBeUniqueUntilProcessing) {
                     $this->ensureUniqueJobLockIsReleased($command);
+
+                    $lockReleased = true;
                 }
 
                 return $this->dispatcher->dispatchNow(

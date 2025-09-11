@@ -35,6 +35,7 @@ remote events git@github.com:illuminate/events.git
 remote filesystem git@github.com:illuminate/filesystem.git
 remote hashing git@github.com:illuminate/hashing.git
 remote http git@github.com:illuminate/http.git
+remote json-schema git@github.com:illuminate/json-schema.git
 remote log git@github.com:illuminate/log.git
 remote macroable git@github.com:illuminate/macroable.git
 remote mail git@github.com:illuminate/mail.git
@@ -69,6 +70,7 @@ split 'src/Illuminate/Events' events
 split 'src/Illuminate/Filesystem' filesystem
 split 'src/Illuminate/Hashing' hashing
 split 'src/Illuminate/Http' http
+split 'src/Illuminate/JsonSchema' json-schema
 split 'src/Illuminate/Log' log
 split 'src/Illuminate/Macroable' macroable
 split 'src/Illuminate/Mail' mail

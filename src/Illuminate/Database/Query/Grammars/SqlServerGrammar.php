@@ -415,19 +415,19 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {
-        $columns = $this->columnize(array_keys(reset($values)));
+        $columns = $this->columnize(array_keys(array_first($values)));
 
         $sql = 'merge '.$this->wrapTable($query->from).' ';
 
-        $parameters = (new Collection($values))->map(function ($record) {
-            return '('.$this->parameterize($record).')';
-        })->implode(', ');
+        $parameters = (new Collection($values))
+            ->map(fn ($record) => '('.$this->parameterize($record).')')
+            ->implode(', ');
 
         $sql .= 'using (values '.$parameters.') '.$this->wrapTable('laravel_source').' ('.$columns.') ';
 
-        $on = (new Collection($uniqueBy))->map(function ($column) use ($query) {
-            return $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column);
-        })->implode(' and ');
+        $on = (new Collection($uniqueBy))
+            ->map(fn ($column) => $this->wrap('laravel_source.'.$column).' = '.$this->wrap($query->from.'.'.$column))
+            ->implode(' and ');
 
         $sql .= 'on '.$on.' ';
 
