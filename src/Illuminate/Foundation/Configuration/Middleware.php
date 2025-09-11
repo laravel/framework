@@ -555,8 +555,8 @@ class Middleware
     /**
      * Configure where users are redirected by the authentication and guest middleware.
      *
-     * @param  callable|string  $guests
-     * @param  callable|string  $users
+     * @param  callable|string|null  $guests
+     * @param  callable|string|null  $users
      * @return $this
      */
     public function redirectTo(callable|string|null $guests = null, callable|string|null $users = null)
