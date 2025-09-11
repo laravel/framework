@@ -664,6 +664,13 @@ class SupportArrTest extends TestCase
         Arr::array($test_array, 'string');
     }
 
+    public function testItReturnsEmptyArrayForMissingKeyByDefault()
+    {
+        $data = ['name' => 'Taylor'];
+
+        $this->assertSame([], Arr::array($data, 'missing_key'));
+    }
+
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];
