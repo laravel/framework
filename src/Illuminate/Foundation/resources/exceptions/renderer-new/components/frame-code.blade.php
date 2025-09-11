@@ -7,7 +7,7 @@
     <x-laravel-exceptions-renderer-new::syntax-highlight
         :code="$code"
         grammar="php"
-        :with-gutter="true"
+        with-gutter
         :starting-line="max(1, $highlightedLine - 5)"
         :highlighted-line="min(5, $highlightedLine - 1)"
         class="overflow-x-auto"

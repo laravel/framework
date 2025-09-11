@@ -7,17 +7,17 @@
         if ($previous = $frame->previous()) {
             $source .= $previous->type();
             $source .= $previous->callable();
-            $source .= '<span class="text-orange-400 dark:text-orange-300 opacity-50">(';
-            $source .= implode(', ', $previous->args());
-            $source .= ')</span>';
+            $source .= '('.implode(', ', $previous->args()).')';
         }
     } else {
         $source = $frame->source();
     }
 @endphp
 
-<div
-    {{ $attributes->merge(['class' => 'truncate font-mono text-xs text-violet-500 dark:text-violet-400']) }}
->
-    <span data-tippy-content="{{ $source }}">{!! $source !!}</span>
-</div>
+<x-laravel-exceptions-renderer-new::syntax-highlight
+    :code="$source"
+    grammar="php"
+    truncate
+    class="text-xs"
+    data-tippy-content="{{ $source }}"
+/>
