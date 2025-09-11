@@ -63,9 +63,34 @@ class Arr
 
     /**
      * Get an array item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null     $key
+     * @param  array|null          $default
+     * @param  bool                $throwOnNotFound
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Illuminate\Support\ItemNotFoundException
      */
-    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = []): array
-    {
+    public static function array(
+        ArrayAccess|array $array,
+        string|int|null $key,
+        array $default = [],
+        bool $throwOnNotFound = false
+    ): array {
+
+        if(! Arr::has($array, $key)){
+
+            if ($throwOnNotFound) {
+                throw new ItemNotFoundException(
+                    sprintf('Array key [%s] not found.', $key)
+                );
+            }
+
+            return $default;
+        }
+
         $value = Arr::get($array, $key, $default);
 
         if (! is_array($value)) {

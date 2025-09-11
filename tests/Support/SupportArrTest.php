@@ -671,6 +671,61 @@ class SupportArrTest extends TestCase
         $this->assertSame([], Arr::array($data, 'missing_key'));
     }
 
+    public function test_it_throws_item_not_found_exception_when_array_is_empty_and_throw_on_not_found_is_true()
+    {
+        $this->expectException(ItemNotFoundException::class);
+        $this->expectExceptionMessage('Array key [roles] not found.');
+
+        $data = [];
+
+        Arr::array($data, 'roles', [], true);
+    }
+
+    public function test_it_throws_item_not_found_exception_when_key_is_missing_and_throw_on_not_found_is_true()
+    {
+        $this->expectException(ItemNotFoundException::class);
+        $this->expectExceptionMessage('Array key [roles] not found.');
+
+        $data = ['name' => 'Taylor'];
+
+        Arr::array($data, 'roles', [], true);
+    }
+
+    public function test_it_supports_nested_keys_with_dot_notation()
+    {
+        $data = ['user' => ['roles' => ['admin']]];
+
+        $result = Arr::array($data, 'user.roles');
+
+        $this->assertSame(['admin'], $result);
+    }
+
+    public function test_it_throws_for_nested_non_array_value()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches(
+            '#^Array value for key \[user.name\] must be an array, string found.#'
+        );
+
+        $data = ['user' => ['name' => 'Taylor']];
+
+        Arr::array($data, 'user.name');
+    }
+
+    public function test_it_should_not_throw_when_key_exists_even_if_equal_to_default()
+    {
+        $data = ['roles' => []];
+
+        // In the current (buggy) version without Arr::has(),
+        // this will wrongly throw ItemNotFoundException
+        // because $value === $default ([] === []).
+        $result = Arr::array($data, 'roles', [], true);
+
+        $this->assertSame([], $result); // expected to return the actual empty array
+    }
+
+
+
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];
