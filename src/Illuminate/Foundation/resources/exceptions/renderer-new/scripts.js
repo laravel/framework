@@ -7,6 +7,7 @@ Alpine.start();
 
 tippy("[data-tippy-content]", {
     arrow: false,
+    allowHTML: true,
     animation: "shift-away",
     delay: [300, 0],
     duration: 200,
