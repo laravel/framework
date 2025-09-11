@@ -108,19 +108,7 @@ class Renderer
      */
     public static function css()
     {
-        return (new Collection([
-            ['styles.css', []],
-            // ['light-mode.css', ['data-theme' => 'light']],
-            // ['dark-mode.css', ['data-theme' => 'dark']],
-        ]))->map(function ($fileAndAttributes) {
-            [$filename, $attributes] = $fileAndAttributes;
-
-            return '<style '.(new Collection($attributes))->map(function ($value, $attribute) {
-                return $attribute.'="'.$value.'"';
-            })->implode(' ').'>'
-                .file_get_contents(static::DIST.$filename)
-                .'</style>';
-        })->implode('');
+        return '<style>'.file_get_contents(static::DIST.'styles.css').'</style>';
     }
 
     /**
