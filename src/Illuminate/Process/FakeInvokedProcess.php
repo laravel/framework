@@ -287,6 +287,31 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Wait until the given callback returns true.
+     *
+     * @param  callable|null  $output
+     * @return \Illuminate\Contracts\Process\ProcessResult
+     */
+    public function waitUntil(?callable $output = null)
+    {
+        $this->outputHandler = $output ?: $this->outputHandler;
+
+        if (! $this->outputHandler) {
+            $this->remainingRunIterations = 0;
+
+            return $this->predictProcessResult();
+        }
+
+        while ($this->running() && ! call_user_func($this->outputHandler, 'out', $this->latestOutput())) {
+            //
+        }
+
+        $this->remainingRunIterations = 0;
+
+        return $this->process->toProcessResult($this->command);
+    }
+
+    /**
      * Get the ultimate process result that will be returned by this "process".
      *
      * @return \Illuminate\Contracts\Process\ProcessResult

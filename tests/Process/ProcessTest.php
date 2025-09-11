@@ -765,6 +765,77 @@ class ProcessTest extends TestCase
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
     }
 
+    public function testFakeInvokedProcessWaitUntil()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('WAITING')
+                ->output('READY')
+                ->output('DONE')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "WAITING"; sleep 1; echo "READY"; sleep 1; echo "DONE";');
+
+        $callbackInvoked = [];
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = $buffer;
+            return str_contains($buffer, 'READY');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertContains("WAITING\n", $callbackInvoked);
+        $this->assertContains("READY\n", $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilWithNoCallback()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('OUTPUT');
+        });
+
+        $process = $factory->start('echo "OUTPUT"');
+
+        $result = $process->waitUntil();
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertEquals("OUTPUT\n", $result->output());
+    }
+
+    public function testFakeInvokedProcessWaitUntilStopsWhenConditionMet()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('STEP1')
+                ->output('TARGET')
+                ->output('STEP3')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "STEP1"; sleep 1; echo "TARGET"; sleep 1; echo "STEP3";');
+
+        $callbackCount = 0;
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackCount) {
+            $callbackCount++;
+            return str_contains($buffer, 'TARGET');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertEquals(2, $callbackCount);
+    }
+
     public function testBasicFakeAssertions()
     {
         $factory = new Factory;
