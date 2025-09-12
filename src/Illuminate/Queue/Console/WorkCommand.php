@@ -170,7 +170,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
-            $this->option('memory-exit-code'),
+            $this->option('memory-exit-code')
         );
     }
 
