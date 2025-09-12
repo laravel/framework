@@ -10,7 +10,7 @@
 
     <div class="flex flex-col gap-1.5">
         @foreach ($exception->frameGroups() as $group)
-            @if ($group['vendor'])
+            @if ($group['is_vendor'])
                 <x-laravel-exceptions-renderer::vendor-frames :frames="$group['frames']" />
             @else
                 @foreach ($group['frames'] as $frame)

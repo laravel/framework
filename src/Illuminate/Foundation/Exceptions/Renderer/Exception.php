@@ -140,18 +140,18 @@ class Exception
     /**
      * Get the exception's frames grouped by vendor status.
      *
-     * @return array<int, array{vendor: bool, frames: array<int, Frame>}>
+     * @return array<int, array{is_vendor: bool, frames: array<int, Frame>}>
      */
     public function frameGroups()
     {
         $groups = [];
 
         foreach ($this->frames() as $frame) {
-            $isFromVendor = $frame->isFromVendor();
+            $isVendor = $frame->isFromVendor();
 
-            if (empty($groups) || $groups[array_key_last($groups)]['vendor'] !== $isFromVendor) {
+            if (empty($groups) || $groups[array_key_last($groups)]['is_vendor'] !== $isVendor) {
                 $groups[] = [
-                    'vendor' => $isFromVendor,
+                    'is_vendor' => $isVendor,
                     'frames' => [],
                 ];
             }
