@@ -182,7 +182,14 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = Arr::except($this->parseAction($action), ['prefix']);
+
+        $parsedAction = $this->parseAction($action);
+
+        if (isset($parsedAction['tags'])) {
+            $this->tags = (array) $parsedAction['tags'];
+        }
+
+        $this->action = Arr::except($parsedAction, ['prefix', 'tags']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
@@ -1012,6 +1019,10 @@ class Route
 
         if (isset($this->action['domain'])) {
             $this->domain($this->action['domain']);
+        }
+
+        if (isset($action['tags'])) {
+            $this->tags = array_unique(array_merge($this->tags, (array) $action['tags']));
         }
 
         return $this;

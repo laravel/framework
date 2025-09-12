@@ -28,10 +28,11 @@ class RouteGroup
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
+            'tags' => static::formatTags($new, $old),
         ]);
 
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'where', 'as', 'tags']
         ), $new);
     }
 
@@ -101,5 +102,20 @@ class RouteGroup
         }
 
         return $new;
+    }
+
+    /**
+     * Format the tags for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return array
+     */
+    protected static function formatTags($new, $old)
+    {
+        $oldTags = $old['tags'] ?? [];
+        $newTags = $new['tags'] ?? [];
+
+        return array_unique(array_merge($oldTags, $newTags));
     }
 }

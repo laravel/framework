@@ -229,6 +229,33 @@ class PendingResourceRegistration
     }
 
     /**
+     * Add tags to the resource routes.
+     *
+     * @param  array|string  $tags
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function tags($tags)
+    {
+        $this->options['tags'] = array_unique(array_merge(
+            $this->options['tags'] ?? [],
+            Arr::wrap($tags)
+        ));
+
+        return $this;
+    }
+
+    /**
+     * Add a tag to the resource routes.
+     *
+     * @param  string  $tag
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function tag($tag)
+    {
+        return $this->tags([$tag]);
+    }
+
+    /**
      * Add "where" constraints to the resource routes.
      *
      * @param  mixed  $wheres
