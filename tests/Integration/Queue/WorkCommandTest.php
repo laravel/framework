@@ -171,7 +171,7 @@ class WorkCommandTest extends QueueTestCase
             '--daemon' => true,
             '--stop-when-empty' => true,
             '--memory' => 0.1,
-            '--memory-exit-code' => 25
+            '--memory-exit-code' => 25,
         ])->assertExitCode(25);
 
         // Memory limit isn't checked until after the first job is attempted.
