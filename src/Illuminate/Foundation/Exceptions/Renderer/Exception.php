@@ -42,6 +42,11 @@ class Exception
 
     /**
      * Creates a new exception renderer instance.
+     *
+     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Foundation\Exceptions\Renderer\Listener  $listener
+     * @param  string  $basePath
      */
     public function __construct(FlattenException $exception, Request $request, Listener $listener, string $basePath)
     {
@@ -114,7 +119,7 @@ class Exception
         $frames = [];
         $previousFrame = null;
 
-        foreach (array_reverse($trace, true) as $frameData) {
+        foreach (array_reverse($trace) as $frameData) {
             $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
             $frames[] = $frame;
             $previousFrame = $frame;
