@@ -705,7 +705,7 @@ class Dispatcher implements DispatcherContract
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->failOnTimeout = $listener->failOnTimeout ?? false;
-            $job->tries = $listener->tries ?? null;
+            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : ($listener->tries ?? null);
 
             $job->through(array_merge(
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],
