@@ -27,7 +27,6 @@ class Worker
 
     const EXIT_SUCCESS = 0;
     const EXIT_ERROR = 1;
-    const EXIT_MEMORY_LIMIT = 12;
 
     /**
      * The name of the worker.
@@ -307,7 +306,7 @@ class Worker
     {
         return match (true) {
             $this->shouldQuit => static::EXIT_SUCCESS,
-            $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
+            $this->memoryExceeded($options->memory) => $options->memoryExitCode,
             $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
             $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,

@@ -162,6 +162,24 @@ class WorkCommandTest extends QueueTestCase
         $this->assertFalse(SecondJob::$ran);
     }
 
+    public function testMemoryExitCode()
+    {
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+            '--stop-when-empty' => true,
+            '--memory' => 0.1,
+            '--memory-exit-code' => 25
+        ])->assertExitCode(25);
+
+        // Memory limit isn't checked until after the first job is attempted.
+        $this->assertSame(1, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
+        $this->assertFalse(SecondJob::$ran);
+    }
+
     public function testFailedJobListenerOnlyRunsOnce()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
