@@ -41,6 +41,11 @@ class FailOnExceptionMiddlewareTest extends TestCase
                 new FailOnException([InvalidArgumentException::class]),
                 false,
             ],
+            'exception is in list with closure' => [
+                TestingExceptionForMiddlewareException::class,
+                new FailOnException([LogicException::class, static fn ($throwable) => $throwable->getMessage() === 'zzz']),
+                true,
+            ],
         ];
     }
 
@@ -94,6 +99,13 @@ class FailOnExceptionMiddlewareTest extends TestCase
 
         $expectedToFail ? $job->assertFailed() : $job->assertNotFailed();
     }
+
+    public function test_cannot_construct_invariants(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Provided exceptions should be a Throwable or a callable.');
+        new FailOnException(['abc']);
+    }
 }
 
 class FailOnExceptionMiddlewareTestJob implements ShouldQueue
@@ -116,5 +128,13 @@ class FailOnExceptionMiddlewareTestJob implements ShouldQueue
     public function middleware(): array
     {
         return self::$_middleware;
+    }
+}
+
+class TestingExceptionForMiddlewareException extends \Exception {
+
+    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null)
+    {
+        parent::__construct("zzz", $code, $previous);
     }
 }
