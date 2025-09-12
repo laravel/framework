@@ -170,7 +170,7 @@ class Frame
 
         return array_map(function ($argument) {
             [$key, $value] = $argument;
-            
+
             return match ($key) {
                 'object' => "{$key}({$value})",
                 default => $key,
@@ -219,7 +219,7 @@ class Frame
         return $this->previous;
     }
 
-     /**
+    /**
      * Mark this frame as the main frame.
      *
      * @return void

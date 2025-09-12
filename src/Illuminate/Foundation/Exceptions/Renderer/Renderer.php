@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Exceptions\Renderer;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Throwable;
 
