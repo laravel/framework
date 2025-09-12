@@ -8,7 +8,7 @@ namespace Illuminate\Support\Facades;
  * @method static int defaultRouteBlockLockSeconds()
  * @method static int defaultRouteBlockWaitSeconds()
  * @method static array getSessionConfig()
- * @method static string getDefaultDriver()
+ * @method static string|null getDefaultDriver()
  * @method static void setDefaultDriver(string $name)
  * @method static mixed driver(string|null $driver = null)
  * @method static \Illuminate\Session\SessionManager extend(string $driver, \Closure $callback)
