@@ -195,7 +195,7 @@ class CallQueuedHandlerExceptionThrower
         //
     }
 
-    public function __wakeup()
+    public function __unserialize($data)
     {
         throw new ModelNotFoundException('Foo');
     }
@@ -209,7 +209,7 @@ class CallQueuedHandlerAttributeExceptionThrower
         //
     }
 
-    public function __wakeup()
+    public function __unserialize($data)
     {
         throw new ModelNotFoundException('Foo');
     }

@@ -147,11 +147,11 @@ class RateLimited
      *
      * @return array
      */
-    public function __sleep()
+    public function __serialize()
     {
         return [
-            'limiterName',
-            'shouldRelease',
+            'limiterName' => $this->limiterName,
+            'shouldRelease' => $this->shouldRelease,
         ];
     }
 
@@ -160,8 +160,13 @@ class RateLimited
      *
      * @return void
      */
-    public function __wakeup()
+    public function __unserialize($data)
     {
+        foreach ($data as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->{$property} = $value;
+            }
+        }
         $this->limiter = Container::getInstance()->make(RateLimiter::class);
     }
 }

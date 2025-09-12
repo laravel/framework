@@ -6,7 +6,7 @@ use Exception;
 
 class Unserializable
 {
-    public function __sleep()
+    public function __serialize()
     {
         throw new Exception('Not serializable');
     }
