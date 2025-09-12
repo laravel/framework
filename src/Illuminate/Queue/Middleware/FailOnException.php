@@ -47,7 +47,7 @@ class FailOnException
             $isCallable = is_callable($exception);
 
             if (! $isExceptionString && ! $isCallable) {
-                throw new LogicException('Provided callback should be an array containing only Throwable class strings or callables.');
+                throw new LogicException('Callback should be an array containing only Throwable class strings or callables.');
             }
         });
     }
@@ -67,8 +67,9 @@ class FailOnException
                         return true;
                     }
                 }
-
-                return (bool) call_user_func($exception, $throwable, $job);
+                elseif (is_callable($exception)) {
+                    return (bool) call_user_func($exception, $throwable, $job);
+                }
             }
 
             return false;

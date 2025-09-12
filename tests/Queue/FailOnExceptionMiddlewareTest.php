@@ -68,6 +68,9 @@ class FailOnExceptionMiddlewareTest extends TestCase
             ]);
             $this->fail('Did not throw exception');
         } catch (Throwable $e) {
+            if (! $e instanceof $thrown) {
+                dd($e);
+            }
             $this->assertInstanceOf($thrown, $e);
         }
 
@@ -103,7 +106,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
     public function test_cannot_construct_invariants(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Provided exceptions should be a Throwable or a callable.');
+        $this->expectExceptionMessage('Callback should be an array containing only Throwable class strings or callables.');
         new FailOnException(['abc']);
     }
 }
