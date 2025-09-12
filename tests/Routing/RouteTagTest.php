@@ -18,6 +18,7 @@ class RouteTagTest extends TestCase
         $container = new Container();
         $this->router = new Router(new Dispatcher($container), $container);
     }
+
     public function testCanAddSingleTag()
     {
         $route = new Route(['GET'], '/test', []);

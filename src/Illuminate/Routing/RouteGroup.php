@@ -28,8 +28,12 @@ class RouteGroup
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old, $prependExistingPrefix),
             'where' => static::formatWhere($new, $old),
-            'tags' => static::formatTags($new, $old),
         ]);
+
+        $tags = static::formatTags($new, $old);
+        if (! empty($tags)) {
+            $new['tags'] = $tags;
+        }
 
         return array_merge_recursive(Arr::except(
             $old, ['namespace', 'prefix', 'where', 'as', 'tags']
