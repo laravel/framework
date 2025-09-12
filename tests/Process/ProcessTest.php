@@ -783,6 +783,7 @@ class ProcessTest extends TestCase
 
         $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
             $callbackInvoked[] = $buffer;
+
             return str_contains($buffer, 'READY');
         });
 
@@ -828,6 +829,7 @@ class ProcessTest extends TestCase
 
         $result = $process->waitUntil(function ($type, $buffer) use (&$callbackCount) {
             $callbackCount++;
+
             return str_contains($buffer, 'TARGET');
         });
 
