@@ -135,11 +135,11 @@ class Frame
     }
 
     /**
-     * Get the frame's type.
+     * Get the frame's function operator.
      *
-     * @return string
+     * @return '::'|'->'|''
      */
-    public function type()
+    public function operator()
     {
         return $this->frame['type'];
     }

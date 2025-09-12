@@ -5,7 +5,7 @@
         $source = $class;
 
         if ($previous = $frame->previous()) {
-            $source .= $previous->type();
+            $source .= $previous->operator();
             $source .= $previous->callable();
             $source .= '('.implode(', ', $previous->args()).')';
         }
