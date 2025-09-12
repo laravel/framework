@@ -81,7 +81,7 @@ class ScheduleListCommand extends Command
      */
     protected function displayJson(Collection $events, DateTimeZone $timezone)
     {
-         $this->output->writeln($events->map(function ($event) use ($timezone) {
+        $this->output->writeln($events->map(function ($event) use ($timezone) {
             $nextDueDate = $this->getNextDueDateForEvent($event, $timezone);
 
             $command = $event->command ?? '';
