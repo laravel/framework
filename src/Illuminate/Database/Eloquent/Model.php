@@ -2601,7 +2601,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Prepare the object for serialization.
      *
      * @return array
-     */ 
+     */
     public function __serialize()
     {
         $this->mergeAttributesFromCachedCasts();
@@ -2618,7 +2618,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * When a model is being unserialized, check if it needs to be booted.
      *
      * @return void
-     */ 
+     */
     public function __unserialize($data)
     {
         foreach ($data as $property => $value) {
