@@ -1109,6 +1109,82 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testWhereStartsWithFiltersItemsCorrectly($collection)
+    {
+        $c = new $collection([
+            ['name' => 'Taylor'],
+            ['name' => 'Tayfun'],
+            ['name' => 'Nuno'],
+            ['name' => 'Otwell'],
+        ]);
+
+        $result = $c->whereStartsWith('name', 'Tay')->pluck('name')->all();
+
+        $this->assertSame(['Taylor', 'Tayfun'], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testWhereEndsWithFiltersItemsCorrectly($collection)
+    {
+        $c = new $collection([
+            ['email' => 'taylor@example.com'],
+            ['email' => 'nuno@test.org'],
+            ['email' => 'support@example.com'],
+        ]);
+
+        $result = $c->whereEndsWith('email', '@example.com')->pluck('email')->all();
+
+        $this->assertSame(['taylor@example.com', 'support@example.com'], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testWhereContainsFiltersItemsCorrectly($collection)
+    {
+        $c = new $collection([
+            ['title' => 'Laravel Framework'],
+            ['title' => 'Symfony Components'],
+            ['title' => 'Livewire for Laravel'],
+        ]);
+
+        $result = $c->whereContains('title', 'Laravel')->pluck('title')->all();
+
+        $this->assertSame(['Laravel Framework', 'Livewire for Laravel'], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testStringBasedWhereFiltersReturnEmptyWhenNoMatch($collection)
+    {
+        $c = new $collection([
+            ['city' => 'Cairo'],
+            ['city' => 'Alexandria'],
+        ]);
+
+        $this->assertSame([], $c->whereStartsWith('city', 'Z')->all());
+        $this->assertSame([], $c->whereEndsWith('city', 'land')->all());
+        $this->assertSame([], $c->whereContains('city', 'zzz')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testCanChainStringFilters($collection)
+    {
+        $c = new $collection([
+            ['value' => 'Laravel 11.x'],
+            ['value' => 'Laravel 10.x'],
+            ['value' => 'Symfony'],
+            ['value' => 'Livewire for Laravel'],
+        ]);
+
+        $result = $c
+            ->whereStartsWith('value', 'Laravel')
+            ->whereEndsWith('value', '.x')
+            ->whereContains('value', '11')
+            ->pluck('value')
+            ->all();
+
+        $this->assertSame(['Laravel 11.x'], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testWhereIn($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);

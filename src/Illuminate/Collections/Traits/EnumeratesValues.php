@@ -768,6 +768,54 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where the value for the given key starts with a string.
+     *
+     * @param  string  $key
+     * @param  string  $needle
+     * @return static
+     */
+    public function whereStartsWith(string $key, string $needle)
+    {
+        return $this->filter(function ($item) use ($key, $needle) {
+            $value = data_get($item, $key);
+
+            return is_string($value) && str_starts_with($value, $needle);
+        });
+    }
+
+    /**
+     * Filter items where the value for the given key ends with a string.
+     *
+     * @param  string  $key
+     * @param  string  $needle
+     * @return static
+     */
+    public function whereEndsWith(string $key, string $needle)
+    {
+        return $this->filter(function ($item) use ($key, $needle) {
+            $value = data_get($item, $key);
+
+            return is_string($value) && str_ends_with($value, $needle);
+        });
+    }
+
+    /**
+     * Filter items where the value for the given key contains a string.
+     *
+     * @param  string  $key
+     * @param  string  $needle
+     * @return static
+     */
+    public function whereContains(string $key, string $needle)
+    {
+        return $this->filter(function ($item) use ($key, $needle) {
+            $value = data_get($item, $key);
+
+            return is_string($value) && str_contains($value, $needle);
+        });
+    }
+
+    /**
      * Pass the collection to the given callback and return the result.
      *
      * @template TPipeReturnType
