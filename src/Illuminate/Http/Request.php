@@ -425,13 +425,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function json($key = null, $default = null)
     {
         if (! isset($this->json)) {
-            $this->json = new InputBag((array) json_decode($this->getContent() ?: '[]', true));
+            $content = $this->getContent() ?: '[]';
+            $decoded = json_decode($content, true);
+            
+            // Check for JSON parsing errors
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException(
+                    'Invalid JSON in request body: ' . json_last_error_msg()
+                );
+            }
+            
+            $this->json = new InputBag((array) $decoded);
         }
-
+    
         if (is_null($key)) {
             return $this->json;
         }
-
+    
         return data_get($this->json->all(), $key, $default);
     }
 
