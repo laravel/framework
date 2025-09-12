@@ -1,8 +1,10 @@
 @props(['frame'])
 
-<div class="flex h-11 items-center justify-between gap-6 px-3 overflow-x-auto">
+<div class="grid gap-3 p-4 bg-neutral-50 dark:bg-transparent overflow-x-auto rounded-lg">
     @if($frame->previous())
-        <x-laravel-exceptions-renderer::formatted-source :$frame className="text-xs" />
+        <div class="flex">
+            <x-laravel-exceptions-renderer::formatted-source :$frame className="text-xs" />
+        </div>
     @else
         <span class="font-mono text-xs leading-3 text-neutral-500">Entrypoint</span>
     @endif

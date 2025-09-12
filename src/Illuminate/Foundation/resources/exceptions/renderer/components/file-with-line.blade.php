@@ -1,4 +1,4 @@
-@props(['frame'])
+@props(['frame', 'direction' => 'ltr'])
 
 @php
     $file = $frame->file();
@@ -6,8 +6,8 @@
 @endphp
 
 <div
-    {{ $attributes->merge(['class' => 'truncate font-mono text-xs text-neutral-700 dark:text-neutral-300']) }}
-    dir="rtl"
+    {{ $attributes->merge(['class' => 'truncate font-mono text-xs text-neutral-500 dark:text-neutral-400']) }}
+    dir="{{ $direction }}"
 >
     <span data-tippy-content="{{ $file }}:{{ $line }}">
         @if (config('app.editor'))

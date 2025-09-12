@@ -18,6 +18,6 @@
     :code="$source"
     grammar="php"
     truncate
-    class="text-xs"
+    class="text-xs min-w-0"
     data-tippy-content="{{ $source }}"
 />

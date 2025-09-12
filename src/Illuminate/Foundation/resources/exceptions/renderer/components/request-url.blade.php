@@ -13,7 +13,7 @@
             }
         }
     }"
-    class="backdrop-blur-[6px] bg-white dark:bg-white/[4%] border border-neutral-200 dark:border-white/10 rounded-lg flex items-center justify-between p-2 shadow-sm"
+    class="bg-white dark:bg-white/[4%] border border-neutral-200 dark:border-white/10 rounded-lg flex items-center justify-between p-2 shadow-sm"
 >
     <div class="flex items-center gap-3 w-full">
         <x-laravel-exceptions-renderer::badge type="error" variant="solid">

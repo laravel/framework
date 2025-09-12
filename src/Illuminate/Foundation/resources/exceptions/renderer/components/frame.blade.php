@@ -24,7 +24,7 @@
 
         <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
             <x-laravel-exceptions-renderer::formatted-source :$frame />
-            <x-laravel-exceptions-renderer::file-with-line :$frame />
+            <x-laravel-exceptions-renderer::file-with-line :$frame direction="rtl" />
         </div>
 
         <div class="flex-shrink-0">
