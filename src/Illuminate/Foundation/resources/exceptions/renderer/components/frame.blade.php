@@ -9,11 +9,11 @@
     :class="expanded ? 'dark:border-white/10' : 'dark:border-white/5'"
 >
     <div
-        class="flex h-11 items-center gap-3 bg-white rounded-lg pr-2.5 pl-4 overflow-x-auto dark:bg-white/3"
+        class="flex h-11 items-center gap-3 bg-white pr-2.5 pl-4 overflow-x-auto dark:bg-white/3"
         :class="{
             'cursor-pointer hover:bg-white/50 dark:hover:bg-white/5 hover:[&_svg]:stroke-emerald-500': hasCode,
-            'dark:bg-white/5': expanded,
-            'dark:bg-white/3': !expanded
+            'dark:bg-white/5 rounded-t-lg': expanded,
+            'dark:bg-white/3 rounded-lg': !expanded
         }"
         @click="hasCode && (expanded = !expanded)"
     >
