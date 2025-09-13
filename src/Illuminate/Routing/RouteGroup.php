@@ -30,8 +30,13 @@ class RouteGroup
             'where' => static::formatWhere($new, $old),
         ]);
 
+        $tags = static::formatTags($new, $old);
+        if (! empty($tags)) {
+            $new['tags'] = $tags;
+        }
+
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'where', 'as', 'tags']
         ), $new);
     }
 
@@ -101,5 +106,20 @@ class RouteGroup
         }
 
         return $new;
+    }
+
+    /**
+     * Format the tags for the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return array
+     */
+    protected static function formatTags($new, $old)
+    {
+        $oldTags = $old['tags'] ?? [];
+        $newTags = $new['tags'] ?? [];
+
+        return array_unique(array_merge($oldTags, $newTags));
     }
 }

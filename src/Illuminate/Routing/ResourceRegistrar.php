@@ -656,6 +656,10 @@ class ResourceRegistrar
             $action['missing'] = $options['missing'];
         }
 
+        if (isset($options['tags'])) {
+            $action['tags'] = $options['tags'];
+        }
+
         return $action;
     }
 

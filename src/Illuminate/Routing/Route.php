@@ -158,6 +158,13 @@ class Route
     protected $bindingFields = [];
 
     /**
+     * The tags assigned to the route.
+     *
+     * @var array
+     */
+    protected $tags = [];
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -175,7 +182,14 @@ class Route
     {
         $this->uri = $uri;
         $this->methods = (array) $methods;
-        $this->action = Arr::except($this->parseAction($action), ['prefix']);
+
+        $parsedAction = $this->parseAction($action);
+
+        if (isset($parsedAction['tags'])) {
+            $this->tags = (array) $parsedAction['tags'];
+        }
+
+        $this->action = Arr::except($parsedAction, ['prefix', 'tags']);
 
         if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
@@ -1007,6 +1021,10 @@ class Route
             $this->domain($this->action['domain']);
         }
 
+        if (isset($action['tags'])) {
+            $this->tags = array_unique(array_merge($this->tags, (array) $action['tags']));
+        }
+
         return $this;
     }
 
@@ -1270,6 +1288,92 @@ class Route
     public function waitsFor()
     {
         return $this->waitSeconds;
+    }
+
+    /**
+     * Add a tag to the route.
+     *
+     * @param  string  $tag
+     * @return $this
+     */
+    public function tag(string $tag)
+    {
+        if (! in_array($tag, $this->tags, true)) {
+            $this->tags[] = $tag;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add multiple tags to the route.
+     *
+     * @param  array  $tags
+     * @return $this
+     */
+    public function tags(array $tags)
+    {
+        foreach ($tags as $tag) {
+            $this->tag($tag);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine if the route has a given tag.
+     *
+     * @param  string  $tag
+     * @return bool
+     */
+    public function hasTag(string $tag)
+    {
+        return in_array($tag, $this->tags, true);
+    }
+
+    /**
+     * Determine if the route has any of the given tags.
+     *
+     * @param  array  $tags
+     * @return bool
+     */
+    public function hasAnyTag(array $tags)
+    {
+        return ! empty(array_intersect($this->tags, $tags));
+    }
+
+    /**
+     * Determine if the route has all of the given tags.
+     *
+     * @param  array  $tags
+     * @return bool
+     */
+    public function hasAllTags(array $tags)
+    {
+        return empty(array_diff($tags, $this->tags));
+    }
+
+    /**
+     * Get all tags assigned to the route.
+     *
+     * @return array
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Remove a tag from the route.
+     *
+     * @param  string  $tag
+     * @return $this
+     */
+    public function withoutTag(string $tag)
+    {
+        $this->tags = array_values(array_filter($this->tags, fn ($t) => $t !== $tag));
+
+        return $this;
     }
 
     /**
