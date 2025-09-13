@@ -697,6 +697,8 @@ class SupportStrTest extends TestCase
 
         $this->assertFalse(Str::isEmail('foo-bar'));
 
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com'));
+
         $this->assertTrue(Str::isEmail('foo@bar.com', strict: true));
 
         $this->assertFalse(Str::isEmail('test@example.com', dns: true));

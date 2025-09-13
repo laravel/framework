@@ -712,8 +712,7 @@ class Str
                     ->filter(fn ($class) => is_string($class) && class_exists($class))
                     ->map(fn ($class) => Container::getInstance()->make($class))
             )
-            ->unique()
-            ->values();
+            ->unique();
 
         if ($validations->isEmpty()) {
             $validations->push(new RFCValidation());

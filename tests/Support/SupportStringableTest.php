@@ -70,6 +70,8 @@ class SupportStringableTest extends TestCase
 
         $this->assertFalse($this->stringable('foo-bar')->isEmail());
 
+        $this->assertFalse($this->stringable('test👨‍💻@domain.com')->isEmail());
+
         $this->assertTrue($this->stringable('foo@bar.com')->isEmail(strict: true));
 
         $this->assertFalse($this->stringable('test@example.com')->isEmail(dns: true));
