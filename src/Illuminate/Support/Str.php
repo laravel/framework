@@ -3,7 +3,15 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
+use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Concerns\FilterEmailValidation;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -677,6 +685,44 @@ class Str
         }
 
         return Ulid::isValid($value);
+    }
+
+    /**
+     * Determine if the given value is a valid email.
+     *
+     * @param  class-string[]  $customValidations
+     */
+    public static function isEmail(
+        \Stringable|string $value,
+        bool $rfc = false,
+        bool $strict = false,
+        bool $dns = false,
+        bool $spoof = false,
+        bool $filter = false,
+        bool $filterUnicode = false,
+        array $customValidations = [],
+    ): bool {
+        $validations = (new Collection())
+            ->when($rfc, fn (Collection $collection) => $collection->push(new RFCValidation()))
+            ->when($strict, fn (Collection $collection) => $collection->push(new NoRFCWarningsValidation()))
+            ->when($dns, fn (Collection $collection) => $collection->push(new DNSCheckValidation()))
+            ->when($spoof, fn (Collection $collection) => $collection->push(new SpoofCheckValidation()))
+            ->when($filter, fn (Collection $collection) => $collection->push(new FilterEmailValidation()))
+            ->when($filterUnicode, fn (Collection $collection) => $collection->push(FilterEmailValidation::unicode()))
+            ->merge(
+                (new Collection($customValidations))
+                    ->filter(fn ($class) => is_string($class) && class_exists($class))
+                    ->map(fn ($class) => Container::getInstance()->make($class))
+            )
+            ->unique();
+
+        if ($validations->isEmpty()) {
+            $validations->push(new RFCValidation());
+        }
+
+        $emailValidator = Container::getInstance()->make(EmailValidator::class);
+
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations->all()));
     }
 
     /**
