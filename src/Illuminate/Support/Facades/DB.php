@@ -114,6 +114,14 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void rollBack(int|null $toLevel = null)
  * @method static int transactionLevel()
  * @method static void afterCommit(callable $callback)
+ * @method static mixed savepoint(string $name, callable|null $callback = null)
+ * @method static void rollbackToSavepoint(string $name)
+ * @method static void releaseSavepoint(string $name, int|null $level = null)
+ * @method static void purgeSavepoints(int|null $level = null)
+ * @method static array getSavepoints()
+ * @method static string|null getCurrentSavepoint()
+ * @method static bool supportsSavepoints()
+ * @method static bool supportsSavepointRelease()
  *
  * @see \Illuminate\Database\DatabaseManager
  */

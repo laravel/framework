@@ -141,7 +141,7 @@ trait RefreshDatabase
                     RefreshDatabaseState::$migrated = false;
                 }
 
-                $connection->rollBack();
+                $connection->rollbackTransaction();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
             }
