@@ -178,7 +178,6 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
-
     }
 
     public function testFailedJobListenerOnlyRunsOnce()
