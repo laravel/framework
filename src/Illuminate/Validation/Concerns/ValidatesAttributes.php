@@ -936,6 +936,7 @@ trait ValidatesAttributes
 
         return Str::isEmail(
             $value,
+            $validations->containsStrict('rfc'),
             $validations->containsStrict('strict'),
             $validations->containsStrict('dns'),
             $validations->containsStrict('spoof'),
@@ -943,7 +944,7 @@ trait ValidatesAttributes
             $validations->containsStrict('filter_unicode'),
             $validations
                 ->reject(fn ($param) => in_array($param, [
-                    'strict', 'dns', 'spoof', 'filter', 'filter_unicode',
+                    'rfc', 'strict', 'dns', 'spoof', 'filter', 'filter_unicode',
                 ], true))
                 ->filter(fn ($class) => is_string($class) && class_exists($class))
                 ->values()

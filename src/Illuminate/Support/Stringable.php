@@ -417,6 +417,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  class-string[]  $customValidations
      */
     public function isEmail(
+        bool $rfc = false,
         bool $strict = false,
         bool $dns = false,
         bool $spoof = false,
@@ -424,7 +425,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         bool $filterUnicode = false,
         array $customValidations = [],
     ): bool {
-        return Str::isEmail($this, $strict, $dns, $spoof, $filter, $filterUnicode, $customValidations);
+        return Str::isEmail($this, $rfc, $strict, $dns, $spoof, $filter, $filterUnicode, $customValidations);
     }
 
     /**

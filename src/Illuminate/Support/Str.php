@@ -694,6 +694,7 @@ class Str
      */
     public static function isEmail(
         \Stringable|string $value,
+        bool $rfc = false,
         bool $strict = false,
         bool $dns = false,
         bool $spoof = false,
@@ -702,6 +703,7 @@ class Str
         array $customValidations = [],
     ): bool {
         $validations = (new Collection())
+            ->when($rfc, fn (Collection $collection) => $collection->push(new RFCValidation()))
             ->when($strict, fn (Collection $collection) => $collection->push(new NoRFCWarningsValidation()))
             ->when($dns, fn (Collection $collection) => $collection->push(new DNSCheckValidation()))
             ->when($spoof, fn (Collection $collection) => $collection->push(new SpoofCheckValidation()))

@@ -72,6 +72,8 @@ class SupportStringableTest extends TestCase
 
         $this->assertFalse($this->stringable('test👨‍💻@domain.com')->isEmail());
 
+        $this->assertFalse($this->stringable('test👨‍💻@domain.com')->isEmail(rfc: true));
+
         $this->assertTrue($this->stringable('foo@bar.com')->isEmail(strict: true));
 
         $this->assertFalse($this->stringable('test@example.com')->isEmail(dns: true));
@@ -85,6 +87,8 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('unicode@xn--r8jz45g.xn--zckzah')->isEmail(filterUnicode: true));
 
         $this->assertTrue($this->stringable('foo@bar.com')->isEmail(customValidations: ['NonExistentClass']));
+
+        $this->assertFalse($this->stringable('test👨‍💻@domain.com')->isEmail(rfc: true, spoof: true));
 
         $this->assertFalse($this->stringable()->isEmail());
     }

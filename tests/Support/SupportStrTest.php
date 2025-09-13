@@ -699,6 +699,8 @@ class SupportStrTest extends TestCase
 
         $this->assertFalse(Str::isEmail('test👨‍💻@domain.com'));
 
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com', rfc: true));
+
         $this->assertTrue(Str::isEmail('foo@bar.com', strict: true));
 
         $this->assertFalse(Str::isEmail('test@example.com', dns: true));
@@ -714,6 +716,8 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isEmail(new Stringable('foo@bar.com')));
 
         $this->assertTrue(Str::isEmail('foo@bar.com', customValidations: ['NonExistentClass']));
+
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com', rfc: true, spoof: true));
 
         $this->assertFalse(Str::isEmail(''));
     }
