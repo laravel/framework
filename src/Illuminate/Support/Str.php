@@ -690,9 +690,8 @@ class Str
     /**
      * Determine if the given value is a valid email.
      *
-     * @param  mixed $value
+     * @param  mixed  $value
      * @param  array<int, int|string>  $parameters
-     *
      * @return bool
      */
     public static function isEmail($value, $parameters = [])
@@ -709,7 +708,7 @@ class Str
                 $validation === 'spoof' => new SpoofCheckValidation(),
                 $validation === 'filter' => new FilterEmailValidation(),
                 $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
-                is_string($validation) && class_exists($validation) => $this->container->make($validation),
+                is_string($validation) && class_exists($validation) => Container::getInstance()->make($validation),
                 default => new RFCValidation(),
             })
             ->values()
