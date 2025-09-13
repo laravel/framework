@@ -11,6 +11,7 @@ use DateTimeZone;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -927,7 +928,27 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value, $parameters)
     {
-        return Str::isEmail($value, $parameters);
+        $validations = new Collection($parameters);
+
+        if (! (is_string($value) || $value instanceof \Stringable)) {
+            return false;
+        }
+
+        return Str::isEmail(
+            $value,
+            $validations->containsStrict('strict'),
+            $validations->containsStrict('dns'),
+            $validations->containsStrict('spoof'),
+            $validations->containsStrict('filter'),
+            $validations->containsStrict('filter_unicode'),
+            $validations
+                ->reject(fn ($param) => in_array($param, [
+                    'strict', 'dns', 'spoof', 'filter', 'filter_unicode',
+                ], true))
+                ->filter(fn ($class) => is_string($class) && class_exists($class))
+                ->values()
+                ->all(),
+        );
     }
 
     /**

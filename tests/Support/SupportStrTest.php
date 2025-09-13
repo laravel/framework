@@ -697,35 +697,23 @@ class SupportStrTest extends TestCase
 
         $this->assertFalse(Str::isEmail('foo-bar'));
 
-        $this->assertTrue(Str::isEmail('foo@bar.com', ['strict']));
+        $this->assertTrue(Str::isEmail('foo@bar.com', strict: true));
 
-        $this->assertTrue(Str::isEmail('taylor@laravel.com', ['dns']));
+        $this->assertFalse(Str::isEmail('test@example.com', dns: true));
 
-        $this->assertTrue(Str::isEmail('foo@bar.com', ['spoof']));
+        $this->assertTrue(Str::isEmail('taylor@laravel.com', dns: true));
 
-        $this->assertTrue(Str::isEmail('foo@bar.com', ['filter']));
+        $this->assertTrue(Str::isEmail('foo@bar.com', spoof: true));
 
-        $this->assertTrue(Str::isEmail('unicode@xn--r8jz45g.xn--zckzah', ['filter_unicode']));
+        $this->assertTrue(Str::isEmail('foo@bar.com', filter: true));
+
+        $this->assertTrue(Str::isEmail('unicode@xn--r8jz45g.xn--zckzah', filterUnicode: true));
 
         $this->assertTrue(Str::isEmail(new Stringable('foo@bar.com')));
 
-        $this->assertFalse(Str::isEmail(new \stdClass));
-
-        $this->assertFalse(Str::isEmail(['foo@bar.com']));
-
-        $this->assertTrue(Str::isEmail('support@laravel.com', ['strict', 'strict', 'dns', 'dns']));
-
-        $this->assertTrue(Str::isEmail('foo@bar.com', ['NonExistentClass']));
+        $this->assertTrue(Str::isEmail('foo@bar.com', customValidations: ['NonExistentClass']));
 
         $this->assertFalse(Str::isEmail(''));
-
-        $this->assertFalse(Str::isEmail(null));
-
-        $this->assertFalse(Str::isEmail(12345));
-
-        $this->assertFalse(Str::isEmail(123.45));
-
-        $this->assertFalse(Str::isEmail(true));
     }
 
     public function testIsJson()

@@ -690,33 +690,38 @@ class Str
     /**
      * Determine if the given value is a valid email.
      *
-     * @param  mixed  $value
-     * @param  array<int, int|string>  $parameters
-     * @return bool
+     * @param  class-string[]  $customValidations
      */
-    public static function isEmail($value, $parameters = [])
-    {
-        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
-            return false;
-        }
-
-        $validations = (new Collection($parameters))
+    public static function isEmail(
+        \Stringable|string $value,
+        bool $strict = false,
+        bool $dns = false,
+        bool $spoof = false,
+        bool $filter = false,
+        bool $filterUnicode = false,
+        array $customValidations = [],
+    ): bool {
+        $validations = (new Collection())
+            ->when($strict, fn (Collection $collection) => $collection->push(new NoRFCWarningsValidation()))
+            ->when($dns, fn (Collection $collection) => $collection->push(new DNSCheckValidation()))
+            ->when($spoof, fn (Collection $collection) => $collection->push(new SpoofCheckValidation()))
+            ->when($filter, fn (Collection $collection) => $collection->push(new FilterEmailValidation()))
+            ->when($filterUnicode, fn (Collection $collection) => $collection->push(FilterEmailValidation::unicode()))
+            ->merge(
+                (new Collection($customValidations))
+                    ->filter(fn ($class) => is_string($class) && class_exists($class))
+                    ->map(fn ($class) => Container::getInstance()->make($class))
+            )
             ->unique()
-            ->map(fn ($validation) => match (true) {
-                $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
-                $validation === 'spoof' => new SpoofCheckValidation(),
-                $validation === 'filter' => new FilterEmailValidation(),
-                $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
-                is_string($validation) && class_exists($validation) => Container::getInstance()->make($validation),
-                default => new RFCValidation(),
-            })
-            ->values()
-            ->all() ?: [new RFCValidation];
+            ->values();
+
+        if ($validations->isEmpty()) {
+            $validations->push(new RFCValidation());
+        }
 
         $emailValidator = Container::getInstance()->make(EmailValidator::class);
 
-        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations->all()));
     }
 
     /**

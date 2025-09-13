@@ -414,12 +414,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Determine if the given value is a valid email.
      *
-     * @param  array<int, int|string>  $parameters
-     * @return bool
+     * @param  class-string[]  $customValidations
      */
-    public function isEmail($parameters = [])
-    {
-        return Str::isEmail($this->value, $parameters);
+    public function isEmail(
+        bool $strict = false,
+        bool $dns = false,
+        bool $spoof = false,
+        bool $filter = false,
+        bool $filterUnicode = false,
+        array $customValidations = [],
+    ): bool {
+        return Str::isEmail($this, $strict, $dns, $spoof, $filter, $filterUnicode, $customValidations);
     }
 
     /**
