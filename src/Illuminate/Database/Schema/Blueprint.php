@@ -3,12 +3,15 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use Illuminate\Contracts\Database\Query\Expression as ExpressionContract;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
+use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
@@ -193,6 +196,7 @@ class Blueprint
     protected function addImpliedCommands()
     {
         $this->addFluentIndexes();
+        $this->addFluentCheckConstraints();
         $this->addFluentCommands();
 
         if (! $this->creating()) {
@@ -252,6 +256,36 @@ class Blueprint
 
                     continue 2;
                 }
+            }
+        }
+    }
+
+    /**
+     * Add the check constraint commands fluently specified on columns.
+     *
+     * @return void
+     */
+    protected function addFluentCheckConstraints()
+    {
+        foreach ($this->columns as $column) {
+            if ($column->type === 'enum' && (
+                $this->grammar instanceof PostgresGrammar ||
+                $this->grammar instanceof SQLiteGrammar ||
+                $this->grammar instanceof SqlServerGrammar
+            )) {
+                $column->check = sprintf('%s in (%s)',
+                    $this->grammar->wrap($column->name),
+                    $this->grammar->quoteString($column->allowed)
+                );
+            }
+
+            if ($column->check) {
+                $this->check(
+                    $column->check,
+                    $this->createIndexName('check', [$column->name])
+                );
+
+                $column->check = null;
             }
         }
     }
@@ -541,6 +575,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given check constraint should be dropped.
+     *
+     * @param  string|string[]  $nameOrColumns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropCheck(string|array $nameOrColumns): Fluent
+    {
+        return $this->addCommand('dropCheck', [(is_array($nameOrColumns) ? 'columns' : 'constraint') => $nameOrColumns]);
+    }
+
+    /**
      * Indicate that the given indexes should be renamed.
      *
      * @param  string  $from
@@ -722,6 +767,22 @@ class Blueprint
         $this->commands[count($this->commands) - 1] = $command;
 
         return $command;
+    }
+
+    /**
+     * Specify a check constraint for the table.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $expression
+     * @param  string|string[]|null  $nameOrColumns
+     * @return \Illuminate\Support\Fluent
+     */
+    public function check(ExpressionContract|string $expression, string|array|null $nameOrColumns = null): Fluent
+    {
+        if (is_array($nameOrColumns)) {
+            $nameOrColumns = $this->createIndexName('check', $nameOrColumns);
+        }
+
+        return $this->addCommand('check', ['expression' => $expression, 'constraint' => $nameOrColumns]);
     }
 
     /**

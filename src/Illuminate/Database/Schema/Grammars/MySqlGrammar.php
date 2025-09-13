@@ -200,6 +200,32 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine the check constraints.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileCheckConstraints($schema, $table)
+    {
+        return sprintf(
+            'select cc.constraint_name as `name`, '
+            .'group_concat(c.column_name order by c.ordinal_position) as `columns`, '
+            .'cc.check_clause as `definition` '
+            .'from information_schema.check_constraints cc join information_schema.table_constraints tc '
+            .'on tc.constraint_schema = cc.constraint_schema and tc.constraint_name = cc.constraint_name '
+            .'left join information_schema.columns c on tc.table_schema = c.table_schema and tc.table_name = c.table_name '
+            ."where tc.table_schema = %s and tc.table_name = %s and tc.constraint_type = 'CHECK' "
+            ."and cc.check_clause like concat('%%`', c.column_name, '`%%') "
+            .'group by cc.constraint_name, cc.check_clause',
+            $schema ? $this->quoteString($schema) : 'schema()',
+            $this->quoteString($table)
+        );
+    }
+
+    /**
      * Compile a create table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
