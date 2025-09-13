@@ -16,6 +16,7 @@ trait ResolvesDumpSource
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
         'idea' => 'idea://open?file={file}&line={line}',
+        'jetbrains-phpstorm' => 'jetbrains://php-storm/navigate/reference?project={project}&path={file}:{line}',
         'macvim' => 'mvim://open/?url=file://{file}&line={line}',
         'netbeans' => 'netbeans://open/?f={file}:{line}',
         'nova' => 'nova://core/open/file?filename={file}&line={line}',
@@ -158,12 +159,28 @@ trait ResolvesDumpSource
             return;
         }
 
+        $editorName = $editor['name'] ?? $editor;
+
         $href = is_array($editor) && isset($editor['href'])
             ? $editor['href']
-            : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
+            : ($this->editorHrefs[$editorName] ?? sprintf('%s://open?file={file}&line={line}', $editorName));
 
         if ($basePath = $editor['base_path'] ?? false) {
             $file = str_replace($this->basePath, $basePath, $file);
+        }
+
+        $project = $editor['project'] ?? null;
+
+        if(in_array($editorName, ['jetbrains-phpstorm']) && empty($project)){
+            $project = basename($this->basePath);
+        }
+
+        if ($project) {
+            $href = str_replace('{project}', $project, $href);
+        }
+
+        if(in_array($editorName, ['jetbrains-phpstorm'])){
+            $file = str_replace($this->basePath, '', $file);
         }
 
         return str_replace(
