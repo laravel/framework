@@ -87,17 +87,13 @@ class Exception
     }
 
     /**
-     * Get the first "non-vendor" frame index.
+     * Get the exception code.
      *
-     * @return int
+     * @return int|string
      */
-    public function defaultFrame()
+    public function code()
     {
-        $key = array_search(false, array_map(function (Frame $frame) {
-            return $frame->isFromVendor();
-        }, $this->frames()->all()));
-
-        return $key === false ? 0 : $key;
+        return $this->exception->getCode();
     }
 
     /**
@@ -120,9 +116,50 @@ class Exception
             array_shift($trace);
         }
 
-        return new Collection(array_map(
-            fn (array $trace) => new Frame($this->exception, $classMap, $trace, $this->basePath), $trace,
-        ));
+        $frames = [];
+        $previousFrame = null;
+
+        foreach (array_reverse($trace) as $frameData) {
+            $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
+            $frames[] = $frame;
+            $previousFrame = $frame;
+        }
+
+        $frames = array_reverse($frames);
+
+        foreach ($frames as $frame) {
+            if (! $frame->isFromVendor()) {
+                $frame->markAsMain();
+                break;
+            }
+        }
+
+        return new Collection($frames);
+    }
+
+    /**
+     * Get the exception's frames grouped by vendor status.
+     *
+     * @return array<int, array{is_vendor: bool, frames: array<int, Frame>}>
+     */
+    public function frameGroups()
+    {
+        $groups = [];
+
+        foreach ($this->frames() as $frame) {
+            $isVendor = $frame->isFromVendor();
+
+            if (empty($groups) || $groups[array_key_last($groups)]['is_vendor'] !== $isVendor) {
+                $groups[] = [
+                    'is_vendor' => $isVendor,
+                    'frames' => [],
+                ];
+            }
+
+            $groups[array_key_last($groups)]['frames'][] = $frame;
+        }
+
+        return $groups;
     }
 
     /**
