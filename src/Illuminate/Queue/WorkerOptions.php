@@ -116,7 +116,7 @@ class WorkerOptions
         $maxJobs = 0,
         $maxTime = 0,
         $rest = 0,
-        $memoryExitCode = 12,
+        $memoryExitCode = Worker::EXIT_MEMORY_LIMIT,
     ) {
         $this->name = $name;
         $this->backoff = $backoff;
