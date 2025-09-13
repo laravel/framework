@@ -78,7 +78,7 @@ class ChannelListCommand extends Command
             return mb_strlen($channelName);
         });
 
-        $terminalWidth = $this->getTerminalWidth();
+        $terminalWidth = static::getTerminalWidth();
 
         $channelCount = $this->determineChannelCountOutput($channels, $terminalWidth);
 

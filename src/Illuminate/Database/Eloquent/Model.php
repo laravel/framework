@@ -1766,7 +1766,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function callNamedScope($scope, array $parameters = [])
     {
-        if ($this->isScopeMethodWithAttribute($scope)) {
+        if (static::isScopeMethodWithAttribute($scope)) {
             return $this->{$scope}(...$parameters);
         }
 
