@@ -177,7 +177,7 @@ class WorkCommandTest extends QueueTestCase
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(1, Queue::size());
         $this->assertTrue(FirstJob::$ran);
-        $this->assertFalse(SecondJob::$ran);
+        $this->assertFalse(SecondJob::$ra);
     }
 
     public function testFailedJobListenerOnlyRunsOnce()
