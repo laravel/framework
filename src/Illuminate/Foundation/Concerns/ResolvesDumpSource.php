@@ -171,7 +171,7 @@ trait ResolvesDumpSource
 
         $project = $editor['project'] ?? null;
 
-        if (in_array($editorName, ['jetbrains-phpstorm']) && empty($project)){
+        if (in_array($editorName, ['jetbrains-phpstorm']) && empty($project)) {
             $project = basename($this->basePath);
         }
 
@@ -179,7 +179,7 @@ trait ResolvesDumpSource
             $href = str_replace('{project}', $project, $href);
         }
 
-        if (in_array($editorName, ['jetbrains-phpstorm'])){
+        if (in_array($editorName, ['jetbrains-phpstorm'])) {
             $file = str_replace($this->basePath, '', $file);
         }
 
