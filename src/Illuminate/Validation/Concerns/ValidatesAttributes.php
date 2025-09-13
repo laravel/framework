@@ -8,17 +8,9 @@ use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
-use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
-use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
-use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
@@ -935,27 +927,7 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
-            return false;
-        }
-
-        $validations = (new Collection($parameters))
-            ->unique()
-            ->map(fn ($validation) => match (true) {
-                $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
-                $validation === 'spoof' => new SpoofCheckValidation(),
-                $validation === 'filter' => new FilterEmailValidation(),
-                $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
-                is_string($validation) && class_exists($validation) => $this->container->make($validation),
-                default => new RFCValidation(),
-            })
-            ->values()
-            ->all() ?: [new RFCValidation];
-
-        $emailValidator = Container::getInstance()->make(EmailValidator::class);
-
-        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
+        return Str::isEmail($value, $parameters);
     }
 
     /**

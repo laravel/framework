@@ -3,7 +3,15 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Egulias\EmailValidator\EmailValidator;
+use Egulias\EmailValidator\Validation\DNSCheckValidation;
+use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
+use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
+use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
+use Egulias\EmailValidator\Validation\RFCValidation;
+use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Validation\Concerns\FilterEmailValidation;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -677,6 +685,39 @@ class Str
         }
 
         return Ulid::isValid($value);
+    }
+
+    /**
+     * Determine if the given value is a valid email.
+     *
+     * @param  mixed $value
+     * @param  array<int, int|string>  $parameters
+     *
+     * @return bool
+     */
+    public static function isEmail($value, $parameters = [])
+    {
+        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+            return false;
+        }
+
+        $validations = (new Collection($parameters))
+            ->unique()
+            ->map(fn ($validation) => match (true) {
+                $validation === 'strict' => new NoRFCWarningsValidation(),
+                $validation === 'dns' => new DNSCheckValidation(),
+                $validation === 'spoof' => new SpoofCheckValidation(),
+                $validation === 'filter' => new FilterEmailValidation(),
+                $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
+                is_string($validation) && class_exists($validation) => $this->container->make($validation),
+                default => new RFCValidation(),
+            })
+            ->values()
+            ->all() ?: [new RFCValidation];
+
+        $emailValidator = Container::getInstance()->make(EmailValidator::class);
+
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
     }
 
     /**

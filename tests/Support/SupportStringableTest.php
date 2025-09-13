@@ -64,6 +64,29 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('01GJSNW9MAF-792C0XYY8RX6ssssss-QFT')->isUlid());
     }
 
+    public function testIsEmail(): void
+    {
+        $this->assertTrue($this->stringable('foo@bar.com')->isEmail());
+
+        $this->assertFalse($this->stringable('foo-bar')->isEmail());
+
+        $this->assertTrue($this->stringable('foo@bar.com')->isEmail(['strict']));
+
+        $this->assertTrue($this->stringable('taylor@laravel.com')->isEmail(['dns']));
+
+        $this->assertTrue($this->stringable('foo@bar.com')->isEmail(['spoof']));
+
+        $this->assertTrue($this->stringable('foo@bar.com')->isEmail(['filter']));
+
+        $this->assertTrue($this->stringable('unicode@xn--r8jz45g.xn--zckzah')->isEmail(['filter_unicode']));
+
+        $this->assertTrue($this->stringable('support@laravel.com')->isEmail(['strict', 'strict', 'dns', 'dns']));
+
+        $this->assertTrue($this->stringable('foo@bar.com')->isEmail(['NonExistentClass']));
+
+        $this->assertFalse($this->stringable()->isEmail());
+    }
+
     public function testIsJson()
     {
         $this->assertTrue($this->stringable('1')->isJson());
