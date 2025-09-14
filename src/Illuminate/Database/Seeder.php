@@ -50,7 +50,7 @@ abstract class Seeder
             $name = get_class($seeder);
 
             if ($silent === false && isset($this->command)) {
-                with(new TwoColumnDetail($this->command->getOutput()))->render(
+                (new TwoColumnDetail($this->command->getOutput()))->render(
                     $name,
                     '<fg=yellow;options=bold>RUNNING</>'
                 );
@@ -63,7 +63,7 @@ abstract class Seeder
             if ($silent === false && isset($this->command)) {
                 $runTime = number_format((microtime(true) - $startTime) * 1000);
 
-                with(new TwoColumnDetail($this->command->getOutput()))->render(
+                (new TwoColumnDetail($this->command->getOutput()))->render(
                     $name,
                     "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>"
                 );

@@ -19,7 +19,7 @@ jobs:
         ports:
           - 11211:11211
       mysql:
-        image: mysql:5.7
+        image: mysql:8
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: forge
@@ -75,6 +75,15 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
+
+      - name: Set Minimum dependencies for `prefer-lowest`
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require opis/string:2.0.1 --no-interaction --no-update
+          shell: bash
+        if: matrix.stability == 'prefer-lowest'
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -144,6 +153,15 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "12.x-dev"
+
+      - name: Set Minimum dependencies for `prefer-lowest`
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer require opis/string:2.0.1 --no-interaction --no-update
+          shell: bash
+        if: matrix.stability == 'prefer-lowest'
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

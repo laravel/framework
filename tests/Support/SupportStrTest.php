@@ -12,6 +12,13 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Str::createRandomStringsNormally();
+    }
+
     public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));

@@ -1046,12 +1046,12 @@ class Handler implements ExceptionHandlerContract
             if (! empty($alternatives = $e->getAlternatives())) {
                 $message .= '. Did you mean one of these?';
 
-                with(new Error($output))->render($message);
-                with(new BulletList($output))->render($alternatives);
+                (new Error($output))->render($message);
+                (new BulletList($output))->render($alternatives);
 
                 $output->writeln('');
             } else {
-                with(new Error($output))->render($message);
+                (new Error($output))->render($message);
             }
 
             return;
