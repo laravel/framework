@@ -246,7 +246,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert whether the response is redirecting back to the previous location and the session has the given errors.
+     * Assert whether the response is redirecting back to the previous location with the given errors in the session.
      *
      * @param  string|array  $keys
      * @param  mixed  $format
