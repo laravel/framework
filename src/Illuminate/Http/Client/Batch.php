@@ -38,42 +38,42 @@ class Batch
      *
      * @var int
      */
-    public $totalRequests;
+    public $totalRequests = 0;
 
     /**
      * The total number of requests that are still pending.
      *
      * @var int
      */
-    public $pendingRequests;
+    public $pendingRequests = 0;
 
     /**
      * The total number of requests that have failed.
      *
      * @var int
      */
-    public $failedRequests;
+    public $failedRequests = 0;
 
     /**
      * The date indicating when the batch was created.
      *
      * @var \Carbon\CarbonImmutable
      */
-    public $createdAt;
+    public $createdAt = null;
 
     /**
      * The date indicating when the batch was cancelled.
      *
      * @var \Carbon\CarbonImmutable|null
      */
-    public $cancelledAt;
+    public $cancelledAt = null;
 
     /**
      * The date indicating when the batch was finished.
      *
      * @var \Carbon\CarbonImmutable|null
      */
-    public $finishedAt;
+    public $finishedAt = null;
 
     /**
      * The callback to run before the first request from the batch runs.
@@ -114,12 +114,7 @@ class Batch
     {
         $this->factory = $factory ?: new Factory();
         $this->handler = Utils::chooseHandler();
-
-        $this->totalRequests = 0;
-        $this->pendingRequests = 0;
-        $this->failedRequests = 0;
         $this->createdAt = new CarbonImmutable();
-        $this->finishedAt = null;
     }
 
     /**
