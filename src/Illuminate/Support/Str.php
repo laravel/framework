@@ -702,6 +702,8 @@ class Str
         bool $filterUnicode = false,
         array $customValidations = [],
     ): bool {
+        $container = Container::getInstance();
+
         $validations = (new Collection())
             ->when($rfc, fn (Collection $collection) => $collection->push(new RFCValidation()))
             ->when($strict, fn (Collection $collection) => $collection->push(new NoRFCWarningsValidation()))
@@ -712,17 +714,15 @@ class Str
             ->merge(
                 (new Collection($customValidations))
                     ->filter(fn ($class) => is_string($class) && class_exists($class))
-                    ->map(fn ($class) => Container::getInstance()->make($class))
+                    ->map(fn ($class) => $container->make($class))
             )
-            ->unique();
+            ->unique()
+            ->values()
+            ->all() ?: [new RFCValidation()];
 
-        if ($validations->isEmpty()) {
-            $validations->push(new RFCValidation());
-        }
+        $emailValidator = $container->make(EmailValidator::class);
 
-        $emailValidator = Container::getInstance()->make(EmailValidator::class);
-
-        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations->all()));
+        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
     }
 
     /**
