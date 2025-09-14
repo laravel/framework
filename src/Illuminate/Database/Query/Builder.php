@@ -4032,6 +4032,7 @@ class Builder implements BuilderContract
      * @param  array<string, mixed>  $extra
      * @param  bool  $treatNullAsZero  Whether to treat NULL values as 0 before incrementing.
      * @return int<0, max>
+     *
      * @throws \InvalidArgumentException
      */
     public function incrementEach(array $columns, array $extra = [], bool $treatNullAsZero = false)
