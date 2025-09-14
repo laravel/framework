@@ -62,6 +62,13 @@ class Batch
     public $createdAt;
 
     /**
+     * The date indicating when the batch was cancelled.
+     *
+     * @var \Carbon\CarbonImmutable|null
+     */
+    public $cancelledAt;
+
+    /**
      * The date indicating when the batch was finished.
      *
      * @var \Carbon\CarbonImmutable|null
@@ -180,6 +187,26 @@ class Batch
     public function hasFailures(): bool
     {
         return $this->failedRequests > 0;
+    }
+
+    /**
+     * Cancel the batch.
+     *
+     * @return void
+     */
+    public function cancel(): void
+    {
+        $this->cancelledAt = new CarbonImmutable();
+    }
+
+    /**
+     * Determine if the batch was cancelled.
+     *
+     * @return bool
+     */
+    public function cancelled(): bool
+    {
+        return ! is_null($this->cancelledAt);
     }
 
     /**
@@ -326,6 +353,10 @@ class Batch
         }
 
         foreach ($requests as $key => $item) {
+            if ($this->cancelled()) {
+                break;
+            }
+
             $result = $item->getPromise()->wait();
             $results[$key] = $result;
             $this->decrementPendingRequests();
@@ -352,7 +383,9 @@ class Batch
             $finallyCallback($this, $results);
         }
 
-        $this->finishedAt = new CarbonImmutable();
+        if (! $this->cancelled()) {
+            $this->finishedAt = new CarbonImmutable();
+        }
 
         return $results;
     }
