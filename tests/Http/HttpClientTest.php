@@ -15,6 +15,7 @@ use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Client\Batch;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -3789,7 +3790,64 @@ class HttpClientTest extends TestCase
         $this->assertInstanceOf(PendingRequest::class, $factory->createPendingRequest());
     }
 
-    public function testPoolProgressHook(): void
+    public function testBatchNoCallbacks(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(3, $batch->totalRequests);
+        $this->assertSame(0, $batch->completion());
+        $this->assertFalse($batch->finished());
+
+        $responses = $batch->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+        $this->assertSame(500, $responses['third']->status());
+
+        $this->assertSame(3, $batch->totalRequests);
+        $this->assertSame(0, $batch->pendingRequests);
+        $this->assertSame(1, $batch->failedRequests);
+        $this->assertSame(100, $batch->completion());
+        $this->assertTrue($batch->hasFailures());
+        $this->assertTrue($batch->finished());
+    }
+
+    public function testBatchBeforeHook(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+        ]);
+
+        $beforeCallback = false;
+
+        $responses = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+            ];
+        })->before(function (Batch $batch) use (&$beforeCallback) {
+            $beforeCallback = true;
+        })->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+        $this->assertTrue($beforeCallback);
+    }
+
+    public function testBatchProgressHook(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3799,17 +3857,15 @@ class HttpClientTest extends TestCase
 
         $progressCallbacks = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$progressCallbacks) {
-            $pool->progress(function (int|string $key, Response $response) use (&$progressCallbacks) {
-                $progressCallbacks[$key] = $response;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://201.com'),
-                $pool->as('third')->get('https://500.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://500.com'),
             ];
-        });
+        })->progress(function (Batch $batch, int|string $key, Response $response) use (&$progressCallbacks) {
+            $progressCallbacks[$key] = $response;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(201, $responses['second']->status());
@@ -3824,7 +3880,7 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['second'], $progressCallbacks['second']);
     }
 
-    public function testPoolCatchHook(): void
+    public function testBatchCatchHook(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3834,17 +3890,15 @@ class HttpClientTest extends TestCase
 
         $catchCallbacks = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$catchCallbacks) {
-            $pool->catch(function (int|string $key, Response|RequestException $response) use (&$catchCallbacks) {
-                $catchCallbacks[$key] = $response;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://201.com'),
-                $pool->as('third')->get('https://500.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://500.com'),
             ];
-        });
+        })->catch(function (Batch $batch, int|string $key, Response|RequestException $response) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $response;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(201, $responses['second']->status());
@@ -3858,7 +3912,7 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['third'], $catchCallbacks['third']);
     }
 
-    public function testPoolThenHookIsCalled(): void
+    public function testBatchThenHookIsCalled(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3867,16 +3921,14 @@ class HttpClientTest extends TestCase
 
         $thenCallback = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$thenCallback) {
-            $pool->then(function (array $results) use (&$thenCallback) {
-                $thenCallback = $results;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://201.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
             ];
-        });
+        })->then(function (Batch $batch, array $results) use (&$thenCallback) {
+            $thenCallback = $results;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(201, $responses['second']->status());
@@ -3889,7 +3941,7 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['second'], $thenCallback['second']);
     }
 
-    public function testPoolThenHookIsNotCalled(): void
+    public function testBatchThenHookIsNotCalled(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3898,16 +3950,14 @@ class HttpClientTest extends TestCase
 
         $thenCallback = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$thenCallback) {
-            $pool->then(function (array $results) use (&$thenCallback) {
-                $thenCallback = $results;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://500.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://500.com'),
             ];
-        });
+        })->then(function (Batch $batch, array $results) use (&$thenCallback) {
+            $thenCallback = $results;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(500, $responses['second']->status());
@@ -3915,7 +3965,7 @@ class HttpClientTest extends TestCase
         $this->assertCount(0, $thenCallback);
     }
 
-    public function testPoolFinallyHookIsCalledWithoutErrors(): void
+    public function testBatchFinallyHookIsCalledWithoutErrors(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3924,16 +3974,14 @@ class HttpClientTest extends TestCase
 
         $finallyCallback = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$finallyCallback) {
-            $pool->finally(function (array $results) use (&$finallyCallback) {
-                $finallyCallback = $results;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://201.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
             ];
-        });
+        })->finally(function (Batch $batch, array $results) use (&$finallyCallback) {
+            $finallyCallback = $results;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(201, $responses['second']->status());
@@ -3946,7 +3994,7 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['second'], $finallyCallback['second']);
     }
 
-    public function testPoolFinallyHookIsCalledWithErrors(): void
+    public function testBatchFinallyHookIsCalledWithErrors(): void
     {
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
@@ -3955,16 +4003,14 @@ class HttpClientTest extends TestCase
 
         $finallyCallback = [];
 
-        $responses = $this->factory->pool(function (Pool $pool) use (&$finallyCallback) {
-            $pool->finally(function (array $results) use (&$finallyCallback) {
-                $finallyCallback = $results;
-            });
-
+        $responses = $this->factory->batch(function (Batch $batch) {
             return [
-                $pool->as('first')->get('https://200.com'),
-                $pool->as('second')->get('https://500.com'),
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://500.com'),
             ];
-        });
+        })->finally(function (Batch $batch, array $results) use (&$finallyCallback) {
+            $finallyCallback = $results;
+        })->send();
 
         $this->assertSame(200, $responses['first']->status());
         $this->assertSame(500, $responses['second']->status());

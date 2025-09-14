@@ -890,42 +890,18 @@ class PendingRequest
     {
         $results = [];
 
-        $pool = tap(new Pool($this->factory), $callback);
-        $requests = $pool->getRequests();
-        $progressCallback = $pool->progressCallback();
-        $catchCallback = $pool->catchCallback();
-        $thenCallback = $pool->thenCallback();
-        $finallyCallback = $pool->finallyCallback();
-        $success = 0;
+        $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         foreach ($requests as $key => $item) {
-            $result = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
-            $results[$key] = $result;
-
-            if ($result instanceof Response && $result->successful()) {
-                $success++;
-                if ($progressCallback !== null) {
-                    $progressCallback($key, $result);
-                }
-            }
-
-            if (
-                (($result instanceof Response && $result->failed()) || $result instanceof RequestException)
-                && $catchCallback !== null
-            ) {
-                $catchCallback($key, $result);
-            }
-        }
-
-        if ($success === count($requests) && $thenCallback !== null) {
-            $thenCallback($results);
-        }
-
-        if ($finallyCallback !== null) {
-            $finallyCallback($results);
+            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
         }
 
         return $results;
+    }
+
+    public function batch(callable $callback): Batch
+    {
+        return tap(new Batch($this->factory), $callback);
     }
 
     /**

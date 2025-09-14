@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use Closure;
 use GuzzleHttp\Utils;
 
 /**
@@ -30,34 +29,6 @@ class Pool
      * @var array<array-key, \Illuminate\Http\Client\PendingRequest>
      */
     protected $pool = [];
-
-    /**
-     * The callback to run after a request from the pool succeeds.
-     *
-     * @var \Closure|null
-     */
-    protected $progressCallback = null;
-
-    /**
-     * The callback to run after a request from the pool fails.
-     *
-     * @var \Closure|null
-     */
-    protected $catchCallback = null;
-
-    /**
-     * The callback to run if all the requests from the pool succeeded.
-     *
-     * @var \Closure|null
-     */
-    protected $thenCallback = null;
-
-    /**
-     * The callback to run after all the requests from the pool finish.
-     *
-     * @var \Closure|null
-     */
-    protected $finallyCallback = null;
 
     /**
      * Create a new requests pool.
@@ -111,89 +82,5 @@ class Pool
     public function __call($method, $parameters)
     {
         return $this->pool[] = $this->asyncRequest()->$method(...$parameters);
-    }
-
-    /**
-     * Register a callback to run after a request from the pool succeeds.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public function progress(Closure $callback)
-    {
-        $this->progressCallback = $callback;
-    }
-
-    /**
-     * Retrieve the progress callback in the pool.
-     *
-     * @return \Closure|null
-     */
-    public function progressCallback(): ?Closure
-    {
-        return $this->progressCallback;
-    }
-
-    /**
-     * Register a callback to run after a request from the pool fails.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public function catch(Closure $callback)
-    {
-        $this->catchCallback = $callback;
-    }
-
-    /**
-     * Retrieve the catch callback in the pool.
-     *
-     * @return \Closure|null
-     */
-    public function catchCallback(): ?Closure
-    {
-        return $this->catchCallback;
-    }
-
-    /**
-     * Register a callback to run after all the requests from the pool succeed.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public function then(Closure $callback)
-    {
-        $this->thenCallback = $callback;
-    }
-
-    /**
-     * Retrieve the then callback in the pool.
-     *
-     * @return \Closure|null
-     */
-    public function thenCallback(): ?Closure
-    {
-        return $this->thenCallback;
-    }
-
-    /**
-     * Register a callback to run after all the requests from the pool finish.
-     *
-     * @param  Closure  $callback
-     * @return void
-     */
-    public function finally(Closure $callback)
-    {
-        $this->finallyCallback = $callback;
-    }
-
-    /**
-     * Retrieve the finally callback in the pool.
-     *
-     * @return \Closure|null
-     */
-    public function finallyCallback(): ?Closure
-    {
-        return $this->finallyCallback;
     }
 }
