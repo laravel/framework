@@ -370,15 +370,15 @@ class Batch
             }
         }
 
-        if (! $this->hasFailures() && $thenCallback !== null) {
-            $thenCallback($this, $results);
-        }
-
-        if ($finallyCallback !== null) {
-            $finallyCallback($this, $results);
-        }
-
         if (! $this->cancelled()) {
+            if (! $this->hasFailures() && $thenCallback !== null) {
+                $thenCallback($this, $results);
+            }
+
+            if ($finallyCallback !== null) {
+                $finallyCallback($this, $results);
+            }
+
             $this->finishedAt = new CarbonImmutable();
         }
 
