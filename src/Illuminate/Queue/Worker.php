@@ -100,6 +100,13 @@ class Worker
     protected static $popCallbacks = [];
 
     /**
+     * The custom exit code to be used when memory is exceeded.
+     *
+     * @var int|null
+     */
+    public static $memoryExceededExitCode;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
@@ -307,7 +314,7 @@ class Worker
     {
         return match (true) {
             $this->shouldQuit => static::EXIT_SUCCESS,
-            $this->memoryExceeded($options->memory) => static::EXIT_MEMORY_LIMIT,
+            $this->memoryExceeded($options->memory) => static::$memoryExceededExitCode ?: static::EXIT_MEMORY_LIMIT,
             $this->queueShouldRestart($lastRestart) => static::EXIT_SUCCESS,
             $options->stopWhenEmpty && is_null($job) => static::EXIT_SUCCESS,
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => static::EXIT_SUCCESS,
