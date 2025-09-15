@@ -370,7 +370,6 @@ class Middleware
         foreach ((array) $replace as $search => $replace) {
             $this->replaceInGroup($group, $search, $replace);
         }
-        
 
         return $this;
     }

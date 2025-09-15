@@ -222,7 +222,6 @@ class MailChannel
         foreach ((array) $message->bcc as $bcc) {
             $mailMessage->bcc($bcc[0], Arr::get($bcc, 1));
         }
-        
     }
 
     /**
@@ -241,7 +240,6 @@ class MailChannel
         foreach ((array) $message->replyTo as $replyTo) {
             $mailMessage->replyTo($replyTo[0], Arr::get($replyTo, 1));
         }
-        
     }
 
     /**
