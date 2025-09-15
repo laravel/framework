@@ -1,5 +1,5 @@
 <x-laravel-exceptions-renderer::layout>
-    <x-laravel-exceptions-renderer::section-container class="px-6 py-6">
+    <x-laravel-exceptions-renderer::section-container class="px-6 py-0 sm:py-0">
         <x-laravel-exceptions-renderer::topbar :title="$exception->title()" :markdown="$exceptionAsMarkdown" />
     </x-laravel-exceptions-renderer::section-container>
 
