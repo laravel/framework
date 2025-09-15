@@ -5,7 +5,7 @@
         expanded: {{ $frame->isMain() ? 'true' : 'false' }},
         hasCode: {{ $frame->snippet() ? 'true' : 'false' }}
     }"
-    class="group rounded-lg border border-neutral-200 shadow-sm"
+    class="group rounded-lg border border-neutral-200 shadow-xs"
     :class="expanded ? 'dark:border-white/10' : 'dark:border-white/5'"
 >
     <div

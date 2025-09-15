@@ -1,7 +1,7 @@
 @props(['queries'])
 
 <div
-    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px] shadow-sm"]) }}
+    {{ $attributes->merge(['class' => "flex flex-col gap-1 bg-neutral-50 dark:bg-white/1 border border-neutral-200 dark:border-neutral-800 rounded-xl p-[10px] shadow-xs"]) }}
     x-data="{
         totalQueries: {{ min(count($queries), 100) }},
         currentPage: 1,
@@ -97,7 +97,7 @@
     <div class="flex flex-col gap-1">
         @forelse (array_slice($queries, 0, 100) as $index => ['connectionName' => $connectionName, 'sql' => $sql, 'time' => $time])
         <div
-            class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center justify-between gap-4 px-4 text-xs font-mono shadow-sm"
+            class="border border-neutral-200 dark:border-none bg-white dark:bg-white/[3%] rounded-md h-10 flex items-center justify-between gap-4 px-4 text-xs font-mono shadow-xs"
             x-show="Math.floor({{ $index }} / perPage) === (currentPage - 1)"
         >
             <div class="flex items-center gap-2 truncate">

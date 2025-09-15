@@ -6,7 +6,7 @@
     x-data="{ expanded: false }"
     class="group rounded-lg border border-neutral-200"
     :class="{
-        'bg-white dark:border-white/5 dark:bg-white/5 shadow-sm': expanded,
+        'bg-white dark:border-white/5 dark:bg-white/5 shadow-xs': expanded,
         'border-dashed border-neutral-300 bg-neutral-50 opacity-90 dark:border-white/10 dark:bg-white/1': !expanded,
     }"
 >

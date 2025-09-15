@@ -9,7 +9,7 @@
     </div>
 
     <div class="flex items-start gap-2 mb-8 sm:mb-16">
-        <div class="bg-white dark:bg-white/[3%] border border-neutral-200 dark:border-white/10 divide-x divide-neutral-200 dark:divide-white/10 rounded-md shadow-sm flex items-center gap-0.5">
+        <div class="bg-white dark:bg-white/[3%] border border-neutral-200 dark:border-white/10 divide-x divide-neutral-200 dark:divide-white/10 rounded-md shadow-xs flex items-center gap-0.5">
             <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px]">
                 <span class="text-neutral-400 dark:text-neutral-500">LARAVEL</span>
                 <span class="text-neutral-500 dark:text-neutral-300">{{ app()->version() }}</span>
