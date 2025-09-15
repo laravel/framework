@@ -5,7 +5,7 @@
 
     <x-laravel-exceptions-renderer::separator />
 
-    <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8">
+    <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8 py-16 sm:py-16">
         <x-laravel-exceptions-renderer::header :$exception />
     </x-laravel-exceptions-renderer::section-container>
 
