@@ -108,6 +108,7 @@ class Inspiring
             'You must be the change you wish to see in the world. - Mahatma Gandhi',
             'It always seems impossible until it is done. - Nelson Mandela',
             'We must ship. - Taylor Otwell',
+            'Opportunities don’t happen, you create them. - Chris Grosser',
         ]);
     }
 
