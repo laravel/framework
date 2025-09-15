@@ -43,7 +43,7 @@ trait ValidatesAttributes
      */
     public function validateAccepted($attribute, $value)
     {
-        $acceptable = ['yes', 'on', '1', 1, true, 'true'];
+        $acceptable = $this->truthyValues();
 
         return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
     }
@@ -58,7 +58,7 @@ trait ValidatesAttributes
      */
     public function validateAcceptedIf($attribute, $value, $parameters)
     {
-        $acceptable = ['yes', 'on', '1', 1, true, 'true'];
+        $acceptable = $this->truthyValues();
 
         $this->requireParameterCount(2, $parameters, 'accepted_if');
 
@@ -82,7 +82,7 @@ trait ValidatesAttributes
      */
     public function validateDeclined($attribute, $value)
     {
-        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+        $acceptable = $this->falsyValues();
 
         return $this->validateRequired($attribute, $value) && in_array($value, $acceptable, true);
     }
@@ -97,7 +97,7 @@ trait ValidatesAttributes
      */
     public function validateDeclinedIf($attribute, $value, $parameters)
     {
-        $acceptable = ['no', 'off', '0', 0, false, 'false'];
+        $acceptable = $this->falsyValues();
 
         $this->requireParameterCount(2, $parameters, 'declined_if');
 
@@ -490,7 +490,10 @@ trait ValidatesAttributes
      */
     public function validateBoolean($attribute, $value, $parameters)
     {
-        $acceptable = [true, false, 0, 1, '0', '1'];
+        $acceptable = [
+          ...$this->truthyValues(),
+          ...$this->falsyValues(),
+        ];
 
         if (($parameters[0] ?? null) === 'strict') {
             $acceptable = [true, false];
@@ -2895,5 +2898,21 @@ trait ValidatesAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Returns a list of truthy values.
+     */
+    protected function truthyValues(): array
+    {
+        return [ 'yes', 'on', '1', 1, true, 'true' ];
+    }
+
+    /**
+     * Returns a list of falsy values.
+     */
+    protected function falsyValues(): array
+    {
+        return [ 'no', 'off', '0', 0, false, 'false' ];
     }
 }
