@@ -13,7 +13,7 @@
             }
         }
     }"
-    class="bg-white dark:bg-white/[4%] border border-neutral-200 dark:border-white/10 rounded-lg flex items-center justify-between p-2 shadow-sm"
+    {{ $attributes->merge(['class' => "bg-white dark:bg-[#1a1a1a] border border-neutral-200 dark:border-white/10 rounded-lg flex items-center justify-between h-10 px-2 shadow-sm"]) }}
 >
     <div class="flex items-center gap-3 w-full">
         <x-laravel-exceptions-renderer::badge type="error" variant="solid">

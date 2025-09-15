@@ -5,15 +5,13 @@
 
     <x-laravel-exceptions-renderer::separator />
 
-    <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8 py-16 sm:py-16">
+    <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8 py-0 sm:py-0">
         <x-laravel-exceptions-renderer::header :$exception />
     </x-laravel-exceptions-renderer::section-container>
 
-    <x-laravel-exceptions-renderer::separator />
+    <x-laravel-exceptions-renderer::separator class="-mt-5 -z-10" />
 
     <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8">
-        <x-laravel-exceptions-renderer::request-url :request="$exception->request()" />
-
         <x-laravel-exceptions-renderer::overview :request="$exception->request()" />
 
         <x-laravel-exceptions-renderer::trace :$exception />
