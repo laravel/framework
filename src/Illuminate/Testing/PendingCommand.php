@@ -511,16 +511,14 @@ class PendingCommand
             $this->test->fail('Question "'.Arr::first($this->test->expectedQuestions)[0].'" was not asked.');
         }
 
-        if (count($this->test->expectedChoices) > 0) {
-            foreach ($this->test->expectedChoices as $question => $answers) {
-                $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
+        foreach ((array) $this->test->expectedChoices as $question => $answers) {
+            $assertion = $answers['strict'] ? 'assertEquals' : 'assertEqualsCanonicalizing';
 
-                $this->test->{$assertion}(
-                    $answers['expected'],
-                    $answers['actual'],
-                    'Question "'.$question.'" has different options.'
-                );
-            }
+            $this->test->{$assertion}(
+                $answers['expected'],
+                $answers['actual'],
+                'Question "'.$question.'" has different options.'
+            );
         }
 
         if (count($this->test->expectedOutput)) {

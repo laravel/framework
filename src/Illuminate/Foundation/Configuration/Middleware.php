@@ -367,11 +367,10 @@ class Middleware
             $this->removeFromGroup($group, $remove);
         }
 
-        if (! empty($replace)) {
-            foreach ($replace as $search => $replace) {
-                $this->replaceInGroup($group, $search, $replace);
-            }
+        foreach ((array) $replace as $search => $replace) {
+            $this->replaceInGroup($group, $search, $replace);
         }
+        
 
         return $this;
     }

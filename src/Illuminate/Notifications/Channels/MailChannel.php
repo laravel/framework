@@ -215,17 +215,14 @@ class MailChannel
 
         $mailMessage->to($this->getRecipients($notifiable, $notification, $message));
 
-        if (! empty($message->cc)) {
-            foreach ($message->cc as $cc) {
-                $mailMessage->cc($cc[0], Arr::get($cc, 1));
-            }
+        foreach ((array) $message->cc as $cc) {
+            $mailMessage->cc($cc[0], Arr::get($cc, 1));
         }
 
-        if (! empty($message->bcc)) {
-            foreach ($message->bcc as $bcc) {
-                $mailMessage->bcc($bcc[0], Arr::get($bcc, 1));
-            }
+        foreach ((array) $message->bcc as $bcc) {
+            $mailMessage->bcc($bcc[0], Arr::get($bcc, 1));
         }
+        
     }
 
     /**
@@ -241,11 +238,10 @@ class MailChannel
             $mailMessage->from($message->from[0], Arr::get($message->from, 1));
         }
 
-        if (! empty($message->replyTo)) {
-            foreach ($message->replyTo as $replyTo) {
-                $mailMessage->replyTo($replyTo[0], Arr::get($replyTo, 1));
-            }
+        foreach ((array) $message->replyTo as $replyTo) {
+            $mailMessage->replyTo($replyTo[0], Arr::get($replyTo, 1));
         }
+        
     }
 
     /**

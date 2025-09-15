@@ -324,10 +324,8 @@ abstract class Queue
      */
     protected function withCreatePayloadHooks($queue, array $payload)
     {
-        if (! empty(static::$createPayloadCallbacks)) {
-            foreach (static::$createPayloadCallbacks as $callback) {
-                $payload = array_merge($payload, $callback($this->getConnectionName(), $queue, $payload));
-            }
+        foreach ((array) static::$createPayloadCallbacks as $callback) {
+            $payload = array_merge($payload, $callback($this->getConnectionName(), $queue, $payload));
         }
 
         return $payload;
