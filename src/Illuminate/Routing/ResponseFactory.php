@@ -40,8 +40,8 @@ class ResponseFactory implements FactoryContract
     /**
      * Create a new response factory instance.
      *
-     * @param ViewFactory $view
-     * @param Redirector $redirector
+     * @param  ViewFactory  $view
+     * @param  Redirector  $redirector
      */
     public function __construct(ViewFactory $view, Redirector $redirector)
     {
@@ -126,7 +126,7 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param StreamedEvent|string|null  $endStreamWith
+     * @param  StreamedEvent|string|null   $endStreamWith
      * @return StreamedResponse
      */
     public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>'): StreamedResponse
@@ -284,7 +284,7 @@ class ResponseFactory implements FactoryContract
     /**
      * Convert the string to ASCII characters that are equivalent to the given name.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     protected function fallbackName(string $name): string
