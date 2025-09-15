@@ -43,6 +43,39 @@ class TranslatorTest extends TestCase
         $this->assertTrue($this->app['translator']->hasForLocale('30 Days'));
     }
 
+    public function testItCanCheckKeyExistsHasFromLocaleForJsonWithNestedKeys()
+    {
+        $this->assertTrue($this->app['translator']->has('days.monday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.monday'));
+        $this->assertTrue($this->app['translator']->has('days.wednesday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.wednesday'));
+        $this->assertTrue($this->app['translator']->has('days.friday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.friday'));
+
+        $this->assertFalse($this->app['translator']->has('days.sunday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.sunday'));
+        $this->assertFalse($this->app['translator']->has('days.tuesday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.tuesday'));
+        $this->assertFalse($this->app['translator']->has('days.thursday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.thursday'));
+
+        $this->app->setLocale('fr');
+
+        $this->assertTrue($this->app['translator']->has('days.sunday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.sunday'));
+        $this->assertTrue($this->app['translator']->has('days.tuesday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.tuesday'));
+        $this->assertTrue($this->app['translator']->has('days.thursday'));
+        $this->assertTrue($this->app['translator']->hasForLocale('days.thursday'));
+
+        $this->assertFalse($this->app['translator']->has('days.monday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.monday'));
+        $this->assertFalse($this->app['translator']->has('days.wednesday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.wednesday'));
+        $this->assertFalse($this->app['translator']->has('days.friday'));
+        $this->assertFalse($this->app['translator']->hasForLocale('days.friday'));
+    }
+
     public function testItCanCheckKeyExistsWithoutTriggeringHandleMissingKeys()
     {
         $this->app['translator']->handleMissingKeysUsing(function ($key) {

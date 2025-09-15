@@ -3,5 +3,10 @@
     "30 Days": "30 Days",
     "365 Days": "365 Days",
     "60 Days": "60 Days",
-    "90 Days": "90 Days"
+    "90 Days": "90 Days",
+    "days": {
+        "monday": "Monday",
+        "wednesday": "Wednesday",
+        "friday": "Friday"
+    }
 }
