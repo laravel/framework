@@ -82,13 +82,6 @@ class WorkerOptions
     public $maxTime;
 
     /**
-     * The exit code when the memory limit is exceeded.
-     *
-     * @var int
-     */
-    public $memoryExitCode;
-
-    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -102,7 +95,6 @@ class WorkerOptions
      * @param  int  $maxJobs
      * @param  int  $maxTime
      * @param  int  $rest
-     * @param  int  $memoryExitCode
      */
     public function __construct(
         $name = 'default',
@@ -116,7 +108,6 @@ class WorkerOptions
         $maxJobs = 0,
         $maxTime = 0,
         $rest = 0,
-        $memoryExitCode = Worker::EXIT_MEMORY_LIMIT,
     ) {
         $this->name = $name;
         $this->backoff = $backoff;
@@ -129,6 +120,5 @@ class WorkerOptions
         $this->stopWhenEmpty = $stopWhenEmpty;
         $this->maxJobs = $maxJobs;
         $this->maxTime = $maxTime;
-        $this->memoryExitCode = $memoryExitCode;
     }
 }
