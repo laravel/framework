@@ -1,25 +1,15 @@
+import Alpine from 'alpinejs';
 import tippy from 'tippy.js';
-import alpine from 'alpinejs';
-import hljs from 'highlight.js/lib/core';
-import php from 'highlight.js/lib/languages/php';
 
-alpine.start();
+window.Alpine = Alpine;
 
-hljs.registerLanguage('php', php);
-
-window.hljs = hljs;
-
-hljs.highlightElement(document.querySelector('.default-highlightable-code'));
-
-document.querySelectorAll('.highlightable-code').forEach((block) => {
-    if (block.dataset.highlighted !== 'yes') {
-        hljs.highlightElement(block);
-    }
-});
+Alpine.start();
 
 tippy('[data-tippy-content]', {
-    trigger: 'click',
-    arrow: true,
-    theme: 'material',
-    animation: 'scale',
+    arrow: false,
+    allowHTML: true,
+    animation: 'shift-away',
+    delay: [300, 0],
+    duration: 200,
+    theme: 'laravel',
 });
