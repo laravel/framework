@@ -133,6 +133,23 @@ class FileFailedJobProviderTest extends TestCase
         $this->assertCount(2, $failedJobs);
     }
 
+    public function testCanPruneFailedJobsWithRelativeHours()
+    {
+        $this->logFailedJob();
+        $this->logFailedJob();
+
+        $this->provider->prune(now()->addHour(1));
+        $failedJobs = $this->provider->all();
+        $this->assertEmpty($failedJobs);
+
+        $this->logFailedJob();
+        $this->logFailedJob();
+
+        $this->provider->prune(now()->subHour(1));
+        $failedJobs = $this->provider->all();
+        $this->assertCount(2, $failedJobs);
+    }
+
     public function testEmptyFailedJobsByDefault()
     {
         $failedJobs = $this->provider->all();

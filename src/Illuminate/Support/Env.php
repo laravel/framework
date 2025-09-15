@@ -285,7 +285,7 @@ class Env
      */
     protected static function prepareQuotedValue(string $input)
     {
-        return strpos($input, '"') !== false
+        return str_contains($input, '"')
             ? "'".self::addSlashesExceptFor($input, ['"'])."'"
             : '"'.self::addSlashesExceptFor($input, ["'"]).'"';
     }

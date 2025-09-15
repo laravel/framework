@@ -21,6 +21,24 @@ class SQLiteConnection extends Connection
     }
 
     /**
+     * Run the statement to start a new transaction.
+     *
+     * @return void
+     */
+    protected function executeBeginTransactionStatement()
+    {
+        if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
+            $mode = $this->getConfig('transaction_mode') ?? 'DEFERRED';
+
+            $this->getPdo()->exec("BEGIN {$mode} TRANSACTION");
+
+            return;
+        }
+
+        $this->getPdo()->beginTransaction();
+    }
+
+    /**
      * Escape a binary value for safe SQL embedding.
      *
      * @param  string  $value

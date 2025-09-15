@@ -255,6 +255,29 @@ class SupportMessageBagTest extends TestCase
         $this->assertSame('{"foo":["bar"],"boom":["baz"]}', $container->toJson());
     }
 
+    public function testMessageBagReturnsExpectedPrettyJson()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('boom', 'baz');
+        $container->add('baz', '123');
+        $results = $container->toPrettyJson();
+        $expected = $container->toJson(JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expected, $results);
+        $this->assertSame($expected, $results);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('"123"', $results);
+
+        $results = $container->toPrettyJson(JSON_NUMERIC_CHECK);
+        $this->assertStringContainsString("\n", $results);
+        $this->assertStringContainsString('    ', $results);
+        $this->assertStringContainsString('123', $results);
+        $this->assertStringNotContainsString('"123"', $results);
+    }
+
     public function testCountReturnsCorrectValue()
     {
         $container = new MessageBag;
