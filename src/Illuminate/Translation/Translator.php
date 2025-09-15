@@ -130,7 +130,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // For JSON translations, the loaded files will contain the correct line.
         // Otherwise, we must assume we are handling typical translation file
         // and check if the returned line is not the same as the given key.
-        if (! is_null($this->loaded['*']['*'][$locale][$key] ?? null)) {
+        if (Arr::has($this->loaded['*']['*'][$locale], $key)) {
             return true;
         }
 
@@ -155,7 +155,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // only one level deep so we do not need to do any fancy searching through it.
         $this->load('*', '*', $locale);
 
-        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
+        $line = Arr::get($this->loaded['*']['*'][$locale], $key);
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a
@@ -333,7 +333,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // lines that have already been loaded so that we can easily access them.
         $lines = $this->loader->load($locale, $group, $namespace);
 
-        $this->loaded[$namespace][$group][$locale] = $lines;
+        Arr::set($this->loaded, "$namespace.$group.$locale", $lines);
     }
 
     /**
@@ -346,7 +346,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function isLoaded($namespace, $group, $locale)
     {
-        return isset($this->loaded[$namespace][$group][$locale]);
+        return Arr::has($this->loaded, "$namespace.$group.$locale");
     }
 
     /**
