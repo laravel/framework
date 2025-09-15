@@ -19,7 +19,13 @@
     >
         {{-- Dot --}}
         <div class="flex size-3 items-center justify-center flex-shrink-0">
-          <div class="size-2 rounded-full bg-rose-500 dark:bg-neutral-400"></div>
+          <div
+          class="size-2 rounded-full"
+          :class="{
+            'bg-rose-500 dark:bg-neutral-400': expanded,
+            'bg-rose-200 dark:bg-neutral-700': !expanded
+          }"
+          ></div>
         </div>
 
         <div class="flex flex-1 items-center justify-between gap-6 min-w-0">
