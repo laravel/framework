@@ -491,8 +491,8 @@ trait ValidatesAttributes
     public function validateBoolean($attribute, $value, $parameters)
     {
         $acceptable = [
-          ...$this->truthyValues(),
-          ...$this->falsyValues(),
+            ...$this->truthyValues(),
+            ...$this->falsyValues(),
         ];
 
         if (($parameters[0] ?? null) === 'strict') {
@@ -2905,7 +2905,7 @@ trait ValidatesAttributes
      */
     protected function truthyValues(): array
     {
-        return [ 'yes', 'on', '1', 1, true, 'true' ];
+        return ['yes', 'on', '1', 1, true, 'true'];
     }
 
     /**
@@ -2913,6 +2913,6 @@ trait ValidatesAttributes
      */
     protected function falsyValues(): array
     {
-        return [ 'no', 'off', '0', 0, false, 'false' ];
+        return ['no', 'off', '0', 0, false, 'false'];
     }
 }
