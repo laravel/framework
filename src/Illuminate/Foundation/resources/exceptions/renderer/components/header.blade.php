@@ -1,7 +1,7 @@
 @props(['exception'])
 
 <div class="flex flex-col pt-16 overflow-x-auto">
-    <div class="flex flex-col gap-6 mb-8">
+    <div class="flex flex-col gap-5 mb-8">
         <h1 class="text-3xl font-semibold text-neutral-950 dark:text-white">{{ $exception->class() }}</h1>
         <p class="text-xl font-light text-neutral-800 dark:text-neutral-300">
             {{ $exception->message() }}
