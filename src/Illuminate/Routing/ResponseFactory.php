@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory as FactoryContract;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\StreamedEvent;
 use Illuminate\Routing\Exceptions\StreamedResponseException;
@@ -25,22 +26,22 @@ class ResponseFactory implements FactoryContract
     /**
      * The view factory instance.
      *
-     * @var \Illuminate\Contracts\View\Factory
+     * @var ViewFactory
      */
-    protected $view;
+    protected ViewFactory $view;
 
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var Redirector
      */
-    protected $redirector;
+    protected Redirector $redirector;
 
     /**
      * Create a new response factory instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param ViewFactory $view
+     * @param Redirector $redirector
      */
     public function __construct(ViewFactory $view, Redirector $redirector)
     {
@@ -54,9 +55,9 @@ class ResponseFactory implements FactoryContract
      * @param  mixed  $content
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function make($content = '', $status = 200, array $headers = [])
+    public function make($content = '', $status = 200, array $headers = []): Response
     {
         return new Response($content, $status, $headers);
     }
@@ -66,9 +67,9 @@ class ResponseFactory implements FactoryContract
      *
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function noContent($status = 204, array $headers = [])
+    public function noContent($status = 204, array $headers = []): Response
     {
         return $this->make('', $status, $headers);
     }
@@ -80,9 +81,9 @@ class ResponseFactory implements FactoryContract
      * @param  array  $data
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function view($view, $data = [], $status = 200, array $headers = [])
+    public function view($view, $data = [], $status = 200, array $headers = []): Response
     {
         if (is_array($view)) {
             return $this->make($this->view->first($view, $data), $status, $headers);
@@ -98,9 +99,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function json($data = [], $status = 200, array $headers = [], $options = 0)
+    public function json($data = [], $status = 200, array $headers = [], $options = 0): JsonResponse
     {
         return new JsonResponse($data, $status, $headers, $options);
     }
@@ -113,9 +114,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $options
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0)
+    public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0): JsonResponse
     {
         return $this->json($data, $status, $headers, $options)->setCallback($callback);
     }
@@ -125,10 +126,10 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @param StreamedEvent|string|null  $endStreamWith
+     * @return StreamedResponse
      */
-    public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>')
+    public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>'): StreamedResponse
     {
         return $this->stream(function () use ($callback, $endStreamWith) {
             foreach ($callback() as $message) {
@@ -189,9 +190,9 @@ class ResponseFactory implements FactoryContract
      * @param  callable|null  $callback
      * @param  int  $status
      * @param  array  $headers
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return StreamedResponse
      */
-    public function stream($callback, $status = 200, array $headers = [])
+    public function stream($callback, $status = 200, array $headers = []): StreamedResponse
     {
         if (! is_null($callback) && (new ReflectionFunction($callback))->isGenerator()) {
             if (isset($_SERVER['LARAVEL_OCTANE'])) {
@@ -219,9 +220,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  int  $encodingOptions
-     * @return \Symfony\Component\HttpFoundation\StreamedJsonResponse
+     * @return StreamedJsonResponse
      */
-    public function streamJson($data, $status = 200, $headers = [], $encodingOptions = JsonResponse::DEFAULT_ENCODING_OPTIONS)
+    public function streamJson($data, $status = 200, $headers = [], $encodingOptions = JsonResponse::DEFAULT_ENCODING_OPTIONS): StreamedJsonResponse
     {
         return new StreamedJsonResponse($data, $status, $headers, $encodingOptions);
     }
@@ -233,11 +234,11 @@ class ResponseFactory implements FactoryContract
      * @param  string|null  $name
      * @param  array  $headers
      * @param  string|null  $disposition
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     * @return StreamedResponse
      *
-     * @throws \Illuminate\Routing\Exceptions\StreamedResponseException
+     * @throws StreamedResponseException
      */
-    public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment')
+    public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment'): StreamedResponse
     {
         $withWrappedException = function () use ($callback) {
             try {
@@ -267,9 +268,9 @@ class ResponseFactory implements FactoryContract
      * @param  string|null  $name
      * @param  array  $headers
      * @param  string|null  $disposition
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
-    public function download($file, $name = null, array $headers = [], $disposition = 'attachment')
+    public function download($file, $name = null, array $headers = [], $disposition = 'attachment'): BinaryFileResponse
     {
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
@@ -283,10 +284,10 @@ class ResponseFactory implements FactoryContract
     /**
      * Convert the string to ASCII characters that are equivalent to the given name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return string
      */
-    protected function fallbackName($name)
+    protected function fallbackName(string $name): string
     {
         return str_replace('%', '', Str::ascii($name));
     }
@@ -296,9 +297,9 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \SplFileInfo|string  $file
      * @param  array  $headers
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
-    public function file($file, array $headers = [])
+    public function file($file, array $headers = []): BinaryFileResponse
     {
         return new BinaryFileResponse($file, 200, $headers);
     }
@@ -310,9 +311,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function redirectTo($path, $status = 302, $headers = [], $secure = null)
+    public function redirectTo($path, $status = 302, $headers = [], $secure = null): RedirectResponse
     {
         return $this->redirector->to($path, $status, $headers, $secure);
     }
@@ -324,9 +325,9 @@ class ResponseFactory implements FactoryContract
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function redirectToRoute($route, $parameters = [], $status = 302, $headers = [])
+    public function redirectToRoute($route, $parameters = [], $status = 302, $headers = []): RedirectResponse
     {
         return $this->redirector->route($route, $parameters, $status, $headers);
     }
@@ -338,9 +339,9 @@ class ResponseFactory implements FactoryContract
      * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function redirectToAction($action, $parameters = [], $status = 302, $headers = [])
+    public function redirectToAction($action, $parameters = [], $status = 302, $headers = []): RedirectResponse
     {
         return $this->redirector->action($action, $parameters, $status, $headers);
     }
@@ -352,9 +353,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function redirectGuest($path, $status = 302, $headers = [], $secure = null)
+    public function redirectGuest($path, $status = 302, $headers = [], $secure = null): RedirectResponse
     {
         return $this->redirector->guest($path, $status, $headers, $secure);
     }
@@ -366,9 +367,9 @@ class ResponseFactory implements FactoryContract
      * @param  int  $status
      * @param  array  $headers
      * @param  bool|null  $secure
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null)
+    public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null): RedirectResponse
     {
         return $this->redirector->intended($default, $status, $headers, $secure);
     }
