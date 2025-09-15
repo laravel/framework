@@ -126,7 +126,7 @@ class ResponseFactory implements FactoryContract
      *
      * @param  \Closure  $callback
      * @param  array  $headers
-     * @param  StreamedEvent|string|null   $endStreamWith
+     * @param  StreamedEvent|string|null  $endStreamWith
      * @return StreamedResponse
      */
     public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>'): StreamedResponse
