@@ -3083,16 +3083,22 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Boolean']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, [], ['foo' => 'Boolean']);
         $this->assertTrue($v->passes());
@@ -3158,16 +3164,22 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['foo' => 'no'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'yes'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'false'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => 'true'], ['foo' => 'Bool']);
-        $this->assertFalse($v->passes());
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'off'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'on'], ['foo' => 'Bool']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, [], ['foo' => 'Bool']);
         $this->assertTrue($v->passes());
