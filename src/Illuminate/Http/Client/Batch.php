@@ -20,13 +20,6 @@ class Batch
     protected $factory;
 
     /**
-     * The handler function for the Guzzle client.
-     *
-     * @var callable
-     */
-    protected $handler;
-
-    /**
      * The list of requests.
      *
      * @var array<array-key, \Illuminate\Http\Client\PendingRequest>
@@ -55,25 +48,11 @@ class Batch
     public $failedRequests = 0;
 
     /**
-     * The date indicating when the batch was created.
+     * The handler function for the Guzzle client.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var callable
      */
-    public $createdAt = null;
-
-    /**
-     * The date indicating when the batch was cancelled.
-     *
-     * @var \Carbon\CarbonImmutable|null
-     */
-    public $cancelledAt = null;
-
-    /**
-     * The date indicating when the batch was finished.
-     *
-     * @var \Carbon\CarbonImmutable|null
-     */
-    public $finishedAt = null;
+    protected $handler;
 
     /**
      * The callback to run before the first request from the batch runs.
@@ -104,17 +83,43 @@ class Batch
     protected $thenCallback = null;
 
     /**
+     * The date when the batch was created.
+     *
+     * @var \Carbon\CarbonImmutable
+     */
+    public $createdAt = null;
+
+    /**
+     * The date when the batch was cancelled.
+     *
+     * @var \Carbon\CarbonImmutable|null
+     */
+    public $cancelledAt = null;
+
+    /**
+     * The date when the batch was finished.
+     *
+     * @var \Carbon\CarbonImmutable|null
+     */
+    public $finishedAt = null;
+
+    /**
      * The callback to run after all the requests from the batch finish.
      *
      * @var \Closure|null
      */
     protected $finallyCallback = null;
 
+    /**
+     * Create a new request batch instance.
+     *
+     * @return void
+     */
     public function __construct(?Factory $factory = null)
     {
-        $this->factory = $factory ?: new Factory();
+        $this->factory = $factory ?: new Factory;
         $this->handler = Utils::chooseHandler();
-        $this->createdAt = new CarbonImmutable();
+        $this->createdAt = new CarbonImmutable;
     }
 
     /**
@@ -128,30 +133,6 @@ class Batch
         $this->incrementPendingRequests();
 
         return $this->requests[$key] = $this->asyncRequest();
-    }
-
-    /**
-     * Retrieve the requests in the batch.
-     *
-     * @return array<array-key, \Illuminate\Http\Client\PendingRequest>
-     */
-    public function getRequests(): array
-    {
-        return $this->requests;
-    }
-
-    /**
-     * Add a request to the batch with a numeric index.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
-     */
-    public function __call(string $method, array $parameters)
-    {
-        $this->incrementPendingRequests();
-
-        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
     }
 
     /**
@@ -424,5 +405,29 @@ class Batch
     protected function incrementFailedRequests(): void
     {
         $this->failedRequests++;
+    }
+
+    /**
+     * Get the requests in the batch.
+     *
+     * @return array<array-key, \Illuminate\Http\Client\PendingRequest>
+     */
+    public function getRequests(): array
+    {
+        return $this->requests;
+    }
+
+    /**
+     * Add a request to the batch with a numeric index.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     */
+    public function __call(string $method, array $parameters)
+    {
+        $this->incrementPendingRequests();
+
+        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
     }
 }
