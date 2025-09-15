@@ -899,6 +899,12 @@ class PendingRequest
         return $results;
     }
 
+    /**
+     * Send a pool of asynchronous requests concurrently, with callbacks for introspection.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Http\Client\Batch
+     */
     public function batch(callable $callback): Batch
     {
         return tap(new Batch($this->factory), $callback);
