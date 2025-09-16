@@ -213,5 +213,23 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "lint": [
+            "pint --parallel"
+        ],
+        "lint:check": [
+            "pint --parallel --test"
+        ],
+        "stan": [
+            "phpstan --configuration=phpstan.src.neon.dist"
+        ],
+        "stan:types": [
+            "phpstan --configuration=phpstan.types.neon.dist"
+        ],
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit"
+        ]
+    }
 }
