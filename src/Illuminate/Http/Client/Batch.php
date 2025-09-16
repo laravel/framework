@@ -5,6 +5,7 @@ namespace Illuminate\Http\Client;
 use Carbon\CarbonImmutable;
 use Closure;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Promise\Utils as PromiseUtils;
 use GuzzleHttp\Utils;
 
 /**
@@ -347,32 +348,45 @@ class Batch
             $beforeCallback($this);
         }
 
+        $promises = [];
         foreach ($requests as $key => $item) {
             if ($this->cancelled()) {
                 break;
             }
 
-            $result = match (true) {
-                $item instanceof static => $item->getPromise()->wait(),
-                $item instanceof PendingRequest => $item->getPromise()->wait(),
-                default => $item->wait(),
+            $promise = match (true) {
+                $item instanceof PendingRequest => $item->getPromise(),
+                default => $item,
             };
 
-            $results[$key] = $result;
-            $this->decrementPendingRequests();
+            $promise->then(function ($result) use ($key, &$results, $progressCallback, $catchCallback) {
+                $results[$key] = $result;
+                $this->decrementPendingRequests();
 
-            if ($result instanceof Response && $result->successful()) {
-                if ($progressCallback !== null) {
-                    $progressCallback($this, $key, $result);
-                }
-            }
+                if ($result instanceof Response && $result->successful()) {
+                    if ($progressCallback !== null) {
+                        $progressCallback($this, $key, $result);
+                    }
 
-            if (($result instanceof Response && $result->failed()) || $result instanceof RequestException) {
-                $this->incrementFailedRequests();
-                if ($catchCallback !== null) {
-                    $catchCallback($this, $key, $result);
+                    return $result;
                 }
-            }
+
+                if (($result instanceof Response && $result->failed()) || $result instanceof RequestException) {
+                    $this->incrementFailedRequests();
+
+                    if ($catchCallback !== null) {
+                        $catchCallback($this, $key, $result);
+                    }
+                }
+
+                return $result;
+            });
+
+            $promises[$key] = $promise;
+        }
+
+        if (! empty($promises)) {
+            PromiseUtils::settle($promises)->wait();
         }
 
         if (! $this->cancelled()) {
