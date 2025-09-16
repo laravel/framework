@@ -330,12 +330,30 @@ class HandleExceptions
      */
     public static function flushHandlersState(?TestCase $testCase = null)
     {
-        while (get_exception_handler() !== null) {
-            restore_exception_handler();
+        if (function_exists('get_exception_handler')) {
+            while (get_exception_handler() !== null) {
+                restore_exception_handler();
+            }
+        } else {
+            // Fallback for PHP < 8.4
+            $handler = set_exception_handler(null);
+            if ($handler !== null) {
+                set_exception_handler($handler);
+                restore_exception_handler();
+            }
         }
 
-        while (get_error_handler() !== null) {
-            restore_error_handler();
+        if (function_exists('get_error_handler')) {
+            while (get_error_handler() !== null) {
+                restore_error_handler();
+            }
+        } else {
+            // Fallback for PHP < 8.4
+            $handler = set_error_handler(null);
+            if ($handler !== null) {
+                set_error_handler($handler);
+                restore_error_handler();
+            }
         }
 
         if (class_exists(ErrorHandler::class)) {

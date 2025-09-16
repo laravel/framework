@@ -184,7 +184,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
-                return array_any($this->items, $key);
+                foreach ($this->items as $item) {
+                    if ($key($item)) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             return in_array($key, $this->items);
@@ -617,7 +622,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_any($keys, fn ($key) => array_key_exists($key, $this->items));
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $this->items)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
