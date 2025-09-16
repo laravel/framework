@@ -189,6 +189,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                         return true;
                     }
                 }
+
                 return false;
             }
 
@@ -627,6 +628,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 return true;
             }
         }
+
         return false;
     }
 
