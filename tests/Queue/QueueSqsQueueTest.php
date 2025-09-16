@@ -4,10 +4,13 @@ namespace Illuminate\Tests\Queue;
 
 use Aws\Result;
 use Aws\Sqs\SqsClient;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
+use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -236,5 +239,37 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals("{$this->prefix}{$this->queueName}{$suffix}.fifo", $queue->getQueue(null));
         $queueUrl = $this->baseUrl.'/'.$this->account.'/test'.$suffix.'.fifo';
         $this->assertEquals($queueUrl, $queue->getQueue('test-staging.fifo'));
+    }
+
+    public function testPushProperlyPushesJobObjectOntoSqs()
+    {
+        $job = new FakeSqsJob();
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
+        $id = $queue->push($job, $this->mockedData, $this->queueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPendingDispatchProperlyPushesJobObjectOntoSqs()
+    {
+        $job = new FakeSqsJob();
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
+
+        $dispatcher = new Dispatcher($container, fn () => $queue);
+        app()->instance(DispatcherContract::class, $dispatcher);
+
+        FakeSqsJob::dispatch();
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 }
