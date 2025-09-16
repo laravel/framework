@@ -27,7 +27,7 @@ class ProcessDriver implements Driver
     /**
      * Run the given tasks concurrently and return an array containing the results.
      */
-    public function run(Closure|array $tasks, int $timeout = null): array
+    public function run(Closure|array $tasks, ?int $timeout = null): array
     {
         $command = Application::formatCommandString('invoke-serialized-closure');
 
