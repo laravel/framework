@@ -1591,7 +1591,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set the maximum query log size
+     * Set the maximum query log size.
      *
      * @param  int  $size
      * @return $this
