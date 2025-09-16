@@ -352,7 +352,12 @@ class Batch
                 break;
             }
 
-            $result = $item->getPromise()->wait();
+            $result = match (true) {
+                $item instanceof static => $item->getPromise()->wait(),
+                $item instanceof PendingRequest => $item->getPromise()->wait(),
+                default => $item->wait(),
+            };
+
             $results[$key] = $result;
             $this->decrementPendingRequests();
 
