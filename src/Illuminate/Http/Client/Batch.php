@@ -367,7 +367,7 @@ class Batch
 
                     return $result;
                 },
-                'rejected' => function ($reason, $key) use (&$results, $catchCallback) {
+                'rejected' => function ($reason, $key) use ($catchCallback) {
                     $this->decrementPendingRequests();
 
                     if ($reason instanceof RequestException) {

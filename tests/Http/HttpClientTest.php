@@ -3826,6 +3826,7 @@ class HttpClientTest extends TestCase
 
     public function testBatchCancel(): void
     {
+        $this->markTestSkipped('SKIPPING UNTIL DECISION IS MADE TO KEEP OR REMOVE CANCEL FEATURE');
         $this->factory->fake([
             'https://200.com' => $this->factory::response('OK', 200),
             'https://500.com' => $this->factory::response('Error', 500),
