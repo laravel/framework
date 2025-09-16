@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
-use GuzzleHttp\Promise\Utils as PromiseUtils;
 use GuzzleHttp\Utils;
 
 /**
