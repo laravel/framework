@@ -865,7 +865,7 @@ class Connection implements ConnectionInterface
 
         if ($this->loggingQueries) {
             $this->queryLog[] = compact('query', 'bindings', 'time');
-            
+
             if (count($this->queryLog) > $this->maxQueryLogSize) {
                 $this->queryLog = array_slice($this->queryLog, -$this->maxQueryLogSize, $this->maxQueryLogSize, false);
             }

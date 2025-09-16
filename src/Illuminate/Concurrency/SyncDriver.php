@@ -20,7 +20,7 @@ class SyncDriver implements Driver
             try {
                 return $task();
             } catch (\Throwable $e) {
-                throw new \Exception("Synchronous task [{$key}] failed: " . $e->getMessage(), 0, $e);
+                throw new \Exception("Synchronous task [{$key}] failed: ".$e->getMessage(), 0, $e);
             }
         })->all();
     }

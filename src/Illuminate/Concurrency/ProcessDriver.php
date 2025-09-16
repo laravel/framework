@@ -38,7 +38,7 @@ class ProcessDriver implements Driver
                         serialize(new SerializableClosure($task))
                     ),
                 ])->command($command);
-                
+
                 if ($timeout !== null) {
                     $process->timeout($timeout);
                 }
@@ -58,7 +58,7 @@ class ProcessDriver implements Driver
 
             $result = json_decode($output, true);
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception("Concurrent process [{$key}] produced invalid JSON output: " . json_last_error_msg());
+                throw new Exception("Concurrent process [{$key}] produced invalid JSON output: ".json_last_error_msg());
             }
 
             if (! $result['successful']) {

@@ -160,10 +160,10 @@ PHP);
     public function testTimeoutHandling()
     {
         $this->expectException(Exception::class);
-        
+
         $app = new Application(__DIR__);
         $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
-        
+
         // This should timeout after 1 second
         $processDriver->run([
             fn () => sleep(5), // Task that takes 5 seconds
@@ -173,12 +173,12 @@ PHP);
     public function testLargeDataHandling()
     {
         $largeString = str_repeat('x', 1000000); // 1MB string
-        
+
         $results = Concurrency::driver('sync')->run([
             'large_data' => fn () => $largeString,
             'small_data' => fn () => 'small',
         ]);
-        
+
         $this->assertEquals($largeString, $results['large_data']);
         $this->assertEquals('small', $results['small_data']);
     }
@@ -187,7 +187,7 @@ PHP);
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/task_1.*failed/');
-        
+
         Concurrency::driver('sync')->run([
             'task_1' => fn () => throw new Exception('Test error'),
             'task_2' => fn () => 'success',
@@ -212,7 +212,7 @@ PHP);
             fn () => ['nested' => ['data' => 'value']],
             fn () => (object) ['property' => 'object_value'],
         ]);
-        
+
         $this->assertEquals(['nested' => ['data' => 'value']], $results[0]);
         $this->assertEquals('object_value', $results[1]->property);
     }
@@ -221,10 +221,10 @@ PHP);
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessageMatches('/Concurrent process.*failed with exit code/');
-        
+
         $app = new Application(__DIR__);
         $processDriver = new ProcessDriver($app->make(ProcessFactory::class));
-        
+
         $processDriver->run([
             'failing_task' => fn () => exit(1),
         ]);

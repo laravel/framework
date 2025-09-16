@@ -12,7 +12,8 @@ class JsonResourceTest extends TestCase
 {
     public function testJsonResourceNullAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $model->setAttribute('relation_sum_column', null);
@@ -32,7 +33,8 @@ class JsonResourceTest extends TestCase
 
     public function testJsonResourceToJsonSucceedsWithPriorErrors(): void
     {
-        $model = new class extends Model {
+        $model = new class extends Model
+        {
         };
 
         $resource = m::mock(JsonResource::class, ['resource' => $model])
