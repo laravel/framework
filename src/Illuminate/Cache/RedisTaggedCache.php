@@ -4,6 +4,8 @@ namespace Illuminate\Cache;
 
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisConnection;
 
 class RedisTaggedCache extends TaggedCache
 {
@@ -110,8 +112,46 @@ class RedisTaggedCache extends TaggedCache
     {
         $this->event(new CacheFlushing($this->getName()));
 
-        $this->flushValues();
-        $this->tags->flush();
+        $redisPrefix = match ($this->store->connection()::class) {
+            PhpRedisConnection::class => $this->store->connection()->client()->getOption(\Redis::OPT_PREFIX),
+            PredisConnection::class => $this->store->connection()->client()->getOptions()->prefix,
+        };
+
+        $cachePrefix = $redisPrefix.$this->store->getPrefix();
+
+        $cacheTags = [];
+        $keysToBeDeleted = [];
+
+        foreach ($this->tags->getNames() as $name) {
+            $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
+        }
+
+        foreach ($this->tags->entries() as $entry) {
+            $keysToBeDeleted[] = $this->store->getPrefix().$entry;
+        }
+
+        $script = <<<'LUA'
+            local prefix = table.remove(ARGV, 1)
+
+            for i, key in ipairs(KEYS) do
+                redis.call('DEL', key)
+
+                for j, arg in ipairs(ARGV) do
+                    local zkey = string.gsub(key, prefix, "")
+                    redis.call('ZREM', arg, zkey)
+                end
+            end
+        LUA;
+
+        $this->store->connection()->eval(
+            $script,
+            count($keysToBeDeleted),
+            ...$keysToBeDeleted,
+            ...[$cachePrefix, ...$cacheTags]
+        );
+
+        // $this->flushValues();
+        // $this->tags->flush();
 
         $this->event(new CacheFlushed($this->getName()));
 
