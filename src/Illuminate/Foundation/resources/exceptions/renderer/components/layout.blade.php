@@ -19,6 +19,28 @@
         {{ $slot }}
     </div>
 
+    <script>
+        window.copyToClipboard = async function(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-999999px';
+                textarea.style.top = '-999999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                
+                if (!document.execCommand('copy')) {
+                    throw new Error('execCommand copy failed');
+                }
+                
+                document.body.removeChild(textarea);
+            }
+        };
+    </script>
     {!! Renderer::js() !!}
 </body>
 </html>
