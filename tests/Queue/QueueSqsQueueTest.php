@@ -326,6 +326,8 @@ class QueueSqsQueueTest extends TestCase
         $id = $queue->push($this->mockedJob, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 
     public function testPushProperlyPushesJobObjectOntoSqsFifoQueue()
@@ -342,6 +344,8 @@ class QueueSqsQueueTest extends TestCase
         $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue()
@@ -362,6 +366,8 @@ class QueueSqsQueueTest extends TestCase
         FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay()
@@ -377,6 +383,8 @@ class QueueSqsQueueTest extends TestCase
         $id = $queue->later($this->mockedDelay, $this->mockedJob, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPushProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay()
@@ -394,6 +402,8 @@ class QueueSqsQueueTest extends TestCase
         $id = $queue->later($this->mockedDelay, $job, $this->mockedData, $this->fifoQueueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 
     public function testDelayedPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithoutDelay()
@@ -414,5 +424,7 @@ class QueueSqsQueueTest extends TestCase
         FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        Str::createUuidsNormally();
     }
 }
