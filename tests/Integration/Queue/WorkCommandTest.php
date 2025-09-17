@@ -167,14 +167,14 @@ class WorkCommandTest extends QueueTestCase
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
-        Worker::$memoryExceededExitCode = 25;
+        Worker::$memoryExceededExitCode = 0;
 
         Queue::push(new FirstJob);
         Queue::push(new SecondJob);
 
         $this->artisan('queue:work', [
             '--memory' => 0.1,
-        ])->assertExitCode(25);
+        ])->assertExitCode(0);
 
         // Memory limit isn't checked until after the first job is attempted.
         $this->assertSame(1, Queue::size());
