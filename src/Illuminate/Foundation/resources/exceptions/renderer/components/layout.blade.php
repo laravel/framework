@@ -41,6 +41,7 @@
             }
         };
     </script>
+
     {!! Renderer::js() !!}
 </body>
 </html>
