@@ -21,7 +21,7 @@ class AuthManagerPackageDiscoveryTest extends TestCase
         $_SERVER['argv'] = ['artisan', 'package:discover'];
 
         $app = new Application(__DIR__);
-        
+
         // Set up minimal configuration
         $app->singleton('config', function () {
             return new \Illuminate\Config\Repository([
