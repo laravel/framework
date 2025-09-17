@@ -20,7 +20,8 @@ class ScheduleWorkCommand extends Command
      */
     protected $signature = 'schedule:work
         {--run-output-file= : The file to direct <info>schedule:run</info> output to}
-        {--whisper : Do not output message indicating that no jobs were ready to run}';
+        {--whisper : Do not output message indicating that no jobs were ready to run}
+        {--tags= : Comma-separated list of tags to filter the scheduled tasks}';
 
     /**
      * The console command description.
@@ -51,6 +52,10 @@ class ScheduleWorkCommand extends Command
 
         if ($this->option('run-output-file')) {
             $command .= ' >> '.ProcessUtils::escapeArgument($this->option('run-output-file')).' 2>&1';
+        }
+
+        if ($this->option('tags')) {
+            $command .= ' --tags='.ProcessUtils::escapeArgument($this->option('tags'));
         }
 
         while (true) {

@@ -26,7 +26,8 @@ class ScheduleRunCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'schedule:run {--whisper : Do not output message indicating that no jobs were ready to run}';
+    protected $signature = 'schedule:run {--whisper : Do not output message indicating that no jobs were ready to run} 
+                                         {--tags= : Comma-separated list of tags to filter the scheduled tasks}';
 
     /**
      * The console command description.
@@ -112,6 +113,18 @@ class ScheduleRunCommand extends Command
         $this->phpBinary = Application::phpBinary();
 
         $events = $this->schedule->dueEvents($this->laravel);
+
+        if ($this->option('tags')) {
+            $tags = array_filter(array_map('trim', explode(',', $this->option('tags'))));
+            $tags = array_unique(array_filter($tags, 'strlen'));
+
+            if (! empty($tags)) {
+                $events = $events->filter(function (Event $event) use ($tags) {
+                    return ! empty(array_intersect($event->getTags(), $tags));
+                });
+            }
+
+        }
 
         if ($events->contains->isRepeatable()) {
             $this->clearInterruptSignal();

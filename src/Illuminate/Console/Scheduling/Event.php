@@ -91,6 +91,13 @@ class Event
     public $exitCode;
 
     /**
+     * The array of tags for the event.
+     *
+     * @var array
+     */
+    protected $tags = [];
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -855,5 +862,32 @@ class Event
             'php',
             preg_replace("#['\"]#", '', Application::artisanBinary()),
         ], $command);
+    }
+
+    /**
+     * Get the tags assigned to the event.
+     *
+     * @return array
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Assign a set of tags to the event.
+     *
+     * @param array|string  $tags
+     * @return $this
+     */
+    public function tags(array|string $tags): static
+    {
+        $tags = is_array($tags) ? $tags : func_get_args();
+
+        $this->tags = array_values(array_unique(
+            array_merge($this->tags, array_map('trim', $tags))
+        ));
+
+        return $this;
     }
 }
