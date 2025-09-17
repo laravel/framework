@@ -328,6 +328,20 @@ class Validator implements ValidatorContract
     protected $ensureExponentWithinAllowedRangeUsing;
 
     /**
+     * Indicates if the validator should generate a detailed report.
+     *
+     * @var bool
+     */
+    protected $verbose = false;
+
+    /**
+     * The detailed report of the validation process.
+     *
+     * @var array
+     */
+    protected $report = [];
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -461,6 +475,10 @@ class Validator implements ValidatorContract
         $this->messages = new MessageBag;
 
         [$this->distinctValues, $this->failedRules] = [[], []];
+
+        if ($this->verbose) {
+            $this->report = [];
+        }
 
         // We'll spin through each rule, validating the attributes attached to that
         // rule. Any error messages will be added to the containers with each of
@@ -682,7 +700,14 @@ class Validator implements ValidatorContract
 
         $this->numericRules = $this->defaultNumericRules;
 
-        if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
+        $result = true;
+        if ($validatable) {
+            $result = $this->$method($attribute, $value, $parameters, $this);
+        }
+
+        $this->recordValidationStep($attribute, $rule, $parameters, $value, $result);
+
+        if ($validatable && ! $result) {
             $this->addFailure($attribute, $rule, $parameters);
         }
     }
@@ -898,7 +923,17 @@ class Validator implements ValidatorContract
             $rule->setData($this->data);
         }
 
-        if (! $rule->passes($attribute, $value)) {
+        $passes = $rule->passes($attribute, $value);
+
+        $ruleClass = $rule instanceof InvokableValidationRule
+            ? get_class($rule->invokable())
+            : get_class($rule);
+
+        $this->recordValidationStep(
+            $this->replacePlaceholderInString($attribute), $ruleClass, [], $value, $passes
+        );
+
+        if (! $passes) {
             $ruleClass = $rule instanceof InvokableValidationRule ?
                 get_class($rule->invokable()) :
                 get_class($rule);
@@ -1314,6 +1349,54 @@ class Validator implements ValidatorContract
         $this->stopOnFirstFailure = $stopOnFirstFailure;
 
         return $this;
+    }
+
+    /**
+     * Enable verbose reporting for the validation process.
+     *
+     * @return $this
+     */
+    public function verbose()
+    {
+        $this->verbose = true;
+
+        $this->report = [];
+
+        return $this;
+    }
+
+    /**
+     * Get the detailed validation report.
+     *
+     * @return array
+     */
+    public function getReport()
+    {
+        return $this->report;
+    }
+
+    /**
+     * Record a single validation step in the report if verbose mode is enabled.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array  $parameters
+     * @param  mixed  $value
+     * @param  bool  $result
+     * @return void
+     */
+    protected function recordValidationStep($attribute, $rule, $parameters, $value, $result)
+    {
+        if (! $this->verbose) {
+            return;
+        }
+
+        $this->report[$attribute][] = [
+            'rule' => $rule,
+            'parameters' => $parameters,
+            'value' => $value,
+            'result' => (bool) $result,
+        ];
     }
 
     /**
