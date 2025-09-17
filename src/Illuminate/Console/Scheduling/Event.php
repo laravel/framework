@@ -877,7 +877,7 @@ class Event
     /**
      * Assign a set of tags to the event.
      *
-     * @param array|string $tags
+     * @param array|string  $tags
      * @return $this
      */
     public function tags(array|string $tags): static

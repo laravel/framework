@@ -118,9 +118,9 @@ class ScheduleRunCommand extends Command
             $tags = array_filter(array_map('trim', explode(',', $this->option('tags'))));
             $tags = array_unique(array_filter($tags, 'strlen'));
 
-            if (!empty($tags)) {
+            if (! empty($tags)) {
                 $events = $events->filter(function (Event $event) use ($tags) {
-                    return !empty(array_intersect($event->getTags(), $tags));
+                    return ! empty(array_intersect($event->getTags(), $tags));
                 });
             }
 
