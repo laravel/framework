@@ -104,4 +104,26 @@ class EventTest extends TestCase
 
         $this->assertSame('fancy-command-description', $event->mutexName());
     }
+
+    public function testEventTags()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $this->assertEmpty($event->getTags());
+
+        $event->tags(['emails', 'marketing']);
+        $this->assertEquals(['emails', 'marketing'], $event->getTags());
+
+        $event->tags('billing', 'notifications');
+        $this->assertEquals(['emails', 'marketing', 'billing', 'notifications'], $event->getTags());
+
+        $event->tags('emails', 'billing');
+        $this->assertEquals(['emails', 'marketing', 'billing', 'notifications'], $event->getTags());
+
+        $result = $event->tags('maintenance');
+        $this->assertSame($event, $result);
+        $this->assertEquals(['emails', 'marketing', 'billing', 'notifications', 'maintenance'], $event->getTags());
+
+        $event->tags('  test  ');
+        $this->assertContains('test', $event->getTags());
+    }
 }
