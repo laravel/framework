@@ -200,10 +200,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $queue,
             $delay,
             function ($payload, $queue, $delay) use ($job) {
-                return $this->pushRaw($payload, $queue, [
-                    'DelaySeconds' => $this->secondsUntil($delay),
-                    ...$this->getQueueableOptions($job, $queue),
-                ]);
+                return $this->pushRaw($payload, $queue, $this->getQueueableOptions($job, $queue, $delay));
             }
         );
     }
@@ -213,9 +210,10 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  mixed  $job
      * @param  string|null  $queue
-     * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @return array{DelaySeconds?: int, MessageGroupId?: string, MessageDeduplicationId?: string}
      */
-    protected function getQueueableOptions($job, $queue): array
+    protected function getQueueableOptions($job, $queue, $delay = null): array
     {
         // Make sure we have a queue name to properly determine if it's a FIFO queue.
         $queue ??= $this->default;
@@ -223,9 +221,16 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $isObject = is_object($job);
         $isFifo = str_ends_with((string) $queue, '.fifo');
 
+        $options = [];
+
+        // DelaySeconds cannot be used with FIFO queues. AWS will return an error.
+        if (! empty($delay) && ! $isFifo) {
+            $options['DelaySeconds'] = $this->secondsUntil($delay);
+        }
+
         // If the job is a string job on a standard queue, there are no more options.
         if (! $isObject && ! $isFifo) {
-            return [];
+            return $options;
         }
 
         $transformToString = fn ($value) => strval($value);
@@ -239,6 +244,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         } elseif ($isFifo) {
             $messageGroupId = transform($queue, $transformToString);
         }
+        $options['MessageGroupId'] = $messageGroupId;
 
         // The message deduplication id is only valid for FIFO queues. Every job
         // without the method will be considered unique. To use content-based
@@ -250,11 +256,9 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
                 default => (string) Str::orderedUuid(),
             };
         }
+        $options['MessageDeduplicationId'] = $messageDeduplicationId;
 
-        return array_filter([
-            'MessageGroupId' => $messageGroupId,
-            'MessageDeduplicationId' => $messageDeduplicationId,
-        ]);
+        return array_filter($options);
     }
 
     /**
