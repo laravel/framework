@@ -114,7 +114,7 @@ class Frame
         return match (true) {
             ! isset($this->frame['file']) => '[internal function]',
             ! is_string($this->frame['file']) => '[unknown file]',
-            default => str_replace($this->basePath.'/', '', $this->frame['file']),
+            default => str_replace($this->basePath.DIRECTORY_SEPARATOR, '', $this->frame['file']),
         };
     }
 
@@ -206,7 +206,7 @@ class Frame
     public function isFromVendor()
     {
         return ! str_starts_with($this->frame['file'], $this->basePath)
-            || str_starts_with($this->frame['file'], $this->basePath.'/vendor');
+            || str_starts_with($this->frame['file'], $this->basePath.DIRECTORY_SEPARATOR.'vendor');
     }
 
     /**
