@@ -1080,11 +1080,13 @@ class Str
      * Generate a more truly "random" alpha-numeric string.
      *
      * @param  int  $length
+     * @param  bool  $lower
+     * @param  bool  $upper
      * @return string
      */
-    public static function random($length = 16)
+    public static function random($length = 16, bool $lower = false, bool $upper = false)
     {
-        return (static::$randomStringFactory ?? function ($length) {
+        return (static::$randomStringFactory ?? function ($length) use ($lower, $upper) {
             $string = '';
 
             while (($len = strlen($string)) < $length) {
@@ -1097,7 +1099,11 @@ class Str
                 $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
             }
 
-            return $string;
+            return match (true) {
+                $lower === true => static::lower($string),
+                $upper === true => static::upper($string),
+                default => $string,
+            };
         })($length);
     }
 
