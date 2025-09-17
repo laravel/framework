@@ -2,7 +2,9 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Orchestra\Testbench\TestCase;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Foundation\Application;
+use PHPUnit\Framework\TestCase;
 
 class AuthManagerPackageDiscoveryTest extends TestCase
 {
@@ -10,37 +12,61 @@ class AuthManagerPackageDiscoveryTest extends TestCase
     {
         parent::tearDown();
 
+        // Reset the application state
         unset($_SERVER['argv']);
     }
 
-    protected function getPackageProviders($app)
+    protected function createApplication()
     {
-        return [
-            \Illuminate\Auth\AuthServiceProvider::class,
-        ];
+        $app = new Application(__DIR__);
+        
+        // Set up basic configuration
+        $app->singleton('config', function () {
+            return new \Illuminate\Config\Repository([
+                'auth' => [
+                    'defaults' => ['guard' => 'api'],
+                    'guards' => [
+                        'api' => [
+                            'driver' => 'my-custom-driver',
+                            'provider' => 'users',
+                        ],
+                    ],
+                    'providers' => [
+                        'users' => [
+                            'driver' => 'eloquent',
+                            'model' => \Illuminate\Tests\Auth\TestUser::class,
+                        ],
+                    ],
+                ],
+            ]);
+        });
+
+        // Register basic services needed by AuthManager
+        $app->singleton('hash', function ($app) {
+            return new \Illuminate\Hashing\HashManager($app);
+        });
+
+        $app->singleton('session', function ($app) {
+            return new \Illuminate\Session\SessionManager($app);
+        });
+
+        $app->singleton('events', function ($app) {
+            return new \Illuminate\Events\Dispatcher();
+        });
+
+        $app->singleton('auth', function ($app) {
+            return new AuthManager($app);
+        });
+
+        return $app;
     }
 
     public function testAuthManagerDoesNotThrowErrorDuringPackageDiscovery()
     {
         $_SERVER['argv'] = ['artisan', 'package:discover'];
 
-        $this->app['config']->set('auth', [
-            'defaults' => ['guard' => 'api'],
-            'guards' => [
-                'api' => [
-                    'driver' => 'my-custom-driver',
-                    'provider' => 'users',
-                ],
-            ],
-            'providers' => [
-                'users' => [
-                    'driver' => 'eloquent',
-                    'model' => \Illuminate\Tests\Auth\TestUser::class,
-                ],
-            ],
-        ]);
-
-        $authManager = $this->app['auth'];
+        $app = $this->createApplication();
+        $authManager = $app['auth'];
 
         $guard = $authManager->guard('api');
 
@@ -51,24 +77,10 @@ class AuthManagerPackageDiscoveryTest extends TestCase
     {
         $_SERVER['argv'] = ['artisan', 'migrate'];
 
-        $this->app['config']->set('auth', [
-            'defaults' => ['guard' => 'api'],
-            'guards' => [
-                'api' => [
-                    'driver' => 'session',
-                    'provider' => 'users',
-                ],
-            ],
-            'providers' => [
-                'users' => [
-                    'driver' => 'eloquent',
-                    'model' => \Illuminate\Tests\Auth\TestUser::class,
-                ],
-            ],
-        ]);
-
-        $authManager = $this->app['auth'];
-
+        $app = $this->createApplication();
+        $app['config']->set('auth.guards.api.driver', 'session');
+        
+        $authManager = $app['auth'];
         $guard = $authManager->guard('api');
 
         $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
@@ -78,24 +90,10 @@ class AuthManagerPackageDiscoveryTest extends TestCase
     {
         $_SERVER['argv'] = ['artisan', 'migrate'];
 
-        $this->app['config']->set('auth', [
-            'defaults' => ['guard' => 'api'],
-            'guards' => [
-                'api' => [
-                    'driver' => 'my-custom-driver',
-                    'provider' => 'users',
-                ],
-            ],
-            'providers' => [
-                'users' => [
-                    'driver' => 'eloquent',
-                    'model' => \Illuminate\Tests\Auth\TestUser::class,
-                ],
-            ],
-        ]);
+        $app = $this->createApplication();
+        $authManager = $app['auth'];
 
-        $authManager = $this->app['auth'];
-
+        // Register a custom driver
         $authManager->extend('my-custom-driver', function ($app, $name, $config) {
             return new \Illuminate\Auth\SessionGuard($name, $app['auth']->createUserProvider($config['provider']), $app['session.store']);
         });
