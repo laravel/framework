@@ -88,7 +88,7 @@ class AuthManager implements FactoryContract
             if ($config['driver'] === 'session') {
                 return $this->createSessionDriver($name, $config);
             }
-            
+
             return $this->createSessionDriver($name, [
                 'driver' => 'session',
                 'provider' => $config['provider'] ?? 'users',

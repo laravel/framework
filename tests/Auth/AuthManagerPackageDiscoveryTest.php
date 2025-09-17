@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\AuthManager;
 use Orchestra\Testbench\TestCase;
 
 class AuthManagerPackageDiscoveryTest extends TestCase
@@ -10,7 +9,7 @@ class AuthManagerPackageDiscoveryTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        
+
         unset($_SERVER['argv']);
     }
 
@@ -24,7 +23,7 @@ class AuthManagerPackageDiscoveryTest extends TestCase
     public function testAuthManagerDoesNotThrowErrorDuringPackageDiscovery()
     {
         $_SERVER['argv'] = ['artisan', 'package:discover'];
-        
+
         $this->app['config']->set('auth', [
             'defaults' => ['guard' => 'api'],
             'guards' => [
@@ -44,15 +43,14 @@ class AuthManagerPackageDiscoveryTest extends TestCase
         $authManager = $this->app['auth'];
 
         $guard = $authManager->guard('api');
-        
+
         $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
     }
 
     public function testAuthManagerWorksNormallyOutsidePackageDiscovery()
     {
-        
         $_SERVER['argv'] = ['artisan', 'migrate'];
-        
+
         $this->app['config']->set('auth', [
             'defaults' => ['guard' => 'api'],
             'guards' => [
@@ -72,14 +70,14 @@ class AuthManagerPackageDiscoveryTest extends TestCase
         $authManager = $this->app['auth'];
 
         $guard = $authManager->guard('api');
-        
+
         $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
     }
 
     public function testCustomDriverRegistrationWorksAfterPackageDiscovery()
     {
         $_SERVER['argv'] = ['artisan', 'migrate'];
-        
+
         $this->app['config']->set('auth', [
             'defaults' => ['guard' => 'api'],
             'guards' => [
@@ -103,7 +101,7 @@ class AuthManagerPackageDiscoveryTest extends TestCase
         });
 
         $guard = $authManager->guard('api');
-        
+
         $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
     }
 }
