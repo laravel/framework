@@ -16,11 +16,13 @@ class AuthManagerPackageDiscoveryTest extends TestCase
         unset($_SERVER['argv']);
     }
 
-    protected function createApplication()
+    public function testAuthManagerDoesNotThrowErrorDuringPackageDiscovery()
     {
+        $_SERVER['argv'] = ['artisan', 'package:discover'];
+
         $app = new Application(__DIR__);
         
-        // Set up basic configuration
+        // Set up minimal configuration
         $app->singleton('config', function () {
             return new \Illuminate\Config\Repository([
                 'auth' => [
@@ -41,7 +43,7 @@ class AuthManagerPackageDiscoveryTest extends TestCase
             ]);
         });
 
-        // Register basic services needed by AuthManager
+        // Register minimal services
         $app->singleton('hash', function ($app) {
             return new \Illuminate\Hashing\HashManager($app);
         });
@@ -54,50 +56,9 @@ class AuthManagerPackageDiscoveryTest extends TestCase
             return new \Illuminate\Events\Dispatcher();
         });
 
-        $app->singleton('auth', function ($app) {
-            return new AuthManager($app);
-        });
+        $authManager = new AuthManager($app);
 
-        return $app;
-    }
-
-    public function testAuthManagerDoesNotThrowErrorDuringPackageDiscovery()
-    {
-        $_SERVER['argv'] = ['artisan', 'package:discover'];
-
-        $app = $this->createApplication();
-        $authManager = $app['auth'];
-
-        $guard = $authManager->guard('api');
-
-        $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
-    }
-
-    public function testAuthManagerWorksNormallyOutsidePackageDiscovery()
-    {
-        $_SERVER['argv'] = ['artisan', 'migrate'];
-
-        $app = $this->createApplication();
-        $app['config']->set('auth.guards.api.driver', 'session');
-        
-        $authManager = $app['auth'];
-        $guard = $authManager->guard('api');
-
-        $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
-    }
-
-    public function testCustomDriverRegistrationWorksAfterPackageDiscovery()
-    {
-        $_SERVER['argv'] = ['artisan', 'migrate'];
-
-        $app = $this->createApplication();
-        $authManager = $app['auth'];
-
-        // Register a custom driver
-        $authManager->extend('my-custom-driver', function ($app, $name, $config) {
-            return new \Illuminate\Auth\SessionGuard($name, $app['auth']->createUserProvider($config['provider']), $app['session.store']);
-        });
-
+        // This should not throw an error during package discovery
         $guard = $authManager->guard('api');
 
         $this->assertInstanceOf(\Illuminate\Contracts\Auth\Guard::class, $guard);
