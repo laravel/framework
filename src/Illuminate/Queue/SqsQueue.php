@@ -162,8 +162,8 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data),
             $queue,
             null,
-            function ($payload, $queue) {
-                return $this->pushRaw($payload, $queue);
+            function ($payload, $queue) use ($job) {
+                return $this->pushRaw($payload, $queue, $this->getQueueableOptions($job, $queue));
             }
         );
     }
@@ -199,14 +199,41 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             $this->createPayload($job, $queue ?: $this->default, $data, $delay),
             $queue,
             $delay,
-            function ($payload, $queue, $delay) {
-                return $this->sqs->sendMessage([
-                    'QueueUrl' => $this->getQueue($queue),
-                    'MessageBody' => $payload,
+            function ($payload, $queue, $delay) use ($job) {
+                return $this->pushRaw($payload, $queue, [
                     'DelaySeconds' => $this->secondsUntil($delay),
-                ])->get('MessageId');
+                    ...$this->getQueueableOptions($job, $queue),
+                ]);
             }
         );
+    }
+
+    /**
+     * Get the queueable options from the job.
+     *
+     * @param  mixed  $job
+     * @param  string|null  $queue
+     * @return array{MessageGroupId?: string, MessageDeduplicationId?: string}
+     */
+    protected function getQueueableOptions($job, $queue): array
+    {
+        if (! is_object($job) || ! str_ends_with((string) $queue, '.fifo')) {
+            return [];
+        }
+
+        $transformToString = fn ($value) => strval($value);
+
+        $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
+
+        $messageDeduplicationId = match (true) {
+            method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
+            default => (string) Str::orderedUuid(),
+        };
+
+        return array_filter([
+            'MessageGroupId' => $messageGroupId,
+            'MessageDeduplicationId' => $messageDeduplicationId,
+        ]);
     }
 
     /**

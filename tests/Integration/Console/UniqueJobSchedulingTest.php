@@ -13,7 +13,7 @@ use Orchestra\Testbench\TestCase;
 
 class UniqueJobSchedulingTest extends TestCase
 {
-    public function testJobsPushedToQueue()
+    public function testJobsPushedToQueue(): void
     {
         Queue::fake();
         $this->dispatch(
@@ -26,7 +26,7 @@ class UniqueJobSchedulingTest extends TestCase
         Queue::assertPushed(TestJob::class, 4);
     }
 
-    public function testUniqueJobsPushedToQueue()
+    public function testUniqueJobsPushedToQueue(): void
     {
         Queue::fake();
         $this->dispatch(

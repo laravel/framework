@@ -250,7 +250,7 @@ trait InteractsWithInput
     /**
      * Retrieve data from the instance.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  mixed  $default
      * @return mixed
      */

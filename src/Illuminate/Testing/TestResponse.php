@@ -246,7 +246,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert whether the response is redirecting back to the previous location and the session has the given errors.
+     * Assert whether the response is redirecting back to the previous location with the given errors in the session.
      *
      * @param  string|array  $keys
      * @param  mixed  $format
@@ -1757,15 +1757,18 @@ class TestResponse implements ArrayAccess
     {
         $content = $this->content();
 
-        return json_validate($content)
-            ? $this->ddJson($key)
-            : dd($content);
+        if (json_validate($content)) {
+            $this->ddJson($key);
+        }
+
+        dd($content);
     }
 
     /**
      * Dump the JSON payload from the response and end the script.
      *
      * @param  string|null  $key
+     * @return never
      */
     public function ddJson($key = null)
     {

@@ -50,6 +50,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static $wrap = 'data';
 
     /**
+     * Whether to force wrapping even if the $wrap key exists in underlying resource data.
+     *
+     * @var bool
+     */
+    public static bool $forceWrapping = false;
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -156,13 +163,14 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Convert the resource to pretty print formatted JSON.
      *
+     * @param  int  $options
      * @return string
      *
      * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
-    public function toPrettyJson()
+    public function toPrettyJson(int $options = 0)
     {
-        return $this->toJson(JSON_PRETTY_PRINT);
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
     }
 
     /**

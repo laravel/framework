@@ -166,7 +166,7 @@ class BoundMethod
         $container,
         $parameter,
         array &$parameters,
-        &$dependencies
+        &$dependencies,
     ) {
         $pendingDependencies = [];
 

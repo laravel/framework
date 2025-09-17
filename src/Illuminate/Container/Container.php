@@ -12,6 +12,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\SelfBuilding;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -1169,6 +1170,11 @@ class Container implements ArrayAccess, ContainerContract
             return $this->notInstantiable($concrete);
         }
 
+        if (is_a($concrete, SelfBuilding::class, true) &&
+            ! in_array($concrete, $this->buildStack, true)) {
+            return $this->buildSelfBuildingInstance($concrete, $reflector);
+        }
+
         $this->buildStack[] = $concrete;
 
         $constructor = $reflector->getConstructor();
@@ -1203,6 +1209,34 @@ class Container implements ArrayAccess, ContainerContract
 
         $this->fireAfterResolvingAttributeCallbacks(
             $reflector->getAttributes(), $instance = $reflector->newInstanceArgs($instances)
+        );
+
+        return $instance;
+    }
+
+    /**
+     * Instantiate a concrete instance of the given self building type.
+     *
+     * @param  \Closure(static, array): TClass|class-string<TClass>  $concrete
+     * @param  \ReflectionClass  $reflector
+     * @return TClass
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function buildSelfBuildingInstance($concrete, $reflector)
+    {
+        if (! method_exists($concrete, 'newInstance')) {
+            throw new BindingResolutionException("No newInstance method exists for [$concrete].");
+        }
+
+        $this->buildStack[] = $concrete;
+
+        $instance = $this->call([$concrete, 'newInstance']);
+
+        array_pop($this->buildStack);
+
+        $this->fireAfterResolvingAttributeCallbacks(
+            $reflector->getAttributes(), $instance
         );
 
         return $instance;

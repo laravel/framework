@@ -179,6 +179,24 @@ class QueuedEventsTest extends TestCase
         });
     }
 
+    public function testQueuePropagateTries()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherOptions::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->tries === 5;
+        });
+    }
+
     public function testQueuePropagateMiddleware()
     {
         $d = new Dispatcher;
@@ -292,6 +310,11 @@ class TestDispatcherOptions implements ShouldQueue
     public function retryUntil()
     {
         return now()->addHour(1);
+    }
+
+    public function tries()
+    {
+        return 5;
     }
 
     public function handle()
