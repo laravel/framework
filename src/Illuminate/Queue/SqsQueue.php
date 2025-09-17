@@ -215,7 +215,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getQueueableOptions($job, $queue, $delay = null): array
     {
-        // Make sure we have a queue name to properly determine if it's a FIFO queue.
+        // Make sure we have a queue name to properly determine if it's a FIFO queue...
         $queue ??= $this->default;
 
         $isObject = is_object($job);
@@ -223,39 +223,43 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         $options = [];
 
-        // DelaySeconds cannot be used with FIFO queues. AWS will return an error.
+        // DelaySeconds cannot be used with FIFO queues. AWS will return an error...
         if (! empty($delay) && ! $isFifo) {
             $options['DelaySeconds'] = $this->secondsUntil($delay);
         }
 
-        // If the job is a string job on a standard queue, there are no more options.
+        // If the job is a string job on a standard queue, there are no more options...
         if (! $isObject && ! $isFifo) {
             return $options;
         }
 
         $transformToString = fn ($value) => strval($value);
 
-        // The message group id is required for FIFO queues and is optional for
-        // standard queues. Job objects contain the group id. For string jobs
-        // sent to FIFO queues, assign them to the same message group id.
+        // The message group ID is required for FIFO queues and is optional for
+        // standard queues. Job objects contain a group ID. With string jobs
+        // sent to FIFO queues, assign these to the same message group ID.
         $messageGroupId = null;
+
         if ($isObject) {
             $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
         } elseif ($isFifo) {
             $messageGroupId = transform($queue, $transformToString);
         }
+
         $options['MessageGroupId'] = $messageGroupId;
 
-        // The message deduplication id is only valid for FIFO queues. Every job
+        // The message deduplication ID is only valid for FIFO queues. Every job
         // without the method will be considered unique. To use content-based
-        // deduplication, enable it in AWS and have the method return empty.
+        // deduplication enable it in AWS and have the method return empty.
         $messageDeduplicationId = null;
+
         if ($isFifo) {
             $messageDeduplicationId = match (true) {
                 $isObject && method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
                 default => (string) Str::orderedUuid(),
             };
         }
+
         $options['MessageDeduplicationId'] = $messageDeduplicationId;
 
         return array_filter($options);
