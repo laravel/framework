@@ -84,6 +84,16 @@ class AuthManager implements FactoryContract
         if (is_null($config)) {
             throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
+        if ($this->app->runningConsoleCommand('package:discover')) {
+            if ($config['driver'] === 'session') {
+                return $this->createSessionDriver($name, $config);
+            }
+            
+            return $this->createSessionDriver($name, [
+                'driver' => 'session',
+                'provider' => $config['provider'] ?? 'users',
+            ]);
+        }
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($name, $config);
