@@ -217,18 +217,39 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function getQueueableOptions($job, $queue): array
     {
-        if (! is_object($job) || ! str_ends_with((string) $queue, '.fifo')) {
+        // Make sure we have a queue name to properly determine if it's a FIFO queue.
+        $queue ??= $this->default;
+
+        $isObject = is_object($job);
+        $isFifo = str_ends_with((string) $queue, '.fifo');
+
+        // If the job is a string job on a standard queue, there are no more options.
+        if (! $isObject && ! $isFifo) {
             return [];
         }
 
         $transformToString = fn ($value) => strval($value);
 
-        $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
+        // The message group id is required for FIFO queues and is optional for
+        // standard queues. Job objects contain the group id. For string jobs
+        // sent to FIFO queues, assign them to the same message group id.
+        $messageGroupId = null;
+        if ($isObject) {
+            $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
+        } elseif ($isFifo) {
+            $messageGroupId = transform($queue, $transformToString);
+        }
 
-        $messageDeduplicationId = match (true) {
-            method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
-            default => (string) Str::orderedUuid(),
-        };
+        // The message deduplication id is only valid for FIFO queues. Every job
+        // without the method will be considered unique. To use content-based
+        // deduplication, enable it in AWS and have the method return empty.
+        $messageDeduplicationId = null;
+        if ($isFifo) {
+            $messageDeduplicationId = match (true) {
+                $isObject && method_exists($job, 'deduplicationId') => transform($job->deduplicationId(), $transformToString),
+                default => (string) Str::orderedUuid(),
+            };
+        }
 
         return array_filter([
             'MessageGroupId' => $messageGroupId,
