@@ -104,7 +104,7 @@ class Worker
      *
      * @var int|null
      */
-    public static $memoryExceededExitCode = null;
+    public static $memoryExceededExitCode;
 
     /**
      * Create a new queue worker.
