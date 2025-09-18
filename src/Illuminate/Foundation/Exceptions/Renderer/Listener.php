@@ -37,6 +37,10 @@ class Listener
         if (isset($_SERVER['LARAVEL_OCTANE'])) {
             $events->listen([RequestReceived::class, TaskReceived::class, TickReceived::class, RequestTerminated::class], function () {
                 $this->queries = [];
+                unset($this->queries);
+                gc_collect_cycles();
+
+                $this->queries = [];
             });
         }
     }
