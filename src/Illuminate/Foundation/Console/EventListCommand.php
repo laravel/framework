@@ -96,6 +96,8 @@ class EventListCommand extends Command
         });
 
         $this->newLine();
+
+        $this->info('Total events: ' . $events->count());
     }
 
     /**
