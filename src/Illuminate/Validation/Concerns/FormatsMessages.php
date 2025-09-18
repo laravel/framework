@@ -394,6 +394,10 @@ trait FormatsMessages
      */
     protected function replaceOrdinalPositionPlaceholder($message, $attribute)
     {
+        if (! extension_loaded('intl')) {
+            return $message;
+        }
+
         return $this->replaceIndexOrPositionPlaceholder(
             $message, $attribute, 'ordinal-position', fn ($segment) => Number::ordinal($segment + 1)
         );

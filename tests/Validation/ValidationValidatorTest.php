@@ -849,6 +849,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    #[RequiresPhpExtension('intl')]
     public function testOrdinalPositionValuesAreReplaced()
     {
         $trans = $this->getIlluminateArrayTranslator();
