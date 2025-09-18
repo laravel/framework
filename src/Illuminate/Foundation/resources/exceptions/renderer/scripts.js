@@ -14,7 +14,7 @@ tippy('[data-tippy-content]', {
     theme: 'laravel',
 });
 
-window.copyToClipboard = async function(text) {
+window.copyToClipboard = async function (text) {
     if (navigator.clipboard) {
         await navigator.clipboard.writeText(text);
     } else {
@@ -26,7 +26,7 @@ window.copyToClipboard = async function(text) {
         document.body.appendChild(textarea);
         textarea.select();
 
-        const result = document.execCommand('copy')
+        const result = document.execCommand('copy');
         document.body.removeChild(textarea);
 
         if (!result) {
