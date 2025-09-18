@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.30.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.30.1...12.x)
+
+## [v12.30.1](https://github.com/laravel/framework/compare/v12.30.0...v12.30.1) - 2025-09-18
+
+* [12.x] Fix: Apply intl extension check to ordinal position to prevent issues by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/57112
 
 ## [v12.30.0](https://github.com/laravel/framework/compare/v12.29.0...v12.30.0) - 2025-09-18
 
