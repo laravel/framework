@@ -1344,7 +1344,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue
@@ -1369,7 +1369,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the first item in the collection but throw an exception if no matching items exist.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue
@@ -1630,17 +1630,22 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
-     * Take items in the collection until a given point in time.
+     * Take items in the collection until a given point in time, with an optional callback on timeout.
      *
      * @param  \DateTimeInterface  $timeout
+     * @param  callable(TValue|null, TKey|null): mixed|null  $callback
      * @return static<TKey, TValue>
      */
-    public function takeUntilTimeout(DateTimeInterface $timeout)
+    public function takeUntilTimeout(DateTimeInterface $timeout, ?callable $callback = null)
     {
         $timeout = $timeout->getTimestamp();
 
-        return new static(function () use ($timeout) {
+        return new static(function () use ($timeout, $callback) {
             if ($this->now() >= $timeout) {
+                if ($callback) {
+                    $callback(null, null);
+                }
+
                 return;
             }
 
@@ -1648,6 +1653,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
                 yield $key => $value;
 
                 if ($this->now() >= $timeout) {
+                    if ($callback) {
+                        $callback($value, $key);
+                    }
+
                     break;
                 }
             }

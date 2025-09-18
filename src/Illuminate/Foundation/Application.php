@@ -40,12 +40,12 @@ class Application extends Container implements ApplicationContract, CachesConfig
 {
     use Macroable;
 
-    /**
-     * The Laravel framework version.
-     *
-     * @var string
-     */
-    const VERSION = '13.x-dev';
+  /**
+  * The Laravel framework version.
+  *
+  * @var string
+   */
+     const VERSION = '12.30.0';
 
     /**
      * The base path for the Laravel installation.

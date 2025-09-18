@@ -117,7 +117,7 @@ class Http extends Facade
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  \Closure|array  $callback
+     * @param  \Closure|array|null  $callback
      * @return \Illuminate\Http\Client\Factory
      */
     public static function fake($callback = null)

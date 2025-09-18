@@ -63,7 +63,7 @@ class Listener
      */
     public function onQueryExecuted(QueryExecuted $event)
     {
-        if (count($this->queries) === 100) {
+        if (count($this->queries) === 101) {
             return;
         }
 

@@ -186,7 +186,7 @@ class Gate implements GateContract
             $response = $condition;
         }
 
-        return with($response instanceof Response ? $response : new Response(
+        return ($response instanceof Response ? $response : new Response(
             (bool) $response === $allowWhenResponseIs, $message, $code
         ))->authorize();
     }

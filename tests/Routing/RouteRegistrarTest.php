@@ -719,6 +719,8 @@ class RouteRegistrarTest extends TestCase
     public function testCanSetScopedOptionOnRegisteredResource()
     {
         $this->router->resource('users.tasks', RouteRegistrarControllerStub::class)->scoped();
+        $this->router->getRoutes()->refreshNameLookups();
+
         $this->assertSame(
             ['user' => null],
             $this->router->getRoutes()->getByName('users.tasks.index')->bindingFields()
@@ -731,6 +733,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users.tasks', RouteRegistrarControllerStub::class)->scoped([
             'task' => 'slug',
         ]);
+        $this->router->getRoutes()->refreshNameLookups();
         $this->assertSame(
             ['user' => null],
             $this->router->getRoutes()->getByName('users.tasks.index')->bindingFields()
@@ -897,6 +900,15 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
+    public function testCanSetMiddlewareCanOnGroups()
+    {
+        $this->router->can('test')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->seeMiddleware('can:test');
+    }
+
     public function testCanSetMiddlewareForSpecifiedMethodsOnRegisteredResource()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)
@@ -904,6 +916,7 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor('index', RouteRegistrarMiddlewareStub::class)
             ->middlewareFor(['create', 'store'], 'one')
             ->middlewareFor(['edit'], ['one', 'two']);
+        $this->router->getRoutes()->refreshNameLookups();
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.index')->gatherMiddleware(), ['default', RouteRegistrarMiddlewareStub::class]);
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['default', 'one']);
@@ -918,6 +931,7 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor(['create', 'store'], 'one')
             ->middlewareFor(['edit'], ['one', 'two'])
             ->middleware('default');
+        $this->router->getRoutes()->refreshNameLookups();
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.index')->gatherMiddleware(), [RouteRegistrarMiddlewareStub::class, 'default']);
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['one', 'default']);
@@ -1448,6 +1462,7 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor('show', RouteRegistrarMiddlewareStub::class)
             ->middlewareFor(['create', 'store'], 'one')
             ->middlewareFor(['edit'], ['one', 'two']);
+        $this->router->getRoutes()->refreshNameLookups();
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['default', 'one']);
         $this->assertEquals($this->router->getRoutes()->getByName('users.store')->gatherMiddleware(), ['default', 'one']);
@@ -1463,6 +1478,7 @@ class RouteRegistrarTest extends TestCase
             ->middlewareFor(['create', 'store'], 'one')
             ->middlewareFor(['edit'], ['one', 'two'])
             ->middleware('default');
+        $this->router->getRoutes()->refreshNameLookups();
 
         $this->assertEquals($this->router->getRoutes()->getByName('users.create')->gatherMiddleware(), ['one', 'default']);
         $this->assertEquals($this->router->getRoutes()->getByName('users.store')->gatherMiddleware(), ['one', 'default']);
