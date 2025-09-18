@@ -849,6 +849,38 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testOrdinalPositionValuesAreReplaced()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => 'Name :position is required.']);
+        // $this->assertFalse($v->passes());
+        // $this->assertSame('Name 1 is required.', $v->messages()->first('name'));
+
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'The :ordinal-position Name is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The 1st Name is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':ordinal-position :Attribute is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('1st Name is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'The :ordinal-position Name is required.']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The 2nd Name is required.', $v->messages()->first('input.*.name'));
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => ''], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => ':ordinal-position :Attribute is required.']);
+        $v->setAttributeNames([
+            'input.*.name' => 'name',
+        ]);
+        $this->assertFalse($v->passes());
+        $this->assertSame('2nd Name is required.', $v->messages()->first('input.*.name'));
+
+        $v = new Validator($trans, ['input' => [['name' => 'Bob'], ['name' => 'Jane']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'Name :ordinal-position is required.']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testCustomValidationLinesAreRespected()
     {
         $trans = $this->getIlluminateArrayTranslator();
