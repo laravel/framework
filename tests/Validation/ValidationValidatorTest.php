@@ -853,10 +853,6 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
-        // $v = new Validator($trans, ['name' => ''], ['name' => 'required'], ['name.required' => ':ordinal-position Name is required.']);
-        // $this->assertFalse($v->passes());
-        // $this->assertSame('1st Name is required.', $v->messages()->first('name'));
-
         $v = new Validator($trans, ['input' => [['name' => '']]], ['input.*.name' => 'required'], ['input.*.name.required' => 'The :ordinal-position Name is required.']);
         $this->assertFalse($v->passes());
         $this->assertSame('The 1st Name is required.', $v->messages()->first('input.*.name'));
