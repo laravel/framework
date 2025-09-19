@@ -1255,6 +1255,51 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest();
     }
 
+    public function testItRetrievesCssContentWhenManifestEntryUsesJsImporter()
+    {
+        $manifestsReflection = new \ReflectionProperty(Vite::class, 'manifests');
+        $manifestsReflection->setAccessible(true);
+
+        try {
+            $manifestsReflection->setValue(null, []);
+
+            $buildPath = 'build';
+            $manifestWithJsImporter = [
+                'resources/css/app.css' => [
+                    'file' => 'assets/app.importer.versioned.js',
+                    'isEntry' => true,
+                    'css' => [
+                        'assets/app.style.versioned.css',
+                    ],
+                ],
+            ];
+            $this->makeViteManifest($manifestWithJsImporter, $buildPath);
+
+            $expectedCssContent = 'body { color: hotpink; }';
+            $jsImporterContent = "import './app.style.versioned.css';";
+
+            $assetsPath = public_path("{$buildPath}/assets");
+            if (! is_dir($assetsPath)) {
+                mkdir($assetsPath, 0755, true);
+            }
+            file_put_contents($assetsPath.'/app.style.versioned.css', $expectedCssContent);
+            file_put_contents($assetsPath.'/app.importer.versioned.js', $jsImporterContent);
+
+            $resolvedContent = ViteFacade::content('resources/css/app.css', $buildPath);
+
+            $this->assertSame($expectedCssContent, $resolvedContent);
+            $this->assertNotSame($jsImporterContent, $resolvedContent);
+        } finally {
+            $manifestsReflection->setValue(null, []);
+            $fullBuildPath = public_path($buildPath);
+            unlink($fullBuildPath.'/manifest.json');
+            unlink($fullBuildPath.'/assets/app.importer.versioned.js');
+            unlink($fullBuildPath.'/assets/app.style.versioned.css');
+            rmdir($fullBuildPath.'/assets');
+            rmdir($fullBuildPath);
+        }
+    }
+
     public function testItThrowsWhenUnableToFindFileToRetrieveContent()
     {
         $this->makeViteManifest();
