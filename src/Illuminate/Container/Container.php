@@ -13,6 +13,7 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -1320,7 +1321,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getLastParameterOverride()
     {
-        return count($this->with) ? array_last($this->with) : [];
+        return count($this->with) ? Arr::last($this->with) : [];
     }
 
     /**
@@ -1680,7 +1681,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function currentlyResolving()
     {
-        return array_last($this->buildStack) ?: null;
+        return Arr::last($this->buildStack) ?: null;
     }
 
     /**
