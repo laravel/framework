@@ -303,6 +303,81 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
     }
 
+    public function testFalseShortSyntax()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool !bool></x-bool>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => false])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testFalseShortSyntaxAsValue()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool :bool="!false"></x-bool>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => !false])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testFalseShortSyntaxWithinValue()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool :bool="$value && !old(\'value\')"></x-bool>');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => \$value && !old('value')])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?> @endComponentClass##END-COMPONENT-CLASS##", trim($result));
+    }
+
+    public function testSelfClosingComponentWithFalseShortSyntax()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool !bool />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => false])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+'@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testSelfClosingComponentWithFalseShortSyntaxAsValue()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool :bool="!false" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => !false])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
+    public function testSelfClosingComponentWithFalseShortSyntaxWithinValue()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(['bool' => TestBoolComponent::class])->compileTags('<x-bool :bool="$value && !old(\'value\')" />');
+
+        $this->assertSame("##BEGIN-COMPONENT-CLASS##@component('Illuminate\Tests\View\Blade\TestBoolComponent', 'bool', ['bool' => \$value && !old('value')])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Illuminate\Tests\View\Blade\TestBoolComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##', trim($result));
+    }
+
     public function testEscapedColonAttribute()
     {
         $this->mockViewFactory();
@@ -1007,6 +1082,21 @@ class TestInputComponent extends Component
     public function render()
     {
         return 'input';
+    }
+}
+
+class TestBoolComponent extends Component
+{
+    public $bool;
+
+    public function __construct($bool)
+    {
+        $this->bool = $bool;
+    }
+
+    public function render()
+    {
+        return 'bool';
     }
 }
 
