@@ -897,7 +897,12 @@ class Vite implements Htmlable
 
         $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
-        $path = public_path($buildDirectory.'/'.$chunk['file']);
+        $fileToLoad = $chunk['file'];
+        if (isset($chunk['css'][0])) {
+            $fileToLoad = $chunk['css'][0];
+        }
+
+        $path = public_path($buildDirectory.'/'.$fileToLoad);
 
         if (! is_file($path) || ! file_exists($path)) {
             throw new ViteException("Unable to locate file from Vite manifest: {$path}.");
