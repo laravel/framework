@@ -1897,6 +1897,17 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    public function testPluralAcronym()
+    {
+        $this->assertSame('CD', Str::pluralAcronym('CD', 1));
+        $this->assertSame('CDs', Str::pluralAcronym('CD'));
+        $this->assertSame('CDs', Str::pluralAcronym('CD', 4));
+        $this->assertSame('DNSes', Str::pluralAcronym('DNS', -4));
+
+        $this->assertSame('1 CD', Str::pluralAcronym('CD', 1, prependCount: true));
+        $this->assertSame('1,000 CDs', Str::pluralAcronym('CD', 1000, prependCount: true));
+    }
 }
 
 class StringableObjectStub

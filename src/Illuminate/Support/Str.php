@@ -1020,6 +1020,19 @@ class Str
     }
 
     /**
+     * Get the plural form of an acronym.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
+     * @return string
+     */
+    public static function pluralAcronym($value, $count = 2, $prependCount = false)
+    {
+        return ($prependCount ? Number::format($count).' ' : '').Pluralizer::pluralAcronym($value, $count);
+    }
+
+    /**
      * Generate a random, secure password.
      *
      * @param  int  $length

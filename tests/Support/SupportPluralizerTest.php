@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Countable;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -111,6 +112,54 @@ class SupportPluralizerTest extends TestCase
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
         $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+    }
+
+    public function testBasicPluralAcronyms()
+    {
+        $this->assertSame('CDs', Str::pluralAcronym('CD'));
+        $this->assertSame('DVDs', Str::pluralAcronym('DVD'));
+        $this->assertSame('DNSes', Str::pluralAcronym('DNS'));
+    }
+
+    public function testPluralAcronymIsCaseSensitive()
+    {
+        // The goal is to always append a lowercase 's' or 'es', unlike the main plural method.
+        $this->assertSame('CDs', Str::pluralAcronym('CD'));
+        $this->assertSame('Cds', Str::pluralAcronym('Cd'));
+        $this->assertSame('cds', Str::pluralAcronym('cd'));
+        $this->assertSame('DNSes', Str::pluralAcronym('DNS'));
+        $this->assertSame('Dnses', Str::pluralAcronym('Dns'));
+    }
+
+    public function testPluralAcronymWithCount()
+    {
+        $this->assertSame('CD', Str::pluralAcronym('CD', 1));
+        $this->assertSame('CDs', Str::pluralAcronym('CD', 4));
+        $this->assertSame('CDs', Str::pluralAcronym('CD', 0));
+        $this->assertSame('CDs', Str::pluralAcronym('CD', []));
+
+        $countable = new class implements Countable
+        {
+            public function count(): int
+            {
+                return 5;
+            }
+        };
+        $this->assertSame('CDs', Str::pluralAcronym('CD', $countable));
+    }
+
+    public function testPluralAcronymWithNegativeCount()
+    {
+        $this->assertSame('CD', Str::pluralAcronym('CD', -1));
+        $this->assertSame('CDs', Str::pluralAcronym('CD', -2));
+    }
+
+    public function testPluralAcronymDoesNotPluralizeStringsEndingInSymbols()
+    {
+        $this->assertSame('CD.', Str::pluralAcronym('CD.'));
+        $this->assertSame('API!', Str::pluralAcronym('API!'));
+        $this->assertSame('URL?', Str::pluralAcronym('URL?'));
+        $this->assertSame('DVD ', Str::pluralAcronym('DVD '));
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)

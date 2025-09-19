@@ -55,6 +55,32 @@ class Pluralizer
     }
 
     /**
+     * Get the plural form of an acronym.
+     * Note: This method uses English-based pluralization rules (appending 's' or 'es')
+     * and does not currently adapt to the configured language.
+     *
+     * @param  string  $value
+     * @param  int|array|\Countable  $count
+     * @return string
+     */
+    public static function pluralAcronym($value, $count = 2)
+    {
+        if (is_countable($count)) {
+            $count = count($count);
+        }
+
+        if ((int) abs($count) === 1 || preg_match('/^(.*)[A-Za-z0-9\x{0080}-\x{FFFF}]$/u', $value) == 0) {
+            return $value;
+        }
+
+        if (mb_substr($value, -1) === 's' || mb_substr($value, -1) === 'S') {
+            return $value.'es';
+        }
+
+        return $value.'s';
+    }
+
+    /**
      * Get the singular form of an English word.
      *
      * @param  string  $value
