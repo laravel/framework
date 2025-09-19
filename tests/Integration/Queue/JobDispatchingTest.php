@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Config;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -137,6 +138,21 @@ class JobDispatchingTest extends QueueTestCase
         UniqueJob::dispatchAfterResponse('test');
         $this->app->terminate();
         $this->assertFalse(UniqueJob::$ran);
+    }
+
+    public function testDispatchDeferDelaysDispatchingUntilDeferredCallbacksAreRun()
+    {
+        Job::dispatchDefer('test');
+
+        $this->assertSame(1, $this->app[DeferredCallbackCollection::class]->count());
+        $this->assertFalse(Job::$ran);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+        $this->assertFalse(Job::$ran);
+
+        $this->app[DeferredCallbackCollection::class]->invoke();
+        $this->runQueueWorkerCommand(['--once' => true]);
+        $this->assertTrue(Job::$ran);
     }
 
     public function testQueueMayBeNullForJobQueueingAndJobQueuedEvent()
