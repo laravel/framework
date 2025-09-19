@@ -297,6 +297,63 @@ class BusBatchTest extends TestCase
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
+    public function test_failure_callbacks_execute_correctly(): void
+    {
+        $queue = m::mock(Factory::class);
+
+        $repository = new DatabaseBatchRepository(new BatchFactory($queue), DB::connection(), 'job_batches');
+
+        $pendingBatch = (new PendingBatch(new Container, collect()))
+            ->allowFailures([
+                static fn (Batch $batch, $e): true => $_SERVER['__failure1.invoked'] = true,
+                function (Batch $batch, $e) {
+                    $_SERVER['__failure2.invoked'] = true;
+                },
+                function (Batch $batch, $e) {
+                    $_SERVER['__failure3.batch'] = $batch;
+                    $_SERVER['__failure3.exception'] = $e;
+                    $_SERVER['__failure3.batch_id'] = $batch->id;
+                    $_SERVER['__failure3.batch_class'] = get_class($batch);
+                    $_SERVER['__failure3.exception_class'] = get_class($e);
+                    $_SERVER['__failure3.exception_message'] = $e->getMessage();
+                    $_SERVER['__failure3.param_count'] = func_num_args();
+                },
+            ])
+            ->onConnection('test-connection')
+            ->onQueue('test-queue');
+
+        $batch = $repository->store($pendingBatch);
+
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once();
+
+        $batch = $batch->add([$job]);
+
+        $_SERVER['__failure1.invoked'] = false;
+        $_SERVER['__failure2.invoked'] = false;
+        $_SERVER['__failure3.batch'] = null;
+        $_SERVER['__failure3.exception'] = null;
+
+        $batch->recordFailedJob('test-id', new RuntimeException('Comprehensive callback test.'));
+
+        $this->assertTrue($_SERVER['__failure1.invoked']);
+        $this->assertTrue($_SERVER['__failure2.invoked']);
+        $this->assertInstanceOf(Batch::class, $_SERVER['__failure3.batch']);
+        $this->assertSame('Comprehensive callback test.', $_SERVER['__failure3.exception']->getMessage());
+        $this->assertSame($batch->id, $_SERVER['__failure3.batch_id']);
+        $this->assertSame(Batch::class, $_SERVER['__failure3.batch_class']);
+        $this->assertSame(RuntimeException::class, $_SERVER['__failure3.exception_class']);
+        $this->assertEquals(2, $_SERVER['__failure3.param_count']);
+    }
+
     public function test_batch_can_be_cancelled()
     {
         $queue = m::mock(Factory::class);
