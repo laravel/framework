@@ -145,15 +145,12 @@ class RedisTaggedCache extends TaggedCache
             end
         LUA;
 
-        $this->store->connection()->eval(
+        $connection->eval(
             $script,
             count($keysToBeDeleted),
             ...$keysToBeDeleted,
             ...[$cachePrefix, ...$cacheTags]
         );
-
-        // $this->flushValues();
-        // $this->tags->flush();
 
         $this->event(new CacheFlushed($this->getName()));
 
