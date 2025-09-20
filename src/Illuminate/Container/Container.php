@@ -1267,7 +1267,7 @@ class Container implements ArrayAccess, ContainerContract
             $result = null;
 
             if (! is_null($attribute = Util::getContextualAttributeFromDependency($dependency))) {
-                $result = $this->resolveFromAttribute($attribute);
+                $result = $this->resolveFromAttribute($attribute, $dependency);
             }
 
             // If the class is null, it means the dependency is a string or some other
@@ -1416,9 +1416,10 @@ class Container implements ArrayAccess, ContainerContract
      * Resolve a dependency based on an attribute.
      *
      * @param  \ReflectionAttribute  $attribute
+     * @param  \ReflectionParameter  $parameter
      * @return mixed
      */
-    public function resolveFromAttribute(ReflectionAttribute $attribute)
+    public function resolveFromAttribute(ReflectionAttribute $attribute, ReflectionParameter $parameter)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
 
@@ -1432,7 +1433,7 @@ class Container implements ArrayAccess, ContainerContract
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
-        return $handler($instance, $this);
+        return $handler($instance, $this, $parameter);
     }
 
     /**
