@@ -113,7 +113,7 @@ class RedisTaggedCache extends TaggedCache
         $this->event(new CacheFlushing($this->getName()));
 
         $connection = $this->store->connection();
-        
+
         $redisPrefix = match (true) {
             $connection instanceof PhpRedisConnection => $connection->client()->getOption(\Redis::OPT_PREFIX),
             $connection instanceof PredisConnection => $connection->client()->getOptions()->prefix,
