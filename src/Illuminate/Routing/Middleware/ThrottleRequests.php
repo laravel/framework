@@ -96,6 +96,7 @@ class ThrottleRequests
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decaySeconds' => 60 * $decayMinutes,
+                    'afterCallback' => null,
                     'responseCallback' => null,
                 ],
             ]
@@ -131,6 +132,7 @@ class ThrottleRequests
                     'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
+                    'afterCallback' => $limit->afterCallback,
                     'responseCallback' => $limit->responseCallback,
                 ];
             })->all()
@@ -154,12 +156,18 @@ class ThrottleRequests
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
 
-            $this->limiter->hit($limit->key, $limit->decaySeconds);
+            if (! $limit->afterCallback) {
+                $this->limiter->hit($limit->key, $limit->decaySeconds);
+            }
         }
 
         $response = $next($request);
 
         foreach ($limits as $limit) {
+            if ($limit->afterCallback && ($limit->afterCallback)($response)) {
+                $this->limiter->hit($limit->key, $limit->decaySeconds);
+            }
+
             $response = $this->addHeaders(
                 $response,
                 $limit->maxAttempts,
