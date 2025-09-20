@@ -8,14 +8,7 @@ use Brick\Math\Exception\MathException as BrickMathException;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
-use Egulias\EmailValidator\EmailValidator;
-use Egulias\EmailValidator\Validation\DNSCheckValidation;
-use Egulias\EmailValidator\Validation\Extra\SpoofCheckValidation;
-use Egulias\EmailValidator\Validation\MultipleValidationWithAnd;
-use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
-use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
-use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -935,27 +928,28 @@ trait ValidatesAttributes
      */
     public function validateEmail($attribute, $value, $parameters)
     {
-        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
+        $validations = new Collection($parameters);
+
+        if (! (is_string($value) || $value instanceof \Stringable)) {
             return false;
         }
 
-        $validations = (new Collection($parameters))
-            ->unique()
-            ->map(fn ($validation) => match (true) {
-                $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
-                $validation === 'spoof' => new SpoofCheckValidation(),
-                $validation === 'filter' => new FilterEmailValidation(),
-                $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
-                is_string($validation) && class_exists($validation) => $this->container->make($validation),
-                default => new RFCValidation(),
-            })
-            ->values()
-            ->all() ?: [new RFCValidation];
-
-        $emailValidator = Container::getInstance()->make(EmailValidator::class);
-
-        return $emailValidator->isValid($value, new MultipleValidationWithAnd($validations));
+        return Str::isEmail(
+            $value,
+            $validations->containsStrict('rfc'),
+            $validations->containsStrict('strict'),
+            $validations->containsStrict('dns'),
+            $validations->containsStrict('spoof'),
+            $validations->containsStrict('filter'),
+            $validations->containsStrict('filter_unicode'),
+            $validations
+                ->reject(fn ($param) => in_array($param, [
+                    'rfc', 'strict', 'dns', 'spoof', 'filter', 'filter_unicode',
+                ], true))
+                ->filter(fn ($class) => is_string($class) && class_exists($class))
+                ->values()
+                ->all(),
+        );
     }
 
     /**

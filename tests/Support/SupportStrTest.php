@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -688,6 +689,37 @@ class SupportStrTest extends TestCase
     public function testIsUuidWithVersion($uuid, $version, $passes)
     {
         $this->assertSame(Str::isUuid($uuid, $version), $passes);
+    }
+
+    public function testIsEmail(): void
+    {
+        $this->assertTrue(Str::isEmail('foo@bar.com'));
+
+        $this->assertFalse(Str::isEmail('foo-bar'));
+
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com'));
+
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com', rfc: true));
+
+        $this->assertTrue(Str::isEmail('foo@bar.com', strict: true));
+
+        $this->assertFalse(Str::isEmail('test@example.com', dns: true));
+
+        $this->assertTrue(Str::isEmail('taylor@laravel.com', dns: true));
+
+        $this->assertTrue(Str::isEmail('foo@bar.com', spoof: true));
+
+        $this->assertTrue(Str::isEmail('foo@bar.com', filter: true));
+
+        $this->assertTrue(Str::isEmail('unicode@xn--r8jz45g.xn--zckzah', filterUnicode: true));
+
+        $this->assertTrue(Str::isEmail(new Stringable('foo@bar.com')));
+
+        $this->assertTrue(Str::isEmail('foo@bar.com', customValidations: ['NonExistentClass']));
+
+        $this->assertFalse(Str::isEmail('test👨‍💻@domain.com', rfc: true, spoof: true));
+
+        $this->assertFalse(Str::isEmail(''));
     }
 
     public function testIsJson()
