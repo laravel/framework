@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Validation\Rules\AnyOf;
@@ -17,6 +18,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\Rules\ImageFile;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Validation\Rules\JsonSchema as JsonSchemaRule;
 use Illuminate\Validation\Rules\NotIn;
 use Illuminate\Validation\Rules\Numeric;
 use Illuminate\Validation\Rules\ProhibitedIf;
@@ -245,6 +247,17 @@ class Rule
     public static function numeric()
     {
         return new Numeric;
+    }
+
+    /**
+     * Create a JSON Schema validation rule.
+     *
+     * @param  \Illuminate\JsonSchema\Types\Type  $schema
+     * @return \Illuminate\Validation\Rules\JsonSchema
+     */
+    public static function jsonSchema(Type $schema)
+    {
+        return new JsonSchemaRule($schema);
     }
 
     /**
