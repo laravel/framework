@@ -96,7 +96,7 @@ class ThrottleRequests
                     'key' => $prefix.$this->resolveRequestSignature($request),
                     'maxAttempts' => $this->resolveMaxAttempts($request, $maxAttempts),
                     'decaySeconds' => 60 * $decayMinutes,
-                    'onSuccess' => false,
+                    'afterCallback' => null,
                     'responseCallback' => null,
                 ],
             ]
@@ -132,7 +132,7 @@ class ThrottleRequests
                     'key' => self::$shouldHashKeys ? md5($limiterName.$limit->key) : $limiterName.':'.$limit->key,
                     'maxAttempts' => $limit->maxAttempts,
                     'decaySeconds' => $limit->decaySeconds,
-                    'onSuccess' => $limit->onSuccess,
+                    'afterCallback' => $limit->afterCallback,
                     'responseCallback' => $limit->responseCallback,
                 ];
             })->all()
@@ -156,17 +156,15 @@ class ThrottleRequests
                 throw $this->buildException($request, $limit->key, $limit->maxAttempts, $limit->responseCallback);
             }
 
-            if (! $limit->onSuccess) {
+            if (! $limit->afterCallback) {
                 $this->limiter->hit($limit->key, $limit->decaySeconds);
             }
         }
 
         $response = $next($request);
 
-        $isSuccess = $this->isSuccessfulResponse($request, $response);
-
         foreach ($limits as $limit) {
-            if ($limit->onSuccess && $isSuccess) {
+            if ($limit->afterCallback && ($limit->afterCallback)($response)) {
                 $this->limiter->hit($limit->key, $limit->decaySeconds);
             }
 
@@ -178,34 +176,6 @@ class ThrottleRequests
         }
 
         return $response;
-    }
-
-    /**
-     * Determine whether we should consider the response successful.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @return bool
-     */
-    protected function isSuccessfulResponse($request, Response $response)
-    {
-        if ($request->isPrecognitive()) {
-            return false;
-        }
-
-        if ($response->isSuccessful()) {
-            return true;
-        }
-
-        if ($response->getStatusCode() >= 400) {
-            return false;
-        }
-
-        if (data_get($response, 'exception.status') >= 400) {
-            return false;
-        }
-
-        return $response->getStatusCode() == 302;
     }
 
     /**

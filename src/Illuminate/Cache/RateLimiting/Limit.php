@@ -26,11 +26,11 @@ class Limit
     public $decaySeconds;
 
     /**
-     * Whether to only record a hit after a successful response.
+     * The after callback used to determine if the limiter should be hit.
      *
-     * @var bool
+     * @var ?callable
      */
-    public $onSuccess = false;
+    public $afterCallback = null;
 
     /**
      * The response generator callback.
@@ -137,14 +137,14 @@ class Limit
     }
 
     /**
-     * Set whether to only record a hit after a successful response.
+     * Set the callback to determine if the limiter should be hit.
      *
-     * @param  bool  $onSuccess
+     * @param  callable  $callback
      * @return $this
      */
-    public function onSuccess(bool $onSuccess = true)
+    public function after($callback)
     {
-        $this->onSuccess = $onSuccess;
+        $this->afterCallback = $callback;
 
         return $this;
     }
