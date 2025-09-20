@@ -45,7 +45,7 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
-        return $formatter->format($number);
+        return $formatter->format($number) ?: (string) $number;
     }
 
     /**
@@ -56,7 +56,7 @@ class Number
      * @param  string|null  $locale
      * @return int|float|false
      */
-    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float
+    public static function parse(string $string, ?int $type = NumberFormatter::TYPE_DOUBLE, ?string $locale = null): int|float|false
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -72,7 +72,7 @@ class Number
      * @param  string|null  $locale
      * @return int|false
      */
-    public static function parseInt(string $string, ?string $locale = null): int
+    public static function parseInt(string $string, ?string $locale = null): int|false
     {
         return self::parse($string, NumberFormatter::TYPE_INT32, $locale);
     }
@@ -84,7 +84,7 @@ class Number
      * @param  string|null  $locale
      * @return float|false
      */
-    public static function parseFloat(string $string, ?string $locale = null): float
+    public static function parseFloat(string $string, ?string $locale = null): float|false
     {
         return self::parse($string, NumberFormatter::TYPE_DOUBLE, $locale);
     }
@@ -98,7 +98,7 @@ class Number
      * @param  int|null  $until
      * @return string
      */
-    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null)
+    public static function spell(int|float $number, ?string $locale = null, ?int $after = null, ?int $until = null): string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -112,7 +112,7 @@ class Number
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::SPELLOUT);
 
-        return $formatter->format($number);
+        return $formatter->format($number) ?: (string) $number;
     }
 
     /**
@@ -122,13 +122,13 @@ class Number
      * @param  string|null  $locale
      * @return string
      */
-    public static function ordinal(int|float $number, ?string $locale = null)
+    public static function ordinal(int|float $number, ?string $locale = null): string
     {
         static::ensureIntlExtensionIsInstalled();
 
         $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::ORDINAL);
 
-        return $formatter->format($number);
+        return $formatter->format($number) ?: (string) $number;
     }
 
     /**
@@ -138,7 +138,7 @@ class Number
      * @param  string|null  $locale
      * @return string
      */
-    public static function spellOrdinal(int|float $number, ?string $locale = null)
+    public static function spellOrdinal(int|float $number, ?string $locale = null): string
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -146,7 +146,7 @@ class Number
 
         $formatter->setTextAttribute(NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal');
 
-        return $formatter->format($number);
+        return $formatter->format($number) ?: (string) $number;
     }
 
     /**
