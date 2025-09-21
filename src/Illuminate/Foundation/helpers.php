@@ -1101,3 +1101,14 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('toIntOrNull')) {
+    /**
+     * @param string|null $value
+     * @return int|null
+     */
+    function toIntOrNull(?string $value): ?int
+    {
+        return $value !== null ? (int) $value : null;
+    }
+}
