@@ -1812,4 +1812,44 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+     public function testArrSomeReturnsTrueIfAtLeastOneElementPasses()
+    {
+        $array = [1, 2, 3, 4];
+
+        $this->assertTrue(Arr::some($array, fn ($value) => $value % 2 === 0));
+        $this->assertTrue(Arr::some($array, fn ($value) => $value > 3));
+    }
+
+    public function testArrSomeReturnsFalseIfNoElementPasses()
+    {
+        $array = [1, 3, 5];
+
+        $this->assertFalse(Arr::some($array, fn ($value) => $value % 2 === 0));
+        $this->assertFalse(Arr::some($array, fn ($value) => $value > 10));
+    }
+
+    public function testArrEveryReturnsTrueIfAllElementsPass()
+    {
+        $array = [2, 4, 6, 8];
+
+        $this->assertTrue(Arr::every($array, fn ($value) => $value % 2 === 0));
+        $this->assertTrue(Arr::every($array, fn ($value) => $value > 0));
+    }
+
+    public function testArrEveryReturnsFalseIfAnyElementFails()
+    {
+        $array = [2, 4, 5, 8];
+
+        $this->assertFalse(Arr::every($array, fn ($value) => $value % 2 === 0));
+        $this->assertFalse(Arr::every($array, fn ($value) => $value < 5));
+    }
+
+    public function testArrSomeAndEveryWithEmptyArray()
+    {
+        $array = [];
+
+        $this->assertFalse(Arr::some($array, fn ($value) => true));
+        $this->assertTrue(Arr::every($array, fn ($value) => true));
+    }
 }

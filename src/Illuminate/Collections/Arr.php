@@ -1223,4 +1223,40 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+     /**
+     * Determine if at least one item in the array passes the truth test.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return bool
+     */
+    public static function some(array $array, callable $callback): bool
+    {
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if all items in the array pass the truth test.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return bool
+     */
+    public static function every(array $array, callable $callback): bool
+    {
+        foreach ($array as $key => $value) {
+            if (! $callback($value, $key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
