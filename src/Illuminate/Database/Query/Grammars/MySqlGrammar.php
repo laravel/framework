@@ -487,6 +487,27 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a delete statement with joins into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  string  $where
+     * @return string
+     */
+    protected function compileDeleteWithJoins(Builder $query, $table, $where)
+    {
+        if (! empty($query->orders)) {
+            throw new \RuntimeException('MySQL does not support ORDER BY on DELETE statements with JOIN clauses.');
+        }
+
+        if (isset($query->limit)) {
+            throw new \RuntimeException('MySQL does not support LIMIT on DELETE statements with JOIN clauses.');
+        }
+
+        return parent::compileDeleteWithJoins($query, $table, $where);
+    }
+
+    /**
      * Compile a query to get the number of open connections for a database.
      *
      * @return string
