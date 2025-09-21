@@ -84,14 +84,25 @@ class IterableCast implements CastsAttributes
         $data = new Collection($data);
 
         if ($this->map) {
-            $this->map = Str::parseCallback($this->map);
-
-            $data = is_callable($this->map)
-                ? $data->map($this->map)
-                : $data->mapInto($this->map[0]);
+            $data = $this->mapItems($data) ?? $data;
         }
 
         return $this->makeIterableObject($data);
+    }
+
+    /**
+     * Maps the items using a callback, if any.
+     *
+     * @param  \Illuminate\Support\Collection  $data
+     * @return \Illuminate\Support\Collection|null
+     */
+    protected function mapItems($data)
+    {
+        $this->map = Str::parseCallback($this->map);
+
+        return is_callable($this->map)
+            ? $data->map($this->map)
+            : $data->mapInto($this->map[0]);
     }
 
     /**
