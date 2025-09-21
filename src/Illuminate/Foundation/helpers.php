@@ -1105,7 +1105,7 @@ if (! function_exists('view')) {
 
 if (! function_exists('toIntOrNull')) {
     /**
-     * @param  string|null $value
+     * @param  string|null  $value
      * @return int|null
      */
     function toIntOrNull(?string $value): ?int
@@ -1116,7 +1116,7 @@ if (! function_exists('toIntOrNull')) {
 
 if (! function_exists('toDateOrNull')) {
     /**
-     * @param  string|null $value
+     * @param  string|null  $value
      * @return DateTime|null
      */
     function toDateOrNull(?string $value): ?DateTime
