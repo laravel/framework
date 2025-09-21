@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Broadcasting\FakePendingBroadcast;
 use Illuminate\Broadcasting\PendingBroadcast;
@@ -1110,5 +1111,16 @@ if (! function_exists('toIntOrNull')) {
     function toIntOrNull(?string $value): ?int
     {
         return $value !== null ? (int) $value : null;
+    }
+}
+
+if (! function_exists('toDateOrNull')) {
+    /**
+     * @param string|null $value
+     * @return DateTime|null
+     */
+    function toDateOrNull(?string $value): ?DateTime
+    {
+        return $value !== null ? Carbon::parse($value) : null;
     }
 }
