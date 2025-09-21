@@ -14,8 +14,8 @@ class ToString implements Stringable, Castable
      * Create a new To Enumerable instance.
      *
      * @param  class-string<TBaseClass>  $class
-     * @param  boolean|null  $withoutCaching
-     * @param  boolean|null  $encrypt
+     * @param  bool|null  $withoutCaching
+     * @param  bool|null  $encrypt
      * @param  class-string<TBaseClass>|null  $using
      */
     public function __construct(
@@ -77,7 +77,7 @@ class ToString implements Stringable, Castable
     /**
      * @inheritDoc
      *
-     * @param array{class-string<TBaseClass>, string|null, string|null, class-string<TBaseClass>|null}  $arguments
+     * @param  array{class-string<TBaseClass>, string|null, string|null, class-string<TBaseClass>|null}  $arguments
      * @return \Illuminate\Database\Eloquent\Casts\StringableCast<TBaseClass>
      */
     public static function castUsing(array $arguments)

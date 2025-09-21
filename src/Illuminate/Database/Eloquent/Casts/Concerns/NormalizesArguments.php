@@ -13,7 +13,7 @@ trait NormalizesArguments
      */
     protected function normalize(): void
     {
-        if (!$this->using) {
+        if (! $this->using) {
             $this->using = $this->class;
         } elseif (! is_a($this->using, $this->class, true)) {
             throw new InvalidArgumentException("The provided class must extend [$this->class].");

@@ -18,7 +18,7 @@ class IterableCast implements CastsAttributes
     use Concerns\NormalizesArguments;
 
     /**
-     * The base iterable class to cast
+     * The base iterable class to cast.
      *
      * @var class-string<TBaseClass>
      */
@@ -69,7 +69,7 @@ class IterableCast implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes)
     {
-        if (!isset($attributes[$key])) {
+        if (! isset($attributes[$key])) {
             return;
         }
 
@@ -77,7 +77,7 @@ class IterableCast implements CastsAttributes
             ? Json::decode(Crypt::decryptString($attributes[$key]))
             : Json::decode($attributes[$key]);
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return;
         }
 
@@ -97,7 +97,7 @@ class IterableCast implements CastsAttributes
     /**
      * Instances the target iterable class.
      *
-     * @param  \Illuminate\Support\Collection $data
+     * @param  \Illuminate\Support\Collection  $data
      * @return \Illuminate\Support\Collection|\Illuminate\Support\Fluent
      */
     protected function makeIterableObject($data)

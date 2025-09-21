@@ -9,7 +9,7 @@ class ArrayObjectCast extends IterableCast
     /**
      * Instances the target iterable class.
      *
-     * @param  \Illuminate\Support\Collection $data
+     * @param  \Illuminate\Support\Collection  $data
      * @return \Illuminate\Database\Eloquent\Casts\ArrayObject
      */
     protected function makeIterableObject($data)

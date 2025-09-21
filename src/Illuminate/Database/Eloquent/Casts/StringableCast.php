@@ -60,7 +60,7 @@ class StringableCast implements CastsAttributes
      */
     public function get(Model $model, string $key, mixed $value, array $attributes)
     {
-        if (!isset($attributes[$key])) {
+        if (! isset($attributes[$key])) {
             return;
         }
 
@@ -74,7 +74,7 @@ class StringableCast implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes)
     {
-        if (!is_null($value)) {
+        if (! is_null($value)) {
             return [
                 $key => $this->encrypt
                     ? Crypt::encryptString($value)

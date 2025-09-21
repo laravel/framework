@@ -23,6 +23,7 @@ use InvalidArgumentException;
 use Mockery as m;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
+
 use function implode;
 
 class DatabaseEloquentCastTo extends TestCase
@@ -47,7 +48,7 @@ class DatabaseEloquentCastTo extends TestCase
         $this->createSchema();
 
         $this->container = new Application();
-        $this->container->singleton('encrypter', fn() => $this->encrypter);
+        $this->container->singleton('encrypter', fn () => $this->encrypter);
 
         Facade::setFacadeApplication($this->container);
 
@@ -170,7 +171,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_stringable_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . Stringable::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.Stringable::class.'].');
 
         $this->model(To::stringable()->using(Fluent::class), 'test_string');
     }
@@ -241,7 +242,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_html_string_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . HtmlString::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.HtmlString::class.'].');
 
         $this->model(To::htmlString()->using(Fluent::class), 'test_string');
     }
@@ -312,7 +313,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_uri_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . Uri::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.Uri::class.'].');
 
         $this->model(To::uri()->using(Fluent::class), 'test_string');
     }
@@ -385,7 +386,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_array_object_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . ArrayObject::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.ArrayObject::class.'].');
 
         $this->model(To::arrayObject()->using(Fluent::class), 'test_string');
     }
@@ -518,7 +519,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_collection_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . Collection::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.Collection::class.'].');
 
         $this->model(To::collection()->using(Fluent::class), 'test_string');
     }
@@ -651,7 +652,7 @@ class DatabaseEloquentCastTo extends TestCase
     public function test_to_fluent_using_throws_when_incorrect_class(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided class must extend [' . Fluent::class . '].');
+        $this->expectExceptionMessage('The provided class must extend ['.Fluent::class.'].');
 
         $this->model(To::fluent()->using(Collection::class), 'test_string');
     }

@@ -15,8 +15,8 @@ class ToIterable implements Stringable, Castable
      * Create a new To Enumerable instance.
      *
      * @param  class-string<TBaseClass>  $class
-     * @param  boolean|null  $withoutCaching
-     * @param  boolean|null  $encrypt
+     * @param  bool|null  $withoutCaching
+     * @param  bool|null  $encrypt
      * @param  class-string<TBaseClass>|null  $using
      * @param  callable-string|array{class-string, string}|null  $map
      */
@@ -155,14 +155,14 @@ class ToIterable implements Stringable, Castable
     public function __toString(): string
     {
         return static::class.':'.implode(',', [
-            $this->class, $this->withoutCaching, $this->encrypt, $this->using, $this->map
+            $this->class, $this->withoutCaching, $this->encrypt, $this->using, $this->map,
         ]);
     }
 
     /**
      * @inheritDoc
      *
-     * @param array{class-string<TBaseClass>, string|null, string|null, class-string<TBaseClass>|null, string|null}  $arguments
+     * @param  array{class-string<TBaseClass>, string|null, string|null, class-string<TBaseClass>|null, string|null}  $arguments
      */
     public static function castUsing(array $arguments)
     {
