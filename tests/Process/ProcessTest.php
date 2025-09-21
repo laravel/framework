@@ -809,33 +809,36 @@ class ProcessTest extends TestCase
         $this->assertInstanceOf(ProcessResult::class, $result);
         $this->assertTrue($result->successful());
         $this->assertEquals("OUTPUT\n", $result->output());
-    }
+    } 
 
-    public function testFakeInvokedProcessWaitUntilStopsWhenConditionMet()
+    public function testFakeInvokedProcessWaitUntilWithErrorOutput()
     {
         $factory = new Factory;
 
         $factory->fake(function () use ($factory) {
             return $factory->describe()
-                ->output('STEP1')
-                ->output('TARGET')
-                ->output('STEP3')
-                ->runsFor(iterations: 3);
+                ->output('STDOUT')
+                ->errorOutput('ERROR1')
+                ->errorOutput('TARGET_ERROR')
+                ->output('MORE_STDOUT')
+                ->runsFor(iterations: 4);
         });
 
-        $process = $factory->start('echo "STEP1"; sleep 1; echo "TARGET"; sleep 1; echo "STEP3";');
+        $process = $factory->start('echo "STDOUT"; echo "ERROR1" >&2; echo "TARGET_ERROR" >&2; echo "MORE_STDOUT";');
 
-        $callbackCount = 0;
+        $callbackInvoked = [];
 
-        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackCount) {
-            $callbackCount++;
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = [$type, $buffer];
 
-            return str_contains($buffer, 'TARGET');
+            return str_contains($buffer, 'TARGET_ERROR');
         });
 
         $this->assertInstanceOf(ProcessResult::class, $result);
         $this->assertTrue($result->successful());
-        $this->assertEquals(2, $callbackCount);
+        $this->assertContains(['out', "STDOUT\n"], $callbackInvoked);
+        $this->assertContains(['err', "ERROR1\n"], $callbackInvoked);
+        $this->assertContains(['err', "TARGET_ERROR\n"], $callbackInvoked);
     }
 
     public function testBasicFakeAssertions()
