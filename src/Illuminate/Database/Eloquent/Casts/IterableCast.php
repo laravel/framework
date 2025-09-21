@@ -32,7 +32,7 @@ class IterableCast implements CastsAttributes
     public $withoutObjectCaching;
 
     /**
-     * Encrypt the storable value in the database.
+     * Should encrypt the storable value in the database.
      *
      * @var string|null
      */
@@ -46,7 +46,7 @@ class IterableCast implements CastsAttributes
     public $using;
 
     /**
-     * The base iterable class to cast
+     * The callback in "class@method" notation or class name to map items into.
      *
      * @var string|null
      */
@@ -91,11 +91,18 @@ class IterableCast implements CastsAttributes
                 : $data->mapInto($this->map[0]);
         }
 
-        return new ($this->using)(
-            $this->class === ArrayObject::class
-                ? [$data->all(), ArrayObject::ARRAY_AS_PROPS]
-                : [$data->all()],
-        );
+        return $this->makeIterableObject($data);
+    }
+
+    /**
+     * Instances the target iterable class.
+     *
+     * @param  \Illuminate\Support\Collection $data
+     * @return \Illuminate\Support\Collection|\Illuminate\Support\Fluent
+     */
+    protected function makeIterableObject($data)
+    {
+        return new ($this->using)($data->all());
     }
 
     /**

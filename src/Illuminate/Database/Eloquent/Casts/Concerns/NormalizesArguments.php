@@ -19,12 +19,8 @@ trait NormalizesArguments
             throw new InvalidArgumentException("The provided class must extend [$this->class].");
         }
 
-        if ($this->withoutObjectCaching !== '') {
-            $this->withoutObjectCaching = filter_var($this->withoutObjectCaching, FILTER_VALIDATE_BOOL);
-        }
+        $this->withoutObjectCaching = filter_var($this->withoutObjectCaching, FILTER_VALIDATE_BOOL);
 
-        if ($this->encrypt !== '') {
-            $this->encrypt = filter_var($this->encrypt, FILTER_VALIDATE_BOOL);
-        }
+        $this->encrypt = filter_var($this->encrypt, FILTER_VALIDATE_BOOL);
     }
 }

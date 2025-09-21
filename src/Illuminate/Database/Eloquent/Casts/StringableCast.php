@@ -16,7 +16,7 @@ class StringableCast implements CastsAttributes
     use Concerns\NormalizesArguments;
 
     /**
-     * The base iterable class to cast
+     * The base iterable class to cast.
      *
      * @var class-string<TBaseClass>
      */
@@ -30,14 +30,14 @@ class StringableCast implements CastsAttributes
     public $withoutObjectCaching;
 
     /**
-     * Encrypt the storable value in the database.
+     * Should encrypt the storable value in the database.
      *
      * @var string|null
      */
     public $encrypt;
 
     /**
-     * A custom iterable class to hold the items.
+     * A custom iterable class to hold the item.
      *
      * @var class-string<TBaseClass>|null
      */
