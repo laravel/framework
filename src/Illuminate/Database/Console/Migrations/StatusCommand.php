@@ -62,31 +62,9 @@ class StatusCommand extends BaseCommand
 
             $batches = $this->migrator->getRepository()->getMigrationBatches();
 
-            $migrations = $this->getStatusFor($ran, $batches)
-                ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
-                    return (new Stringable($migration[1]))->contains('Pending');
-                }));
-
-            if (count($migrations) > 0) {
-                $this->newLine();
-
-                $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
-
-                $migrations
-                    ->each(
-                        fn ($migration) => $this->components->twoColumnDetail($migration[0], $migration[1])
-                    );
-
-                $this->newLine();
-            } elseif ($this->option('pending') !== false) {
-                $this->components->info('No pending migrations');
-            } else {
-                $this->components->info('No migrations found');
-            }
-
-            if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
-                return $this->option('pending');
-            }
+            $this->option('json')
+                ? $this->displayJson($ran, $batches)
+                : $this->displayForCli($ran, $batches);
         });
     }
 
@@ -126,6 +104,82 @@ class StatusCommand extends BaseCommand
     }
 
     /**
+     * Render the migrations status information as JSON.
+     *
+     * @param  array  $ran
+     * @param  array  $batches
+     * @return mixed
+     */
+    protected function displayJson(array $ran, array $batches)
+    {
+        $migrations = (new Collection($this->getAllMigrationFiles()))
+            ->map(function ($migration) use ($ran, $batches) {
+                $migrationName = $this->migrator->getMigrationName($migration);
+
+                $status = in_array($migrationName, $ran) ? 'Ran' : 'Pending';
+
+                if (in_array($migrationName, $ran)) {
+                    $batch = $batches[$migrationName];
+                }
+
+                return [
+                    'name' => $migrationName,
+                    'status' => $status,
+                    'batch' => $batch ?? null,
+                ];
+            })
+            ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
+                return $migration['status'] === 'Pending';
+            }));
+
+        if (count($migrations) > 0) {
+            $this->output->writeln($migrations->values()->toJson());
+        } else {
+            $this->output->writeln('[]');
+        }
+
+        if ($this->option('pending') && $migrations->some(fn ($m) => ($m['status'] === 'Pending'))) {
+            return $this->option('pending');
+        }
+    }
+
+    /**
+     * Render the migrations status information formatted for the CLI.
+     *
+     * @param  array  $ran
+     * @param  array  $batches
+     * @return mixed
+     */
+    protected function displayForCli(array $ran, array $batches)
+    {
+        $migrations = $this->getStatusFor($ran, $batches)
+            ->when($this->option('pending') !== false, fn ($collection) => $collection->filter(function ($migration) {
+                return (new Stringable($migration[1]))->contains('Pending');
+            }));
+
+        if (count($migrations) > 0) {
+            $this->newLine();
+
+            $this->components->twoColumnDetail('<fg=gray>Migration name</>', '<fg=gray>Batch / Status</>');
+
+            $migrations
+                ->each(
+                    fn ($migration) => $this->components->twoColumnDetail($migration[0], $migration[1])
+                );
+
+            $this->newLine();
+        } elseif ($this->option('pending') !== false) {
+            $this->components->info('No pending migrations');
+        } else {
+            $this->components->info('No migrations found');
+        }
+
+        if ($this->option('pending') && $migrations->some(fn ($m) => (new Stringable($m[1]))->contains('Pending'))) {
+            return $this->option('pending');
+        }
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -137,6 +191,7 @@ class StatusCommand extends BaseCommand
             ['pending', null, InputOption::VALUE_OPTIONAL, 'Only list pending migrations', false],
             ['path', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The path(s) to the migrations files to use'],
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths'],
+            ['json', null, InputOption::VALUE_NONE, 'Output the status of all migrations as JSON'],
         ];
     }
 }
