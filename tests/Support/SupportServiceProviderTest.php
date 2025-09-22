@@ -31,14 +31,12 @@ class SupportServiceProviderTest extends TestCase
         $one->boot();
         $two = new ServiceProviderForTestingTwo($app);
         $two->boot();
-
-        $this->tempFile = __DIR__ . '/providers.php';
     }
 
     protected function tearDown(): void
     {
         m::close();
-        if ($this->tempFile && file_exists($this->tempFile)) {
+        if (isset($this->tempFile) && file_exists($this->tempFile)) {
             @unlink($this->tempFile);
         }
     }
@@ -200,7 +198,7 @@ class SupportServiceProviderTest extends TestCase
 
     public function test_can_remove_provider()
     {
-
+        $this->tempFile = __DIR__.'/providers.php';
         file_put_contents($this->tempFile, $contents = <<< PHP
 <?php
 
@@ -209,12 +207,13 @@ return [
     App\Providers\TelescopeServiceProvider::class,
 ];
 PHP
-    );
+        );
         ServiceProvider::removeProviderFromBootstrapFile('TelescopeServiceProvider', $this->tempFile, true);
 
         // Should have deleted nothing
         $this->assertStringEqualsStringIgnoringLineEndings($contents, trim(file_get_contents($this->tempFile)));
 
+        // Should delete the telescope provider
         ServiceProvider::removeProviderFromBootstrapFile('App\Providers\TelescopeServiceProvider', $this->tempFile, true);
 
         $this->assertStringEqualsStringIgnoringLineEndings(<<< PHP
@@ -226,6 +225,7 @@ return [
 PHP
             , trim(file_get_contents($this->tempFile)));
 
+        // Should fuzzily delete the App\Providers\AppServiceProvider class
         ServiceProvider::removeProviderFromBootstrapFile('AppServiceProvider', $this->tempFile);
 
         $this->assertStringEqualsStringIgnoringLineEndings(<<< 'PHP'
