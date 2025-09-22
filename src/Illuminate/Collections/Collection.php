@@ -479,6 +479,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
+        $key ??= '';
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
@@ -497,6 +498,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function getOrPut($key, $value)
     {
+        $key ??= '';
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
@@ -539,6 +541,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                     is_bool($groupKey) => (int) $groupKey,
                     $groupKey instanceof \UnitEnum => enum_value($groupKey),
                     $groupKey instanceof \Stringable => (string) $groupKey,
+                    is_null($groupKey) => (string) $groupKey,
                     default => $groupKey,
                 };
 
@@ -600,7 +603,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_all($keys, fn ($key) => array_key_exists($key, $this->items));
+        return array_all($keys, fn ($key) => array_key_exists($key ?? '', $this->items));
     }
 
     /**
@@ -617,7 +620,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_any($keys, fn ($key) => array_key_exists($key, $this->items));
+        return array_any($keys, fn ($key) => array_key_exists($key ?? '', $this->items));
     }
 
     /**
