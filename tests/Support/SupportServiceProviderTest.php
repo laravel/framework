@@ -12,6 +12,7 @@ use PHPUnit\Framework\TestCase;
 class SupportServiceProviderTest extends TestCase
 {
     protected $app;
+    protected string $tempFile;
 
     protected function setUp(): void
     {
@@ -30,11 +31,16 @@ class SupportServiceProviderTest extends TestCase
         $one->boot();
         $two = new ServiceProviderForTestingTwo($app);
         $two->boot();
+
+        $this->tempFile = __DIR__ . '/providers.php';
     }
 
     protected function tearDown(): void
     {
         m::close();
+        if ($this->tempFile && file_exists($this->tempFile)) {
+            @unlink($this->tempFile);
+        }
     }
 
     public function testPublishableServiceProviders()
@@ -190,6 +196,46 @@ class SupportServiceProviderTest extends TestCase
 
         $provider = new ServiceProviderForTestingOne($this->app);
         $provider->loadTranslationsFrom(__DIR__.'/translations', 'namespace');
+    }
+
+    public function test_can_remove_provider()
+    {
+
+        $r = file_put_contents($this->tempFile, $contents = <<< PHP
+<?php
+
+return [
+    App\Providers\AppServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
+];
+PHP
+    );
+        ServiceProvider::removeProviderFromBootstrapFile('TelescopeServiceProvider', $this->tempFile, true);
+
+        // Should have deleted nothing
+        $this->assertSame($contents, trim(file_get_contents($this->tempFile)));
+
+        ServiceProvider::removeProviderFromBootstrapFile('App\Providers\TelescopeServiceProvider', $this->tempFile, true);
+
+        $this->assertSame(<<< PHP
+<?php
+
+return [
+    App\Providers\AppServiceProvider::class,
+];
+PHP
+            , trim(file_get_contents($this->tempFile)));
+
+        ServiceProvider::removeProviderFromBootstrapFile('AppServiceProvider', $this->tempFile);
+
+        $this->assertSame(<<< 'PHP'
+<?php
+
+return [
+
+];
+PHP
+            , trim(file_get_contents($this->tempFile)));
     }
 }
 
