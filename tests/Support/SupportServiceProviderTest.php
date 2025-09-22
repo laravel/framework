@@ -201,7 +201,7 @@ class SupportServiceProviderTest extends TestCase
     public function test_can_remove_provider()
     {
 
-        $r = file_put_contents($this->tempFile, $contents = <<< PHP
+        file_put_contents($this->tempFile, $contents = <<< PHP
 <?php
 
 return [
@@ -213,11 +213,11 @@ PHP
         ServiceProvider::removeProviderFromBootstrapFile('TelescopeServiceProvider', $this->tempFile, true);
 
         // Should have deleted nothing
-        $this->assertSame($contents, trim(file_get_contents($this->tempFile)));
+        $this->assertStringEqualsStringIgnoringLineEndings($contents, trim(file_get_contents($this->tempFile)));
 
         ServiceProvider::removeProviderFromBootstrapFile('App\Providers\TelescopeServiceProvider', $this->tempFile, true);
 
-        $this->assertSame(<<< PHP
+        $this->assertStringEqualsStringIgnoringLineEndings(<<< PHP
 <?php
 
 return [
@@ -228,7 +228,7 @@ PHP
 
         ServiceProvider::removeProviderFromBootstrapFile('AppServiceProvider', $this->tempFile);
 
-        $this->assertSame(<<< 'PHP'
+        $this->assertStringEqualsStringIgnoringLineEndings(<<< 'PHP'
 <?php
 
 return [
