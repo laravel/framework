@@ -50,7 +50,7 @@ class EloquentDeleteTest extends DatabaseTestCase
 
     public function testDeleteUseLimitWithJoins()
     {
-        $ignoredDrivers = ['sqlsrv', 'mysql'];
+        $ignoredDrivers = ['sqlsrv', 'mysql', 'mariadb'];
 
         if (in_array($this->driver, $ignoredDrivers)) {
             $this->markTestSkipped("{$this->driver} does not support LIMIT on DELETE statements with JOIN clauses");
