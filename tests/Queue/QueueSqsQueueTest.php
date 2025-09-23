@@ -351,7 +351,9 @@ class QueueSqsQueueTest extends TestCase
 
     public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicationId()
     {
-        $job = (new FakeSqsJobWithDeduplication())->onGroup($this->mockedMessageGroupId)->useDeduplicationId($this->mockedDeduplicationId);
+        $job = $this->getMockBuilder(FakeSqsJobWithDeduplication::class)->onlyMethods(['deduplicationId'])->getMock();
+        $job->expects($this->once())->method('deduplicationId')->with($this->mockedPayload, $this->fifoQueueName)->willReturn($this->mockedDeduplicationId);
+        $job->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));

@@ -9,7 +9,7 @@ class FakeSqsJobWithDeduplication implements ShouldQueue
 {
     use Queueable;
 
-    protected $testDeduplicationId = 'test-deduplication-id';
+    protected static $deduplicationIdFactory;
 
     public function handle(): void
     {
@@ -19,23 +19,35 @@ class FakeSqsJobWithDeduplication implements ShouldQueue
     /**
      * Deduplication ID method called by SqsQueue.
      *
+     * @param  string  $payload
+     * @param  string  $queue
      * @return string
      */
-    public function deduplicationId(): string
+    public function deduplicationId($payload, $queue): string
     {
-        return (string) $this->testDeduplicationId;
+        return static::$deduplicationIdFactory
+            ? (string) call_user_func(static::$deduplicationIdFactory, $payload, $queue)
+            : hash('sha256', json_encode(func_get_args()));
     }
 
     /**
-     * Helper method to allow a test to specify the deduplication ID to use.
+     * Set the callable that will be used to generate deduplication IDs.
      *
-     * @param  string  $id
-     * @return $this
+     * @param  callable|null  $factory
+     * @return void
      */
-    public function useDeduplicationId($id): static
+    public static function createDeduplicationIdsUsing(?callable $factory = null)
     {
-        $this->testDeduplicationId = $id;
+        static::$deduplicationIdFactory = $factory;
+    }
 
-        return $this;
+    /**
+     * Indicate that deduplication IDs should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createDeduplicationIdsNormally()
+    {
+        static::$deduplicationIdFactory = null;
     }
 }
