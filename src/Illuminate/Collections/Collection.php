@@ -95,7 +95,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return;
         }
 
-        $middle = (int) ($count / 2);
+        $middle = intdiv($count, 2);
 
         if ($count % 2) {
             return $values->get($middle);
