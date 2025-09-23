@@ -2732,6 +2732,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate and fail with message.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int<0, 8>|'max'>  $parameters
+     * @return bool
+     */
+    public function validateFail($attribute, $value, $parameters)
+    {
+        return false;
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute

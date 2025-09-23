@@ -874,4 +874,18 @@ trait ReplacesAttributes
     {
         return $this->replaceIn($message, $attribute, $rule, $parameters);
     }
+
+    /**
+     * Replace all place-holders for the fail rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceFail($message, $attribute, $rule, $parameters)
+    {
+        return $parameters[0] ?? '';
+    }
 }

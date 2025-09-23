@@ -9829,6 +9829,26 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testFail()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => ['fail:this is a message']]);
+        $this->assertTrue($validator->fails());
+    }
+
+    public function testFailRuleShowsMessage()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => ['fail:this is a message']]);
+        $this->assertTrue($validator->fails());
+
+        $this->assertSame([
+            'foo' => [
+                'this is a message',
+            ],
+        ], $validator->messages()->messages());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
