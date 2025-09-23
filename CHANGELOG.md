@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.31.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.31.1...12.x)
+
+## [v12.31.1](https://github.com/laravel/framework/compare/v12.31.0...v12.31.1) - 2025-09-23
+
+* Revert "[12.x] Reintroduce short-hand "false" syntax for Blade component props" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57151
 
 ## [v12.31.0](https://github.com/laravel/framework/compare/v12.30.1...v12.31.0) - 2025-09-23
 
