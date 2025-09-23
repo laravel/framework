@@ -12,6 +12,7 @@ use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
+use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -346,6 +347,20 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
+    }
+
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicationId()
+    {
+        $job = (new FakeSqsJobWithDeduplication())->onGroup($this->mockedMessageGroupId)->useDeduplicationId($this->mockedDeduplicationId);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
+        $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue()
