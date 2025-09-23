@@ -9848,6 +9848,18 @@ class ValidationValidatorTest extends TestCase
             ],
         ], $validator->messages()->messages());
     }
+    public function testFailRuleShowsMessageAndIgnoresCommas()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $validator = new Validator($trans, ['foo' => 'bar'], ['foo' => ['fail:this is a message, a message this is']]);
+        $this->assertTrue($validator->fails());
+
+        $this->assertSame([
+            'foo' => [
+                'this is a message, a message this is',
+            ],
+        ], $validator->messages()->messages());
+    }
 
     public function testFailRuleShowsDefaultMessage()
     {

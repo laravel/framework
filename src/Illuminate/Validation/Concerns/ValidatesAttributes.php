@@ -2736,7 +2736,7 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array<int, int<0, 8>|'max'>  $parameters
+     * @param  array<int,string>  $parameters
      * @return bool
      */
     public function validateFail($attribute, $value, $parameters)
