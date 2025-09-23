@@ -475,6 +475,30 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get an item from the cache, or execute the given Closure and store the result.
+     * Uses a lock to prevent cache stampede.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  int  $lockTtl
+     * @param  int  $blockTtl
+     * @param  \DateTimeInterface|\DateInterval|int|null  $cacheTtl
+     * @param  \Closure(): TCacheValue  $callback
+     * @return TCacheValue
+     *
+     * @throws \Illuminate\Contracts\Cache\LockTimeoutException
+     */
+    public function lockAndRemember($key, $lockTtl, $blockTtl, $cacheTtl, Closure $callback)
+    {
+        $lockName = "lock:{$this->itemKey($key)}";
+
+        return $this->lock($lockName, $lockTtl)->block($blockTtl, function () use ($key, $cacheTtl, $callback) {
+            return $this->remember($key, $cacheTtl, $callback);
+        });
+    }
+
+    /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
      *
      * @template TCacheValue
