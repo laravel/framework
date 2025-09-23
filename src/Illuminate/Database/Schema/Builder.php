@@ -451,13 +451,19 @@ class Builder
     /**
      * Modify a table on the schema.
      *
-     * @param  string  $table
+     * @param  string|array  $table
      * @param  \Closure  $callback
      * @return void
      */
     public function table($table, Closure $callback)
     {
-        $this->build($this->createBlueprint($table, $callback));
+        if (is_array($table)) {
+            foreach ($table as $table) {
+                $this->build($this->createBlueprint($table, $callback));
+            }
+        } else {
+            $this->build($this->createBlueprint($table, $callback));
+        }
     }
 
     /**
