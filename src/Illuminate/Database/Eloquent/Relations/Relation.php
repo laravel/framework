@@ -13,6 +13,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Conditionable;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -26,6 +27,8 @@ abstract class Relation implements BuilderContract
     use ForwardsCalls, Macroable {
         Macroable::__call as macroCall;
     }
+
+    use Conditionable;
 
     /**
      * The Eloquent query builder instance.
@@ -423,9 +426,9 @@ abstract class Relation implements BuilderContract
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-            && in_array($model->getKeyType(), ['int', 'integer'])
-                ? 'whereIntegerInRaw'
-                : 'whereIn';
+        && in_array($model->getKeyType(), ['int', 'integer'])
+            ? 'whereIntegerInRaw'
+            : 'whereIn';
     }
 
     /**
@@ -533,6 +536,10 @@ abstract class Relation implements BuilderContract
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if ($this->query->hasMacro($method)) {
+            return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
         }
 
         return $this->forwardDecoratedCallTo($this->query, $method, $parameters);

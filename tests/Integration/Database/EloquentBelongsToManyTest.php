@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
@@ -1431,6 +1432,43 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'user_uuid',
             $instance->toArray(),
         );
+    }
+
+    public function testBelongsToManyWhenMethodMaintainsRelationInstance()
+    {
+        $post = Post::create(['title' => Str::random()]);
+        $tag = Tag::create(['name' => Str::random()]);
+
+        // Create the pivot record with a known updated_at
+        $post->tags()->attach($tag->id, [
+            'updated_at' => '2023-01-01 00:00:00',
+            'created_at' => '2023-01-01 00:00:00',
+        ]);
+
+        $query = $post->tags()
+            ->when(true, function ($query) {
+                $this->assertInstanceOf(
+                    BelongsToMany::class,
+                    $query,
+                    'Query should be instance of BelongsToMany within when callback'
+                );
+
+                return $query->wherePivotBetween(
+                    'updated_at',
+                    ['2022-01-01 00:00:00', '2024-01-01 00:00:00']
+                );
+            });
+
+        $this->assertInstanceOf(
+            BelongsToMany::class,
+            $query,
+            'Query should remain instance of BelongsToMany after when method'
+        );
+
+        $result = $query->get();
+
+        $this->assertInstanceOf(Collection::class, $result);
+        $this->assertCount(1, $result);
     }
 }
 
