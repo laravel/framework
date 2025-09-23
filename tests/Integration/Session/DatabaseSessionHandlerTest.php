@@ -110,4 +110,26 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertNull($session->ip_address);
         $this->assertNull($session->user_id);
     }
+
+    public function test_it_sanitizes_invalid_utf8_user_agent_on_write()
+    {
+        $connection = $this->app['db']->connection();
+        $handler = new DatabaseSessionHandler($connection, 'sessions', 1);
+        $handler->setContainer($this->app);
+
+        $invalidUa = 'Mozilla/5.0 (compatible; YodaoBot/1.0; http://www.yodao.com/help/webmaster/spider/'."\xA1".'; )';
+
+        $this->app['request']->headers->set('User-Agent', $invalidUa);
+        $this->app['request']->server->set('REMOTE_ADDR', '134.122.184.11');
+
+        // Should not throw and should persist a valid UTF-8 string to the DB
+        $this->assertTrue($handler->write('ua_invalid_utf8', json_encode(['k' => 'v'])));
+
+        $session = $connection->table('sessions')->where('id', 'ua_invalid_utf8')->first();
+
+        $this->assertNotNull($session);
+        $this->assertNotNull($session->user_agent);
+        $this->assertTrue(mb_check_encoding($session->user_agent, 'UTF-8'));
+        $this->assertStringNotContainsString("\xA1", $session->user_agent);
+    }
 }
