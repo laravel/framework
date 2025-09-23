@@ -28,7 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static array getIndexListing(string $table)
  * @method static bool hasIndex(string $table, string|array $index, string|null $type = null)
  * @method static array getForeignKeys(string $table)
- * @method static void table(string $table, \Closure $callback)
+ * @method static void table(string|array $table, \Closure $callback)
  * @method static void create(string $table, \Closure $callback)
  * @method static void drop(string $table)
  * @method static void dropIfExists(string $table)
