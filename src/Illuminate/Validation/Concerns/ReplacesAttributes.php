@@ -886,6 +886,6 @@ trait ReplacesAttributes
      */
     protected function replaceFail($message, $attribute, $rule, $parameters)
     {
-        return $parameters[0] ?? '';
+        return $parameters[0] ?? 'This validation has failed.';
     }
 }
