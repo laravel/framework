@@ -262,7 +262,13 @@ class Mailable implements MailableContract, Renderable
      */
     protected function newQueuedJob()
     {
+        $messageGroup = $this->messageGroup ?? null;
+
+        $deduplicator = $this->deduplicator ?? (method_exists($this, 'deduplicationId') ? $this->deduplicationId(...) : null);
+
         return Container::getInstance()->make(SendQueuedMailable::class, ['mailable' => $this])
+            ->onGroup($messageGroup)
+            ->withDeduplicator($deduplicator)
             ->through(array_merge(
                 method_exists($this, 'middleware') ? $this->middleware() : [],
                 $this->middleware ?? []
