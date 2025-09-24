@@ -91,13 +91,6 @@ class Batch
     public $createdAt = null;
 
     /**
-     * The date when the batch was cancelled.
-     *
-     * @var \Carbon\CarbonImmutable|null
-     */
-    public $cancelledAt = null;
-
-    /**
      * The date when the batch was finished.
      *
      * @var \Carbon\CarbonImmutable|null
@@ -164,26 +157,6 @@ class Batch
     public function hasFailures(): bool
     {
         return $this->failedRequests > 0;
-    }
-
-    /**
-     * Cancel the batch.
-     *
-     * @return void
-     */
-    public function cancel(): void
-    {
-        $this->cancelledAt = new CarbonImmutable();
-    }
-
-    /**
-     * Determine if the batch was cancelled.
-     *
-     * @return bool
-     */
-    public function cancelled(): bool
-    {
-        return ! is_null($this->cancelledAt);
     }
 
     /**
@@ -331,10 +304,6 @@ class Batch
 
         $promises = [];
         foreach ($requests as $key => $item) {
-            if ($this->cancelled()) {
-                break;
-            }
-
             $promise = match (true) {
                 $item instanceof PendingRequest => $item->getPromise(),
                 default => $item,
@@ -383,17 +352,15 @@ class Batch
             ]))->promise()->wait();
         }
 
-        if (! $this->cancelled()) {
-            if (! $this->hasFailures() && $thenCallback !== null) {
-                $thenCallback($this, $results);
-            }
-
-            if ($finallyCallback !== null) {
-                $finallyCallback($this, $results);
-            }
-
-            $this->finishedAt = new CarbonImmutable();
+        if (! $this->hasFailures() && $thenCallback !== null) {
+            $thenCallback($this, $results);
         }
+
+        if ($finallyCallback !== null) {
+            $finallyCallback($this, $results);
+        }
+
+        $this->finishedAt = new CarbonImmutable();
 
         return $results;
     }

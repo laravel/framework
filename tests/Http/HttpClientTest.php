@@ -3824,45 +3824,6 @@ class HttpClientTest extends TestCase
         $this->assertTrue($batch->finished());
     }
 
-    public function testBatchCancel(): void
-    {
-        $this->markTestSkipped('SKIPPING UNTIL DECISION IS MADE TO KEEP OR REMOVE CANCEL FEATURE');
-        $this->factory->fake([
-            'https://200.com' => $this->factory::response('OK', 200),
-            'https://500.com' => $this->factory::response('Error', 500),
-            'https://201.com' => $this->factory::response('Created', 201),
-        ]);
-
-        $batch = $this->factory->batch(function (Batch $batch) {
-            return [
-                $batch->as('first')->get('https://200.com'),
-                $batch->as('second')->get('https://500.com'),
-                $batch->as('third')->get('https://201.com'),
-            ];
-        })->catch(function (Batch $batch, int|string $key, Response|RequestException $response) {
-            $batch->cancel();
-        });
-
-        $this->assertSame(3, $batch->totalRequests);
-        $this->assertSame(0, $batch->completion());
-        $this->assertFalse($batch->finished());
-        $this->assertFalse($batch->cancelled());
-
-        $responses = $batch->send();
-
-        $this->assertCount(2, $responses);
-        $this->assertSame(200, $responses['first']->status());
-        $this->assertSame(500, $responses['second']->status());
-
-        $this->assertSame(3, $batch->totalRequests);
-        $this->assertSame(1, $batch->pendingRequests);
-        $this->assertSame(1, $batch->failedRequests);
-        $this->assertSame(67, $batch->completion());
-        $this->assertTrue($batch->hasFailures());
-        $this->assertFalse($batch->finished());
-        $this->assertTrue($batch->cancelled());
-    }
-
     public function testBatchBeforeHook(): void
     {
         $this->factory->fake([
