@@ -2001,6 +2001,16 @@ class RoutingUrlGeneratorTest extends TestCase
             $url->route('tenantPostUserOptionalMethod', ['concreteTenant', 'concretePost', 'concreteUser', 'concreteMethod']),
         );
     }
+
+    public function testIsValidUrlPathIsNull()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        $this->assertSame(false, $url->isValidUrl(null));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
