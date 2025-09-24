@@ -195,7 +195,7 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
         }
 
         PHPUnit::assertEmpty(
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()] ?? [],
+            $this->notifications[get_class($notifiable)][$notifiable->getKey() ?? ''] ?? [],
             'Notifications were sent unexpectedly.',
         );
     }
