@@ -473,13 +473,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TGetDefault
      *
-     * @param  TKey  $key
+     * @param  TKey|null  $key
      * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null)
     {
-        $key ??= ''; // @phpstan-ignore nullCoalesce.variable
+        $key ??= '';
 
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
