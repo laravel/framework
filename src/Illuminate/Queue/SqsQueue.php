@@ -256,6 +256,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
 
         if ($isFifo) {
             $messageDeduplicationId = match (true) {
+                $isObject && isset($job->deduplicator) && is_callable($job->deduplicator) => transform(call_user_func($job->deduplicator, $payload, $queue), $transformToString),
                 $isObject && method_exists($job, 'deduplicationId') => transform($job->deduplicationId($payload, $queue), $transformToString),
                 default => (string) Str::orderedUuid(),
             };

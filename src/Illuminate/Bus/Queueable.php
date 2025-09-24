@@ -35,6 +35,13 @@ trait Queueable
     public $messageGroup;
 
     /**
+     * The job deduplicator callback the job should use to generate the deduplication id.
+     *
+     * @var callable|null
+     */
+    public $deduplicator;
+
+    /**
      * The number of seconds before the job should be made available.
      *
      * @var \DateTimeInterface|\DateInterval|array|int|null
@@ -120,6 +127,21 @@ trait Queueable
     public function onGroup($group)
     {
         $this->messageGroup = enum_value($group);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired job deduplicator callback.
+     *
+     * This feature is only supported by some queues, such as Amazon SQS FIFO.
+     *
+     * @param  callable|null  $deduplicator
+     * @return $this
+     */
+    public function withDeduplicator($deduplicator)
+    {
+        $this->deduplicator = $deduplicator;
 
         return $this;
     }
