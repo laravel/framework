@@ -313,6 +313,10 @@ class FilesystemManager implements FactoryContract
                 if (isset($config['visibility'])) {
                     $parent['visibility'] = $config['visibility'];
                 }
+
+                if (isset($config['throw'])) {
+                    $parent['throw'] = $config['throw'];
+                }
             }
         ));
     }
