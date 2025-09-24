@@ -909,6 +909,24 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('can:test');
     }
 
+    public function testCanSetMiddlewareCanWithSingleParameterOnGroups()
+    {
+        $this->router->can('test', 'param')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->seeMiddleware('can:test,param');
+    }
+
+    public function testCanSetMiddlewareCanWithMultipleParametersOnGroups()
+    {
+        $this->router->can('test', ['param1', 'param2'])->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->seeMiddleware('can:test,param1,param2');
+    }
+
     public function testCanSetMiddlewareForSpecifiedMethodsOnRegisteredResource()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)
