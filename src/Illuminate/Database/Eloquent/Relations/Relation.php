@@ -425,9 +425,9 @@ abstract class Relation implements BuilderContract
     protected function whereInMethod(Model $model, $key)
     {
         return $model->getKeyName() === last(explode('.', $key))
-        && in_array($model->getKeyType(), ['int', 'integer'])
-            ? 'whereIntegerInRaw'
-            : 'whereIn';
+            && in_array($model->getKeyType(), ['int', 'integer'])
+                ? 'whereIntegerInRaw'
+                : 'whereIn';
     }
 
     /**
@@ -523,8 +523,6 @@ abstract class Relation implements BuilderContract
     {
         return array_search($className, static::$morphMap, strict: true) ?: $className;
     }
-
-
 
     /**
      * Determine which object should be passed to conditional callbacks.
