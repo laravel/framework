@@ -255,13 +255,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
      */
     protected function userAgent()
     {
-        $userAgent = (string) $this->container->make('request')->header('User-Agent');
-
-        $userAgent = mb_detect_encoding($userAgent, 'UTF-8', true) === 'UTF-8'
-            ? $userAgent
-            : mb_convert_encoding($userAgent, 'UTF-8');
-
-        return substr($userAgent, 0, 500);
+        return substr(mb_convert_encoding((string) $this->container->make('request')->header('User-Agent'), 'UTF-8'), 0, 500);
     }
 
     /**

@@ -2808,16 +2808,60 @@ class TestResponseTest extends TestCase
         $response->assertSessionMissing('foo');
     }
 
-    #[TestWith(['foo', 'badvalue'])]
-    #[TestWith(['foo', null])]
-    #[TestWith([['foo', 'bar'], null])]
-    public function testAssertSessionMissingValue(array|string $key, mixed $value): void
+    #[TestWith(['foo', 'goodvalue'])]
+    #[TestWith([['foo', 'bar'], 'goodvalue'])]
+    public function testAssertSessionMissingValueIsPresent(array|string $key, mixed $value): void
     {
         $this->expectException(AssertionFailedError::class);
 
         app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
 
         $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    public function testAssertSessionMissingValueIsPresentClosure(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $key = 'foo';
+
+        $value = function ($value) {
+            return $value === 'goodvalue';
+        };
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    #[TestWith(['foo', 'badvalue'])]
+    public function testAssertSessionMissingValueIsMissing(array|string $key, mixed $value): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    public function testAssertSessionMissingValueIsMissingClosure(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $key = 'foo';
+
+        $value = function ($value) {
+            return $value === 'badvalue';
+        };
 
         $response = TestResponse::fromBaseResponse(new Response());
         $response->assertSessionMissing($key, $value);

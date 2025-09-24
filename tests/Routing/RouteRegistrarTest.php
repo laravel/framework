@@ -900,6 +900,15 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware(RouteRegistrarMiddlewareStub::class);
     }
 
+    public function testCanSetMiddlewareCanOnGroups()
+    {
+        $this->router->can('test')->group(function ($router) {
+            $router->get('/');
+        });
+
+        $this->seeMiddleware('can:test');
+    }
+
     public function testCanSetMiddlewareForSpecifiedMethodsOnRegisteredResource()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)

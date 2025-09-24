@@ -1,6 +1,97 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.28.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.31.1...12.x)
+
+## [v12.31.1](https://github.com/laravel/framework/compare/v12.31.0...v12.31.1) - 2025-09-23
+
+* Revert "[12.x] Reintroduce short-hand "false" syntax for Blade component props" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57151
+
+## [v12.31.0](https://github.com/laravel/framework/compare/v12.30.1...v12.31.0) - 2025-09-23
+
+* Bump vite from 7.1.2 to 7.1.6 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/57114
+* [12.x] Reintroduce short-hand "false" syntax for Blade component props by [@PerryvanderMeer](https://github.com/PerryvanderMeer) in https://github.com/laravel/framework/pull/57104
+* [12.x] Allow Number parse helpers to return false by [@platoindebugmode](https://github.com/platoindebugmode) in https://github.com/laravel/framework/pull/57127
+* [12.x] Refactor `RedisTaggedCache@flush()` to allow for custom connections by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57122
+* [12.x] Use light-dark scheme for exception renderer by [@pxlrbt](https://github.com/pxlrbt) in https://github.com/laravel/framework/pull/57128
+* [12.x] Replace logger helper and log function concrete return type ?LogManager with abstract ?LoggerInterface by [@abdelrahmenAyman](https://github.com/abdelrahmenAyman) in https://github.com/laravel/framework/pull/57028
+* [12.x] Fix session value is missing assertion by [@barclaymichael](https://github.com/barclaymichael) in https://github.com/laravel/framework/pull/57134
+* median() div swapped for intdiv() by [@artumi-richard](https://github.com/artumi-richard) in https://github.com/laravel/framework/pull/57148
+* [12.x] Fix PHP 8.5 null-key deprecations by [@IonBazan](https://github.com/IonBazan) in https://github.com/laravel/framework/pull/57137
+
+## [v12.30.1](https://github.com/laravel/framework/compare/v12.30.0...v12.30.1) - 2025-09-18
+
+* [12.x] Fix: Apply intl extension check to ordinal position to prevent issues by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/57112
+
+## [v12.30.0](https://github.com/laravel/framework/compare/v12.29.0...v12.30.0) - 2025-09-18
+
+* [12.x] Allow newer versions for phiki/phiki than 2.0.0 by [@hebbet](https://github.com/hebbet) in https://github.com/laravel/framework/pull/57075
+* [12.x] Use null coalescing for memoryExceededExitCode by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57090
+* [12.x] Fix 'can' function that was defined in RouterRegistrar in #54648 by [@pdewit](https://github.com/pdewit) in https://github.com/laravel/framework/pull/57072
+* [12.x] Fix SQS FIFO and fair queue support by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/57080
+* atomically flush redis cache tags by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57098
+* [12.x] Add type hints to `\Illuminate\Support\Str` by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/57096
+* Doc: Update Database Connection getElapsedTime comment to specify unit by [@glensc](https://github.com/glensc) in https://github.com/laravel/framework/pull/57099
+* [12.x] Add support for Ordinal Position in validation messages by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/57109
+* [12.x] Fix exception frame file path on Windows by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57103
+* Add fallback to copy buttons on new exception page by [@joaokamun](https://github.com/joaokamun) in https://github.com/laravel/framework/pull/57092
+* [12.x] Adds `Macroable` trait to `Illuminate/Support/Benchmark` by [@1tim22](https://github.com/1tim22) in https://github.com/laravel/framework/pull/57107
+
+## [v12.29.0](https://github.com/laravel/framework/compare/v12.28.1...v12.29.0) - 2025-09-16
+
+* Ensure cached and uncached routes share same precedence when resolving actions and names by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/56920
+* [12.x] Re-enable previously commented assertions by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56930
+* [12.x] Reorder .gitignore entries for consistency and readability by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56963
+* [12.x] SQLite: Allow setting any pragmas by [@stancl](https://github.com/stancl) in https://github.com/laravel/framework/pull/56962
+* refactor: remove unused array from docblock by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/56961
+* PendingResourceRegistration withoutMiddleware never returns array by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/56959
+* [12.x] Allow not having "fakerphp/faker" installed by [@SjorsO](https://github.com/SjorsO) in https://github.com/laravel/framework/pull/56953
+* [12.x] Fix Validator placeholderHash PHPDoc by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56947
+* [12.x] Handle MariaDB innodb_snapshot_isolation=ON by [@Muffinman](https://github.com/Muffinman) in https://github.com/laravel/framework/pull/56945
+* [12.x] Add PhpRedis pack ignore numbers option by [@tuandp](https://github.com/tuandp) in https://github.com/laravel/framework/pull/56941
+* test(support): add edge-case tuples for preg_replace_array by [@realpvz](https://github.com/realpvz) in https://github.com/laravel/framework/pull/56937
+* [12.x] Allow for BackedEnum on dynamic blade component by [@gehrisandro](https://github.com/gehrisandro) in https://github.com/laravel/framework/pull/56940
+* [12.x] Remove one redundant array access by [@vincentvanhoven](https://github.com/vincentvanhoven) in https://github.com/laravel/framework/pull/56931
+* [12.x] Add withoutGlobalScopesExcept() to keep only specified global scopes by [@theHocineSaad](https://github.com/theHocineSaad) in https://github.com/laravel/framework/pull/56957
+* [12.x] Make visibility consistent by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56970
+* [12.x] Change list to tuple in PHPDoc block by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/56967
+* [12.x] Improve `AggregateServiceProvider` docblocks by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56968
+* [12.x] add --whisper option to schedule:work command by [@thojo0](https://github.com/thojo0) in https://github.com/laravel/framework/pull/56969
+* [12.x] Update Faker suggestion to match skeleton version by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56974
+* Refactor: use str_contains() instead of strpos() for clarity by [@arshidkv12](https://github.com/arshidkv12) in https://github.com/laravel/framework/pull/56979
+* [12.x] remove unnecessary `with()` helper call by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56975
+* [12.x] Config: Move some items into pragmas by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56980
+* Add callback support to takeUntilTimeout in LazyCollection by [@kamilkozak](https://github.com/kamilkozak) in https://github.com/laravel/framework/pull/56981
+* [12.x] Utilize the is_finite() PHP function by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/56990
+* [12.x] Use property promotion in `MessageLogged` and narrow `$level` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/56989
+* [12.x] do not use `with()` helper when no second argument is passed by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56986
+* [12.x] Correct the type of $handler from Connection::whenQueryingForLongerThan by [@sethsandaru](https://github.com/sethsandaru) in https://github.com/laravel/framework/pull/56987
+* [12.x] Some quick fixes by [@theHocineSaad](https://github.com/theHocineSaad) in https://github.com/laravel/framework/pull/56991
+* tests: Ensure transaction callbacks run in FIFO order by [@realpvz](https://github.com/realpvz) in https://github.com/laravel/framework/pull/56973
+* Pass $attributes and $parent arguments to Factory Sequence by [@fritz-c](https://github.com/fritz-c) in https://github.com/laravel/framework/pull/56972
+* [12.x] - Support `Castable` on `Enum` by [@jrseliga](https://github.com/jrseliga) in https://github.com/laravel/framework/pull/56977
+* [12.x] add trailing commas in multiline method signatures by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/56992
+* [12.x] Improve docblocks for nullable parameters by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56995
+* [12.x] Improve docblocks for nullable parameters by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56996
+* [12.x] Improve docblocks for nullable parameters by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/56997
+* Revert "[12.x] Config: Move some items into pragmas" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57003
+* [12.x]: Cache Session Driver by [@joaopalopes24](https://github.com/joaopalopes24) in https://github.com/laravel/framework/pull/56887
+* [12.x] Add support for #[UseResource(...)] and #[UseResourceCollection(...)] attributes on models by [@Lukasss93](https://github.com/Lukasss93) in https://github.com/laravel/framework/pull/56966
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57010
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57031
+* [12.x] Infinite method chaining in contextual binding builder by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57026
+* [12.x] Improved manager typehints by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57024
+* Bump vite from 5.4.19 to 5.4.20 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/57009
+* [12.x] Correct APC cache store docblock types by [@xurshudyan](https://github.com/xurshudyan) in https://github.com/laravel/framework/pull/57020
+* [12.x] Enable dynamic tries() method on Queueable Listeners by [@glioympas](https://github.com/glioympas) in https://github.com/laravel/framework/pull/57014
+* [12.x] Add --json option to ScheduleListCommand by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/57006
+* [12.x] `with()` helper call simplification by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57041
+* [12.x] handle all Enum types for default values by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57040
+* [12.x] Refactor chained method calls for readability by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57050
+* [12.x] Improve docblock wording by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57056
+* [12.x] Refactor chained method calls for readability by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57054
+* [12.x] Update local exception page by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57036
+* [12.x] Add ability to control QueueWorker memory exceeded exit code by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57044
+* [12.x] Ensure `laravel-cloud-socket` respects `LOG_LEVEL` by [@PeteBishwhip](https://github.com/PeteBishwhip) in https://github.com/laravel/framework/pull/57071
 
 ## [v12.28.1](https://github.com/laravel/framework/compare/v12.28.0...v12.28.1) - 2025-09-04
 
