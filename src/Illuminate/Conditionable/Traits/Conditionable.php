@@ -68,12 +68,31 @@ trait Conditionable
             return (new HigherOrderWhenProxy($this))->condition(! $value);
         }
 
+        $target = $this->conditionalTarget();
+
         if (! $value) {
-            return $callback($this, $value) ?? $this;
+            $result = $callback ? $callback($target, $value) : null;
+
+            return $target === $this ? ($result ?? $this) : $this;
         } elseif ($default) {
-            return $default($this, $value) ?? $this;
+            $result = $default($target, $value);
+
+            return $target === $this ? ($result ?? $this) : $this;
         }
 
+        return $this;
+    }
+
+    /**
+     * Determine which object should be passed to conditional callbacks.
+     *
+     * By default, the current object ($this) is provided. Classes may override this
+     * to customize the callback target.
+     *
+     * @return mixed
+     */
+    protected function conditionalTarget(): mixed
+    {
         return $this;
     }
 }

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
