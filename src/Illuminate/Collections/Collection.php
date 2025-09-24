@@ -479,7 +479,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function get($key, $default = null)
     {
-        $key ??= '';
+        $key ??= ''; // @phpstan-ignore nullCoalesce.variable
 
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
