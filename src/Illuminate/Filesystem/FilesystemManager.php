@@ -330,7 +330,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function createFlysystem(FlysystemAdapter $adapter, array $config)
     {
-        if ($config['read-only'] ?? false === true) {
+        if (($config['read-only'] ?? false) === true) {
             $adapter = new ReadOnlyFilesystemAdapter($adapter);
         }
 
