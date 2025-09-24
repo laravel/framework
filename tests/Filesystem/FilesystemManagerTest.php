@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
+use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
@@ -161,6 +162,29 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
             rmdir(__DIR__.'/../../to-be-scoped');
         }
+    }
+
+    public function testCanBuildScopedDisksWithThrow()
+    {
+        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => 'to-be-scoped',
+                    'throw' => false,
+                ],
+            ];
+        }));
+
+        $scoped = $filesystem->build([
+            'driver' => 'scoped',
+            'disk' => 'local',
+            'prefix' => 'path-prefix',
+            'throw' => true,
+        ]);
+
+        $this->expectException(UnableToReadFile::class);
+        $scoped->get('dirname/filename.txt');
     }
 
     public function testCanBuildInlineScopedDisks()
