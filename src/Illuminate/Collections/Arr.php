@@ -648,7 +648,7 @@ class Arr
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  callable|array|string  $keyBy
      * @return array
      */
@@ -1024,7 +1024,7 @@ class Arr
     /**
      * Sort the array using the given callback or "dot" notation.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  callable|array|string|null  $callback
      * @return array
      */
@@ -1036,7 +1036,7 @@ class Arr
     /**
      * Sort the array in descending order using the given callback or "dot" notation.
      *
-     * @param  array  $array
+     * @param  iterable  $array
      * @param  callable|array|string|null  $callback
      * @return array
      */
