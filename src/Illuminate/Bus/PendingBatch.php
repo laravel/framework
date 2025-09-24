@@ -227,19 +227,16 @@ class PendingBatch
     }
 
     /**
-     * Indicate that the batch should not be canceled when a job within the batch fails;
-     * optionally add callbacks to be executed upon each job failure.
+     * Indicate that the batch should not be canceled when a job within the batch fails.
      *
-     * When passed a boolean true, enables failure tolerance without callbacks.
-     * When passed a boolean false, disables failure tolerance.
-     * When passed callable(s), registers failure callbacks and enables failure tolerance.
-     * Invalid callables are silently ignored during registration.
+     * Optionally, add callbacks to be executed upon each job failure.
      *
      * @template TParam of Closure(\Illuminate\Bus\Batch, \Throwable|null): mixed)|(callable(\Illuminate\Bus\Batch, \Throwable|null): mixed)
      *
      * @param  bool|TParam|array<array-key, TParam>  $param
+     * @return $this
      */
-    public function allowFailures(bool|Closure|callable|array $param = true): self
+    public function allowFailures(Closure|callable|array|bool $param = true)
     {
         if (! is_bool($param)) {
             $param = Arr::wrap($param);

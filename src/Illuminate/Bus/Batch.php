@@ -259,6 +259,17 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Decrement the pending jobs for the batch.
+     *
+     * @param  string  $jobId
+     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     */
+    public function decrementPendingJobs(string $jobId)
+    {
+        return $this->repository->decrementPendingJobs($this->id, $jobId);
+    }
+
+    /**
      * Invoke the callbacks of the given type.
      */
     protected function invokeCallbacks(string $type, ?Throwable $e = null): void
@@ -268,17 +279,6 @@ class Batch implements Arrayable, JsonSerializable
         foreach ($this->options[$type] ?? [] as $handler) {
             $this->invokeHandlerCallback($handler, $batch, $e);
         }
-    }
-
-    /**
-     * Decrement the pending jobs for the batch.
-     *
-     * @param  string  $jobId
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
-     */
-    public function decrementPendingJobs(string $jobId)
-    {
-        return $this->repository->decrementPendingJobs($this->id, $jobId);
     }
 
     /**
@@ -387,6 +387,14 @@ class Batch implements Arrayable, JsonSerializable
     }
 
     /**
+     * Determine if the batch has "failure" callbacks.
+     */
+    public function hasFailureCallbacks(): bool
+    {
+        return isset($this->options['failure']) && ! empty($this->options['failure']);
+    }
+
+    /**
      * Determine if the batch has "finally" callbacks.
      *
      * @return bool
@@ -394,14 +402,6 @@ class Batch implements Arrayable, JsonSerializable
     public function hasFinallyCallbacks()
     {
         return isset($this->options['finally']) && ! empty($this->options['finally']);
-    }
-
-    /**
-     * Determine if the batch has "failure" callbacks.
-     */
-    public function hasFailureCallbacks(): bool
-    {
-        return isset($this->options['failure']) && ! empty($this->options['failure']);
     }
 
     /**
