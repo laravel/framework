@@ -84,6 +84,13 @@ class Batch
     protected $thenCallback = null;
 
     /**
+     * If the batch already was sent.
+     *
+     * @var bool
+     */
+    protected $inProgress = false;
+
+    /**
      * The date when the batch was created.
      *
      * @var \Carbon\CarbonImmutable
@@ -121,9 +128,15 @@ class Batch
      *
      * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
+     *
+     * @throws BatchInProgressException
      */
     public function as(string $key)
     {
+        if ($this->inProgress) {
+            throw new BatchInProgressException();
+        }
+
         $this->incrementPendingRequests();
 
         return $this->requests[$key] = $this->asyncRequest();
@@ -289,6 +302,7 @@ class Batch
      */
     public function send(): array
     {
+        $this->inProgress = true;
         $results = [];
 
         $requests = $this->getRequests();
@@ -361,6 +375,7 @@ class Batch
         }
 
         $this->finishedAt = new CarbonImmutable();
+        $this->inProgress = false;
 
         return $results;
     }
@@ -425,6 +440,10 @@ class Batch
      */
     public function __call(string $method, array $parameters)
     {
+        if ($this->inProgress) {
+            throw new BatchInProgressException();
+        }
+
         $this->incrementPendingRequests();
 
         return $this->requests[] = $this->asyncRequest()->$method(...$parameters);

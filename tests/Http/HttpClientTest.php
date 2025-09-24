@@ -16,6 +16,7 @@ use GuzzleHttp\TransferStats;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Batch;
+use Illuminate\Http\Client\BatchInProgressException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
@@ -3822,6 +3823,26 @@ class HttpClientTest extends TestCase
         $this->assertSame(100, $batch->completion());
         $this->assertTrue($batch->hasFailures());
         $this->assertTrue($batch->finished());
+    }
+
+    public function testCannotAddRequestsToInProgressBatch(): void
+    {
+        $this->expectException(BatchInProgressException::class);
+
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $responses = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+            ];
+        })->progress(function (Batch $batch, int|string $key, Response $response) use (&$progressCallbacks) {
+            $batch->as('third')->get('https://500.com');
+        })->send();
     }
 
     public function testBatchBeforeHook(): void
