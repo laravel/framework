@@ -28,5 +28,5 @@
         </x-laravel-exceptions-renderer::badge>
     </div>
 
-    <x-laravel-exceptions-renderer::request-url :request="$exception->request()" class="relative z-50" />
+    <x-laravel-exceptions-renderer::request-url :$exception :request="$exception->request()" class="relative z-50" />
 </div>
