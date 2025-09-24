@@ -608,7 +608,10 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function extractQueryString($path)
     {
-        if (($queryPosition = strpos($path, '?')) !== false) {
+        if (
+            $path !== null
+            && ($queryPosition = strpos($path, '?')) !== false
+        ) {
             return [
                 substr($path, 0, $queryPosition),
                 substr($path, $queryPosition),

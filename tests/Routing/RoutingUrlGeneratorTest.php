@@ -56,6 +56,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertSame('http://www.foo.com/foo/bar', $url->query('foo/bar?baz=boom', ['baz' => null]));
         $this->assertSame('https://www.foo.com/foo/bar/baz?foo=bar&zal=bee', $url->query('foo/bar?foo=bar', ['zal' => 'bee'], ['baz'], true));
         $this->assertSame('http://www.foo.com/foo/bar?baz[0]=boom&baz[1]=bam&baz[2]=bim', urldecode($url->query('foo/bar', ['baz' => ['boom', 'bam', 'bim']])));
+        $this->assertSame('http://www.foo.com', urldecode($url->query(null)));
     }
 
     public function testAssetGeneration()
