@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -210,5 +211,25 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
             rmdir(__DIR__.'/../../to-be-scoped');
         }
+    }
+
+    public function testKeepTrackOfAdapterDecoration()
+    {
+        $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.local' => [
+                    'driver' => 'local',
+                    'root' => 'to-be-scoped',
+                ],
+            ];
+        }));
+
+        $scoped = $filesystem->build([
+            'driver' => 'scoped',
+            'disk' => 'local',
+            'prefix' => 'path-prefix',
+        ]);
+
+        $this->assertInstanceOf(PathPrefixedAdapter::class, $scoped->getAdapter());
     }
 }
