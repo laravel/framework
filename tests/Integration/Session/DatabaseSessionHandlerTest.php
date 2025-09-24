@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Session;
 
 use Illuminate\Session\DatabaseSessionHandler;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -109,5 +110,17 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $this->assertNull($session->user_agent);
         $this->assertNull($session->ip_address);
         $this->assertNull($session->user_id);
+    }
+
+    public function test_it_stores_user_agent_as_utf_8()
+    {
+        $handler = new DatabaseSessionHandler($this->app['db']->connection(), 'sessions', 1, $this->app);
+        $this->app['request']->headers->set('User-Agent', $ua = "Mozilla/5.0 \xA1");
+
+        $handler->write('simple_id_1', 'abcd');
+
+        $session = DB::table('sessions')->sole();
+        $this->assertSame($session->user_agent, 'Mozilla/5.0 ?');
+        $this->assertTrue(mb_check_encoding($session->user_agent, 'UTF-8'));
     }
 }
