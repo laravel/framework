@@ -127,7 +127,7 @@ if (! function_exists('e')) {
         }
 
         if ($value instanceof Htmlable) {
-            return $value->toHtml();
+            return $value->toHtml() ?? '';
         }
 
         if ($value instanceof BackedEnum) {
