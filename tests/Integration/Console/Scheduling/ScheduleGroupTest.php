@@ -181,9 +181,10 @@ class ScheduleGroupTest extends TestCase
         ];
     }
 
-    public function testGroupedPendingEventAttribute(){
+    public function testGroupedPendingEventAttribute()
+    {
         $schedule = new ScheduleClass;
-        $schedule->weekdays()->group(function ($schedule)  {
+        $schedule->weekdays()->group(function ($schedule) {
             $schedule->command('inspire')->at('00:00'); // this is event, not pending attribute
             $schedule->at('01:00')->command('inspire'); // this is pending attribute
             $schedule->command('inspire');  // this goes back to group pending attribute
