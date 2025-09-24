@@ -400,6 +400,9 @@ abstract class Relation implements BuilderContract
     /**
      * Add a whereIn eager constraint for the given set of model keys to be loaded.
      *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>|null  $query
      * @return void
      */
@@ -415,6 +418,7 @@ abstract class Relation implements BuilderContract
     /**
      * Get the name of the "where in" method for eager loading.
      *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
      * @return string
      */
@@ -520,11 +524,15 @@ abstract class Relation implements BuilderContract
         return array_search($className, static::$morphMap, strict: true) ?: $className;
     }
 
+
+
     /**
      * Determine which object should be passed to conditional callbacks.
      *
      * For relations that support pivot helpers, return the relation itself; otherwise
      * return the underlying Eloquent Builder instance.
+     *
+     * @return mixed
      */
     protected function conditionalTarget(): mixed
     {
