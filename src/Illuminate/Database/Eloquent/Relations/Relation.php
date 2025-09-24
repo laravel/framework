@@ -556,10 +556,6 @@ abstract class Relation implements BuilderContract
             return $this->macroCall($method, $parameters);
         }
 
-        if ($this->query->hasMacro($method)) {
-            return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
-        }
-
         return $this->forwardDecoratedCallTo($this->query, $method, $parameters);
     }
 
