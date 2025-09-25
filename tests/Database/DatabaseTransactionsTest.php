@@ -95,7 +95,7 @@ class DatabaseTransactionsTest extends TestCase
         $this->connection()->table('users')->where(['name' => 'zain'])->update([
             'value' => 2,
         ]);
-        $this->connection()->commit();
+        $this->connection()->commitTransaction();
     }
 
     public function testNestedTransactionIsRecordedAndCommitted()
@@ -205,7 +205,7 @@ class DatabaseTransactionsTest extends TestCase
             'value' => 2,
         ]);
 
-        $this->connection()->rollBack();
+        $this->connection()->rollbackTransaction();
     }
 
     public function testNestedTransactionsAreRolledBack()

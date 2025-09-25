@@ -32,6 +32,7 @@ class Connection implements ConnectionInterface
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
         Concerns\ManagesTransactions,
+        Concerns\ManagesSavepoints,
         InteractsWithTime,
         Macroable;
 
@@ -230,6 +231,8 @@ class Connection implements ConnectionInterface
         $this->useDefaultQueryGrammar();
 
         $this->useDefaultPostProcessor();
+
+        $this->initializeSavepointManagement();
     }
 
     /**
@@ -1460,6 +1463,8 @@ class Connection implements ConnectionInterface
     {
         $this->events = $events;
 
+        $this->initializeSavepointManagement();
+
         return $this;
     }
 
@@ -1691,5 +1696,30 @@ class Connection implements ConnectionInterface
     public static function getResolver($driver)
     {
         return static::$resolvers[$driver] ?? null;
+    }
+
+    /**
+     * Commit the active database transaction.
+     *
+     * @return void
+     *
+     * @deprecated Use commitTransaction() instead
+     */
+    public function commit()
+    {
+        return $this->commitTransaction();
+    }
+
+    /**
+     * Rollback the active database transaction.
+     *
+     * @param  int|null  $toLevel
+     * @return void
+     *
+     * @deprecated Use rollbackTransaction() instead
+     */
+    public function rollBack($toLevel = null)
+    {
+        return $this->rollbackTransaction($toLevel);
     }
 }
