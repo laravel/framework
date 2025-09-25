@@ -1556,7 +1556,7 @@ trait ValidatesAttributes
      * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
-    public function validateInteger($attribute, $value, array $parameters)
+    public function validateInteger($attribute, $value, array $parameters = [])
     {
         if (($parameters[0] ?? null) === 'strict') {
             return is_int($value);
