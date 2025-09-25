@@ -6,9 +6,9 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\NullStore;
 use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as Event;
-use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -320,7 +320,7 @@ class CacheManagerTest extends TestCase
 
     protected function getApp(array $userConfig)
     {
-        $app = new Application;
+        $app = new Container;
         $app->singleton('config', fn () => new Repository($userConfig));
 
         return $app;
