@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
@@ -33,7 +34,7 @@ class EloquentDeleteTest extends DatabaseTestCase
         });
     }
 
-    public function testDeleteUseLimitWithoutJoins()
+    public function testDeleteUseLimitWithoutJoins(): void
     {
         $totalPosts = 10;
         $deleteLimit = 1;
@@ -48,12 +49,12 @@ class EloquentDeleteTest extends DatabaseTestCase
         $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
     }
 
-    public function testDeleteUseLimitWithJoins()
+    public function testDeleteUseLimitWithJoins(): void
     {
         $ignoredDrivers = ['sqlsrv', 'mysql', 'mariadb'];
 
         if (in_array($this->driver, $ignoredDrivers)) {
-            $this->markTestSkipped("{$this->driver} does not support LIMIT on DELETE statements with JOIN clauses");
+            $this->markTestSkipped("{$this->driver} does not support LIMIT on DELETE statements with JOIN clauses.");
         }
 
         $totalPosts = 10;
@@ -75,6 +76,28 @@ class EloquentDeleteTest extends DatabaseTestCase
             ->delete();
 
         $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
+    }
+
+    public function testDeleteWithLimitAndJoinThrowsExceptionOnMySql(): void
+    {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('This test only applies to MySQL/MariaDB.');
+        }
+
+        $this->expectException(QueryException::class);
+
+        for ($i = 0; $i < 10; $i++) {
+            Comment::query()->create([
+                'post_id' => Post::query()->create()->id,
+            ]);
+        }
+
+        Post::query()
+            ->join('comments', 'comments.post_id', '=', 'posts.id')
+            ->where('posts.id', '>', 5)
+            ->orderBy('posts.id')
+            ->limit(1)
+            ->delete();
     }
 
     public function testForceDeletedEventIsFired()

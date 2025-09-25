@@ -461,7 +461,10 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Compile a delete query that does not use joins.
+     * Compile a delete statement without joins into SQL.
+     *
+     *  MySQL supports ORDER BY and LIMIT on deletes without joins.
+     *  This appends those clauses to the base SQL when present.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
@@ -472,9 +475,6 @@ class MySqlGrammar extends Grammar
     {
         $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
 
-        // When using MySQL, delete statements may contain order by statements and limits
-        // so we will compile both of those here. Once we have finished compiling this
-        // we will return the completed SQL statement so it will be executed for us.
         if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
@@ -489,6 +489,10 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete statement with joins into SQL.
      *
+     * Adds ORDER BY and LIMIT if present, for platforms that allow them (e.g., PlanetScale).
+     *
+     * Note: Standard MySQL does not support ORDER BY or LIMIT with joined deletes and will throw a syntax error.
+     *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
@@ -496,15 +500,17 @@ class MySqlGrammar extends Grammar
      */
     protected function compileDeleteWithJoins(Builder $query, $table, $where)
     {
+        $sql = parent::compileDeleteWithJoins($query, $table, $where);
+
         if (! empty($query->orders)) {
-            throw new \RuntimeException('MySQL does not support ORDER BY on DELETE statements with JOIN clauses.');
+            $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
         if (isset($query->limit)) {
-            throw new \RuntimeException('MySQL does not support LIMIT on DELETE statements with JOIN clauses.');
+            $sql .= ' '.$this->compileLimit($query, $query->limit);
         }
 
-        return parent::compileDeleteWithJoins($query, $table, $where);
+        return $sql;
     }
 
     /**
