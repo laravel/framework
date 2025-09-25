@@ -6,9 +6,9 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\NullStore;
 use Illuminate\Config\Repository;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Events\Dispatcher as Event;
+use Illuminate\Foundation\Application;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -22,18 +22,17 @@ class CacheManagerTest extends TestCase
 
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
-        $cacheManager = new CacheManager([
-            'config' => [
-                'cache.stores.'.__CLASS__ => [
-                    'driver' => __CLASS__,
+        $manager = new CacheManager($this->getApp([
+            'cache' => [
+                'stores' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
                 ],
             ],
-        ]);
-        $driver = function () {
-            return $this;
-        };
-        $cacheManager->extend(__CLASS__, $driver);
-        $this->assertEquals($cacheManager, $cacheManager->store(__CLASS__));
+        ]));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->store(__CLASS__));
     }
 
     public function testCustomDriverOverridesInternalDrivers()
@@ -321,7 +320,7 @@ class CacheManagerTest extends TestCase
 
     protected function getApp(array $userConfig)
     {
-        $app = new Container;
+        $app = new Application;
         $app->singleton('config', fn () => new Repository($userConfig));
 
         return $app;
