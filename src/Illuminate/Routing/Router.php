@@ -1516,6 +1516,10 @@ class Router implements BindingRegistrar, RegistrarContract
             return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
+        if ($method === 'can') {
+            return (new RouteRegistrar($this))->attribute($method, [$parameters]);
+        }
+
         if ($method !== 'where' && Str::startsWith($method, 'where')) {
             return (new RouteRegistrar($this))->{$method}(...$parameters);
         }

@@ -1008,7 +1008,9 @@ class Route
         }
 
         if (isset($this->action['can'])) {
-            $this->can($this->action['can']);
+            foreach ($this->action['can'] as $can) {
+                $this->can($can[0], $can[1] ?? []);
+            }
         }
 
         return $this;
