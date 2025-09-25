@@ -4,6 +4,7 @@ namespace Illuminate\Foundation;
 
 use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
+use Illuminate\Contracts\Console\Kernel;
 
 class ComposerScripts
 {
@@ -54,8 +55,6 @@ class ComposerScripts
      */
     public static function prePackageUninstall(PackageEvent $event)
     {
-        $bootstrapFile = $event->getComposer()->getConfig()->get('base-dir');
-
         $bootstrapFile = dirname($vendorDir = $event->getComposer()->getConfig()->get('vendor-dir')).'/bootstrap/app.php';
 
         if (! file_exists($bootstrapFile)) {
@@ -69,16 +68,15 @@ class ComposerScripts
         /** @var Application $app */
         $app = require_once $bootstrapFile;
 
+        $app->make(Kernel::class)->bootstrap();
+
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
         $uninstallOperation = $event->getOperation()->getPackage();
         $packageName = $uninstallOperation->getName();
-        $isDev = $uninstallOperation->isDev();
 
-        $app['events']->dispatch('composer_package:'.$packageName.':pre_uninstall', [
-            'package' => $packageName,
-            'isDev' => $isDev,
-        ]);
+        $app['events']->dispatch('composer_package.'.$packageName.':pre_uninstall');
     }
+
 
     /**
      * Clear the cached Laravel bootstrapping files.
