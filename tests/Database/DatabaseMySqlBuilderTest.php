@@ -10,7 +10,6 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar as MySqlGrammarSchema;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class DatabaseMySqlBuilderTest extends TestCase
 {
@@ -50,7 +49,7 @@ class DatabaseMySqlBuilderTest extends TestCase
         $builder->dropDatabaseIfExists('my_database_a');
     }
 
-    public function testDeleteWithJoinThrowsExceptionOnOrderBy(): void
+    public function testDeleteWithJoinCompilesOrderByAndLimit(): void
     {
         $connection = Mockery::mock(Connection::class);
         $processor = Mockery::mock(Processor::class);
@@ -61,36 +60,16 @@ class DatabaseMySqlBuilderTest extends TestCase
 
         $builder = new Builder($connection, $grammar, $processor);
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('MySQL does not support ORDER BY on DELETE statements with JOIN clauses.');
-
         $builder
             ->from('users')
             ->join('contacts', 'users.id', '=', 'contacts.id')
             ->where('email', '=', 'foo')
-            ->orderBy('id')
-            ->delete();
-    }
+            ->orderBy('users.id')
+            ->limit(5);
 
-    public function testDeleteWithJoinThrowsExceptionOnLimit(): void
-    {
-        $connection = Mockery::mock(Connection::class);
-        $processor = Mockery::mock(Processor::class);
-        $grammar = new MySqlGrammar($connection);
+        $sql = $grammar->compileDelete($builder);
 
-        $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $connection->shouldReceive('getTablePrefix')->andReturn('');
-
-        $builder = new Builder($connection, $grammar, $processor);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('MySQL does not support LIMIT on DELETE statements with JOIN clauses.');
-
-        $builder
-            ->from('users')
-            ->join('contacts', 'users.id', '=', 'contacts.id')
-            ->where('email', '=', 'foo')
-            ->limit(10)
-            ->delete();
+        $this->assertStringContainsString('order by `users`.`id` asc', $sql);
+        $this->assertStringContainsString('limit 5', $sql);
     }
 }
