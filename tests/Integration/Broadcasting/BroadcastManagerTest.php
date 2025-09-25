@@ -100,6 +100,21 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager->connection('alien_connection');
     }
 
+    public function testCustomDriverClosureBoundObjectIsBroadcastManager()
+    {
+        $manager = new BroadcastManager($this->getApp([
+            'broadcasting' => [
+                'connections' => [
+                    __CLASS__ => [
+                        'driver' => __CLASS__,
+                    ],
+                ],
+            ],
+        ]));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->connection(__CLASS__));
+    }
+
     protected function getApp(array $userConfig)
     {
         $app = new Container;

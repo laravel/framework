@@ -752,6 +752,18 @@ class LogManagerTest extends TestCase
         $this->assertCount(1, $loggerSpy->logs);
         $this->assertEquals('some alert', $loggerSpy->logs[0]['message']);
     }
+
+    public function testCustomDriverClosureBoundObjectIsLogManager()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.'.__CLASS__, [
+            'driver' => __CLASS__,
+        ]);
+
+        $manager = new LogManager($this->app);
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->channel(__CLASS__)->getLogger());
+    }
 }
 
 class CustomizeFormatter

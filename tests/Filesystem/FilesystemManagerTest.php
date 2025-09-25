@@ -187,4 +187,17 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped');
         }
     }
+
+    public function testCustomDriverClosureBoundObjectIsFilesystemManager()
+    {
+        $manager = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.'.__CLASS__ => [
+                    'driver' => __CLASS__,
+                ],
+            ];
+        }));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->disk(__CLASS__));
+    }
 }
