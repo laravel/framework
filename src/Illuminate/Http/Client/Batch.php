@@ -30,21 +30,21 @@ class Batch
     /**
      * The total number of requests that belong to the batch.
      *
-     * @var int
+     * @var non-negative-int
      */
     public $totalRequests = 0;
 
     /**
      * The total number of requests that are still pending.
      *
-     * @var int
+     * @var non-negative-int
      */
     public $pendingRequests = 0;
 
     /**
      * The total number of requests that have failed.
      *
-     * @var int
+     * @var non-negative-int
      */
     public $failedRequests = 0;
 
@@ -58,30 +58,37 @@ class Batch
     /**
      * The callback to run before the first request from the batch runs.
      *
-     * @var \Closure|null
+     * @var (\Closure($this): void)|null
      */
     protected $beforeCallback = null;
 
     /**
      * The callback to run after a request from the batch succeeds.
      *
-     * @var \Closure|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
      */
     protected $progressCallback = null;
 
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var \Closure|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
      */
     protected $catchCallback = null;
 
     /**
      * The callback to run if all the requests from the batch succeeded.
      *
-     * @var \Closure|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
      */
     protected $thenCallback = null;
+
+    /**
+     * The callback to run after all the requests from the batch finish.
+     *
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     */
+    protected $finallyCallback = null;
 
     /**
      * If the batch already was sent.
@@ -103,13 +110,6 @@ class Batch
      * @var \Carbon\CarbonImmutable|null
      */
     public $finishedAt = null;
-
-    /**
-     * The callback to run after all the requests from the batch finish.
-     *
-     * @var \Closure|null
-     */
-    protected $finallyCallback = null;
 
     /**
      * Create a new request batch instance.
@@ -145,7 +145,7 @@ class Batch
     /**
      * Get the total number of requests that have been processed by the batch thus far.
      *
-     * @return int
+     * @return non-negative-int
      */
     public function processedRequests(): int
     {
@@ -155,7 +155,7 @@ class Batch
     /**
      * Get the percentage of requests that have been processed (between 0-100).
      *
-     * @return int
+     * @return non-negative-int
      */
     public function completion(): int
     {
@@ -185,7 +185,7 @@ class Batch
     /**
      * Register a callback to run before the first request from the batch runs.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure($this): void)  $callback
      * @return Batch
      */
     public function before(Closure $callback): self
@@ -198,7 +198,7 @@ class Batch
     /**
      * Retrieve the before callback in the batch.
      *
-     * @return \Closure|null
+     * @return (\Closure($this): void)|null
      */
     public function beforeCallback(): ?Closure
     {
@@ -208,7 +208,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch succeeds.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
      * @return Batch
      */
     public function progress(Closure $callback): self
@@ -221,7 +221,7 @@ class Batch
     /**
      * Retrieve the progress callback in the batch.
      *
-     * @return \Closure|null
+     * @return (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
      */
     public function progressCallback(): ?Closure
     {
@@ -231,7 +231,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -244,7 +244,7 @@ class Batch
     /**
      * Retrieve the catch callback in the batch.
      *
-     * @return \Closure|null
+     * @return (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
      */
     public function catchCallback(): ?Closure
     {
@@ -254,7 +254,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch succeed.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
      * @return Batch
      */
     public function then(Closure $callback): self
@@ -267,7 +267,7 @@ class Batch
     /**
      * Retrieve the then callback in the batch.
      *
-     * @return \Closure|null
+     * @return (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
      */
     public function thenCallback(): ?Closure
     {
@@ -277,7 +277,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch finish.
      *
-     * @param  \Closure  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
      * @return Batch
      */
     public function finally(Closure $callback): self
@@ -290,7 +290,7 @@ class Batch
     /**
      * Retrieve the finally callback in the batch.
      *
-     * @return \Closure|null
+     * @return (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
      */
     public function finallyCallback(): ?Closure
     {
