@@ -74,7 +74,7 @@ class ComposerScripts
         $packageName = $uninstallOperation->getName();
         $isDev = $uninstallOperation->isDev();
 
-        $app['events']->dispatch('composer_package:'.$packageName.':uninstall', [
+        $app['events']->dispatch('composer_package:'.$packageName.':pre_uninstall', [
             'package' => $packageName,
             'isDev' => $isDev,
         ]);
