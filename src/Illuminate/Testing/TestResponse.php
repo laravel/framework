@@ -1692,6 +1692,7 @@ class TestResponse implements ArrayAccess
      * Assert that the session does not have a given key.
      *
      * @template T of (\Closure(mixed): bool)|mixed
+     *
      * @param  string|T[]  $key
      * @param  T  $value
      * @return $this
