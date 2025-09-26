@@ -42,9 +42,11 @@ abstract class Type extends JsonSchema
     /**
      * Indicate that the type is required.
      */
-    public function required(): static
+    public function required(bool $required = true): static
     {
-        $this->required = true;
+        if ($required) {
+            $this->required = true;
+        }
 
         return $this;
     }
