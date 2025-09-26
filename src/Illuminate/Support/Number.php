@@ -346,7 +346,7 @@ class Number
     /**
      * Convert the given number to its Roman numeral equivalent.
      *
-     * @param int<1, 3999> $number
+     * @param  int<1, 3999>  $number
      * @return string
      */
     public static function roman(int $number): string
