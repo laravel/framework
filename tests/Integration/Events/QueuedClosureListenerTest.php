@@ -26,6 +26,44 @@ class QueuedClosureListenerTest extends TestCase
             return $job->class == InvokeQueuedClosure::class;
         });
     }
+
+    public function testAnonymousQueuedListenerIsQueuedOnMessageGroup()
+    {
+        $messageGroup = 'group-1';
+
+        Bus::fake();
+
+        Event::listen(\Illuminate\Events\queueable(function (TestEvent $event) {
+            //
+        })->catch(function (TestEvent $event) {
+            //
+        })->onConnection(null)->onQueue(null)->onGroup($messageGroup));
+
+        Event::dispatch(new TestEvent);
+
+        Bus::assertDispatched(CallQueuedListener::class, function ($job) use ($messageGroup) {
+            return $job->messageGroup == $messageGroup;
+        });
+    }
+
+    public function testAnonymousQueuedListenerIsQueuedWithDeduplicator()
+    {
+        $deduplicator = fn ($payload, $queue) => 'deduplicator-1';
+
+        Bus::fake();
+
+        Event::listen(\Illuminate\Events\queueable(function (TestEvent $event) {
+            //
+        })->catch(function (TestEvent $event) {
+            //
+        })->onConnection(null)->onQueue(null)->withDeduplicator($deduplicator));
+
+        Event::dispatch(new TestEvent);
+
+        Bus::assertDispatched(CallQueuedListener::class, function ($job) {
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) == 'deduplicator-1';
+        });
+    }
 }
 
 class TestEvent
