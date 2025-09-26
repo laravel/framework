@@ -19,55 +19,6 @@ class Arr
     use Macroable;
 
     /**
-     * Conversion mode for converting keys to uppercase.
-     *
-     * @var int
-     */
-    const KEY_MODE_UPPER_CASE = MB_CASE_UPPER;
-
-    /**
-     * Conversion mode for converting keys to lowercase.
-     *
-     * @var int
-     */
-    const KEY_MODE_LOWER_CASE = MB_CASE_LOWER;
-
-    /**
-     * Conversion mode for converting keys to the title case.
-     *
-     * @var int
-     */
-    const KEY_MODE_TITLE_CASE = MB_CASE_TITLE;
-
-    /**
-     * Conversion mode for converting keys to snake case.
-     *
-     * @var int
-     */
-    const KEY_MODE_SNAKE_CASE = 10_0;
-
-    /**
-     * Conversion mode for converting keys to camel case.
-     *
-     * @var int
-     */
-    const KEY_MODE_CAMEL_CASE = 10_1;
-
-    /**
-     * Conversion mode for converting keys to kebab case.
-     *
-     * @var int
-     */
-    const KEY_MODE_KEBAB_CASE = 10_2;
-
-    /**
-     * Conversion mode for converting keys to studly case.
-     *
-     * @var int
-     */
-    const KEY_MODE_STUDLY_CASE = 10_3;
-
-    /**
      * Determine whether the given value is array accessible.
      *
      * @param  mixed  $value
@@ -148,25 +99,14 @@ class Arr
      * Recursively converts the keys of an array to a specified casing mode.
      *
      * @param  array  $array
-     * @param  int  $mode  Use one of the `KEY_MODE_*` constants.
+     * @param  CaseMode  $mode
      * @param  int  $depth
      * @return array
      */
-    public static function convertKeyCase(array $array, int $mode = Arr::KEY_MODE_SNAKE_CASE, $depth = INF): array
+    public static function convertKeyCase(array $array, CaseMode $mode = CaseMode::SNAKE, $depth = INF): array
     {
         return static::mapWithKeys($array, function ($value, $key) use ($mode, $depth): array {
-            $str = Str::of((string) $key);
-
-            $converted = match ($mode) {
-                static::KEY_MODE_UPPER_CASE => $str->upper()->value(),
-                static::KEY_MODE_LOWER_CASE => $str->lower()->value(),
-                static::KEY_MODE_TITLE_CASE => $str->title()->value(),
-                static::KEY_MODE_SNAKE_CASE => $str->snake()->value(),
-                static::KEY_MODE_CAMEL_CASE => $str->camel()->value(),
-                static::KEY_MODE_KEBAB_CASE => $str->kebab()->value(),
-                static::KEY_MODE_STUDLY_CASE => $str->studly()->value(),
-                default => throw new InvalidArgumentException("The mode [{$mode}] is not supported."),
-            };
+            $converted = $mode->convert((string) $key);
 
             if (is_array($value) && $depth > 1) {
                 $value = static::convertKeyCase($value, $mode, $depth - 1);

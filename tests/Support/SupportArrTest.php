@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use ArrayObject;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\CaseMode;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
@@ -109,7 +110,7 @@ class SupportArrTest extends TestCase
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
         ];
 
-        // Case Arr::KEY_MODE_SNAKE_CASE and depth INF
+        // Case CaseMode::SNAKE_CASE and depth INF
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -122,7 +123,7 @@ class SupportArrTest extends TestCase
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
         ], Arr::convertKeyCase($data));
 
-        // Case Arr::KEY_MODE_SNAKE_CASE and depth 1
+        // Case CaseMode::SNAKE_CASE and depth 1
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -133,9 +134,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_SNAKE_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::SNAKE, 1));
 
-        // Case Arr::KEY_MODE_UPPER_CASE and depth INF
+        // Case CaseMode::UPPER_CASE and depth INF
         $this->assertEquals([
             'FIRST_NAME' => 'Taylor',
             'EMAIL-ADDRESS' => 'taylor@laravel.com',
@@ -146,9 +147,9 @@ class SupportArrTest extends TestCase
                 'PREFERENCES' => ['LANGUAGECODE' => 'en', 'THEME_COLOR' => 'dark', 'FONT-SIZE' => 'medium'],
             ],
             'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_UPPER_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::UPPER));
 
-        // Case Arr::KEY_MODE_UPPER_CASE and depth 1
+        // Case CaseMode::UPPER_CASE and depth 1
         $this->assertEquals([
             'FIRST_NAME' => 'Taylor',
             'EMAIL-ADDRESS' => 'taylor@laravel.com',
@@ -159,9 +160,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_UPPER_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::UPPER, 1));
 
-        // Case Arr::KEY_MODE_LOWER_CASE and depth INF
+        // Case CaseMode::LOWER_CASE and depth INF
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -172,9 +173,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['languagecode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_LOWER_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::LOWER));
 
-        // Case Arr::KEY_MODE_LOWER_CASE and depth 1
+        // Case CaseMode::LOWER_CASE and depth 1
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -185,9 +186,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_LOWER_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::LOWER, 1));
 
-        // Case Arr::KEY_MODE_TITLE_CASE and depth INF
+        // Case CaseMode::TITLE_CASE and depth INF
         $this->assertEquals([
             'First_Name' => 'Taylor',
             'Email-Address' => 'taylor@laravel.com',
@@ -198,9 +199,9 @@ class SupportArrTest extends TestCase
                 'Preferences' => ['Languagecode' => 'en', 'Theme_Color' => 'dark', 'Font-Size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_TITLE_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::TITLE));
 
-        // Case Arr::KEY_MODE_TITLE_CASE and depth 1
+        // Case CaseMode::TITLE_CASE and depth 1
         $this->assertEquals([
             'First_Name' => 'Taylor',
             'Email-Address' => 'taylor@laravel.com',
@@ -211,9 +212,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_TITLE_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::TITLE, 1));
 
-        // Case Arr::KEY_MODE_CAMEL_CASE and depth INF
+        // Case CaseMode::CAMEL_CASE and depth INF
         $this->assertEquals([
             'firstName' => 'Taylor',
             'emailAddress' => 'taylor@laravel.com',
@@ -224,9 +225,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['languageCode' => 'en', 'themeColor' => 'dark', 'fontSize' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_CAMEL_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::CAMEL));
 
-        // Case Arr::KEY_MODE_CAMEL_CASE and depth 1
+        // Case CaseMode::CAMEL_CASE and depth 1
         $this->assertEquals([
             'firstName' => 'Taylor',
             'emailAddress' => 'taylor@laravel.com',
@@ -237,9 +238,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_CAMEL_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::CAMEL, 1));
 
-        // Case Arr::self::KEY_MODE_KEBAB_CASE and depth INF
+        // Case CaseMode::KEBAB_CASE and depth INF
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -250,9 +251,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['language-code' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_KEBAB_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::KEBAB));
 
-        // Case Arr::self::KEY_MODE_KEBAB_CASE and depth 1
+        // Case CaseMode::KEBAB_CASE and depth 1
         $this->assertEquals([
             'first_name' => 'Taylor',
             'email-address' => 'taylor@laravel.com',
@@ -263,9 +264,9 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_KEBAB_CASE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::KEBAB, 1));
 
-        // Case Arr::self::self::KEY_MODE_STUDLY_CASE and depth INF
+        // Case CaseMode::STUDLY_CASE and depth INF
         $this->assertEquals([
             'FirstName' => 'Taylor',
             'EmailAddress' => 'taylor@laravel.com',
@@ -276,9 +277,9 @@ class SupportArrTest extends TestCase
                 'Preferences' => ['LanguageCode' => 'en', 'ThemeColor' => 'dark', 'FontSize' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_STUDLY_CASE));
+        ], Arr::convertKeyCase($data, CaseMode::STUDLY));
 
-        // Case Arr::self::self::KEY_MODE_STUDLY_CASE and depth 1
+        // Case CaseMode::STUDLY_CASE and depth 1
         $this->assertEquals([
             'FirstName' => 'Taylor',
             'EmailAddress' => 'taylor@laravel.com',
@@ -289,11 +290,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, Arr::KEY_MODE_STUDLY_CASE, 1));
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("The mode [999] is not supported.");
-        Arr::convertKeyCase($data, 999);
+        ], Arr::convertKeyCase($data, CaseMode::STUDLY, 1));
     }
 
     public function testCollapse()
