@@ -35,7 +35,7 @@
         </button>
     </div>
 
-    <div class="flex flex-col rounded-b-lg divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-white/5 dark:border-white/5" x-show="expanded">
+    <div x-cloak class="flex flex-col rounded-b-lg divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-white/5 dark:border-white/5" x-show="expanded">
         @foreach ($frames as $frame)
             <div class="flex flex-col divide-y divide-neutral-200 dark:divide-white/5">
                 <x-laravel-exceptions-renderer::vendor-frame :$frame />
