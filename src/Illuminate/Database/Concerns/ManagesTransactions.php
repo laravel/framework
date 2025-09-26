@@ -362,7 +362,7 @@ trait ManagesTransactions
      *
      * @throws \RuntimeException
      */
-    public function afterRollback($callback)
+    public function afterRollBack($callback)
     {
         if ($this->transactionsManager) {
             return $this->transactionsManager->addCallbackForRollback($callback);
