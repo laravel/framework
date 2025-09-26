@@ -2,15 +2,15 @@
 
 namespace Illuminate\Support;
 
-enum CaseMode: int
+enum CaseMode
 {
-    case UPPER = 1;
-    case LOWER = 2;
-    case TITLE = 3;
-    case SNAKE = 4;
-    case CAMEL = 5;
-    case KEBAB = 6;
-    case STUDLY = 7;
+    case UPPER;
+    case LOWER;
+    case TITLE;
+    case SNAKE;
+    case CAMEL;
+    case KEBAB;
+    case STUDLY;
 
     /**
      * Convert the given string to the case mode.
