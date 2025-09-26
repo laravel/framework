@@ -200,7 +200,7 @@ class WorkCommandTest extends QueueTestCase
         $repository = m::mock(Repository::class);
 
         $cacheManager->shouldReceive('driver')
-            ->once()
+            ->twice()
             ->andReturn($repository);
 
         $cacheManager->shouldReceive('store')
