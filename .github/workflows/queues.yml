@@ -1,12 +1,8 @@
 name: queues
 
 on:
-  push:
-    branches:
-      - master
-      - '*.x'
   pull_request:
-
+  push:
 jobs:
   sync:
     runs-on: ubuntu-24.04
