@@ -203,10 +203,6 @@ class WorkCommandTest extends QueueTestCase
             ->twice()
             ->andReturn($repository);
 
-        $cacheManager->shouldReceive('store')
-            ->once()
-            ->andReturn($repository);
-
         $repository->shouldReceive('get')
             ->once()
             ->with('illuminate:queue:restart')
