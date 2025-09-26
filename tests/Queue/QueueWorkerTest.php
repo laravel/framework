@@ -481,6 +481,7 @@ class InsomniacWorker extends Worker
     {
         return $status;
     }
+
     public function memoryExceeded($memoryLimit)
     {
         return $this->stopOnMemoryExceeded;
