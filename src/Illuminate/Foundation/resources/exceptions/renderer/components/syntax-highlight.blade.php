@@ -9,9 +9,10 @@
 
 @php
     $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
-    $lines = explode("\n", $code);
 
     if ($editor) {
+        $lines = explode("\n", $code);
+
         foreach ($lines as $index => $line) {
             $lineNumber = $startingLine + $index;
             $highlight = $highlightedLine === $index;
