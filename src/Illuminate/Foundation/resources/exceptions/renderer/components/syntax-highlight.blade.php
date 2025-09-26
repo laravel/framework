@@ -1,7 +1,7 @@
 @props([
     'code',
     'language',
-    'withGutter' => false,
+    'editor' => false,
     'startingLine' => 1,
     'highlightedLine' => null,
     'truncate' => false,
@@ -9,7 +9,7 @@
 
 @php
     // $highlightedCode = (new Phiki)->codeToHtml($code, $grammar, ['light' => $lightTheme, 'dark' => $darkTheme])
-    //     ->withGutter($withGutter)
+    //     ->withGutter($editor)
     //     ->startingLine($startingLine)
     //     ->decoration(
     //         PreDecoration::make()->class('bg-transparent!', $truncate ? ' truncate' : ''),
@@ -25,7 +25,7 @@
     $lines = explode("\n", $code);
     $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
 
-    if ($withGutter) {
+    if ($editor) {
         foreach ($lines as $index => $line) {
             $lineNumber = $startingLine + $index;
             $lineClass = $highlightedLine === $index
@@ -57,6 +57,7 @@
                 {{ Illuminate\Support\Js::from($code) }},
                 {{ Illuminate\Support\Js::from($language) }},
                 {{ Illuminate\Support\Js::from($truncate) }},
+                {{ Illuminate\Support\Js::from($editor) }},
                 {{ Illuminate\Support\Js::from($startingLine) }},
                 {{ Illuminate\Support\Js::from($highlightedLine) }}
             );

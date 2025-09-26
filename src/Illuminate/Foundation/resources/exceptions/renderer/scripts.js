@@ -52,6 +52,7 @@ window.highlight = function (
     code,
     language,
     truncate = false,
+    editor = false,
     startingLine = 1,
     highlightedLine = null
 ) {
@@ -66,25 +67,32 @@ window.highlight = function (
                 pre(node) {
                     this.addClassToHast(node, [
                         "bg-transparent!",
-                        truncate ? " truncate" : "",
+                        truncate ? "truncate" : "",
                     ]);
                 },
                 code(node) {
-                    // this.addClassToHast(node, "language-js");
+                    this.addClassToHast(node, "flex flex-col");
                 },
                 line(node, line) {
+                    if (!editor) {
+                        return;
+                    }
+
                     const lineNumber = startingLine + line - 1;
                     node.properties["data-line"] = lineNumber;
+
+                    this.addClassToHast(
+                        node,
+                        "block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4 [&_.line-number]:dark:text-white!"
+                    );
+
                     if (highlightedLine === line - 1) {
                         this.addClassToHast(
                             node,
-                            "bg-rose-200! dark:bg-rose-900! [&_.line-number]:dark:text-white!"
+                            "bg-rose-200! dark:bg-rose-900!"
                         );
                     }
                 },
-                // span(node, line, col) {
-                //     node.properties["data-token"] = `token:${line}:${col}`;
-                // },
             },
         ],
     });
