@@ -67,5 +67,4 @@
 >
     <div x-cloak x-html="highlightedCode"></div>
     <div x-show="!highlightedCode">{!! $fallback !!}</div>
-    {{-- {!! $fallback !!} --}}
 </div>

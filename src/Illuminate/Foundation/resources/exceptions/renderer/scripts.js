@@ -79,19 +79,28 @@ window.highlight = function (
                     }
 
                     const lineNumber = startingLine + line - 1;
-                    node.properties["data-line"] = lineNumber;
+                    const highlight = highlightedLine === line - 1;
 
-                    this.addClassToHast(
-                        node,
-                        "block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4 [&_.line-number]:dark:text-white!"
-                    );
+                    const lineNumberSpan = {
+                        type: "element",
+                        tagName: "span",
+                        properties: {
+                            className: [
+                                "mr-6 text-neutral-500! dark:text-neutral-600!",
+                                highlight ? "dark:text-white!" : "",
+                            ],
+                        },
+                        children: [
+                            { type: "text", value: lineNumber.toString() },
+                        ],
+                    };
 
-                    if (highlightedLine === line - 1) {
-                        this.addClassToHast(
-                            node,
-                            "bg-rose-200! dark:bg-rose-900!"
-                        );
-                    }
+                    node.children.unshift(lineNumberSpan);
+
+                    this.addClassToHast(node, [
+                        "block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4",
+                        highlight ? "bg-rose-200! dark:bg-rose-900!" : "",
+                    ]);
                 },
             },
         ],
