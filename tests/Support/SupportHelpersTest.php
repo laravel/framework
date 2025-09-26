@@ -1552,7 +1552,7 @@ trait SupportTestTraitArrayAccess
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->items);
+        return array_key_exists($offset ?? '', $this->items);
     }
 
     public function offsetGet($offset): mixed

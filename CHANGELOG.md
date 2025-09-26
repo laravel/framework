@@ -1,6 +1,40 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.29.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.31.1...12.x)
+
+## [v12.31.1](https://github.com/laravel/framework/compare/v12.31.0...v12.31.1) - 2025-09-23
+
+* Revert "[12.x] Reintroduce short-hand "false" syntax for Blade component props" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57151
+
+## [v12.31.0](https://github.com/laravel/framework/compare/v12.30.1...v12.31.0) - 2025-09-23
+
+* Bump vite from 7.1.2 to 7.1.6 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/57114
+* [12.x] Reintroduce short-hand "false" syntax for Blade component props by [@PerryvanderMeer](https://github.com/PerryvanderMeer) in https://github.com/laravel/framework/pull/57104
+* [12.x] Allow Number parse helpers to return false by [@platoindebugmode](https://github.com/platoindebugmode) in https://github.com/laravel/framework/pull/57127
+* [12.x] Refactor `RedisTaggedCache@flush()` to allow for custom connections by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57122
+* [12.x] Use light-dark scheme for exception renderer by [@pxlrbt](https://github.com/pxlrbt) in https://github.com/laravel/framework/pull/57128
+* [12.x] Replace logger helper and log function concrete return type ?LogManager with abstract ?LoggerInterface by [@abdelrahmenAyman](https://github.com/abdelrahmenAyman) in https://github.com/laravel/framework/pull/57028
+* [12.x] Fix session value is missing assertion by [@barclaymichael](https://github.com/barclaymichael) in https://github.com/laravel/framework/pull/57134
+* median() div swapped for intdiv() by [@artumi-richard](https://github.com/artumi-richard) in https://github.com/laravel/framework/pull/57148
+* [12.x] Fix PHP 8.5 null-key deprecations by [@IonBazan](https://github.com/IonBazan) in https://github.com/laravel/framework/pull/57137
+
+## [v12.30.1](https://github.com/laravel/framework/compare/v12.30.0...v12.30.1) - 2025-09-18
+
+* [12.x] Fix: Apply intl extension check to ordinal position to prevent issues by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/57112
+
+## [v12.30.0](https://github.com/laravel/framework/compare/v12.29.0...v12.30.0) - 2025-09-18
+
+* [12.x] Allow newer versions for phiki/phiki than 2.0.0 by [@hebbet](https://github.com/hebbet) in https://github.com/laravel/framework/pull/57075
+* [12.x] Use null coalescing for memoryExceededExitCode by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57090
+* [12.x] Fix 'can' function that was defined in RouterRegistrar in #54648 by [@pdewit](https://github.com/pdewit) in https://github.com/laravel/framework/pull/57072
+* [12.x] Fix SQS FIFO and fair queue support by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/57080
+* atomically flush redis cache tags by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57098
+* [12.x] Add type hints to `\Illuminate\Support\Str` by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/57096
+* Doc: Update Database Connection getElapsedTime comment to specify unit by [@glensc](https://github.com/glensc) in https://github.com/laravel/framework/pull/57099
+* [12.x] Add support for Ordinal Position in validation messages by [@BinaryKitten](https://github.com/BinaryKitten) in https://github.com/laravel/framework/pull/57109
+* [12.x] Fix exception frame file path on Windows by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57103
+* Add fallback to copy buttons on new exception page by [@joaokamun](https://github.com/joaokamun) in https://github.com/laravel/framework/pull/57092
+* [12.x] Adds `Macroable` trait to `Illuminate/Support/Benchmark` by [@1tim22](https://github.com/1tim22) in https://github.com/laravel/framework/pull/57107
 
 ## [v12.29.0](https://github.com/laravel/framework/compare/v12.28.1...v12.29.0) - 2025-09-16
 
