@@ -4,6 +4,8 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Cache\Repository as Cache;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -12,6 +14,7 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
@@ -628,11 +631,15 @@ class Dispatcher implements DispatcherContract
     {
         $instance = $this->container->make($class);
 
-        if (method_exists($instance, 'shouldQueue')) {
-            return $instance->shouldQueue($arguments[0]);
+        $shouldQueue = method_exists($instance, 'shouldQueue')
+            ? $instance->shouldQueue($arguments[0])
+            : true;
+
+        if ($shouldQueue && $instance instanceof ShouldBeUnique) {
+            return (new UniqueLock($this->container->make(Cache::class)))->acquire($instance, ...$arguments);;
         }
 
-        return true;
+        return $shouldQueue;
     }
 
     /**

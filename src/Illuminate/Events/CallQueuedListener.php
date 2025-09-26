@@ -3,8 +3,12 @@
 namespace Illuminate\Events;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Cache\Repository as Cache;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -110,7 +114,19 @@ class CallQueuedListener implements ShouldQueue
             $this->job, $container->make($this->class)
         );
 
-        $handler->{$this->method}(...array_values($this->data));
+        $lockReleased = false;
+        if ($handler instanceof ShouldBeUniqueUntilProcessing) {
+            $this->releaseLock($handler);
+            $lockReleased = true;
+        }
+
+        try {
+            $handler->{$this->method}(...array_values($this->data));
+        } finally {
+            if (! $lockReleased && $handler instanceof ShouldBeUnique) {
+                $this->releaseLock($handler);
+            }
+        }
     }
 
     /**
@@ -127,6 +143,14 @@ class CallQueuedListener implements ShouldQueue
         }
 
         return $instance;
+    }
+
+    /**
+     * Release the lock for the given handler.
+     */
+    protected function releaseLock(object $handler): void
+    {
+        (new UniqueLock(Container::getInstance()->make(Cache::class)))->release($handler, ...array_values($this->data));
     }
 
     /**
