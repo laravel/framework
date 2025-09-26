@@ -95,6 +95,207 @@ class SupportArrTest extends TestCase
         Arr::push($array, 'foo.bar', 'baz');
     }
 
+    public function testConvertKeysCase()
+    {
+        $data = [
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'UserID' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ];
+
+        // Case Arr::KEY_MODE_SNAKE_CASE and depth INF
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'user_i_d' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['language_code' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data));
+
+        // Case Arr::KEY_MODE_SNAKE_CASE and depth 1
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'user_i_d' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_SNAKE_CASE, 1));
+
+        // Case Arr::KEY_MODE_UPPER_CASE and depth INF
+        $this->assertEquals([
+            'FIRST_NAME' => 'Taylor',
+            'EMAIL-ADDRESS' => 'taylor@laravel.com',
+            'USERID' => 100,
+            'ACCOUNT_SETTINGS' => [
+                'IS_ACTIVE' => true,
+                'LOGIN-ATTEMPTS' => 3,
+                'PREFERENCES' => ['LANGUAGECODE' => 'en', 'THEME_COLOR' => 'dark', 'FONT-SIZE' => 'medium'],
+            ],
+            'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_UPPER_CASE));
+
+        // Case Arr::KEY_MODE_UPPER_CASE and depth 1
+        $this->assertEquals([
+            'FIRST_NAME' => 'Taylor',
+            'EMAIL-ADDRESS' => 'taylor@laravel.com',
+            'USERID' => 100,
+            'ACCOUNT_SETTINGS' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_UPPER_CASE, 1));
+
+        // Case Arr::KEY_MODE_LOWER_CASE and depth INF
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'userid' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['languagecode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_LOWER_CASE));
+
+        // Case Arr::KEY_MODE_LOWER_CASE and depth 1
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'userid' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_LOWER_CASE, 1));
+
+        // Case Arr::KEY_MODE_TITLE_CASE and depth INF
+        $this->assertEquals([
+            'First_Name' => 'Taylor',
+            'Email-Address' => 'taylor@laravel.com',
+            'Userid' => 100,
+            'Account_Settings' => [
+                'Is_Active' => true,
+                'Login-Attempts' => 3,
+                'Preferences' => ['Languagecode' => 'en', 'Theme_Color' => 'dark', 'Font-Size' => 'medium'],
+            ],
+            'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_TITLE_CASE));
+
+        // Case Arr::KEY_MODE_TITLE_CASE and depth 1
+        $this->assertEquals([
+            'First_Name' => 'Taylor',
+            'Email-Address' => 'taylor@laravel.com',
+            'Userid' => 100,
+            'Account_Settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_TITLE_CASE, 1));
+
+        // Case Arr::KEY_MODE_CAMEL_CASE and depth INF
+        $this->assertEquals([
+            'firstName' => 'Taylor',
+            'emailAddress' => 'taylor@laravel.com',
+            'userID' => 100,
+            'accountSettings' => [
+                'isActive' => true,
+                'loginAttempts' => 3,
+                'preferences' => ['languageCode' => 'en', 'themeColor' => 'dark', 'fontSize' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_CAMEL_CASE));
+
+        // Case Arr::KEY_MODE_CAMEL_CASE and depth 1
+        $this->assertEquals([
+            'firstName' => 'Taylor',
+            'emailAddress' => 'taylor@laravel.com',
+            'userID' => 100,
+            'accountSettings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_CAMEL_CASE, 1));
+
+        // Case Arr::self::KEY_MODE_KEBAB_CASE and depth INF
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'user-i-d' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['language-code' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_KEBAB_CASE));
+
+        // Case Arr::self::KEY_MODE_KEBAB_CASE and depth 1
+        $this->assertEquals([
+            'first_name' => 'Taylor',
+            'email-address' => 'taylor@laravel.com',
+            'user-i-d' => 100,
+            'account_settings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_KEBAB_CASE, 1));
+
+        // Case Arr::self::self::KEY_MODE_STUDLY_CASE and depth INF
+        $this->assertEquals([
+            'FirstName' => 'Taylor',
+            'EmailAddress' => 'taylor@laravel.com',
+            'UserID' => 100,
+            'AccountSettings' => [
+                'IsActive' => true,
+                'LoginAttempts' => 3,
+                'Preferences' => ['LanguageCode' => 'en', 'ThemeColor' => 'dark', 'FontSize' => 'medium'],
+            ],
+            'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_STUDLY_CASE));
+
+        // Case Arr::self::self::KEY_MODE_STUDLY_CASE and depth 1
+        $this->assertEquals([
+            'FirstName' => 'Taylor',
+            'EmailAddress' => 'taylor@laravel.com',
+            'UserID' => 100,
+            'AccountSettings' => [
+                'is_active' => true,
+                'login-attempts' => 3,
+                'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
+            ],
+            'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
+        ], Arr::convertKeyCase($data, Arr::KEY_MODE_STUDLY_CASE, 1));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("The mode [999] is not supported.");
+        Arr::convertKeyCase($data, 999);
+    }
+
     public function testCollapse()
     {
         // Normal case: a two-dimensional array with different elements
