@@ -8,10 +8,6 @@ import sql from "@shikijs/langs/sql";
 import darkPlus from "@shikijs/themes/dark-plus";
 import lightPlus from "@shikijs/themes/light-plus";
 
-window.Alpine = Alpine;
-
-Alpine.start();
-
 tippy("[data-tippy-content]", {
     arrow: false,
     allowHTML: true,
@@ -106,3 +102,7 @@ window.highlight = function (
         ],
     });
 };
+
+window.Alpine = Alpine;
+
+Alpine.start();

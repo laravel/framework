@@ -8,32 +8,24 @@
 ])
 
 @php
-    // $highlightedCode = (new Phiki)->codeToHtml($code, $grammar, ['light' => $lightTheme, 'dark' => $darkTheme])
-    //     ->withGutter($editor)
-    //     ->startingLine($startingLine)
-    //     ->decoration(
-    //         PreDecoration::make()->class('bg-transparent!', $truncate ? ' truncate' : ''),
-    //         GutterDecoration::make()->class('mr-6 text-neutral-500! dark:text-neutral-600!'),
-    //     );
-
-    // if ($highlightedLine !== null) {
-    //     $highlightedCode->decoration(
-    //         LineDecoration::forLine($highlightedLine)->class('bg-rose-200! [&_.line-number]:dark:text-white! dark:bg-rose-900!'),
-    //     );
-    // }
-
-    $lines = explode("\n", $code);
     $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
+    $lines = explode("\n", $code);
 
     if ($editor) {
         foreach ($lines as $index => $line) {
             $lineNumber = $startingLine + $index;
-            $lineClass = $highlightedLine === $index
-                ? 'line bg-rose-200! [&_.line-number]:dark:text-white! dark:bg-rose-900!'
-                : 'line';
+            $highlight = $highlightedLine === $index;
+            $lineClass = implode(' ', [
+                'block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4',
+                $highlight ? 'bg-rose-200! dark:bg-rose-900!' : '',
+            ]);
+            $lineNumberClass = implode(' ', [
+                'mr-6 text-neutral-500! dark:text-neutral-600!',
+                $highlight ? 'dark:text-white!' : '',
+            ]);
 
             $fallback .= '<span class="' . $lineClass . '">';
-            $fallback .= '<span class="line-number mr-6 text-neutral-500! dark:text-neutral-600!">' . $lineNumber . '</span>';
+            $fallback .= '<span class="' . $lineNumberClass . '">' . $lineNumber . '</span>';
             $fallback .= htmlspecialchars($line);
             $fallback .= '</span>';
         }
@@ -46,25 +38,22 @@
 @endphp
 
 <div
-    x-data="{
-        highlightedCode: null,
-        async init() {
-            // Wait for window.highlight to be available
-            while (typeof window.highlight !== 'function') {
-                await new Promise(resolve => setTimeout(resolve, 10));
-            }
-            this.highlightedCode = window.highlight(
-                {{ Illuminate\Support\Js::from($code) }},
-                {{ Illuminate\Support\Js::from($language) }},
-                {{ Illuminate\Support\Js::from($truncate) }},
-                {{ Illuminate\Support\Js::from($editor) }},
-                {{ Illuminate\Support\Js::from($startingLine) }},
-                {{ Illuminate\Support\Js::from($highlightedLine) }}
-            );
-        }
-    }"
+    x-data="{ highlightedCode: null }"
+    x-init="
+        highlightedCode = window.highlight(
+            {{ Illuminate\Support\Js::from($code) }},
+            {{ Illuminate\Support\Js::from($language) }},
+            {{ Illuminate\Support\Js::from($truncate) }},
+            {{ Illuminate\Support\Js::from($editor) }},
+            {{ Illuminate\Support\Js::from($startingLine) }},
+            {{ Illuminate\Support\Js::from($highlightedLine) }}
+        );
+    "
     {{ $attributes }}
 >
-    <div x-cloak x-html="highlightedCode"></div>
+    <div
+        x-cloak
+        x-html="highlightedCode"
+    ></div>
     <div x-show="!highlightedCode">{!! $fallback !!}</div>
 </div>
