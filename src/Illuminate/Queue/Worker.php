@@ -754,10 +754,7 @@ class Worker
                 return $this->cache->get('illuminate:queue:restart');
             } catch (Throwable $e) {
                 $this->exceptions->report($e);
-
                 $this->cacheFailed = true;
-
-                return null;
             }
         }
     }
