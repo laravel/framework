@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -307,6 +309,60 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-1.1T', Number::abbreviate(-1100000000000, maxPrecision: 1));
         $this->assertSame('-1Q', Number::abbreviate(-1000000000000000));
         $this->assertSame('-1KQ', Number::abbreviate(-1000000000000000000));
+    }
+
+    public static function romanNumberProvider()
+    {
+        return [
+            [1, 'I', null],
+            [2, 'II', null],
+            [3, 'III', null],
+            [4, 'IV', null],
+            [5, 'V', null],
+            [6, 'VI', null],
+            [7, 'VII', null],
+            [8, 'VIII', null],
+            [9, 'IX', null],
+            [10, 'X', null],
+            [11, 'XI', null],
+            [12, 'XII', null],
+            [13, 'XIII', null],
+            [14, 'XIV', null],
+            [15, 'XV', null],
+            [16, 'XVI', null],
+            [17, 'XVII', null],
+            [18, 'XVIII', null],
+            [19, 'XIX', null],
+            [20, 'XX', null],
+            [21, 'XXI', null],
+            [30, 'XXX', null],
+            [32, 'XXXII', null],
+            [43, 'XLIII', null],
+            [54, 'LIV', null],
+            [71, 'LXXI', null],
+            [93, 'XCIII', null],
+            [144, 'CXLIV', null],
+            [171, 'CLXXI', null],
+            [271, 'CCLXXI', null],
+            [871, 'DCCCLXXI', null],
+            [1913, 'MCMXIII', null],
+            [2021, 'MMXXI', null],
+            [3999, 'MMMCMXCIX', null],
+            [3999, 'MMMCMXCIX', null],
+            [0, null, InvalidArgumentException::class],
+            [4000, null, InvalidArgumentException::class],
+        ];
+    }
+
+    #[DataProvider('romanNumberProvider')]
+    public function testRoman(int $number, ?string $expected, ?string $exception)
+    {
+        if ($exception) {
+            $this->expectException($exception);
+            Number::roman($number);
+        } else {
+            $this->assertSame($expected, Number::roman($number));
+        }
     }
 
     public function testPairs()

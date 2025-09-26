@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use NumberFormatter;
 use RuntimeException;
 
@@ -340,6 +341,26 @@ class Number
     public static function trim(int|float $number)
     {
         return json_decode(json_encode($number));
+    }
+
+    public static function roman(int $number): string
+    {
+        if ($number < 1 || $number > 3999) {
+            throw new InvalidArgumentException('Number must be between 1 and 3999');
+        }
+
+        $values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+        $symbols = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
+
+        $roman = '';
+        for ($i = 0; $i < count($values); $i++) {
+            while ($number >= $values[$i]) {
+                $number -= $values[$i];
+                $roman .= $symbols[$i];
+            }
+        }
+
+        return $roman;
     }
 
     /**
