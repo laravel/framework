@@ -6,7 +6,7 @@
 >
     <x-laravel-exceptions-renderer::syntax-highlight
         :code="$code"
-        grammar="php"
+        language="php"
         with-gutter
         :starting-line="max(1, $highlightedLine - 5)"
         :highlighted-line="min(5, $highlightedLine - 1)"
