@@ -28,6 +28,11 @@ abstract class Type extends JsonSchema
     protected mixed $default = null;
 
     /**
+     * The type's nullability.
+     */
+    protected ?bool $nullable = null;
+
+    /**
      * The set of allowed values for the type.
      *
      * @var array<int, mixed>|null
@@ -40,6 +45,18 @@ abstract class Type extends JsonSchema
     public function required(): static
     {
         $this->required = true;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that the type is optional.
+     */
+    public function nullable(bool $nullable = true): static
+    {
+        if ($nullable) {
+            $this->nullable = true;
+        }
 
         return $this;
     }
