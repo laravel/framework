@@ -343,6 +343,12 @@ class Number
         return json_decode(json_encode($number));
     }
 
+    /**
+     * Convert the given number to its Roman numeral equivalent.
+     *
+     * @param int<1, 3999> $number
+     * @return string
+     */
     public static function roman(int $number): string
     {
         if ($number < 1 || $number > 3999) {
@@ -353,9 +359,9 @@ class Number
         $symbols = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
 
         $roman = '';
-        for ($i = 0; $i < count($values); $i++) {
-            while ($number >= $values[$i]) {
-                $number -= $values[$i];
+        foreach ($values as $i => $value) {
+            while ($number >= $value) {
+                $number -= $value;
                 $roman .= $symbols[$i];
             }
         }
