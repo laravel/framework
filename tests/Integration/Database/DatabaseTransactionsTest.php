@@ -117,7 +117,7 @@ class DatabaseTransactionsTest extends DatabaseTestCase
                     $afterCommitRan = true;
                 });
 
-                DB::afterRollback(function () use (&$afterRollbackRan) {
+                DB::afterRollBack(function () use (&$afterRollbackRan) {
                     $afterRollbackRan = true;
                 });
 
