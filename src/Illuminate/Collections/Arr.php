@@ -103,16 +103,26 @@ class Arr
      * @param  int  $depth
      * @return array
      */
-    public static function convertKeyCase(array $array, CaseMode $mode = CaseMode::SNAKE, $depth = INF): array
+    public static function convertKeyCase(array $array, CaseMode $mode = CaseMode::Snake, $depth = INF): array
     {
         return static::mapWithKeys($array, function ($value, $key) use ($mode, $depth): array {
-            $converted = $mode->convert((string) $key);
+            $str = Str::of($key);
+
+            $converted = match ($mode) {
+                CaseMode::Upper => $str->upper(),
+                CaseMode::Lower => $str->lower(),
+                CaseMode::Title => $str->title(),
+                CaseMode::Snake => $str->snake(),
+                CaseMode::Camel => $str->camel(),
+                CaseMode::Kebab => $str->kebab(),
+                CaseMode::Studly => $str->studly(),
+            };
 
             if (is_array($value) && $depth > 1) {
                 $value = static::convertKeyCase($value, $mode, $depth - 1);
             }
 
-            return [$converted => $value];
+            return [$converted->value() => $value];
         });
     }
 

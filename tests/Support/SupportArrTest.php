@@ -134,7 +134,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::SNAKE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Snake, 1));
 
         // Case CaseMode::UPPER_CASE and depth INF
         $this->assertEquals([
@@ -147,7 +147,7 @@ class SupportArrTest extends TestCase
                 'PREFERENCES' => ['LANGUAGECODE' => 'en', 'THEME_COLOR' => 'dark', 'FONT-SIZE' => 'medium'],
             ],
             'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::UPPER));
+        ], Arr::convertKeyCase($data, CaseMode::Upper));
 
         // Case CaseMode::UPPER_CASE and depth 1
         $this->assertEquals([
@@ -160,7 +160,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'LOGS' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::UPPER, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Upper, 1));
 
         // Case CaseMode::LOWER_CASE and depth INF
         $this->assertEquals([
@@ -173,7 +173,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['languagecode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::LOWER));
+        ], Arr::convertKeyCase($data, CaseMode::Lower));
 
         // Case CaseMode::LOWER_CASE and depth 1
         $this->assertEquals([
@@ -186,7 +186,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::LOWER, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Lower, 1));
 
         // Case CaseMode::TITLE_CASE and depth INF
         $this->assertEquals([
@@ -199,7 +199,7 @@ class SupportArrTest extends TestCase
                 'Preferences' => ['Languagecode' => 'en', 'Theme_Color' => 'dark', 'Font-Size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::TITLE));
+        ], Arr::convertKeyCase($data, CaseMode::Title));
 
         // Case CaseMode::TITLE_CASE and depth 1
         $this->assertEquals([
@@ -212,7 +212,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::TITLE, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Title, 1));
 
         // Case CaseMode::CAMEL_CASE and depth INF
         $this->assertEquals([
@@ -225,7 +225,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['languageCode' => 'en', 'themeColor' => 'dark', 'fontSize' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::CAMEL));
+        ], Arr::convertKeyCase($data, CaseMode::Camel));
 
         // Case CaseMode::CAMEL_CASE and depth 1
         $this->assertEquals([
@@ -238,7 +238,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::CAMEL, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Camel, 1));
 
         // Case CaseMode::KEBAB_CASE and depth INF
         $this->assertEquals([
@@ -251,7 +251,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['language-code' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::KEBAB));
+        ], Arr::convertKeyCase($data, CaseMode::Kebab));
 
         // Case CaseMode::KEBAB_CASE and depth 1
         $this->assertEquals([
@@ -264,7 +264,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::KEBAB, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Kebab, 1));
 
         // Case CaseMode::STUDLY_CASE and depth INF
         $this->assertEquals([
@@ -277,7 +277,7 @@ class SupportArrTest extends TestCase
                 'Preferences' => ['LanguageCode' => 'en', 'ThemeColor' => 'dark', 'FontSize' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::STUDLY));
+        ], Arr::convertKeyCase($data, CaseMode::Studly));
 
         // Case CaseMode::STUDLY_CASE and depth 1
         $this->assertEquals([
@@ -290,7 +290,7 @@ class SupportArrTest extends TestCase
                 'preferences' => ['LanguageCode' => 'en', 'theme_color' => 'dark', 'font-size' => 'medium'],
             ],
             'Logs' => [0 => 'Log entry 1', 1 => 'Log entry 2'],
-        ], Arr::convertKeyCase($data, CaseMode::STUDLY, 1));
+        ], Arr::convertKeyCase($data, CaseMode::Studly, 1));
     }
 
     public function testCollapse()
