@@ -636,7 +636,7 @@ class Dispatcher implements DispatcherContract
             : true;
 
         if ($shouldQueue && $instance instanceof ShouldBeUnique) {
-            return (new UniqueLock($this->container->make(Cache::class)))->acquire($instance, ...$arguments);;
+            return (new UniqueLock($this->container->make(Cache::class)))->acquire($instance, ...$arguments);
         }
 
         return $shouldQueue;

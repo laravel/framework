@@ -33,5 +33,7 @@ class UniqueListenerTestEvent
 
 class UniqueListener implements ShouldQueue, ShouldBeUnique
 {
-    public function handle() {}
+    public function handle()
+    {
+    }
 }

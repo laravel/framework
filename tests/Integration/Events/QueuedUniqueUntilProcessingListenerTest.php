@@ -25,7 +25,6 @@ class QueuedUniqueUntilProcessingListenerTest extends TestCase
         $app['config']->set('cache.default', 'database');
     }
 
-
     public function testUniqueListenersPushedToQueue()
     {
         Event::listen(UniqueUntilProcessingListenerTestEvent::class, UniqueUntilProcessingListener::class);
