@@ -11,7 +11,7 @@ class Serializer
      *
      * @var array<int, string>
      */
-    protected static array $ignore = ['required'];
+    protected static array $ignore = ['required', 'nullable'];
 
     /**
      * Serialize the given property to an array.
