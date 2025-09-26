@@ -188,7 +188,8 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$memoryExceededExitCode = null;
     }
-    public function testCacheErrorExitCode() {
+    public function testCacheErrorExitCode()
+    {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
         Worker::$cacheFailedExitCode = 100;

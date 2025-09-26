@@ -401,7 +401,7 @@ class QueueWorkerTest extends TestCase
             ->andThrow(new Exception('Cache read failed'));
 
         $worker = $this->getWorker('default', ['queue' => [
-            $firstJob = new WorkerFakeJob()
+            $firstJob = new WorkerFakeJob,
         ]]);
 
         $worker->setCache(new Repository($mockStore));
