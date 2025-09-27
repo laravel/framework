@@ -1042,23 +1042,4 @@ class SqlServerGrammar extends Grammar
 
         return "N'$value'";
     }
-
-    /**
-     * Compile an update morph type command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return string
-     */
-    public function compileUpdateMorphType(Blueprint $blueprint, Fluent $command)
-    {
-        return sprintf(
-            'update %s set %s = %s where %s is not null and %s is null',
-            $this->wrapTable($blueprint->getTable()),
-            $this->wrap($command->morphTypeColumn),
-            $this->getDefaultValue($command->defaultOwnerType),
-            $this->wrap($command->morphIdColumn),
-            $this->wrap($command->morphTypeColumn)
-        );
-    }
 }
