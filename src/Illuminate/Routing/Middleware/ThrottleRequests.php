@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
+
 use function Illuminate\Support\enum_value;
 
 class ThrottleRequests
