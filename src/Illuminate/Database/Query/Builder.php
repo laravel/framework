@@ -3257,7 +3257,7 @@ class Builder implements BuilderContract
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
-        $this->offset(($page - 1) * $perPage)->limit($perPage + 1);
+        $this->forPage($page, $perPage);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
