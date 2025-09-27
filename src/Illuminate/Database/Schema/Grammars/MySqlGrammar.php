@@ -1409,5 +1409,4 @@ class MySqlGrammar extends Grammar
             $this->wrap($command->morphTypeColumn)
         );
     }
-
 }

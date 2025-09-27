@@ -422,12 +422,12 @@ class DatabaseSchemaBlueprintTest extends TestCase
                 $connection->shouldReceive('isMaria')->andReturn(false);
 
                 return (new Blueprint($connection, 'posts', function ($table) {
-$table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
 
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
-$table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
 
                 })->toSql();
             }
@@ -440,7 +440,6 @@ $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
             'alter table `posts` add `author_type` varchar(255) null after `author_id`',
             'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
             'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
-
         ], $getSql('MySql'));
     }
 
@@ -453,12 +452,12 @@ $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
                 $connection->shouldReceive('isMaria')->andReturn(false);
 
                 return (new Blueprint($connection, 'posts', function ($table) {
-$table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
 
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
-$table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
 
                 })->toSql();
             }
@@ -471,7 +470,6 @@ $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
             'alter table `posts` add `author_type` varchar(255) null after `author_id`',
             'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
             'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
-
         ], $getSql('MySql'));
     }
 
@@ -484,12 +482,12 @@ $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
                 $connection->shouldReceive('isMaria')->andReturn(false);
 
                 return (new Blueprint($connection, 'posts', function ($table) {
-$table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
 
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
-$table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
+                    $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
 
                 })->toSql();
             }
@@ -502,7 +500,6 @@ $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
             'alter table `posts` add `author_type` varchar(255) null after `author_id`',
             'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
             'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
-
         ], $getSql('MySql'));
     }
 
@@ -756,8 +753,8 @@ $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
             ->getMock();
 
         $grammar ??= 'MySql';
-$grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
-$builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
+        $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
+        $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 
         $connection->shouldReceive('getSchemaGrammar')->andReturn(new $grammarClass($connection));
         $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock($builderClass));
@@ -788,6 +785,6 @@ $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 enum ApostropheBackedEnum: string
 {
     case ValueWithoutApostrophe = 'this will work';
-case ValueWithApostrophe = 'this\'ll work too';
+    case ValueWithApostrophe = 'this\'ll work too';
 
 }
