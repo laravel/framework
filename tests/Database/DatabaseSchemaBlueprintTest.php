@@ -413,6 +413,99 @@ class DatabaseSchemaBlueprintTest extends TestCase
         ], $getSql('MySql'));
     }
 
+    public function testForeignIdToMorph()
+    {
+        $getSql = function ($grammar) {
+            if ($grammar == 'MySql') {
+                $connection = $this->getConnection($grammar);
+                $connection->shouldReceive('getServerVersion')->andReturn('8.0.4');
+                $connection->shouldReceive('isMaria')->andReturn(false);
+
+                return (new Blueprint($connection, 'posts', function ($table) {
+$table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
+
+                }))->toSql();
+            } else {
+                return $this->getBlueprint($grammar, 'posts', function ($table) {
+$table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
+
+                })->toSql();
+            }
+        };
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+            'alter table `posts` rename column `user_id` to `author_id`',
+            'alter table `posts` modify `author_id` bigint unsigned not null',
+            'alter table `posts` add `author_type` varchar(255) null after `author_id`',
+            'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
+            'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
+
+        ], $getSql('MySql'));
+    }
+
+    public function testForeignIdToUuidMorph()
+    {
+        $getSql = function ($grammar) {
+            if ($grammar == 'MySql') {
+                $connection = $this->getConnection($grammar);
+                $connection->shouldReceive('getServerVersion')->andReturn('8.0.4');
+                $connection->shouldReceive('isMaria')->andReturn(false);
+
+                return (new Blueprint($connection, 'posts', function ($table) {
+$table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
+
+                }))->toSql();
+            } else {
+                return $this->getBlueprint($grammar, 'posts', function ($table) {
+$table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
+
+                })->toSql();
+            }
+        };
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+            'alter table `posts` rename column `user_id` to `author_id`',
+            'alter table `posts` modify `author_id` char(36) not null',
+            'alter table `posts` add `author_type` varchar(255) null after `author_id`',
+            'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
+            'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
+
+        ], $getSql('MySql'));
+    }
+
+    public function testForeignIdToUlidMorph()
+    {
+        $getSql = function ($grammar) {
+            if ($grammar == 'MySql') {
+                $connection = $this->getConnection($grammar);
+                $connection->shouldReceive('getServerVersion')->andReturn('8.0.4');
+                $connection->shouldReceive('isMaria')->andReturn(false);
+
+                return (new Blueprint($connection, 'posts', function ($table) {
+$table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
+
+                }))->toSql();
+            } else {
+                return $this->getBlueprint($grammar, 'posts', function ($table) {
+$table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
+
+                })->toSql();
+            }
+        };
+
+        $this->assertEquals([
+            'alter table `posts` drop foreign key `posts_user_id_foreign`',
+            'alter table `posts` rename column `user_id` to `author_id`',
+            'alter table `posts` modify `author_id` char(26) not null',
+            'alter table `posts` add `author_type` varchar(255) null after `author_id`',
+            'alter table `posts` add index `posts_author_type_author_id_index`(`author_type`, `author_id`)',
+            'update `posts` set `author_type` = \'App\\\\Models\\\\Post\' where `author_id` is not null and `author_type` is null',
+
+        ], $getSql('MySql'));
+    }
+
     public function testGenerateRelationshipColumnWithIncrementalModel()
     {
         $getSql = function ($grammar) {
@@ -663,8 +756,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
             ->getMock();
 
         $grammar ??= 'MySql';
-        $grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
-        $builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
+$grammarClass = 'Illuminate\Database\Schema\Grammars\\'.$grammar.'Grammar';
+$builderClass = 'Illuminate\Database\Schema\\'.$grammar.'Builder';
 
         $connection->shouldReceive('getSchemaGrammar')->andReturn(new $grammarClass($connection));
         $connection->shouldReceive('getSchemaBuilder')->andReturn(m::mock($builderClass));
@@ -695,5 +788,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
 enum ApostropheBackedEnum: string
 {
     case ValueWithoutApostrophe = 'this will work';
-    case ValueWithApostrophe = 'this\'ll work too';
+case ValueWithApostrophe = 'this\'ll work too';
+
 }

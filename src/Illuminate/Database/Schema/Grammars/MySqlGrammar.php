@@ -1390,4 +1390,24 @@ class MySqlGrammar extends Grammar
 
         return 'json_unquote(json_extract('.$field.$path.'))';
     }
+
+    /**
+     * Compile an update morph type command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileUpdateMorphType(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf(
+            'update %s set %s = %s where %s is not null and %s is null',
+            $this->wrapTable($blueprint->getTable()),
+            $this->wrap($command->morphTypeColumn),
+            $this->getDefaultValue(addslashes($command->defaultOwnerType)),
+            $this->wrap($command->morphIdColumn),
+            $this->wrap($command->morphTypeColumn)
+        );
+    }
+
 }

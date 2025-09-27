@@ -1049,6 +1049,80 @@ class Blueprint
     }
 
     /**
+     * Convert a foreign key column to a polymorphic relationship (integer IDs).
+     *
+     * @param  string  $column
+     * @param  string  $morphName
+     * @param  string  $defaultOwnerType
+     * @return void
+     */
+    public function foreignIdToMorph($column, $morphName, $defaultOwnerType)
+    {
+        $this->convertToMorph($column, $morphName, $defaultOwnerType, 'bigInteger', ['unsigned' => true]);
+    }
+
+    /**
+     * Convert a foreign key column to a polymorphic relationship (UUID IDs).
+     *
+     * @param  string  $column
+     * @param  string  $morphName
+     * @param  string  $defaultOwnerType
+     * @return void
+     */
+    public function foreignIdToUuidMorph($column, $morphName, $defaultOwnerType)
+    {
+        $this->convertToMorph($column, $morphName, $defaultOwnerType, 'uuid');
+    }
+
+    /**
+     * Convert a foreign key column to a polymorphic relationship (ULID IDs).
+     *
+     * @param  string  $column
+     * @param  string  $morphName
+     * @param  string  $defaultOwnerType
+     * @return void
+     */
+    public function foreignIdToUlidMorph($column, $morphName, $defaultOwnerType)
+    {
+        $this->convertToMorph($column, $morphName, $defaultOwnerType, 'char', ['length' => 26]);
+    }
+
+    /**
+     * Convert a foreign key column to a polymorphic relationship.
+     *
+     * @param  string  $column
+     * @param  string  $morphName
+     * @param  string  $defaultOwnerType
+     * @param  string  $columnType
+     * @param  array  $columnOptions
+     * @return void
+     */
+    protected function convertToMorph($column, $morphName, $defaultOwnerType, $columnType, $columnOptions = [])
+    {
+        // Drop the foreign key constraint if it exists
+        $this->dropForeign([$column]);
+
+        // Rename the column first
+        $this->renameColumn($column, "{$morphName}_id");
+
+        // Change the column type
+        $this->addColumn($columnType, "{$morphName}_id", $columnOptions)->change();
+
+        // Add the morph type column
+        $this->string("{$morphName}_type")->after("{$morphName}_id")->nullable();
+
+        // Add index for the morph columns
+        $this->index(["{$morphName}_type", "{$morphName}_id"]);
+
+        // Add command to update existing records with the default owner type
+        $this->addCommand('updateMorphType', [
+            'morphIdColumn' => "{$morphName}_id",
+            'morphTypeColumn' => "{$morphName}_type",
+            'defaultOwnerType' => $defaultOwnerType,
+        ]);
+    }
+
+    /**
      * Create a new float column on the table.
      *
      * @param  string  $column
