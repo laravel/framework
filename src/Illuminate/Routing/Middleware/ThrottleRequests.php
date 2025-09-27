@@ -45,7 +45,7 @@ class ThrottleRequests
     /**
      * Specify the named rate limiter to use for the middleware.
      *
-     * @param  string|\UnitEnum  $name
+     * @param  \BackedEnum|\UnitEnum|string  $name
      * @return string
      */
     public static function using($name)
