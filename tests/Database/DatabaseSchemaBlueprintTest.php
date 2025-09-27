@@ -423,12 +423,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
                 return (new Blueprint($connection, 'posts', function ($table) {
                     $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
-
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
                     $table->foreignIdToMorph('user_id', 'author', 'App\Models\Post');
-
                 })->toSql();
             }
         };
@@ -453,12 +451,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
                 return (new Blueprint($connection, 'posts', function ($table) {
                     $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
-
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
                     $table->foreignIdToUuidMorph('user_id', 'author', 'App\Models\Post');
-
                 })->toSql();
             }
         };
@@ -483,12 +479,10 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
                 return (new Blueprint($connection, 'posts', function ($table) {
                     $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
-
                 }))->toSql();
             } else {
                 return $this->getBlueprint($grammar, 'posts', function ($table) {
                     $table->foreignIdToUlidMorph('user_id', 'author', 'App\Models\Post');
-
                 })->toSql();
             }
         };
@@ -786,5 +780,4 @@ enum ApostropheBackedEnum: string
 {
     case ValueWithoutApostrophe = 'this will work';
     case ValueWithApostrophe = 'this\'ll work too';
-
 }

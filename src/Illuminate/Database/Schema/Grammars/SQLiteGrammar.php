@@ -1213,5 +1213,4 @@ class SQLiteGrammar extends Grammar
             $this->wrap($command->morphTypeColumn)
         );
     }
-
 }
