@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
@@ -33,27 +34,70 @@ class EloquentDeleteTest extends DatabaseTestCase
         });
     }
 
-    public function testDeleteWithLimit()
+    public function testDeleteUseLimitWithoutJoins(): void
     {
-        if ($this->driver === 'sqlsrv') {
-            $this->markTestSkipped('The limit keyword is not supported on MSSQL.');
+        $totalPosts = 10;
+        $deleteLimit = 1;
+
+        for ($i = 0; $i < $totalPosts; $i++) {
+            Post::query()->create();
         }
 
-        for ($i = 1; $i <= 10; $i++) {
-            Comment::create([
-                'post_id' => Post::create()->id,
+        // Test simple delete with limit (no join)
+        Post::query()->latest('id')->limit($deleteLimit)->delete();
+
+        $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
+    }
+
+    public function testDeleteUseLimitWithJoins(): void
+    {
+        $ignoredDrivers = ['sqlsrv', 'mysql', 'mariadb'];
+
+        if (in_array($this->driver, $ignoredDrivers)) {
+            $this->markTestSkipped("{$this->driver} does not support LIMIT on DELETE statements with JOIN clauses.");
+        }
+
+        $totalPosts = 10;
+        $deleteLimit = 1;
+        $whereThreshold = 8;
+
+        for ($i = 0; $i < $totalPosts; $i++) {
+            Comment::query()->create([
+                'post_id' => Post::query()->create()->id,
             ]);
         }
 
-        Post::latest('id')->limit(1)->delete();
-        $this->assertCount(9, Post::all());
+        // Test delete with join and limit
+        Post::query()
+            ->join('comments', 'comments.post_id', '=', 'posts.id')
+            ->where('posts.id', '>', $whereThreshold)
+            ->orderBy('posts.id')
+            ->limit($deleteLimit)
+            ->delete();
 
-        Post::join('comments', 'comments.post_id', '=', 'posts.id')
-            ->where('posts.id', '>', 8)
+        $this->assertEquals($totalPosts - $deleteLimit, Post::query()->count());
+    }
+
+    public function testDeleteWithLimitAndJoinThrowsExceptionOnMySql(): void
+    {
+        if (! in_array($this->driver, ['mysql', 'mariadb'])) {
+            $this->markTestSkipped('This test only applies to MySQL/MariaDB.');
+        }
+
+        $this->expectException(QueryException::class);
+
+        for ($i = 0; $i < 10; $i++) {
+            Comment::query()->create([
+                'post_id' => Post::query()->create()->id,
+            ]);
+        }
+
+        Post::query()
+            ->join('comments', 'comments.post_id', '=', 'posts.id')
+            ->where('posts.id', '>', 5)
             ->orderBy('posts.id')
             ->limit(1)
             ->delete();
-        $this->assertCount(8, Post::all());
     }
 
     public function testForceDeletedEventIsFired()
