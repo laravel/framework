@@ -13,6 +13,8 @@ use Illuminate\Support\InteractsWithTime;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
+use function Illuminate\Support\enum_value;
+
 class ThrottleRequests
 {
     use InteractsWithTime;
@@ -44,12 +46,12 @@ class ThrottleRequests
     /**
      * Specify the named rate limiter to use for the middleware.
      *
-     * @param  string  $name
+     * @param  \UnitEnum|string  $name
      * @return string
      */
     public static function using($name)
     {
-        return static::class.':'.$name;
+        return static::class.':'.enum_value($name);
     }
 
     /**
