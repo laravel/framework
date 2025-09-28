@@ -463,9 +463,6 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete statement without joins into SQL.
      *
-     *  MySQL supports ORDER BY and LIMIT on deletes without joins.
-     *  This appends those clauses to the base SQL when present.
-     *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
@@ -491,7 +488,7 @@ class MySqlGrammar extends Grammar
      *
      * Adds ORDER BY and LIMIT if present, for platforms that allow them (e.g., PlanetScale).
      *
-     * Note: Standard MySQL does not support ORDER BY or LIMIT with joined deletes and will throw a syntax error.
+     * Standard MySQL does not support ORDER BY or LIMIT with joined deletes and will throw a syntax error.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
