@@ -7,7 +7,7 @@
     'truncate' => false,
 ])
 
-@use('Illuminate\Support\Str')
+@use('Illuminate\Support\Js')
 
 @php
     $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
