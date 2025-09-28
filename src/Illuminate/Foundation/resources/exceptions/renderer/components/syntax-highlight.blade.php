@@ -7,6 +7,8 @@
     'truncate' => false,
 ])
 
+@use('Illuminate\Support\Str')
+
 @php
     $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
 
@@ -42,12 +44,12 @@
     x-data="{ highlightedCode: null }"
     x-init="
         highlightedCode = window.highlight(
-            {{ Illuminate\Support\Js::from($code) }},
-            {{ Illuminate\Support\Js::from($language) }},
-            {{ Illuminate\Support\Js::from($truncate) }},
-            {{ Illuminate\Support\Js::from($editor) }},
-            {{ Illuminate\Support\Js::from($startingLine) }},
-            {{ Illuminate\Support\Js::from($highlightedLine) }}
+            {{ Js::from($code) }},
+            {{ Js::from($language) }},
+            {{ Js::from($truncate) }},
+            {{ Js::from($editor) }},
+            {{ Js::from($startingLine) }},
+            {{ Js::from($highlightedLine) }}
         );
     "
     {{ $attributes }}
