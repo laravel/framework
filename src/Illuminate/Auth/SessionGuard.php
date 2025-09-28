@@ -575,7 +575,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         $this->session->put($this->getName(), $id);
 
-        $this->session->migrate(true);
+        $this->session->regenerate(true);
     }
 
     /**
