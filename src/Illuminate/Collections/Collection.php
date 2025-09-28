@@ -740,7 +740,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  string  $glue
      * @param  string  $finalGlue
-     * @return \Closure|string
+     * @return TValue|string
      */
     public function join($glue, $finalGlue = '')
     {
