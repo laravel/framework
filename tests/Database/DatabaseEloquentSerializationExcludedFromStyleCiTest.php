@@ -22,9 +22,7 @@ class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
 }
 
 if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
-    eval(<<<'MODEL'
-<?php
-
+    eval(<<<'PHP'
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +40,7 @@ class EloquentModelWithVirtualPropertiesStub extends Model
         }
     }
 }
-MODEL
+
+PHP
     );
 }
