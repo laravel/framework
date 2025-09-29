@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Foundation\Testing\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
 {
