@@ -72,9 +72,8 @@ class ComposerScripts
 
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
         $uninstallOperation = $event->getOperation()->getPackage();
-        $packageName = $uninstallOperation->getName();
 
-        $app['events']->dispatch('composer_package.'.$packageName.':pre_uninstall');
+        $app['events']->dispatch('composer_package.'.$uninstallOperation->getName().':pre_uninstall');
     }
 
 
