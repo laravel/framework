@@ -29,7 +29,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static string render(string|array $view, array $data = [])
  * @method static \Illuminate\Mail\SentMessage|null send(\Illuminate\Contracts\Mail\Mailable|string|array $view, array $data = [], \Closure|string|null $callback = null)
  * @method static \Illuminate\Mail\SentMessage|null sendNow(\Illuminate\Contracts\Mail\Mailable|string|array $mailable, array $data = [], \Closure|string|null $callback = null)
- * @method static mixed queue(\Illuminate\Contracts\Mail\Mailable|string|array $view, \BackedEnum|string|null $queue = null)
+ * @method static mixed queue(\Illuminate\Contracts\Mail\Mailable $view, \BackedEnum|string|null $queue = null)
  * @method static mixed onQueue(\BackedEnum|string|null $queue, \Illuminate\Contracts\Mail\Mailable $view)
  * @method static mixed queueOn(string $queue, \Illuminate\Contracts\Mail\Mailable $view)
  * @method static mixed later(\DateTimeInterface|\DateInterval|int $delay, \Illuminate\Contracts\Mail\Mailable $view, string|null $queue = null)

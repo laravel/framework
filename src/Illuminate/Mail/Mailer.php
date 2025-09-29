@@ -463,7 +463,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new mail message for sending.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @param  \BackedEnum|string|null  $queue
      * @return mixed
      *
