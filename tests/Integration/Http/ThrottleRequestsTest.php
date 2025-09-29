@@ -15,14 +15,12 @@ use Illuminate\Routing\Exceptions\MissingRateLimiterException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\RateLimiter as RateLimiterFacade;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 #[WithConfig('hashing.driver', 'bcrypt')]
@@ -421,7 +419,7 @@ class ThrottleRequestsTest extends TestCase
         RateLimiterFacade::for('throttle-not-found', function (Request $request) {
             return Limit::perMinute(1)->after(fn ($response) => $response->status() === 404);
         });
-        Route::get('/', fn () => match(request('status')) {
+        Route::get('/', fn () => match (request('status')) {
             '404' => abort(404),
             default => 'ok',
         })->middleware(ThrottleRequests::using('throttle-not-found'));
