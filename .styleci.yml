@@ -4,6 +4,7 @@ php:
   finder:
     not-name:
       - bad-syntax-strategy.php
+      - "*ExcludedFromStyleCiTest.php"
 js:
   finder:
     exclude:

@@ -3356,20 +3356,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(1, $model->getAttribute('duplicatedAttribute'));
     }
 
-    public function testModelSkipsVirtualPropertiesOnSerialization()
-    {
-        if (!class_exists(EloquentModelWithVirtualPropertiesStub::class)) {
-            $this->markTestSkipped('Virtual properties are not supported for PHP 8.3 or below.');
-        }
-
-        $model = new EloquentModelWithVirtualPropertiesStub();
-
-        $serialized = serialize($model);
-
-        $this->assertStringNotContainsString('virtualGet', $serialized);
-        $this->assertStringNotContainsString('virtualSet', $serialized);
-    }
-
     public function testCastOnArrayFormatWithOneElement()
     {
         $model = new EloquentModelCastingStub;
@@ -3943,24 +3929,6 @@ class EloquentModelGetMutatorsStub extends Model
     public function doNotGetFourthInvalidAttributeEither()
     {
         //
-    }
-}
-
-if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
-    class EloquentModelWithVirtualPropertiesStub extends Model
-    {
-        // php-cs-fixer-disable
-        public $virtualGet {
-            get => $this->foo;
-        }
-
-        public $virtualSet {
-            get => $this->foo;
-            set {
-                //
-            }
-        }
-        // php-cs-fixer-enable
     }
 }
 
