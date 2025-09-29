@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\TestCase;
 
 class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
@@ -23,17 +22,26 @@ class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
 }
 
 if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
-    class EloquentModelWithVirtualPropertiesStub extends Model
-    {
-        public $virtualGet {
-            get => $this->foo;
-        }
+    eval(<<<'MODEL'
+<?php
 
-        public $virtualSet {
-            get => $this->foo;
-            set {
-                //
-            }
+namespace Illuminate\Tests\Database;
+
+use Illuminate\Database\Eloquent\Model;
+
+class EloquentModelWithVirtualPropertiesStub extends Model
+{
+    public $virtualGet {
+        get => $this->foo;
+    }
+
+    public $virtualSet {
+        get => $this->foo;
+        set {
+            //
         }
     }
+}
+MODEL
+    );
 }
