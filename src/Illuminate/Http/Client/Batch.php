@@ -309,16 +309,6 @@ class Batch
     }
 
     /**
-     * Get the percentage of requests that have been processed (between 0-100).
-     *
-     * @return non-negative-int
-     */
-    public function completion(): int
-    {
-        return $this->totalRequests > 0 ? round(($this->processedRequests() / $this->totalRequests) * 100) : 0;
-    }
-
-    /**
      * Determine if the batch has finished executing.
      *
      * @return bool
