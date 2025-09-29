@@ -22,16 +22,18 @@ class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
     }
 }
 
-class EloquentModelWithVirtualPropertiesStub extends Model
-{
-    public $virtualGet {
-        get => $this->foo;
-    }
+if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
+    class EloquentModelWithVirtualPropertiesStub extends Model
+    {
+        public $virtualGet {
+            get => $this->foo;
+        }
 
-    public $virtualSet {
-        get => $this->foo;
-        set {
-            //
+        public $virtualSet {
+            get => $this->foo;
+            set {
+                //
+            }
         }
     }
 }
