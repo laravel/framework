@@ -28,16 +28,16 @@ abstract class Type extends JsonSchema
     protected mixed $default = null;
 
     /**
-     * The type's nullability.
-     */
-    protected ?bool $nullable = null;
-
-    /**
      * The set of allowed values for the type.
      *
      * @var array<int, mixed>|null
      */
     protected ?array $enum = null;
+
+    /**
+     * Indicates if the type is nullable.
+     */
+    protected ?bool $nullable = null;
 
     /**
      * Indicate that the type is required.

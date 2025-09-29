@@ -33,7 +33,7 @@ class Serializer
             default => throw new RuntimeException('Unsupported ['.get_class($type).'] type.'),
         };
 
-        $nullable = self::isNullable($type);
+        $nullable = static::isNullable($type);
 
         if ($nullable) {
             $attributes['type'] = [$attributes['type'], 'null'];
