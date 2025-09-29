@@ -3949,6 +3949,7 @@ class EloquentModelGetMutatorsStub extends Model
 if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
     class EloquentModelWithVirtualPropertiesStub extends Model
     {
+        // php-cs-fixer-disable
         public $virtualGet {
             get => $this->foo;
         }
@@ -3959,6 +3960,7 @@ if (version_compare(PHP_VERSION, '8.4.0-dev', '>=')) {
                 //
             }
         }
+        // php-cs-fixer-enable
     }
 }
 
