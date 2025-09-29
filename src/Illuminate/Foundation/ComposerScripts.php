@@ -76,7 +76,6 @@ class ComposerScripts
         $app['events']->dispatch('composer_package.'.$uninstallOperation->getName().':pre_uninstall');
     }
 
-
     /**
      * Clear the cached Laravel bootstrapping files.
      *
