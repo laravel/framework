@@ -78,6 +78,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\Response put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static \Illuminate\Http\Client\Response delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static array pool(callable $callback)
+ * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
  * @method static \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
  * @method static \GuzzleHttp\Client buildClient()
  * @method static \GuzzleHttp\Client createClient(\GuzzleHttp\HandlerStack $handlerStack)
