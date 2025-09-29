@@ -21,7 +21,7 @@ class Batch
     protected $factory;
 
     /**
-     * The list of requests.
+     * The array of requests.
      *
      * @var array<array-key, \Illuminate\Http\Client\PendingRequest>
      */
@@ -105,7 +105,7 @@ class Batch
     public $createdAt = null;
 
     /**
-     * The date when the batch was finished.
+     * The date when the batch finished.
      *
      * @var \Carbon\CarbonImmutable|null
      */
@@ -143,6 +143,162 @@ class Batch
     }
 
     /**
+     * Register a callback to run before the first request from the batch runs.
+     *
+     * @param  (\Closure($this): void)  $callback
+     * @return Batch
+     */
+    public function before(Closure $callback): self
+    {
+        $this->beforeCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to run after a request from the batch succeeds.
+     *
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
+     * @return Batch
+     */
+    public function progress(Closure $callback): self
+    {
+        $this->progressCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to run after a request from the batch fails.
+     *
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
+     * @return Batch
+     */
+    public function catch(Closure $callback): self
+    {
+        $this->catchCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to run after all the requests from the batch succeed.
+     *
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @return Batch
+     */
+    public function then(Closure $callback): self
+    {
+        $this->thenCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to run after all the requests from the batch finish.
+     *
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @return Batch
+     */
+    public function finally(Closure $callback): self
+    {
+        $this->finallyCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Send all of the requests in the batch.
+     *
+     * @return array<int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException>
+     */
+    public function send(): array
+    {
+        $this->inProgress = true;
+
+        if ($this->beforeCallback !== null) {
+            call_user_func($this->beforeCallback, $this);
+        }
+
+        $results = [];
+        $promises = [];
+
+        foreach ($this->requests as $key => $item) {
+            $promise = match (true) {
+                $item instanceof PendingRequest => $item->getPromise(),
+                default => $item,
+            };
+
+            $promises[$key] = $promise;
+        }
+
+        if (! empty($promises)) {
+            (new EachPromise($promises, [
+                'fulfilled' => function ($result, $key) use (&$results) {
+                    $results[$key] = $result;
+
+                    $this->decrementPendingRequests();
+
+                    if ($result instanceof Response && $result->successful()) {
+                        if ($this->progressCallback !== null) {
+                            call_user_func($this->progressCallback, $this, $key, $result);
+                        }
+
+                        return $result;
+                    }
+
+                    if (($result instanceof Response && $result->failed()) ||
+                        $result instanceof RequestException) {
+                        $this->incrementFailedRequests();
+
+                        if ($this->catchCallback !== null) {
+                            call_user_func($this->catchCallback, $this, $key, $result);
+                        }
+                    }
+
+                    return $result;
+                },
+                'rejected' => function ($reason, $key) use ($catchCallback) {
+                    $this->decrementPendingRequests();
+
+                    if ($reason instanceof RequestException) {
+                        $this->incrementFailedRequests();
+
+                        if ($this->catchCallback !== null) {
+                            call_user_func($this->catchCallback, $this, $key, $reason);
+                        }
+                    }
+
+                    return $reason;
+                },
+            ]))->promise()->wait();
+        }
+
+        if (! $this->hasFailures() && $this->thenCallback !== null) {
+            call_user_func($this->thenCallback, $this, $results);
+        }
+
+        if ($this->finallyCallback !== null) {
+            call_user_func($this->finallyCallback, $this, $results);
+        }
+
+        $this->finishedAt = new CarbonImmutable;
+        $this->inProgress = false;
+
+        return $results;
+    }
+
+    /**
+     * Retrieve a new async pending request.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    protected function asyncRequest()
+    {
+        return $this->factory->setHandler($this->handler)->async();
+    }
+
+    /**
      * Get the total number of requests that have been processed by the batch thus far.
      *
      * @return non-negative-int
@@ -163,16 +319,6 @@ class Batch
     }
 
     /**
-     * Determine if the batch has job failures.
-     *
-     * @return bool
-     */
-    public function hasFailures(): bool
-    {
-        return $this->failedRequests > 0;
-    }
-
-    /**
      * Determine if the batch has finished executing.
      *
      * @return bool
@@ -180,214 +326,6 @@ class Batch
     public function finished(): bool
     {
         return ! is_null($this->finishedAt);
-    }
-
-    /**
-     * Register a callback to run before the first request from the batch runs.
-     *
-     * @param  (\Closure($this): void)  $callback
-     * @return Batch
-     */
-    public function before(Closure $callback): self
-    {
-        $this->beforeCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the before callback in the batch.
-     *
-     * @return (\Closure($this): void)|null
-     */
-    public function beforeCallback(): ?Closure
-    {
-        return $this->beforeCallback;
-    }
-
-    /**
-     * Register a callback to run after a request from the batch succeeds.
-     *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
-     * @return Batch
-     */
-    public function progress(Closure $callback): self
-    {
-        $this->progressCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the progress callback in the batch.
-     *
-     * @return (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
-     */
-    public function progressCallback(): ?Closure
-    {
-        return $this->progressCallback;
-    }
-
-    /**
-     * Register a callback to run after a request from the batch fails.
-     *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
-     * @return Batch
-     */
-    public function catch(Closure $callback): self
-    {
-        $this->catchCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the catch callback in the batch.
-     *
-     * @return (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
-     */
-    public function catchCallback(): ?Closure
-    {
-        return $this->catchCallback;
-    }
-
-    /**
-     * Register a callback to run after all the requests from the batch succeed.
-     *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
-     * @return Batch
-     */
-    public function then(Closure $callback): self
-    {
-        $this->thenCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the then callback in the batch.
-     *
-     * @return (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
-     */
-    public function thenCallback(): ?Closure
-    {
-        return $this->thenCallback;
-    }
-
-    /**
-     * Register a callback to run after all the requests from the batch finish.
-     *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
-     * @return Batch
-     */
-    public function finally(Closure $callback): self
-    {
-        $this->finallyCallback = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Retrieve the finally callback in the batch.
-     *
-     * @return (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
-     */
-    public function finallyCallback(): ?Closure
-    {
-        return $this->finallyCallback;
-    }
-
-    /**
-     * @return array<int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException>
-     */
-    public function send(): array
-    {
-        $this->inProgress = true;
-        $results = [];
-
-        $requests = $this->getRequests();
-        $beforeCallback = $this->beforeCallback();
-        $progressCallback = $this->progressCallback();
-        $catchCallback = $this->catchCallback();
-        $thenCallback = $this->thenCallback();
-        $finallyCallback = $this->finallyCallback();
-
-        if ($beforeCallback !== null) {
-            $beforeCallback($this);
-        }
-
-        $promises = [];
-        foreach ($requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
-            };
-
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
-            (new EachPromise($promises, [
-                'fulfilled' => function ($result, $key) use (&$results, $progressCallback, $catchCallback) {
-                    $results[$key] = $result;
-                    $this->decrementPendingRequests();
-
-                    if ($result instanceof Response && $result->successful()) {
-                        if ($progressCallback !== null) {
-                            $progressCallback($this, $key, $result);
-                        }
-
-                        return $result;
-                    }
-
-                    if (($result instanceof Response && $result->failed()) || $result instanceof RequestException) {
-                        $this->incrementFailedRequests();
-
-                        if ($catchCallback !== null) {
-                            $catchCallback($this, $key, $result);
-                        }
-                    }
-
-                    return $result;
-                },
-                'rejected' => function ($reason, $key) use ($catchCallback) {
-                    $this->decrementPendingRequests();
-
-                    if ($reason instanceof RequestException) {
-                        $this->incrementFailedRequests();
-
-                        if ($catchCallback !== null) {
-                            $catchCallback($this, $key, $reason);
-                        }
-                    }
-
-                    return $reason;
-                },
-            ]))->promise()->wait();
-        }
-
-        if (! $this->hasFailures() && $thenCallback !== null) {
-            $thenCallback($this, $results);
-        }
-
-        if ($finallyCallback !== null) {
-            $finallyCallback($this, $results);
-        }
-
-        $this->finishedAt = new CarbonImmutable();
-        $this->inProgress = false;
-
-        return $results;
-    }
-
-    /**
-     * Retrieve a new async pending request.
-     *
-     * @return \Illuminate\Http\Client\PendingRequest
-     */
-    protected function asyncRequest()
-    {
-        return $this->factory->setHandler($this->handler)->async();
     }
 
     /**
@@ -409,6 +347,16 @@ class Batch
     protected function decrementPendingRequests(): void
     {
         $this->pendingRequests--;
+    }
+
+    /**
+     * Determine if the batch has job failures.
+     *
+     * @return bool
+     */
+    public function hasFailures(): bool
+    {
+        return $this->failedRequests > 0;
     }
 
     /**
