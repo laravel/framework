@@ -2421,15 +2421,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->classCastCache = [];
         $this->attributeCastCache = [];
 
-        // When serializing the model, we may accidentally catch up some virtual properties.
-        // We will cast the model to a native array to skip them and then apply a function
-        // to clean each of the property names which is miles faster than using a regex.
-        return array_map(
-            fn ($key) => $key[0] === "\0"
-                ? substr($key, strpos($key, "\0", 1) + 1)
-                : $key,
-            array_keys((array) $this)
-        );
+        return array_keys(get_object_vars($this));
     }
 
     /**
