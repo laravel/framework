@@ -240,4 +240,35 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped');
         }
     }
+
+    public function testScopedFilesystemDiskCanCallUrl()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'to-be-scoped',
+                    ],
+                ];
+            }));
+
+            $local = $filesystem->disk('local');
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'local',
+                'prefix' => 'path-prefix',
+            ]);
+
+            $scoped->put('dirname/filename.txt', 'file content');
+
+            $scopedUrl = $scoped->url('dirname/filename.txt');
+            $this->assertEquals('/storage/path-prefix/dirname/filename.txt', $scopedUrl);
+        } finally {
+            unlink(__DIR__.'/../../to-be-scoped/path-prefix/dirname/filename.txt');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix/dirname');
+            rmdir(__DIR__.'/../../to-be-scoped/path-prefix');
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
 }

@@ -20,6 +20,7 @@ use League\Flysystem\FilesystemOperator;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 use League\Flysystem\PathPrefixer;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\StorageAttributes;
 use League\Flysystem\UnableToCopyFile;
@@ -736,7 +737,7 @@ class FilesystemAdapter implements CloudFilesystemContract
             return $this->driver->getUrl($path);
         } elseif ($adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter) {
             return $this->getFtpUrl($path);
-        } elseif ($adapter instanceof LocalAdapter) {
+        } elseif ($adapter instanceof LocalAdapter || $adapter instanceof PathPrefixedAdapter) {
             return $this->getLocalUrl($path);
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
