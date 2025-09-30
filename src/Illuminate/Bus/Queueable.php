@@ -36,7 +36,7 @@ trait Queueable
     public $messageGroup;
 
     /**
-     * The job deduplicator callback the job should use to generate the deduplication id.
+     * The job deduplicator callback the job should use to generate the deduplication ID.
      *
      * @var \Laravel\SerializableClosure\SerializableClosure|null
      */
