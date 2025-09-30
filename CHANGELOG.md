@@ -1,6 +1,11 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.46.0...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.46.1...11.x)
+
+## [v11.46.1](https://github.com/laravel/framework/compare/v11.46.0...v11.46.1) - 2025-09-30
+
+* [11.x] Fixes incorrectly serializing virtual properties (backport) by [@DarkGhostHunter](https://github.com/DarkGhostHunter) in https://github.com/laravel/framework/pull/57201
+* Revert "[11.x] Fixes incorrectly serializing virtual properties (backport)" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57203
 
 ## [v11.46.0](https://github.com/laravel/framework/compare/v11.45.3...v11.46.0) - 2025-09-08
 
