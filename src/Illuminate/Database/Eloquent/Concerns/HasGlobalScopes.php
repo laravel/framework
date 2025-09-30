@@ -32,8 +32,13 @@ trait HasGlobalScopes
     {
         $reflectionClass = new ReflectionClass(static::class);
 
-        return (new Collection($reflectionClass->getAttributes(ScopedBy::class, ReflectionAttribute::IS_INSTANCEOF)))
-            ->map(fn ($attribute) => $attribute->getArguments())
+        $attributes = (new Collection($reflectionClass->getAttributes(ScopedBy::class, ReflectionAttribute::IS_INSTANCEOF)));
+
+        foreach ($reflectionClass->getTraits() as $trait) {
+            $attributes->push(...$trait->getAttributes(ScopedBy::class, ReflectionAttribute::IS_INSTANCEOF));
+        }
+
+        return $attributes->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
             ->all();
     }
