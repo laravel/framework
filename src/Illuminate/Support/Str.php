@@ -93,7 +93,12 @@ class Str
      */
     public static function after($subject, $search)
     {
-        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strpos($subject, $search);
+        return $position === false ? $subject : substr($subject, $position + strlen($search));
     }
 
     /**
