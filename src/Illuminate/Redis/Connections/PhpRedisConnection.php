@@ -70,6 +70,31 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Build the list of channels, applying the prefix except for skipped patterns.
+     *
+     * @param  array<int, string>  $channels
+     * @return array<int, string>
+     */
+    protected function channelsWithAppliedPrefix(array $channels): array
+    {
+        $patterns = $this->config['options']['skip_prefix_for_channels'] ?? [
+            '/^__keyevent@\d+__:/',
+            '/^__keyspace@\d+__:/',
+        ];
+
+        $prefix = $this->client->getOption(\Redis::OPT_PREFIX) ?? '';
+
+        return array_map(function ($channel) use ($patterns, $prefix) {
+            foreach ($patterns as $regex) {
+                if (@preg_match($regex, $channel) === 1) {
+                    return $channel;
+                }
+            }
+            return $prefix ? $prefix.$channel : $channel;
+        }, $channels);
+    }
+
+    /**
      * Set the string value in the argument as the value of the key.
      *
      * @param  string  $key
@@ -457,10 +482,22 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function subscribe($channels, Closure $callback)
     {
-        $this->client->subscribe((array) $channels, function ($redis, $channel, $message) use ($callback) {
-            $callback($message, $channel);
-        });
+        $channels = (array) $channels;
+
+        $finalChannels = $this->channelsWithAppliedPrefix($channels);
+
+        $oldPrefix = $this->client->getOption(\Redis::OPT_PREFIX);
+        $this->client->setOption(\Redis::OPT_PREFIX, '');
+
+        try {
+            $this->client->subscribe($finalChannels, function ($redis, $channel, $message) use ($callback) {
+                $callback($message, $channel);
+            });
+        } finally {
+            $this->client->setOption(\Redis::OPT_PREFIX, $oldPrefix ?? '');
+        }
     }
+
 
     /**
      * Subscribe to a set of given channels with wildcards.
@@ -471,10 +508,22 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function psubscribe($channels, Closure $callback)
     {
-        $this->client->psubscribe((array) $channels, function ($redis, $pattern, $channel, $message) use ($callback) {
-            $callback($message, $channel);
-        });
+        $channels = (array) $channels;
+
+        $finalChannels = $this->channelsWithAppliedPrefix($channels);
+
+        $oldPrefix = $this->client->getOption(\Redis::OPT_PREFIX);
+        $this->client->setOption(\Redis::OPT_PREFIX, '');
+
+        try {
+            $this->client->psubscribe($finalChannels, function ($redis, $pattern, $channel, $message) use ($callback) {
+                $callback($message, $channel);
+            });
+        } finally {
+            $this->client->setOption(\Redis::OPT_PREFIX, $oldPrefix);
+        }
     }
+
 
     /**
      * Subscribe to a set of given channels for messages.

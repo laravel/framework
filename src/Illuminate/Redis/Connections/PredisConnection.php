@@ -30,6 +30,38 @@ class PredisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Build the list of channels, applying the prefix except for skipped patterns.
+     *
+     * @param  array<int, string>  $channels
+     * @return array<int, string>
+     */
+    protected function channelsWithAppliedPrefix(array $channels): array
+    {
+        $patterns = ($this->config['options']['skip_prefix_for_channels'] ?? null) ?: [
+            '/^__keyevent@\d+__:/',
+            '/^__keyspace@\d+__:/',
+        ];
+
+        $options = $this->client->getOptions();
+        $prefix = '';
+        if (isset($options->prefix)) {
+            $prefix = is_object($options->prefix) && method_exists($options->prefix, 'getPrefix')
+                ? $options->prefix->getPrefix()
+                : (string) $options->prefix;
+        }
+
+        return array_map(function ($channel) use ($patterns, $prefix) {
+            foreach ($patterns as $regex) {
+                if (@preg_match($regex, $channel) === 1) {
+                    return $channel; // skip prefix
+                }
+            }
+            return $prefix ? $prefix.$channel : $channel;
+        }, $channels);
+    }
+
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -39,9 +71,11 @@ class PredisConnection extends Connection implements ConnectionContract
      */
     public function createSubscription($channels, Closure $callback, $method = 'subscribe')
     {
-        $loop = $this->pubSubLoop();
+        $channels = (array) $channels;
+        $channels = $this->channelsWithAppliedPrefix($channels);
 
-        $loop->{$method}(...array_values((array) $channels));
+        $loop = $this->pubSubLoop();
+        $loop->{$method}(...array_values($channels));
 
         foreach ($loop as $message) {
             if ($message->kind === 'message' || $message->kind === 'pmessage') {
