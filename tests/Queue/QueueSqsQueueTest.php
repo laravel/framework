@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -467,6 +468,42 @@ class QueueSqsQueueTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         FakeSqsJobWithDeduplication::createDeduplicationIdsNormally();
+    }
+
+    public function testJobObjectCanBeSerializedOntoSqsFifoQueueWithDeduplicator()
+    {
+        // Can't reference test case property in serialized closure.
+        $deduplicationId = $this->mockedDeduplicationId;
+
+        $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) use ($deduplicationId) {
+            return $deduplicationId;
+        });
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) {
+            $this->assertIsArray($args);
+            $this->assertEqualsCanonicalizing(['QueueUrl', 'MessageBody', 'MessageGroupId', 'MessageDeduplicationId'], array_keys($args));
+            $this->assertEquals($this->fifoQueueUrl, $args['QueueUrl']);
+            $this->assertEquals($this->mockedMessageGroupId, $args['MessageGroupId']);
+            $this->assertEquals($this->mockedDeduplicationId, $args['MessageDeduplicationId']);
+
+            $message = json_decode($args['MessageBody'], true);
+            $command = unserialize($message['data']['command'] ?? '');
+            $this->assertInstanceOf(FakeSqsJobWithDeduplication::class, $command);
+            $this->assertInstanceOf(SerializableClosure::class, $command->deduplicator);
+
+            return true;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $dispatcher = new Dispatcher($container, fn () => $queue);
+        app()->instance(DispatcherContract::class, $dispatcher);
+
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay()

@@ -13,6 +13,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailer;
 use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -122,7 +123,8 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals($mockedDeduplicator, $pushedJob->deduplicator);
+        $this->assertInstanceOf(SerializableClosure::class, $pushedJob->deduplicator);
+        $this->assertEquals($mockedDeduplicator, $pushedJob->deduplicator->getClosure());
     }
 
     public function testQueuedMailableForwardsDeduplicationIdMethodToQueueJob(): void
@@ -139,7 +141,8 @@ class MailableQueuedTest extends TestCase
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
 
         $pushedJob = $queueFake->pushed(SendQueuedMailable::class)->first();
-        $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator);
+        $this->assertInstanceOf(SerializableClosure::class, $pushedJob->deduplicator);
+        $this->assertEquals($mailable->deduplicationId(...), $pushedJob->deduplicator->getClosure());
     }
 
     protected function getMocks()

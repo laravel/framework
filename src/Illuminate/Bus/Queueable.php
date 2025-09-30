@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
@@ -37,7 +38,7 @@ trait Queueable
     /**
      * The job deduplicator callback the job should use to generate the deduplication id.
      *
-     * @var callable|null
+     * @var \Laravel\SerializableClosure\SerializableClosure|null
      */
     public $deduplicator;
 
@@ -141,7 +142,9 @@ trait Queueable
      */
     public function withDeduplicator($deduplicator)
     {
-        $this->deduplicator = $deduplicator;
+        $this->deduplicator = $deduplicator instanceof Closure
+            ? new SerializableClosure($deduplicator)
+            : $deduplicator;
 
         return $this;
     }

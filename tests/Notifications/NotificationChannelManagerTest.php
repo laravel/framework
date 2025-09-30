@@ -18,6 +18,7 @@ use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -259,7 +260,8 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $bus->shouldReceive('dispatch')->once()->withArgs(function ($job) use ($mockedDeduplicator) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedDeduplicator, $job->deduplicator);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($mockedDeduplicator, $job->deduplicator->getClosure());
 
             return true;
         });
@@ -284,7 +286,8 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedDeduplicatorSet) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($mockedDeduplicatorSet[$job->channels[0]], $job->deduplicator);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($mockedDeduplicatorSet[$job->channels[0]], $job->deduplicator->getClosure());
 
             return true;
         });
@@ -324,7 +327,8 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
-            $this->assertEquals($job->notification->deduplicationId(...), $job->deduplicator);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($job->notification->deduplicationId(...), $job->deduplicator->getClosure());
 
             return true;
         });

@@ -41,7 +41,7 @@ class QueuedClosure
     /**
      * The job deduplicator callback the job should use to generate the deduplication id.
      *
-     * @var callable|null
+     * @var \Laravel\SerializableClosure\SerializableClosure|null
      */
     public $deduplicator;
 
@@ -120,7 +120,9 @@ class QueuedClosure
      */
     public function withDeduplicator($deduplicator)
     {
-        $this->deduplicator = $deduplicator;
+        $this->deduplicator = $deduplicator instanceof Closure
+            ? new SerializableClosure($deduplicator)
+            : $deduplicator;
 
         return $this;
     }
