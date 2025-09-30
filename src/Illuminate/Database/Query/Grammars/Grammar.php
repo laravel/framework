@@ -991,6 +991,7 @@ class Grammar extends BaseGrammar
             if (isset($order['sql']) && $order['sql'] instanceof Expression) {
                 return $order['sql']->getValue($query->getGrammar());
             }
+
             return $order['sql'] ?? $this->wrap($order['column']).' '.$order['direction'];
         }, $orders);
     }
