@@ -1,6 +1,36 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.31.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.32.0...12.x)
+
+## [v12.32.0](https://github.com/laravel/framework/compare/v12.31.1...v12.32.0) - 2025-09-30
+
+* [12.x] fix static analysis error  by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57162
+* Fix: Handle non-string returns from Htmlable::toHtml() in e() helper by [@Carnicero90](https://github.com/Carnicero90) in https://github.com/laravel/framework/pull/57157
+* [12.x] Fix pending attributes in schedule group by [@jamessa](https://github.com/jamessa) in https://github.com/laravel/framework/pull/57156
+* Remove Request overview from Exceptions by [@barryvdh](https://github.com/barryvdh) in https://github.com/laravel/framework/pull/57158
+* [12.x] Pass "throw" option from scoped to parent disk by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57163
+* [12.x] Make docblock return type in line with actual return type by [@parijke](https://github.com/parijke) in https://github.com/laravel/framework/pull/57164
+* [12.x] Adjust `Arr` typehints by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57165
+* [12.x] Track filesystem adapter decoration by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57167
+* [12.x] Batch Job Failure Callbacks Support by [@yitzwillroth](https://github.com/yitzwillroth) in https://github.com/laravel/framework/pull/55916
+* [12.x] Fix operator precedence by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57169
+* [12.x] Clean up after filesystem manager tests by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57168
+* Fix: Improve validateInteger ergonomics and fix BC break by [@ntm-dev](https://github.com/ntm-dev) in https://github.com/laravel/framework/pull/57175
+* [12.x] Fix nested `can` and inherit models on route groups by [@bonroyage](https://github.com/bonroyage) in https://github.com/laravel/framework/pull/57172
+* [12.x] Syntax highlight on the frontend by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57184
+* [12.x] Add missing Closure type to Collection::pluck() docblock  by [@Bariss61](https://github.com/Bariss61) in https://github.com/laravel/framework/pull/57178
+* Add database afterRollback callback support and tests by [@maltekuhr](https://github.com/maltekuhr) in https://github.com/laravel/framework/pull/57180
+* fix: add return type by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57192
+* [12.x] Adds support enums for `ThrottleRequests::using` method by [@sethsandaru](https://github.com/sethsandaru) in https://github.com/laravel/framework/pull/57190
+* [12.x] Introduce "after" rate limiting by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/57125
+* [12.x] Json schema nullable by [@Katalam](https://github.com/Katalam) in https://github.com/laravel/framework/pull/57181
+* [12.x] Dispatch framework events on composer `pre-package-uninstall` event by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57144
+* [12.x] Add Http::batch by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/56946
+* [12.x] [Mail] Update `queue` PHPDoc according to function behavior by [@MrYamous](https://github.com/MrYamous) in https://github.com/laravel/framework/pull/57207
+* [12.x] Remove unnecessary parentheses by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57212
+* [12.x] Remove unnecessary parentheses by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57210
+* [12.x] Fixes error renderer report page by [@xiCO2k](https://github.com/xiCO2k) in https://github.com/laravel/framework/pull/57208
+* [12.x] Extend SQS FIFO and fair queue support by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/57187
 
 ## [v12.31.1](https://github.com/laravel/framework/compare/v12.31.0...v12.31.1) - 2025-09-23
 
