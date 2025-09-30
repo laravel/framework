@@ -295,6 +295,7 @@ class FakeInvokedProcess implements InvokedProcessContract
     public function waitUntil(?callable $output = null)
     {
         $shouldStop = false;
+
         $this->outputHandler = $output 
             ? function ($type, $buffer) use ($output, &$shouldStop) {
                 $shouldStop = call_user_func($output, $type, $buffer);
