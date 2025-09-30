@@ -566,7 +566,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Update the session with the given user ID and regenerate the session's token.
+     * Update the session with the given ID and regenerate the session's token.
      *
      * @param  string  $id
      * @return void
