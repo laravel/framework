@@ -6,6 +6,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\InvokeQueuedClosure;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use Laravel\SerializableClosure\SerializableClosure;
 use Orchestra\Testbench\TestCase;
 
 class QueuedClosureListenerTest extends TestCase
@@ -61,6 +62,8 @@ class QueuedClosureListenerTest extends TestCase
         Event::dispatch(new TestEvent);
 
         Bus::assertDispatched(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
             return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) == 'deduplicator-1';
         });
     }

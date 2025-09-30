@@ -9,6 +9,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -247,6 +248,8 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
             return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplication-id-method';
         });
     }
@@ -265,6 +268,8 @@ class QueuedEventsTest extends TestCase
         $d->dispatch('some.event', ['foo', 'bar']);
 
         $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
             return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplicator-method';
         });
     }
