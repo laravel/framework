@@ -809,7 +809,7 @@ class ProcessTest extends TestCase
         $this->assertInstanceOf(ProcessResult::class, $result);
         $this->assertTrue($result->successful());
         $this->assertEquals("OUTPUT\n", $result->output());
-    } 
+    }
 
     public function testFakeInvokedProcessWaitUntilWithErrorOutput()
     {
@@ -839,6 +839,185 @@ class ProcessTest extends TestCase
         $this->assertContains(['out', "STDOUT\n"], $callbackInvoked);
         $this->assertContains(['err', "ERROR1\n"], $callbackInvoked);
         $this->assertContains(['err', "TARGET_ERROR\n"], $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilCalledTwice()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->output('FOURTH')
+                ->runsFor(iterations: 4);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD"; echo "FOURTH";');
+
+        $firstCallbackInvoked = [];
+        $secondCallbackInvoked = [];
+
+        $firstResult = $process->waitUntil(function ($type, $buffer) use (&$firstCallbackInvoked) {
+            $firstCallbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'SECOND');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $firstResult);
+        $this->assertTrue($firstResult->successful());
+        $this->assertContains("FIRST\n", $firstCallbackInvoked);
+        $this->assertContains("SECOND\n", $firstCallbackInvoked);
+        $this->assertCount(2, $firstCallbackInvoked);
+
+        $secondResult = $process->waitUntil(function ($type, $buffer) use (&$secondCallbackInvoked) {
+            $secondCallbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'FOURTH');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $secondResult);
+        $this->assertTrue($secondResult->successful());
+        $this->assertContains("THIRD\n", $secondCallbackInvoked);
+        $this->assertContains("FOURTH\n", $secondCallbackInvoked);
+        $this->assertCount(2, $secondCallbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilThatNeverMatches()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('LINE1')
+                ->output('LINE2')
+                ->output('LINE3')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "LINE1"; echo "LINE2"; echo "LINE3";');
+
+        $callbackInvoked = [];
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'NEVER_MATCHES');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(3, $callbackInvoked);
+        $this->assertContains("LINE1\n", $callbackInvoked);
+        $this->assertContains("LINE2\n", $callbackInvoked);
+        $this->assertContains("LINE3\n", $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilFollowedByWait()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $waitUntilCallbacks = [];
+        $waitCallbacks = [];
+
+        $process->waitUntil(function ($type, $buffer) use (&$waitUntilCallbacks) {
+            $waitUntilCallbacks[] = $buffer;
+
+            return str_contains($buffer, 'FIRST');
+        });
+
+        $result = $process->wait(function ($type, $buffer) use (&$waitCallbacks) {
+            $waitCallbacks[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(1, $waitUntilCallbacks);
+        $this->assertEquals("FIRST\n", $waitUntilCallbacks[0]);
+        $this->assertCount(2, $waitCallbacks);
+        $this->assertContains("SECOND\n", $waitCallbacks);
+        $this->assertContains("THIRD\n", $waitCallbacks);
+    }
+
+    public function testFakeInvokedProcessWaitCalledTwice()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $firstCallbackInvoked = [];
+        $secondCallbackInvoked = [];
+
+        $firstResult = $process->wait(function ($type, $buffer) use (&$firstCallbackInvoked) {
+            $firstCallbackInvoked[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $firstResult);
+        $this->assertTrue($firstResult->successful());
+        $this->assertCount(3, $firstCallbackInvoked);
+        $this->assertContains("FIRST\n", $firstCallbackInvoked);
+        $this->assertContains("SECOND\n", $firstCallbackInvoked);
+        $this->assertContains("THIRD\n", $firstCallbackInvoked);
+
+        $secondResult = $process->wait(function ($type, $buffer) use (&$secondCallbackInvoked) {
+            $secondCallbackInvoked[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $secondResult);
+        $this->assertTrue($secondResult->successful());
+        $this->assertEmpty($secondCallbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitFollowedByWaitUntil()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $waitCallbacks = [];
+        $waitUntilCallbacks = [];
+
+        $process->wait(function ($type, $buffer) use (&$waitCallbacks) {
+            $waitCallbacks[] = $buffer;
+        });
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$waitUntilCallbacks) {
+            $waitUntilCallbacks[] = $buffer;
+
+            return str_contains($buffer, 'THIRD');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(3, $waitCallbacks);
+        $this->assertEmpty($waitUntilCallbacks);
     }
 
     public function testBasicFakeAssertions()
