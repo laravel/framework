@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.32.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.32.1...12.x)
+
+## [v12.32.1](https://github.com/laravel/framework/compare/v12.32.0...v12.32.1) - 2025-09-30
+
+* [13.x] Fix scopedBy attribute not following inheritance chain by [@Muffinman](https://github.com/Muffinman) in https://github.com/laravel/framework/pull/57213
+* [12.x] Fix AWS S3 adapter's constructor not allowing decorated adapter instances by [@daniser](https://github.com/daniser) in https://github.com/laravel/framework/pull/57217
 
 ## [v12.32.0](https://github.com/laravel/framework/compare/v12.31.1...v12.32.0) - 2025-09-30
 
