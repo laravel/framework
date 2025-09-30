@@ -312,7 +312,8 @@ class Schedule
             throw new RuntimeException('Invoke an attribute method such as Schedule::daily() before defining a schedule group.');
         }
 
-        $this->groupStack[] = clone $this->attributes;
+        $this->groupStack[] = $this->attributes;
+        $this->attributes = null;
 
         $events($this);
 
@@ -327,16 +328,16 @@ class Schedule
      */
     protected function mergePendingAttributes(Event $event)
     {
-        if (isset($this->attributes)) {
-            $this->attributes->mergeAttributes($event);
-
-            $this->attributes = null;
-        }
-
         if (! empty($this->groupStack)) {
             $group = array_last($this->groupStack);
 
             $group->mergeAttributes($event);
+        }
+
+        if (isset($this->attributes)) {
+            $this->attributes->mergeAttributes($event);
+
+            $this->attributes = null;
         }
     }
 
@@ -476,7 +477,7 @@ class Schedule
         }
 
         if (method_exists(PendingEventAttributes::class, $method)) {
-            $this->attributes ??= array_last($this->groupStack) ?: new PendingEventAttributes($this);
+            $this->attributes ??= $this->groupStack ? clone array_last($this->groupStack) : new PendingEventAttributes($this);
 
             return $this->attributes->$method(...$parameters);
         }

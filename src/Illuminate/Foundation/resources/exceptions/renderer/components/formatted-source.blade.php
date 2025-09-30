@@ -16,7 +16,7 @@
 
 <x-laravel-exceptions-renderer::syntax-highlight
     :code="$source"
-    grammar="php"
+    language="php"
     truncate
     class="text-xs min-w-0"
     data-tippy-content="{{ $source }}"

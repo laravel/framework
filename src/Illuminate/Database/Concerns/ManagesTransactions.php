@@ -353,4 +353,21 @@ trait ManagesTransactions
 
         throw new RuntimeException('Transactions Manager has not been set.');
     }
+
+    /**
+     * Execute the callback after a transaction rolls back.
+     *
+     * @param  callable  $callback
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function afterRollBack($callback)
+    {
+        if ($this->transactionsManager) {
+            return $this->transactionsManager->addCallbackForRollback($callback);
+        }
+
+        throw new RuntimeException('Transactions Manager has not been set.');
+    }
 }

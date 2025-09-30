@@ -1,39 +1,60 @@
 @props([
     'code',
-    'grammar',
-    'lightTheme' => 'light-plus',
-    'darkTheme' => 'dark-plus',
-    'withGutter' => false,
+    'language',
+    'editor' => false,
     'startingLine' => 1,
     'highlightedLine' => null,
     'truncate' => false,
 ])
 
-@use('Phiki\Phiki')
-@use('Phiki\Grammar\Grammar')
-@use('Phiki\Theme\Theme')
-@use('Phiki\Transformers\Decorations\GutterDecoration')
-@use('Phiki\Transformers\Decorations\LineDecoration')
-@use('Phiki\Transformers\Decorations\PreDecoration')
-
 @php
-    $highlightedCode = (new Phiki)->codeToHtml($code, $grammar, ['light' => $lightTheme, 'dark' => $darkTheme])
-        ->withGutter($withGutter)
-        ->startingLine($startingLine)
-        ->decoration(
-            PreDecoration::make()->class('bg-transparent!', $truncate ? ' truncate' : ''),
-            GutterDecoration::make()->class('mr-6 text-neutral-500! dark:text-neutral-600!'),
-        );
+    $fallback = $truncate ? '<pre class="truncate"><code>' : '<pre><code>';
 
-    if ($highlightedLine !== null) {
-        $highlightedCode->decoration(
-            LineDecoration::forLine($highlightedLine)->class('bg-rose-200! [&_.line-number]:dark:text-white! dark:bg-rose-900!'),
-        );
+    if ($editor) {
+        $lines = explode("\n", $code);
+
+        foreach ($lines as $index => $line) {
+            $lineNumber = $startingLine + $index;
+            $highlight = $highlightedLine === $index;
+            $lineClass = implode(' ', [
+                'block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4',
+                $highlight ? 'bg-rose-200! dark:bg-rose-900!' : '',
+            ]);
+            $lineNumberClass = implode(' ', [
+                'mr-6 text-neutral-500! dark:text-neutral-600!',
+                $highlight ? 'dark:text-white!' : '',
+            ]);
+
+            $fallback .= '<span class="' . $lineClass . '">';
+            $fallback .= '<span class="' . $lineNumberClass . '">' . $lineNumber . '</span>';
+            $fallback .= htmlspecialchars($line);
+            $fallback .= '</span>';
+        }
+
+    } else {
+        $fallback .= htmlspecialchars($code);
     }
+
+    $fallback .= '</code></pre>';
 @endphp
 
 <div
+    x-data="{ highlightedCode: null }"
+    x-init="
+        highlightedCode = window.highlight(
+            {{ Illuminate\Support\Js::from($code) }},
+            {{ Illuminate\Support\Js::from($language) }},
+            {{ Illuminate\Support\Js::from($truncate) }},
+            {{ Illuminate\Support\Js::from($editor) }},
+            {{ Illuminate\Support\Js::from($startingLine) }},
+            {{ Illuminate\Support\Js::from($highlightedLine) }}
+        );
+    "
     {{ $attributes }}
 >
-    {!! $highlightedCode !!}
+    <div
+        x-cloak
+        x-html="highlightedCode"
+    ></div>
+    <div x-show="!highlightedCode">{!! $fallback !!}</div>
 </div>

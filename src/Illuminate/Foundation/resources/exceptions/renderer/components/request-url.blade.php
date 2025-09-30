@@ -1,4 +1,4 @@
-@props(['request'])
+@props(['exception', 'request'])
 
 <div
     x-data="{
@@ -17,9 +17,10 @@
 >
     <div class="flex items-center gap-3 w-full">
         <x-laravel-exceptions-renderer::badge type="error" variant="solid">
-            <x-laravel-exceptions-renderer::icons.globe class="w-2.5 h-2.5" />
-            {{ $request->method() }}
+            <x-laravel-exceptions-renderer::icons.alert class="w-2.5 h-2.5" />
+            {{ $exception->httpStatusCode() }}
         </x-laravel-exceptions-renderer::badge>
+        <x-laravel-exceptions-renderer::http-method method="{{ $request->method() }}" />
         <div class="flex-1 text-sm font-light truncate text-neutral-950 dark:text-white">
             <span data-tippy-content="{{ $request->fullUrl() }}">
                 {{ $request->fullUrl() }}

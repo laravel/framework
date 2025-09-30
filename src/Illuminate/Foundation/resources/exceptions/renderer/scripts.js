@@ -1,9 +1,12 @@
 import Alpine from 'alpinejs';
 import tippy from 'tippy.js';
-
-window.Alpine = Alpine;
-
-Alpine.start();
+import { createHighlighterCoreSync } from 'shiki/core';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import json from '@shikijs/langs/json';
+import php from '@shikijs/langs/php';
+import sql from '@shikijs/langs/sql';
+import darkPlus from '@shikijs/themes/dark-plus';
+import lightPlus from '@shikijs/themes/light-plus';
 
 tippy('[data-tippy-content]', {
     arrow: false,
@@ -34,3 +37,67 @@ window.copyToClipboard = async function (text) {
         }
     }
 };
+
+const highlighter = createHighlighterCoreSync({
+    themes: [lightPlus, darkPlus],
+    langs: [php, sql, json],
+    engine: createJavaScriptRegexEngine(),
+});
+
+window.highlight = function (
+    code,
+    language,
+    truncate = false,
+    editor = false,
+    startingLine = 1,
+    highlightedLine = null
+) {
+    return highlighter.codeToHtml(code, {
+        lang: language,
+        themes: {
+            light: 'light-plus',
+            dark: 'dark-plus',
+        },
+        transformers: [
+            {
+                pre(node) {
+                    this.addClassToHast(node, ['bg-transparent!', truncate ? 'truncate' : 'w-fit min-w-full']);
+                },
+                code(node) {
+                    this.addClassToHast(node, 'flex flex-col');
+                },
+                line(node, line) {
+                    if (!editor) {
+                        return;
+                    }
+
+                    const lineNumber = startingLine + line - 1;
+                    const highlight = highlightedLine === line - 1;
+
+                    const lineNumberSpan = {
+                        type: 'element',
+                        tagName: 'span',
+                        properties: {
+                            className: [
+                                'mr-6 text-neutral-500! dark:text-neutral-600!',
+                                highlight ? 'dark:text-white!' : '',
+                            ],
+                        },
+                        children: [{ type: 'text', value: lineNumber.toString() }],
+                    };
+
+                    node.children.unshift(lineNumberSpan);
+
+                    this.addClassToHast(node, [
+                        'block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4',
+                        highlight ? 'bg-rose-200! dark:bg-rose-900!' : '',
+                    ]);
+                },
+            },
+        ],
+    });
+};
+
+window.Alpine = Alpine;
+
+Alpine.start();
