@@ -202,14 +202,14 @@ class Schedule
 
         $this->events[] = $event = new CallbackEvent(
             $this->eventMutex, function () use ($job, $queue, $connection) {
-            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+                $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
-            if ($job instanceof ShouldQueue) {
-                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
-            } else {
-                $this->dispatchNow($job);
-            }
-        }, [], $this->timezone
+                if ($job instanceof ShouldQueue) {
+                    $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+                } else {
+                    $this->dispatchNow($job);
+                }
+            }, [], $this->timezone
         );
 
         $event->name($jobName);
