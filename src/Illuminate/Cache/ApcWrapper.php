@@ -8,7 +8,7 @@ class ApcWrapper
      * Get an item from the cache.
      *
      * @param  string  $key
-     * @return mixed|null
+     * @return mixed
      */
     public function get($key)
     {
