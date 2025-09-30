@@ -61,7 +61,7 @@ window.highlight = function (
         transformers: [
             {
                 pre(node) {
-                    this.addClassToHast(node, ['bg-transparent!', truncate ? 'truncate' : '']);
+                    this.addClassToHast(node, ['bg-transparent!', truncate ? 'truncate' : 'w-fit min-w-full']);
                 },
                 code(node) {
                     this.addClassToHast(node, 'flex flex-col');
