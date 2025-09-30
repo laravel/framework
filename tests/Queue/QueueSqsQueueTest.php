@@ -12,6 +12,8 @@ use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Tests\Queue\Fixtures\FakeSqsJob;
+use Illuminate\Tests\Queue\Fixtures\FakeSqsJobWithDeduplication;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -266,18 +268,20 @@ class QueueSqsQueueTest extends TestCase
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqs()
     {
-        $job = new FakeSqsJob();
+        // Job will not be dispatched until the PendingDispatch object is destroyed.
+        $pendingDispatch = FakeSqsJob::dispatch();
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
-        FakeSqsJob::dispatch();
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
@@ -298,18 +302,19 @@ class QueueSqsQueueTest extends TestCase
 
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFairQueue()
     {
-        $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
+        $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
-        FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
     }
@@ -348,26 +353,157 @@ class QueueSqsQueueTest extends TestCase
         Str::createUuidsNormally();
     }
 
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicationId()
+    {
+        $job = $this->getMockBuilder(FakeSqsJobWithDeduplication::class)->onlyMethods(['deduplicationId'])->getMock();
+        $job->expects($this->once())->method('deduplicationId')->with($this->mockedPayload, $this->fifoQueueName)->willReturn($this->mockedDeduplicationId);
+        $job->onGroup($this->mockedMessageGroupId);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
+        $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
+    public function testPushProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicator()
+    {
+        $job = $this->getMockBuilder(FakeSqsJobWithDeduplication::class)->onlyMethods(['deduplicationId'])->getMock();
+
+        // Ensure the deduplicationId method is not called when a deduplicator callback is provided.
+        $job->expects($this->never())->method('deduplicationId')->willReturn('this-should-not-be-used');
+        $job->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) {
+            $this->assertEquals($this->mockedPayload, $payload);
+            $this->assertEquals($this->fifoQueueName, $queue);
+
+            return $this->mockedDeduplicationId;
+        });
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, $this->mockedData)->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with($this->fifoQueueName)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
+        $id = $queue->push($job, $this->mockedData, $this->fifoQueueName);
+        $this->assertEquals($this->mockedMessageId, $id);
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+    }
+
     public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueue()
     {
         Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
 
-        $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId);
+        $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
-        FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId);
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Str::createUuidsNormally();
+    }
+
+    public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicationId()
+    {
+        FakeSqsJobWithDeduplication::createDeduplicationIdsUsing(fn ($payload, $queue) => $this->mockedDeduplicationId);
+
+        $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId);
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
+
+        $dispatcher = new Dispatcher($container, fn () => $queue);
+        app()->instance(DispatcherContract::class, $dispatcher);
+
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        FakeSqsJobWithDeduplication::createDeduplicationIdsNormally();
+    }
+
+    public function testPendingDispatchProperlyPushesJobObjectOntoSqsFifoQueueWithDeduplicator()
+    {
+        FakeSqsJobWithDeduplication::createDeduplicationIdsUsing(function ($payload, $queue) {
+            $this->fail('The deduplicationId method should not be called when a deduplicator callback is provided.');
+
+            return 'this-should-not-be-used';
+        });
+
+        $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) {
+            $this->assertEquals($this->mockedPayload, $payload);
+            $this->assertEquals($this->fifoQueueName, $queue);
+
+            return $this->mockedDeduplicationId;
+        });
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
+
+        $dispatcher = new Dispatcher($container, fn () => $queue);
+        app()->instance(DispatcherContract::class, $dispatcher);
+
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+
+        FakeSqsJobWithDeduplication::createDeduplicationIdsNormally();
+    }
+
+    public function testJobObjectCanBeSerializedOntoSqsFifoQueueWithDeduplicator()
+    {
+        // Can't reference test case property in serialized closure.
+        $deduplicationId = $this->mockedDeduplicationId;
+
+        $pendingDispatch = FakeSqsJobWithDeduplication::dispatch()->onGroup($this->mockedMessageGroupId)->withDeduplicator(function ($payload, $queue) use ($deduplicationId) {
+            return $deduplicationId;
+        });
+
+        $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
+        $queue->setContainer($container = m::spy(Container::class));
+        $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
+        $this->sqs->shouldReceive('sendMessage')->once()->withArgs(function ($args) {
+            $this->assertIsArray($args);
+            $this->assertEqualsCanonicalizing(['QueueUrl', 'MessageBody', 'MessageGroupId', 'MessageDeduplicationId'], array_keys($args));
+            $this->assertEquals($this->fifoQueueUrl, $args['QueueUrl']);
+            $this->assertEquals($this->mockedMessageGroupId, $args['MessageGroupId']);
+            $this->assertEquals($this->mockedDeduplicationId, $args['MessageDeduplicationId']);
+
+            $message = json_decode($args['MessageBody'], true);
+            $command = unserialize($message['data']['command'] ?? '');
+            $this->assertInstanceOf(FakeSqsJobWithDeduplication::class, $command);
+            $this->assertInstanceOf(SerializableClosure::class, $command->deduplicator);
+
+            return true;
+        })->andReturn($this->mockedSendMessageResponseModel);
+
+        $dispatcher = new Dispatcher($container, fn () => $queue);
+        app()->instance(DispatcherContract::class, $dispatcher);
+
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
     }
 
     public function testDelayedPushProperlyPushesJobStringOntoSqsFifoQueueWithoutDelay()
@@ -410,18 +546,19 @@ class QueueSqsQueueTest extends TestCase
     {
         Str::createUuidsUsing(fn () => $this->mockedDeduplicationId);
 
-        $job = (new FakeSqsJob())->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
+        $pendingDispatch = FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
 
         $queue = $this->getMockBuilder(SqsQueue::class)->onlyMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->fifoQueueName, $this->account])->getMock();
         $queue->setContainer($container = m::spy(Container::class));
-        $queue->expects($this->once())->method('createPayload')->with($job, $this->fifoQueueName, '')->willReturn($this->mockedPayload);
+        $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->fifoQueueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->fifoQueueUrl);
         $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->fifoQueueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId, 'MessageDeduplicationId' => $this->mockedDeduplicationId])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
 
-        FakeSqsJob::dispatch()->onGroup($this->mockedMessageGroupId)->delay($this->mockedDelay);
+        // Destroy object to trigger dispatch.
+        unset($pendingDispatch);
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 

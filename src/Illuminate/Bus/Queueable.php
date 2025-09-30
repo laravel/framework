@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Laravel\SerializableClosure\SerializableClosure;
 use PHPUnit\Framework\Assert as PHPUnit;
 use RuntimeException;
 
@@ -33,6 +34,13 @@ trait Queueable
      * @var string|null
      */
     public $messageGroup;
+
+    /**
+     * The job deduplicator callback the job should use to generate the deduplication ID.
+     *
+     * @var \Laravel\SerializableClosure\SerializableClosure|null
+     */
+    public $deduplicator;
 
     /**
      * The number of seconds before the job should be made available.
@@ -120,6 +128,23 @@ trait Queueable
     public function onGroup($group)
     {
         $this->messageGroup = enum_value($group);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired job deduplicator callback.
+     *
+     * This feature is only supported by some queues, such as Amazon SQS FIFO.
+     *
+     * @param  callable|null  $deduplicator
+     * @return $this
+     */
+    public function withDeduplicator($deduplicator)
+    {
+        $this->deduplicator = $deduplicator instanceof Closure
+            ? new SerializableClosure($deduplicator)
+            : $deduplicator;
 
         return $this;
     }
