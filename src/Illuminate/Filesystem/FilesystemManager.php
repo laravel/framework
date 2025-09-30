@@ -328,7 +328,7 @@ class FilesystemManager implements FactoryContract
      * @param  array  $config
      * @return \League\Flysystem\FilesystemOperator
      */
-    protected function createFlysystem(FlysystemAdapter &$adapter, array $config)
+    protected function createFlysystem(FlysystemAdapter $adapter, array $config)
     {
         if ($config['read-only'] ?? false) {
             $adapter = new ReadOnlyFilesystemAdapter($adapter);
