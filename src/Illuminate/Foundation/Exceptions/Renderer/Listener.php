@@ -79,8 +79,12 @@ class Listener
         }
         $this->totalBytes = 0;
 
-        if (function_exists('gc_collect_cycles')) gc_collect_cycles();
-        if (function_exists('gc_mem_caches'))  gc_mem_caches();
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+        if (function_exists('gc_mem_caches')) {
+            gc_mem_caches();
+        }
     }
 
     /**

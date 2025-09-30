@@ -12,12 +12,29 @@ use PHPUnit\Framework\TestCase;
 
 class FakeConnection extends Connection
 {
-    public function __construct() {}
-    public function prepareBindings(array $bindings) { return $bindings; }
-    public function getName() { return 'mysql'; }
-    protected function getDefaultQueryGrammar() { return new QueryGrammar(); }
-    protected function getDefaultPostProcessor() { return new Processor(); }
-    protected function getDefaultSchemaGrammar() { return new SchemaGrammar(); }
+    public function __construct()
+    {
+    }
+    public function prepareBindings(array $bindings)
+    {
+        return $bindings;
+    }
+    public function getName()
+    {
+        return 'mysql';
+    }
+    protected function getDefaultQueryGrammar()
+    {
+        return new QueryGrammar();
+    }
+    protected function getDefaultPostProcessor()
+    {
+        return new Processor();
+    }
+    protected function getDefaultSchemaGrammar()
+    {
+        return new SchemaGrammar();
+    }
 }
 
 final class ListenerByteBudgetTest extends TestCase
@@ -43,7 +60,7 @@ final class ListenerByteBudgetTest extends TestCase
 
     public function test_respects_memory_budget_and_evicts_old_entries(): void
     {
-        $listener = new Listener;
+        $listener = new Listener();
         $conn     = new FakeConnection();
 
         // Large SQL/binding to force budget pressure

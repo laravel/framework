@@ -105,6 +105,7 @@
         "ably/ably-php": "^1.0",
         "aws/aws-sdk-php": "^3.322.9",
         "fakerphp/faker": "^1.24",
+        "friendsofphp/php-cs-fixer": "^3.88",
         "guzzlehttp/promises": "^2.0.3",
         "guzzlehttp/psr7": "^2.4",
         "laravel/pint": "^1.18",
