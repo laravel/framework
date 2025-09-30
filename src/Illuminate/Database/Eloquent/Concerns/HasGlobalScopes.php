@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Scope;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use ReflectionAttribute;
 use ReflectionClass;
 
 trait HasGlobalScopes
@@ -31,7 +32,7 @@ trait HasGlobalScopes
     {
         $reflectionClass = new ReflectionClass(static::class);
 
-        return (new Collection($reflectionClass->getAttributes(ScopedBy::class)))
+        return (new Collection($reflectionClass->getAttributes(ScopedBy::class, ReflectionAttribute::IS_INSTANCEOF)))
             ->map(fn ($attribute) => $attribute->getArguments())
             ->flatten()
             ->all();
