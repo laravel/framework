@@ -64,7 +64,7 @@ class ComposerScripts
         require_once $vendorDir.'/autoload.php';
 
         if (! defined('LARAVEL_START')) {
-        define('LARAVEL_START', microtime(true));
+            define('LARAVEL_START', microtime(true));
         }
 
         /** @var Application $app */
