@@ -1,6 +1,11 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.32.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.32.3...12.x)
+
+## [v12.32.3](https://github.com/laravel/framework/compare/v12.32.2...v12.32.3) - 2025-09-30
+
+* [12.x] Define LARAVEL_START if not already defined by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57222
+* [12.x] Clean up redundant type hints in docblocks by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57219
 
 ## [v12.32.2](https://github.com/laravel/framework/compare/v12.32.1...v12.32.2) - 2025-09-30
 
