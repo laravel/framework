@@ -277,7 +277,8 @@ class ActiveScope implements Scope
 }
 
 #[ScopedBy(ActiveScope::class)]
-trait EloquentGlobalScopeInInheritedAttributeTestTrait {
+trait EloquentGlobalScopeInInheritedAttributeTestTrait
+{
     //
 }
 
