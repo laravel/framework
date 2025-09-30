@@ -98,6 +98,7 @@ class Str
         }
 
         $position = strpos($subject, $search);
+
         return $position === false ? $subject : substr($subject, $position + strlen($search));
     }
 
