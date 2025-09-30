@@ -5,6 +5,7 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\HigherOrderTapProxy;
 use Illuminate\Support\Once;
@@ -513,5 +514,121 @@ if (! function_exists('with')) {
     function with($value, ?callable $callback = null)
     {
         return is_null($callback) ? $value : $callback($value);
+    }
+}
+
+if (! function_exists('queryLog')) {
+    /**
+     * Start logging database queries to a custom log file or default Laravel log.
+     *
+     * @param  string|null  $file
+     * @param  bool  $withBacktrace
+     * @param  string|null  $channel
+     * @return void
+     */
+    function queryLog($file = null, $withBacktrace = false, $channel = null)
+    {
+        gc_collect_cycles();
+
+        $useCustomFile = $file !== null;
+        $logPath = $useCustomFile ? storage_path("logs/{$file}.log") : null;
+
+        // Clean up existing log file if using custom file
+        if ($useCustomFile && file_exists($logPath)) {
+            @unlink($logPath);
+        }
+
+        $queryCount = 0;
+        $logger = $channel ? Log::channel($channel) : Log::withoutContext();
+
+        DB::listen(function ($query) use (&$queryCount, $logPath, $withBacktrace, $useCustomFile, $logger) {
+            // Format the SQL with bindings
+            $sql = $query->sql;
+            $bindings = $query->bindings;
+
+
+            $sql = preg_replace([
+                '/"([a-zA-Z_][a-zA-Z0-9_]*)("\.)"([a-zA-Z_][a-zA-Z0-9_]*)"/',
+                '/"([a-zA-Z_][a-zA-Z0-9_]*)"/',
+            ], ['`$1`.`$3`', '`$1`'], $sql);
+
+            if (empty($bindings)) {
+                $formattedSql = $sql;
+            } else {
+                $parts = explode('?', $sql);
+                $formattedSql = '';
+
+                foreach ($parts as $i => $part) {
+                    $formattedSql .= $part;
+
+                    if (isset($bindings[$i])) {
+                        $value = $bindings[$i];
+
+                        // Format the value
+                        if (is_string($value)) {
+                            $formattedSql .= "'".addslashes($value)."'";
+                        } elseif (is_object($value)) {
+                            if (method_exists($value, '__toString')) {
+                                $formattedSql .= "'".addslashes((string) $value)."'";
+                            } elseif ($value instanceof DateTimeInterface) {
+                                $formattedSql .= "'".$value->format('Y-m-d H:i:s')."'";
+                            } else {
+                                $formattedSql .= "'".addslashes(current((array) $value))."'";
+                            }
+                        } elseif (is_null($value)) {
+                            $formattedSql .= 'null';
+                        } else {
+                            $formattedSql .= (string) $value;
+                        }
+                    }
+                }
+            }
+
+            // Build the log message
+            $queryCount++;
+            $messageLines = [
+                "{$queryCount}. {$formattedSql}",
+                "Execution Time = {$query->time}ms",
+                'Date Time = '.now()->toDateTimeString(),
+            ];
+
+            if ($withBacktrace) {
+                $backtrace = collect(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS))
+                    ->filter(function ($trace) {
+                        if (! isset($trace['file'], $trace['line'])) {
+                            return false;
+                        }
+
+                        $filePath = $trace['file'];
+                        $skipPatterns = ['vendor', 'Middleware', 'public', 'server'];
+
+                        foreach ($skipPatterns as $pattern) {
+                            if (str_contains($filePath, $pattern)) {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    })
+                    ->take(5)
+                    ->map(function ($trace) {
+                        return "{$trace['file']} line {$trace['line']}";
+                    })
+                    ->implode(PHP_EOL);
+
+                if (! empty($backtrace)) {
+                    $messageLines[] = $backtrace;
+                }
+            }
+
+            $logMessage = implode(PHP_EOL, $messageLines);
+
+            // Write the formatted log
+            if ($useCustomFile) {
+                file_put_contents($logPath, $logMessage.PHP_EOL.PHP_EOL, FILE_APPEND | LOCK_EX);
+            } else {
+                $logger->info(PHP_EOL.$logMessage.PHP_EOL);
+            }
+        });
     }
 }
