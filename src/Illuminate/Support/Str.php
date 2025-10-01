@@ -569,6 +569,8 @@ class Str
      *
      * @param  mixed  $value
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isJson($value)
     {
@@ -585,6 +587,8 @@ class Str
      * @param  mixed  $value
      * @param  array  $protocols
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUrl($value, array $protocols = [])
     {
@@ -628,6 +632,8 @@ class Str
      * @param  mixed  $value
      * @param  int<0, 8>|'nil'|'max'|null  $version
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUuid($value, $version = null)
     {
@@ -669,6 +675,8 @@ class Str
      *
      * @param  mixed  $value
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUlid($value)
     {
