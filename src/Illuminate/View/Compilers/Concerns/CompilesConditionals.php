@@ -435,7 +435,7 @@ trait CompilesConditionals
             throw new ViewCompilationException('The @maybe directive requires exactly 2 parameters.');
         }
 
-        [ $attribute, $data ] = array_map('trim', $parts);
+        [$attribute, $data] = array_map('trim', $parts);
 
         return "<?php if($data !== '' && $data !== null && trim(is_bool($data) ? ($data ? 'true' : 'false') : $data) !== '') echo $attribute . '=\"' . e(is_bool($data) ? ($data ? 'true' : 'false') : $data) . '\"'; ?>";
     }

@@ -161,7 +161,7 @@ class BladeMaybeStatementsTest extends AbstractBladeTestCase
     {
         extract($data);
         ob_start();
-        eval('?>' . $compiled);
+        eval('?>'.$compiled);
         return ob_get_clean();
     }
 }
