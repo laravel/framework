@@ -197,7 +197,7 @@ class ScheduleGroupTest extends TestCase
         $this->assertSame('* * * * 1-5', $events[2]->expression);
     }
 
-    public function testGroupedPendingEventAttributesWithoutOverlap()
+    public function testGroupedPendingEventAttributesWithoutOverlapping()
     {
         $schedule = new ScheduleClass;
         $schedule->weekdays()->withoutOverlapping()->group(function ($schedule) {
