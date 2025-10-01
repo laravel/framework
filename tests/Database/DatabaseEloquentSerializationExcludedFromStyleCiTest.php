@@ -13,11 +13,18 @@ class DatabaseEloquentSerializationExcludedFromStyleCiTest extends TestCase
         }
 
         $model = new EloquentModelWithVirtualPropertiesStub();
+        $model->foo = 'bar';
 
         $serialized = serialize($model);
 
         $this->assertStringNotContainsString('virtualGet', $serialized);
         $this->assertStringNotContainsString('virtualSet', $serialized);
+
+        // Ensure attributes and protected normal attributes are also serialized.
+        $this->assertStringContainsString('foo', $serialized);
+        $this->assertStringContainsString('bar', $serialized);
+        $this->assertStringContainsString('isVisible', $serialized);
+        $this->assertStringContainsString('yes', $serialized);
     }
 }
 
@@ -39,6 +46,8 @@ class EloquentModelWithVirtualPropertiesStub extends Model
             //
         }
     }
+
+    protected $isVisible = 'yes';
 }
 
 PHP

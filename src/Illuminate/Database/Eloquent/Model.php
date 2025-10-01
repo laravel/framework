@@ -2584,25 +2584,29 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Prepare the object for serialization.
      *
-     * @return array
+     * @return string[]
      */
     public function __sleep()
     {
         $this->mergeAttributesFromCachedCasts();
 
-        $this->classCastCache = [];
-        $this->attributeCastCache = [];
-        $this->relationAutoloadCallback = null;
-        $this->relationAutoloadContext = null;
-
         // When serializing the model, we may accidentally catch up some virtual properties.
         // We will cast the model to a native array to skip them and then apply a function
         // to clean each of the property names which is miles faster than using a regex.
+        $props = (array) $this;
+
+        unset(
+            $props["\0*\0classCastCache"],
+            $props["\0*\0attributeCastCache"],
+            $props["\0*\0relationAutoloadCallback"],
+            $props["\0*\0relationAutoloadContext"],
+        );
+
         return array_map(
             fn ($key) => $key[0] === "\0"
                 ? substr($key, strpos($key, "\0", 1) + 1)
                 : $key,
-            array_keys((array) $this)
+            array_keys($props)
         );
     }
 
