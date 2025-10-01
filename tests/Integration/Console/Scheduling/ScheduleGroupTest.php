@@ -200,17 +200,16 @@ class ScheduleGroupTest extends TestCase
     public function testGroupedPendingEventAttributesWithoutOverlap()
     {
         $schedule = new ScheduleClass;
-        $schedule->weekdays()
-            ->withoutOverlapping()->group(function ($schedule) {
-                $schedule->command('inspire')->at('00:00'); // this is event, not pending attribute
-                $schedule->at('01:00')->command('inspire'); // this is pending attribute
-                $schedule->command('inspire');  // this goes back to group pending attribute
-                $schedule->job(JobToTestWithSchedule::class)->at('04:00'); // this is event, not pending attribute
-            });
+        $schedule->weekdays()->withoutOverlapping()->group(function ($schedule) {
+            $schedule->command('inspire')->at('14:00'); // this is event, not pending attribute
+            $schedule->at('03:00')->command('inspire'); // this is pending attribute
+            $schedule->command('inspire');  // this goes back to group pending attribute
+            $schedule->job(JobToTestWithSchedule::class)->at('04:00');  // this is pending attribute
+        });
 
         $events = $schedule->events();
-        $this->assertSame('0 0 * * 1-5', $events[0]->expression);
-        $this->assertSame('0 1 * * 1-5', $events[1]->expression);
+        $this->assertSame('0 14 * * 1-5', $events[0]->expression);
+        $this->assertSame('0 3 * * 1-5', $events[1]->expression);
         $this->assertSame('* * * * 1-5', $events[2]->expression);
         $this->assertSame('0 4 * * 1-5', $events[3]->expression);
     }
