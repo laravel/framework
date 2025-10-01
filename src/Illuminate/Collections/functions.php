@@ -12,8 +12,8 @@ if (! function_exists('Illuminate\Support\enum_value')) {
      * @template TDefault
      *
      * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     * @return ($value is empty ? TDefault : mixed)
+     * @param  TDefault|\Closure(): TDefault  $default
+     * @return ($value is \BackedEnum ? int|string : ($value is \UnitEnum ? string : ($value is null ? TDefault : TValue)))
      */
     function enum_value($value, $default = null)
     {
