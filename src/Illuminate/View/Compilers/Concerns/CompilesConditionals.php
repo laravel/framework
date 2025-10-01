@@ -2,6 +2,7 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
+use Illuminate\Contracts\View\ViewCompilationException;
 use Illuminate\Support\Str;
 
 trait CompilesConditionals
@@ -416,5 +417,26 @@ trait CompilesConditionals
     protected function compileEndPushIf()
     {
         return '<?php $__env->stopPush(); endif; ?>';
+    }
+
+    /**
+     * Compile conditional HTML attributes into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\View\ViewCompilationException
+     */
+    protected function compileMaybe($expression)
+    {
+        $parts = explode(',', $this->stripParentheses($expression), 2);
+
+        if (2 !== count($parts)) {
+            throw new ViewCompilationException('The @maybe directive requires exactly 2 parameters.');
+        }
+
+        [ $attribute, $data ] = array_map('trim', $parts);
+
+        return "<?php if($data !== '' && $data !== null && trim(is_bool($data) ? ($data ? 'true' : 'false') : $data) !== '') echo $attribute . '=\"' . e(is_bool($data) ? ($data ? 'true' : 'false') : $data) . '\"'; ?>";
     }
 }
