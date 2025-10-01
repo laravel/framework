@@ -236,7 +236,7 @@ class PendingBatch
      * @param  bool|TParam|array<array-key, TParam>  $param
      * @return $this
      */
-    public function allowFailures(Closure|callable|array|bool $param = true)
+    public function allowFailures($param = true)
     {
         if (! is_bool($param)) {
             $param = Arr::wrap($param);
