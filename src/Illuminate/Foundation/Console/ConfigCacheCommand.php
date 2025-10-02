@@ -77,6 +77,8 @@ class ConfigCacheCommand extends Command
                     throw new LogicException("Your configuration files could not be serialized because the value at \"{$key}\" contains a non-serializable value.", 0, $e);
                 }
             }
+
+            throw new LogicException('Your configuration files are not serializable.', 0, $e);
         }
 
         $this->components->info('Configuration cached successfully.');
