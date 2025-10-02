@@ -451,6 +451,18 @@ class PendingRequest
     }
 
     /**
+     * Replace the given header on the request.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function replaceHeader($name, $value)
+    {
+        return $this->replaceHeaders([$name => $value]);
+    }
+
+    /**
      * Specify the basic authentication username and password for the request.
      *
      * @param  string  $username
