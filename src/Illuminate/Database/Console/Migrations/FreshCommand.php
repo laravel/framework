@@ -62,8 +62,9 @@ class FreshCommand extends Command
         }
 
         $database = $this->input->getOption('database');
+        $force = (bool) $this->input->getOption('force');
 
-        $this->migrator->usingConnection($database, function () use ($database) {
+        $this->migrator->usingConnection($database, function () use ($database, $force) {
             if ($this->migrator->repositoryExists()) {
                 $this->newLine();
 
@@ -71,7 +72,7 @@ class FreshCommand extends Command
                     '--database' => $database,
                     '--drop-views' => $this->option('drop-views'),
                     '--drop-types' => $this->option('drop-types'),
-                    '--force' => true,
+                    '--force' => $force,
                 ])) == 0);
             }
         });
@@ -83,7 +84,7 @@ class FreshCommand extends Command
             '--path' => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
             '--schema-path' => $this->input->getOption('schema-path'),
-            '--force' => true,
+            '--force' => $force,
             '--step' => $this->option('step'),
         ]));
 
@@ -94,7 +95,7 @@ class FreshCommand extends Command
         }
 
         if ($this->needsSeeding()) {
-            $this->runSeeder($database);
+            $this->runSeeder($database, $force);
         }
 
         return 0;
@@ -114,14 +115,15 @@ class FreshCommand extends Command
      * Run the database seeder command.
      *
      * @param  string  $database
+     * @param  bool  $force
      * @return void
      */
-    protected function runSeeder($database)
+    protected function runSeeder($database, $force)
     {
         $this->call('db:seed', array_filter([
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
-            '--force' => true,
+            '--force' => $force,
         ]));
     }
 
