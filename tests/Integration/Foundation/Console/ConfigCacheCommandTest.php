@@ -72,7 +72,7 @@ class ConfigCacheCommandTest extends TestCase
         );
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Your configuration files could not be serialized because the value at "testconfig.closure" contains a non-serializable value.');
+        $this->expectExceptionMessage('Your configuration files could not be serialized because the value at "testconfig.closure" is non-serializable.');
 
         $this->artisan('config:cache');
     }
@@ -96,7 +96,7 @@ class ConfigCacheCommandTest extends TestCase
         );
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Your configuration files could not be serialized because the value at "testconfig.nested.deep.closure" contains a non-serializable value.');
+        $this->expectExceptionMessage('Your configuration files could not be serialized because the value at "testconfig.nested.deep.closure" is non-serializable.');
 
         $this->artisan('config:cache');
     }

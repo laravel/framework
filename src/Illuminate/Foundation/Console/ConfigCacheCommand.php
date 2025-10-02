@@ -74,7 +74,7 @@ class ConfigCacheCommand extends Command
                 try {
                     eval(var_export($value, true).';');
                 } catch (Throwable $e) {
-                    throw new LogicException("Your configuration files could not be serialized because the value at \"{$key}\" contains a non-serializable value.", 0, $e);
+                    throw new LogicException("Your configuration files could not be serialized because the value at \"{$key}\" is non-serializable.", 0, $e);
                 }
             }
 
