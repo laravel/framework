@@ -499,4 +499,43 @@ class SupportLazyCollectionTest extends TestCase
 
         Carbon::setTestNow();
     }
+
+    public function testIsEmpty()
+    {
+        $empty = LazyCollection::make(function () {
+            if (false) {
+                yield 1;
+            }
+        });
+
+        $this->assertTrue($empty->isEmpty());
+        $this->assertFalse($empty->isNotEmpty());
+
+        $notEmpty = LazyCollection::make(function () {
+            yield 1;
+            yield 2;
+        });
+
+        $this->assertFalse($notEmpty->isEmpty());
+        $this->assertTrue($notEmpty->isNotEmpty());
+    }
+
+    public function testIsNotEmpty()
+    {
+        $empty = LazyCollection::make(function () {
+            if (false) {
+                yield 1;
+            }
+        });
+
+        $this->assertFalse($empty->isNotEmpty());
+        $this->assertTrue($empty->isEmpty());
+
+        $notEmpty = LazyCollection::make(function () {
+            yield 'a';
+        });
+
+        $this->assertTrue($notEmpty->isNotEmpty());
+        $this->assertFalse($notEmpty->isEmpty());
+    }
 }
