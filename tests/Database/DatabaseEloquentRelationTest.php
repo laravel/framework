@@ -284,6 +284,30 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
     }
+
+    public function testSearchRelationsRecursively()
+    {
+        $parent = new EloquentRelationResetModelStub;
+        $child = new EloquentRelationResetModelStub;
+        $relation = new EloquentRelationResetModelStub;
+
+        $child->setRelation('bar', $relation);
+        $parent->setRelation('foo', $child);
+
+        $this->assertTrue($parent->relationLoaded('foo.bar'));
+    }
+
+    public function testNotFailWhenSearchingRelationsRecursivelyWithEmptyModel()
+    {
+        $parent = new EloquentRelationResetModelStub;
+        $child = new EloquentRelationResetModelStub;
+
+        $child->setRelation('bar', null);
+        $parent->setRelation('foo', $child);
+
+        $this->assertTrue($parent->relationLoaded('foo.bar'));
+        $this->assertFalse($parent->relationLoaded('foo.bar.baz'));
+    }
 }
 
 class EloquentRelationResetModelStub extends Model

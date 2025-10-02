@@ -1081,7 +1081,36 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
+        $relations = explode('.', $key);
+        if (count($relations) > 1) {
+            return $this->relationLoadedRecursively($relations, $this);
+        }
+
         return array_key_exists($key, $this->relations);
+    }
+
+    /**
+     * Recursively check loaded relations in relations array.
+     *
+     * @param  array  $relations
+     * @param  Model|null  $model
+     * @return bool
+     */
+    protected function relationLoadedRecursively($relations, $model): bool
+    {
+        // if we get a null model - than relation was loaded, but empty
+        if (is_null($model)) {
+            return false;
+        }
+        $currentRelation = array_shift($relations);
+        // if the count of relations is 0, then we are at the end of recursion
+        if (count($relations) === 0) {
+            return $model->relationLoaded($currentRelation);
+        } elseif ($model->relationLoaded($currentRelation)) {
+            return $this->relationLoadedRecursively($relations, $model->relations[$currentRelation]);
+        }
+
+        return false;
     }
 
     /**
