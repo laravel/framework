@@ -200,23 +200,15 @@ class Schedule
                 : $job::class;
         }
 
-        $this->events[] = $event = new CallbackEvent(
-            $this->eventMutex, function () use ($job, $queue, $connection) {
-                $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+        return $this->name($jobName)->call(function () use ($job, $queue, $connection) {
+            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
-                if ($job instanceof ShouldQueue) {
-                    $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
-                } else {
-                    $this->dispatchNow($job);
-                }
-            }, [], $this->timezone
-        );
-
-        $event->name($jobName);
-
-        $this->mergePendingAttributes($event);
-
-        return $event;
+            if ($job instanceof ShouldQueue) {
+                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+            } else {
+                $this->dispatchNow($job);
+            }
+        });
     }
 
     /**
@@ -336,6 +328,8 @@ class Schedule
      */
     protected function mergePendingAttributes(Event $event)
     {
+        $event->name($this->attributes?->description);
+
         if (! empty($this->groupStack)) {
             $group = array_last($this->groupStack);
 
