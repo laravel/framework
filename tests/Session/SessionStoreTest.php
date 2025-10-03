@@ -123,7 +123,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
-    public function testTouchExtendsTtl(): void
+    public function testTouchExtendsTtl()
     {
         $session = $this->getSession();
 

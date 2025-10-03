@@ -71,7 +71,7 @@ class CacheSessionStoreTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testTouchExtendsTtl(): void
+    public function testTouchExtendsTtl()
     {
         Carbon::setTestNow(Carbon::now());
 
