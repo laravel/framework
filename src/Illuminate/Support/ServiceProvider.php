@@ -461,7 +461,7 @@ abstract class ServiceProvider
     /**
      * Register the package's custom Artisan commands.
      *
-     * @param  array|mixed  $commands
+     * @param  mixed  $commands
      * @return void
      */
     public function commands($commands)
@@ -547,7 +547,7 @@ abstract class ServiceProvider
      * Add the given provider to the application's provider bootstrap file.
      *
      * @param  string  $provider
-     * @param  string  $path
+     * @param  string|null  $path
      * @return bool
      */
     public static function addProviderToBootstrapFile(string $provider, ?string $path = null)
@@ -567,6 +567,51 @@ abstract class ServiceProvider
             ->unique()
             ->sort()
             ->values()
+            ->map(fn ($p) => '    '.$p.'::class,')
+            ->implode(PHP_EOL);
+
+        $content = '<?php
+
+return [
+'.$providers.'
+];';
+
+        file_put_contents($path, $content.PHP_EOL);
+
+        return true;
+    }
+
+    /**
+     * Remove a provider from the application's provider bootstrap file.
+     *
+     * @param  string|array  $providersToRemove
+     * @param  string|null  $path
+     * @param  bool  $strict
+     * @return bool
+     */
+    public static function removeProviderFromBootstrapFile(string|array $providersToRemove, ?string $path = null, bool $strict = false)
+    {
+        $path ??= app()->getBootstrapProvidersPath();
+
+        if (! file_exists($path)) {
+            return false;
+        }
+
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($path, true);
+        }
+
+        $providersToRemove = Arr::wrap($providersToRemove);
+
+        $providers = (new Collection(require $path))
+            ->unique()
+            ->sort()
+            ->values()
+            ->when(
+                $strict,
+                static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => in_array($p, $providersToRemove, true)),
+                static fn (Collection $providerCollection) => $providerCollection->reject(fn (string $p) => Str::contains($p, $providersToRemove))
+            )
             ->map(fn ($p) => '    '.$p.'::class,')
             ->implode(PHP_EOL);
 

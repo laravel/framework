@@ -472,10 +472,9 @@ trait ValidatesAttributes
         $this->requireParameterCount(2, $parameters, 'between');
 
         try {
-            return with(
-                BigNumber::of($this->getSize($attribute, $value)),
-                fn ($size) => $size->isGreaterThanOrEqualTo($this->trim($parameters[0])) && $size->isLessThanOrEqualTo($this->trim($parameters[1]))
-            );
+            $size = BigNumber::of($this->getSize($attribute, $value));
+
+            return $size->isGreaterThanOrEqualTo($this->trim($parameters[0])) && $size->isLessThanOrEqualTo($this->trim($parameters[1]));
         } catch (MathException) {
             return false;
         }
@@ -625,7 +624,7 @@ trait ValidatesAttributes
 
         foreach ($parameters as $format) {
             try {
-                $date = DateTime::createFromFormat('!'.$format, $value);
+                $date = DateTime::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'));
 
                 if ($date && $date->format($format) == $value) {
                     return true;
@@ -1557,7 +1556,7 @@ trait ValidatesAttributes
      * @param  array{0: 'strict'}  $parameters
      * @return bool
      */
-    public function validateInteger($attribute, $value, array $parameters)
+    public function validateInteger($attribute, $value, array $parameters = [])
     {
         if (($parameters[0] ?? null) === 'strict') {
             return is_int($value);

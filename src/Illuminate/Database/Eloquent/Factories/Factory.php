@@ -16,6 +16,9 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
 use Throwable;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -101,7 +104,7 @@ abstract class Factory
     /**
      * The name of the database connection that will be used to create the models.
      *
-     * @var string|null
+     * @var \UnitEnum|string|null
      */
     protected $connection;
 
@@ -156,7 +159,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $for
      * @param  \Illuminate\Support\Collection|null  $afterMaking
      * @param  \Illuminate\Support\Collection|null  $afterCreating
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool|null  $expandRelationships
      * @param  array  $excludeRelationships
@@ -802,16 +805,16 @@ abstract class Factory
      */
     public function getConnectionName()
     {
-        return $this->connection;
+        return enum_value($this->connection);
     }
 
     /**
      * Specify the database connection that should be used to generate models.
      *
-     * @param  string  $connection
+     * @param  \UnitEnum|string  $connection
      * @return static
      */
-    public function connection(string $connection)
+    public function connection(UnitEnum|string $connection)
     {
         return $this->newInstance(['connection' => $connection]);
     }
@@ -950,10 +953,14 @@ abstract class Factory
     /**
      * Get a new Faker instance.
      *
-     * @return \Faker\Generator
+     * @return \Faker\Generator|null
      */
     protected function withFaker()
     {
+        if (! class_exists(Generator::class)) {
+            return;
+        }
+
         return Container::getInstance()->make(Generator::class);
     }
 

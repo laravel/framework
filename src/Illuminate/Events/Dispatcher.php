@@ -587,7 +587,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event handler should be dispatched after all database transactions have committed.
      *
-     * @param  object|mixed  $listener
+     * @param  mixed  $listener
      * @return bool
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
@@ -705,8 +705,13 @@ class Dispatcher implements DispatcherContract
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->failOnTimeout = $listener->failOnTimeout ?? false;
-            $job->tries = $listener->tries ?? null;
             $job->deleteWhenMissingModels = $listener->deleteWhenMissingModels ?? false;
+            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : ($listener->tries ?? null);
+            $job->messageGroup = method_exists($listener, 'messageGroup') ? $listener->messageGroup(...$data) : ($listener->messageGroup ?? null);
+            $job->withDeduplicator(method_exists($listener, 'deduplicator')
+                ? $listener->deduplicator(...$data)
+                : (method_exists($listener, 'deduplicationId') ? $listener->deduplicationId(...) : null)
+            );
 
             $job->through(array_merge(
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],

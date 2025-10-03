@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModel;
 use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithGuessableResource;
+use Illuminate\Tests\Database\Fixtures\Models\EloquentResourceTestResourceModelWithUseResourceAttribute;
+use Illuminate\Tests\Database\Fixtures\Resources\EloquentResourceTestJsonResource;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentResourceModelTest extends TestCase
@@ -59,9 +60,14 @@ class DatabaseEloquentResourceModelTest extends TestCase
             'Illuminate\Tests\Database\Fixtures\Http\Resources\EloquentResourceTestResourceModel',
         ], $model::guessResourceName());
     }
-}
 
-class EloquentResourceTestJsonResource extends JsonResource
-{
-    //
+    public function testItCanTransformToResourceViaUseResourceAttribute()
+    {
+        $model = new EloquentResourceTestResourceModelWithUseResourceAttribute();
+
+        $resource = $model->toResource();
+
+        $this->assertInstanceOf(EloquentResourceTestJsonResource::class, $resource);
+        $this->assertSame($model, $resource->resource);
+    }
 }

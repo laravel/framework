@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\MissingRateLimiterException;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\RateLimiter as RateLimiterFacade;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -409,6 +412,81 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(2, $e->getHeaders()['Retry-After']);
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
+    }
+
+    public function testItCanThrottleBasedOnResponse()
+    {
+        RateLimiterFacade::for('throttle-not-found', function (Request $request) {
+            return Limit::perMinute(1)->after(fn ($response) => $response->status() === 404);
+        });
+        Route::get('/', fn () => match (request('status')) {
+            '404' => abort(404),
+            default => 'ok',
+        })->middleware(ThrottleRequests::using('throttle-not-found'));
+
+        $this->travelTo('2000-01-01 00:00:00');
+        $this->get('?status=404')->assertNotFound();
+        $this->get('?status=404')->assertTooManyRequests();
+        $this->get('?status=404')->assertTooManyRequests();
+
+        $this->travelTo('2000-01-01 00:00:59');
+        $this->get('?status=404')->assertTooManyRequests();
+        $this->get('?status=404')->assertTooManyRequests();
+
+        $this->travelTo('2000-01-01 00:01:00');
+        $this->get('?status=404')->assertNotFound();
+        $this->get('?status=404')->assertTooManyRequests();
+        $this->get('?status=404')->assertTooManyRequests();
+
+        $this->travelTo('2000-01-01 00:01:59');
+        $this->get('?status=404')->assertTooManyRequests();
+        $this->get('?status=404')->assertTooManyRequests();
+
+        $this->travelTo('2000-01-01 00:02:00');
+        $this->get('?status=404')->assertNotFound();
+        $this->get('?status=404')->assertTooManyRequests();
+        $this->get('?status=404')->assertTooManyRequests();
+    }
+
+    public function testItDoesNotHitLimiterUntilResponseHasBeenGenerated()
+    {
+        ThrottleRequests::shouldHashKeys(false);
+        RateLimiterFacade::for('throttle-not-found', function (Request $request) {
+            return Limit::perMinute(1)->after(fn ($response) => $response->status() === 404);
+        });
+        $duringRequest = null;
+        Route::get('/', function () use (&$duringRequest) {
+            $duringRequest = [
+                Cache::get('throttle-not-found:'),
+                Cache::get('throttle-not-found::timer'),
+            ];
+
+            abort(404);
+        })->middleware(ThrottleRequests::using('throttle-not-found'));
+
+        $this->travelTo('2000-01-01 00:00:00');
+        $this->get('?status=404')->assertNotFound();
+
+        $this->assertSame([null, null], $duringRequest);
+        $this->assertSame([1, 946684860], [
+            Cache::get('throttle-not-found:'),
+            Cache::get('throttle-not-found::timer'),
+        ]);
+    }
+
+    public function testItReturnsConfiguredResponseWhenUsingAfterLimit(): void
+    {
+        ThrottleRequests::shouldHashKeys(false);
+        RateLimiterFacade::for('throttle-not-found', function (Request $request) {
+            return Limit::perMinute(1)
+                ->after(fn ($response) => $response->status() === 404)
+                ->response(fn () => response('ah ah ah', status: 429));
+        });
+        Route::get('/', fn () => abort(404))->middleware(ThrottleRequests::using('throttle-not-found'));
+
+        $this->travelTo('2000-01-01 00:00:00');
+        $this->get('?status=404')->assertNotFound();
+        $this->get('?status=404')->assertTooManyRequests()->assertContent('ah ah ah');
     }
 }
 

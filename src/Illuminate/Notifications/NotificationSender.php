@@ -76,7 +76,7 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Support\Collection|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
@@ -94,7 +94,7 @@ class NotificationSender
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Support\Collection|mixed  $notifiables
      * @param  mixed  $notification
      * @param  array|null  $channels
      * @return void
@@ -247,6 +247,18 @@ class NotificationSender
                     $delay = $notification->withDelay($notifiable, $channel) ?? null;
                 }
 
+                $messageGroup = $notification->messageGroup ?? null;
+
+                if (method_exists($notification, 'withMessageGroups')) {
+                    $messageGroup = $notification->withMessageGroups($notifiable, $channel) ?? null;
+                }
+
+                $deduplicator = $notification->deduplicator ?? (method_exists($notification, 'deduplicationId') ? $notification->deduplicationId(...) : null);
+
+                if (method_exists($notification, 'withDeduplicators')) {
+                    $deduplicator = $notification->withDeduplicators($notifiable, $channel) ?? null;
+                }
+
                 $middleware = $notification->middleware ?? [];
 
                 if (method_exists($notification, 'middleware')) {
@@ -265,6 +277,8 @@ class NotificationSender
                         ->onConnection($connection)
                         ->onQueue($queue)
                         ->delay(is_array($delay) ? ($delay[$channel] ?? null) : $delay)
+                        ->onGroup(is_array($messageGroup) ? ($messageGroup[$channel] ?? null) : $messageGroup)
+                        ->withDeduplicator(is_array($deduplicator) ? ($deduplicator[$channel] ?? null) : $deduplicator)
                         ->through($middleware)
                 );
             }

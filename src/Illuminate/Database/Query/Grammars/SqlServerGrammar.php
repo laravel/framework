@@ -415,7 +415,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
     {
-        $columns = $this->columnize(array_keys(reset($values)));
+        $columns = $this->columnize(array_keys(array_first($values)));
 
         $sql = 'merge '.$this->wrapTable($query->from).' ';
 
