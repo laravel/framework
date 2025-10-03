@@ -4322,17 +4322,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
-        $closure = function () {
-            //
-        };
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
-            '*.email' => (new Unique('users'))->where($closure),
-            '*.type' => (new Exists('user_types'))->where($closure),
+            '*.email' => (new Unique('users')),
+            '*.type' => (new Exists('user_types')),
         ]);
         $mock = m::mock(DatabasePresenceVerifierInterface::class);
         $mock->shouldReceive('setConnection')->twice()->with(null);
-        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, 'id', [$closure])->andReturn(0);
-        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null, [$closure])->andReturn(1);
+        $mock->shouldReceive('getCount')->with('users', 'email', 'foo', null, 'id')->andReturn(0);
+        $mock->shouldReceive('getCount')->with('user_types', 'type', 'bar', null, null)->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
     }
