@@ -156,6 +156,29 @@ class SessionStore implements Store
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        $item = $this->session->get($this->itemKey($key));
+
+        if (is_null($item)) {
+            return false;
+        }
+
+        $this->session->put($this->itemKey($key), [
+            'value' => $item['value'],
+            'expiresAt' => $this->toTimestamp($seconds),
+        ]);
+
+        return true;
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key

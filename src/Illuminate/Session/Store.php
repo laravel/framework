@@ -842,4 +842,15 @@ class Store implements Session
             $this->handler->setRequest($request);
         }
     }
+
+    /**
+     * Extend the session TTL.
+     *
+     * @param  int  $ttl
+     * @return bool
+     */
+    public function touch($ttl)
+    {
+        return $this->handler->touch($this->getId(), $ttl);
+    }
 }

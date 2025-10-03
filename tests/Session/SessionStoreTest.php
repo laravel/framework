@@ -123,6 +123,19 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
+    public function testTouchExtendsTtl(): void
+    {
+        $session = $this->getSession();
+
+        $ttl = 60;
+
+        $session->getHandler()->shouldReceive('touch')
+            ->once()
+            ->with($this->getSessionId(), $ttl)
+            ->andReturn(true);
+
+        $this->assertTrue($session->touch($ttl));
+    }
     public function testSessionIsProperlyUpdated()
     {
         $session = $this->getSession();
