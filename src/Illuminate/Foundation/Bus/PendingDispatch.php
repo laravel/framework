@@ -28,6 +28,13 @@ class PendingDispatch
     protected $afterResponse = false;
 
     /**
+     * Indicates if the job dispatch should be deferred.
+     *
+     * @var bool
+     */
+    protected $defer = false;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
@@ -194,6 +201,18 @@ class PendingDispatch
     }
 
     /**
+     * Indicate that the job dispatch should be deferred.
+     *
+     * @return $this
+     */
+    public function defer(): static
+    {
+        $this->defer = true;
+
+        return $this;
+    }
+
+    /**
      * Determine if the job should be dispatched.
      *
      * @return bool
@@ -247,6 +266,8 @@ class PendingDispatch
             return;
         } elseif ($this->afterResponse) {
             app(Dispatcher::class)->dispatchAfterResponse($this->job);
+        } elseif ($this->defer) {
+            defer(fn () => app(Dispatcher::class)->dispatch($this->job));
         } else {
             app(Dispatcher::class)->dispatch($this->job);
         }
