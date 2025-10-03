@@ -271,8 +271,6 @@ trait ValidatesAttributes
         if ($result = $this->getRule($attribute, 'DateFormat')) {
             return $result[1][0];
         }
-
-        return null;
     }
 
     /**
