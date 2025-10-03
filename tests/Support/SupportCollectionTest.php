@@ -953,7 +953,17 @@ class SupportCollectionTest extends TestCase
     #[DataProvider('collectionClassProvider')]
     public function testWhere($collection)
     {
-        $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+        $c = new $collection([['v' => 0],['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
+     
+        $this->assertEquals(
+            [['v' => 0]],
+            $c->where('v', 0)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 0.0]],
+            $c->where('v', 0.0)->values()->all()
+        );
 
         $this->assertEquals(
             [['v' => 3], ['v' => '3']],
@@ -977,19 +987,19 @@ class SupportCollectionTest extends TestCase
         );
 
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 4]],
             $c->where('v', '<>', 3)->values()->all()
         );
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 4]],
             $c->where('v', '!=', 3)->values()->all()
         );
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => '3'], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => '3'], ['v' => 4]],
             $c->where('v', '!==', 3)->values()->all()
         );
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3']],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3']],
             $c->where('v', '<=', 3)->values()->all()
         );
         $this->assertEquals(
@@ -997,7 +1007,7 @@ class SupportCollectionTest extends TestCase
             $c->where('v', '>=', 3)->values()->all()
         );
         $this->assertEquals(
-            [['v' => 1], ['v' => 2]],
+            [['v' => 0],['v' => 1], ['v' => 2]],
             $c->where('v', '<', 3)->values()->all()
         );
         $this->assertEquals(
@@ -1013,17 +1023,17 @@ class SupportCollectionTest extends TestCase
         );
 
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
             $c->where('v', '<>', $object)->values()->all()
         );
 
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
             $c->where('v', '!=', $object)->values()->all()
         );
 
         $this->assertEquals(
-            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            [['v' => 0],['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
             $c->where('v', '!==', $object)->values()->all()
         );
 
@@ -1086,6 +1096,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['v' => 2, 'g' => 3]], $c->where('v', 2)->where('g', '>', 2)->values()->all());
         $this->assertEquals([], $c->where('v', 2)->where('g', 4)->values()->all());
         $this->assertEquals([['v' => 2, 'g' => null]], $c->where('v', 2)->whereNull('g')->values()->all());
+   
+        $c = new $collection([ 
+            ['name' => 'c', 'v' => null],
+            ['name' => 'd', 'v' => 0],
+            ['name' => 'e', 'v' => 0.0],
+            ['name' => 'f', 'v' => 0.1],
+        ]);
+        
+        $this->assertSame($c->where('name' , 'c')->value('v') , null);
+        $this->assertSame($c->where('name' , 'd')->value('v') , 0);
+        $this->assertSame($c->where('name' , 'e')->value('v') , 0.0);
+        $this->assertSame($c->where('name' , 'f')->value('v') , 0.1);
     }
 
     #[DataProvider('collectionClassProvider')]

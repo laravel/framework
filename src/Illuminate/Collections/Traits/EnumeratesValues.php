@@ -1114,9 +1114,13 @@ trait EnumeratesValues
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
+            if ((is_int($retrieved) || is_float($retrieved)) && $retrieved == 0 && $value === true) {
+                return true;
+            }
+      
             switch ($operator) {
-                default:
-                case '=':
+                default:  
+                case '=':       
                 case '==':  return $retrieved == $value;
                 case '!=':
                 case '<>':  return $retrieved != $value;
