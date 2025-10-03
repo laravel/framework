@@ -696,6 +696,34 @@ class FoundationViteTest extends TestCase
         $this->cleanViteManifest($buildDir);
     }
 
+    public function testViteCanResolvePublicPath()
+    {
+        $this->makeViteManifest([
+            'resources/style.css' => [
+                'src' => 'resources/style.css',
+                'file' => 'assets/style.css?v=version',
+            ],
+        ], $buildDir = Str::random());
+        $vite = app(Vite::class)->useBuildDirectory($buildDir);
+        $this->makeAsset('/assets/style.css', 'some content');
+
+        // default behaviour: exception caused by appended version param
+        $this->assertThrows(fn () => $vite->content('resources/style.css'), ViteException::class);
+
+        // custom behaviour: works because we strip the version param
+        $vite->createPublicPathsUsing(fn ($path) => Str::before($path, '?'));
+
+        $this->assertDoesntThrow(fn () => $vite->content('resources/style.css'));
+        $this->assertSame('some content', $vite->content('resources/style.css'));
+
+        // restore default behaviour...
+        $vite->createPublicPathsUsing(null);
+
+        $this->assertThrows(fn () => $vite->content('resources/style.css'), ViteException::class);
+
+        $this->cleanViteManifest($buildDir);
+    }
+
     public function testViteIsMacroable()
     {
         $this->makeViteManifest([
