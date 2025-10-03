@@ -136,6 +136,7 @@ class SessionStoreTest extends TestCase
 
         $this->assertTrue($session->touch($ttl));
     }
+
     public function testSessionIsProperlyUpdated()
     {
         $session = $this->getSession();
