@@ -13,8 +13,6 @@ use Illuminate\Routing\Attributes\Group;
 use Illuminate\Routing\Attributes\Post;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Facades\Route;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +31,7 @@ class BasicController implements AttributeRouteController
         return 'post success';
     }
 }
+
 #[Group(prefix: 'group', name: 'group.')]
 class GroupController implements AttributeRouteController
 {
@@ -59,8 +58,6 @@ class AttributeRoutingTest extends TestCase
         $this->router = new Router(new Dispatcher, $this->container);
         $this->container->instance('router', $this->router);
 
-        Facade::setFacadeApplication($this->container);
-
         $request = Request::create('http://example.com');
         $this->container->instance('url', new UrlGenerator(
             $this->router->getRoutes(), $request
@@ -68,7 +65,11 @@ class AttributeRoutingTest extends TestCase
 
         $appMock = m::mock(Application::class);
         $appMock->shouldReceive('basePath')->andReturn('');
-        $this->container->instance(Application::class, $appMock);
+
+        $this->container->bind(
+            \Illuminate\Routing\Contracts\CallableDispatcher::class,
+            \Illuminate\Routing\CallableDispatcher::class
+        );
 
         $this->registrar = new AttributeRouteRegistrar($appMock, $this->router);
 
@@ -81,9 +82,6 @@ class AttributeRoutingTest extends TestCase
     protected function tearDown(): void
     {
         m::close();
-        Facade::clearResolvedInstances();
-        Container::setInstance(null);
-        parent::tearDown();
     }
 
     public function test_it_registers_and_accesses_a_basic_get_route(): void
@@ -104,7 +102,7 @@ class AttributeRoutingTest extends TestCase
 
     public function test_it_applies_a_name_to_a_route(): void
     {
-        $this->assertTrue(Route::has('get'));
+        $this->assertTrue($this->router->has('get'));
         $this->assertEquals('http://example.com/get', route('get'));
     }
 
@@ -118,7 +116,7 @@ class AttributeRoutingTest extends TestCase
 
     public function test_it_applies_group_name_prefix(): void
     {
-        $this->assertTrue(Route::has('group.route'));
+        $this->assertTrue($this->router->has('group.route'));
         $this->assertEquals('http://example.com/group/route', route('group.route'));
     }
 }
