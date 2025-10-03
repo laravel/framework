@@ -27,16 +27,15 @@ trait SerializesModels
             ! empty($reflectionClass->getAttributes(WithoutRelations::class)),
         ];
 
+        $skipFlags = ReflectionProperty::IS_STATIC | 512 /* ReflectionProperty::IS_VIRTUAL */;
+
         foreach ($properties as $property) {
-            if ($property->isStatic()) {
+            $modifiers = $property->getModifiers();
+            if ($modifiers & $skipFlags) {
                 continue;
             }
 
             if (! $property->isInitialized($this)) {
-                continue;
-            }
-
-            if (method_exists($property, 'isVirtual') && $property->isVirtual()) {
                 continue;
             }
 
@@ -48,9 +47,9 @@ trait SerializesModels
 
             $name = $property->getName();
 
-            if ($property->isPrivate()) {
+            if ($modifiers & ReflectionProperty::IS_PRIVATE) {
                 $name = "\0{$class}\0{$name}";
-            } elseif ($property->isProtected()) {
+            } elseif ($modifiers & ReflectionProperty::IS_PROTECTED) {
                 $name = "\0*\0{$name}";
             }
 
@@ -76,16 +75,19 @@ trait SerializesModels
 
         $class = get_class($this);
 
+        $skipFlags = ReflectionProperty::IS_STATIC | 512 /* ReflectionProperty::IS_VIRTUAL */;
+
         foreach ($properties as $property) {
-            if ($property->isStatic()) {
+            $modifiers = $property->getModifiers();
+            if ($modifiers & $skipFlags) {
                 continue;
             }
 
             $name = $property->getName();
 
-            if ($property->isPrivate()) {
+            if ($modifiers & ReflectionProperty::IS_PRIVATE) {
                 $name = "\0{$class}\0{$name}";
-            } elseif ($property->isProtected()) {
+            } elseif ($modifiers & ReflectionProperty::IS_PROTECTED) {
                 $name = "\0*\0{$name}";
             }
 
