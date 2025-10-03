@@ -1196,6 +1196,61 @@ class TestResponse implements ArrayAccess
     }
 
     /**
+     * Assert that the response contains the expected pagination keys.
+     *
+     * @param  array  $include
+     * @param  array  $exclude
+     * @return $this
+     */
+    public function assertResourcePagination(array $include = [], array $exclude = [])
+    {
+        $structure = [
+            'data',
+            'links' => [
+                'first',
+                'last',
+                'prev',
+                'next',
+            ],
+            'meta' => [
+                'current_page',
+                'from',
+                'last_page',
+                'links' => [
+                    'url',
+                    'label',
+                    'page',
+                    'active',
+                ],
+                'path',
+                'per_page',
+                'to',
+                'total',
+            ],
+        ];
+
+        if (! empty($include)) {
+            foreach ($include as $key => $value) {
+                if (is_numeric($key)) {
+                    Arr::set($structure, $value, []);
+                } else {
+                    Arr::set($structure, $key, $value);
+                }
+            }
+        }
+
+        if (! empty($exclude)) {
+            foreach ($exclude as $key) {
+                $this->removeKeyFromStructure($structure, $key);
+            }
+        }
+
+        $this->assertJsonStructure($structure);
+
+        return $this;
+    }
+
+    /**
      * Validate the decoded response JSON.
      *
      * @return \Illuminate\Testing\AssertableJsonString
@@ -1294,6 +1349,58 @@ class TestResponse implements ArrayAccess
         }
 
         return $this;
+    }
+
+    /**
+     * Remove a key from the structure array using dot notation.
+     *
+     * @param  array  $structure
+     * @param  string  $key
+     * @return void
+     */
+    protected function removeKeyFromStructure(array &$structure, string $key)
+    {
+        if (! str_contains($key, '.')) {
+            unset($structure[$key]);
+
+            return;
+        }
+
+        $keys = explode('.', $key);
+        $current = &$structure;
+
+        for ($i = 0; $i < count($keys) - 1; $i++) {
+            if (! isset($current[$keys[$i]]) || ! is_array($current[$keys[$i]])) {
+                return;
+            }
+
+            $current = &$current[$keys[$i]];
+        }
+
+        $finalKey = end($keys);
+
+        if (is_array($current)) {
+            if (array_key_exists($finalKey, $current)) {
+                unset($current[$finalKey]);
+            } elseif (in_array($finalKey, $current, true)) {
+                $newArray = [];
+                $numericIndex = 0;
+
+                foreach ($current as $currentKey => $currentValue) {
+                    if ($currentValue === $finalKey) {
+                        continue;
+                    }
+
+                    if (is_numeric($currentKey)) {
+                        $newArray[$numericIndex++] = $currentValue;
+                    } else {
+                        $newArray[$currentKey] = $currentValue;
+                    }
+                }
+
+                $current = $newArray;
+            }
+        }
     }
 
     /**
