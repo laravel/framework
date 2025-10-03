@@ -164,16 +164,13 @@ class SessionStore implements Store
      */
     public function touch($key, $seconds)
     {
-        $item = $this->session->get($this->itemKey($key));
+        $value = $this->get($key);
 
-        if (is_null($item)) {
+        if (is_null($value)) {
             return false;
         }
 
-        $this->session->put($this->itemKey($key), [
-            'value' => $item['value'],
-            'expiresAt' => $this->toTimestamp($seconds),
-        ]);
+        $this->put($key, $value, $seconds);
 
         return true;
     }
