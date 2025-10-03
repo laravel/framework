@@ -504,6 +504,18 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register a callback when a composer package is being uninstalled.
+     *
+     * @param  string  $packageName
+     * @param  callable  $callback
+     * @return void
+     */
+    protected function registerPackageUninstallingListener(string $packageName, callable $callback)
+    {
+        $this->app['events']->listen("composer_package.{$packageName}:pre_uninstall", $callback);
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array

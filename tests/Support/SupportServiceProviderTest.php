@@ -237,6 +237,25 @@ return [
 PHP
             , trim(file_get_contents($this->tempFile)));
     }
+
+    public function test_can_register_uninstalling_callback()
+    {
+        $app = new Application();
+
+        $provider = new class ($app) extends ServiceProvider
+        {
+            public static int $timesCalled = 0;
+            public function boot()
+            {
+                $this->registerPackageUninstallingListener('laravel/framework', fn () => static::$timesCalled++);
+            }
+        };
+
+        $provider->boot();
+        $app['events']->hasListeners('composer_package.laravel/framework:pre_uninstall');
+        $app['events']->dispatch('composer_package.laravel/framework:pre_uninstall');
+        $this->assertEquals(1, $provider::$timesCalled);
+    }
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider
