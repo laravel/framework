@@ -84,6 +84,13 @@ class Vite implements Htmlable
     protected $preloadTagAttributesResolvers = [];
 
     /**
+     * The public path resolver.
+     *
+     * @var callable|null
+     */
+    protected $publicPathResolver = null;
+
+    /**
      * The preloaded assets.
      *
      * @var array
@@ -211,6 +218,19 @@ class Vite implements Htmlable
     public function createAssetPathsUsing($resolver)
     {
         $this->assetPathResolver = $resolver;
+
+        return $this;
+    }
+
+    /**
+     * Resolve public paths using the provided resolver.
+     *
+     * @param  callable|null  $resolver
+     * @return $this
+     */
+    public function createPublicPathsUsing($resolver)
+    {
+        $this->publicPathResolver = $resolver;
 
         return $this;
     }
@@ -897,7 +917,7 @@ class Vite implements Htmlable
 
         $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
-        $path = public_path($buildDirectory.'/'.$chunk['file']);
+        $path = $this->publicPath($buildDirectory.'/'.$chunk['file']);
 
         if (! is_file($path) || ! file_exists($path)) {
             throw new ViteException("Unable to locate file from Vite manifest: {$path}.");
@@ -916,6 +936,17 @@ class Vite implements Htmlable
     protected function assetPath($path, $secure = null)
     {
         return ($this->assetPathResolver ?? asset(...))($path, $secure);
+    }
+
+    /**
+     * Generate a public path for an asset.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    protected function publicPath($path)
+    {
+        return ($this->publicPathResolver ?? public_path(...))($path);
     }
 
     /**
