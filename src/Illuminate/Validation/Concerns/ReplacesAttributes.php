@@ -598,7 +598,7 @@ trait ReplacesAttributes
      * @param  array<int,string>  $parameters
      * @return string
      */
-    public function replaceRequiredIfDeclined($message, $attribute, $rule, $parameters)
+    protected function replaceRequiredIfDeclined($message, $attribute, $rule, $parameters)
     {
         return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
     }
@@ -662,7 +662,7 @@ trait ReplacesAttributes
      * @param  array<int,string>  $parameters
      * @return string
      */
-    public function replaceProhibitedIfDeclined($message, $attribute, $rule, $parameters)
+    protected function replaceProhibitedIfDeclined($message, $attribute, $rule, $parameters)
     {
         return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
     }

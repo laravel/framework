@@ -19,7 +19,7 @@ class Give implements ContextualAttribute
      */
     public function __construct(
         public string $class,
-        public array $params = []
+        public array $params = [],
     ) {
     }
 

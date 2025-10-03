@@ -95,7 +95,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return;
         }
 
-        $middle = (int) ($count / 2);
+        $middle = intdiv($count, 2);
 
         if ($count % 2) {
             return $values->get($middle);
@@ -473,12 +473,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @template TGetDefault
      *
-     * @param  TKey  $key
+     * @param  TKey|null  $key
      * @param  TGetDefault|(\Closure(): TGetDefault)  $default
      * @return TValue|TGetDefault
      */
     public function get($key, $default = null)
     {
+        $key ??= '';
+
         if (array_key_exists($key, $this->items)) {
             return $this->items[$key];
         }
@@ -497,8 +499,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function getOrPut($key, $value)
     {
-        if (array_key_exists($key, $this->items)) {
-            return $this->items[$key];
+        if (array_key_exists($key ?? '', $this->items)) {
+            return $this->items[$key ?? ''];
         }
 
         $this->offsetSet($key, $value = value($value));
@@ -539,6 +541,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                     is_bool($groupKey) => (int) $groupKey,
                     $groupKey instanceof \UnitEnum => enum_value($groupKey),
                     $groupKey instanceof \Stringable => (string) $groupKey,
+                    is_null($groupKey) => (string) $groupKey,
                     default => $groupKey,
                 };
 
@@ -600,7 +603,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_all($keys, fn ($key) => array_key_exists($key, $this->items));
+        return array_all($keys, fn ($key) => array_key_exists($key ?? '', $this->items));
     }
 
     /**
@@ -617,7 +620,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        return array_any($keys, fn ($key) => array_key_exists($key, $this->items));
+        return array_any($keys, fn ($key) => array_key_exists($key ?? '', $this->items));
     }
 
     /**
@@ -737,7 +740,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  string  $glue
      * @param  string  $finalGlue
-     * @return string
+     * @return TValue|string
      */
     public function join($glue, $finalGlue = '')
     {
@@ -789,8 +792,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the values of a given key.
      *
-     * @param  string|int|array<array-key, string>|null  $value
-     * @param  string|null  $key
+     * @param  \Closure|string|int|array<array-key, string>|null  $value
+     * @param  \Closure|string|null  $key
      * @return static<array-key, mixed>
      */
     public function pluck($value, $key = null)
@@ -1386,7 +1389,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get the first item in the collection, but only if exactly one item exists. Otherwise, throw an exception.
      *
-     * @param  (callable(TValue, TKey): bool)|string  $key
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return TValue

@@ -2490,6 +2490,18 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('male', $data->get('gender'));
     }
 
+    public function testGetOrPutWithNoKey()
+    {
+        $data = new Collection(['taylor', 'shawn']);
+        $this->assertSame('dayle', $data->getOrPut(null, 'dayle'));
+        $this->assertSame('john', $data->getOrPut(null, 'john'));
+        $this->assertSame(['taylor', 'shawn', 'dayle', 'john'], $data->all());
+
+        $data = new Collection(['taylor', '' => 'shawn']);
+        $this->assertSame('shawn', $data->getOrPut(null, 'dayle'));
+        $this->assertSame(['taylor', '' => 'shawn'], $data->all());
+    }
+
     public function testPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
