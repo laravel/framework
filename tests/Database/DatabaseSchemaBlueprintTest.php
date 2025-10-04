@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -653,6 +654,99 @@ class DatabaseSchemaBlueprintTest extends TestCase
             })->toSql();
         };
         $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
+    }
+
+    public function testAddCheckConstraintWorks()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function ($table) {
+                $table->check('c1 > 10');
+                $table->check('c1 > 10', 'foo');
+                $table->check(new Expression('c1 > 10'));
+                $table->check(new Expression('c1 > 10'), 'foo');
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            'alter table `users` add check (c1 > 10)',
+            'alter table `users` add constraint `foo` check (c1 > 10)',
+            'alter table `users` add check (c1 > 10)',
+            'alter table `users` add constraint `foo` check (c1 > 10)',
+        ], $getSql('MySql'));
+
+        $this->assertEquals([
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+        ], $getSql('Postgres'));
+
+        $this->assertEquals([
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+            'alter table "users" add check (c1 > 10)',
+            'alter table "users" add constraint "foo" check (c1 > 10)',
+        ], $getSql('SqlServer'));
+    }
+
+    public function testDropCheckConstraintWorks()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function ($table) {
+                $table->dropCheck('foo');
+            })->toSql();
+        };
+
+        $this->assertEquals(['alter table `users` drop constraint `foo`'], $getSql('MySql'));
+
+        $this->assertEquals(['alter table "users" drop constraint "foo"'], $getSql('Postgres'));
+
+        $this->assertEquals(['alter table "users" drop constraint "foo"'], $getSql('SqlServer'));
+    }
+
+    public function testCheckConstraintOnColumnsWorks()
+    {
+        $getSql = function ($grammar) {
+            return $this->getBlueprint($grammar, 'users', function (Blueprint $table) {
+                $table->enum('e1', ['v1', 'v2'])->change();
+                $table->enum('e2', ['v3', 'v4']);
+                $table->integer('c1')->check('c1 > 10');
+                $table->integer('c2')->check(new Expression('c2 > 10'));
+            })->toSql();
+        };
+
+        $this->assertEquals([
+            "alter table `users` modify `e1` enum('v1', 'v2') not null",
+            "alter table `users` add `e2` enum('v3', 'v4') not null",
+            'alter table `users` add `c1` int not null',
+            'alter table `users` add `c2` int not null',
+            'alter table `users` add constraint `users_c1_check` check (c1 > 10)',
+            'alter table `users` add constraint `users_c2_check` check (c2 > 10)',
+        ], $getSql('MySql'));
+
+        $this->assertEquals([
+            'alter table "users" alter column "e1" type varchar(255), alter column "e1" set not null, alter column "e1" drop default, alter column "e1" drop identity if exists',
+            'alter table "users" add column "e2" varchar(255) not null',
+            'alter table "users" add column "c1" integer not null',
+            'alter table "users" add column "c2" integer not null',
+            'alter table "users" add constraint "users_e1_check" check ("e1" in (\'v1\', \'v2\'))',
+            'alter table "users" add constraint "users_e2_check" check ("e2" in (\'v3\', \'v4\'))',
+            'alter table "users" add constraint "users_c1_check" check (c1 > 10)',
+            'alter table "users" add constraint "users_c2_check" check (c2 > 10)',
+            'comment on column "users"."e1" is NULL',
+        ], $getSql('Postgres'));
+
+        $this->assertEquals([
+            "DECLARE @sql NVARCHAR(MAX) = '';SELECT @sql += 'ALTER TABLE \"users\" DROP CONSTRAINT ' + OBJECT_NAME([default_object_id]) + ';' FROM sys.columns WHERE [object_id] = OBJECT_ID(N'\"users\"') AND [name] in ('e1') AND [default_object_id] <> 0;EXEC(@sql)",
+            'alter table "users" alter column "e1" nvarchar(255) not null',
+            'alter table "users" add "e2" nvarchar(255) not null',
+            'alter table "users" add "c1" int not null',
+            'alter table "users" add "c2" int not null',
+            'alter table "users" add constraint "users_e1_check" check ("e1" in (N\'v1\', N\'v2\'))',
+            'alter table "users" add constraint "users_e2_check" check ("e2" in (N\'v3\', N\'v4\'))',
+            'alter table "users" add constraint "users_c1_check" check (c1 > 10)',
+            'alter table "users" add constraint "users_c2_check" check (c2 > 10)',
+        ], $getSql('SqlServer'));
     }
 
     protected function getConnection(?string $grammar = null, string $prefix = '')
