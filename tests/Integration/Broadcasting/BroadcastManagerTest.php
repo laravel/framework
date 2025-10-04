@@ -101,57 +101,32 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager->connection('alien_connection');
     }
 
-    public function testThrowExceptionWhenPusherDriverCreationFailsWithMissingConfig()
+    public function testThrowExceptionWhenDriverCreationFailsWithServiceError()
     {
         $userConfig = [
             'broadcasting' => [
                 'connections' => [
-                    'reverb_connection_1' => [
-                        'driver' => 'reverb',
-                        // Missing required 'key', 'secret', 'app_id' configuration
+                    'log_connection_1' => [
+                        'driver' => 'log',
                     ],
                 ],
             ],
         ];
 
         $app = $this->getApp($userConfig);
+        $app->singleton(\Psr\Log\LoggerInterface::class, function () {
+            throw new \RuntimeException('Logger service not available');
+        });
 
         $broadcastManager = new BroadcastManager($app);
 
         try {
-            $broadcastManager->connection('reverb_connection_1');
+            $broadcastManager->connection('log_connection_1');
             $this->fail('Expected BroadcastException was not thrown');
         } catch (BroadcastException $e) {
-            $this->assertStringContainsString('Failed to create broadcaster for connection "reverb_connection_1"', $e->getMessage());
-            $this->assertNotNull($e->getPrevious());
-        }
-    }
-
-    public function testThrowExceptionWhenPusherDriverCreationFailsWithNullConfig()
-    {
-        $userConfig = [
-            'broadcasting' => [
-                'connections' => [
-                    'reverb_connection_2' => [
-                        'driver' => 'reverb',
-                        'key' => null,
-                        'secret' => null,
-                        'app_id' => null,
-                    ],
-                ],
-            ],
-        ];
-
-        $app = $this->getApp($userConfig);
-
-        $broadcastManager = new BroadcastManager($app);
-
-        try {
-            $broadcastManager->connection('reverb_connection_2');
-            $this->fail('Expected BroadcastException was not thrown');
-        } catch (BroadcastException $e) {
-            $this->assertStringContainsString('Failed to create broadcaster for connection "reverb_connection_2"', $e->getMessage());
-            $this->assertNotNull($e->getPrevious());
+            $this->assertStringContainsString('Failed to create broadcaster for connection "log_connection_1"', $e->getMessage());
+            $this->assertStringContainsString('Logger service not available', $e->getMessage());
+            $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
         }
     }
 
