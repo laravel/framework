@@ -385,8 +385,8 @@ trait CompilesConditionals
             $last = array_pop($parts);
 
             $parts = [
-                0 => implode(',', $parts),
-                1 => trim($last),
+                implode(',', $parts),
+                trim($last),
             ];
         }
 
