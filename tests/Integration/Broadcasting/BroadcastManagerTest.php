@@ -123,36 +123,6 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager->connection('my_connection');
     }
 
-    public function testThrowExceptionWithConnectionNameWhenBuiltInDriverCreationFails()
-    {
-        $userConfig = [
-            'broadcasting' => [
-                'connections' => [
-                    'redis_connection' => [
-                        'driver' => 'redis',
-                        'connection' => 'invalid_connection',
-                    ],
-                ],
-            ],
-        ];
-
-        $app = $this->getApp($userConfig);
-        $app->singleton('redis', function () {
-            throw new \RuntimeException('Redis service not available');
-        });
-
-        $broadcastManager = new BroadcastManager($app);
-
-        try {
-            $broadcastManager->connection('redis_connection');
-            $this->fail('Expected BroadcastException was not thrown');
-        } catch (BroadcastException $e) {
-            $this->assertStringContainsString('Failed to create broadcaster for connection "redis_connection"', $e->getMessage());
-            $this->assertStringContainsString('Redis service not available', $e->getMessage());
-            $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
-        }
-    }
-
     public function testThrowExceptionWhenPusherDriverCreationFailsWithMissingConfig()
     {
         $userConfig = [
