@@ -101,7 +101,7 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager->connection('alien_connection');
     }
 
-    public function testThrowExceptionWhenDriverCreationFailsWithServiceError()
+    public function testThrowExceptionWhenDriverCreationFails()
     {
         $userConfig = [
             'broadcasting' => [
