@@ -292,7 +292,11 @@ class BroadcastManager implements FactoryContract
             throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
         }
 
-        return $this->{$driverMethod}($config);
+        try {
+            return $this->{$driverMethod}($config);
+        } catch (\Throwable $e) {
+            throw new BroadcastException("Failed to create broadcaster for connection \"{$name}\" with error: {$e->getMessage()}.", 0, $e);
+        }
     }
 
     /**
