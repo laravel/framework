@@ -379,7 +379,18 @@ trait CompilesConditionals
      */
     protected function compilePushIf($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression), 2);
+        $parts = explode(',', $this->stripParentheses($expression));
+
+        /**
+         * @see https://github.com/laravel/framework/issues/57264
+         */
+        if (count($parts) > 2) {
+            $last = array_pop($parts);
+            $parts = [
+                0 => implode(',', $parts),
+                1 => trim($last),
+            ];
+        }
 
         return "<?php if({$parts[0]}): \$__env->startPush({$parts[1]}); ?>";
     }
