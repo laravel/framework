@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Config\Repository;
@@ -98,6 +99,112 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager = new BroadcastManager($app);
 
         $broadcastManager->connection('alien_connection');
+    }
+
+    public function testThrowExceptionWhenUnsupportedDriverIsUsed()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Driver [unsupported_driver] is not supported.');
+
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'my_connection' => [
+                        'driver' => 'unsupported_driver',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+
+        $broadcastManager = new BroadcastManager($app);
+
+        $broadcastManager->connection('my_connection');
+    }
+
+    public function testThrowExceptionWithConnectionNameWhenBuiltInDriverCreationFails()
+    {
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'redis_connection' => [
+                        'driver' => 'redis',
+                        'connection' => 'invalid_connection',
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+        $app->singleton('redis', function () {
+            throw new \RuntimeException('Redis service not available');
+        });
+
+        $broadcastManager = new BroadcastManager($app);
+
+        try {
+            $broadcastManager->connection('redis_connection');
+            $this->fail('Expected BroadcastException was not thrown');
+        } catch (BroadcastException $e) {
+            $this->assertStringContainsString('Failed to create broadcaster for connection "redis_connection"', $e->getMessage());
+            $this->assertStringContainsString('Redis service not available', $e->getMessage());
+            $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
+        }
+    }
+
+    public function testThrowExceptionWhenPusherDriverCreationFailsWithMissingConfig()
+    {
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'pusher_connection' => [
+                        'driver' => 'pusher',
+                        // Missing required 'key', 'secret', 'app_id' configuration
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+
+        $broadcastManager = new BroadcastManager($app);
+
+        try {
+            $broadcastManager->connection('pusher_connection');
+            $this->fail('Expected BroadcastException was not thrown');
+        } catch (BroadcastException $e) {
+            $this->assertStringContainsString('Failed to create broadcaster for connection "pusher_connection"', $e->getMessage());
+            $this->assertNotNull($e->getPrevious());
+        }
+    }
+
+    public function testThrowExceptionWhenPusherDriverCreationFailsWithNullConfig()
+    {
+        $userConfig = [
+            'broadcasting' => [
+                'connections' => [
+                    'pusher_connection' => [
+                        'driver' => 'pusher',
+                        'key' => null,
+                        'secret' => null,
+                        'app_id' => null,
+                    ],
+                ],
+            ],
+        ];
+
+        $app = $this->getApp($userConfig);
+
+        $broadcastManager = new BroadcastManager($app);
+
+        try {
+            $broadcastManager->connection('pusher_connection');
+            $this->fail('Expected BroadcastException was not thrown');
+        } catch (BroadcastException $e) {
+            $this->assertStringContainsString('Failed to create broadcaster for connection "pusher_connection"', $e->getMessage());
+            $this->assertNotNull($e->getPrevious());
+        }
     }
 
     protected function getApp(array $userConfig)
