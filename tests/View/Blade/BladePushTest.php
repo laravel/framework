@@ -70,6 +70,32 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testPushIfWithMoreThanOneCommaIsCompiled()
+    {
+        $string = '@pushIf(Str::startsWith(\'abc\', \'a\'), \'body-end\')
+test
+@endPushIf';
+
+        $expected = '<?php if(Str::startsWith(\'abc\', \'a\')): $__env->startPush(\'body-end\'); ?>
+test
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testPushIfWithCommaInStringIsCompiled()
+    {
+        $string = '@pushIf(Str::startsWith(\'abc,,,\', \'a,,,\'), \'body-end\')
+test
+@endPushIf';
+
+        $expected = '<?php if(Str::startsWith(\'abc,,,\', \'a,,,\')): $__env->startPush(\'body-end\'); ?>
+test
+<?php $__env->stopPush(); endif; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
     public function testPushIfElseIsCompiled()
     {
         $string = '@pushIf(true, \'stack\')
