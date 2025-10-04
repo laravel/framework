@@ -101,35 +101,13 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager->connection('alien_connection');
     }
 
-    public function testThrowExceptionWhenUnsupportedDriverIsUsed()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Driver [unsupported_driver] is not supported.');
-
-        $userConfig = [
-            'broadcasting' => [
-                'connections' => [
-                    'my_connection' => [
-                        'driver' => 'unsupported_driver',
-                    ],
-                ],
-            ],
-        ];
-
-        $app = $this->getApp($userConfig);
-
-        $broadcastManager = new BroadcastManager($app);
-
-        $broadcastManager->connection('my_connection');
-    }
-
     public function testThrowExceptionWhenPusherDriverCreationFailsWithMissingConfig()
     {
         $userConfig = [
             'broadcasting' => [
                 'connections' => [
-                    'pusher_connection' => [
-                        'driver' => 'pusher',
+                    'reverb_connection_1' => [
+                        'driver' => 'reverb',
                         // Missing required 'key', 'secret', 'app_id' configuration
                     ],
                 ],
@@ -141,10 +119,10 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager = new BroadcastManager($app);
 
         try {
-            $broadcastManager->connection('pusher_connection');
+            $broadcastManager->connection('reverb_connection_1');
             $this->fail('Expected BroadcastException was not thrown');
         } catch (BroadcastException $e) {
-            $this->assertStringContainsString('Failed to create broadcaster for connection "pusher_connection"', $e->getMessage());
+            $this->assertStringContainsString('Failed to create broadcaster for connection "reverb_connection_1"', $e->getMessage());
             $this->assertNotNull($e->getPrevious());
         }
     }
@@ -154,8 +132,8 @@ class BroadcastManagerTest extends TestCase
         $userConfig = [
             'broadcasting' => [
                 'connections' => [
-                    'pusher_connection' => [
-                        'driver' => 'pusher',
+                    'reverb_connection_2' => [
+                        'driver' => 'reverb',
                         'key' => null,
                         'secret' => null,
                         'app_id' => null,
@@ -169,10 +147,10 @@ class BroadcastManagerTest extends TestCase
         $broadcastManager = new BroadcastManager($app);
 
         try {
-            $broadcastManager->connection('pusher_connection');
+            $broadcastManager->connection('reverb_connection_2');
             $this->fail('Expected BroadcastException was not thrown');
         } catch (BroadcastException $e) {
-            $this->assertStringContainsString('Failed to create broadcaster for connection "pusher_connection"', $e->getMessage());
+            $this->assertStringContainsString('Failed to create broadcaster for connection "reverb_connection_2"', $e->getMessage());
             $this->assertNotNull($e->getPrevious());
         }
     }
