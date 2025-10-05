@@ -688,6 +688,28 @@ class Str
     }
 
     /**
+     * Determine if the given string is empty.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isEmpty($value)
+    {
+        return $value === '';
+    }
+
+    /**
+     * Determine if the given string is not empty.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isNotEmpty($value)
+    {
+        return $value !== '';
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
