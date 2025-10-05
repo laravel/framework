@@ -77,12 +77,12 @@ class ComposerScripts
         }
     }
 
-    /**  
-    * Collect the installed package name on the post-package-install Composer event.
-    *
-    * @param \Composer\Installer\PackageEvent $event
-    * @return void
-    */
+    /**
+     * Collect the installed package name on the post-package-install Composer event.
+     *
+     * @param \Composer\Installer\PackageEvent $event
+     * @return void
+     */
     public static function collectInstalledPackage(PackageEvent $event)
     {
         $file = self::getInstalledQueueFile($event);
