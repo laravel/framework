@@ -18,6 +18,19 @@ class TestSeeder extends Seeder
     }
 }
 
+class TestSkippedSeeder extends Seeder
+{
+    public function shouldRun(): bool
+    {
+        return false;
+    }
+
+    public function run()
+    {
+        //
+    }
+}
+
 class TestDepsSeeder extends Seeder
 {
     public function run(Mock $someDependency, $someParam = '')
@@ -45,6 +58,7 @@ class DatabaseSeederTest extends TestCase
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('shouldRun')->once()->andReturn(true);
         $child->shouldReceive('__invoke')->once();
 
         $seeder->call('ClassName');
@@ -88,5 +102,54 @@ class DatabaseSeederTest extends TestCase
         $seeder->__invoke(['test1', 'test2']);
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
+    }
+
+    public function testCallSkipsSeederWhenShouldRunReturnsFalse()
+    {
+        $seeder = new TestSeeder;
+        $seeder->setContainer($container = m::mock(Container::class));
+        $output = m::mock(OutputInterface::class);
+        $output->shouldReceive('writeln')->twice();
+        $command = m::mock(Command::class);
+        $command->shouldReceive('getOutput')->twice()->andReturn($output);
+        $seeder->setCommand($command);
+        $container->shouldReceive('make')->once()->with(TestSkippedSeeder::class)->andReturn($child = m::mock(TestSkippedSeeder::class));
+        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+        $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('shouldRun')->once()->andReturn(false);
+        $child->shouldNotReceive('__invoke');
+
+        $seeder->call(TestSkippedSeeder::class);
+    }
+
+    public function testCallRunsSeederWhenShouldRunReturnsTrue()
+    {
+        $seeder = new TestSeeder;
+        $seeder->setContainer($container = m::mock(Container::class));
+        $output = m::mock(OutputInterface::class);
+        $output->shouldReceive('writeln')->times(3);
+        $command = m::mock(Command::class);
+        $command->shouldReceive('getOutput')->times(3)->andReturn($output);
+        $seeder->setCommand($command);
+        $container->shouldReceive('make')->once()->with(TestSeeder::class)->andReturn($child = m::mock(TestSeeder::class));
+        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+        $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('shouldRun')->once()->andReturn(true);
+        $child->shouldReceive('__invoke')->once();
+
+        $seeder->call(TestSeeder::class);
+    }
+
+    public function testCallSilentlySkipsSeederWhenShouldRunReturnsFalse()
+    {
+        $seeder = new TestSeeder;
+        $seeder->setContainer($container = m::mock(Container::class));
+        $container->shouldReceive('make')->once()->with(TestSkippedSeeder::class)->andReturn($child = m::mock(TestSkippedSeeder::class));
+        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+        $child->shouldReceive('setCommand')->never();
+        $child->shouldReceive('shouldRun')->once()->andReturn(false);
+        $child->shouldNotReceive('__invoke');
+
+        $seeder->callSilent(TestSkippedSeeder::class);
     }
 }
