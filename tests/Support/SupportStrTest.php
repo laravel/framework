@@ -708,6 +708,26 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isJson([]));
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue(Str::isEmpty(''));
+        $this->assertFalse(Str::isEmpty('0'));
+        $this->assertFalse(Str::isEmpty(' '));
+        $this->assertFalse(Str::isEmpty('hello'));
+        $this->assertFalse(Str::isEmpty('false'));
+        $this->assertFalse(Str::isEmpty('null'));
+    }
+
+    public function testIsNotEmpty()
+    {
+        $this->assertFalse(Str::isNotEmpty(''));
+        $this->assertTrue(Str::isNotEmpty('0'));
+        $this->assertTrue(Str::isNotEmpty(' '));
+        $this->assertTrue(Str::isNotEmpty('hello'));
+        $this->assertTrue(Str::isNotEmpty('false'));
+        $this->assertTrue(Str::isNotEmpty('null'));
+    }
+
     public function testIsMatch()
     {
         $this->assertTrue(Str::isMatch('/.*,.*!/', 'Hello, Laravel!'));
