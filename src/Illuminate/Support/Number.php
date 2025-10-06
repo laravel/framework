@@ -217,6 +217,27 @@ class Number
     }
 
     /**
+     * Convert the given number to its bit rate equivalent.
+     *
+     * @param  int|float  $bits
+     * @param  int  $precision
+     * @param  int|null  $maxPrecision
+     * @return string
+     */
+    public static function bitRate(int|float $bits, int $precision = 0, ?int $maxPrecision = null)
+    {
+        $units = ['bps', 'Kbps', 'Mbps', 'Gbps', 'Tbps', 'Pbps', 'Ebps', 'Zbps', 'Ybps'];
+
+        $unitCount = count($units);
+
+        for ($i = 0; ($bits / 1000) > 0.9 && ($i < $unitCount - 1); $i++) {
+            $bits /= 1000;
+        }
+
+        return sprintf('%s %s', static::format($bits, $precision, $maxPrecision), $units[$i]);
+    }
+
+    /**
      * Convert the number to its human-readable equivalent.
      *
      * @param  int|float  $number

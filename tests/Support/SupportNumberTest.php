@@ -188,6 +188,29 @@ class SupportNumberTest extends TestCase
         $this->assertSame('1,024 YB', Number::fileSize(1024 ** 9));
     }
 
+    public function testBitRate()
+    {
+        $this->assertSame('0 bps', Number::bitRate(0));
+        $this->assertSame('0.00 bps', Number::bitRate(0, precision: 2));
+        $this->assertSame('1 bps', Number::bitRate(1));
+        $this->assertSame('900 bps', Number::bitRate(900));
+        $this->assertSame('1 Kbps', Number::bitRate(1000));
+        $this->assertSame('2 Kbps', Number::bitRate(2000));
+        $this->assertSame('2.00 Kbps', Number::bitRate(2000, precision: 2));
+        $this->assertSame('1.25 Kbps', Number::bitRate(1250, precision: 2));
+        $this->assertSame('1.235 Kbps', Number::bitRate(1234.56789, maxPrecision: 3));
+        $this->assertSame('1.235 Kbps', Number::bitRate(1234.56789, 3));
+        $this->assertSame('1 Mbps', Number::bitRate(1000 * 1000));
+        $this->assertSame('1 Gbps', Number::bitRate(1000 * 1000 * 1000));
+        $this->assertSame('5 Gbps', Number::bitRate(1000 * 1000 * 1000 * 5));
+        $this->assertSame('10 Tbps', Number::bitRate((1000 ** 4) * 10));
+        $this->assertSame('10 Pbps', Number::bitRate((1000 ** 5) * 10));
+        $this->assertSame('1 Ebps', Number::bitRate(1000 ** 6));
+        $this->assertSame('1 Zbps', Number::bitRate(1000 ** 7));
+        $this->assertSame('1 Ybps', Number::bitRate(1000 ** 8));
+        $this->assertSame('1,000 Ybps', Number::bitRate(1000 ** 9));
+    }
+
     public function testClamp()
     {
         $this->assertSame(2, Number::clamp(1, 2, 3));
