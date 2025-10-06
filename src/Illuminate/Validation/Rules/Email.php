@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use Closure;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -271,24 +272,16 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
         }
 
         if ($this->allowedDomains) {
-            $rules[] = function ($attribute, $value, $fail) {
-                $domain = explode('@', $value)[1];
-
-                $isAllowed = Str::of($domain)->is($this->allowedDomains, true);
-
-                if (! $isAllowed) {
+            $rules[] = function (string $attribute, mixed $value, Closure $fail): void {
+                if (! $this->addressContainsDomain($value, $this->allowedDomains)) {
                     $fail('The :attribute must be a valid email address.');
                 }
             };
         }
 
         if ($this->disallowedDomains) {
-            $rules[] = function ($attribute, $value, $fail) {
-                $domain = explode('@', $value)[1];
-
-                $isDisallowed = Str::of($domain)->is($this->disallowedDomains, true);
-
-                if ($isDisallowed) {
+            $rules[] = function (string $attribute, mixed $value, Closure $fail): void {
+                if ($this->addressContainsDomain($value, $this->disallowedDomains)) {
                     $fail('The :attribute must be a valid email address.');
                 }
             };
@@ -331,5 +324,12 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
         $this->data = $data;
 
         return $this;
+    }
+
+    private function addressContainsDomain($value, $domains)
+    {
+        $domain = explode('@', $value)[1];
+
+        return Str::of($domain)->is($domains, true);
     }
 }
