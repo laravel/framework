@@ -1114,20 +1114,18 @@ trait EnumeratesValues
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '!=':
-                case '<>':  return $retrieved != $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '===': return $retrieved === $value;
-                case '!==': return $retrieved !== $value;
-                case '<=>': return $retrieved <=> $value;
-            }
+            return match ($operator) {
+                '=', '==' => $retrieved == $value,
+                '!=', '<>' => $retrieved != $value,
+                '<' => $retrieved < $value,
+                '>' => $retrieved > $value,
+                '<=' => $retrieved <= $value,
+                '>=' => $retrieved >= $value,
+                '===' => $retrieved === $value,
+                '!==' => $retrieved !== $value,
+                '<=>' => $retrieved <=> $value,
+                default => null,
+            };
         };
     }
 
