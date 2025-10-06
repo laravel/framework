@@ -651,6 +651,28 @@ trait EnumeratesValues
     }
 
     /**
+     * Filter items where the value for the given key is true.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereTrue($key)
+    {
+        return $this->where($key, '===', true);
+    }
+
+    /**
+     * Filter items where the value for the given key is false.
+     *
+     * @param  string|null  $key
+     * @return static
+     */
+    public function whereFalse($key)
+    {
+        return $this->where($key, '===', false);
+    }
+
+    /**
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key

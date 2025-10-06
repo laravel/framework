@@ -5640,6 +5640,39 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testWhereTrue($collection)
+    {
+        $data = new $collection([
+            ['active' => true],
+            ['active' => false],
+            ['active' => true],
+            ['active' => 1],
+            ['active' => 0],
+        ]);
+
+        $this->assertSame([
+            0 => ['active' => true],
+            2 => ['active' => true],
+        ], $data->whereTrue('active')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testWhereFalse($collection)
+    {
+        $data = new $collection([
+            ['active' => true],
+            ['active' => false],
+            ['active' => true],
+            ['active' => 1],
+            ['active' => 0],
+        ]);
+
+        $this->assertSame([
+            1 => ['active' => false],
+        ], $data->whereFalse('active')->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCollect($collection)
     {
         $data = $collection::make([
