@@ -167,6 +167,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Ensure the domain of the email address matches one of the given patterns.
+     *
      * @param  array  $domains
      * @return $this
      */
@@ -178,6 +180,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Ensure the domain of the email address does not match any of the given patterns.
+     *
      * @param  array  $domains
      * @return $this
      */
