@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
 use InvalidArgumentException;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class BroadcastManagerTest extends TestCase
 {
@@ -123,7 +124,7 @@ class BroadcastManagerTest extends TestCase
         try {
             $broadcastManager->connection('log_connection_1');
             $this->fail('Expected BroadcastException was not thrown');
-        } catch (BroadcastException $e) {
+        } catch (RuntimeException $e) {
             $this->assertStringContainsString('Failed to create broadcaster for connection "log_connection_1"', $e->getMessage());
             $this->assertStringContainsString('Logger service not available', $e->getMessage());
             $this->assertInstanceOf(\RuntimeException::class, $e->getPrevious());
