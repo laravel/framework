@@ -2,13 +2,15 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use BackedEnum;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 use RuntimeException;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 abstract class Grammar extends BaseGrammar
 {
@@ -477,8 +479,8 @@ abstract class Grammar extends BaseGrammar
             return $this->getValue($value);
         }
 
-        if ($value instanceof BackedEnum) {
-            return "'".str_replace("'", "''", $value->value)."'";
+        if ($value instanceof UnitEnum) {
+            return "'".str_replace("'", "''", enum_value($value))."'";
         }
 
         return is_bool($value)

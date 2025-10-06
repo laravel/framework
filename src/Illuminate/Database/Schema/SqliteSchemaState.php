@@ -16,11 +16,11 @@ class SqliteSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
-        with($process = $this->makeProcess(
-            $this->baseCommand().' ".schema --indent"'
-        ))->setTimeout(null)->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
-            //
-        ]));
+        $process = $this->makeProcess($this->baseCommand().' ".schema --indent"')
+            ->setTimeout(null)
+            ->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+                //
+            ]));
 
         $migrations = preg_replace('/CREATE TABLE sqlite_.+?\);[\r\n]+/is', '', $process->getOutput());
 
@@ -39,9 +39,9 @@ class SqliteSchemaState extends SchemaState
      */
     protected function appendMigrationData(string $path)
     {
-        with($process = $this->makeProcess(
+        $process = $this->makeProcess(
             $this->baseCommand().' ".dump \''.$this->getMigrationTable().'\'"'
-        ))->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
+        )->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [
             //
         ]));
 

@@ -1,28 +1,32 @@
-<x-laravel-exceptions-renderer::card>
-    <div class="md:flex md:items-center md:justify-between md:gap-2">
-        <div class="min-w-0">
-            <div class="inline-block rounded-full bg-red-500/20 px-3 py-2 max-w-full text-sm font-bold leading-5 text-red-500 truncate lg:text-base dark:bg-red-500/20">
-                <span class="hidden md:inline">
-                    {{ $exception->class() }}
-                </span>
-                <span class="md:hidden">
-                    {{ implode(' ', array_slice(explode('\\', $exception->class()), -1)) }}
-                </span>
-            </div>
-            <div class="mt-4 text-lg font-semibold text-gray-900 break-words dark:text-white lg:text-2xl">
-                {{ $exception->message() }}
-            </div>
-        </div>
+@props(['exception'])
 
-        <div class="hidden text-right shrink-0 md:block md:min-w-64 md:max-w-80">
-            <div>
-                <span class="inline-block rounded-full bg-gray-200 px-3 py-2 text-sm leading-5 text-gray-900 max-w-full truncate dark:bg-gray-800 dark:text-white">
-                    {{ $exception->request()->method() }} {{ $exception->request()->httpHost() }}
-                </span>
+<div class="flex flex-col pt-8 sm:pt-16 overflow-x-auto">
+    <div class="flex flex-col gap-5 mb-8">
+        <h1 class="text-3xl font-semibold text-neutral-950 dark:text-white">{{ $exception->class() }}</h1>
+        <p class="text-xl font-light text-neutral-800 dark:text-neutral-300">
+            {{ $exception->message() }}
+        </p>
+    </div>
+
+    <div class="flex items-start gap-2 mb-8 sm:mb-16">
+        <div class="bg-white dark:bg-white/[3%] border border-neutral-200 dark:border-white/10 divide-x divide-neutral-200 dark:divide-white/10 rounded-md shadow-xs flex items-center gap-0.5">
+            <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px]">
+                <span class="text-neutral-400 dark:text-neutral-500">LARAVEL</span>
+                <span class="text-neutral-500 dark:text-neutral-300">{{ app()->version() }}</span>
             </div>
-            <div class="px-4">
-                <span class="text-sm text-gray-500 dark:text-gray-400">PHP {{ PHP_VERSION }} — Laravel {{ app()->version() }}</span>
+            <div class="flex items-center gap-1.5 h-6 px-[6px] font-mono text-[13px]">
+                <span class="text-neutral-400 dark:text-neutral-500">PHP</span>
+                <span class="text-neutral-500 dark:text-neutral-300">{{ PHP_VERSION }}</span>
             </div>
         </div>
+        <x-laravel-exceptions-renderer::badge type="error">
+            <x-laravel-exceptions-renderer::icons.alert class="w-2.5 h-2.5" />
+            UNHANDLED
+        </x-laravel-exceptions-renderer::badge>
+        <x-laravel-exceptions-renderer::badge type="error" variant="solid">
+            CODE {{ $exception->code() }}
+        </x-laravel-exceptions-renderer::badge>
     </div>
-</x-laravel-exceptions-renderer::card>
+
+    <x-laravel-exceptions-renderer::request-url :$exception :request="$exception->request()" class="relative z-50" />
+</div>

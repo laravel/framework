@@ -246,7 +246,7 @@ class TestResponse implements ArrayAccess
     }
 
     /**
-     * Assert whether the response is redirecting back to the previous location and the session has the given errors.
+     * Assert whether the response is redirecting back to the previous location with the given errors in the session.
      *
      * @param  string|array  $keys
      * @param  mixed  $format
@@ -1711,9 +1711,9 @@ class TestResponse implements ArrayAccess
                 "Session has unexpected key [{$key}]."
             );
         } elseif ($value instanceof Closure) {
-            PHPUnit::withResponse($this)->assertTrue($value($this->session()->get($key)));
+            PHPUnit::withResponse($this)->assertFalse($value($this->session()->get($key)));
         } else {
-            PHPUnit::withResponse($this)->assertEquals($value, $this->session()->get($key));
+            PHPUnit::withResponse($this)->assertNotEquals($value, $this->session()->get($key));
         }
 
         return $this;

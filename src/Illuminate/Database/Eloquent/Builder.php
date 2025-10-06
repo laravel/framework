@@ -243,6 +243,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Remove all global scopes except the given scopes.
+     *
+     * @param  array  $scopes
+     * @return $this
+     */
+    public function withoutGlobalScopesExcept(array $scopes = [])
+    {
+        $this->withoutGlobalScopes(
+            array_diff(array_keys($this->scopes), $scopes)
+        );
+
+        return $this;
+    }
+
+    /**
      * Get an array of global scopes that were removed from the query.
      *
      * @return array
