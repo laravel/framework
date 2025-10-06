@@ -528,22 +528,7 @@ class PendingRequest
     public function withUrlParameters(array $parameters = [])
     {
         return tap($this, function () use ($parameters) {
-            $this->urlParameters = $parameters;
-        });
-    }
-
-    /**
-     * Merge the given URL parameters into the existing map.
-     *
-     * Later values win on key collisions. Nested arrays are replaced recursively.
-     *
-     * @param  array  $parameters
-     * @return $this
-     */
-    public function mergeUrlParameters(array $parameters = [])
-    {
-        return tap($this, function () use ($parameters) {
-            $this->urlParameters = array_replace_recursive($this->urlParameters, $parameters);
+            $this->urlParameters = array_merge($this->urlParameters, $parameters);
         });
     }
 
