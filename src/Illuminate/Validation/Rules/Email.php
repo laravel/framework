@@ -273,7 +273,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
         if ($this->allowedDomains) {
             $rules[] = function (string $attribute, mixed $value, Closure $fail): void {
-                if (! $this->addressContainsDomain($value, $this->allowedDomains)) {
+                if (! $this->domainMatchesPattern($value, $this->allowedDomains)) {
                     $fail('The :attribute must be a valid email address.');
                 }
             };
@@ -281,7 +281,7 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
 
         if ($this->disallowedDomains) {
             $rules[] = function (string $attribute, mixed $value, Closure $fail): void {
-                if ($this->addressContainsDomain($value, $this->disallowedDomains)) {
+                if ($this->domainMatchesPattern($value, $this->disallowedDomains)) {
                     $fail('The :attribute must be a valid email address.');
                 }
             };
@@ -326,7 +326,14 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
         return $this;
     }
 
-    private function addressContainsDomain($value, $domains)
+    /**
+     * Determine whether the email address matches one of the given domains.
+     *
+     * @param  string  $value
+     * @param  string[]  $domains
+     * @return bool
+     */
+    protected function domainMatchesPattern($value, $domains)
     {
         $domain = explode('@', $value)[1];
 
