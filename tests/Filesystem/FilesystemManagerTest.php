@@ -217,6 +217,19 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    public function testCustomDriverClosureBoundObjectIsFilesystemManager()
+    {
+        $manager = new FilesystemManager(tap(new Application, function ($app) {
+            $app['config'] = [
+                'filesystems.disks.'.__CLASS__ => [
+                    'driver' => __CLASS__,
+                ],
+            ];
+        }));
+        $manager->extend(__CLASS__, fn () => $this);
+        $this->assertSame($manager, $manager->disk(__CLASS__));
+    }
+
     // public function testKeepTrackOfAdapterDecoration()
     // {
     //     try {
