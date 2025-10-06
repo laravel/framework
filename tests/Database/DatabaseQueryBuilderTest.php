@@ -2020,6 +2020,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testBasicWhereTrue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereTrue('is_active');
+        $this->assertSame('select * from "users" where "is_active" = ?', $builder->toSql());
+        $this->assertEquals([0 => true], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereTrue('is_active');
+        $this->assertSame('select * from "users" where "id" = ? or "is_active" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => true], $builder->getBindings());
+    }
+
+    public function testBasicWhereFalse()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereFalse('is_active');
+        $this->assertSame('select * from "users" where "is_active" = ?', $builder->toSql());
+        $this->assertEquals([0 => false], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereFalse('is_active');
+        $this->assertSame('select * from "users" where "id" = ? or "is_active" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => false], $builder->getBindings());
+    }
+
     public function testGroupBys()
     {
         $builder = $this->getBuilder();

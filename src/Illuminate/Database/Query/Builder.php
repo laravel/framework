@@ -1382,6 +1382,52 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where true" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereTrue($column, $boolean = 'and')
+    {
+        return $this->where($column, '=', true, $boolean);
+    }
+
+    /**
+     * Add an "or where true" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function orWhereTrue($column)
+    {
+        return $this->whereTrue($column, 'or');
+    }
+
+    /**
+     * Add a "where false" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereFalse($column, $boolean = 'and')
+    {
+        return $this->where($column, '=', false, $boolean);
+    }
+
+    /**
+     * Add an "or where false" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @return $this
+     */
+    public function orWhereFalse($column)
+    {
+        return $this->whereFalse($column, 'or');
+    }
+
+    /**
      * Add a where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
