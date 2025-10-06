@@ -533,6 +533,21 @@ class PendingRequest
     }
 
     /**
+     * Merge the given URL parameters into the existing map.
+     *
+     * Later values win on key collisions. Nested arrays are replaced recursively.
+     *
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function mergeUrlParameters(array $parameters = [])
+    {
+        return tap($this, function () use ($parameters) {
+            $this->urlParameters = array_replace_recursive($this->urlParameters, $parameters);
+        });
+    }
+
+    /**
      * Specify the cookies that should be included with the request.
      *
      * @param  array  $cookies
