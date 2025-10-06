@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Broadcasting;
 
 use Illuminate\Broadcasting\BroadcastEvent;
-use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Broadcasting\BroadcastManager;
 use Illuminate\Broadcasting\UniqueBroadcastEvent;
 use Illuminate\Config\Repository;
