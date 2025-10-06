@@ -7,6 +7,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
@@ -21,6 +22,8 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     public bool $nativeValidationWithUnicodeAllowed = false;
     public bool $rfcCompliant = false;
     public bool $strictRfcCompliant = false;
+    private array $allowedDomains = [];
+    private array $disallowedDomains = [];
 
     /**
      * The validator performing the validation.
@@ -163,6 +166,28 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * @param  array  $domains
+     * @return $this
+     */
+    public function domainIs($domains)
+    {
+        $this->allowedDomains = $domains;
+
+        return $this;
+    }
+
+    /**
+     * @param  array  $domains
+     * @return $this
+     */
+    public function domainIsNot($domains)
+    {
+        $this->disallowedDomains = $domains;
+
+        return $this;
+    }
+
+    /**
      * Specify additional validation rules that should be merged with the default rules during validation.
      *
      * @param  string|array  $rules
@@ -243,6 +268,30 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
             $rules = ['email:'.implode(',', $rules)];
         } else {
             $rules = ['email'];
+        }
+
+        if ($this->allowedDomains) {
+            $rules[] = function ($attribute, $value, $fail) {
+                $domain = explode('@', $value)[1];
+
+                $isAllowed = Str::of($domain)->is($this->allowedDomains, true);
+
+                if (! $isAllowed) {
+                    $fail('The :attribute must be a valid email address.');
+                }
+            };
+        }
+
+        if ($this->disallowedDomains) {
+            $rules[] = function ($attribute, $value, $fail) {
+                $domain = explode('@', $value)[1];
+
+                $isDisallowed = Str::of($domain)->is($this->disallowedDomains, true);
+
+                if ($isDisallowed) {
+                    $fail('The :attribute must be a valid email address.');
+                }
+            };
         }
 
         return array_merge(array_filter($rules), $this->customRules);

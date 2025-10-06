@@ -876,6 +876,70 @@ class ValidationEmailRuleTest extends TestCase
         );
     }
 
+    public function testDomainIs()
+    {
+        $this->passes(
+            (new Email())->domainIs(['example.com', 'test.com']),
+            'passes@example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIs(['*']),
+            'passes@example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIs(['*example.com']),
+            'passes@example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIs(['*ex*le.com']),
+            'passes@subdomain.example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIs(['*example.com']),
+            'passes@subdomain.example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIs(['example*']),
+            'passes@example.com',
+        );
+
+        $this->fails(
+            (new Email())->domainIs(['test.com']),
+            'fails@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
+
+    public function testDomainIsNot()
+    {
+        $this->passes(
+            (new Email())->domainIsNot(['test.com', 'example.org']),
+            'passes@example.com',
+        );
+
+        $this->passes(
+            (new Email())->domainIsNot(['*test.com']),
+            'passes@example.com',
+        );
+
+        $this->fails(
+            (new Email())->domainIsNot(['example.com']),
+            'passes@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+
+        $this->fails(
+            (new Email())->domainIsNot(['example*']),
+            'passes@example.com',
+            ['The '.self::ATTRIBUTE_REPLACED.' must be a valid email address.']
+        );
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();
