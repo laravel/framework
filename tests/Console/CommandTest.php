@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -214,5 +215,119 @@ class CommandTest extends TestCase
         $command->setOutput($output);
 
         $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
+    }
+
+    public function testConsoleComponentsUseErrorOutputWhenConsoleOutputInterfaceIsAvailable()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+                $this->components->task('Test task', fn () => true);
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([]);
+        $output = new ConsoleOutput;
+        
+        $mainOutputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')
+            ->with(OutputStyle::class, ['input' => $input, 'output' => $output])
+            ->andReturn($mainOutputStyle);
+
+        $errorOutputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')
+            ->with(OutputStyle::class, ['input' => $input, 'output' => $output->getErrorOutput()])
+            ->andReturn($errorOutputStyle);
+
+        $factory = m::mock(Factory::class);
+        $application->shouldReceive('make')
+            ->with(Factory::class, ['output' => $errorOutputStyle])
+            ->andReturn($factory);
+
+        $factory->shouldReceive('task')
+            ->with('Test task', m::type('callable'))
+            ->once();
+
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command) {
+            $command->handle();
+        });
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+
+        $command->run($input, $output);
+    }
+
+    public function testConsoleComponentsUseMainOutputWhenConsoleOutputInterfaceIsNotAvailable()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+                $this->components->task('Test task', fn () => true);
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([]);
+        $output = new NullOutput;
+        
+        $mainOutputStyle = m::mock(OutputStyle::class);
+        $application->shouldReceive('make')
+            ->with(OutputStyle::class, ['input' => $input, 'output' => $output])
+            ->andReturn($mainOutputStyle);
+
+        $factory = m::mock(Factory::class);
+        $application->shouldReceive('make')
+            ->with(Factory::class, ['output' => $mainOutputStyle])
+            ->andReturn($factory);
+
+        $factory->shouldReceive('task')
+            ->with('Test task', m::type('callable'))
+            ->once();
+
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command) {
+            $command->handle();
+        });
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+
+        $command->run($input, $output);
+    }
+
+    public function testConsoleComponentsUseMainOutputWhenOutputIsAlreadyOutputStyle()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+                $this->components->task('Test task', fn () => true);
+            }
+        };
+
+        $application = m::mock(Application::class);
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([]);
+        $existingOutputStyle = m::mock(OutputStyle::class);
+        
+        $factory = m::mock(Factory::class);
+        $application->shouldReceive('make')
+            ->with(Factory::class, ['output' => $existingOutputStyle])
+            ->andReturn($factory);
+
+        $factory->shouldReceive('task')
+            ->with('Test task', m::type('callable'))
+            ->once();
+
+        $application->shouldReceive('call')->with([$command, 'handle'])->andReturnUsing(function () use ($command) {
+            $command->handle();
+        });
+        $application->shouldReceive('runningUnitTests')->andReturn(true);
+
+        $command->run($input, $existingOutputStyle);
     }
 }

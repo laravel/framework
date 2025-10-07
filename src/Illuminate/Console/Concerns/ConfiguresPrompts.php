@@ -29,11 +29,11 @@ trait ConfiguresPrompts
     {
         Prompt::setOutput($this->output);
 
-        Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests());
+        Prompt::interactive(($input->isInteractive() && defined('STDIN') && stream_isatty(STDIN)) || (method_exists($this->laravel, 'runningUnitTests') && $this->laravel->runningUnitTests()));
 
         Prompt::validateUsing(fn (Prompt $prompt) => $this->validatePrompt($prompt->value(), $prompt->validate));
 
-        Prompt::fallbackWhen(windows_os() || $this->laravel->runningUnitTests());
+        Prompt::fallbackWhen(windows_os() || (method_exists($this->laravel, 'runningUnitTests') && $this->laravel->runningUnitTests()));
 
         TextPrompt::fallbackUsing(fn (TextPrompt $prompt) => $this->promptUntilValid(
             fn () => $this->components->ask($prompt->label, $prompt->default ?: null) ?? '',
