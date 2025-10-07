@@ -17,7 +17,6 @@ use UnexpectedValueException;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
-use function PHPUnit\Framework\never;
 
 /**
  * @template TKey of array-key
