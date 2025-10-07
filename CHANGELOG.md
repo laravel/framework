@@ -1,6 +1,26 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.32.5...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.33.0...12.x)
+
+## [v12.33.0](https://github.com/laravel/framework/compare/v12.32.5...v12.33.0) - 2025-10-07
+
+* Fix compiling queries that use orderByRaw with expressions by [@LukeTowers](https://github.com/LukeTowers) in https://github.com/laravel/framework/pull/57228
+* [12.x] Narrow type after `Str::is*(...)` check by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/57230
+* [12.x] Fix invalid docblock by [@tm1000](https://github.com/tm1000) in https://github.com/laravel/framework/pull/57240
+* [12.x] Refactor switch to match by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/57236
+* [12.x] Refactor switch to match by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57237
+* [12.x] Fix rounded issue in exception frame component by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57239
+* [12.x] Ensure calling job within a group works as expected by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57224
+* fix: remove duplicated word in `Str::apa` method by [@balboacodes](https://github.com/balboacodes) in https://github.com/laravel/framework/pull/57254
+* refactor: add |null in docblock by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57253
+* [12.x] Improve `php artisan config:cache` and `php artisan optimize` error messages for non-serializable values by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/57249
+* [12.x] Ensure cookie lifetime matches session lifetime in StartSession middleware by [@michaelcontento](https://github.com/michaelcontento) in https://github.com/laravel/framework/pull/57266
+* Run tests on PostgreSQL version 18 by [@JurianArie](https://github.com/JurianArie) in https://github.com/laravel/framework/pull/57232
+* [12x.] reduce repeated inserts in tests by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57273
+* [12.x] Fix using pushIf blade directive with complex conditions (#57264) by [@hosni](https://github.com/hosni) in https://github.com/laravel/framework/pull/57274
+* [12.x] Add Stringable::doesntContain() to match API symmetry by [@michaelcontento](https://github.com/michaelcontento) in https://github.com/laravel/framework/pull/57279
+* [12.x] Improve BroadcastManager error messages when trying to get a Broadcaster by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/57275
+* [12.x] HTTP Client: add mergeUrlParameters() to combine URL parameters without overwriting by [@leek](https://github.com/leek) in https://github.com/laravel/framework/pull/57282
 
 ## [v12.32.5](https://github.com/laravel/framework/compare/v12.32.4...v12.32.5) - 2025-09-30
 
