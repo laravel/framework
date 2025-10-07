@@ -28,6 +28,7 @@ trait ResolvesDumpSource
         'vscode-remote' => 'vscode://vscode-remote/{file}:{line}',
         'vscodium' => 'vscodium://file/{file}:{line}',
         'xdebug' => 'xdebug://{file}@{line}',
+        'zed' => 'zed://file/{file}:{line}',
     ];
 
     /**
