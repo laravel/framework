@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "illuminate/collections": "^13.0",
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
