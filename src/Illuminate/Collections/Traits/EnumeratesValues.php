@@ -17,6 +17,7 @@ use UnexpectedValueException;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
+use function PHPUnit\Framework\never;
 
 /**
  * @template TKey of array-key
@@ -1115,7 +1116,6 @@ trait EnumeratesValues
             }
 
             return match ($operator) {
-                '=', '==' => $retrieved == $value,
                 '!=', '<>' => $retrieved != $value,
                 '<' => $retrieved < $value,
                 '>' => $retrieved > $value,
@@ -1124,7 +1124,7 @@ trait EnumeratesValues
                 '===' => $retrieved === $value,
                 '!==' => $retrieved !== $value,
                 '<=>' => $retrieved <=> $value,
-                default => null,
+                default => $retrieved == $value,
             };
         };
     }
