@@ -64,7 +64,7 @@ class Connector
     {
         return version_compare(phpversion(), '8.4.0', '<')
             ? new PDO($dsn, $username, $password, $options)
-            : PDO::connect($dsn, $username, $password, $options); /** @phpstan-ignore staticMethod.notFound (PHP 8.4) */
+            : PDO::connect($dsn, $username, $password, $options);
     }
 
     /**
