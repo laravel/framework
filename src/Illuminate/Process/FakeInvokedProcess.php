@@ -296,12 +296,12 @@ class FakeInvokedProcess implements InvokedProcessContract
     {
         $shouldStop = false;
 
-        $this->outputHandler = $output 
+        $this->outputHandler = $output
             ? function ($type, $buffer) use ($output, &$shouldStop) {
                 $shouldStop = call_user_func($output, $type, $buffer);
-            } 
-            : $this->outputHandler;
-        
+            }
+        : $this->outputHandler;
+
         if (! $this->outputHandler) {
             $this->remainingRunIterations = 0;
 
