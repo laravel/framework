@@ -1761,9 +1761,9 @@ class FoundationViteTest extends TestCase
         }
     }
 
-    protected function makeAsset($asset, $content)
+    protected function makeAsset($asset, $content, $buildDir = 'build')
     {
-        $path = public_path('build/assets');
+        $path = public_path($buildDir.'/assets');
 
         if (! file_exists($path)) {
             mkdir($path, recursive: true);
@@ -1772,9 +1772,9 @@ class FoundationViteTest extends TestCase
         file_put_contents($path.'/'.$asset, $content);
     }
 
-    protected function cleanAsset($asset)
+    protected function cleanAsset($asset, $buildDir = 'build')
     {
-        $path = public_path('build/assets');
+        $path = public_path($buildDir.'/assets');
 
         unlink($path.$asset);
 
