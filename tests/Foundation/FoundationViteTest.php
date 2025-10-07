@@ -705,7 +705,7 @@ class FoundationViteTest extends TestCase
             ],
         ], $buildDir = Str::random());
         $vite = app(Vite::class)->useBuildDirectory($buildDir);
-        $this->makeAsset('/assets/style.css', 'some content');
+        $this->makeAsset('/style.css', 'some content', $buildDir);
 
         // default behaviour: exception caused by appended version param
         $this->assertThrows(fn () => $vite->content('resources/style.css'), ViteException::class);
@@ -721,6 +721,7 @@ class FoundationViteTest extends TestCase
 
         $this->assertThrows(fn () => $vite->content('resources/style.css'), ViteException::class);
 
+        $this->cleanAsset('/style.css', $buildDir);
         $this->cleanViteManifest($buildDir);
     }
 
