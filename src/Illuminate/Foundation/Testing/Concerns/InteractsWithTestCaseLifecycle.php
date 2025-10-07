@@ -184,6 +184,9 @@ trait InteractsWithTestCaseLifecycle
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
         Sleep::fake(false);
+        Str::createRandomStringsNormally();
+        Str::createUlidsNormally();
+        Str::createUuidsNormally();
         TrimStrings::flushState();
         TrustProxies::flushState();
         TrustHosts::flushState();
