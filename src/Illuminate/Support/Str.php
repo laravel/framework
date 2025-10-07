@@ -2089,7 +2089,6 @@ class Str
         static::$studlyCache = [];
     }
 
-
     /**
      * Return all factory functions to their default state.
      *
