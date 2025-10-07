@@ -1112,7 +1112,7 @@ class Str
     /**
      * Set the callable that will be used to generate random strings.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(int): string)|null  $factory
      * @return void
      */
     public static function createRandomStringsUsing(?callable $factory = null)
@@ -1913,7 +1913,7 @@ class Str
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $factory
      * @return void
      */
     public static function createUuidsUsing(?callable $factory = null)
@@ -1925,7 +1925,7 @@ class Str
      * Set the sequence that will be used to generate UUIDs.
      *
      * @param  array  $sequence
-     * @param  callable|null  $whenMissing
+     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $whenMissing
      * @return void
      */
     public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
@@ -2020,7 +2020,7 @@ class Str
     /**
      * Set the callable that will be used to generate ULIDs.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(): \Symfony\Component\Uid\Ulid)|null  $factory
      * @return void
      */
     public static function createUlidsUsing(?callable $factory = null)
@@ -2032,7 +2032,7 @@ class Str
      * Set the sequence that will be used to generate ULIDs.
      *
      * @param  array  $sequence
-     * @param  callable|null  $whenMissing
+     * @param  (callable(): \Symfony\Component\Uid\Ulid)|null  $whenMissing
      * @return void
      */
     public static function createUlidsUsingSequence(array $sequence, $whenMissing = null)
