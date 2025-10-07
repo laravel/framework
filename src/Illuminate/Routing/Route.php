@@ -1399,7 +1399,8 @@ class Route
 
         $this->compileRoute();
 
-        unset($this->router, $this->container);
+        $this->container = null;
+        $this->router = null;
     }
 
     /**
