@@ -711,7 +711,7 @@ class FoundationViteTest extends TestCase
         $this->assertThrows(fn () => $vite->content('resources/style.css'), ViteException::class);
 
         // custom behaviour: works because we strip the version param
-        $vite->createPublicPathsUsing(fn ($path) => Str::before($path, '?'));
+        $vite->createPublicPathsUsing(fn ($path) => public_path(Str::before($path, '?')));
 
         $this->assertDoesntThrow(fn () => $vite->content('resources/style.css'));
         $this->assertSame('some content', $vite->content('resources/style.css'));
