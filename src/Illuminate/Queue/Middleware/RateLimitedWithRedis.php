@@ -93,9 +93,14 @@ class RateLimitedWithRedis extends RateLimited
      *
      * @return void
      */
-    public function __wakeup()
+    public function __unserialize($data)
     {
-        parent::__wakeup();
+        foreach ($data as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->{$property} = $value;
+            }
+        }
+        parent::__unserialize($data);
 
         $this->redis = Container::getInstance()->make(Redis::class);
     }

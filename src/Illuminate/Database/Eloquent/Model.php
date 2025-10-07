@@ -2602,7 +2602,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return array
      */
-    public function __sleep()
+    public function __serialize()
     {
         $this->mergeAttributesFromCachedCasts();
 
@@ -2611,7 +2611,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
 
-        return array_keys(get_object_vars($this));
+        return get_object_vars($this);
     }
 
     /**
@@ -2619,8 +2619,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @return void
      */
-    public function __wakeup()
+    public function __unserialize($data)
     {
+        foreach ($data as $property => $value) {
+            if (property_exists($this, $property)) {
+                $this->{$property} = $value;
+            }
+        }
         $this->bootIfNotBooted();
 
         $this->initializeTraits();
