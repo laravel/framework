@@ -1240,7 +1240,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         // Convert decrements to negative increments
         $negativeIncrements = collect($columns)
-            ->mapWithKeys(fn ($amount, $column) => [$column => -abs($amount)])
+            ->mapWithKeys(fn (float|int|string $amount, string $column) => [$column => -abs($amount)])
             ->all();
 
         return $this->incrementEach($negativeIncrements, $extra, $scoped);
