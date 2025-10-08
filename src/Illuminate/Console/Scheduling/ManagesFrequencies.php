@@ -326,6 +326,16 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run at midday (12:00 PM).
+     *
+     * @return $this
+     */
+    public function midday()
+    {
+        return $this->hourBasedSchedule(0, 12);
+    }
+
+    /**
      * Schedule the command at a given time.
      *
      * @param  string  $time

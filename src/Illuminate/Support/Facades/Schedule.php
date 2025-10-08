@@ -59,6 +59,7 @@ use Illuminate\Console\Scheduling\Schedule as ConsoleSchedule;
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes daily()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes at(string $time)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes dailyAt(string $time)
+ * @method static \Illuminate\Console\Scheduling\PendingEventAttributes midday()
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes twiceDaily(int $first = 1, int $second = 13)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes twiceDailyAt(int $first = 1, int $second = 13, int $offset = 0)
  * @method static \Illuminate\Console\Scheduling\PendingEventAttributes weekdays()
