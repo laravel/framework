@@ -22,6 +22,7 @@ trait ResolvesDumpSource
         'phpstorm' => 'phpstorm://open?file={file}&line={line}',
         'sublime' => 'subl://open?url=file://{file}&line={line}',
         'textmate' => 'txmt://open?url=file://{file}&line={line}',
+        'trae' => 'trae://file/{file}:{line}',
         'vscode' => 'vscode://file/{file}:{line}',
         'vscode-insiders' => 'vscode-insiders://file/{file}:{line}',
         'vscode-insiders-remote' => 'vscode-insiders://vscode-remote/{file}:{line}',
