@@ -94,10 +94,18 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
+        $input = file_get_contents($this->laravel->environmentFilePath());
+
+        $currentKey = $this->laravel['config']['app.key'];
+
+        if (strlen($currentKey) !== 0) {
+            $input = $this->moveToPreviousKeys($input, $currentKey);
+        }
+
         $replaced = preg_replace(
             $this->keyReplacementPattern(),
             'APP_KEY='.$key,
-            $input = file_get_contents($this->laravel->environmentFilePath())
+            $input
         );
 
         if ($replaced === $input || $replaced === null) {
@@ -109,6 +117,40 @@ class KeyGenerateCommand extends Command
         file_put_contents($this->laravel->environmentFilePath(), $replaced);
 
         return true;
+    }
+
+    /**
+     * Move the current APP_KEY to APP_PREVIOUS_KEYS.
+     *
+     * @param  string  $envContent
+     * @param  string  $currentKey
+     * @return string
+     */
+    protected function moveToPreviousKeys($envContent, $currentKey)
+    {
+        preg_match('/^APP_PREVIOUS_KEYS=(.*)$/m', $envContent, $matches);
+
+        $existingPreviousKeys = isset($matches[1]) ? trim($matches[1]) : '';
+
+        $previousKeysArray = array_filter(explode(',', $existingPreviousKeys));
+        $previousKeysArray[] = $currentKey;
+        $newPreviousKeys = implode(',', $previousKeysArray);
+
+        if (preg_match('/^APP_PREVIOUS_KEYS=/m', $envContent)) {
+            $envContent = preg_replace(
+                '/^APP_PREVIOUS_KEYS=.*$/m',
+                'APP_PREVIOUS_KEYS='.$newPreviousKeys,
+                $envContent
+            );
+        } else {
+            $envContent = preg_replace(
+                '/^(APP_KEY=.*$)/m',
+                "$1\nAPP_PREVIOUS_KEYS=".$newPreviousKeys,
+                $envContent
+            );
+        }
+
+        return $envContent;
     }
 
     /**
