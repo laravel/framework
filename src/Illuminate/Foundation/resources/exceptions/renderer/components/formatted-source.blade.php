@@ -19,5 +19,5 @@
     language="php"
     truncate
     class="text-xs min-w-0"
-    data-tippy-content="{{ $source }}"
+    data-tippy-content="{!! nl2br(e($source)) !!}"
 />
