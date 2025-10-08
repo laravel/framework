@@ -98,7 +98,7 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
      *
      * @return \Illuminate\Contracts\Cache\Repository
      */
-    public function getCache()
+    public function getCache(): CacheContract
     {
         return $this->cache;
     }

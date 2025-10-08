@@ -51,7 +51,7 @@ class PruneStaleTagsCommand extends Command
      *
      * @return array
      */
-    protected function getArguments()
+    protected function getArguments(): array
     {
         return [
             ['store', InputArgument::OPTIONAL, 'The name of the store you would like to prune tags from'],

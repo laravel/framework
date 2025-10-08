@@ -62,7 +62,7 @@ class EncryptedStore extends Store
      *
      * @return \Illuminate\Contracts\Encryption\Encrypter
      */
-    public function getEncrypter()
+    public function getEncrypter(): EncrypterContract
     {
         return $this->encrypter;
     }

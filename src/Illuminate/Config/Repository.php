@@ -36,7 +36,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @return bool
      */
-    public function has($key)
+    public function has($key): bool
     {
         return Arr::has($this->items, $key);
     }
@@ -48,7 +48,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $default
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get($key, $default = null): mixed
     {
         if (is_array($key)) {
             return $this->getMany($key);
@@ -63,7 +63,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  array<string|int,mixed>  $keys
      * @return array<string,mixed>
      */
-    public function getMany($keys)
+    public function getMany($keys): array
     {
         $config = [];
 
@@ -197,7 +197,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function set($key, $value = null)
+    public function set($key, $value = null): void
     {
         $keys = is_array($key) ? $key : [$key => $value];
 
@@ -213,7 +213,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function prepend($key, $value)
+    public function prepend($key, $value): void
     {
         $array = $this->get($key, []);
 
@@ -229,7 +229,7 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  mixed  $value
      * @return void
      */
-    public function push($key, $value)
+    public function push($key, $value): void
     {
         $array = $this->get($key, []);
 
@@ -243,7 +243,7 @@ class Repository implements ArrayAccess, ConfigContract
      *
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->items;
     }

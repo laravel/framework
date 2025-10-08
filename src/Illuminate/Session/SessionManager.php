@@ -221,7 +221,7 @@ class SessionManager extends Manager
      *
      * @return bool
      */
-    public function shouldBlock()
+    public function shouldBlock(): bool
     {
         return $this->config->get('session.block', false);
     }
@@ -231,7 +231,7 @@ class SessionManager extends Manager
      *
      * @return string|null
      */
-    public function blockDriver()
+    public function blockDriver(): ?string
     {
         return $this->config->get('session.block_store');
     }
@@ -241,7 +241,7 @@ class SessionManager extends Manager
      *
      * @return int
      */
-    public function defaultRouteBlockLockSeconds()
+    public function defaultRouteBlockLockSeconds(): int
     {
         return $this->config->get('session.block_lock_seconds', 10);
     }
@@ -251,7 +251,7 @@ class SessionManager extends Manager
      *
      * @return int
      */
-    public function defaultRouteBlockWaitSeconds()
+    public function defaultRouteBlockWaitSeconds(): int
     {
         return $this->config->get('session.block_wait_seconds', 10);
     }
@@ -261,7 +261,7 @@ class SessionManager extends Manager
      *
      * @return array
      */
-    public function getSessionConfig()
+    public function getSessionConfig(): array
     {
         return $this->config->get('session');
     }
@@ -271,7 +271,7 @@ class SessionManager extends Manager
      *
      * @return string|null
      */
-    public function getDefaultDriver()
+    public function getDefaultDriver(): ?string
     {
         return $this->config->get('session.driver');
     }
@@ -282,7 +282,7 @@ class SessionManager extends Manager
      * @param  string  $name
      * @return void
      */
-    public function setDefaultDriver($name)
+    public function setDefaultDriver($name): void
     {
         $this->config->set('session.driver', $name);
     }
