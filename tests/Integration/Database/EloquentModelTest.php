@@ -35,13 +35,15 @@ class EloquentModelTest extends DatabaseTestCase
         });
     }
 
-    /** ----------------------------------------------------------------
-     *  Existing tests
-     *  ---------------------------------------------------------------- */
     public function testUserCanUpdateNullableDate()
     {
-        $user = TestModel1::create(['nullable_date' => null]);
-        $user->fill(['nullable_date' => $now = Carbon::now()]);
+        $user = TestModel1::create([
+            'nullable_date' => null,
+        ]);
+
+        $user->fill([
+            'nullable_date' => $now = Carbon::now(),
+        ]);
         $this->assertTrue($user->isDirty('nullable_date'));
 
         $user->save();
@@ -55,12 +57,26 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+
         $user->name = $overrideName = Str::random();
 
         $this->assertEquals(['name' => $overrideName], $user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+
         $user->save();
+
+        $this->assertEmpty($user->getDirty());
         $this->assertEquals(['name' => $overrideName], $user->getChanges());
         $this->assertEquals(['name' => $originalName], $user->getPrevious());
+        $this->assertTrue($user->wasChanged());
+        $this->assertTrue($user->wasChanged('name'));
     }
 
     public function testDiscardChanges()
@@ -69,12 +85,34 @@ class EloquentModelTest extends DatabaseTestCase
             'name' => $originalName = Str::random(), 'title' => Str::random(),
         ]);
 
+        $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+
         $user->name = $overrideName = Str::random();
+
+        $this->assertEquals(['name' => $overrideName], $user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->wasChanged());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($overrideName, $user->getAttribute('name'));
+
         $user->discardChanges();
 
-        $this->assertSame($originalName, $user->name);
+        $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
+        $this->assertSame($originalName, $user->getOriginal('name'));
+        $this->assertSame($originalName, $user->getAttribute('name'));
+
         $user->save();
         $this->assertFalse($user->wasChanged());
+        $this->assertEmpty($user->getChanges());
+        $this->assertEmpty($user->getPrevious());
     }
 
     public function testInsertRecordWithReservedWordFieldName()
@@ -109,9 +147,6 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
     }
 
-    /** ----------------------------------------------------------------
-     *  New incrementEach / decrementEach tests
-     *  ---------------------------------------------------------------- */
     public function testIncrementEachOnExistingModel()
     {
         $model = TestIncrementEachModel::create(['points' => 5, 'views' => 10, 'likes' => 2]);
@@ -185,19 +220,8 @@ class EloquentModelTest extends DatabaseTestCase
         $this->assertEquals([8, 17], [$first->fresh()->points, $first->fresh()->views]);
         $this->assertEquals([5, 5], [$second->fresh()->points, $second->fresh()->views]);
     }
-
-    protected function tearDown(): void
-    {
-        \Illuminate\Database\Eloquent\Model::clearBootedModels();
-        Schema::dropIfExists('test_increment_each');
-        Schema::dropIfExists('actions');
-        parent::tearDown();
-    }
 }
 
-/** ----------------------------------------------------------------
- *  Helper Models
- *  ---------------------------------------------------------------- */
 class TestModel1 extends Model
 {
     public $table = 'test_model1';
