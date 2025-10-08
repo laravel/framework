@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
 use Orchestra\Testbench\TestCase;
+use function Orchestra\Testbench\package_path;
 
 class RenderBladeFilesTest extends TestCase
 {
@@ -24,8 +25,7 @@ class RenderBladeFilesTest extends TestCase
             public function source() { return "Foo::bar(1)\nAnother line"; }
         };
 
-        $root = realpath(__DIR__.'/../../../..');
-        $path = $root.'/src/Illuminate/Foundation/resources/exceptions/renderer/components/formatted-source.blade.php';
+        $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/formatted-source.blade.php');
 
         $html = (string) $this->app['view']->file($path, ['frame' => $frame])->render();
 
@@ -38,8 +38,7 @@ class RenderBladeFilesTest extends TestCase
         $sql = "SELECT * FROM tests\nWHERE id = 1";
         $queries = [[ 'connectionName' => 'mysql', 'sql' => $sql, 'time' => 1.23 ]];
 
-        $root = realpath(__DIR__.'/../../../..');
-        $path = $root.'/src/Illuminate/Foundation/resources/exceptions/renderer/components/query.blade.php';
+        $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/query.blade.php');
 
         $html = (string) $this->app['view']->file($path, ['queries' => $queries])->render();
 
@@ -51,8 +50,7 @@ class RenderBladeFilesTest extends TestCase
     {
         $headers = [ 'X-Test' => "A\nB<script>bad()</script>" ];
 
-        $root = realpath(__DIR__.'/../../../..');
-        $path = $root.'/src/Illuminate/Foundation/resources/exceptions/renderer/components/request-header.blade.php';
+        $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/request-header.blade.php');
 
         $html = (string) $this->app['view']->file($path, ['headers' => $headers])->render();
 
@@ -65,8 +63,7 @@ class RenderBladeFilesTest extends TestCase
     {
         $routing = [ 'URI' => "users/1\nedit" ];
 
-        $root = realpath(__DIR__.'/../../../..');
-        $path = $root.'/src/Illuminate/Foundation/resources/exceptions/renderer/components/routing.blade.php';
+        $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/routing.blade.php');
 
         $html = (string) $this->app['view']->file($path, ['routing' => $routing])->render();
 
