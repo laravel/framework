@@ -169,8 +169,12 @@ class Arr
             foreach ($data as $key => $value) {
                 $newKey = $prefix.$key;
 
-                if (is_array($value) && ! empty($value)) {
-                    $flatten($value, $newKey.'.');
+                if (is_array($value)) {
+                    if (! empty($value)) {
+                        $flatten($value, $newKey.'.');
+                    } else {
+                        $results[$newKey] = null;
+                    }
                 } else {
                     $results[$newKey] = $value;
                 }
@@ -597,7 +601,6 @@ class Arr
      *
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
-     * @param  array  $array
      * @return bool
      */
     public static function isAssoc(array $array)
@@ -766,8 +769,6 @@ class Arr
     /**
      * Run a map over each of the items in the array.
      *
-     * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function map(array $array, callable $callback)
@@ -967,11 +968,6 @@ class Arr
 
     /**
      * Push an item into an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $values
-     * @return array
      */
     public static function push(ArrayAccess|array &$array, string|int|null $key, mixed ...$values): array
     {
@@ -1152,7 +1148,6 @@ class Arr
      * Filter the array using the given callback.
      *
      * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function where($array, callable $callback)
@@ -1164,7 +1159,6 @@ class Arr
      * Filter the array using the negation of the given callback.
      *
      * @param  array  $array
-     * @param  callable  $callback
      * @return array
      */
     public static function reject($array, callable $callback)
