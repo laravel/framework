@@ -141,7 +141,7 @@ class BroadcastEvent implements ShouldQueue
      * Get the channels for the given connection.
      *
      * @param  array  $channels
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return array
      */
     protected function getConnectionChannels($channels, $connection)
@@ -155,7 +155,7 @@ class BroadcastEvent implements ShouldQueue
      * Get the payload for the given connection.
      *
      * @param  array  $payload
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return array
      */
     protected function getConnectionPayload($payload, $connection)

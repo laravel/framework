@@ -32,7 +32,7 @@ class Worker
     /**
      * The name of the worker.
      *
-     * @var string
+     * @var string|null
      */
     protected $name;
 
