@@ -27,6 +27,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
 use Illuminate\Support\Traits\ForwardsCalls;
+use InvalidArgumentException;
 use JsonException;
 use JsonSerializable;
 use LogicException;
@@ -1153,6 +1154,96 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return static::withoutEvents(
             fn () => $this->incrementOrDecrement($column, $amount, $extra, 'increment')
         );
+    }
+
+    /**
+     * Increment multiple columns' values by given amounts on the current model.
+     *
+     * This method behaves like "increment()", but allows incrementing several
+     * columns at once. It is always scoped to the current model instance.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @param  bool  $scoped  Whether to restrict the operation to this model only.
+     * @return int|bool
+     *
+     * @throws \LogicException|\InvalidArgumentException
+     */
+    public function incrementEach(array $columns, array $extra = [], bool $scoped = true)
+    {
+        if (! $scoped) {
+            // Use query builder version for bulk increments
+            return $this->newQueryWithoutScopes()->incrementEach($columns, $extra);
+        }
+
+        if (! $this->exists) {
+            throw new LogicException('Cannot call incrementEach on a model that does not exist.');
+        }
+
+        // Validate input
+        foreach ($columns as $column => $amount) {
+            if (! is_numeric($amount)) {
+                throw new InvalidArgumentException("Non-numeric value passed as increment amount for column: '$column'.");
+            } elseif (! is_string($column)) {
+                throw new InvalidArgumentException('Non-associative array passed to incrementEach method.');
+            }
+        }
+
+        // Update model attributes locally
+        foreach ($columns as $column => $amount) {
+            if (isset($this->{$column})) {
+                $this->{$column} += $amount;
+            }
+        }
+
+        $this->forceFill($extra);
+
+        if ($this->fireModelEvent('updating') === false) {
+            return false;
+        }
+
+        // Build scoped query to current model
+        $query = $this->setKeysForSaveQuery($this->newQueryWithoutScopes());
+
+        // Build raw update expressions
+        $updates = [];
+        foreach ($columns as $column => $amount) {
+            $updates[$column] = $this->getConnection()->raw(
+                "{$this->getConnection()->getQueryGrammar()->wrap($column)} + {$amount}"
+            );
+        }
+
+        // Perform update
+        $updated = $query->update(array_merge($updates, $extra));
+
+        if ($updated) {
+            $this->syncChanges();
+            $this->fireModelEvent('updated', false);
+            $this->syncOriginal();
+        }
+
+        return $updated;
+    }
+
+    /**
+     * Decrement multiple columns' values by given amounts on the current model.
+     *
+     * This method behaves like "decrement()", but allows decrementing several
+     * columns at once. It is always scoped to the current model instance.
+     *
+     * @param  array<string, float|int|numeric-string>  $columns
+     * @param  array<string, mixed>  $extra
+     * @param  bool  $scoped  Whether to restrict the operation to this model only.
+     * @return int|bool
+     */
+    public function decrementEach(array $columns, array $extra = [], bool $scoped = true)
+    {
+        // Convert decrements to negative increments
+        $negativeIncrements = collect($columns)
+            ->mapWithKeys(fn ($amount, $column) => [$column => -abs($amount)])
+            ->all();
+
+        return $this->incrementEach($negativeIncrements, $extra, $scoped);
     }
 
     /**
