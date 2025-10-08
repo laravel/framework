@@ -29,6 +29,7 @@ trait ResolvesDumpSource
         'vscodium' => 'vscodium://file/{file}:{line}',
         'xdebug' => 'xdebug://{file}@{line}',
         'zed' => 'zed://file/{file}:{line}',
+        'trae' => 'trae://file/{file}:{line}',
     ];
 
     /**
