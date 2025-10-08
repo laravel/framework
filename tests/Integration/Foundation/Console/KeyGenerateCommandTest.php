@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Foundation\Console;
 
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\TestCase;
 
 class KeyGenerateCommandTest extends TestCase
