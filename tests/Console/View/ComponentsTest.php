@@ -7,68 +7,94 @@ use Illuminate\Console\View\Components;
 use Illuminate\Database\Migrations\MigrationResult;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ComponentsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Set a sufficient terminal width for tests to prevent text truncation
+        putenv('COLUMNS=120');
+    }
+
     protected function tearDown(): void
     {
         m::close();
+
+        // Clean up environment variable
+        putenv('COLUMNS');
+    }
+
+    /**
+     * Create an OutputStyle instance with a BufferedOutput for testing.
+     *
+     * @return array{OutputStyle, BufferedOutput}
+     */
+    private function createOutputStyle(): array
+    {
+        $bufferedOutput = new BufferedOutput();
+        $input = new ArrayInput([]);
+        $outputStyle = new OutputStyle($input, $bufferedOutput);
+
+        return [$outputStyle, $bufferedOutput];
     }
 
     public function testAlert()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Alert($output))->render('The application is in the [production] environment');
 
         $this->assertStringContainsString(
             'THE APPLICATION IS IN THE [PRODUCTION] ENVIRONMENT.',
-            $output->fetch()
+            $bufferedOutput->fetch()
         );
     }
 
     public function testBulletList()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\BulletList($output))->render([
             'ls -la',
             'php artisan inspire',
         ]);
 
-        $output = $output->fetch();
+        $result = $bufferedOutput->fetch();
 
-        $this->assertStringContainsString('⇂ ls -la', $output);
-        $this->assertStringContainsString('⇂ php artisan inspire', $output);
+        $this->assertStringContainsString('⇂ ls -la', $result);
+        $this->assertStringContainsString('⇂ php artisan inspire', $result);
     }
 
     public function testSuccess()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Success($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('SUCCESS  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('SUCCESS  The application is in the [production] environment.', $bufferedOutput->fetch());
     }
 
     public function testError()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Error($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('ERROR  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('ERROR  The application is in the [production] environment.', $bufferedOutput->fetch());
     }
 
     public function testInfo()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Info($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('INFO  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('INFO  The application is in the [production] environment.', $bufferedOutput->fetch());
     }
 
     public function testConfirm()
@@ -107,40 +133,40 @@ class ComponentsTest extends TestCase
 
     public function testTask()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Task($output))->render('My task', fn () => MigrationResult::Success->value);
-        $result = $output->fetch();
+        $result = $bufferedOutput->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('DONE', $result);
 
         (new Components\Task($output))->render('My task', fn () => MigrationResult::Failure->value);
-        $result = $output->fetch();
+        $result = $bufferedOutput->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('FAIL', $result);
 
         (new Components\Task($output))->render('My task', fn () => MigrationResult::Skipped->value);
-        $result = $output->fetch();
+        $result = $bufferedOutput->fetch();
         $this->assertStringContainsString('My task', $result);
         $this->assertStringContainsString('SKIPPED', $result);
     }
 
     public function testTwoColumnDetail()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\TwoColumnDetail($output))->render('First', 'Second');
-        $result = $output->fetch();
+        $result = $bufferedOutput->fetch();
         $this->assertStringContainsString('First', $result);
         $this->assertStringContainsString('Second', $result);
     }
 
     public function testWarn()
     {
-        $output = new BufferedOutput();
+        [$output, $bufferedOutput] = $this->createOutputStyle();
 
         (new Components\Warn($output))->render('The application is in the [production] environment');
 
-        $this->assertStringContainsString('WARN  The application is in the [production] environment.', $output->fetch());
+        $this->assertStringContainsString('WARN  The application is in the [production] environment.', $bufferedOutput->fetch());
     }
 }
