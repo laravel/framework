@@ -1226,6 +1226,15 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
+    public function testEnvInteger()
+    {
+        $_SERVER['foo'] = 1234;
+        $this->assertIsInt(env_int('foo'));
+        $this->assertIsInt(Env::integer('foo'));
+        $this->assertSame(1234, env_int('foo'));
+        $this->assertSame(1234, Env::integer('foo'));
+    }
+
     public function testWriteArrayOfEnvVariablesToFile()
     {
         $filesystem = new Filesystem;

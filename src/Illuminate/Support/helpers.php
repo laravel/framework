@@ -152,6 +152,20 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('env_int')) {
+    /**
+     * Gets the integer value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return int
+     */
+    function env_int(string $key, mixed $default = null): int
+    {
+        return Env::integer($key, $default);
+    }
+}
+
 if (! function_exists('filled')) {
     /**
      * Determine if a value is "filled".

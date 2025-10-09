@@ -106,6 +106,27 @@ class Env
     }
 
     /**
+     * Get the integer value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return int
+     */
+    public static function integer(string $key, mixed $default = null): int
+    {
+        $value = self::get($key, $default);
+
+        if (! is_numeric($value)) {
+            throw new RuntimeException(sprintf(
+                'Environment variable [%s] must be integer, got %s instead.',
+                $key, gettype($value)
+            ));
+        }
+
+        return (int) $value;
+    }
+
+    /**
      * Get the value of a required environment variable.
      *
      * @param  string  $key
