@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
+namespace Illuminate\Tests\Integration\Foundation\Exceptions\Renderer;
 
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
