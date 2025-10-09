@@ -2595,7 +2595,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
 
-        return array_keys(get_object_vars($this));
+        return array_keys(get_mangled_object_vars($this));
     }
 
     /**
