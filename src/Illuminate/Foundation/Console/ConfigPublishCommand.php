@@ -71,14 +71,14 @@ class ConfigPublishCommand extends Command
     protected function publish(string $name, string $file, string $destination)
     {
         if (file_exists($destination) && ! $this->option('force')) {
-            $this->components->error("The '{$name}' configuration file already exists.");
+            $this->components->error("The [$destination] configuration file already exists.");
 
             return;
         }
 
         copy($file, $destination);
 
-        $this->components->info("Published '{$name}' configuration file.");
+        $this->components->info("Published the [$destination] configuration file.");
     }
 
     /**
