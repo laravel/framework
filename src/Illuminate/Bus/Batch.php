@@ -201,10 +201,10 @@ class Batch implements Arrayable, JsonSerializable
             } catch (Throwable $e) {
             }
         } else {
-            $this->repository->transaction(function () use ($jobs, $count) {
+            $this->repository->transaction(function () use ($jobs, $count, $queueConnection) {
                 $this->repository->incrementTotalJobs($this->id, $count);
 
-                $this->queue->connection($this->options['connection'] ?? null)->bulk(
+                $queueConnection->bulk(
                     $jobs->all(),
                     $data = '',
                     $this->options['queue'] ?? null
