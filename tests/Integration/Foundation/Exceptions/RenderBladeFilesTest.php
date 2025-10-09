@@ -32,7 +32,7 @@ class RenderBladeFilesTest extends TestCase
         $html = (string) $this->app['view']->file($path, ['frame' => $frame])->render();
 
         $this->assertStringContainsString('data-tippy-content="', $html);
-        $this->assertMatchesRegularExpression('/data-tippy-content=\"[^\"]*<br\s*\/?>(?:(?!\").)*\"/s', $html);
+        $this->assertStringNotContainsString('<br', $html);
     }
 
     public function testQueryTooltipRendersMultilineSafely(): void
@@ -57,7 +57,7 @@ class RenderBladeFilesTest extends TestCase
         $html = (string) $this->app['view']->file($path, ['headers' => $headers])->render();
 
         $this->assertStringContainsString('data-tippy-content="', $html);
-        $this->assertMatchesRegularExpression('/data-tippy-content=\"[^\"]*<br\s*\/?>(?:(?!\").)*\"/s', $html);
+        $this->assertStringNotContainsString('<br', $html);
         $this->assertStringContainsString('&lt;script&gt;bad()&lt;/script&gt;', $html);
     }
 
@@ -70,7 +70,7 @@ class RenderBladeFilesTest extends TestCase
         $html = (string) $this->app['view']->file($path, ['routing' => $routing])->render();
 
         $this->assertStringContainsString('data-tippy-content="', $html);
-        $this->assertMatchesRegularExpression('/data-tippy-content=\"[^\"]*<br\s*\/?>(?:(?!\").)*\"/s', $html);
+        $this->assertStringNotContainsString('<br', $html);
     }
 }
 
