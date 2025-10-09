@@ -752,6 +752,28 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['John (US)', 'Jane (NL)', 'Taylor (US)'], $c->pluck(fn (TestEloquentCollectionModel $model) => "{$model->name} ({$model->country})")->all());
     }
 
+    public function testUnion()
+    {
+        $one = m::mock(Model::class);
+        $one->shouldReceive('getKey')->andReturn(1);
+
+        $two = m::mock(Model::class);
+        $two->shouldReceive('getKey')->andReturn(2);
+
+        $twoCopy = m::mock(Model::class);
+        $twoCopy->shouldReceive('getKey')->andReturn(2);
+
+        $three = m::mock(Model::class);
+        $three->shouldReceive('getKey')->andReturn(3);
+
+        $c1 = new Collection([$one, $two]);
+        $c2 = new Collection([$twoCopy, $three]);
+        $union = $c1->union($c2);
+
+        $this->assertEquals(new Collection([$one, $two, $three]), $union);
+        $this->assertNotContains($twoCopy, $union);
+    }
+
     /**
      * Helpers...
      */

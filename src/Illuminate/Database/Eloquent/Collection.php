@@ -509,6 +509,17 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Union the collection with the given items.
+     *
+     * @param  iterable<array-key, TModel>  $items
+     * @return static
+     */
+    public function union($items)
+    {
+        return new static(array_values($this->getDictionary() + $items->getDictionary()));
+    }
+
+    /**
      * Return only unique items from the collection.
      *
      * @param  (callable(TModel, TKey): mixed)|string|null  $key
