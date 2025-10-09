@@ -669,6 +669,8 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
         $this->assertTrue(Str::isUrl('http://localhost'));
+        $this->assertTrue(Str::isUrl('ftp://user_123+456:foo+bar-baz@example.com/path/file.txt.gz'));
+        $this->assertTrue(Str::isUrl('https://l.o_g~i!n$u\'s(e)r*n+a,m;e=:p.a_s~s!w$o\'r(d)*+,;=secret@example.com/path/file.txt.gz'));
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
