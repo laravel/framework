@@ -6,6 +6,7 @@ use __PHP_Incomplete_Class;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Log\Context\Contracts\Contextable;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
@@ -39,6 +40,11 @@ class Repository
      * @var array<string, mixed>
      */
     protected $hidden = [];
+
+    /**
+     * @var array<class-string<Contracts\Contextable>, Contracts\Contextable>
+     */
+    protected $contextables = [];
 
     /**
      * The callback that should handle unserialize exceptions.
@@ -107,6 +113,17 @@ class Repository
     public function all()
     {
         return $this->data;
+    }
+
+    public function allWithContextables()
+    {
+        $data = $this->data;
+
+        foreach($this->contextables as $contextable) {
+            $data = array_merge($data, $contextable->data());
+        }
+
+        return $data;
     }
 
     /**
@@ -371,6 +388,48 @@ class Repository
     }
 
     /**
+     * Register a contextable.
+     *
+     * @param  array<array-key, Contextable>|Contextable  $contextable
+     * @return $this
+     */
+    public function contextable($contextable)
+    {
+        $contextables = is_array($contextable) ? $contextable : [$contextable];
+
+        foreach($contextables as $contextable) {
+            $this->contextables[$contextable::class] = $contextable;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve all registered contextables.
+     *
+     * @return array<class-string<Contextable>, Contextable>
+     */
+    public function getContextables()
+    {
+        return $this->contextables;
+    }
+
+    /**
+     * Remove a Contextable.
+     *
+     * @param  class-string<Contextable>|Contextable  $contextable
+     * @return $this
+     */
+    public function forgetContextable($contextable)
+    {
+        $class = is_string($contextable) ? $contextable : $contextable::class;
+
+        unset($this->contextables[$class]);
+
+        return $this;
+    }
+
+    /**
      * Pop the latest value from the key's stack.
      *
      * @param  string  $key
@@ -572,7 +631,7 @@ class Repository
      */
     public function isEmpty()
     {
-        return $this->all() === [] && $this->allHidden() === [];
+        return $this->all() === [] && $this->allHidden() === [] && $this->getContextables() === [];
     }
 
     /**
@@ -623,6 +682,7 @@ class Repository
     {
         $this->data = [];
         $this->hidden = [];
+        $this->contextables = [];
 
         return $this;
     }
@@ -638,7 +698,8 @@ class Repository
     {
         $instance = (new static($this->events))
             ->add($this->all())
-            ->addHidden($this->allHidden());
+            ->addHidden($this->allHidden())
+            ->contextable($this->getContextables());
 
         $instance->events->dispatch(new Dehydrating($instance));
 
@@ -647,6 +708,7 @@ class Repository
         return $instance->isEmpty() ? null : [
             'data' => array_map($serialize, $instance->all()),
             'hidden' => array_map($serialize, $instance->allHidden()),
+            'contextables' => array_map($serialize, $instance->getContextables()),
         ];
     }
 
@@ -686,13 +748,14 @@ class Repository
             }
         };
 
-        [$data, $hidden] = [
+        [$data, $hidden, $contextable] = [
             (new Collection($context['data'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
             (new Collection($context['hidden'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
+            (new Collection($context['contextables'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
         ];
 
         $this->events->dispatch(new Hydrated(
-            $this->flush()->add($data)->addHidden($hidden)
+            $this->flush()->add($data)->addHidden($hidden)->contextable($contextable)
         ));
 
         return $this;
