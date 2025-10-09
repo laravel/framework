@@ -2,18 +2,20 @@
 
 namespace Illuminate\Tests\Foundation\Exceptions\Renderer;
 
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+
+use function Orchestra\Testbench\after_resolving;
 use function Orchestra\Testbench\package_path;
 
+#[WithConfig('app.debug', true)]
 class RenderBladeFilesTest extends TestCase
 {
-    protected function setUp(): void
+    protected function defineEnvironment($app)
     {
-        parent::setUp();
-
-        $this->app['config']->set('app.debug', true);
-
-        $this->app['view.engine.resolver']->resolve('blade')->getCompiler()->withoutComponentTags();
+        after_resolving($app, 'view.engine.resolver', function ($resolver) {
+            $resolver->resolve('blade')->getCompiler()->withoutComponentTags();
+        });
     }
 
     public function testFormattedSourceTooltipRendersMultilineSafely(): void
