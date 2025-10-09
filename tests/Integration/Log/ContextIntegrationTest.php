@@ -21,6 +21,7 @@ class ContextIntegrationTest extends TestCase
     {
         Context::hydrate(null);
         $this->assertEquals([], Context::all());
+        $this->assertEquals([], Context::getContextables());
     }
 
     public function test_it_handles_eloquent()
@@ -37,6 +38,7 @@ class ContextIntegrationTest extends TestCase
                 'number' => 'i:55;',
             ],
             'hidden' => [],
+            'contextables' => [],
         ], $dehydrated);
 
         Context::flush();
