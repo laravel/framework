@@ -120,7 +120,7 @@ class Repository
         $data = $this->data;
 
         foreach($this->contextables as $contextable) {
-            $data = array_merge($data, $contextable->data());
+            $data = array_merge($data, $contextable->contextData());
         }
 
         return $data;
