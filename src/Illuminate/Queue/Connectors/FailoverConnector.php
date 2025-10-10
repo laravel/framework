@@ -14,7 +14,8 @@ class FailoverConnector implements ConnectorInterface
     public function __construct(
         protected QueueManager $manager,
         protected Dispatcher $events
-    ) {}
+    ) {
+    }
 
     /**
      * Establish a queue connection.

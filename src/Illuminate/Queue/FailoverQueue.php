@@ -16,7 +16,8 @@ class FailoverQueue extends Queue implements QueueContract
         public QueueManager $manager,
         public EventDispatcher $events,
         public array $connections
-    ) {}
+    ) {
+    }
 
     /**
      * Get the size of the queue.
