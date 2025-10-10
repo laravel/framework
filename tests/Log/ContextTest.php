@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Monolog\LogRecord;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -722,6 +723,16 @@ class ContextTest extends TestCase
         Context::forgetContextable($contextable::class);
         $this->assertEmpty(Context::getContextables());
         $this->assertEquals(['woody' => 'guthrie'], Context::all());
+    }
+
+    public function test_registering_a_non_contextable_throws_exception()
+    {
+        try {
+            Context::contextable((object) ['foo' => 'bar']);
+            $this->fail('Did not throw expected exception');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Only Contextable classes can be registered.', $e->getMessage());
+        }
     }
 }
 

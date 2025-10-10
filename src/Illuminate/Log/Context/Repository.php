@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -391,12 +392,18 @@ class Repository
      *
      * @param  array<array-key, Contextable>|Contextable  $contextable
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function contextable($contextable)
     {
         $contextables = is_array($contextable) ? $contextable : [$contextable];
 
         foreach($contextables as $contextable) {
+            if (! $contextable instanceof Contextable) {
+                throw new InvalidArgumentException('Only Contextable classes can be registered.');
+            }
+
             $this->contextables[] = $contextable;
         }
 
