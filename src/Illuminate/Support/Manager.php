@@ -50,21 +50,21 @@ abstract class Manager
     /**
      * Get the default driver name.
      *
-     * @return string|null
+     * @return \UnitEnum|string|null
      */
     abstract public function getDefaultDriver();
 
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     public function driver($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver = enum_value($driver ?: $this->getDefaultDriver());
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
@@ -118,13 +118,13 @@ abstract class Manager
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
+     * @param  \UnitEnum|string  $driver
      * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
+        $this->customCreators[enum_value($driver)] = $callback;
 
         return $this;
     }
