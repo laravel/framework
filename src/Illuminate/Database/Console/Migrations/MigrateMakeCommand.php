@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Console\Concerns\DryRunnable;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Support\Composer;
@@ -11,6 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'make:migration')]
 class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 {
+    use DryRunnable;
     /**
      * The console command signature.
      *
@@ -55,6 +57,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     public function __construct(MigrationCreator $creator, Composer $composer)
     {
         parent::__construct();
+
+        $this->configureDryRun();
 
         $this->creator = $creator;
         $this->composer = $composer;
@@ -108,15 +112,55 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      */
     protected function writeMigration($name, $table, $create)
     {
-        $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
-        );
+        $path = $this->getMigrationPath();
+        
+        if ($this->isDryRun()) {
+            $this->handleMigrationDryRun($name, $table, $create, $path);
+            return;
+        }
+
+        $file = $this->creator->create($name, $path, $table, $create);
 
         if (windows_os()) {
             $file = str_replace('/', '\\', $file);
         }
 
         $this->components->info(sprintf('Migration [%s] created successfully.', $file));
+    }
+
+    /**
+     * Handle the dry-run mode for migration creation.
+     *
+     * @param  string  $name
+     * @param  string  $table
+     * @param  bool  $create
+     * @param  string  $path
+     * @return void
+     */
+    protected function handleMigrationDryRun($name, $table, $create, $path)
+    {
+        $fileName = date('Y_m_d_His').'_'.$name.'.php';
+        $fullPath = $path.'/'.$fileName;
+
+        if (windows_os()) {
+            $fullPath = str_replace('/', '\\', $fullPath);
+        }
+
+        $operationType = $create ? 'Create table' : 'Modify table';
+
+        $this->recordDryRunOperation(
+            'CREATE',
+            'Would create migration file',
+            [
+                'File' => $fullPath,
+                'Directory' => $path,
+                'Migration name' => $name,
+                'Table' => $table ?: 'N/A',
+                'Operation' => $operationType,
+            ]
+        );
+
+        $this->displayDryRunOperations();
     }
 
     /**

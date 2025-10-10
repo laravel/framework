@@ -152,7 +152,10 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($parentModelClass) &&
             confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", default: true)) {
-            $this->call('make:model', ['name' => $parentModelClass]);
+            $this->call('make:model', array_filter([
+                'name' => $parentModelClass,
+                '--dry-run' => $this->option('dry-run') ?: null,
+            ]));
         }
 
         return [
@@ -179,7 +182,10 @@ class ControllerMakeCommand extends GeneratorCommand
         $modelClass = $this->parseModel($this->option('model'));
 
         if (! class_exists($modelClass) && confirm("A {$modelClass} model does not exist. Do you want to generate it?", default: true)) {
-            $this->call('make:model', ['name' => $modelClass]);
+            $this->call('make:model', array_filter([
+                'name' => $modelClass,
+                '--dry-run' => $this->option('dry-run') ?: null,
+            ]));
         }
 
         $replace = $this->buildFormRequestReplacements($replace, $modelClass);
@@ -267,15 +273,17 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         $storeRequestClass = 'Store'.class_basename($modelClass).'Request';
 
-        $this->call('make:request', [
+        $this->call('make:request', array_filter([
             'name' => $storeRequestClass,
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
 
         $updateRequestClass = 'Update'.class_basename($modelClass).'Request';
 
-        $this->call('make:request', [
+        $this->call('make:request', array_filter([
             'name' => $updateRequestClass,
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
 
         return [$storeRequestClass, $updateRequestClass];
     }
