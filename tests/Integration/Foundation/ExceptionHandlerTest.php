@@ -3,20 +3,20 @@
 namespace Illuminate\Tests\Integration\Foundation;
 
 use Exception;
-use Throwable;
-use Illuminate\Http\JsonResponse;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Auth\Access\Response;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Routing\ResponseFactory;
-use Symfony\Component\Process\PhpProcess;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Debug\ShouldntReport;
-use PHPUnit\Framework\Attributes\DataProvider;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Debug\ShouldntReport;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\ResponseFactory;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Process\PhpProcess;
+use Throwable;
 
 class ExceptionHandlerTest extends TestCase
 {
