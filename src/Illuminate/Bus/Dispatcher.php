@@ -3,11 +3,8 @@
 namespace Illuminate\Bus;
 
 use Closure;
-use Illuminate\Bus\Events\QueueFailedOver;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
@@ -16,7 +13,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
 use RuntimeException;
-use Throwable;
 
 class Dispatcher implements QueueingDispatcher
 {
@@ -64,9 +60,6 @@ class Dispatcher implements QueueingDispatcher
 
     /**
      * Create a new command dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Closure|null  $queueResolver
      */
     public function __construct(Container $container, ?Closure $queueResolver = null)
     {
@@ -143,7 +136,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Attempt to find the batch with the given ID.
      *
-     * @param  string  $batchId
      * @return \Illuminate\Bus\Batch|null
      */
     public function findBatch(string $batchId)
@@ -231,23 +223,11 @@ class Dispatcher implements QueueingDispatcher
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
 
-        try {
-            if (method_exists($command, 'queue')) {
-                return $command->queue($queue, $command);
-            }
-
-            return $this->pushCommandToQueue($queue, $command);
-        } catch (Throwable $e) {
-            if (empty($queue->getConfig()['failover'] ?? [])) {
-                throw $e;
-            }
-
-            if ($this->container->bound(ExceptionHandler::class)) {
-                $this->container->make(ExceptionHandler::class)->report($e);
-            }
-
-            $this->pushToFailoverQueue($queue, $command);
+        if (method_exists($command, 'queue')) {
+            return $command->queue($queue, $command);
         }
+
+        return $this->pushCommandToQueue($queue, $command);
     }
 
     /**
@@ -264,34 +244,6 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $queue->push($command, queue: $command->queue ?? null);
-    }
-
-    /**
-     * Push the command to its failover queue if possible.
-     *
-     * @param  \Illuminate\Contracts\Queue\Queue  $queue
-     * @param  mixed  $connection
-     * @return void
-     */
-    protected function pushToFailoverQueue($queue, $command)
-    {
-        $this->container->make(EventDispatcher::class)->dispatch(
-            new QueueFailedOver($command->connection ?? null, $command)
-        );
-
-        foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
-            try {
-                $command->connection = $failover;
-
-                return $this->dispatchToQueue($command);
-            } catch (Throwable $e) {
-                //
-            }
-        }
-
-        if (isset($e)) {
-            throw $e;
-        }
     }
 
     /**
@@ -317,7 +269,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Set the pipes through which commands should be piped before dispatching.
      *
-     * @param  array  $pipes
      * @return $this
      */
     public function pipeThrough(array $pipes)
@@ -330,7 +281,6 @@ class Dispatcher implements QueueingDispatcher
     /**
      * Map a command to a handler.
      *
-     * @param  array  $map
      * @return $this
      */
     public function map(array $map)

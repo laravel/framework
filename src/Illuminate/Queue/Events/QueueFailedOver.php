@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Bus\Events;
+namespace Illuminate\Queue\Events;
 
 class QueueFailedOver
 {
     /**
      * Create a new event instance.
      *
-     * @param  string|null  $connectionName  The queue connection that failed.
-     * @param  mixed  $command  The command / job that was queued.
+     * @param  string  $connectionName  The queue connection that failed.
+     * @param  \Closure|string|object  $job  The job instance.
      */
     public function __construct(
         public ?string $connectionName,
