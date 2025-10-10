@@ -284,13 +284,13 @@ class Dispatcher implements QueueingDispatcher
                 $command->connection = $failover;
 
                 return $this->dispatchToQueue($command);
-            } catch (Throwable $failoverException) {
+            } catch (Throwable $e) {
                 //
             }
         }
 
-        if (isset($failoverException)) {
-            throw $failoverException;
+        if (isset($e)) {
+            throw $e;
         }
     }
 
