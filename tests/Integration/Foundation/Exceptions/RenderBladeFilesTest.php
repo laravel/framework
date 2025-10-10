@@ -45,7 +45,7 @@ class RenderBladeFilesTest extends TestCase
         $html = (string) $this->app['view']->file($path, ['queries' => $queries])->render();
 
         $this->assertStringContainsString('data-tippy-content="', $html);
-        $this->assertMatchesRegularExpression('/data-tippy-content=\"[^\"]*<br\s*\/?>(?:(?!\").)*\"/s', $html);
+        $this->assertMatchesRegularExpression('/&lt;br\s*\/?&gt;/', $html);
     }
 
     public function testRequestHeaderTooltipRendersMultilineSafely(): void
