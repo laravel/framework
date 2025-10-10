@@ -721,6 +721,7 @@ class ContextTest extends TestCase
         $this->assertEquals(['value' => 'hello', 'woody' => 'guthrie'], Context::all());
         Context::forgetContextable($contextable::class);
         $this->assertEmpty(Context::getContextables());
+        $this->assertEquals(['woody' => 'guthrie'], Context::all());
     }
 }
 
