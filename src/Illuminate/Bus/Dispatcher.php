@@ -246,23 +246,7 @@ class Dispatcher implements QueueingDispatcher
                 $this->container->make(ExceptionHandler::class)->report($e);
             }
 
-            $this->container->make(EventDispatcher::class)->dispatch(
-                new QueueFailedOver($command->connection ?? null, $command)
-            );
-
-            foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
-                try {
-                    $command->connection = $failover;
-
-                    return $this->dispatchToQueue($command);
-                } catch (Throwable $failoverException) {
-                    //
-                }
-            }
-
-            if (isset($failoverException)) {
-                throw $failoverException;
-            }
+            $this->pushToFailoverQueue($queue, $command);
         }
     }
 
@@ -280,6 +264,34 @@ class Dispatcher implements QueueingDispatcher
         }
 
         return $queue->push($command, queue: $command->queue ?? null);
+    }
+
+    /**
+     * Push the command to its failover queue if possible.
+     *
+     * @param  \Illuminate\Contracts\Queue\Queue  $queue
+     * @param  mixed  $connection
+     * @return void
+     */
+    protected function pushToFailoverQueue($queue, $command)
+    {
+        $this->container->make(EventDispatcher::class)->dispatch(
+            new QueueFailedOver($command->connection ?? null, $command)
+        );
+
+        foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
+            try {
+                $command->connection = $failover;
+
+                return $this->dispatchToQueue($command);
+            } catch (Throwable $failoverException) {
+                //
+            }
+        }
+
+        if (isset($failoverException)) {
+            throw $failoverException;
+        }
     }
 
     /**
