@@ -18,6 +18,7 @@ use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -176,6 +177,168 @@ class NotificationChannelManagerTest extends TestCase
 
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestQueuedNotification);
     }
+
+    public function testQueuedNotificationForwardsMessageGroupToQueueJob()
+    {
+        $mockedMessageGroupId = 'group-1';
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->once()->withArgs(function ($job) use ($mockedMessageGroupId) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertEquals($mockedMessageGroupId, $job->messageGroup);
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotification)->onGroup($mockedMessageGroupId);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsMessageGroupSetToQueueJob()
+    {
+        $mockedMessageGroupSet = [
+            'test' => 'group-1',
+            'test2' => 'group-2',
+        ];
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupSet) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertEquals($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotificationWithTwoChannels)->onGroup($mockedMessageGroupSet);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsMessageGroupSetFromClassToQueueJob()
+    {
+        $mockedMessageGroupSet = [
+            'test' => 'group-1',
+            'test2' => 'group-2',
+        ];
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupSet) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertEquals($mockedMessageGroupSet[$job->channels[0]], $job->messageGroup);
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotificationWithMessageGroups);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsDeduplicatorToQueueJob()
+    {
+        $mockedDeduplicator = fn ($payload, $queue) => 'deduplication-id-1';
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->once()->withArgs(function ($job) use ($mockedDeduplicator) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($mockedDeduplicator, $job->deduplicator->getClosure());
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotification)->withDeduplicator($mockedDeduplicator);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsDeduplicatorSetToQueueJob()
+    {
+        $mockedDeduplicatorSet = [
+            'test' => fn ($payload, $queue) => 'deduplication-id-1',
+            'test2' => fn ($payload, $queue) => 'deduplication-id-2',
+        ];
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedDeduplicatorSet) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($mockedDeduplicatorSet[$job->channels[0]], $job->deduplicator->getClosure());
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotificationWithTwoChannels)->withDeduplicator($mockedDeduplicatorSet);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsDeduplicatorSetFromClassToQueueJob()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertEquals($job->notification->deduplicatorResults[$job->channels[0]], call_user_func($job->deduplicator, '', null));
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotificationWithDeduplicators);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testQueuedNotificationForwardsDeduplicationIdMethodToQueueJob()
+    {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Dispatcher::class, $events = m::mock());
+        $container->instance(Bus::class, $bus = m::mock());
+        $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) {
+            $this->assertInstanceOf(SendQueuedNotifications::class, $job);
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+            $this->assertEquals($job->notification->deduplicationId(...), $job->deduplicator->getClosure());
+
+            return true;
+        });
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $events->shouldReceive('listen')->once();
+
+        $notification = (new NotificationChannelManagerTestQueuedNotificationWithDeduplicationId);
+        $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
 }
 
 class TestSendQueuedNotifications implements ShouldQueue
@@ -262,5 +425,93 @@ class NotificationChannelManagerTestQueuedNotification extends Notification impl
     public function message()
     {
         return $this->line('test')->action('Text', 'url');
+    }
+}
+
+class NotificationChannelManagerTestQueuedNotificationWithTwoChannels extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via()
+    {
+        return ['test', 'test2'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+}
+
+class NotificationChannelManagerTestQueuedNotificationWithMessageGroups extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via()
+    {
+        return ['test', 'test2'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+
+    public function withMessageGroups($notifiable, $channel)
+    {
+        return match ($channel) {
+            'test' => 'group-1',
+            'test2' => 'group-2',
+            default => null,
+        };
+    }
+}
+
+class NotificationChannelManagerTestQueuedNotificationWithDeduplicators extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public $deduplicatorResults = [
+        'test' => 'deduplication-id-1',
+        'test2' => 'deduplication-id-2',
+    ];
+
+    public function via()
+    {
+        return ['test', 'test2'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+
+    public function withDeduplicators($notifiable, $channel)
+    {
+        return match ($channel) {
+            'test' => fn ($payload, $queue) => $this->deduplicatorResults['test'],
+            'test2' => fn ($payload, $queue) => $this->deduplicatorResults['test2'],
+            default => null,
+        };
+    }
+}
+
+class NotificationChannelManagerTestQueuedNotificationWithDeduplicationId extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public function via()
+    {
+        return ['test', 'test2'];
+    }
+
+    public function message()
+    {
+        return $this->line('test')->action('Text', 'url');
+    }
+
+    public function deduplicationId($payload, $queue)
+    {
+        return 'deduplication-id-1';
     }
 }

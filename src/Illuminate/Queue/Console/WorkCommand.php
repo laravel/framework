@@ -168,7 +168,7 @@ class WorkCommand extends Command
             $this->option('stop-when-empty'),
             $this->option('max-jobs'),
             $this->option('max-time'),
-            $this->option('rest')
+            $this->option('rest'),
         );
     }
 

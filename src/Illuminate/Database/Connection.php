@@ -862,7 +862,7 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the elapsed time since a given starting point.
+     * Get the elapsed time in milliseconds since a given starting point.
      *
      * @param  float  $start
      * @return float

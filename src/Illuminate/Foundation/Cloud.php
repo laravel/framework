@@ -123,6 +123,7 @@ class Cloud
 
         $app['config']->set('logging.channels.laravel-cloud-socket', [
             'driver' => 'monolog',
+            'level' => $_ENV['LOG_LEVEL'] ?? $_SERVER['LOG_LEVEL'] ?? 'debug',
             'handler' => SocketHandler::class,
             'formatter' => JsonFormatter::class,
             'formatter_with' => [

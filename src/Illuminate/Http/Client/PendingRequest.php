@@ -528,7 +528,7 @@ class PendingRequest
     public function withUrlParameters(array $parameters = [])
     {
         return tap($this, function () use ($parameters) {
-            $this->urlParameters = $parameters;
+            $this->urlParameters = array_merge($this->urlParameters, $parameters);
         });
     }
 
@@ -897,6 +897,17 @@ class PendingRequest
         }
 
         return $results;
+    }
+
+    /**
+     * Send a pool of asynchronous requests concurrently, with callbacks for introspection.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Http\Client\Batch
+     */
+    public function batch(callable $callback): Batch
+    {
+        return tap(new Batch($this->factory), $callback);
     }
 
     /**

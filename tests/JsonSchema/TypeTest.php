@@ -7,6 +7,7 @@ use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\SchemaLoader;
 use Opis\JsonSchema\Validator;
 use Opis\Uri\Uri;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Stringable;
 
@@ -79,13 +80,13 @@ class TypeTest extends TestCase
         JSON, (string) $type);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('validSchemasProvider')]
+    #[DataProvider('validSchemasProvider')]
     public function test_produces_valid_json_schemas(Stringable $schema, mixed $data): void
     {
         $this->assertValidOnJsonSchema($schema, $data);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidSchemasProvider')]
+    #[DataProvider('invalidSchemasProvider')]
     public function test_produces_invalid_json_schemas(Stringable $schema, mixed $data): void
     {
         $this->assertNotValidOnJsonSchema($schema, $data);
@@ -117,6 +118,8 @@ class TypeTest extends TestCase
             [JsonSchema::string()->min(1)->max(3), 'a'], // boundary at min
             [JsonSchema::string()->pattern('^[A-Z]{2}[0-9]{2}$'), 'AB12'], // complex pattern
             [JsonSchema::string()->enum(['', 'x', 'y']), ''], // enum including empty string
+            [JsonSchema::string()->nullable(), null],
+            [JsonSchema::string()->nullable(false), ''],
 
             // IntegerType
             [JsonSchema::integer(), 10],
@@ -130,6 +133,8 @@ class TypeTest extends TestCase
             [JsonSchema::integer()->min(1)->max(3), 3], // boundary at max
             [JsonSchema::integer()->enum([0, -1, 5]), 0], // enum with zero
             [JsonSchema::integer()->default(0), 0], // default value
+            [JsonSchema::integer()->nullable(), null],
+            [JsonSchema::integer()->nullable(false), 0],
 
             // NumberType
             [JsonSchema::number(), 3.14],
@@ -143,6 +148,8 @@ class TypeTest extends TestCase
             [JsonSchema::number(), 5], // integers are numbers
             [JsonSchema::number()->enum([0.0, 1.1]), 0.0],
             [JsonSchema::number()->default(0.0), 0.0],
+            [JsonSchema::number()->nullable(), null],
+            [JsonSchema::number()->nullable(false), 0.0],
 
             // BooleanType
             [JsonSchema::boolean(), true],
@@ -154,6 +161,8 @@ class TypeTest extends TestCase
             [JsonSchema::boolean()->enum([true]), true],
             [JsonSchema::boolean()->enum([false]), false],
             [JsonSchema::boolean()->default(true), true],
+            [JsonSchema::boolean()->nullable(), null],
+            [JsonSchema::boolean()->nullable(false), false],
 
             // ObjectType
             [
@@ -210,6 +219,18 @@ class TypeTest extends TestCase
                 ]),
                 (object) ['age' => 0], // boundary at min
             ],
+            [
+                JsonSchema::object([
+                    'age' => JsonSchema::integer()->nullable(),
+                ]),
+                (object) ['age' => null], // nullable
+            ],
+            [
+                JsonSchema::object([
+                    'age' => JsonSchema::integer()->nullable(false),
+                ]),
+                (object) ['age' => 0], // not nullable
+            ],
 
             // ArrayType
             [JsonSchema::array(), []],
@@ -224,6 +245,8 @@ class TypeTest extends TestCase
             [JsonSchema::array()->items(JsonSchema::string())->min(2)->max(2), ['a', 'b']],
             [JsonSchema::array()->items(JsonSchema::integer()->min(0)), [0, 1, 2]],
             [JsonSchema::array()->enum([[]]), []],
+            [JsonSchema::array()->nullable(), null],
+            [JsonSchema::array()->nullable(false), []],
         ];
     }
 
@@ -243,6 +266,7 @@ class TypeTest extends TestCase
             [JsonSchema::string()->pattern('^[a]+$'), 'ab'], // pattern mismatch
             [JsonSchema::string()->enum(['a', 'b']), 'A'], // case sensitive mismatch
             [JsonSchema::string(), null], // null not allowed
+            [JsonSchema::string()->nullable(false), null], // not nullable
 
             // IntegerType
             [JsonSchema::integer(), '10'], // type mismatch
@@ -256,6 +280,7 @@ class TypeTest extends TestCase
             [JsonSchema::integer(), 3.14], // not an integer
             [JsonSchema::integer()->enum([1, 2]), 2.5], // not in enum and not an integer
             [JsonSchema::integer()->default(1), null], // wrong type
+            [JsonSchema::integer()->nullable(false), null], // not nullable
 
             // NumberType
             [JsonSchema::number(), '3.14'], // type mismatch
@@ -269,6 +294,7 @@ class TypeTest extends TestCase
             [JsonSchema::number(), 'NaN'], // string, not number
             [JsonSchema::number()->enum([1.1, 2.2]), 1.1000001], // not exactly in enum
             [JsonSchema::number()->default(0.0), []], // wrong type
+            [JsonSchema::number()->nullable(false), null], // not nullable
 
             // BooleanType
             [JsonSchema::boolean(), 'true'], // type mismatch
@@ -280,6 +306,7 @@ class TypeTest extends TestCase
             [JsonSchema::boolean(), 1], // wrong type
             [JsonSchema::boolean()->default(true), 'true'], // wrong type
             [JsonSchema::boolean(), null], // null is invalid
+            [JsonSchema::boolean()->nullable(false), null], // not nullable
 
             // ObjectType
             [JsonSchema::object(['name' => JsonSchema::string()->required()]), (object) []], // missing required
@@ -291,6 +318,7 @@ class TypeTest extends TestCase
             [JsonSchema::object(['meta' => JsonSchema::object()->withoutAdditionalProperties()]), (object) ['meta' => 'nope']], // wrong type in nested object
             [JsonSchema::object(['name' => JsonSchema::string()->required()])->default(['name' => 'x']), (object) []], // default doesn't satisfy missing required
             [JsonSchema::object(['score' => JsonSchema::integer()->min(0)]), (object) ['score' => -1]], // below min
+            [JsonSchema::object(['age' => JsonSchema::integer()->nullable(false)]), (object) ['age' => null]], // not nullable
 
             // ArrayType
             [JsonSchema::array(), (object) []], // type mismatch
@@ -304,6 +332,7 @@ class TypeTest extends TestCase
             [JsonSchema::array()->max(0), ['a']], // too many for zero max
             [JsonSchema::array()->enum([['a'], ['b']]), ['a', 'b']], // not equal to any enum member
             [JsonSchema::array()->items(JsonSchema::string()->max(1)), ['ab']], // item too long
+            [JsonSchema::array()->nullable(false), null], // not nullable
         ];
     }
 
