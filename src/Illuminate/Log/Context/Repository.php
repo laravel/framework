@@ -6,12 +6,14 @@ use __PHP_Incomplete_Class;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Log\Context\Contracts\Contextable;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
@@ -39,6 +41,11 @@ class Repository
      * @var array<string, mixed>
      */
     protected $hidden = [];
+
+    /**
+     * @var list<\Illuminate\Log\Context\Contracts\Contextable>
+     */
+    protected $contextables = [];
 
     /**
      * The callback that should handle unserialize exceptions.
@@ -106,7 +113,13 @@ class Repository
      */
     public function all()
     {
-        return $this->data;
+        $data = $this->data;
+
+        foreach($this->contextables as $contextable) {
+            $data = array_merge($data, $contextable->context($this) ?? []);
+        }
+
+        return $data;
     }
 
     /**
@@ -218,16 +231,20 @@ class Repository
     /**
      * Add a context value.
      *
-     * @param  string|array<string, mixed>  $key
+     * @param  string|array<string, mixed>|\Illuminate\Log\Context\Contracts\Contextable  $key
      * @param  mixed  $value
      * @return $this
      */
     public function add($key, $value = null)
     {
-        $this->data = array_merge(
-            $this->data,
-            is_array($key) ? $key : [$key => $value]
-        );
+        if ($key instanceof Contextable) {
+            $this->contextables[] = $key;
+        } else {
+            $this->data = array_merge(
+                $this->data,
+                is_array($key) ? $key : [$key => $value]
+            );
+        }
 
         return $this;
     }
@@ -366,6 +383,58 @@ class Repository
             ...$this->data[$key] ?? [],
             ...$values,
         ];
+
+        return $this;
+    }
+
+    /**
+     * Register a contextable.
+     *
+     * @param  array<array-key, Contextable>|Contextable  $contextable
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function contextable($contextable)
+    {
+        $contextables = is_array($contextable) ? $contextable : [$contextable];
+
+        foreach($contextables as $contextable) {
+            if (! $contextable instanceof Contextable) {
+                throw new InvalidArgumentException('Only Contextable classes can be registered.');
+            }
+
+            $this->contextables[] = $contextable;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve all registered contextables.
+     *
+     * @return list<\Illuminate\Log\Context\Contracts\Contextable>
+     */
+    public function getContextables()
+    {
+        return $this->contextables;
+    }
+
+    /**
+     * Remove a Contextable.
+     *
+     * @param  class-string<\Illuminate\Log\Context\Contracts\Contextable>|\Illuminate\Log\Context\Contracts\Contextable  $contextableToRemove
+     * @return $this
+     */
+    public function forgetContextable($contextableToRemove)
+    {
+        foreach($this->contextables as $i => $contextable) {
+            if ((is_string($contextableToRemove) && is_a($contextable, $contextableToRemove, true)) || ($contextableToRemove === $contextable)) {
+                unset($this->contextables[$i]);
+            }
+        }
+
+        $this->contextables = array_values($this->contextables);
 
         return $this;
     }
@@ -572,7 +641,7 @@ class Repository
      */
     public function isEmpty()
     {
-        return $this->all() === [] && $this->allHidden() === [];
+        return $this->all() === [] && $this->allHidden() === [] && $this->getContextables() === [];
     }
 
     /**
@@ -591,7 +660,7 @@ class Repository
     /**
      * Execute the given callback when context has been hydrated.
      *
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Log\Context\Repository): mixed  $callback
      * @return $this
      */
     public function hydrated($callback)
@@ -623,6 +692,7 @@ class Repository
     {
         $this->data = [];
         $this->hidden = [];
+        $this->contextables = [];
 
         return $this;
     }
@@ -637,16 +707,18 @@ class Repository
     public function dehydrate()
     {
         $instance = (new static($this->events))
-            ->add($this->all())
-            ->addHidden($this->allHidden());
+            ->add($this->data)
+            ->addHidden($this->allHidden())
+            ->contextable($this->getContextables());
 
         $instance->events->dispatch(new Dehydrating($instance));
 
         $serialize = fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
 
         return $instance->isEmpty() ? null : [
-            'data' => array_map($serialize, $instance->all()),
+            'data' => array_map($serialize, $instance->data),
             'hidden' => array_map($serialize, $instance->allHidden()),
+            'contextables' => array_map($serialize, $instance->getContextables()),
         ];
     }
 
@@ -686,13 +758,14 @@ class Repository
             }
         };
 
-        [$data, $hidden] = [
+        [$data, $hidden, $contextable] = [
             (new Collection($context['data'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
             (new Collection($context['hidden'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, true))->all(),
+            (new Collection($context['contextables'] ?? []))->map(fn ($value, $key) => $unserialize($value, $key, false))->all(),
         ];
 
         $this->events->dispatch(new Hydrated(
-            $this->flush()->add($data)->addHidden($hidden)
+            $this->flush()->add($data)->addHidden($hidden)->contextable($contextable)
         ));
 
         return $this;
