@@ -129,7 +129,7 @@ class Batch
      * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      *
-     * @throws BatchInProgressException
+     * @throws \Illuminate\Http\Client\BatchInProgressException
      */
     public function as(string $key)
     {
