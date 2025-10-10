@@ -2000,6 +2000,42 @@ class RoutingUrlGeneratorTest extends TestCase
             $url->route('tenantPostUserOptionalMethod', ['concreteTenant', 'concretePost', 'concreteUser', 'concreteMethod']),
         );
     }
+
+    public function testActionUrlGenerationChoosesFirstMatchingRoute()
+    {
+        $routes = new RouteCollection;
+        $request = Request::create('http://www.foo.com/');
+        $url = new UrlGenerator($routes, $request);
+
+        $route1 = new Route(['GET'], '{resource}/attachable/{field}', [
+            'controller' => 'MyController',
+        ]);
+        $routes->add($route1);
+
+        $route2 = new Route(['GET'], '{resource}/{resourceId}/attachable/{field}', [
+            'controller' => 'MyController',
+        ]);
+        $routes->add($route2);
+
+        $routes->refreshActionLookups();
+
+        $result = $url->action('MyController', [
+            'resource' => 'posts',
+            'resourceId' => 1,
+            'field' => 'category',
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('http://www.foo.com/posts/attachable/category?resourceId=1&foo=bar', $result,);
+
+        $result = $url->action('MyController', [
+            'resource' => 'posts',
+            'field' => 'category',
+            'foo' => 'bar',
+        ]);
+
+        $this->assertSame('http://www.foo.com/posts/attachable/category?foo=bar', $result);
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
