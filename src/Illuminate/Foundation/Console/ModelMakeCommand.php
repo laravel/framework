@@ -100,10 +100,11 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $factory = Str::studly($this->argument('name'));
 
-        $this->call('make:factory', [
+        $this->call('make:factory', array_filter([
             'name' => "{$factory}Factory",
             '--model' => $this->qualifyClass($this->getNameInput()),
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
     }
 
     /**
@@ -119,10 +120,11 @@ class ModelMakeCommand extends GeneratorCommand
             $table = Str::singular($table);
         }
 
-        $this->call('make:migration', [
+        $this->call('make:migration', array_filter([
             'name' => "create_{$table}_table",
             '--create' => $table,
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
     }
 
     /**
@@ -134,9 +136,10 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $seeder = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:seeder', [
+        $this->call('make:seeder', array_filter([
             'name' => "{$seeder}Seeder",
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
     }
 
     /**
@@ -157,6 +160,7 @@ class ModelMakeCommand extends GeneratorCommand
             '--requests' => $this->option('requests') || $this->option('all'),
             '--test' => $this->option('test'),
             '--pest' => $this->option('pest'),
+            '--dry-run' => $this->option('dry-run') ?: null,
         ]));
     }
 
@@ -169,13 +173,15 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $request = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:request', [
+        $this->call('make:request', array_filter([
             'name' => "Store{$request}Request",
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
 
-        $this->call('make:request', [
+        $this->call('make:request', array_filter([
             'name' => "Update{$request}Request",
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
     }
 
     /**
@@ -187,10 +193,11 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $policy = Str::studly(class_basename($this->argument('name')));
 
-        $this->call('make:policy', [
+        $this->call('make:policy', array_filter([
             'name' => "{$policy}Policy",
             '--model' => $this->qualifyClass($this->getNameInput()),
-        ]);
+            '--dry-run' => $this->option('dry-run') ?: null,
+        ]));
     }
 
     /**

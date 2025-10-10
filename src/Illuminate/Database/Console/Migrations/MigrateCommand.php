@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console\Migrations;
 
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Concerns\DryRunnable;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -20,7 +21,7 @@ use function Laravel\Prompts\confirm;
 #[AsCommand(name: 'migrate')]
 class MigrateCommand extends BaseCommand implements Isolatable
 {
-    use ConfirmableTrait;
+    use ConfirmableTrait, DryRunnable;
 
     /**
      * The name and signature of the console command.
@@ -69,6 +70,8 @@ class MigrateCommand extends BaseCommand implements Isolatable
     {
         parent::__construct();
 
+        $this->configureDryRun();
+
         $this->migrator = $migrator;
         $this->dispatcher = $dispatcher;
     }
@@ -112,16 +115,18 @@ class MigrateCommand extends BaseCommand implements Isolatable
             // Next, we will check to see if a path option has been defined. If it has
             // we will use the path relative to the root of this installation folder
             // so that migrations may be run for any path within the applications.
+            $pretend = $this->option('pretend') || $this->isDryRun();
+            
             $this->migrator->setOutput($this->output)
                 ->run($this->getMigrationPaths(), [
-                    'pretend' => $this->option('pretend'),
+                    'pretend' => $pretend,
                     'step' => $this->option('step'),
                 ]);
 
             // Finally, if the "seed" option has been given, we will re-run the database
             // seed task to re-populate the database, which is convenient when adding
             // a migration and a seed at the same time, as it is only this command.
-            if ($this->option('seed') && ! $this->option('pretend')) {
+            if ($this->option('seed') && ! $pretend) {
                 $this->call('db:seed', [
                     '--class' => $this->option('seeder') ?: 'Database\\Seeders\\DatabaseSeeder',
                     '--force' => true,

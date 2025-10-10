@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Console\Concerns\DryRunnable;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -12,6 +13,7 @@ use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
+    use DryRunnable;
     /**
      * The filesystem instance.
      *
@@ -130,6 +132,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             $this->addTestOptions();
         }
 
+        $this->configureDryRun();
+
         $this->files = $files;
     }
 
@@ -168,9 +172,24 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
-            $this->components->error($this->type.' already exists.');
+            
+            if ($this->isDryRun()) {
+                $this->recordDryRunOperation(
+                    'SKIP',
+                    $this->type.' already exists',
+                    ['Path' => $path]
+                );
+                $this->displayDryRunOperations();
+            } else {
+                $this->components->error($this->type.' already exists.');
+            }
 
             return false;
+        }
+
+        // Handle dry-run mode
+        if ($this->isDryRun()) {
+            return $this->handleDryRun($name, $path);
         }
 
         // Next, we will generate the path to the location where this class' file should get
@@ -191,6 +210,79 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         $this->components->info(sprintf('%s [%s] created successfully.', $info, $path));
+    }
+
+    /**
+     * Handle the dry-run mode for file generation.
+     *
+     * @param  string  $name
+     * @param  string  $path
+     * @return bool|null
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function handleDryRun($name, $path)
+    {
+        $stub = $this->sortImports($this->buildClass($name));
+
+        if (windows_os()) {
+            $path = str_replace('/', '\\', $path);
+        }
+
+        $this->recordDryRunOperation(
+            'CREATE',
+            'Would create '.$this->type,
+            [
+                'Path' => $path,
+                'Directory' => dirname($path),
+                'Namespace' => $this->getNamespace($name),
+                'Class' => str_replace($this->getNamespace($name).'\\', '', $name),
+                'Size' => strlen($stub).' bytes',
+            ]
+        );
+
+        // Show stub preview option
+        if ($this->option('verbose')) {
+            $this->newLine();
+            $this->components->info('File content preview:');
+            $this->newLine();
+            $this->line('<fg=gray>'.str_repeat('─', 80).'</>');
+            $this->line($stub);
+            $this->line('<fg=gray>'.str_repeat('─', 80).'</>');
+            $this->newLine();
+        }
+
+        if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
+            $this->handleTestCreationDryRun($path);
+        }
+
+        $this->displayDryRunOperations();
+
+        return true;
+    }
+
+    /**
+     * Handle the test creation in dry-run mode.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function handleTestCreationDryRun($path)
+    {
+        if (! $this->option('test') && ! $this->option('pest') && ! $this->option('phpunit')) {
+            return;
+        }
+
+        $testType = $this->option('pest') ? 'Pest' : 'PHPUnit';
+        
+        $this->recordDryRunOperation(
+            'CREATE',
+            'Would create '.$testType.' test',
+            [
+                'Related to' => $path,
+                'Test framework' => $testType,
+            ]
+        );
     }
 
     /**
