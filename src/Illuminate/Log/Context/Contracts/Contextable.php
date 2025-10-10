@@ -7,7 +7,8 @@ interface Contextable
     /**
      * The data to append to your log output.
      *
-     * @return array<string, mixed>
+     * @param  \Illuminate\Log\Context\Repository  $repository
+     * @return array<string, mixed>|null
      */
-    public function contextData();
+    public function context($repository);
 }

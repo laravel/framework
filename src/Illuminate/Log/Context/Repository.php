@@ -42,7 +42,7 @@ class Repository
     protected $hidden = [];
 
     /**
-     * @var array<class-string<Contracts\Contextable>, Contracts\Contextable>
+     * @var array<int, Contracts\Contextable>
      */
     protected $contextables = [];
 
@@ -112,15 +112,10 @@ class Repository
      */
     public function all()
     {
-        return $this->data;
-    }
-
-    public function allWithContextables()
-    {
         $data = $this->data;
 
         foreach($this->contextables as $contextable) {
-            $data = array_merge($data, $contextable->contextData());
+            $data = array_merge($data, $contextable->context($this) ?? []);
         }
 
         return $data;
@@ -235,16 +230,20 @@ class Repository
     /**
      * Add a context value.
      *
-     * @param  string|array<string, mixed>  $key
+     * @param  string|array<string, mixed>|\Illuminate\Log\Context\Contracts\Contextable  $key
      * @param  mixed  $value
      * @return $this
      */
     public function add($key, $value = null)
     {
-        $this->data = array_merge(
-            $this->data,
-            is_array($key) ? $key : [$key => $value]
-        );
+        if ($key instanceof Contextable) {
+            $this->contextables[] = $key;
+        } else {
+            $this->data = array_merge(
+                $this->data,
+                is_array($key) ? $key : [$key => $value]
+            );
+        }
 
         return $this;
     }
@@ -398,7 +397,7 @@ class Repository
         $contextables = is_array($contextable) ? $contextable : [$contextable];
 
         foreach($contextables as $contextable) {
-            $this->contextables[$contextable::class] = $contextable;
+            $this->contextables[] = $contextable;
         }
 
         return $this;
@@ -407,7 +406,7 @@ class Repository
     /**
      * Retrieve all registered contextables.
      *
-     * @return array<class-string<Contextable>, Contextable>
+     * @return array<int, \Illuminate\Log\Context\Contracts\Contextable>
      */
     public function getContextables()
     {
@@ -417,14 +416,18 @@ class Repository
     /**
      * Remove a Contextable.
      *
-     * @param  class-string<Contextable>|Contextable  $contextable
+     * @param  class-string<\Illuminate\Log\Context\Contracts\Contextable>|\Illuminate\Log\Context\Contracts\Contextable  $contextable
      * @return $this
      */
-    public function forgetContextable($contextable)
+    public function forgetContextable($contextableToRemove)
     {
-        $class = is_string($contextable) ? $contextable : $contextable::class;
+        foreach($this->contextables as $i => $contextable) {
+            if ((is_string($contextableToRemove) && is_a($contextable, $contextableToRemove, true)) || ($contextableToRemove === $contextable)) {
+                unset($this->contextables[$i]);
+            }
+        }
 
-        unset($this->contextables[$class]);
+        $this->contextables = array_values($this->contextables);
 
         return $this;
     }
@@ -697,7 +700,7 @@ class Repository
     public function dehydrate()
     {
         $instance = (new static($this->events))
-            ->add($this->all())
+            ->add($this->data)
             ->addHidden($this->allHidden())
             ->contextable($this->getContextables());
 
@@ -706,7 +709,7 @@ class Repository
         $serialize = fn ($value) => serialize($instance->getSerializedPropertyValue($value, withRelations: false));
 
         return $instance->isEmpty() ? null : [
-            'data' => array_map($serialize, $instance->all()),
+            'data' => array_map($serialize, $instance->data),
             'hidden' => array_map($serialize, $instance->allHidden()),
             'contextables' => array_map($serialize, $instance->getContextables()),
         ];
