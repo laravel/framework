@@ -33,6 +33,27 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
     }
 
+    public function testCommandsCanFailoverToOtherQueues()
+    {
+        $container = new Container;
+        $dispatcher = new Dispatcher($container, function ($connection) {
+            if ($connection === 'sync-failover') {
+                $mock = m::mock(Queue::class);
+                $mock->shouldReceive('push')->once();
+                return $mock;
+            }
+
+            $mock = m::mock(Queue::class);
+            $mock->shouldReceive('getConfig')->andReturn([
+                'failover' => ['sync-failover'],
+            ]);
+            $mock->shouldReceive('push')->once()->andReturnUsing(fn () => throw new \Exception('error'));
+            return $mock;
+        });
+
+        $dispatcher->dispatch(m::mock(ShouldQueue::class));
+    }
+
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
