@@ -240,11 +240,9 @@ class Dispatcher implements QueueingDispatcher
                 throw $e;
             }
 
-            $exceptionHandler = $this->container->bound(ExceptionHandler::class)
-                ? $this->container->make(ExceptionHandler::class)
-                : null;
-
-            $exceptionHandler?->report($e);
+            if ($this->container->bound(ExceptionHandler::class)) {
+                $this->container->make(ExceptionHandler::class)->report($e);
+            }
 
             foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
                 try {
