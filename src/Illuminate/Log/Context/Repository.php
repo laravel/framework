@@ -42,7 +42,7 @@ class Repository
     protected $hidden = [];
 
     /**
-     * @var array<int, Contracts\Contextable>
+     * @var list<\Illuminate\Log\Context\Contracts\Contextable>
      */
     protected $contextables = [];
 
@@ -653,7 +653,7 @@ class Repository
     /**
      * Execute the given callback when context has been hydrated.
      *
-     * @param  callable  $callback
+     * @param  callable(\Illuminate\Log\Context\Repository): mixed  $callback
      * @return $this
      */
     public function hydrated($callback)

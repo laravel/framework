@@ -6,6 +6,10 @@ use ErrorException;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Log\Context\Contracts\Contextable;
+use Illuminate\Log\Context\Repository;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Context;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
@@ -150,5 +154,50 @@ class ContextIntegrationTest extends TestCase
         $this->assertSame('replaced value 2', Context::getHidden('other'));
 
         Context::handleUnserializeExceptionsUsing(null);
+    }
+
+    public function test_it_can_serialize_a_contextable_object()
+    {
+        $user = UserFactory::new()->create(['id' => 99, 'name' => 'Luke']);
+        Context::add(new MyContextableClass($user, 'you have been replaced'));
+
+        $dehydrated = Context::dehydrate();
+
+        $this->assertEquals([
+            'data' => [],
+            'hidden' => [],
+            'contextables' => [
+                'O:51:"Illuminate\Tests\Integration\Log\MyContextableClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:31:"Illuminate\Foundation\Auth\User";s:2:"id";i:99;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"other";s:22:"you have been replaced";}',
+            ],
+        ], $dehydrated);
+
+        Context::hydrated(function (Repository $context) {
+            App::instance(MyContextableClass::class, $context->getContextables()[0]);
+        });
+
+        Context::hydrate($dehydrated);
+
+        $this->assertSame(resolve(MyContextableClass::class), $contextable = Context::getContextables()[0]);
+        $this->assertTrue($user->is($contextable->user));
+    }
+}
+
+class MyContextableClass implements Contextable
+{
+    use SerializesModels;
+
+    public function __construct(
+        public readonly User $user,
+        public readonly string $other = 'replace me',
+    ) {
+    }
+
+    #[\Override]
+    public function context($repository)
+    {
+        return [
+            'user_id' => $this->user->id,
+            'other' => $this->other,
+        ];
     }
 }
