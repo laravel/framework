@@ -484,6 +484,24 @@ class JobChainingTest extends QueueTestCase
         $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
     }
 
+    public function testChainBatchFailureNotAllowedOnSyncDoesNotDuplicateChainCatch()
+    {
+        config(['queue.default' => 'sync']);
+
+        JobRunRecorder::reset();
+
+        Bus::chain([
+            new JobChainingNamedTestJob('c1'),
+            Bus::batch([
+                new JobChainingTestFailingBatchedJob('fb-sync'),
+            ])->allowFailures(false)->catch(fn () => JobRunRecorder::recordFailure('batch failed')),
+            new JobChainingNamedTestJob('c2'),
+        ])->catch(fn () => JobRunRecorder::recordFailure('chain failed'))->dispatch();
+
+        $this->assertEquals(['batch failed', 'chain failed'], JobRunRecorder::$failures);
+        $this->assertSame(1, collect(JobRunRecorder::$failures)->filter(fn ($m) => $m === 'chain failed')->count());
+    }
+
     public function testChainConditionable()
     {
         $chain = Bus::chain([])
