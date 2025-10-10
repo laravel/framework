@@ -171,6 +171,8 @@ class ContextIntegrationTest extends TestCase
             ],
         ], $dehydrated);
 
+        $this->assertEquals(['user_id' => 99, 'other' => 'you have been replaced'], Context::all());
+
         Context::hydrated(function (Repository $context) {
             App::instance(MyContextableClass::class, $context->getContextables()[0]);
         });
