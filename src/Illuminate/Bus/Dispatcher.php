@@ -5,6 +5,7 @@ namespace Illuminate\Bus;
 use Closure;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
@@ -13,6 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
 use RuntimeException;
+use Throwable;
 
 class Dispatcher implements QueueingDispatcher
 {
@@ -227,11 +229,37 @@ class Dispatcher implements QueueingDispatcher
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
 
-        if (method_exists($command, 'queue')) {
-            return $command->queue($queue, $command);
-        }
+        try {
+            if (method_exists($command, 'queue')) {
+                return $command->queue($queue, $command);
+            }
 
-        return $this->pushCommandToQueue($queue, $command);
+            return $this->pushCommandToQueue($queue, $command);
+        } catch (Throwable $e) {
+            if (empty($queue->getConfig()['failover'] ?? [])) {
+                throw $e;
+            }
+
+            $exceptionHandler = $this->container->bound(ExceptionHandler::class)
+                ? $this->container->make(ExceptionHandler::class)
+                : null;
+
+            $exceptionHandler?->report($e);
+
+            foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
+                try {
+                    $command->connection = $failover;
+
+                    return $this->dispatchToQueue($command);
+                } catch (Throwable $failoverException) {
+                    //
+                }
+            }
+
+            if (isset($failoverException)) {
+                throw $failoverException;
+            }
+        }
     }
 
     /**
