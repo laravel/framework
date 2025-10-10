@@ -172,6 +172,11 @@ class Arr
                 if (is_array($value) && ! empty($value)) {
                     $flatten($value, $newKey.'.');
                 } else {
+
+                    if (is_array($value) && empty($value)) {
+                        $value = null;
+                    }
+
                     $results[$newKey] = $value;
                 }
             }
