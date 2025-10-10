@@ -8,7 +8,7 @@
             <div class="uppercase text-neutral-500 dark:text-neutral-400 shrink-0">{{ $key }}</div>
             <div class="min-w-6 grow h-3 border-b-2 border-dotted border-neutral-300 dark:border-white/20"></div>
             <div class="truncate text-neutral-900 dark:text-white">
-            <span data-tippy-content="{{ $value }}">
+                <span data-tippy-content="{{ $value }}">
                     {{ $value }}
                 </span>
             </div>
