@@ -416,7 +416,7 @@ class Repository
     /**
      * Remove a Contextable.
      *
-     * @param  class-string<\Illuminate\Log\Context\Contracts\Contextable>|\Illuminate\Log\Context\Contracts\Contextable  $contextable
+     * @param  class-string<\Illuminate\Log\Context\Contracts\Contextable>|\Illuminate\Log\Context\Contracts\Contextable  $contextableToRemove
      * @return $this
      */
     public function forgetContextable($contextableToRemove)
