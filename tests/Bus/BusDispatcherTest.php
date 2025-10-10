@@ -40,6 +40,7 @@ class BusDispatcherTest extends TestCase
             if ($connection === 'sync-failover') {
                 $mock = m::mock(Queue::class);
                 $mock->shouldReceive('push')->once();
+
                 return $mock;
             }
 
@@ -48,6 +49,7 @@ class BusDispatcherTest extends TestCase
                 'failover' => ['sync-failover'],
             ]);
             $mock->shouldReceive('push')->once()->andReturnUsing(fn () => throw new \Exception('error'));
+
             return $mock;
         });
 
