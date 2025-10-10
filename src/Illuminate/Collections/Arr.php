@@ -1223,4 +1223,26 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * @param  array $value
+     * @param  string|callable|null $callback
+     * @return float|int
+     */
+    public static function sum($value, $callback = null)
+    {
+        if ($callback) {
+            $sum = 0;
+
+            foreach ($value as $key => $item) {
+                $sum += is_callable($callback)
+                    ? $callback($item, $key)
+                    : (float) data_get($item, $callback);
+            }
+
+            return $sum;
+        }
+
+        return array_sum(array_filter(static::flatten($value), 'is_numeric'));
+    }
 }

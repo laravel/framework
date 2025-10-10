@@ -1812,4 +1812,31 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testSum()
+    {
+        $data = [1, 2, 3, 4, 5];
+        $this->assertEquals(15, Arr::sum($data), 'Failed on simple numeric array');
+
+        $data = [1, [2, 3], [4, [5, 6]]];
+        $this->assertEquals(21, Arr::sum($data), 'Failed on nested arrays');
+
+        $data = [
+            ['price' => 100, 'qty' => 2],
+            ['price' => 200, 'qty' => 1],
+            ['price' => 150, 'qty' => 3],
+        ];
+        $this->assertEquals(450, Arr::sum($data, 'price'), 'Failed on key-based sum');
+
+        $sum = Arr::sum($data, fn($item) => $item['price'] * $item['qty']);
+        $this->assertEquals(850, $sum, 'Failed on callable sum');
+
+        $data = [1, 'a', 3, null, '5', [], false];
+        $this->assertEquals(9, Arr::sum($data), 'Failed on mixed types');
+
+        $this->assertEquals(0, Arr::sum([]), 'Failed on empty array');
+
+        $data = ['a', null, false, [], 'hello'];
+        $this->assertEquals(0, Arr::sum($data), 'Failed on non-numeric-only array');
+    }
 }
