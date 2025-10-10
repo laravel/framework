@@ -188,9 +188,7 @@ class Batch implements Arrayable, JsonSerializable
         $queueConnection = $this->queue->connection($this->options['connection'] ?? null);
 
         if ($queueConnection instanceof SyncQueue) {
-            $this->repository->transaction(function () use ($count) {
-                $this->repository->incrementTotalJobs($this->id, $count);
-            });
+            $this->repository->incrementTotalJobs($this->id, $count);
 
             try {
                 $queueConnection->bulk(
