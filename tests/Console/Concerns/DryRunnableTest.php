@@ -74,7 +74,7 @@ class DryRunnableTest extends TestCase
             ->andReturn(m::mock(Factory::class));
         $laravel->shouldReceive('call')
             ->once()
-            ->andReturnUsing(function ($callback) use ($command) {
+            ->andReturnUsing(function ($callback) {
                 return $callback[0]->{$callback[1]}();
             });
         $laravel->shouldReceive('runningUnitTests')
@@ -119,7 +119,7 @@ class DryRunnableTest extends TestCase
             ->andReturn(m::mock(Factory::class));
         $laravel->shouldReceive('call')
             ->once()
-            ->andReturnUsing(function ($callback) use ($command) {
+            ->andReturnUsing(function ($callback) {
                 return $callback[0]->{$callback[1]}();
             });
         $laravel->shouldReceive('runningUnitTests')
@@ -169,7 +169,7 @@ class DryRunnableTest extends TestCase
             ->andReturn(m::mock(Factory::class));
         $laravel->shouldReceive('call')
             ->once()
-            ->andReturnUsing(function ($callback) use ($command) {
+            ->andReturnUsing(function ($callback) {
                 return $callback[0]->{$callback[1]}();
             });
         $laravel->shouldReceive('runningUnitTests')
@@ -227,7 +227,7 @@ class DryRunnableTest extends TestCase
             ->andReturn(m::mock(Factory::class));
         $laravel->shouldReceive('call')
             ->once()
-            ->andReturnUsing(function ($callback) use ($command) {
+            ->andReturnUsing(function ($callback) {
                 return $callback[0]->{$callback[1]}();
             });
         $laravel->shouldReceive('runningUnitTests')
@@ -285,7 +285,7 @@ class DryRunnableTest extends TestCase
             ->andReturn($components);
         $laravel->shouldReceive('call')
             ->once()
-            ->andReturnUsing(function ($callback) use ($command) {
+            ->andReturnUsing(function ($callback) {
                 return $callback[0]->{$callback[1]}();
             });
         $laravel->shouldReceive('runningUnitTests')

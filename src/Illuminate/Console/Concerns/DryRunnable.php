@@ -62,6 +62,7 @@ trait DryRunnable
     {
         if (empty($this->dryRunOperations)) {
             $this->components->info('No operations would be performed.');
+
             return;
         }
 
@@ -77,7 +78,7 @@ trait DryRunnable
 
         foreach ($this->dryRunOperations as $index => $operation) {
             $number = $index + 1;
-            
+
             $this->components->twoColumnDetail(
                 "<fg=cyan>[{$number}] {$operation['type']}</>",
                 $operation['description']

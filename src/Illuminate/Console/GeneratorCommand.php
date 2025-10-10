@@ -172,7 +172,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if ((! $this->hasOption('force') ||
              ! $this->option('force')) &&
              $this->alreadyExists($this->getNameInput())) {
-            
             if ($this->isDryRun()) {
                 $this->recordDryRunOperation(
                     'SKIP',
@@ -274,7 +273,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         $testType = $this->option('pest') ? 'Pest' : 'PHPUnit';
-        
+
         $this->recordDryRunOperation(
             'CREATE',
             'Would create '.$testType.' test',

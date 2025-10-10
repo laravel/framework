@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Console\Concerns\DryRunnable;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events\SchemaLoaded;
@@ -116,7 +116,7 @@ class MigrateCommand extends BaseCommand implements Isolatable
             // we will use the path relative to the root of this installation folder
             // so that migrations may be run for any path within the applications.
             $pretend = $this->option('pretend') || $this->isDryRun();
-            
+
             $this->migrator->setOutput($this->output)
                 ->run($this->getMigrationPaths(), [
                     'pretend' => $pretend,

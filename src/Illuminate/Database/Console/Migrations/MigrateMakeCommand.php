@@ -113,9 +113,10 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected function writeMigration($name, $table, $create)
     {
         $path = $this->getMigrationPath();
-        
+
         if ($this->isDryRun()) {
             $this->handleMigrationDryRun($name, $table, $create, $path);
+
             return;
         }
 
