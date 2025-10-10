@@ -406,7 +406,7 @@ class Repository
     /**
      * Retrieve all registered contextables.
      *
-     * @return array<int, \Illuminate\Log\Context\Contracts\Contextable>
+     * @return list<\Illuminate\Log\Context\Contracts\Contextable>
      */
     public function getContextables()
     {
