@@ -1181,7 +1181,13 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return array_search($value, $this->items, $strict);
         }
 
-        return array_find_key($this->items, $value) ?? false;
+        foreach ($this->items as $key => $item) {
+            if ($value($item, $key)) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -261,7 +261,7 @@ class Arr
             }
 
             if (is_array($array)) {
-                return array_first($array);
+                return reset($array) ?: null;
             }
 
             foreach ($array as $item) {
@@ -271,9 +271,13 @@ class Arr
             return value($default);
         }
 
-        $key = array_find_key($array, $callback);
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+        }
 
-        return $key !== null ? $array[$key] : value($default);
+        return value($default);
     }
 
     /**
@@ -291,7 +295,7 @@ class Arr
     public static function last($array, ?callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : array_last($array);
+            return empty($array) ? value($default) : (end($array) ?: null);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
@@ -645,7 +649,7 @@ class Arr
         }
 
         if (count($array) === 1) {
-            return array_last($array);
+            return end($array) ?: null;
         }
 
         $finalItem = array_pop($array);

@@ -294,7 +294,7 @@ if (! function_exists('cache')) {
             );
         }
 
-        return app('cache')->put(key($key), array_first($key), ttl: $default);
+        return app('cache')->put(key($key), reset($key) ?: null, ttl: $default);
     }
 }
 
