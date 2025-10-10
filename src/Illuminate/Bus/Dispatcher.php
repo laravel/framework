@@ -3,9 +3,11 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Bus\Events\QueueFailedOver;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
@@ -243,6 +245,10 @@ class Dispatcher implements QueueingDispatcher
             if ($this->container->bound(ExceptionHandler::class)) {
                 $this->container->make(ExceptionHandler::class)->report($e);
             }
+
+            $this->container->make(EventDispatcher::class)->dispatch(
+                new QueueFailedOver($command->connection ?? null, $command)
+            );
 
             foreach ((array) ($queue->getConfig()['failover'] ?? []) as $failover) {
                 try {

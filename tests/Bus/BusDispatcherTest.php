@@ -6,6 +6,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -36,6 +37,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsCanFailoverToOtherQueues()
     {
         $container = new Container;
+
         $dispatcher = new Dispatcher($container, function ($connection) {
             if ($connection === 'sync-failover') {
                 $mock = m::mock(Queue::class);
@@ -52,6 +54,9 @@ class BusDispatcherTest extends TestCase
 
             return $mock;
         });
+
+        $container->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
+        $events->shouldReceive('dispatch');
 
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
     }
