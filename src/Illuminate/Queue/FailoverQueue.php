@@ -90,8 +90,6 @@ class FailoverQueue extends Queue implements QueueContract
             try {
                 return $this->manager->connection($connection)->push($job, $data, $queue);
             } catch (Throwable $e) {
-                $failed = true;
-
                 $this->events->dispatch(new QueueFailedOver($connection, $job));
             }
         }
