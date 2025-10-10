@@ -1828,7 +1828,7 @@ class SupportArrTest extends TestCase
         ];
         $this->assertEquals(450, Arr::sum($data, 'price'), 'Failed on key-based sum');
 
-        $sum = Arr::sum($data, fn($item) => $item['price'] * $item['qty']);
+        $sum = Arr::sum($data, fn ($item) => $item['price'] * $item['qty']);
         $this->assertEquals(850, $sum, 'Failed on callable sum');
 
         $data = [1, 'a', 3, null, '5', [], false];

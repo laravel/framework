@@ -1225,8 +1225,8 @@ class Arr
     }
 
     /**
-     * @param  array $value
-     * @param  string|callable|null $callback
+     * @param  array  $value
+     * @param  string|callable|null  $callback
      * @return float|int
      */
     public static function sum($value, $callback = null)
