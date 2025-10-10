@@ -2026,7 +2026,7 @@ class RoutingUrlGeneratorTest extends TestCase
             'foo' => 'bar',
         ]);
 
-        $this->assertSame('http://www.foo.com/posts/attachable/category?resourceId=1&foo=bar', $result,);
+        $this->assertSame('http://www.foo.com/posts/attachable/category?resourceId=1&foo=bar', $result);
 
         $result = $url->action('MyController', [
             'resource' => 'posts',
