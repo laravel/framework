@@ -277,6 +277,29 @@ class ValidationEnumRuleTest extends TestCase
         ];
     }
 
+    public function testCustomMessageUsingDotNotationWorks()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'invalid_value',
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ],
+            [
+                'status.enum' => 'Please choose a valid pattern (dot notation)',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+
+        $this->assertEquals(
+            ['Please choose a valid pattern (dot notation)'],
+            $v->messages()->get('status')
+        );
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();
