@@ -103,7 +103,7 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
-        $shortHandRule = strtolower(class_basename($lowerRule));
+        $shortHandRule = Str::snake(class_basename($lowerRule));
 
         if (! isset($keys[$shortHandRule])) {
             $keys[] = "{$attribute}.{$shortHandRule}";
