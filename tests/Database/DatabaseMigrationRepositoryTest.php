@@ -44,7 +44,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
         $query->shouldReceive('where')->once()->with('batch', 1)->andReturn($query);
-        $query->shouldReceive('orderBy')->once()->with('migration', 'desc')->andReturn($query);
+        $query->shouldReceive('orderByDesc')->once()->with('migration')->andReturn($query);
         $query->shouldReceive('get')->once()->andReturn(new Collection(['foo']));
         $query->shouldReceive('useWritePdo')->once()->andReturn($query);
 
