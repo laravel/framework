@@ -101,9 +101,13 @@ trait FormatsMessages
     {
         $source = $source ?: $this->customMessages;
 
+        $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
+
         $shortHandRule = strtolower(class_basename($lowerRule));
 
-        $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute, "{$attribute}.$shortHandRule"];
+        if (! isset($keys[$shortHandRule])) {
+            $keys[] = "{$attribute}.{$shortHandRule}";
+        }
 
         // First we will check for a custom message for an attribute specific rule
         // message for the fields, then we will check for a general custom line
