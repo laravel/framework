@@ -3478,6 +3478,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
     }
 
+    public function testTransformKeys()
+    {
+        $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
+        $data = $data->mapKeys('strtoupper');
+        $this->assertSame(['FIRST' => 'taylor', 'LAST' => 'otwell'], $data->all());
+    }
+
     #[DataProvider('collectionClassProvider')]
     public function testGroupByAttribute($collection)
     {

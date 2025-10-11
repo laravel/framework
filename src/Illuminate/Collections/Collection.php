@@ -877,6 +877,19 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Map each key in the collection using a callback.
+     *
+     * @template TNewKey of array-key
+     *
+     * @param  callable(TKey): TNewKey  $callback
+     * @return static<TNewKey, TValue>
+     */
+    public function mapKeys(callable $callback)
+    {
+        return new static(Arr::mapKeys($this->all(), $callback));
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.
@@ -1816,6 +1829,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function transform(callable $callback)
     {
         $this->items = $this->map($callback)->all();
+
+        return $this;
+    }
+
+    /**
+     * Transform each key in the collection using a callback.
+     *
+     * @param  callable(TKey): TKey  $callback
+     * @return $this
+     *
+     * @phpstan-this-out static<TKey, TValue>
+     */
+    public function transformKeys(callable $callback)
+    {
+        $this->items = Arr::mapKeys($this->all(), $callback);
 
         return $this;
     }

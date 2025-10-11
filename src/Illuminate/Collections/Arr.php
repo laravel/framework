@@ -1196,6 +1196,60 @@ class Arr
     }
 
     /**
+     * Executes a callback that transforms each key of the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @param  int  $maxDepth
+     * @return array|void
+     */
+    public static function mapKeys(array &$array, callable $callback, $maxDepth = 512)
+    {
+        if ($maxDepth <= 0) {
+            return $array;
+        }
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                static::mapKeys($array, $callback, $maxDepth - 1);
+            }
+
+            if (is_string($key)) {
+                $newKey = $callback($key);
+
+                if ($newKey !== $key) {
+                    $array[$newKey] = $array[$key];
+                    unset($array[$key]);
+                }
+            }
+        }
+
+        return $array;
+    }
+
+    /**
+     * Transforms each key of the array into "camelCase".
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function mapKeysToCamel(array $array)
+    {
+        return static::mapKeys($array, Str::camel(...));
+    }
+
+    /**
+     * Transforms each key of the array into "snake_case".
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function mapKeysToSnake(array $array)
+    {
+        return static::mapKeys($array, Str::snake(...));
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
