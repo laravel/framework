@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Mockery;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +19,7 @@ class SupportStrTest extends TestCase
     protected function tearDown(): void
     {
         Str::createRandomStringsNormally();
+        Mockery::close();
     }
 
     public function testStringCanBeLimitedByWords(): void
@@ -54,8 +57,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel123', Str::title('laravel123'));
         $this->assertSame('Laravel123', Str::title('Laravel123'));
 
-        $longString = 'lorem ipsum '.str_repeat('dolor sit amet ', 1000);
-        $expectedResult = 'Lorem Ipsum Dolor Sit Amet '.str_repeat('Dolor Sit Amet ', 999);
+        $longString = 'lorem ipsum ' . str_repeat('dolor sit amet ', 1000);
+        $expectedResult = 'Lorem Ipsum Dolor Sit Amet ' . str_repeat('Dolor Sit Amet ', 999);
         $this->assertSame($expectedResult, Str::title($longString));
     }
 
@@ -137,7 +140,7 @@ class SupportStrTest extends TestCase
 
     public function testStringWithoutWordsDoesntProduceError(): void
     {
-        $nbsp = chr(0xC2).chr(0xA0);
+        $nbsp = chr(0xC2) . chr(0xA0);
         $this->assertSame(' ', Str::words(' '));
         $this->assertEquals($nbsp, Str::words($nbsp));
         $this->assertSame('   ', Str::words('   '));
@@ -315,9 +318,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('[...]is a beautiful morn[...]', Str::excerpt('This is a beautiful morning', 'beautiful', ['omission' => '[...]', 'radius' => 5]));
         $this->assertSame(
             'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome tempera[...]',
-            Str::excerpt('This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?', 'very',
+            Str::excerpt(
+                'This is the ultimate supercalifragilisticexpialidocious very looooooooooooooooooong looooooooooooong beautiful morning with amazing sunshine and awesome temperatures. So what are you gonna do about it?',
+                'very',
                 ['omission' => '[...]'],
-            ));
+            )
+        );
 
         $this->assertSame('...y...', Str::excerpt('taylor', 'y', ['radius' => 0]));
         $this->assertSame('...ayl...', Str::excerpt('taylor', 'Y', ['radius' => 1]));
@@ -523,6 +529,52 @@ class SupportStrTest extends TestCase
         $this->assertSame('500-dollar-bill', Str::slug('500$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('500-dollar-bill', Str::slug('500-$--bill', '-', 'en', ['$' => 'dollar']));
         $this->assertSame('أحمد-في-المدرسة', Str::slug('أحمد@المدرسة', '-', null, ['@' => 'في']));
+    }
+
+    public function testSlugUniqueThrowsExceptionIfTableMissing()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->expectExceptionMessage('The "table" parameter is required to generate unique slugs.');
+
+        Str::slug('hello world', unique: true);
+    }
+
+    public function testSlugUniqueGeneratesUniqueSlug()
+    {
+        DB::shouldReceive('table')->with('posts')->andReturnSelf();
+
+        DB::shouldReceive('clone')->andReturnSelf();
+
+        DB::shouldReceive('where')
+            ->withArgs(function ($column, $slug) {
+                return $column === 'slug' && in_array($slug, ['hello-world', 'hello-world-1']);
+            })
+            ->andReturnSelf()
+            ->twice();
+
+        DB::shouldReceive('exists')->andReturn(true, false);
+
+        $slug = Str::slug('hello world', '-', unique: true, table: 'posts');
+
+        $this->assertSame('hello-world-1', $slug);
+    }
+
+    public function testSlugUniqueIgnoresGivenId()
+    {
+        DB::shouldReceive('table')->with('posts')->andReturnSelf();
+
+        DB::shouldReceive('where')->with('id', '!=', 1)->andReturnSelf();
+
+        DB::shouldReceive('clone')->andReturnSelf();
+
+        DB::shouldReceive('where')->with('slug', 'hello-world')->andReturnSelf();
+
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $slug = Str::slug('hello world', unique: true, table: 'posts', column: 'slug', ignoreId: 1);
+
+        $this->assertSame('hello-world', $slug);
     }
 
     public function testStrStart()
@@ -810,7 +862,7 @@ class SupportStrTest extends TestCase
 
     public function testRandomStringFactoryCanBeSet()
     {
-        Str::createRandomStringsUsing(fn ($length) => 'length:'.$length);
+        Str::createRandomStringsUsing(fn($length) => 'length:' . $length);
 
         $this->assertSame('length:7', Str::random(7));
         $this->assertSame('length:7', Str::random(7));
@@ -842,7 +894,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForARandomStringSequence()
     {
-        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn () => throw new Exception('Out of random strings.'));
+        Str::createRandomStringsUsingSequence([Str::random(), Str::random()], fn() => throw new Exception('Out of random strings.'));
         Str::random();
         Str::random();
 
@@ -1403,7 +1455,7 @@ class SupportStrTest extends TestCase
         return [
             ['not a valid uuid so we can test this'],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1' . PHP_EOL],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
             [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
             ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
@@ -1609,7 +1661,7 @@ class SupportStrTest extends TestCase
     {
         try {
             Str::freezeUuids(function () {
-                Str::createUuidsUsing(fn () => Str::of('1234'));
+                Str::createUuidsUsing(fn() => Str::of('1234'));
                 $this->assertSame('1234', Str::uuid()->toString());
                 throw new \Exception('Something failed.');
             });
@@ -1653,7 +1705,7 @@ class SupportStrTest extends TestCase
 
     public function testItCanSpecifyAFallbackForASequence()
     {
-        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn () => throw new Exception('Out of Uuids.'));
+        Str::createUuidsUsingSequence([Str::uuid(), Str::uuid()], fn() => throw new Exception('Out of Uuids.'));
         Str::uuid();
         Str::uuid();
 
@@ -1711,7 +1763,7 @@ class SupportStrTest extends TestCase
     {
         try {
             Str::freezeUlids(function () {
-                Str::createUlidsUsing(fn () => Str::of('1234'));
+                Str::createUlidsUsing(fn() => Str::of('1234'));
                 $this->assertSame('1234', (string) Str::ulid());
                 throw new \Exception('Something failed');
             });
@@ -1757,7 +1809,7 @@ class SupportStrTest extends TestCase
     {
         Str::createUlidsUsingSequence(
             [Str::ulid(), Str::ulid()],
-            fn () => throw new Exception('Out of Ulids'),
+            fn() => throw new Exception('Out of Ulids'),
         );
         Str::ulid();
         Str::ulid();
@@ -1797,18 +1849,20 @@ class SupportStrTest extends TestCase
 
     public function testChopStart()
     {
-        foreach ([
-            ['http://laravel.com', 'http://', 'laravel.com'],
-            ['http://-http://', 'http://', '-http://'],
-            ['http://laravel.com', 'htp:/', 'http://laravel.com'],
-            ['http://laravel.com', 'http://www.', 'http://laravel.com'],
-            ['http://laravel.com', '-http://', 'http://laravel.com'],
-            ['http://laravel.com', ['https://', 'http://'], 'laravel.com'],
-            ['http://www.laravel.com', ['http://', 'www.'], 'www.laravel.com'],
-            ['http://http-is-fun.test', 'http://', 'http-is-fun.test'],
-            ['🌊✋', '🌊', '✋'],
-            ['🌊✋', '✋', '🌊✋'],
-        ] as $value) {
+        foreach (
+            [
+                ['http://laravel.com', 'http://', 'laravel.com'],
+                ['http://-http://', 'http://', '-http://'],
+                ['http://laravel.com', 'htp:/', 'http://laravel.com'],
+                ['http://laravel.com', 'http://www.', 'http://laravel.com'],
+                ['http://laravel.com', '-http://', 'http://laravel.com'],
+                ['http://laravel.com', ['https://', 'http://'], 'laravel.com'],
+                ['http://www.laravel.com', ['http://', 'www.'], 'www.laravel.com'],
+                ['http://http-is-fun.test', 'http://', 'http-is-fun.test'],
+                ['🌊✋', '🌊', '✋'],
+                ['🌊✋', '✋', '🌊✋'],
+            ] as $value
+        ) {
             [$subject, $needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopStart($subject, $needle));
@@ -1817,18 +1871,20 @@ class SupportStrTest extends TestCase
 
     public function testChopEnd()
     {
-        foreach ([
-            ['path/to/file.php', '.php', 'path/to/file'],
-            ['.php-.php', '.php', '.php-'],
-            ['path/to/file.php', '.ph', 'path/to/file.php'],
-            ['path/to/file.php', 'foo.php', 'path/to/file.php'],
-            ['path/to/file.php', '.php-', 'path/to/file.php'],
-            ['path/to/file.php', ['.html', '.php'], 'path/to/file'],
-            ['path/to/file.php', ['.php', 'file'], 'path/to/file'],
-            ['path/to/php.php', '.php', 'path/to/php'],
-            ['✋🌊', '🌊', '✋'],
-            ['✋🌊', '✋', '✋🌊'],
-        ] as $value) {
+        foreach (
+            [
+                ['path/to/file.php', '.php', 'path/to/file'],
+                ['.php-.php', '.php', '.php-'],
+                ['path/to/file.php', '.ph', 'path/to/file.php'],
+                ['path/to/file.php', 'foo.php', 'path/to/file.php'],
+                ['path/to/file.php', '.php-', 'path/to/file.php'],
+                ['path/to/file.php', ['.html', '.php'], 'path/to/file'],
+                ['path/to/file.php', ['.php', 'file'], 'path/to/file'],
+                ['path/to/php.php', '.php', 'path/to/php'],
+                ['✋🌊', '🌊', '✋'],
+                ['✋🌊', '✋', '✋🌊'],
+            ] as $value
+        ) {
             [$subject, $needle, $expected] = $value;
 
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
@@ -1846,7 +1902,7 @@ class SupportStrTest extends TestCase
 
         // Test with callback
         $result = Str::replaceMatches('/ba(.)/', function ($match) {
-            return 'ba'.strtoupper($match[1]);
+            return 'ba' . strtoupper($match[1]);
         }, 'foo baz bar');
 
         $this->assertSame('foo baZ baR', $result);
@@ -1861,7 +1917,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo baz baz', Str::replaceMatches('/ba(.)/', 'ba$1', 'foo baz baz', 1));
 
         $result = Str::replaceMatches('/ba(.)/', function ($match) {
-            return 'ba'.strtoupper($match[1]);
+            return 'ba' . strtoupper($match[1]);
         }, 'foo baz baz bar', 1);
 
         $this->assertSame('foo baZ baz bar', $result);
