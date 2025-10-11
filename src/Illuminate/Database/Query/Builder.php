@@ -2723,7 +2723,7 @@ class Builder implements BuilderContract
      */
     public function latest($column = 'created_at')
     {
-        return $this->orderBy($column, 'desc');
+        return $this->orderByDesc($column);
     }
 
     /**
@@ -2866,7 +2866,7 @@ class Builder implements BuilderContract
             $this->where($column, '<', $lastId);
         }
 
-        return $this->orderBy($column, 'desc')
+        return $this->orderByDesc($column)
             ->limit($perPage);
     }
 

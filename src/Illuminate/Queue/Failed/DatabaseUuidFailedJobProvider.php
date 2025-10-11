@@ -76,7 +76,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
     {
         return $this->getTable()
             ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->pluck('uuid')
             ->all();
     }
@@ -88,7 +88,7 @@ class DatabaseUuidFailedJobProvider implements CountableFailedJobProvider, Faile
      */
     public function all()
     {
-        return $this->getTable()->orderBy('id', 'desc')->get()->map(function ($record) {
+        return $this->getTable()->orderByDesc('id')->get()->map(function ($record) {
             $record->id = $record->uuid;
             unset($record->uuid);
 

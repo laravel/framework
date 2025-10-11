@@ -73,7 +73,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
     {
         return $this->getTable()
             ->when(! is_null($queue), fn ($query) => $query->where('queue', $queue))
-            ->orderBy('id', 'desc')
+            ->orderByDesc('id')
             ->pluck('id')
             ->all();
     }
@@ -85,7 +85,7 @@ class DatabaseFailedJobProvider implements CountableFailedJobProvider, FailedJob
      */
     public function all()
     {
-        return $this->getTable()->orderBy('id', 'desc')->get()->all();
+        return $this->getTable()->orderByDesc('id')->get()->all();
     }
 
     /**
