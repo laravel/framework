@@ -277,27 +277,29 @@ class ValidationEnumRuleTest extends TestCase
         ];
     }
 
-    public function testCustomMessageUsingDotNotationWorks()
+    public function testCustomMessageUsingDotNotationOrFqcnWorks()
     {
         $v = new Validator(
             resolve('translator'),
             [
                 'status' => 'invalid_value',
+                'status_fqcn' => 'another_invalid',
             ],
             [
                 'status' => new Enum(StringStatus::class),
+                'status_fqcn' => new Enum(StringStatus::class),
             ],
             [
                 'status.enum' => 'Please choose a valid pattern (dot notation)',
+                'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid pattern (fqcn)',
             ]
         );
-
         $this->assertTrue($v->fails());
 
-        $this->assertEquals(
-            ['Please choose a valid pattern (dot notation)'],
-            $v->messages()->get('status')
-        );
+        $this->assertSame([
+            'Please choose a valid pattern (fqcn)',
+            'Please choose a valid pattern (dot notation)',
+        ], $v->messages()->all());
     }
 
     protected function setUp(): void
