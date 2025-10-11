@@ -1066,6 +1066,45 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first' => 'first-taylor', 'last' => 'last-'], $mapped);
     }
 
+    public function testMapKeys()
+    {
+        $array = [100, '200', 300, '400', 500];
+
+        $array = Arr::mapKeys($array, fn($key) => $key + 1);
+
+        $this->assertSame([1 => 100, 2 => '200', 3 => 300, 4 => '400', 5 => 500], $array);
+    }
+
+    public function testMapKeysToCamel()
+    {
+        $array = [
+            1 => 'foo',
+            'foo_bar' => 'bar',
+            'cuzCux' => 'baz',
+        ];
+
+        $this->assertSame([
+            '1' => 'foo',
+            'fooBar' => 'bar',
+            'cuzCux' => 'baz',
+        ], Arr::mapKeysToCamel($array));
+    }
+
+    public function testMapKeysToSnake()
+    {
+        $array = [
+            1 => 'foo',
+            'foo_bar' => 'bar',
+            'cuzCux' => 'baz',
+        ];
+
+        $this->assertSame([
+            '1' => 'foo',
+            'foo_bar' => 'bar',
+            'cuz_cux' => 'baz',
+        ], Arr::mapKeysToSnake($array));
+    }
+
     public function testMapWithKeys()
     {
         $data = [
