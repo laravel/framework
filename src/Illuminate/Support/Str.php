@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -1514,9 +1515,13 @@ class Str
      * @param  string  $separator
      * @param  string|null  $language
      * @param  array<string, string>  $dictionary
+     * @param  bool  $unique
+     * @param  string|null  $table
+     * @param  string  $column
+     * @param  string|int|null  $ignoreId
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'])
+    public static function slug($title, $separator = '-', $language = 'en', $dictionary = ['@' => 'at'], bool $unique = false, ?string $table = null, string $column = 'slug', string|int|null $ignoreId = null)
     {
         $title = $language ? static::ascii($title, $language) : $title;
 
@@ -1538,7 +1543,29 @@ class Str
         // Replace all separator characters and whitespace by a single separator
         $title = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $title);
 
-        return trim($title, $separator);
+        $slug = trim($title, $separator);
+
+        // Ensure the slug is unique
+        if ($unique) {
+            if ($table === null) {
+                throw new \InvalidArgumentException('The "table" parameter is required to generate unique slugs.');
+            }
+
+            $originalSlug = $slug;
+            $i = 1;
+
+            $query = DB::table($table);
+
+            if ($ignoreId !== null) {
+                $query->where('id', '!=', $ignoreId);
+            }
+
+            while ($query->clone()->where($column, $slug)->exists()) {
+                $slug = $originalSlug . $separator . $i++;
+            }
+        }
+
+        return $slug;
     }
 
     /**
