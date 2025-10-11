@@ -1491,6 +1491,15 @@ class SupportArrTest extends TestCase
         $this->assertSame('font-weight: bold; margin-top: 4px; margin-left: 2px;', $styles);
     }
 
+    public function testTransformKeys()
+    {
+        $array = [100, '200', 300, '400', 500];
+
+        $new = Arr::transformKeys($array, fn($key) => $key + 1);
+
+        $this->assertSame([1 => 100, 2 => '200', 3 => 300, 4 => '400', 5 => 500], $new);
+    }
+
     public function testWhere()
     {
         $array = [100, '200', 300, '400', 500];

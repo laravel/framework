@@ -1159,6 +1159,18 @@ class Arr
     }
 
     /**
+     * Executes a callback that transforms each key of the array.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function transformKeys(array $array, callable $callback)
+    {
+        return array_combine(array_map($callback, array_keys($array)), array_values($array));
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array

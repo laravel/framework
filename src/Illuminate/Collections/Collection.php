@@ -1743,6 +1743,21 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Transform each key in the collection using a callback.
+     *
+     * @param  callable(TKey): TKey  $callback
+     * @return $this
+     *
+     * @phpstan-this-out static<TKey, TValue>
+     */
+    public function transformKeys(callable $callback)
+    {
+        $this->items = Arr::transformKeys($this->all(), $callback);
+
+        return $this;
+    }
+
+    /**
      * Flatten a multi-dimensional associative array with dots.
      *
      * @return static
