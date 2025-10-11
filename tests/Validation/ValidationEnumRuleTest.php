@@ -294,6 +294,7 @@ class ValidationEnumRuleTest extends TestCase
                 'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid pattern (fqcn)',
             ]
         );
+
         $this->assertTrue($v->fails());
 
         $this->assertSame([
