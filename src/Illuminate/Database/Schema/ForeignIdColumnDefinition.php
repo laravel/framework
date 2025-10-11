@@ -14,6 +14,13 @@ class ForeignIdColumnDefinition extends ColumnDefinition
     protected $blueprint;
 
     /**
+     * Whether to skip automatic index creation.
+     *
+     * @var bool
+     */
+    protected $shouldSkipAutoIndex = false;
+
+    /**
      * Create a new foreign ID column definition.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -24,6 +31,18 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         parent::__construct($attributes);
 
         $this->blueprint = $blueprint;
+    }
+
+    /**
+     * Indicate that the foreign key should not have an automatically created index.
+     *
+     * @return $this
+     */
+    public function withoutIndex()
+    {
+        $this->shouldSkipAutoIndex = true;
+
+        return $this;
     }
 
     /**
@@ -39,7 +58,13 @@ class ForeignIdColumnDefinition extends ColumnDefinition
         $table ??= $this->table;
         $column ??= $this->referencesModelColumn ?? 'id';
 
-        return $this->references($column, $indexName)->on($table ?? (new Stringable($this->name))->beforeLast('_'.$column)->plural());
+        $foreignKey = $this->references($column, $indexName)->on($table ?? (new Stringable($this->name))->beforeLast('_'.$column)->plural());
+
+        if ($this->shouldSkipAutoIndex) {
+            $foreignKey->withoutIndex();
+        }
+
+        return $foreignKey;
     }
 
     /**
@@ -51,6 +76,12 @@ class ForeignIdColumnDefinition extends ColumnDefinition
      */
     public function references($column, $indexName = null)
     {
-        return $this->blueprint->foreign($this->name, $indexName)->references($column);
+        $foreignKey = $this->blueprint->foreign($this->name, $indexName)->references($column);
+
+        if ($this->shouldSkipAutoIndex) {
+            $foreignKey->withoutIndex();
+        }
+
+        return $foreignKey;
     }
 }
