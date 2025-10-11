@@ -297,8 +297,8 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertTrue($v->fails());
 
         $this->assertSame([
-            'Please choose a valid pattern (fqcn)',
             'Please choose a valid pattern (dot notation)',
+            'Please choose a valid pattern (fqcn)',
         ], $v->messages()->all());
     }
 
