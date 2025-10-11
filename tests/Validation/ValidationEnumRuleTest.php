@@ -277,7 +277,7 @@ class ValidationEnumRuleTest extends TestCase
         ];
     }
 
-    public function testCustomMessageUsingDotNotationOrFqcnWorks()
+    public function testCustomMessageUsingDotNotationAndFqcnWorks()
     {
         $v = new Validator(
             resolve('translator'),
