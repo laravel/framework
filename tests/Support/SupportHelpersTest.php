@@ -832,6 +832,30 @@ class SupportHelpersTest extends TestCase
         throw_if(true, LogicException::class, 'test');
     }
 
+    public function testThrowClosureException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => new \Exception('test'));
+    }
+
+    public function testThrowClosureWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+    }
+
+    public function testThrowClosureStringWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => \Exception::class, 'test');
+    }
+
     public function testThrowUnless()
     {
         $this->expectException(LogicException::class);

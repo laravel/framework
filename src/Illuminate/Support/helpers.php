@@ -398,11 +398,12 @@ if (! function_exists('throw_if')) {
      * Throw the given exception if the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  TException|\Closure(TParams): mixed|class-string<TException>|string  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
      * @throws TException
@@ -410,6 +411,10 @@ if (! function_exists('throw_if')) {
     function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
     {
         if ($condition) {
+            if ($exception instanceof Closure) {
+                $exception = $exception(...$parameters);
+            }
+
             if (is_string($exception) && class_exists($exception)) {
                 $exception = new $exception(...$parameters);
             }
