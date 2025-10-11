@@ -3308,7 +3308,7 @@ class SupportCollectionTest extends TestCase
     public function testTransformKeys()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
-        $data->transformKeys('strtoupper');
+        $data->mapKeys('strtoupper');
         $this->assertSame(['FIRST' => 'taylor', 'LAST' => 'otwell'], $data->all());
     }
 
