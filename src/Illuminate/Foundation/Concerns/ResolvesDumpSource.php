@@ -27,6 +27,7 @@ trait ResolvesDumpSource
         'vscode-insiders' => 'vscode-insiders://file/{file}:{line}',
         'vscode-insiders-remote' => 'vscode-insiders://vscode-remote/{file}:{line}',
         'vscode-remote' => 'vscode://vscode-remote/{file}:{line}',
+        'windsurf' => 'windsurf://file/{file}:{line}',
         'vscodium' => 'vscodium://file/{file}:{line}',
         'xdebug' => 'xdebug://{file}@{line}',
         'zed' => 'zed://file/{file}:{line}',
