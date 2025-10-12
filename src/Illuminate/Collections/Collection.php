@@ -1765,7 +1765,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function transformKeys(callable $callback)
     {
-        $this->items = Arr::transformKeys($this->all(), $callback);
+        $this->items = Arr::mapKeys($this->all(), $callback);
 
         return $this;
     }
