@@ -2916,7 +2916,7 @@ class Builder implements BuilderContract
     /**
      * Add descending "reorder" clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null  $column
+     * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string $column
      * @return $this
      */
     public function reorderDesc($column)
