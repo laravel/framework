@@ -39,16 +39,18 @@ class ComponentMakeCommand extends GeneratorCommand
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return bool|null
      */
     public function handle()
     {
         if ($this->option('view')) {
-            return $this->writeView();
+            $this->writeView();
+
+            return null;
         }
 
         if (parent::handle() === false && ! $this->option('force')) {
-            return;
+            return false;
         }
 
         if (! $this->option('inline')) {
@@ -63,14 +65,8 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function writeView()
     {
-        $separator = '/';
-
-        if (windows_os()) {
-            $separator = '\\';
-        }
-
         $path = $this->viewPath(
-            str_replace('.', $separator, $this->getView()).'.blade.php'
+            str_replace('.', '/', $this->getViewPath()) . '.blade.php'
         );
 
         if (! $this->files->isDirectory(dirname($path))) {
@@ -86,7 +82,7 @@ class ComponentMakeCommand extends GeneratorCommand
         file_put_contents(
             $path,
             '<div>
-    <!-- '.Inspiring::quotes()->random().' -->
+    <!-- ' . Inspiring::quotes()->random() . ' -->
 </div>'
         );
 
@@ -104,41 +100,81 @@ class ComponentMakeCommand extends GeneratorCommand
         if ($this->option('inline')) {
             return str_replace(
                 ['DummyView', '{{ view }}'],
-                "<<<'blade'\n<div>\n    <!-- ".Inspiring::quotes()->random()." -->\n</div>\nblade",
+                "<<<'blade'\n<div>\n    <!-- " . Inspiring::quotes()->random() . " -->\n</div>\nblade",
                 parent::buildClass($name)
             );
         }
 
         return str_replace(
             ['DummyView', '{{ view }}'],
-            'view(\''.$this->getView().'\')',
+            "view('{$this->getViewName()}')",
             parent::buildClass($name)
         );
     }
 
     /**
-     * Get the view name relative to the view path.
+     * Get the desired class name from the input.
      *
-     * @return string view
+     * @return string
      */
-    protected function getView()
+    protected function getNameInput()
     {
-        $segments = explode('/', str_replace('\\', '/', $this->argument('name')));
+        $name = trim($this->argument('name'));
 
-        $name = array_pop($segments);
+        $normalized = str_replace(['.', '\\'], '/', $name);
 
-        $path = is_string($this->option('path'))
-            ? explode('/', trim($this->option('path'), '/'))
-            : [
-                'components',
-                ...$segments,
-            ];
+        return (new Collection(explode('/', $normalized)))
+            ->map(fn($segment) => Str::studly($segment))
+            ->implode('/');
+    }
 
-        $path[] = $name;
+    /**
+     * Get the full view path including the base directory.
+     *
+     * @return string
+     */
+    protected function getViewPath()
+    {
+        $segments = $this->getViewSegments();
 
-        return (new Collection($path))
-            ->map(fn ($segment) => Str::kebab($segment))
-            ->implode('.');
+        if ($customPath = $this->option('path')) {
+            $basePath = trim($customPath, '/');
+            return $basePath . '.' . $segments->implode('.');
+        }
+
+        return 'components.' . $segments->implode('.');
+    }
+
+    /**
+     * Get the view name for referencing in the component class.
+     *
+     * @return string
+     */
+    protected function getViewName()
+    {
+        $segments = $this->getViewSegments();
+
+        if ($customPath = $this->option('path')) {
+            $basePath = str_replace('/', '.', trim($customPath, '/'));
+            return $basePath . '.' . $segments->implode('.');
+        }
+
+        return 'components.' . $segments->implode('.');
+    }
+
+    /**
+     * Get the view name segments in kebab-case.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getViewSegments()
+    {
+        $name = trim($this->argument('name'));
+
+        $normalized = str_replace(['.', '\\'], '/', $name);
+
+        return (new Collection(explode('/', $normalized)))
+            ->map(fn($segment) => Str::kebab($segment));
     }
 
     /**
@@ -161,7 +197,7 @@ class ComponentMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$stub;
+            : __DIR__ . $stub;
     }
 
     /**
@@ -172,7 +208,7 @@ class ComponentMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\View\Components';
+        return $rootNamespace . '\View\Components';
     }
 
     /**
