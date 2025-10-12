@@ -70,15 +70,14 @@ class TrustProxies
 
         $host = $request->host();
 
-        if (is_null($trustedIps) &&
-            (laravel_cloud() ||
-             str_ends_with($host, '.on-forge.com') ||
-             str_ends_with($host, '.on-vapor.com'))) {
+        $isForgeOrVapor = str_ends_with($host, '.on-forge.com') ||
+            str_ends_with($host, '.on-vapor.com');
+
+        if (is_null($trustedIps) && (laravel_cloud() || $isForgeOrVapor)) {
             $trustedIps = '*';
         }
 
-        if (str_ends_with($host, '.on-forge.com') ||
-            str_ends_with($host, '.on-vapor.com')) {
+        if ($isForgeOrVapor) {
             $request->headers->remove('X-Forwarded-Host');
         }
 
