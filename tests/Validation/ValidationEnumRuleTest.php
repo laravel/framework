@@ -290,16 +290,16 @@ class ValidationEnumRuleTest extends TestCase
                 'status_fqcn' => new Enum(StringStatus::class),
             ],
             [
-                'status.enum' => 'Please choose a valid pattern (dot notation)',
-                'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid pattern (fqcn)',
+                'status.enum' => 'Please choose a valid status (dot notation)',
+                'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid status (fqcn)',
             ]
         );
 
         $this->assertTrue($v->fails());
 
         $this->assertSame([
-            'Please choose a valid pattern (dot notation)',
-            'Please choose a valid pattern (fqcn)',
+            'Please choose a valid status (dot notation)',
+            'Please choose a valid status (fqcn)',
         ], $v->messages()->all());
     }
 
