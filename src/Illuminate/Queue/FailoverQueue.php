@@ -16,8 +16,7 @@ class FailoverQueue extends Queue implements QueueContract
         public QueueManager $manager,
         public EventDispatcher $events,
         public array $connections
-    ) {
-    }
+    ) {}
 
     /**
      * Get the size of the queue.
@@ -86,15 +85,18 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
+        $lastException = null;
+
         foreach ($this->connections as $connection) {
             try {
                 return $this->manager->connection($connection)->push($job, $data, $queue);
             } catch (Throwable $e) {
+                $lastException = $e;
                 $this->events->dispatch(new QueueFailedOver($connection, $job));
             }
         }
 
-        throw $e;
+        throw $lastException ?? new \RuntimeException('No available connections to push the job.');
     }
 
     /**
@@ -106,15 +108,17 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
+        $lastException = null;
+
         foreach ($this->connections as $connection) {
             try {
                 return $this->manager->connection($connection)->pushRaw($payload, $queue, $options);
             } catch (Throwable $e) {
-                //
+                $lastException = $e;
             }
         }
 
-        throw $e;
+        throw $lastException ?? new \RuntimeException('No available connections to push the raw payload.');
     }
 
     /**
@@ -128,15 +132,18 @@ class FailoverQueue extends Queue implements QueueContract
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
+        $lastException = null;
+
         foreach ($this->connections as $connection) {
             try {
                 return $this->manager->connection($connection)->later($delay, $job, $data, $queue);
             } catch (Throwable $e) {
+                $lastException = $e;
                 $this->events->dispatch(new QueueFailedOver($connection, $job));
             }
         }
 
-        throw $e;
+        throw $lastException ?? new \RuntimeException('No available connections to schedule the job.');
     }
 
     /**
