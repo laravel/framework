@@ -204,7 +204,7 @@ class ScheduleListCommand extends Command
         $hasMutex = $event->mutex->exists($event) ? 'Has Mutex › ' : '';
 
         $dots = str_repeat('.', max(
-            $terminalWidth - mb_strlen($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
+            $terminalWidth - mb_strwidth($expression.$repeatExpression.$command.$nextDueDateLabel.$nextDueDate.$hasMutex) - 8, 0
         ));
 
         // Highlight the parameters...
