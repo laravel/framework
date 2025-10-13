@@ -330,25 +330,21 @@ class HandleExceptions
      */
     public static function flushHandlersState(?TestCase $testCase = null)
     {
-        while (get_exception_handler() !== null) {
+        while (set_exception_handler(null) !== null) {
             restore_exception_handler();
         }
 
-        while (get_error_handler() !== null) {
+        while (set_error_handler(null) !== null) {
             restore_error_handler();
         }
 
         if (class_exists(ErrorHandler::class)) {
             $instance = ErrorHandler::instance();
 
-            if ((fn () => $this->enabled ?? false)->call($instance)) {
+            if (method_exists($instance, 'isEnabled') ? $instance->isEnabled() : true) {
                 $instance->disable();
 
-                if (version_compare(Version::id(), '12.3.4', '>=')) {
-                    $instance->enable($testCase);
-                } else {
-                    $instance->enable();
-                }
+                $instance->enable();
             }
         }
     }
