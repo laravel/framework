@@ -268,4 +268,35 @@ class Exception
             ];
         }, $this->listener->queries());
     }
+
+    /**
+     * Get all previous exceptions.
+     *
+     * @return \Illuminate\Support\Collection<int, array{class: string, message: string, code: int|string}>
+     */
+    public function previousExceptions()
+    {
+        $previous = [];
+        $exception = $this->exception;
+
+        while ($exception = $exception->getPrevious()) {
+            $previous[] = [
+                'class' => $exception->getClass(),
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ];
+        }
+
+        return new Collection($previous);
+    }
+
+    /**
+     * Determine if the exception has previous exceptions.
+     *
+     * @return bool
+     */
+    public function hasPreviousExceptions()
+    {
+        return $this->exception->getPrevious() !== null;
+    }
 }

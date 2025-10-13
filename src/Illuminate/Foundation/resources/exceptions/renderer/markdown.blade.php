@@ -11,6 +11,16 @@ Laravel {{ app()->version() }}
 {{ $index }} - {{ $frame->file() }}:{{ $frame->line() }}
 @endforeach
 
+## Previous Exceptions
+
+@forelse ($exception->previousExceptions() as $index => $previousException)
+{{ $index + 1 }}. **{{ $previousException['class'] }}**@if($previousException['code']) (Code: {{ $previousException['code'] }})@endif
+
+{!! $previousException['message'] !!}
+@empty
+No previous exceptions.
+@endforelse
+
 ## Request
 
 {{ $exception->request()->method() }} {{ \Illuminate\Support\Str::start($exception->request()->path(), '/') }}

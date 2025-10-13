@@ -17,6 +17,17 @@ class RendererTest extends TestCase
     protected function defineRoutes($router)
     {
         $router->get('failed', fn () => throw new RuntimeException('Bad route!'));
+        $router->get('failed-with-previous', function () {
+            try {
+                try {
+                    throw new RuntimeException('First exception');
+                } catch (RuntimeException $e) {
+                    throw new RuntimeException('Second exception', 0, $e);
+                }
+            } catch (RuntimeException $e) {
+                throw new RuntimeException('Third exception', 0, $e);
+            }
+        });
     }
 
     #[WithConfig('app.debug', true)]
@@ -138,5 +149,19 @@ class RendererTest extends TestCase
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
+    }
+
+    #[WithConfig('app.debug', true)]
+    public function testItCanRenderPreviousExceptions()
+    {
+        $this->assertTrue($this->app->bound(Renderer::class));
+
+        $this->get('/failed-with-previous')
+            ->assertInternalServerError()
+            ->assertSee('RuntimeException')
+            ->assertSee('Third exception')
+            ->assertSee('Previous exceptions')
+            ->assertSee('Second exception')
+            ->assertSee('First exception');
     }
 }
