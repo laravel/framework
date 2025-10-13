@@ -1867,6 +1867,22 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo baZ baz bar', $result);
     }
 
+    public function testItCanDetectValidSlugs(): void
+    {
+        $this->assertTrue(Str::isSlug('hello-world'));
+        $this->assertTrue(Str::isSlug('my-slug-123'));
+        $this->assertFalse(Str::isSlug('Hello World'));
+        $this->assertFalse(Str::isSlug('-slug'));
+        $this->assertFalse(Str::isSlug('slug-'));
+        $this->assertFalse(Str::isSlug('slug--test'));
+    }
+
+    public function testStringableIsSlug(): void
+    {
+        $this->assertTrue(str('valid-slug')->isSlug());
+        $this->assertFalse(str('Not A Slug')->isSlug());
+    }
+
     public function testPlural(): void
     {
         $this->assertSame('Laracon', Str::plural('Laracon', 1));

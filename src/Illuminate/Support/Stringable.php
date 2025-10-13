@@ -424,6 +424,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if the given string is a valid slug.
+     *
+     * @return bool
+     */
+    public function isSlug()
+    {
+        return Str::isSlug($this->value);
+    }
+
+    /**
      * Determine if the given string is empty.
      *
      * @return bool

@@ -688,6 +688,24 @@ class Str
     }
 
     /**
+     * Determine if a given string is a valid slug.
+     *
+     * A valid slug may contain lowercase letters, numbers, and single hyphens,
+     * and cannot begin or end with a hyphen.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    public static function isSlug($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $value) === 1;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
