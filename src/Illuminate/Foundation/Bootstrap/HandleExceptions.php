@@ -332,21 +332,21 @@ class HandleExceptions
     {
         $dummyExceptionHandler = fn () => null;
 
-        while (set_exception_handler($dummyExceptionHandler) !== null) {
-            restore_exception_handler();
+        $previousExceptionHandler = set_exception_handler($dummyExceptionHandler);
+        restore_exception_handler();
+
+        if ($previousExceptionHandler !== null) {
             restore_exception_handler();
         }
-
-        restore_exception_handler();
 
         $dummyErrorHandler = fn () => false;
 
-        while (set_error_handler($dummyErrorHandler) !== null) {
-            restore_error_handler();
+        $previousErrorHandler = set_error_handler($dummyErrorHandler);
+        restore_error_handler();
+
+        if ($previousErrorHandler !== null) {
             restore_error_handler();
         }
-
-        restore_error_handler();
 
         if (class_exists(ErrorHandler::class)) {
             $instance = ErrorHandler::instance();
