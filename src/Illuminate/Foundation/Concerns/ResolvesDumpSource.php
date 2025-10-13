@@ -15,6 +15,7 @@ trait ResolvesDumpSource
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
+        'fleet' => 'fleet://open?file={file}&line={line}',
         'idea' => 'idea://open?file={file}&line={line}',
         'kiro' => 'kiro://file/{file}:{line}',
         'macvim' => 'mvim://open/?url=file://{file}&line={line}',
