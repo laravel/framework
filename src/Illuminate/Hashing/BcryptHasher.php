@@ -61,6 +61,10 @@ class BcryptHasher extends AbstractHasher implements HasherContract
             $hash = password_hash($value, PASSWORD_BCRYPT, [
                 'cost' => $this->cost($options),
             ]);
+
+            if ($hash === false) {
+                throw new RuntimeException('Bcrypt hashing failed.');
+            }
         } catch (Error) {
             throw new RuntimeException('Bcrypt hashing not supported.');
         }
