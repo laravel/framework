@@ -284,8 +284,12 @@ class RouteUrlGenerator
             $bindingField = $route->bindingFieldFor($key);
             $defaultParameterKey = $bindingField ? "$key:$bindingField" : $key;
 
-            if ($value === '' && isset($this->defaultParameters[$defaultParameterKey])) {
-                $namedParameters[$key] = $this->defaultParameters[$defaultParameterKey];
+            $defaultParameter = $this->defaultParameters[$defaultParameterKey]
+                ?? $this->defaultParameters[$key]
+                ?? null;
+
+            if ($value === '' && isset($defaultParameter)) {
+                $namedParameters[$key] = $defaultParameter;
             }
         }
 
