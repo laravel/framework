@@ -3,6 +3,8 @@
 @import 'tippy.js/dist/tippy.css';
 @import 'tippy.js/animations/shift-away.css';
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 [x-cloak] {
     display: none !important;
 }
@@ -17,7 +19,7 @@
     @apply px-2 py-1;
 }
 
-@media (prefers-color-scheme: dark) {
+html[data-theme~='dark'] {
     .shiki,
     .shiki span {
         color: var(--shiki-dark) !important;
