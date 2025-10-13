@@ -400,9 +400,10 @@ if (! function_exists('throw_if')) {
      * @template TValue
      * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|\Closure(TParams): mixed|class-string<TException>|string  $exception
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
      * @param  TParams  ...$parameters
      * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
@@ -431,11 +432,13 @@ if (! function_exists('throw_unless')) {
      * Throw the given exception unless the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is false ? never : ($condition is non-empty-mixed ? TValue : never))
      *
      * @throws TException
