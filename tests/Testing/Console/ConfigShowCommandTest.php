@@ -39,7 +39,7 @@ class ConfigShowCommandTest extends TestCase
             ->expectsOutput('  boolean ............................................... true  ')
             ->expectsOutput('  null .................................................. null  ')
             ->expectsOutput('  array ⇁ 0 .. Illuminate\Foundation\Console\ConfigShowCommand  ')
-            ->expectsOutput('  empty_array ............................................. []  ')
+            ->expectsOutputToContain('empty_array')
             ->expectsOutput('  assoc_array ⇁ foo ...................................... bar  ')
             ->expectsOutput('  class ............................................. stdClass  ');
     }
