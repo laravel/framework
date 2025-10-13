@@ -31,16 +31,20 @@
         </div>
     </div>
 
-    <button
-        x-cloak
-        @class([
-            "text-sm rounded-md border px-3 h-8 flex items-center gap-2 transition-colors duration-200 ease-in-out cursor-pointer shadow-xs",
-            "text-neutral-600 dark:text-neutral-400 bg-white/5 border-neutral-200 hover:bg-neutral-100 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10",
-        ])
-        @click="copyToClipboard()"
-    >
-        <x-laravel-exceptions-renderer::icons.copy class="w-3 h-3" x-show="!copied" />
-        <x-laravel-exceptions-renderer::icons.check class="w-3 h-3 text-emerald-500" x-show="copied" />
-        <span x-text="copied ? 'Copied to clipboard' : 'Copy as Markdown'"></span>
-    </button>
+    <div class="flex items-center gap-2">
+        <x-laravel-exceptions-renderer::theme-switcher />
+
+        <button
+            x-cloak
+            @class([
+                "text-sm rounded-md border px-3 h-8 flex items-center gap-2 transition-colors duration-200 ease-in-out cursor-pointer",
+                "text-neutral-600 dark:text-neutral-400 bg-white/5 border-neutral-200 hover:bg-neutral-100 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10",
+            ])
+            @click="copyToClipboard()"
+        >
+            <x-laravel-exceptions-renderer::icons.copy class="w-3 h-3" x-show="!copied" />
+            <x-laravel-exceptions-renderer::icons.check class="w-3 h-3 text-emerald-500" x-show="copied" />
+            <span x-text="copied ? 'Copied to clipboard' : 'Copy as Markdown'"></span>
+        </button>
+    </div>
 </div>
