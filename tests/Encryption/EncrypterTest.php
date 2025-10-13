@@ -269,4 +269,98 @@ class EncrypterTest extends TestCase
         $enc = new Encrypter(str_repeat('x', 16));
         $enc->decrypt(base64_encode(json_encode($payload)));
     }
+
+    public function testGetCipherReturnsNormalizedCipher()
+    {
+        $e = new Encrypter(str_repeat('a', 16), 'AES-128-CBC');
+        $this->assertSame('aes-128-cbc', $e->getCipher());
+
+        $e2 = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $this->assertSame('aes-256-gcm', $e2->getCipher());
+    }
+
+    public function testPreviousKeysWithEmptyArray()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $result = $e->previousKeys([]);
+
+        $this->assertSame($e, $result);
+        $this->assertSame([], $e->getPreviousKeys());
+    }
+
+    public function testPreviousKeysThrowsExceptionForInvalidKey()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unsupported cipher or incorrect key length.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+        $e->previousKeys([str_repeat('x', 5)]);
+    }
+
+    public function testDecryptWithInvalidBase64InPayload()
+    {
+        $this->expectException(DecryptException::class);
+        $this->expectExceptionMessage('The payload is invalid.');
+
+        $e = new Encrypter(str_repeat('a', 16));
+
+        // Create payload with invalid base64 in IV field
+        $payload = [
+            'iv' => 'not!!!valid!!!base64',
+            'value' => base64_encode('test'),
+            'mac' => hash_hmac('sha256', 'test', str_repeat('a', 16)),
+            'tag' => '',
+        ];
+
+        $e->decrypt(base64_encode(json_encode($payload)));
+    }
+
+    public function testGetAllKeysIncludesPrimaryAndPreviousKeys()
+    {
+        $primaryKey = str_repeat('a', 16);
+        $previousKey1 = str_repeat('b', 16);
+        $previousKey2 = str_repeat('c', 16);
+
+        $e = new Encrypter($primaryKey);
+        $e->previousKeys([$previousKey1, $previousKey2]);
+
+        $allKeys = $e->getAllKeys();
+
+        $this->assertCount(3, $allKeys);
+        $this->assertSame($primaryKey, $allKeys[0]);
+        $this->assertSame($previousKey1, $allKeys[1]);
+        $this->assertSame($previousKey2, $allKeys[2]);
+    }
+
+    public function testEncryptionWithVeryLongString()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $longString = str_repeat('Lorem ipsum dolor sit amet ', 10000); // ~270KB
+
+        $encrypted = $e->encryptString($longString);
+        $decrypted = $e->decryptString($encrypted);
+
+        $this->assertSame($longString, $decrypted);
+    }
+
+    public function testEncryptionPreservesComplexArrayStructures()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+
+        $complexData = [
+            'nested' => [
+                'deeply' => [
+                    'structure' => 'value',
+                ],
+            ],
+            'numbers' => [1, 2, 3, 4, 5],
+            'mixed' => ['string', 123, true, null],
+            'unicode' => '你好世界 🌍',
+        ];
+
+        $encrypted = $e->encrypt($complexData);
+        $decrypted = $e->decrypt($encrypted);
+
+        $this->assertSame($complexData, $decrypted);
+    }
 }
