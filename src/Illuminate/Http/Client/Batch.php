@@ -7,6 +7,9 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Support\Defer\DeferredCallback;
+
+use function Illuminate\Support\defer;
 
 /**
  * @mixin \Illuminate\Http\Client\Factory
@@ -205,6 +208,16 @@ class Batch
         $this->finallyCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Defer the batch to run in the background after the current task has finished.
+     *
+     * @return \Illuminate\Support\Defer\DeferredCallback
+     */
+    public function defer(): DeferredCallback
+    {
+        return defer(fn () => $this->send());
     }
 
     /**
