@@ -103,10 +103,10 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
-        $shortHandRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
+        $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
 
-        if (! in_array($shortHandRule, $keys)) {
-            $keys[] = $shortHandRule;
+        if (! in_array($shortRule, $keys)) {
+            $keys[] = $shortRule;
         }
 
         // First we will check for a custom message for an attribute specific rule
