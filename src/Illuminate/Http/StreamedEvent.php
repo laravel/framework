@@ -16,6 +16,9 @@ class StreamedEvent
 
     /**
      * Create a new streamed event instance.
+     *
+     * @param string $event
+     * @param mixed $data
      */
     public function __construct(string $event, mixed $data)
     {

@@ -114,6 +114,7 @@ class Batch
     /**
      * Create a new request batch instance.
      *
+     * @param Factory|null $factory
      * @return void
      */
     public function __construct(?Factory $factory = null)

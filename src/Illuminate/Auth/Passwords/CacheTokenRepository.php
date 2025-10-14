@@ -17,6 +17,12 @@ class CacheTokenRepository implements TokenRepositoryInterface
 
     /**
      * Create a new token repository instance.
+     *
+     * @param Repository $cache
+     * @param HasherContract $hasher
+     * @param string $hashKey
+     * @param int $expires
+     * @param int $throttle
      */
     public function __construct(
         protected Repository $cache,

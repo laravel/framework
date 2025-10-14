@@ -264,6 +264,10 @@ class Builder implements BuilderContract
 
     /**
      * Create a new query builder instance.
+     *
+     * @param ConnectionInterface $connection
+     * @param Grammar|null $grammar
+     * @param Processor|null $processor
      */
     public function __construct(
         ConnectionInterface $connection,
