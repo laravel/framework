@@ -19,7 +19,7 @@ trait ResolvesDumpSource
         'idea' => 'idea://open?file={file}&line={line}',
         'kiro' => 'kiro://file/{file}:{line}',
         'macvim' => 'mvim://open/?url=file://{file}&line={line}',
-        'neovim'=> 'nvim://open?url=file://{file}&line={line}',
+        'neovim' => 'nvim://open?url=file://{file}&line={line}',
         'netbeans' => 'netbeans://open/?f={file}:{line}',
         'nova' => 'nova://core/open/file?filename={file}&line={line}',
         'phpstorm' => 'phpstorm://open?file={file}&line={line}',
