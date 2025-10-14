@@ -2000,6 +2000,174 @@ class RoutingUrlGeneratorTest extends TestCase
             $url->route('tenantPostUserOptionalMethod', ['concreteTenant', 'concretePost', 'concreteUser', 'concreteMethod']),
         );
     }
+
+    /**
+     * Test the fix for route parameter resolution with URL::defaults() and model key binding fields.
+     */
+    public function testRouteParameterResolutionWithDefaultsAndBindingFields(): void
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            Request::create('https://www.foo.com/')
+        );
+
+        /**
+         * Test case 1: Route with optional parameter with binding field
+         */
+        $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show', fn () => '']);
+        $routes->add($route);
+
+        // Set up defaults
+        $url->defaults([
+            'team' => 'example-team',
+        ]);
+
+        // Test with positional parameters
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show', [123]),
+        );
+
+        // Test with named parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show', ['post' => 123]),
+        );
+
+        // Test with explicit team parameter
+        $this->assertSame(
+            'https://www.foo.com/another-team/posts/123',
+            $url->route('posts.show', ['team' => 'another-team', 'post' => 123]),
+        );
+
+        /**
+         * Test case 2: Route with required parameter with binding field
+         */
+        $route = new Route(['GET'], '{team:slug}/posts/{post}', ['as' => 'posts.show.required', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameters
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.required', [123]),
+        );
+
+        // Test with named parameters
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.required', ['post' => 123]),
+        );
+
+        /**
+         * Test case 3: Route with multiple parameters with binding fields
+         */
+        $url->defaults([
+            'team' => 'example-team',
+            'team:slug' => 'example-team',
+            'post' => '123',
+        ]);
+
+        $route = new Route(['GET'], '{team:slug?}/posts/{post:id}/comments/{comment}', ['as' => 'posts.show.multi', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123/comments/456',
+            $url->route('posts.show.multi', [456]),
+        );
+
+        // Test with named parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123/comments/456',
+            $url->route('posts.show.multi', ['comment' => 456]),
+        );
+
+        /**
+         * Test case 4: Route with mixed parameter types (some with defaults, some without)
+         */
+        $route = new Route(['GET'], '{team:slug?}/posts/{post}/comments/{comment}', ['as' => 'comments.show', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameters
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123/comments/456',
+            $url->route('comments.show', [123, 456]),
+        );
+
+        // Test with named parameters
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123/comments/456',
+            $url->route('comments.show', ['post' => 123, 'comment' => 456]),
+        );
+
+        /**
+         * Test case 5: Route with only binding field default (no regular parameter default)
+         */
+        $url->defaults([
+            'team:slug' => 'example-team',
+        ]);
+
+        $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show.binding-only', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.binding-only', [123]),
+        );
+
+        // Test with named parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.binding-only', ['post' => 123]),
+        );
+
+        /**
+         * Test case 6: Route with only regular parameter default (no binding field default)
+         */
+        $url->defaults([
+            'team' => 'example-team',
+        ]);
+
+        $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show.regular-only', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.regular-only', [123]),
+        );
+
+        // Test with named parameter
+        $this->assertSame(
+            'https://www.foo.com/example-team/posts/123',
+            $url->route('posts.show.regular-only', ['post' => 123]),
+        );
+
+        /**
+         * Test case 7: Route without any defaults to ensure existing functionality works
+         */
+        $route = new Route(['GET'], '{team:slug}/posts/{post}', ['as' => 'posts.show.no-defaults', fn () => '']);
+        $routes->add($route);
+
+        // Test with positional parameters
+        $this->assertSame(
+            'https://www.foo.com/another-team/posts/123',
+            $url->route('posts.show.no-defaults', ['another-team', 123]),
+        );
+
+        // Test with named parameters
+        $this->assertSame(
+            'https://www.foo.com/another-team/posts/123',
+            $url->route('posts.show.no-defaults', ['team' => 'another-team', 'post' => 123]),
+        );
+
+        // Test with mixed parameters
+        $this->assertSame(
+            'https://www.foo.com/another-team/posts/123',
+            $url->route('posts.show.no-defaults', ['team' => 'another-team', 123]),
+        );
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
