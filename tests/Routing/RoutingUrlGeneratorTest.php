@@ -2012,7 +2012,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 1: Route with optional parameter with binding field
+         * Test case 1: Route with optional parameter with binding field.
          */
         $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show', fn () => '']);
         $routes->add($route);
@@ -2041,7 +2041,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 2: Route with required parameter with binding field
+         * Test case 2: Route with required parameter with binding field.
          */
         $route = new Route(['GET'], '{team:slug}/posts/{post}', ['as' => 'posts.show.required', fn () => '']);
         $routes->add($route);
@@ -2083,7 +2083,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 4: Route with mixed parameter types (some with defaults, some without)
+         * Test case 4: Route with mixed parameter types (some with defaults, some without).
          */
         $route = new Route(['GET'], '{team:slug?}/posts/{post}/comments/{comment}', ['as' => 'comments.show', fn () => '']);
         $routes->add($route);
@@ -2101,7 +2101,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 5: Route with only binding field default (no regular parameter default)
+         * Test case 5: Route with only binding field default (no regular parameter default).
          */
         $url->defaults([
             'team:slug' => 'example-team',
@@ -2123,7 +2123,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 6: Route with only regular parameter default (no binding field default)
+         * Test case 6: Route with only regular parameter default (no binding field default).
          */
         $url->defaults([
             'team' => 'example-team',
@@ -2145,7 +2145,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 7: Route without any defaults to ensure existing functionality works
+         * Test case 7: Route without any defaults to ensure existing functionality works.
          */
         $route = new Route(['GET'], '{team:slug}/posts/{post}', ['as' => 'posts.show.no-defaults', fn () => '']);
         $routes->add($route);
