@@ -28,16 +28,37 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
     public function testBasicUpdateForJson($column, $given, $expected)
     {
         DB::table('example')->insert([
-            'name' => 'Taylor Otwell',
-            'title' => 'Mr.',
+            ['name' => 'Taylor Otwell', 'title' => 'Mr.'],
         ]);
 
-        DB::table('example')->update([$column => $given]);
+        DB::table('example')->update([
+            $column => $given,
+        ]);
 
         $this->assertDatabaseHas('example', [
             'name' => 'Taylor Otwell',
             'title' => 'Mr.',
             $column => $column === 'payload' ? $this->castAsJson($expected) : $expected,
+        ]);
+    }
+
+    #[RequiresDatabase(['sqlite', 'mysql', 'mariadb'])]
+    public function testSubqueryUpdate()
+    {
+        DB::table('example')->insert([
+            ['name' => 'Taylor Otwell', 'title' => 'Mr.'],
+        ]);
+
+        var_dump(DB::table('example')->selectRaw('CONCAT(example.title, example.name)')::class);
+
+        DB::table('example')->update([
+            'payload->fullname' => DB::table('example')->selectRaw('CONCAT(example.title, example.name)')
+        ]);
+
+        $this->assertDatabaseHas('example', [
+            'name' => 'Taylor Otwell',
+            'title' => 'Mr.',
+            'payload' => $this->castAsJson(['fullname' => 'Mr. Taylor Otwell']),
         ]);
     }
 
