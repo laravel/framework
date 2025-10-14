@@ -62,7 +62,7 @@ class Dispatcher implements QueueingDispatcher
      * Create a new command dispatcher instance.
      *
      * @param  Container  $container
-     * @param  Closure|null  $queueResolver
+     * @param  (Closure(mixed): Queue)|null  $queueResolver
      */
     public function __construct(Container $container, ?Closure $queueResolver = null)
     {
