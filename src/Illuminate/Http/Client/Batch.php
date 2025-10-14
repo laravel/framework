@@ -75,7 +75,7 @@ class Batch
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
      */
     protected $catchCallback = null;
 
@@ -174,7 +174,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -260,8 +260,11 @@ class Batch
                         return $result;
                     }
 
-                    if (($result instanceof Response && $result->failed()) ||
-                        $result instanceof RequestException) {
+                    if (
+                        ($result instanceof Response && $result->failed()) ||
+                        $result instanceof RequestException ||
+                        $result instanceof ConnectionException
+                    ) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
@@ -274,7 +277,7 @@ class Batch
                 'rejected' => function ($reason, $key) {
                     $this->decrementPendingRequests();
 
-                    if ($reason instanceof RequestException) {
+                    if ($reason instanceof RequestException || $reason instanceof ConnectionException) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
