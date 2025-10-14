@@ -384,6 +384,7 @@ class SQLiteGrammar extends Grammar
      * @param  array  $values
      * @return array
      */
+    #[\Override]
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $groups = $this->groupJsonColumnsForUpdate($values);
@@ -395,6 +396,8 @@ class SQLiteGrammar extends Grammar
             ->all();
 
         $cleanBindings = Arr::except($bindings, 'select');
+
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))
