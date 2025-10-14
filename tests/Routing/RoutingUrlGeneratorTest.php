@@ -2014,13 +2014,12 @@ class RoutingUrlGeneratorTest extends TestCase
         /**
          * Test case 1: Route with optional parameter with binding field.
          */
-        $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show', fn () => '']);
-        $routes->add($route);
-
-        // Set up defaults
         $url->defaults([
             'team' => 'example-team',
         ]);
+
+        $route = new Route(['GET'], '{team:slug?}/posts/{post}', ['as' => 'posts.show', fn () => '']);
+        $routes->add($route);
 
         // Test with positional parameters
         $this->assertSame(
