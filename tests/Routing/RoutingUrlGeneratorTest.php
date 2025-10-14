@@ -2059,7 +2059,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         /**
-         * Test case 3: Route with multiple parameters with binding fields
+         * Test case 3: Route with multiple parameters with binding fields.
          */
         $url->defaults([
             'team' => 'example-team',
