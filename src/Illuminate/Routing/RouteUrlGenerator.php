@@ -201,7 +201,7 @@ class RouteUrlGenerator
                 $bindingField = $route->bindingFieldFor($name);
                 $defaultParameterKey = $bindingField ? "$name:$bindingField" : $name;
 
-                if (! isset($this->defaultParameters[$defaultParameterKey]) && ! isset($optionalParameters[$name])) {
+                if (! isset($this->defaultParameters[$defaultParameterKey]) && ! isset($this->defaultParameters[$name]) && ! isset($optionalParameters[$name])) {
                     // No named parameter or default value for a required parameter, try to match to positional parameter below...
                     array_push($requiredRouteParametersWithoutDefaultsOrNamedParameters, $name);
                 }
