@@ -276,18 +276,18 @@ class Exception
      */
     public function previousExceptions()
     {
-        $previous = [];
+        $previous = new Collection();
         $exception = $this->exception;
 
         while ($exception = $exception->getPrevious()) {
-            $previous[] = [
+            $previous->push([
                 'class' => $exception->getClass(),
                 'message' => $exception->getMessage(),
                 'code' => $exception->getCode(),
-            ];
+            ]);
         }
 
-        return new Collection($previous);
+        return $previous;
     }
 
     /**
