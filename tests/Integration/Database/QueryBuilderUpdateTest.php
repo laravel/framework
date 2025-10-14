@@ -52,7 +52,7 @@ class QueryBuilderUpdateTest extends DatabaseTestCase
         var_dump(DB::table('example')->selectRaw('CONCAT(example.title, example.name)')::class);
 
         DB::table('example')->update([
-            'payload->fullname' => DB::table('example')->selectRaw('CONCAT(example.title, example.name)'),
+            'payload->fullname' => DB::table('example')->selectRaw('CONCAT(title, name)'),
         ]);
 
         $this->assertDatabaseHas('example', [
