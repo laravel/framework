@@ -7,7 +7,7 @@ use RuntimeException;
 class StrayRequestException extends RuntimeException
 {
     /**
-     * @param string $uri
+     * @param  string  $uri
      */
     public function __construct(string $uri)
     {

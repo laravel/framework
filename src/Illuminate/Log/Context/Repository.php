@@ -50,7 +50,7 @@ class Repository
     /**
      * Create a new Context instance.
      *
-     * @param Dispatcher $events
+     * @param  Dispatcher  $events
      */
     public function __construct(Dispatcher $events)
     {

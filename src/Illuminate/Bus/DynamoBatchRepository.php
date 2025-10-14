@@ -62,12 +62,12 @@ class DynamoBatchRepository implements BatchRepository
     /**
      * Create a new batch repository instance.
      *
-     * @param BatchFactory $factory
-     * @param DynamoDbClient $dynamoDbClient
-     * @param string $applicationName
-     * @param string $table
-     * @param int|null $ttl
-     * @param string|null $ttlAttribute
+     * @param  BatchFactory  $factory
+     * @param  DynamoDbClient  $dynamoDbClient
+     * @param  string  $applicationName
+     * @param  string  $table
+     * @param  int|null  $ttl
+     * @param  string|null  $ttlAttribute
      */
     public function __construct(
         BatchFactory $factory,
