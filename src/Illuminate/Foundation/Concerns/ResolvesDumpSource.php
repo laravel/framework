@@ -13,6 +13,7 @@ trait ResolvesDumpSource
      */
     protected $editorHrefs = [
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
+        'brackets' => 'brackets://open?url=file://{file}&line={line}',
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
         'fleet' => 'fleet://open?file={file}&line={line}',
