@@ -2705,6 +2705,31 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Order the query by a column with a given set of priority values.
+     *
+     * @param  array{string|\BackedEnum}|null  $priorities
+     * @return $this
+     */
+    public function orderByWithPriority(string $column, ?array $priorities = [], ?string $direction = 'asc')
+    {
+        if (empty($priorities)) {
+            return $this->orderBy($column, $direction);
+        }
+
+        // Convert enums to their backing values if needed
+        $priorities = array_map(function ($value) {
+            return $value instanceof \UnitEnum
+                ? ($value instanceof \BackedEnum ? $value->value : $value->name)
+                : $value;
+        }, $priorities);
+
+        $bindings = array_map(fn () => '?', $priorities);
+        $sql = "FIELD({$this->grammar->wrap($column)}, ".implode(',', $bindings).')';
+
+        return $this->orderByRaw($sql.' '.$direction, $priorities);
+    }
+
+    /**
      * Add a descending "order by" clause to the query.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column

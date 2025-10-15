@@ -440,6 +440,19 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Order the query by a column with a given set of priority values.
+     *
+     * @param  array{string|\BackedEnum}|null  $priorities
+     * @return $this
+     */
+    public function orderByWithPriority(string $column, ?array $priorities = [], ?string $direction = 'asc')
+    {
+        $this->query->orderByWithPriority(...func_get_args());
+
+        return $this;
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column

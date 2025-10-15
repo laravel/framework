@@ -2077,6 +2077,39 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1, 1, 'news', 'opinion'], $builder->getBindings());
     }
 
+    public function test_order_by_with_priority_generates_expected_sql()
+    {
+        $properties = [
+            'done',
+            'pending',
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->orderByWithPriority('status', $properties);
+
+        $this->assertSame(
+            'select * from "posts" order by FIELD("status", ?,?) asc',
+            $builder->toSql()
+        );
+
+        $this->assertEquals($properties, $builder->getBindings());
+
+        $properties = [
+            StringStatus::done,
+            StringStatus::pending,
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('posts')->orderByWithPriority('status', $properties);
+
+        $this->assertSame(
+            'select * from "posts" order by FIELD("status", ?,?) asc',
+            $builder->toSql()
+        );
+
+        $this->assertEquals(array_map(fn (StringStatus $item) => $item->value, $properties), $builder->getBindings());
+    }
+
     public function testLatest()
     {
         $builder = $this->getBuilder();
