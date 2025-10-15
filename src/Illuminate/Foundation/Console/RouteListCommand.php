@@ -546,7 +546,9 @@ class RouteListCommand extends Command
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, definition) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
-            ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file'],
+            ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file (.json extension is optional)
+            
+            You may combine this option with --pretty for pretty printed JSON'],
             ['pretty', null, InputOption::VALUE_NONE, 'Pretty-print JSON output when using --output'],
         ];
     }
