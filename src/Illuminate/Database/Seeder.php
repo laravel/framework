@@ -33,16 +33,6 @@ abstract class Seeder
     protected static $called = [];
 
     /**
-     * Determine if this seeder should run.
-     *
-     * @return bool
-     */
-    public function shouldRun(): bool
-    {
-        return true;
-    }
-
-    /**
      * Run the given seeder class.
      *
      * @param  array|string  $class
@@ -152,6 +142,16 @@ abstract class Seeder
         }
 
         return $instance;
+    }
+
+    /**
+     * Determine if this seeder should run.
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return true;
     }
 
     /**
