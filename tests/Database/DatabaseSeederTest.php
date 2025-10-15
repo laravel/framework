@@ -45,7 +45,20 @@ class DatabaseSeederTest extends TestCase
         $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
         $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
         $child->shouldReceive('setCommand')->once()->with($command)->andReturn($child);
+        $child->shouldReceive('shouldRun')->once()->andReturn(true);
         $child->shouldReceive('__invoke')->once();
+
+        $seeder->call('ClassName');
+    }
+
+    public function testCallShouldntRun()
+    {
+        $seeder = new TestSeeder;
+        $seeder->setContainer($container = m::mock(Container::class));
+        $container->shouldReceive('make')->once()->with('ClassName')->andReturn($child = m::mock(Seeder::class));
+        $child->shouldReceive('setContainer')->once()->with($container)->andReturn($child);
+        $child->shouldReceive('shouldRun')->once()->andReturn(false);
+        $child->shouldNotReceive('__invoke');
 
         $seeder->call('ClassName');
     }

@@ -33,6 +33,16 @@ abstract class Seeder
     protected static $called = [];
 
     /**
+     * Determine if this seeder should run.
+     *
+     * @return bool
+     */
+    public function shouldRun(): bool
+    {
+        return true;
+    }
+
+    /**
      * Run the given seeder class.
      *
      * @param  array|string  $class
@@ -46,6 +56,10 @@ abstract class Seeder
 
         foreach ($classes as $class) {
             $seeder = $this->resolve($class);
+
+            if (! $seeder->shouldRun()) {
+                continue;
+            }
 
             $name = get_class($seeder);
 
