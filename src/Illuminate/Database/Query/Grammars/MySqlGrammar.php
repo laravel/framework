@@ -525,4 +525,14 @@ class MySqlGrammar extends Grammar
 
         return 'json_extract('.$field.$path.')';
     }
+    public function compileInsertOrUpdateUsing(Builder $query, array $columns, Builder $select, array $updates)
+    {
+        $insert = $this->compileInsertUsing($query, $columns, $select->toSql());
+
+        $update = collect($updates)
+            ->map(fn($col) => "{$this->wrap($col)} = VALUES({$this->wrap($col)})")
+            ->implode(', ');
+
+        return "{$insert} ON DUPLICATE KEY UPDATE {$update}";
+    }
 }

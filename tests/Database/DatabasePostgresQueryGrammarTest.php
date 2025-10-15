@@ -72,4 +72,31 @@ class DatabasePostgresQueryGrammarTest extends TestCase
             'truncate "users" restart identity cascade' => [],
         ], $postgres->compileTruncate($builder));
     }
+    
+    public function testCompileInsertOrUpdateUsing()
+    {
+        $connection = m::mock(\Illuminate\Database\Connection::class);
+        $connection->shouldReceive('getPostProcessor')->andReturn(new \Illuminate\Database\Query\Processors\Processor());
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $connection->shouldReceive('getQueryGrammar')->andReturnUsing(fn() => new PostgresGrammar($connection));
+
+        $grammar = new PostgresGrammar($connection);
+
+        $builder = new Builder($connection, $grammar);
+        $builder->from('users');
+
+        $select = clone $builder;
+        $select->from('imports')->select('id', 'name', 'email');
+
+        $sql = $grammar->compileInsertOrUpdateUsing(
+            $builder,
+            ['id', 'name', 'email'],
+            $select,
+            ['name', 'email']
+        );
+
+      $this->assertMatchesRegularExpression('/insert\s+into/i', $sql);
+      $this->assertMatchesRegularExpression('/on\s+conflict/i', $sql);
+      $this->assertMatchesRegularExpression('/do\s+update/i', $sql);
+    }
 }

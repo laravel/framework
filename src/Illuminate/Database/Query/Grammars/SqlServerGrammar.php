@@ -586,4 +586,10 @@ class SqlServerGrammar extends Grammar
 
         return $table;
     }
+    public function compileInsertOrUpdateUsing(Builder $query, array $columns, Builder $select, array $updates)
+    {
+        throw new \RuntimeException(
+            'The insertOrUpdateUsing() operation is not supported for SQL Server.'
+        );
+    }
 }

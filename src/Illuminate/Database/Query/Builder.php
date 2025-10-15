@@ -4513,4 +4513,18 @@ class Builder implements BuilderContract
 
         static::throwBadMethodCallException($method);
     }
+    /**
+     * Insert new records into the database using a subquery and update duplicates.
+     *
+     * @param  array  $columns
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $updateColumns
+     * @return bool
+     */
+    public function insertOrUpdateUsing(array $columns, Builder $query, array $updateColumns)
+    {
+        $sql = $this->grammar->compileInsertOrUpdateUsing($this, $columns, $query, $updateColumns);
+
+        return $this->connection->insert($sql, $query->getBindings());
+    }
 }
