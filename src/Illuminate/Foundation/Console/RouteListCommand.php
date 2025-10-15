@@ -10,6 +10,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Routing\ViewController;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use ReflectionClass;
