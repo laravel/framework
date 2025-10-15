@@ -721,6 +721,10 @@ class Str
      */
     public static function limit($value, $limit = 100, $end = '...', $preserveWords = false)
     {
+        if ($value === null) {
+            return $value;
+        }
+
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
