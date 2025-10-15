@@ -521,10 +521,10 @@ class RouteListCommand extends Command
         file_put_contents($filename, $content);
 
         // Get file size for better feedback
-        $fileSize = number_format(filesize($filename) / 1024, 2);
+        $fileSize = Number::fileSize(filesize($filename)), 2);
         $routeCount = count(json_decode($content, true) ?? []);
 
-        $this->components->info("Route list saved to: {$filename} ({$routeCount} routes, {$fileSize} KB)");
+        $this->components->info("Route list saved to: {$filename} ({$routeCount} routes, {$fileSize})");
     }
 
     /**
