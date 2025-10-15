@@ -151,7 +151,7 @@ class Dispatcher implements QueueingDispatcher
      */
     public function batch($jobs)
     {
-        return new PendingBatch($this->container, Collection::wrap($jobs));
+        return $this->container->make(PendingBatch::class, [$this->container, Collection::wrap($jobs)]);
     }
 
     /**
@@ -165,7 +165,7 @@ class Dispatcher implements QueueingDispatcher
         $jobs = Collection::wrap($jobs);
         $jobs = ChainedBatch::prepareNestedBatches($jobs);
 
-        return new PendingChain($jobs->shift(), $jobs->toArray());
+        return $this->container->make(PendingChain::class, [$jobs->shift(), $jobs->toArray()]);
     }
 
     /**
