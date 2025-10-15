@@ -8,15 +8,11 @@ class AppendableAttributeValue implements Stringable
 {
     /**
      * The attribute value.
-     *
-     * @var mixed
      */
     public $value;
 
     /**
      * Create a new appendable attribute value.
-     *
-     * @param  mixed  $value
      */
     public function __construct($value)
     {

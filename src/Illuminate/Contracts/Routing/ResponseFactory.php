@@ -12,7 +12,6 @@ interface ResponseFactory
      *
      * @param  array|string  $content
      * @param  int  $status
-     * @param  array  $headers
      * @return \Illuminate\Http\Response
      */
     public function make($content = '', $status = 200, array $headers = []);
@@ -21,7 +20,6 @@ interface ResponseFactory
      * Create a new "no content" response.
      *
      * @param  int  $status
-     * @param  array  $headers
      * @return \Illuminate\Http\Response
      */
     public function noContent($status = 204, array $headers = []);
@@ -32,7 +30,6 @@ interface ResponseFactory
      * @param  string|array  $view
      * @param  array  $data
      * @param  int  $status
-     * @param  array  $headers
      * @return \Illuminate\Http\Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []);
@@ -40,9 +37,7 @@ interface ResponseFactory
     /**
      * Create a new JSON response instance.
      *
-     * @param  mixed  $data
      * @param  int  $status
-     * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Http\JsonResponse
      */
@@ -52,9 +47,7 @@ interface ResponseFactory
      * Create a new JSONP response instance.
      *
      * @param  string  $callback
-     * @param  mixed  $data
      * @param  int  $status
-     * @param  array  $headers
      * @param  int  $options
      * @return \Illuminate\Http\JsonResponse
      */
@@ -63,9 +56,6 @@ interface ResponseFactory
     /**
      * Create a new event stream response.
      *
-     * @param  \Closure  $callback
-     * @param  array  $headers
-     * @param  \Illuminate\Http\StreamedEvent|string|null  $endStreamWith
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function eventStream(Closure $callback, array $headers = [], StreamedEvent|string|null $endStreamWith = '</stream>');
@@ -75,7 +65,6 @@ interface ResponseFactory
      *
      * @param  callable  $callback
      * @param  int  $status
-     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function stream($callback, $status = 200, array $headers = []);
@@ -96,7 +85,6 @@ interface ResponseFactory
      *
      * @param  callable  $callback
      * @param  string|null  $name
-     * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
@@ -107,7 +95,6 @@ interface ResponseFactory
      *
      * @param  \SplFileInfo|string  $file
      * @param  string|null  $name
-     * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -117,7 +104,6 @@ interface ResponseFactory
      * Return the raw contents of a binary file.
      *
      * @param  \SplFileInfo|string  $file
-     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function file($file, array $headers = []);
@@ -137,7 +123,6 @@ interface ResponseFactory
      * Create a new redirect response to a named route.
      *
      * @param  \BackedEnum|string  $route
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -148,7 +133,6 @@ interface ResponseFactory
      * Create a new redirect response to a controller action.
      *
      * @param  array|string  $action
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse

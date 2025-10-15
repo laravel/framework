@@ -25,9 +25,6 @@ class HandleCors
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @param  \Fruitcake\Cors\CorsService  $cors
      */
     public function __construct(Container $container, CorsService $cors)
     {
@@ -39,7 +36,6 @@ class HandleCors
      * Handle the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      */
     public function handle($request, Closure $next)
@@ -69,9 +65,6 @@ class HandleCors
 
     /**
      * Get the path from the configuration to determine if the CORS service should run.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return bool
      */
     protected function hasMatchingPath(Request $request): bool
     {
@@ -93,7 +86,6 @@ class HandleCors
     /**
      * Get the CORS paths for the given host.
      *
-     * @param  string  $host
      * @return array
      */
     protected function getPathsByHost(string $host)

@@ -15,9 +15,7 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array  $parameters
      * @param  string|null  $defaultMethod
-     * @return mixed
      *
      * @throws \ReflectionException
      * @throws \InvalidArgumentException
@@ -42,9 +40,7 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $target
-     * @param  array  $parameters
      * @param  string|null  $defaultMethod
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -75,8 +71,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable  $callback
-     * @param  mixed  $default
-     * @return mixed
      */
     protected static function callBoundMethod($container, $callback, $default)
     {
@@ -114,7 +108,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array  $parameters
      * @return array
      *
      * @throws \ReflectionException
@@ -156,7 +149,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
      * @param  array  $dependencies
      * @return void
      *
@@ -208,7 +200,6 @@ class BoundMethod
     /**
      * Determine if the given string is in Class@method syntax.
      *
-     * @param  mixed  $callback
      * @return bool
      */
     protected static function isCallableWithAtSign($callback)

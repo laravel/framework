@@ -63,7 +63,6 @@ class Process extends Facade
     /**
      * Indicate that the process factory should fake processes.
      *
-     * @param  \Closure|array|null  $callback
      * @return \Illuminate\Process\Factory
      */
     public static function fake(Closure|array|null $callback = null)

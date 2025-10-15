@@ -59,7 +59,6 @@ class ConcurrencyLimiter
      * @param  int  $timeout
      * @param  callable|null  $callback
      * @param  int  $sleep
-     * @return mixed
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      * @throws \Throwable
@@ -97,7 +96,6 @@ class ConcurrencyLimiter
      * Attempt to acquire the lock.
      *
      * @param  string  $id  A unique identifier for this lock
-     * @return mixed
      */
     protected function acquire($id)
     {

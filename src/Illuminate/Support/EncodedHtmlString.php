@@ -26,7 +26,6 @@ class EncodedHtmlString extends HtmlString
      * Create a new encoded HTML string instance.
      *
      * @param  \Illuminate\Contracts\Support\DeferringDisplayableValue|\Illuminate\Contracts\Support\Htmlable|\BackedEnum|string|int|float|null  $html
-     * @param  bool  $doubleEncode
      */
     public function __construct($html = '', protected bool $doubleEncode = true)
     {
@@ -40,7 +39,6 @@ class EncodedHtmlString extends HtmlString
      *
      * @param  string|null  $value
      * @param  int  $withQuote
-     * @param  bool  $doubleEncode
      * @return string
      */
     public static function convert($value, bool $withQuote = true, bool $doubleEncode = true)
@@ -80,7 +78,6 @@ class EncodedHtmlString extends HtmlString
     /**
      * Set the callable that will be used to encode the HTML strings.
      *
-     * @param  callable|null  $factory
      * @return void
      */
     public static function encodeUsing(?callable $factory = null)

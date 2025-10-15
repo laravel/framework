@@ -33,7 +33,6 @@ class MigrationCreator
     /**
      * Create a new migration creator instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $customStubPath
      */
     public function __construct(Filesystem $files, $customStubPath)
@@ -190,7 +189,6 @@ class MigrationCreator
     /**
      * Register a post migration create hook.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function afterCreate(Closure $callback)

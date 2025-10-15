@@ -49,7 +49,6 @@ class ConnectionResolver implements ConnectionResolverInterface
      * Add a connection to the resolver.
      *
      * @param  string  $name
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @return void
      */
     public function addConnection($name, ConnectionInterface $connection)

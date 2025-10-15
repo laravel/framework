@@ -576,7 +576,6 @@ class CompiledRouteCollectionTest extends TestCase
      *
      * @param  array|string  $methods
      * @param  string  $uri
-     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function newRoute($methods, $uri, $action)
@@ -589,7 +588,6 @@ class CompiledRouteCollectionTest extends TestCase
     /**
      * Create a new fallback Route object.
      *
-     * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
     protected function fallbackRoute($action)

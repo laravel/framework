@@ -45,7 +45,6 @@ class BelongsToManyRelationship
     /**
      * Create the attached relationship for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
      */
     public function createFor(Model $model)

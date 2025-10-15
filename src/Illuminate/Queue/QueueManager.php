@@ -46,7 +46,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the before job event.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function before($callback)
@@ -57,7 +56,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the after job event.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function after($callback)
@@ -68,7 +66,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the exception occurred job event.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function exceptionOccurred($callback)
@@ -79,7 +76,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the daemon queue loop.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function looping($callback)
@@ -90,7 +86,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the failed job event.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function failing($callback)
@@ -101,7 +96,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the daemon queue starting.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function starting($callback)
@@ -112,7 +106,6 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Register an event listener for the daemon queue stopping.
      *
-     * @param  mixed  $callback
      * @return void
      */
     public function stopping($callback)
@@ -195,7 +188,6 @@ class QueueManager implements FactoryContract, MonitorContract
      * Add a queue connection resolver.
      *
      * @param  string  $driver
-     * @param  \Closure  $resolver
      * @return void
      */
     public function extend($driver, Closure $resolver)
@@ -207,7 +199,6 @@ class QueueManager implements FactoryContract, MonitorContract
      * Add a queue connection resolver.
      *
      * @param  string  $driver
-     * @param  \Closure  $resolver
      * @return void
      */
     public function addConnector($driver, Closure $resolver)
@@ -294,7 +285,6 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

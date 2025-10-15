@@ -30,8 +30,6 @@ trait Authenticatable
 
     /**
      * Get the unique identifier for the user.
-     *
-     * @return mixed
      */
     public function getAuthIdentifier()
     {
@@ -40,8 +38,6 @@ trait Authenticatable
 
     /**
      * Get the unique broadcast identifier for the user.
-     *
-     * @return mixed
      */
     public function getAuthIdentifierForBroadcasting()
     {

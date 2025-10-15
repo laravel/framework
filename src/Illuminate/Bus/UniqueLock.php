@@ -15,8 +15,6 @@ class UniqueLock
 
     /**
      * Create a new unique lock manager instance.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      */
     public function __construct(Cache $cache)
     {
@@ -26,7 +24,6 @@ class UniqueLock
     /**
      * Attempt to acquire a lock for the given job.
      *
-     * @param  mixed  $job
      * @return bool
      */
     public function acquire($job)
@@ -45,7 +42,6 @@ class UniqueLock
     /**
      * Release the lock for the given job.
      *
-     * @param  mixed  $job
      * @return void
      */
     public function release($job)
@@ -60,7 +56,6 @@ class UniqueLock
     /**
      * Generate the lock key for the given job.
      *
-     * @param  mixed  $job
      * @return string
      */
     public static function getKey($job)

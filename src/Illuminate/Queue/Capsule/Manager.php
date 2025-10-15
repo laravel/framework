@@ -24,8 +24,6 @@ class Manager
 
     /**
      * Create a new queue capsule manager.
-     *
-     * @param  \Illuminate\Container\Container|null  $container
      */
     public function __construct(?Container $container = null)
     {
@@ -88,10 +86,8 @@ class Manager
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
      * @param  string|null  $connection
-     * @return mixed
      */
     public static function push($job, $data = '', $queue = null, $connection = null)
     {
@@ -102,10 +98,8 @@ class Manager
      * Push a new an array of jobs onto the queue.
      *
      * @param  array  $jobs
-     * @param  mixed  $data
      * @param  string|null  $queue
      * @param  string|null  $connection
-     * @return mixed
      */
     public static function bulk($jobs, $data = '', $queue = null, $connection = null)
     {
@@ -117,10 +111,8 @@ class Manager
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
      * @param  string|null  $connection
-     * @return mixed
      */
     public static function later($delay, $job, $data = '', $queue = null, $connection = null)
     {
@@ -141,7 +133,6 @@ class Manager
     /**
      * Register a connection with the manager.
      *
-     * @param  array  $config
      * @param  string  $name
      * @return void
      */
@@ -165,7 +156,6 @@ class Manager
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {
@@ -177,7 +167,6 @@ class Manager
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public static function __callStatic($method, $parameters)
     {

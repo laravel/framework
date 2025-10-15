@@ -13,8 +13,6 @@ class DatabaseMessage
 
     /**
      * Create a new database message.
-     *
-     * @param  array  $data
      */
     public function __construct(array $data = [])
     {

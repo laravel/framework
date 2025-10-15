@@ -24,22 +24,16 @@ class ApplicationBuilder
 {
     /**
      * The service provider that are marked for registration.
-     *
-     * @var array
      */
     protected array $pendingProviders = [];
 
     /**
      * Any additional routing callbacks that should be invoked while registering routes.
-     *
-     * @var array
      */
     protected array $additionalRoutingCallbacks = [];
 
     /**
      * The Folio / page middleware that have been defined by the user.
-     *
-     * @var array
      */
     protected array $pageMiddleware = [];
 
@@ -73,8 +67,6 @@ class ApplicationBuilder
     /**
      * Register additional service providers.
      *
-     * @param  array  $providers
-     * @param  bool  $withBootstrapProviders
      * @return $this
      */
     public function withProviders(array $providers = [], bool $withBootstrapProviders = true)
@@ -119,8 +111,6 @@ class ApplicationBuilder
     /**
      * Register the broadcasting services for the application.
      *
-     * @param  string  $channels
-     * @param  array  $attributes
      * @return $this
      */
     public function withBroadcasting(string $channels, array $attributes = [])
@@ -139,14 +129,6 @@ class ApplicationBuilder
     /**
      * Register the routing services for the application.
      *
-     * @param  \Closure|null  $using
-     * @param  array|string|null  $web
-     * @param  array|string|null  $api
-     * @param  string|null  $commands
-     * @param  string|null  $channels
-     * @param  string|null  $pages
-     * @param  string  $apiPrefix
-     * @param  callable|null  $then
      * @return $this
      */
     public function withRouting(?Closure $using = null,
@@ -187,12 +169,6 @@ class ApplicationBuilder
     /**
      * Create the routing callback for the application.
      *
-     * @param  array|string|null  $web
-     * @param  array|string|null  $api
-     * @param  string|null  $pages
-     * @param  string|null  $health
-     * @param  string  $apiPrefix
-     * @param  callable|null  $then
      * @return \Closure
      */
     protected function buildRoutingCallback(array|string|null $web,
@@ -268,7 +244,6 @@ class ApplicationBuilder
     /**
      * Register the global middleware, middleware groups, and middleware aliases for the application.
      *
-     * @param  callable|null  $callback
      * @return $this
      */
     public function withMiddleware(?callable $callback = null)
@@ -309,7 +284,6 @@ class ApplicationBuilder
     /**
      * Register additional Artisan commands with the application.
      *
-     * @param  array  $commands
      * @return $this
      */
     public function withCommands(array $commands = [])
@@ -335,7 +309,6 @@ class ApplicationBuilder
     /**
      * Register additional Artisan route paths.
      *
-     * @param  array  $paths
      * @return $this
      */
     protected function withCommandRouting(array $paths)
@@ -363,7 +336,6 @@ class ApplicationBuilder
     /**
      * Register and configure the application's exception handler.
      *
-     * @param  callable|null  $using
      * @return $this
      */
     public function withExceptions(?callable $using = null)
@@ -386,7 +358,6 @@ class ApplicationBuilder
     /**
      * Register an array of container bindings to be bound when the application is booting.
      *
-     * @param  array  $bindings
      * @return $this
      */
     public function withBindings(array $bindings)
@@ -401,7 +372,6 @@ class ApplicationBuilder
     /**
      * Register an array of singleton container bindings to be bound when the application is booting.
      *
-     * @param  array  $singletons
      * @return $this
      */
     public function withSingletons(array $singletons)
@@ -420,7 +390,6 @@ class ApplicationBuilder
     /**
      * Register an array of scoped singleton container bindings to be bound when the application is booting.
      *
-     * @param  array  $scopedSingletons
      * @return $this
      */
     public function withScopedSingletons(array $scopedSingletons)
@@ -439,7 +408,6 @@ class ApplicationBuilder
     /**
      * Register a callback to be invoked when the application's service providers are registered.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function registered(callable $callback)
@@ -452,7 +420,6 @@ class ApplicationBuilder
     /**
      * Register a callback to be invoked when the application is "booting".
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function booting(callable $callback)
@@ -465,7 +432,6 @@ class ApplicationBuilder
     /**
      * Register a callback to be invoked when the application is "booted".
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function booted(callable $callback)

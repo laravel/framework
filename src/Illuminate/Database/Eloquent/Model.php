@@ -429,7 +429,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a closure to be executed after the model has booted.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     protected static function whenBooted(Closure $callback)
@@ -455,7 +454,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Disables relationship model touching for the current class during given callback scope.
      *
-     * @param  callable  $callback
      * @return void
      */
     public static function withoutTouching(callable $callback)
@@ -466,8 +464,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Disables relationship model touching for the given model classes during given callback scope.
      *
-     * @param  array  $models
-     * @param  callable  $callback
      * @return void
      */
     public static function withoutTouchingOn(array $models, callable $callback)
@@ -507,7 +503,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Indicate that models should prevent lazy loading, silently discarding attributes, and accessing missing attributes.
      *
-     * @param  bool  $shouldBeStrict
      * @return void
      */
     public static function shouldBeStrict(bool $shouldBeStrict = true)
@@ -542,7 +537,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling lazy loading violations.
      *
-     * @param  callable|null  $callback
      * @return void
      */
     public static function handleLazyLoadingViolationUsing(?callable $callback)
@@ -564,7 +558,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling discarded attribute violations.
      *
-     * @param  callable|null  $callback
      * @return void
      */
     public static function handleDiscardedAttributeViolationUsing(?callable $callback)
@@ -586,7 +579,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling missing attribute violations.
      *
-     * @param  callable|null  $callback
      * @return void
      */
     public static function handleMissingAttributeViolationUsing(?callable $callback)
@@ -596,9 +588,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Execute a callback without broadcasting any model events for all model types.
-     *
-     * @param  callable  $callback
-     * @return mixed
      */
     public static function withoutBroadcasting(callable $callback)
     {
@@ -1031,7 +1020,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     protected function increment($column, $amount = 1, array $extra = [])
@@ -1044,7 +1032,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     protected function decrement($column, $amount = 1, array $extra = [])
@@ -1145,7 +1132,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     protected function incrementQuietly($column, $amount = 1, array $extra = [])
@@ -1160,7 +1146,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     protected function decrementQuietly($column, $amount = 1, array $extra = [])
@@ -1214,7 +1199,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Save the model to the database without raising any events.
      *
-     * @param  array  $options
      * @return bool
      */
     public function saveQuietly(array $options = [])
@@ -1225,7 +1209,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Save the model to the database.
      *
-     * @param  array  $options
      * @return bool
      */
     public function save(array $options = [])
@@ -1274,7 +1257,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Save the model to the database within a transaction.
      *
-     * @param  array  $options
      * @return bool
      *
      * @throws \Throwable
@@ -1287,7 +1269,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Perform any actions that are necessary after the model is saved.
      *
-     * @param  array  $options
      * @return void
      */
     protected function finishSave(array $options)
@@ -1354,8 +1335,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the primary key value for a select query.
-     *
-     * @return mixed
      */
     protected function getKeyForSelectQuery()
     {
@@ -1377,8 +1356,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the primary key value for a save query.
-     *
-     * @return mixed
      */
     protected function getKeyForSaveQuery()
     {
@@ -1732,7 +1709,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  array<string, mixed>  $attributes
      * @param  string  $table
      * @param  bool  $exists
@@ -1761,8 +1737,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Apply the given named scope if possible.
      *
      * @param  string  $scope
-     * @param  array  $parameters
-     * @return mixed
      */
     public function callNamedScope($scope, array $parameters = [])
     {
@@ -1776,7 +1750,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Determine if the given method has a scope attribute.
      *
-     * @param  string  $method
      * @return bool
      */
     protected static function isScopeMethodWithAttribute(string $method)
@@ -1821,7 +1794,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Convert the model instance to pretty print formatted JSON.
      *
-     * @param  int  $options
      * @return string
      *
      * @throws \Illuminate\Database\Eloquent\JsonEncodingException
@@ -1833,8 +1805,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed
     {
@@ -1890,7 +1860,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Clone the model into a new, non-existing instance.
      *
-     * @param  array|null  $except
      * @return static
      */
     public function replicate(?array $except = null)
@@ -1919,7 +1888,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Clone the model into a new, non-existing instance without raising any events.
      *
-     * @param  array|null  $except
      * @return static
      */
     public function replicateQuietly(?array $except = null)
@@ -2009,7 +1977,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Set the connection resolver instance.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @return void
      */
     public static function setConnectionResolver(Resolver $resolver)
@@ -2131,8 +2098,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the value of the model's primary key.
-     *
-     * @return mixed
      */
     public function getKey()
     {
@@ -2141,8 +2106,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the queueable identity for the entity.
-     *
-     * @return mixed
      */
     public function getQueueableId()
     {
@@ -2195,8 +2158,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the value of the model's route key.
-     *
-     * @return mixed
      */
     public function getRouteKey()
     {
@@ -2216,7 +2177,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
@@ -2228,7 +2188,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
@@ -2241,7 +2200,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the child model for a bound value.
      *
      * @param  string  $childType
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
@@ -2254,7 +2212,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the child model for a bound value.
      *
      * @param  string  $childType
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Model|null
      */
@@ -2267,7 +2224,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the child model query for a bound value.
      *
      * @param  string  $childType
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Database\Eloquent\Relations\Relation<\Illuminate\Database\Eloquent\Model, $this, *>
      */
@@ -2302,7 +2258,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Retrieve the model for a bound value.
      *
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Contracts\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\Relation  $query
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return \Illuminate\Contracts\Database\Eloquent\Builder
      */
@@ -2432,7 +2387,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Dynamically retrieve attributes on the model.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {
@@ -2443,7 +2397,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * Dynamically set attributes on the model.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return void
      */
     public function __set($key, $value)
@@ -2453,9 +2406,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Determine if the given attribute exists.
-     *
-     * @param  mixed  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -2472,9 +2422,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Get the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -2483,10 +2430,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Set the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -2495,9 +2438,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
     /**
      * Unset the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
      */
     public function offsetUnset($offset): void
     {
@@ -2536,7 +2476,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {
@@ -2561,7 +2500,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public static function __callStatic($method, $parameters)
     {

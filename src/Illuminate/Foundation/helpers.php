@@ -111,7 +111,6 @@ if (! function_exists('action')) {
      * Generate the URL to a controller action.
      *
      * @param  string|array  $name
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      */
     function action($name, $parameters = [], $absolute = true): string
@@ -187,7 +186,6 @@ if (! function_exists('back')) {
      *
      * @param  int  $status
      * @param  array  $headers
-     * @param  mixed  $fallback
      */
     function back($status = 302, $headers = [], $fallback = false): RedirectResponse
     {
@@ -223,8 +221,6 @@ if (! function_exists('bcrypt')) {
 if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
-     *
-     * @param  mixed  $event
      */
     function broadcast($event = null): PendingBroadcast
     {
@@ -237,7 +233,6 @@ if (! function_exists('broadcast_if')) {
      * Begin broadcasting an event if the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed  $event
      */
     function broadcast_if($boolean, $event = null): PendingBroadcast
     {
@@ -254,7 +249,6 @@ if (! function_exists('broadcast_unless')) {
      * Begin broadcasting an event unless the given condition is true.
      *
      * @param  bool  $boolean
-     * @param  mixed  $event
      */
     function broadcast_unless($boolean, $event = null): PendingBroadcast
     {
@@ -305,7 +299,6 @@ if (! function_exists('config')) {
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
      * @param  array<string, mixed>|string|null  $key
-     * @param  mixed  $default
      * @return ($key is null ? \Illuminate\Config\Repository : ($key is string ? mixed : null))
      */
     function config($key = null, $default = null)
@@ -339,7 +332,6 @@ if (! function_exists('context')) {
      * Get / set the specified context value.
      *
      * @param  array|string|null  $key
-     * @param  mixed  $default
      * @return ($key is string ? mixed : \Illuminate\Log\Context\Repository)
      */
     function context($key = null, $default = null)
@@ -427,7 +419,6 @@ if (! function_exists('decrypt')) {
      *
      * @param  string  $value
      * @param  bool  $unserialize
-     * @return mixed
      */
     function decrypt($value, $unserialize = true)
     {
@@ -451,7 +442,6 @@ if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
      *
-     * @param  mixed  $job
      * @return ($job is \Closure ? \Illuminate\Foundation\Bus\PendingClosureDispatch : \Illuminate\Foundation\Bus\PendingDispatch)
      */
     function dispatch($job): PendingDispatch|PendingClosureDispatch
@@ -467,10 +457,6 @@ if (! function_exists('dispatch_sync')) {
      * Dispatch a command to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
-     *
-     * @param  mixed  $job
-     * @param  mixed  $handler
-     * @return mixed
      */
     function dispatch_sync($job, $handler = null)
     {
@@ -482,7 +468,6 @@ if (! function_exists('encrypt')) {
     /**
      * Encrypt the given value.
      *
-     * @param  mixed  $value
      * @param  bool  $serialize
      */
     function encrypt($value, $serialize = true): string
@@ -496,13 +481,12 @@ if (! function_exists('event')) {
      * Dispatch an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
      * @param  bool  $halt
      * @return array|null
      */
-    function event(...$args)
+    function event($event, $payload = [], $halt = false)
     {
-        return app('events')->dispatch(...$args);
+        return app('events')->dispatch($event, $payload, $halt);
     }
 }
 
@@ -644,7 +628,6 @@ if (! function_exists('policy')) {
      * Get a policy instance for a given class.
      *
      * @param  object|string  $class
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */
@@ -659,7 +642,6 @@ if (! function_exists('precognitive')) {
      * Handle a Precognition controller hook.
      *
      * @param  null|callable  $callable
-     * @return mixed
      */
     function precognitive($callable = null)
     {
@@ -766,7 +748,6 @@ if (! function_exists('request')) {
      * Get an instance of the current request or an input item from the request.
      *
      * @param  list<string>|string|null  $key
-     * @param  mixed  $default
      * @return ($key is null ? \Illuminate\Http\Request : ($key is string ? mixed : array<string, mixed>))
      */
     function request($key = null, $default = null)
@@ -863,7 +844,6 @@ if (! function_exists('route')) {
      * Generate the URL to a named route.
      *
      * @param  \BackedEnum|string  $name
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      */
     function route($name, $parameters = [], $absolute = true): string
@@ -889,7 +869,6 @@ if (! function_exists('secure_url')) {
      * Generate a HTTPS url for the application.
      *
      * @param  string  $path
-     * @param  mixed  $parameters
      * @return string
      */
     function secure_url($path, $parameters = [])
@@ -905,7 +884,6 @@ if (! function_exists('session')) {
      * If an array is passed as the key, we will assume you want to set an array of values.
      *
      * @param  array<string, mixed>|string|null  $key
-     * @param  mixed  $default
      * @return ($key is null ? \Illuminate\Session\SessionManager : ($key is string ? mixed : null))
      */
     function session($key = null, $default = null)
@@ -939,7 +917,6 @@ if (! function_exists('to_action')) {
      * Create a new redirect response to a controller action.
      *
      * @param  string|array  $action
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -955,7 +932,6 @@ if (! function_exists('to_route')) {
      * Create a new redirect response to a named route.
      *
      * @param  \BackedEnum|string  $route
-     * @param  mixed  $parameters
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\RedirectResponse
@@ -1049,7 +1025,6 @@ if (! function_exists('url')) {
      * Generate a URL for the application.
      *
      * @param  string|null  $path
-     * @param  mixed  $parameters
      * @param  bool|null  $secure
      * @return ($path is null ? \Illuminate\Contracts\Routing\UrlGenerator : string)
      */

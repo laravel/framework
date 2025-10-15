@@ -48,8 +48,6 @@ trait HasRelationships
 
     /**
      * The relationship autoloader callback context.
-     *
-     * @var mixed
      */
     protected $relationAutoloadContext = null;
 
@@ -95,7 +93,6 @@ trait HasRelationships
      * Define a dynamic relation resolver.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolveRelationUsing($name, Closure $callback)
@@ -119,8 +116,6 @@ trait HasRelationships
     /**
      * Define an automatic relationship autoloader callback for this model and its relations.
      *
-     * @param  \Closure  $callback
-     * @param  mixed  $context
      * @return $this
      */
     public function autoloadRelationsUsing(Closure $callback, $context = null)
@@ -175,7 +170,6 @@ trait HasRelationships
      * Propagate the relationship autoloader callback to the given related models.
      *
      * @param  string  $key
-     * @param  mixed  $models
      * @return void
      */
     protected function propagateRelationAutoloadCallbackToRelation($key, $models)
@@ -1066,7 +1060,6 @@ trait HasRelationships
      * Get a specified relationship.
      *
      * @param  string  $relation
-     * @return mixed
      */
     public function getRelation($relation)
     {
@@ -1088,7 +1081,6 @@ trait HasRelationships
      * Set the given relationship on the model.
      *
      * @param  string  $relation
-     * @param  mixed  $value
      * @return $this
      */
     public function setRelation($relation, $value)
@@ -1116,7 +1108,6 @@ trait HasRelationships
     /**
      * Set the entire relations array on the model.
      *
-     * @param  array  $relations
      * @return $this
      */
     public function setRelations(array $relations)
@@ -1175,7 +1166,6 @@ trait HasRelationships
     /**
      * Set the relationships that are touched on save.
      *
-     * @param  array  $touches
      * @return $this
      */
     public function setTouchedRelations(array $touches)

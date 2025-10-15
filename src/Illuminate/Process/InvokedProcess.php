@@ -18,8 +18,6 @@ class InvokedProcess implements InvokedProcessContract
 
     /**
      * Create a new invoked process instance.
-     *
-     * @param  \Symfony\Component\Process\Process  $process
      */
     public function __construct(Process $process)
     {
@@ -49,7 +47,6 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Send a signal to the process.
      *
-     * @param  int  $signal
      * @return $this
      */
     public function signal(int $signal)
@@ -62,8 +59,6 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Stop the process if it is still running.
      *
-     * @param  float  $timeout
-     * @param  int|null  $signal
      * @return int|null
      */
     public function stop(float $timeout = 10, ?int $signal = null)
@@ -140,7 +135,6 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Wait for the process to finish.
      *
-     * @param  callable|null  $output
      * @return \Illuminate\Process\ProcessResult
      *
      * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
@@ -159,7 +153,6 @@ class InvokedProcess implements InvokedProcessContract
     /**
      * Wait until the given callback returns true.
      *
-     * @param  callable|null  $output
      * @return \Illuminate\Process\ProcessResult
      *
      * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException

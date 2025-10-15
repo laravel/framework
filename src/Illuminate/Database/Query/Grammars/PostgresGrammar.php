@@ -49,7 +49,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a basic where clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -70,7 +69,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a bitwise operator where clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -86,7 +84,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a "where like" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -102,7 +99,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a "where date" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -121,7 +117,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a "where time" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -141,7 +136,6 @@ class PostgresGrammar extends Grammar
      * Compile a date based where clause.
      *
      * @param  string  $type
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -155,7 +149,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a "where fulltext" clause.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
      */
@@ -220,7 +213,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the "select *" portion of the query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $columns
      * @return string|null
      */
@@ -310,7 +302,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a single having clause.
      *
-     * @param  array  $having
      * @return string
      */
     protected function compileHaving(array $having)
@@ -340,7 +331,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the lock into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  bool|string  $value
      * @return string
      */
@@ -356,8 +346,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an insert ignore statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
      * @return string
      */
     public function compileInsertOrIgnore(Builder $query, array $values)
@@ -368,9 +356,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an insert ignore statement using a subquery into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $columns
-     * @param  string  $sql
      * @return string
      */
     public function compileInsertOrIgnoreUsing(Builder $query, array $columns, string $sql)
@@ -381,7 +366,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an insert and get ID statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @param  string|null  $sequence
      * @return string
@@ -394,8 +378,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an update statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
      * @return string
      */
     public function compileUpdate(Builder $query, array $values)
@@ -410,8 +392,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the columns for an update statement.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
      * @return string
      */
     protected function compileUpdateColumns(Builder $query, array $values)
@@ -430,10 +410,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an "upsert" statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
-     * @param  array  $uniqueBy
-     * @param  array  $update
      * @return string
      */
     public function compileUpsert(Builder $query, array $values, array $uniqueBy, array $update)
@@ -453,10 +429,6 @@ class PostgresGrammar extends Grammar
 
     /**
      * Compile a "lateral join" clause.
-     *
-     * @param  \Illuminate\Database\Query\JoinLateralClause  $join
-     * @param  string  $expression
-     * @return string
      */
     public function compileJoinLateral(JoinLateralClause $join, string $expression): string
     {
@@ -467,7 +439,6 @@ class PostgresGrammar extends Grammar
      * Prepares a JSON column being updated using the JSONB_SET function.
      *
      * @param  string  $key
-     * @param  mixed  $value
      * @return string
      */
     protected function compileJsonUpdateColumn($key, $value)
@@ -484,7 +455,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an update from statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $values
      * @return string
      */
@@ -520,7 +490,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the additional where clauses for updates with joins.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     protected function compileUpdateWheres(Builder $query)
@@ -546,7 +515,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the "join" clause where clauses for an update.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     protected function compileUpdateJoinWheres(Builder $query)
@@ -570,8 +538,6 @@ class PostgresGrammar extends Grammar
     /**
      * Prepare the bindings for an update statement.
      *
-     * @param  array  $bindings
-     * @param  array  $values
      * @return array
      */
     public function prepareBindingsForUpdateFrom(array $bindings, array $values)
@@ -594,8 +560,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile an update statement with joins or limit into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
      * @return string
      */
     protected function compileUpdateWithJoinsOrLimit(Builder $query, array $values)
@@ -614,8 +578,6 @@ class PostgresGrammar extends Grammar
     /**
      * Prepare the bindings for an update statement.
      *
-     * @param  array  $bindings
-     * @param  array  $values
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
@@ -636,7 +598,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a delete statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     public function compileDelete(Builder $query)
@@ -651,7 +612,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a delete statement with joins or limit into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return string
      */
     protected function compileDeleteWithJoinsOrLimit(Builder $query)
@@ -668,7 +628,6 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a truncate table statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @return array
      */
     public function compileTruncate(Builder $query)
@@ -815,7 +774,6 @@ class PostgresGrammar extends Grammar
     /**
      * Set any Postgres grammar specific custom operators.
      *
-     * @param  array  $operators
      * @return void
      */
     public static function customOperators(array $operators)
@@ -828,7 +786,6 @@ class PostgresGrammar extends Grammar
     /**
      * Enable or disable the "cascade" option when compiling the truncate statement.
      *
-     * @param  bool  $value
      * @return void
      */
     public static function cascadeOnTruncate(bool $value = true)

@@ -82,9 +82,6 @@ class Factory implements FactoryContract
 
     /**
      * Create a new Validator factory instance.
-     *
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      */
     public function __construct(Translator $translator, ?Container $container = null)
     {
@@ -95,10 +92,6 @@ class Factory implements FactoryContract
     /**
      * Create a new Validator instance.
      *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      * @return \Illuminate\Validation\Validator
      */
     public function make(array $data, array $rules, array $messages = [], array $attributes = [])
@@ -131,10 +124,6 @@ class Factory implements FactoryContract
     /**
      * Validate the given data against the provided rules.
      *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
@@ -147,10 +136,6 @@ class Factory implements FactoryContract
     /**
      * Resolve a new Validator instance.
      *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      * @return \Illuminate\Validation\Validator
      */
     protected function resolve(array $data, array $rules, array $messages, array $attributes)
@@ -165,7 +150,6 @@ class Factory implements FactoryContract
     /**
      * Add the extensions to a validator instance.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
      * @return void
      */
     protected function addExtensions(Validator $validator)
@@ -270,7 +254,6 @@ class Factory implements FactoryContract
     /**
      * Set the Validator instance resolver.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public function resolver(Closure $resolver)
@@ -301,7 +284,6 @@ class Factory implements FactoryContract
     /**
      * Set the Presence Verifier implementation.
      *
-     * @param  \Illuminate\Validation\PresenceVerifierInterface  $presenceVerifier
      * @return void
      */
     public function setPresenceVerifier(PresenceVerifierInterface $presenceVerifier)
@@ -322,7 +304,6 @@ class Factory implements FactoryContract
     /**
      * Set the container instance used by the validation factory.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return $this
      */
     public function setContainer(Container $container)

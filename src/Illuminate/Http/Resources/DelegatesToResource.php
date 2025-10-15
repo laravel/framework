@@ -14,8 +14,6 @@ trait DelegatesToResource
 
     /**
      * Get the value of the resource's route key.
-     *
-     * @return mixed
      */
     public function getRouteKey()
     {
@@ -35,7 +33,6 @@ trait DelegatesToResource
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return void
      *
@@ -50,7 +47,6 @@ trait DelegatesToResource
      * Retrieve the model for a bound value.
      *
      * @param  string  $childType
-     * @param  mixed  $value
      * @param  string|null  $field
      * @return void
      *
@@ -63,9 +59,6 @@ trait DelegatesToResource
 
     /**
      * Determine if the given attribute exists.
-     *
-     * @param  mixed  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -74,9 +67,6 @@ trait DelegatesToResource
 
     /**
      * Get the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -85,10 +75,6 @@ trait DelegatesToResource
 
     /**
      * Set the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -97,9 +83,6 @@ trait DelegatesToResource
 
     /**
      * Unset the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @return void
      */
     public function offsetUnset($offset): void
     {
@@ -132,7 +115,6 @@ trait DelegatesToResource
      * Dynamically get properties from the underlying resource.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function __get($key)
     {
@@ -144,7 +126,6 @@ trait DelegatesToResource
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

@@ -53,7 +53,6 @@ trait RunsInParallel
      * Creates a new test runner instance.
      *
      * @param  \ParaTest\Runners\PHPUnit\Options|\ParaTest\Options  $options
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      */
     public function __construct($options, OutputInterface $output)
     {
@@ -98,8 +97,6 @@ trait RunsInParallel
 
     /**
      * Runs the test suite.
-     *
-     * @return int
      */
     public function execute(): int
     {
@@ -126,8 +123,6 @@ trait RunsInParallel
 
     /**
      * Returns the highest exit code encountered throughout the course of test execution.
-     *
-     * @return int
      */
     public function getExitCode(): int
     {

@@ -121,8 +121,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Create a new URL Generator instance.
      *
-     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
-     * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $assetRoot
      */
     public function __construct(RouteCollectionInterface $routes, Request $request, $assetRoot = null)
@@ -156,7 +154,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL for the previous request.
      *
-     * @param  mixed  $fallback
      * @return string
      */
     public function previous($fallback = false)
@@ -177,7 +174,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the previous path info for the request.
      *
-     * @param  mixed  $fallback
      * @return string
      */
     public function previousPath($fallback = false)
@@ -201,7 +197,6 @@ class UrlGenerator implements UrlGeneratorContract
      * Generate an absolute URL to the given path.
      *
      * @param  string  $path
-     * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
      */
@@ -235,7 +230,6 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $path
      * @param  array  $query
-     * @param  mixed  $extra
      * @param  bool|null  $secure
      * @return string
      */
@@ -348,7 +342,6 @@ class UrlGenerator implements UrlGeneratorContract
      * Create a signed route URL for a named route.
      *
      * @param  \BackedEnum|string  $name
-     * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
      * @return string
@@ -381,7 +374,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Ensure the given signed route parameters are not reserved.
      *
-     * @param  mixed  $parameters
      * @return void
      */
     protected function ensureSignedRouteParametersAreNotReserved($parameters)
@@ -416,9 +408,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the given request has a valid signature.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
-     * @param  \Closure|array  $ignoreQuery
      * @return bool
      */
     public function hasValidSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
@@ -430,8 +420,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the given request has a valid signature for a relative URL.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure|array  $ignoreQuery
      * @return bool
      */
     public function hasValidRelativeSignature(Request $request, Closure|array $ignoreQuery = [])
@@ -442,9 +430,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the signature from the given request matches the URL.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $absolute
-     * @param  \Closure|array  $ignoreQuery
      * @return bool
      */
     public function hasCorrectSignature(Request $request, $absolute = true, Closure|array $ignoreQuery = [])
@@ -488,7 +474,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Determine if the expires timestamp from the given request is not from the past.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return bool
      */
     public function signatureHasNotExpired(Request $request)
@@ -502,7 +487,6 @@ class UrlGenerator implements UrlGeneratorContract
      * Get the URL to a named route.
      *
      * @param  \BackedEnum|string  $name
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      *
@@ -530,7 +514,6 @@ class UrlGenerator implements UrlGeneratorContract
      * Get the URL for a given route instance.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      *
@@ -547,7 +530,6 @@ class UrlGenerator implements UrlGeneratorContract
      * Get the URL to a controller action.
      *
      * @param  string|array  $action
-     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      *
@@ -584,7 +566,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the array of URL parameters.
      *
-     * @param  mixed  $parameters
      * @return array
      */
     public function formatParameters($parameters)
@@ -695,7 +676,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the default named parameters used by the URL generator.
      *
-     * @param  array  $defaults
      * @return void
      */
     public function defaults(array $defaults)
@@ -742,7 +722,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the URL origin for all generated URLs.
      *
-     * @param  string|null  $root
      * @return void
      */
     public function useOrigin(?string $root)
@@ -768,7 +747,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the URL origin for all generated asset URLs.
      *
-     * @param  string|null  $root
      * @return void
      */
     public function useAssetOrigin(?string $root)
@@ -779,7 +757,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set a callback to be used to format the host of generated URLs.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function formatHostUsing(Closure $callback)
@@ -792,7 +769,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set a callback to be used to format the path of generated URLs.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function formatPathUsing(Closure $callback)
@@ -827,7 +803,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the current request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function setRequest(Request $request)
@@ -849,7 +824,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the route collection.
      *
-     * @param  \Illuminate\Routing\RouteCollectionInterface  $routes
      * @return $this
      */
     public function setRoutes(RouteCollectionInterface $routes)
@@ -874,7 +848,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the session resolver for the generator.
      *
-     * @param  callable  $sessionResolver
      * @return $this
      */
     public function setSessionResolver(callable $sessionResolver)
@@ -887,7 +860,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the encryption key resolver.
      *
-     * @param  callable  $keyResolver
      * @return $this
      */
     public function setKeyResolver(callable $keyResolver)
@@ -900,7 +872,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Clone a new instance of the URL generator with a different encryption key resolver.
      *
-     * @param  callable  $keyResolver
      * @return \Illuminate\Routing\UrlGenerator
      */
     public function withKeyResolver(callable $keyResolver)
@@ -911,7 +882,6 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Set the callback that should be used to attempt to resolve missing named routes.
      *
-     * @param  callable  $missingNamedRouteResolver
      * @return $this
      */
     public function resolveMissingNamedRoutesUsing(callable $missingNamedRouteResolver)

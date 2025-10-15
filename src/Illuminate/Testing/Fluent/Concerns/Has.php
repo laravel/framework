@@ -12,7 +12,6 @@ trait Has
      * Assert that the prop is of the expected size.
      *
      * @param  string|int  $key
-     * @param  int|null  $length
      * @return $this
      */
     public function count($key, ?int $length = null): static
@@ -43,8 +42,6 @@ trait Has
     /**
      * Assert that the prop size is between a given minimum and maximum.
      *
-     * @param  int|string  $min
-     * @param  int|string  $max
      * @return $this
      */
     public function countBetween(int|string $min, int|string $max): static
@@ -77,7 +74,6 @@ trait Has
      *
      * @param  string|int  $key
      * @param  int|\Closure|null  $length
-     * @param  \Closure|null  $callback
      * @return $this
      */
     public function has($key, $length = null, ?Closure $callback = null): static
@@ -182,7 +178,6 @@ trait Has
     /**
      * Assert that the given prop does not exist.
      *
-     * @param  string  $key
      * @return $this
      */
     public function missing(string $key): static
@@ -197,33 +192,22 @@ trait Has
 
     /**
      * Compose the absolute "dot" path to the given key.
-     *
-     * @param  string  $key
-     * @return string
      */
     abstract protected function dotPath(string $key = ''): string;
 
     /**
      * Marks the property as interacted.
-     *
-     * @param  string  $key
-     * @return void
      */
     abstract protected function interactsWith(string $key): void;
 
     /**
      * Retrieve a prop within the current scope using "dot" notation.
-     *
-     * @param  string|null  $key
-     * @return mixed
      */
     abstract protected function prop(?string $key = null);
 
     /**
      * Instantiate a new "scope" at the path of the given key.
      *
-     * @param  string  $key
-     * @param  \Closure  $callback
      * @return $this
      */
     abstract protected function scope(string $key, Closure $callback);
@@ -238,7 +222,6 @@ trait Has
     /**
      * Instantiate a new "scope" on the first element.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     abstract public function first(Closure $callback);

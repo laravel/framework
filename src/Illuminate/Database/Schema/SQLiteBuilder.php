@@ -140,8 +140,6 @@ class SQLiteBuilder extends Builder
      * Get the value for the given pragma name or set the given value.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return mixed
      */
     public function pragma($key, $value = null)
     {

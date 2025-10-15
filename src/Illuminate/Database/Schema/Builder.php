@@ -55,8 +55,6 @@ class Builder
 
     /**
      * Create a new database Schema manager.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
      */
     public function __construct(Connection $connection)
     {
@@ -86,7 +84,6 @@ class Builder
     /**
      * Set the default morph key type for migrations.
      *
-     * @param  string  $type
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -295,9 +292,6 @@ class Builder
     /**
      * Execute a table builder callback if the given table has a given column.
      *
-     * @param  string  $table
-     * @param  string  $column
-     * @param  \Closure  $callback
      * @return void
      */
     public function whenTableHasColumn(string $table, string $column, Closure $callback)
@@ -310,9 +304,6 @@ class Builder
     /**
      * Execute a table builder callback if the given table doesn't have a given column.
      *
-     * @param  string  $table
-     * @param  string  $column
-     * @param  \Closure  $callback
      * @return void
      */
     public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
@@ -452,7 +443,6 @@ class Builder
      * Modify a table on the schema.
      *
      * @param  string  $table
-     * @param  \Closure  $callback
      * @return void
      */
     public function table($table, Closure $callback)
@@ -464,7 +454,6 @@ class Builder
      * Create a new table on the schema.
      *
      * @param  string  $table
-     * @param  \Closure  $callback
      * @return void
      */
     public function create($table, Closure $callback)
@@ -592,9 +581,6 @@ class Builder
 
     /**
      * Disable foreign key constraints during the execution of a callback.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
      */
     public function withoutForeignKeyConstraints(Closure $callback)
     {
@@ -610,7 +596,6 @@ class Builder
     /**
      * Execute the blueprint to build / modify the table.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @return void
      */
     protected function build(Blueprint $blueprint)
@@ -622,7 +607,6 @@ class Builder
      * Create a new command set with a Closure.
      *
      * @param  string  $table
-     * @param  \Closure|null  $callback
      * @return \Illuminate\Database\Schema\Blueprint
      */
     protected function createBlueprint($table, ?Closure $callback = null)

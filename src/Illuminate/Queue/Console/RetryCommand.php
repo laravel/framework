@@ -116,7 +116,6 @@ class RetryCommand extends Command
     /**
      * Get the job IDs ranges, if applicable.
      *
-     * @param  array  $ranges
      * @return array
      */
     protected function getJobIdsByRanges(array $ranges)

@@ -35,7 +35,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
      *
      * @param  string  $path
      * @param  int  $limit
-     * @param  \Closure|null  $lockProviderResolver
      */
     public function __construct($path, $limit = 100, ?Closure $lockProviderResolver = null)
     {
@@ -105,7 +104,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
      * @return object|null
      */
     public function find($id)
@@ -117,7 +115,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
      * @return bool
      */
     public function forget($id)
@@ -146,7 +143,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * Prune all of the entries older than the given date.
      *
-     * @param  \DateTimeInterface  $before
      * @return int
      */
     public function prune(DateTimeInterface $before)
@@ -166,9 +162,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
 
     /**
      * Execute the given callback while holding a lock.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
      */
     protected function lock(Closure $callback)
     {
@@ -208,7 +201,6 @@ class FileFailedJobProvider implements CountableFailedJobProvider, FailedJobProv
     /**
      * Write the given array of jobs to the failed jobs file.
      *
-     * @param  array  $jobs
      * @return void
      */
     protected function write(array $jobs)

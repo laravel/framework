@@ -51,8 +51,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
 
     /**
      * Create a new explicit Invokable validation rule.
-     *
-     * @param  \Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Contracts\Validation\InvokableRule  $invokable
      */
     protected function __construct(ValidationRule|InvokableRule $invokable)
     {
@@ -79,7 +77,6 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
-     * @param  mixed  $value
      * @return bool
      */
     public function passes($attribute, $value)

@@ -31,7 +31,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
     /**
      * Create a new SES V2 transport instance.
      *
-     * @param  \Aws\SesV2\SesV2Client  $ses
      * @param  array  $options
      */
     public function __construct(SesV2Client $ses, $options = [])
@@ -100,7 +99,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
     /**
      * Extract the SES list managenent options, if applicable.
      *
-     * @param  \Symfony\Component\Mailer\SentMessage  $message
      * @return array|null
      */
     protected function listManagementOptions(SentMessage $message)
@@ -135,7 +133,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
     /**
      * Set the transmission options being used by the transport.
      *
-     * @param  array  $options
      * @return array
      */
     public function setOptions(array $options)
@@ -145,8 +142,6 @@ class SesV2Transport extends AbstractTransport implements Stringable
 
     /**
      * Get the string representation of the transport.
-     *
-     * @return string
      */
     public function __toString(): string
     {

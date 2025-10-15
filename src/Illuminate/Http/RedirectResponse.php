@@ -36,7 +36,6 @@ class RedirectResponse extends BaseRedirectResponse
      * Flash a piece of data to the session.
      *
      * @param  string|array  $key
-     * @param  mixed  $value
      * @return $this
      */
     public function with($key, $value = null)
@@ -53,7 +52,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Add multiple cookies to the response.
      *
-     * @param  array  $cookies
      * @return $this
      */
     public function withCookies(array $cookies)
@@ -68,7 +66,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Flash an array of input to the session.
      *
-     * @param  array|null  $input
      * @return $this
      */
     public function withInput(?array $input = null)
@@ -83,7 +80,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Remove all uploaded files form the given input array.
      *
-     * @param  array  $input
      * @return array
      */
     protected function removeFilesFromInput(array $input)
@@ -205,7 +201,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Set the request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function setRequest(Request $request)
@@ -226,7 +221,6 @@ class RedirectResponse extends BaseRedirectResponse
     /**
      * Set the session store instance.
      *
-     * @param  \Illuminate\Session\Store  $session
      * @return void
      */
     public function setSession(SessionStore $session)
@@ -239,7 +233,6 @@ class RedirectResponse extends BaseRedirectResponse
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      *
      * @throws \BadMethodCallException
      */

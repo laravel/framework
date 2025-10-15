@@ -86,9 +86,6 @@ class WorkCommand extends Command
 
     /**
      * Create a new queue work command.
-     *
-     * @param  \Illuminate\Queue\Worker  $worker
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      */
     public function __construct(Worker $worker, Cache $cache)
     {
@@ -207,9 +204,7 @@ class WorkCommand extends Command
     /**
      * Write the status output for the queue worker for JSON or TTY.
      *
-     * @param  Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
      * @return void
      */
     protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
@@ -222,7 +217,6 @@ class WorkCommand extends Command
     /**
      * Write the status output for the queue worker.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $status
      * @return void
      */
@@ -270,9 +264,7 @@ class WorkCommand extends Command
     /**
      * Write the status output for the queue worker in JSON format.
      *
-     * @param  \Illuminate\Contracts\Queue\Job  $job
      * @param  string  $status
-     * @param  Throwable|null  $exception
      * @return void
      */
     protected function writeOutputAsJson(Job $job, $status, ?Throwable $exception = null)
@@ -326,7 +318,6 @@ class WorkCommand extends Command
     /**
      * Store a failed job event.
      *
-     * @param  \Illuminate\Queue\Events\JobFailed  $event
      * @return void
      */
     protected function logFailedJob(JobFailed $event)

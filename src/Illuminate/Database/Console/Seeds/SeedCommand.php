@@ -39,8 +39,6 @@ class SeedCommand extends Command
 
     /**
      * Create a new database seed command instance.
-     *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      */
     public function __construct(Resolver $resolver)
     {

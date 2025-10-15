@@ -28,7 +28,6 @@ class Js implements Htmlable, Stringable
     /**
      * Create a new class instance.
      *
-     * @param  mixed  $data
      * @param  int|null  $flags
      * @param  int  $depth
      *
@@ -42,7 +41,6 @@ class Js implements Htmlable, Stringable
     /**
      * Create a new JavaScript string from the given data.
      *
-     * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
      * @return static
@@ -57,7 +55,6 @@ class Js implements Htmlable, Stringable
     /**
      * Convert the given data to a JavaScript expression.
      *
-     * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
      * @return string
@@ -93,7 +90,6 @@ class Js implements Htmlable, Stringable
     /**
      * Encode the given data as JSON.
      *
-     * @param  mixed  $data
      * @param  int  $flags
      * @param  int  $depth
      * @return string

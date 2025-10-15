@@ -38,7 +38,6 @@ class FakeProcessDescription
     /**
      * Specify the process ID that should be assigned to the process.
      *
-     * @param  int  $processId
      * @return $this
      */
     public function id(int $processId)
@@ -51,7 +50,6 @@ class FakeProcessDescription
     /**
      * Describe a line of standard output.
      *
-     * @param  array|string  $output
      * @return $this
      */
     public function output(array|string $output)
@@ -70,7 +68,6 @@ class FakeProcessDescription
     /**
      * Describe a line of error output.
      *
-     * @param  array|string  $output
      * @return $this
      */
     public function errorOutput(array|string $output)
@@ -89,7 +86,6 @@ class FakeProcessDescription
     /**
      * Replace the entire output buffer with the given string.
      *
-     * @param  string  $output
      * @return $this
      */
     public function replaceOutput(string $output)
@@ -112,7 +108,6 @@ class FakeProcessDescription
     /**
      * Replace the entire error output buffer with the given string.
      *
-     * @param  string  $output
      * @return $this
      */
     public function replaceErrorOutput(string $output)
@@ -135,7 +130,6 @@ class FakeProcessDescription
     /**
      * Specify the process exit code.
      *
-     * @param  int  $exitCode
      * @return $this
      */
     public function exitCode(int $exitCode)
@@ -148,7 +142,6 @@ class FakeProcessDescription
     /**
      * Specify how many times the "isRunning" method should return "true".
      *
-     * @param  int  $iterations
      * @return $this
      */
     public function iterations(int $iterations)
@@ -159,7 +152,6 @@ class FakeProcessDescription
     /**
      * Specify how many times the "isRunning" method should return "true".
      *
-     * @param  int  $iterations
      * @return $this
      */
     public function runsFor(int $iterations)
@@ -172,7 +164,6 @@ class FakeProcessDescription
     /**
      * Turn the fake process description into an actual process.
      *
-     * @param  string  $command
      * @return \Symfony\Component\Process\Process
      */
     public function toSymfonyProcess(string $command)
@@ -183,7 +174,6 @@ class FakeProcessDescription
     /**
      * Convert the process description into a process result.
      *
-     * @param  string  $command
      * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function toProcessResult(string $command)

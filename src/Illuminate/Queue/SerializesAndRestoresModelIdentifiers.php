@@ -15,9 +15,7 @@ trait SerializesAndRestoresModelIdentifiers
     /**
      * Get the property value prepared for serialization.
      *
-     * @param  mixed  $value
      * @param  bool  $withRelations
-     * @return mixed
      */
     protected function getSerializedPropertyValue($value, $withRelations = true)
     {
@@ -48,9 +46,6 @@ trait SerializesAndRestoresModelIdentifiers
 
     /**
      * Get the restored property value after deserialization.
-     *
-     * @param  mixed  $value
-     * @return mixed
      */
     protected function getRestoredPropertyValue($value)
     {

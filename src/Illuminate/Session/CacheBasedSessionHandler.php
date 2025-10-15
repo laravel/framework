@@ -24,7 +24,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
     /**
      * Create a new cache driven handler instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      * @param  int  $minutes
      */
     public function __construct(CacheContract $cache, $minutes)
@@ -35,8 +34,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function open($savePath, $sessionName): bool
     {
@@ -45,8 +42,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function close(): bool
     {
@@ -55,8 +50,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function read($sessionId): string
     {
@@ -65,8 +58,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function write($sessionId, $data): bool
     {
@@ -75,8 +66,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function destroy($sessionId): bool
     {
@@ -85,8 +74,6 @@ class CacheBasedSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function gc($lifetime): int
     {

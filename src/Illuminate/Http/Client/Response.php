@@ -78,8 +78,6 @@ class Response implements ArrayAccess, Stringable
      * Get the JSON decoded body of the response as an array or scalar value.
      *
      * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
     public function json($key = null, $default = null)
     {
@@ -141,7 +139,6 @@ class Response implements ArrayAccess, Stringable
     /**
      * Get a header from the response.
      *
-     * @param  string  $header
      * @return string
      */
     public function header(string $header)
@@ -505,7 +502,6 @@ class Response implements ArrayAccess, Stringable
      * Determine if the given offset exists.
      *
      * @param  string  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -516,7 +512,6 @@ class Response implements ArrayAccess, Stringable
      * Get the value for a given offset.
      *
      * @param  string  $offset
-     * @return mixed
      */
     public function offsetGet($offset): mixed
     {
@@ -527,8 +522,6 @@ class Response implements ArrayAccess, Stringable
      * Set the value at the given offset.
      *
      * @param  string  $offset
-     * @param  mixed  $value
-     * @return void
      *
      * @throws \LogicException
      */
@@ -541,7 +534,6 @@ class Response implements ArrayAccess, Stringable
      * Unset the value at the given offset.
      *
      * @param  string  $offset
-     * @return void
      *
      * @throws \LogicException
      */
@@ -565,7 +557,6 @@ class Response implements ArrayAccess, Stringable
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

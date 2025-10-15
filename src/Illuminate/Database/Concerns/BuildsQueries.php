@@ -513,7 +513,6 @@ trait BuildsQueries
      * Get the original column name of the given column, without any aliasing.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>  $builder
-     * @param  string  $parameter
      * @return string
      */
     protected function getOriginalColumnNameForCursorPagination($builder, string $parameter)

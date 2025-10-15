@@ -77,7 +77,6 @@ class RouteParameterBinder
     /**
      * Combine a set of parameter matches with the route's keys.
      *
-     * @param  array  $matches
      * @return array
      */
     protected function matchToKeys(array $matches)
@@ -96,7 +95,6 @@ class RouteParameterBinder
     /**
      * Replace null parameters with their defaults.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function replaceDefaults(array $parameters)

@@ -29,7 +29,6 @@ trait ManagesEvents
     /**
      * Register multiple view composers via an array.
      *
-     * @param  array  $composers
      * @return array
      */
     public function composers(array $composers)
@@ -169,7 +168,6 @@ trait ManagesEvents
     /**
      * Call the composer for a given view.
      *
-     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
     public function callComposer(ViewContract $view)
@@ -182,7 +180,6 @@ trait ManagesEvents
     /**
      * Call the creator for a given view.
      *
-     * @param  \Illuminate\Contracts\View\View  $view
      * @return void
      */
     public function callCreator(ViewContract $view)

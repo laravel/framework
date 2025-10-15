@@ -97,10 +97,6 @@ class ScheduleRunCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
-     * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $handler
      * @return void
      */
     public function handle(Schedule $schedule, Dispatcher $dispatcher, Cache $cache, ExceptionHandler $handler)

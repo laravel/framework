@@ -6,8 +6,6 @@ class WritingKey extends CacheEvent
 {
     /**
      * The value that will be written.
-     *
-     * @var mixed
      */
     public $value;
 
@@ -23,7 +21,6 @@ class WritingKey extends CacheEvent
      *
      * @param  string|null  $storeName
      * @param  string  $key
-     * @param  mixed  $value
      * @param  int|null  $seconds
      * @param  array  $tags
      */

@@ -46,7 +46,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Create a new database queue instance.
      *
-     * @param  \Illuminate\Database\Connection  $database
      * @param  string  $table
      * @param  string  $default
      * @param  int  $retryAfter
@@ -143,9 +142,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * Push a new job onto the queue.
      *
      * @param  string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -165,8 +162,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
-     * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -178,9 +173,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -199,9 +192,7 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * Push an array of jobs onto the queue.
      *
      * @param  array  $jobs
-     * @param  mixed  $data
      * @param  string|null  $queue
-     * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
@@ -226,7 +217,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $queue
      * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
      * @param  int  $delay
-     * @return mixed
      */
     public function release($queue, $job, $delay)
     {
@@ -240,7 +230,6 @@ class DatabaseQueue extends Queue implements QueueContract, ClearableQueue
      * @param  string  $payload
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  int  $attempts
-     * @return mixed
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {

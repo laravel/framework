@@ -30,8 +30,6 @@ class RateLimiter
 
     /**
      * Create a new rate limiter instance.
-     *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
      */
     public function __construct(Cache $cache)
     {
@@ -42,7 +40,6 @@ class RateLimiter
      * Register a named limiter configuration.
      *
      * @param  \BackedEnum|\UnitEnum|string  $name
-     * @param  \Closure  $callback
      * @return $this
      */
     public function for($name, Closure $callback)
@@ -98,9 +95,7 @@ class RateLimiter
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @param  \Closure  $callback
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
-     * @return mixed
      */
     public function attempt($key, $maxAttempts, Closure $callback, $decaySeconds = 60)
     {
@@ -197,7 +192,6 @@ class RateLimiter
      * Get the number of attempts for the given key.
      *
      * @param  string  $key
-     * @return mixed
      */
     public function attempts($key)
     {
@@ -288,9 +282,6 @@ class RateLimiter
 
     /**
      * Execute the given callback without serialization or compression when applicable.
-     *
-     * @param  callable  $callback
-     * @return mixed
      */
     protected function withoutSerializationOrCompression(callable $callback)
     {
@@ -313,7 +304,6 @@ class RateLimiter
      * Resolve the rate limiter name.
      *
      * @param  \BackedEnum|\UnitEnum|string  $name
-     * @return string
      */
     private function resolveLimiterName($name): string
     {

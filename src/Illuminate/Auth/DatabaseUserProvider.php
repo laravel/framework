@@ -35,8 +35,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Create a new database user provider.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
      * @param  string  $table
      */
     public function __construct(ConnectionInterface $connection, HasherContract $hasher, $table)
@@ -49,7 +47,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier.
      *
-     * @param  mixed  $identifier
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveById($identifier)
@@ -62,7 +59,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
-     * @param  mixed  $identifier
      * @param  string  $token
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
@@ -80,7 +76,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string  $token
      * @return void
      */
@@ -94,7 +89,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param  array  $credentials
      * @return \Illuminate\Contracts\Auth\Authenticatable|null
      */
     public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
@@ -135,7 +129,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Get the generic user.
      *
-     * @param  mixed  $user
      * @return \Illuminate\Auth\GenericUser|null
      */
     protected function getGenericUser($user)
@@ -148,8 +141,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Validate a user against the given credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
      * @return bool
      */
     public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
@@ -168,9 +159,6 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Rehash the user's password if required and supported.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  array  $credentials
-     * @param  bool  $force
      * @return void
      */
     public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)

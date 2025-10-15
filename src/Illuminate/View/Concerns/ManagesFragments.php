@@ -58,7 +58,6 @@ trait ManagesFragments
      *
      * @param  string  $name
      * @param  string|null  $default
-     * @return mixed
      */
     public function getFragment($name, $default = null)
     {

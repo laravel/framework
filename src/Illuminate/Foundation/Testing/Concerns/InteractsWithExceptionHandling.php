@@ -99,7 +99,6 @@ trait InteractsWithExceptionHandling
             /**
              * Report or log an exception.
              *
-             * @param  \Throwable  $e
              * @return void
              *
              * @throws \Exception
@@ -112,7 +111,6 @@ trait InteractsWithExceptionHandling
             /**
              * Determine if the exception should be reported.
              *
-             * @param  \Throwable  $e
              * @return false
              */
             public function shouldReport(Throwable $e)
@@ -124,7 +122,6 @@ trait InteractsWithExceptionHandling
              * Render an exception into an HTTP response.
              *
              * @param  \Illuminate\Http\Request  $request
-             * @param  \Throwable  $e
              * @return \Symfony\Component\HttpFoundation\Response
              *
              * @throws \Throwable
@@ -150,7 +147,6 @@ trait InteractsWithExceptionHandling
              * Render an exception to the console.
              *
              * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-             * @param  \Throwable  $e
              * @return void
              */
             public function renderForConsole($output, Throwable $e)
@@ -171,9 +167,7 @@ trait InteractsWithExceptionHandling
     /**
      * Assert that the given callback throws an exception with the given message when invoked.
      *
-     * @param  \Closure  $test
      * @param  (\Closure(\Throwable): bool)|class-string<\Throwable>  $expectedClass
-     * @param  string|null  $expectedMessage
      * @return $this
      */
     protected function assertThrows(Closure $test, string|Closure $expectedClass = Throwable::class, ?string $expectedMessage = null)
@@ -217,7 +211,6 @@ trait InteractsWithExceptionHandling
     /**
      * Assert that the given callback does not throw an exception.
      *
-     * @param  \Closure  $test
      * @return $this
      */
     protected function assertDoesntThrow(Closure $test)

@@ -99,7 +99,6 @@ abstract class Component
      * Eventually performs a question using the component's question helper.
      *
      * @param  callable  $callable
-     * @return mixed
      */
     protected function usingQuestionHelper($callable)
     {

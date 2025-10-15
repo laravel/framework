@@ -24,7 +24,6 @@ class RegisterProviders
     /**
      * Bootstrap the given application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function bootstrap(Application $app)
@@ -68,8 +67,6 @@ class RegisterProviders
     /**
      * Merge the given providers into the provider configuration before registration.
      *
-     * @param  array  $providers
-     * @param  string|null  $bootstrapProviderPath
      * @return void
      */
     public static function merge(array $providers, ?string $bootstrapProviderPath = null)

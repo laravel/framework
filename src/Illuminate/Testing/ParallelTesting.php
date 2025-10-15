@@ -65,8 +65,6 @@ class ParallelTesting
 
     /**
      * Create a new parallel testing instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      */
     public function __construct(Container $container)
     {
@@ -240,7 +238,6 @@ class ParallelTesting
      * Get a parallel testing option.
      *
      * @param  string  $option
-     * @return mixed
      */
     public function option($option)
     {

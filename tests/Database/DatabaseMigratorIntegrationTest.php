@@ -20,8 +20,6 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
     /**
      * Bootstrap Eloquent.
-     *
-     * @return void
      */
     protected function setUp(): void
     {

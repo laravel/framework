@@ -15,8 +15,6 @@ class LogBroadcaster extends Broadcaster
 
     /**
      * Create a new broadcaster instance.
-     *
-     * @param  \Psr\Log\LoggerInterface  $logger
      */
     public function __construct(LoggerInterface $logger)
     {

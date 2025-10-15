@@ -8,8 +8,6 @@ class MaintenanceModeManager extends Manager
 {
     /**
      * Create an instance of the file based maintenance driver.
-     *
-     * @return \Illuminate\Foundation\FileBasedMaintenanceMode
      */
     protected function createFileDriver(): FileBasedMaintenanceMode
     {
@@ -19,7 +17,6 @@ class MaintenanceModeManager extends Manager
     /**
      * Create an instance of the cache based maintenance driver.
      *
-     * @return \Illuminate\Foundation\CacheBasedMaintenanceMode
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
@@ -34,8 +31,6 @@ class MaintenanceModeManager extends Manager
 
     /**
      * Get the default driver name.
-     *
-     * @return string
      */
     public function getDefaultDriver(): string
     {

@@ -17,8 +17,6 @@ class ProcessResult implements ProcessResultContract
 
     /**
      * Create a new process result instance.
-     *
-     * @param  \Symfony\Component\Process\Process  $process
      */
     public function __construct(Process $process)
     {
@@ -78,7 +76,6 @@ class ProcessResult implements ProcessResultContract
     /**
      * Determine if the output contains the given string.
      *
-     * @param  string  $output
      * @return bool
      */
     public function seeInOutput(string $output)
@@ -99,7 +96,6 @@ class ProcessResult implements ProcessResultContract
     /**
      * Determine if the error output contains the given string.
      *
-     * @param  string  $output
      * @return bool
      */
     public function seeInErrorOutput(string $output)
@@ -110,7 +106,6 @@ class ProcessResult implements ProcessResultContract
     /**
      * Throw an exception if the process failed.
      *
-     * @param  callable|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Process\Exceptions\ProcessFailedException
@@ -133,8 +128,6 @@ class ProcessResult implements ProcessResultContract
     /**
      * Throw an exception if the process failed and the given condition is true.
      *
-     * @param  bool  $condition
-     * @param  callable|null  $callback
      * @return $this
      *
      * @throws \Throwable

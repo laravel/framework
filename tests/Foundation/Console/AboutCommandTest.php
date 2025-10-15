@@ -10,7 +10,6 @@ class AboutCommandTest extends TestCase
 {
     /**
      * @param  \Closure(bool):mixed  $format
-     * @param  mixed  $expected
      */
     #[DataProvider('cliDataProvider')]
     public function testItCanFormatForCliInterface($format, $expected)
@@ -26,7 +25,6 @@ class AboutCommandTest extends TestCase
 
     /**
      * @param  \Closure(bool):mixed  $format
-     * @param  mixed  $expected
      */
     #[DataProvider('jsonDataProvider')]
     public function testItCanFormatForJsonInterface($format, $expected)

@@ -32,7 +32,6 @@ class CookieValuePrefix
      *
      * @param  string  $cookieName
      * @param  string  $cookieValue
-     * @param  array  $keys
      * @return string|null
      */
     public static function validate($cookieName, $cookieValue, array $keys)

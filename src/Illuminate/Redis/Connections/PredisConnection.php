@@ -33,7 +33,6 @@ class PredisConnection extends Connection implements ConnectionContract
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
-     * @param  \Closure  $callback
      * @param  string  $method
      * @return void
      */
@@ -55,7 +54,6 @@ class PredisConnection extends Connection implements ConnectionContract
     /**
      * Parse the command's parameters for event dispatching.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function parseParametersForEvent(array $parameters)

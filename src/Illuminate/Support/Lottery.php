@@ -102,9 +102,6 @@ class Lottery
 
     /**
      * Run the lottery.
-     *
-     * @param  mixed  ...$args
-     * @return mixed
      */
     public function __invoke(...$args)
     {
@@ -115,7 +112,6 @@ class Lottery
      * Run the lottery.
      *
      * @param  null|int  $times
-     * @return mixed
      */
     public function choose($times = null)
     {
@@ -135,7 +131,6 @@ class Lottery
     /**
      * Run the winner or loser callback, randomly.
      *
-     * @param  mixed  ...$args
      * @return callable
      */
     protected function runCallback(...$args)

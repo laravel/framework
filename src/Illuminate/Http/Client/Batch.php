@@ -126,7 +126,6 @@ class Batch
     /**
      * Add a request to the batch with a key.
      *
-     * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      *
      * @throws BatchInProgressException
@@ -146,7 +145,6 @@ class Batch
      * Register a callback to run before the first request from the batch runs.
      *
      * @param  (\Closure($this): void)  $callback
-     * @return Batch
      */
     public function before(Closure $callback): self
     {
@@ -159,7 +157,6 @@ class Batch
      * Register a callback to run after a request from the batch succeeds.
      *
      * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
-     * @return Batch
      */
     public function progress(Closure $callback): self
     {
@@ -172,7 +169,6 @@ class Batch
      * Register a callback to run after a request from the batch fails.
      *
      * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
-     * @return Batch
      */
     public function catch(Closure $callback): self
     {
@@ -185,7 +181,6 @@ class Batch
      * Register a callback to run after all the requests from the batch succeed.
      *
      * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
-     * @return Batch
      */
     public function then(Closure $callback): self
     {
@@ -198,7 +193,6 @@ class Batch
      * Register a callback to run after all the requests from the batch finish.
      *
      * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
-     * @return Batch
      */
     public function finally(Closure $callback): self
     {
@@ -310,8 +304,6 @@ class Batch
 
     /**
      * Determine if the batch has finished executing.
-     *
-     * @return bool
      */
     public function finished(): bool
     {
@@ -320,8 +312,6 @@ class Batch
 
     /**
      * Increment the count of total and pending requests in the batch.
-     *
-     * @return void
      */
     protected function incrementPendingRequests(): void
     {
@@ -331,8 +321,6 @@ class Batch
 
     /**
      * Decrement the count of pending requests in the batch.
-     *
-     * @return void
      */
     protected function decrementPendingRequests(): void
     {
@@ -341,8 +329,6 @@ class Batch
 
     /**
      * Determine if the batch has job failures.
-     *
-     * @return bool
      */
     public function hasFailures(): bool
     {
@@ -351,8 +337,6 @@ class Batch
 
     /**
      * Increment the count of failed requests in the batch.
-     *
-     * @return void
      */
     protected function incrementFailedRequests(): void
     {
@@ -372,8 +356,6 @@ class Batch
     /**
      * Add a request to the batch with a numeric index.
      *
-     * @param  string  $method
-     * @param  array  $parameters
      * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
      */
     public function __call(string $method, array $parameters)

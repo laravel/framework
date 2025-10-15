@@ -20,9 +20,6 @@ class Address
 
     /**
      * Create a new address instance.
-     *
-     * @param  string  $address
-     * @param  string|null  $name
      */
     public function __construct(string $address, ?string $name = null)
     {

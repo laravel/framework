@@ -26,7 +26,6 @@ interface Gate
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array|null  $abilities
      * @return $this
      */
     public function resource($name, $class, ?array $abilities = null);
@@ -43,7 +42,6 @@ interface Gate
     /**
      * Register a callback to run before all Gate checks.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function before(callable $callback);
@@ -51,7 +49,6 @@ interface Gate
     /**
      * Register a callback to run after all Gate checks.
      *
-     * @param  callable  $callback
      * @return $this
      */
     public function after(callable $callback);
@@ -60,7 +57,6 @@ interface Gate
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return bool
      */
     public function allows($ability, $arguments = []);
@@ -69,7 +65,6 @@ interface Gate
      * Determine if any of the given abilities should be denied for the current user.
      *
      * @param  iterable|\UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return bool
      */
     public function denies($ability, $arguments = []);
@@ -78,7 +73,6 @@ interface Gate
      * Determine if all of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
      * @return bool
      */
     public function check($abilities, $arguments = []);
@@ -87,7 +81,6 @@ interface Gate
      * Determine if any one of the given abilities should be granted for the current user.
      *
      * @param  iterable|\UnitEnum|string  $abilities
-     * @param  mixed  $arguments
      * @return bool
      */
     public function any($abilities, $arguments = []);
@@ -96,7 +89,6 @@ interface Gate
      * Determine if the given ability should be granted for the current user.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
@@ -107,7 +99,6 @@ interface Gate
      * Inspect the user for the given ability.
      *
      * @param  \UnitEnum|string  $ability
-     * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response
      */
     public function inspect($ability, $arguments = []);
@@ -116,8 +107,6 @@ interface Gate
      * Get the raw result from the authorization callback.
      *
      * @param  string  $ability
-     * @param  mixed  $arguments
-     * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
@@ -127,7 +116,6 @@ interface Gate
      * Get a policy instance for a given class.
      *
      * @param  object|string  $class
-     * @return mixed
      *
      * @throws \InvalidArgumentException
      */

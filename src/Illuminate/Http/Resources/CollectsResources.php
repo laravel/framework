@@ -15,9 +15,6 @@ trait CollectsResources
 {
     /**
      * Map the given collection resource into its individual resources.
-     *
-     * @param  mixed  $resource
-     * @return mixed
      */
     protected function collectResource($resource)
     {

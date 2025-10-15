@@ -49,7 +49,6 @@ class EventFake implements Dispatcher, Fake
     /**
      * Create a new event fake instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @param  array|string  $eventsToFake
      */
     public function __construct(Dispatcher $dispatcher, $eventsToFake = [])
@@ -151,7 +150,6 @@ class EventFake implements Dispatcher, Fake
      * Assert if an event was dispatched exactly once.
      *
      * @param  string  $event
-     * @param  int  $times
      * @return void
      */
     public function assertDispatchedOnce($event)
@@ -258,7 +256,6 @@ class EventFake implements Dispatcher, Fake
      * Register an event listener with the dispatcher.
      *
      * @param  \Closure|string|array  $events
-     * @param  mixed  $listener
      * @return void
      */
     public function listen($events, $listener = null)
@@ -315,7 +312,6 @@ class EventFake implements Dispatcher, Fake
      * Fire an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
      * @param  bool  $halt
      * @return array|null
      */
@@ -334,7 +330,6 @@ class EventFake implements Dispatcher, Fake
      * Determine if an event should be faked or actually dispatched.
      *
      * @param  string  $eventName
-     * @param  mixed  $payload
      * @return bool
      */
     protected function shouldFakeEvent($eventName, $payload)
@@ -378,7 +373,6 @@ class EventFake implements Dispatcher, Fake
      * Determine whether an event should be dispatched or not.
      *
      * @param  string  $eventName
-     * @param  mixed  $payload
      * @return bool
      */
     protected function shouldDispatchEvent($eventName, $payload)
@@ -421,8 +415,6 @@ class EventFake implements Dispatcher, Fake
      * Dispatch an event and call the listeners.
      *
      * @param  string|object  $event
-     * @param  mixed  $payload
-     * @return mixed
      */
     public function until($event, $payload = [])
     {
@@ -444,7 +436,6 @@ class EventFake implements Dispatcher, Fake
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return mixed
      */
     public function __call($method, $parameters)
     {

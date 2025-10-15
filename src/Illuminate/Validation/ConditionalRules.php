@@ -44,7 +44,6 @@ class ConditionalRules
     /**
      * Determine if the conditional rules should be added.
      *
-     * @param  array  $data
      * @return bool
      */
     public function passes(array $data = [])
@@ -57,7 +56,6 @@ class ConditionalRules
     /**
      * Get the rules.
      *
-     * @param  array  $data
      * @return array
      */
     public function rules(array $data = [])
@@ -70,7 +68,6 @@ class ConditionalRules
     /**
      * Get the default rules.
      *
-     * @param  array  $data
      * @return array
      */
     public function defaultRules(array $data = [])

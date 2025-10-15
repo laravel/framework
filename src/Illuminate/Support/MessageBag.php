@@ -392,8 +392,6 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
 
     /**
      * Get the number of messages in the message bag.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -412,8 +410,6 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {

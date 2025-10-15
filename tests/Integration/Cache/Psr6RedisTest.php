@@ -43,9 +43,6 @@ class Psr6RedisTest extends TestCase
         Cache::store('redis')->get('foo');
     }
 
-    /**
-     * @return array
-     */
     public static function redisClientDataProvider(): array
     {
         return [

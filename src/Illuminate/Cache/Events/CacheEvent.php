@@ -30,7 +30,6 @@ abstract class CacheEvent
      *
      * @param  string|null  $storeName
      * @param  string  $key
-     * @param  array  $tags
      */
     public function __construct($storeName, $key, array $tags = [])
     {

@@ -30,8 +30,6 @@ class TrustHosts
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      */
     public function __construct(Application $app)
     {
@@ -65,7 +63,6 @@ class TrustHosts
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @return \Illuminate\Http\Response
      */
@@ -82,7 +79,6 @@ class TrustHosts
      * Specify the hosts that should always be trusted.
      *
      * @param  array<int, string>|(callable(): array<int, string>)  $hosts
-     * @param  bool  $subdomains
      * @return void
      */
     public static function at(array|callable $hosts, bool $subdomains = true)

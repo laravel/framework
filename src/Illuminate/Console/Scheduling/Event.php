@@ -93,7 +93,6 @@ class Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string  $command
      * @param  \DateTimeZone|string|null  $timezone
      */
@@ -119,7 +118,6 @@ class Event
     /**
      * Run the given event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      *
      * @throws \Throwable
@@ -209,7 +207,6 @@ class Event
     /**
      * Mark the command process as finished and run callbacks/cleanup.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @param  int  $exitCode
      * @return void
      */
@@ -227,7 +224,6 @@ class Event
     /**
      * Call all of the "before" callbacks for the event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function callBeforeCallbacks(Container $container)
@@ -240,7 +236,6 @@ class Event
     /**
      * Call all of the "after" callbacks for the event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function callAfterCallbacks(Container $container)
@@ -380,7 +375,6 @@ class Event
     /**
      * E-mail the results of the scheduled operation.
      *
-     * @param  mixed  $addresses
      * @param  bool  $onlyIfOutputExists
      * @return $this
      *
@@ -400,7 +394,6 @@ class Event
     /**
      * E-mail the results of the scheduled operation if it produces output.
      *
-     * @param  mixed  $addresses
      * @return $this
      *
      * @throws \LogicException
@@ -413,7 +406,6 @@ class Event
     /**
      * E-mail the results of the scheduled operation if it fails.
      *
-     * @param  mixed  $addresses
      * @return $this
      */
     public function emailOutputOnFailure($addresses)
@@ -442,7 +434,6 @@ class Event
     /**
      * E-mail the output of the event to the recipients.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @param  array  $addresses
      * @param  bool  $onlyIfOutputExists
      * @return void
@@ -586,7 +577,6 @@ class Event
     /**
      * Get the Guzzle HTTP client to use to send pings.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return \GuzzleHttp\ClientInterface
      */
     protected function getHttpClient(Container $container)
@@ -605,7 +595,6 @@ class Event
     /**
      * Register a callback to be called before the operation.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function before(Closure $callback)
@@ -618,7 +607,6 @@ class Event
     /**
      * Register a callback to be called after the operation.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function after(Closure $callback)
@@ -629,7 +617,6 @@ class Event
     /**
      * Register a callback to be called after the operation.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function then(Closure $callback)
@@ -648,7 +635,6 @@ class Event
     /**
      * Register a callback that uses the output after the job runs.
      *
-     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -662,7 +648,6 @@ class Event
     /**
      * Register a callback to be called if the operation succeeds.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function onSuccess(Closure $callback)
@@ -683,7 +668,6 @@ class Event
     /**
      * Register a callback that uses the output if the operation succeeds.
      *
-     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -697,7 +681,6 @@ class Event
     /**
      * Register a callback to be called if the operation fails.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function onFailure(Closure $callback)
@@ -718,7 +701,6 @@ class Event
     /**
      * Register a callback that uses the output if the operation fails.
      *
-     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return $this
      */
@@ -732,7 +714,6 @@ class Event
     /**
      * Get a callback that provides output.
      *
-     * @param  \Closure  $callback
      * @param  bool  $onlyIfOutputExists
      * @return \Closure
      */
@@ -788,7 +769,6 @@ class Event
     /**
      * Set the event mutex implementation to be used.
      *
-     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @return $this
      */
     public function preventOverlapsUsing(EventMutex $mutex)
@@ -818,7 +798,6 @@ class Event
     /**
      * Set the mutex name or name resolver callback.
      *
-     * @param  \Closure|string  $mutexName
      * @return $this
      */
     public function createMutexNameUsing(Closure|string $mutexName)

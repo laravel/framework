@@ -38,7 +38,6 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Add a Route instance to the collection.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
     public function add(Route $route)
@@ -178,7 +177,6 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Find the first route matching a given request.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
@@ -287,8 +285,6 @@ class RouteCollection extends AbstractRouteCollection
     /**
      * Convert the collection to a CompiledRouteCollection instance.
      *
-     * @param  \Illuminate\Routing\Router  $router
-     * @param  \Illuminate\Container\Container  $container
      * @return \Illuminate\Routing\CompiledRouteCollection
      */
     public function toCompiledRouteCollection(Router $router, Container $container)

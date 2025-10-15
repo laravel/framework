@@ -104,9 +104,7 @@ trait BroadcastsEvents
     /**
      * Broadcast the given event instance if channels are configured for the model event.
      *
-     * @param  mixed  $instance
      * @param  string  $event
-     * @param  mixed  $channels
      * @return \Illuminate\Broadcasting\PendingBroadcast|null
      */
     protected function broadcastIfBroadcastChannelsExistForEvent($instance, $event, $channels = null)
@@ -124,7 +122,6 @@ trait BroadcastsEvents
      * Create a new broadcastable model event event.
      *
      * @param  string  $event
-     * @return mixed
      */
     public function newBroadcastableModelEvent($event)
     {
@@ -146,7 +143,6 @@ trait BroadcastsEvents
     /**
      * Create a new broadcastable model event for the model.
      *
-     * @param  string  $event
      * @return \Illuminate\Database\Eloquent\BroadcastableModelEventOccurred
      */
     protected function newBroadcastableEvent(string $event)

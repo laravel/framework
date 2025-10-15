@@ -23,9 +23,6 @@ class ConnectionFailed
 
     /**
      * Create a new event instance.
-     *
-     * @param  \Illuminate\Http\Client\Request  $request
-     * @param  \Illuminate\Http\Client\ConnectionException  $exception
      */
     public function __construct(Request $request, ConnectionException $exception)
     {

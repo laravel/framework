@@ -47,7 +47,6 @@ class PostgresConnection extends Connection
     /**
      * Determine if the given database exception was caused by a unique constraint violation.
      *
-     * @param  \Exception  $exception
      * @return bool
      */
     protected function isUniqueConstraintError(Exception $exception)
@@ -92,8 +91,6 @@ class PostgresConnection extends Connection
     /**
      * Get the schema state for the connection.
      *
-     * @param  \Illuminate\Filesystem\Filesystem|null  $files
-     * @param  callable|null  $processFactory
      * @return \Illuminate\Database\Schema\PostgresSchemaState
      */
     public function getSchemaState(?Filesystem $files = null, ?callable $processFactory = null)

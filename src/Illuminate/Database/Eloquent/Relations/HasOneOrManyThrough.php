@@ -196,8 +196,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrNew(array $attributes = [], array $values = [])
@@ -212,8 +210,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Get the first record matching the attributes. If the record is not found, create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
@@ -228,8 +224,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function createOrFirst(array $attributes = [], array $values = [])
@@ -244,8 +238,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function updateOrCreate(array $attributes, array $values = [])
@@ -261,8 +253,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Add a basic where clause to the query, and return the first result.
      *
      * @param  \Closure|string|array  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @param  string  $boolean
      * @return TRelatedModel|null
      */
@@ -328,7 +318,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Find a related model by its primary key.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel|null)
      */
@@ -346,7 +335,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Find a sole related model by its primary key.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return TRelatedModel
      *
@@ -383,7 +371,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Find a related model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
      * @param  array  $columns
      * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TRelatedModel> : TRelatedModel)
      *
@@ -411,7 +398,6 @@ abstract class HasOneOrManyThrough extends Relation
      *
      * @template TValue
      *
-     * @param  mixed  $id
      * @param  (\Closure(): TValue)|list<string>|string  $columns
      * @param  (\Closure(): TValue)|null  $callback
      * @return (
@@ -513,7 +499,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Set the select clause for the relation query.
      *
-     * @param  array  $columns
      * @return array
      */
     protected function shouldSelect(array $columns = ['*'])
@@ -529,7 +514,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -541,7 +525,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of a query by comparing numeric IDs.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -559,7 +542,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of a query by comparing IDs in descending order.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -576,7 +558,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
@@ -604,7 +585,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @return bool
      */
@@ -702,7 +682,6 @@ abstract class HasOneOrManyThrough extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -727,7 +706,6 @@ abstract class HasOneOrManyThrough extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForThroughSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])

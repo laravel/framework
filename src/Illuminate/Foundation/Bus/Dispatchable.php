@@ -11,7 +11,6 @@ trait Dispatchable
     /**
      * Dispatch the job with the given arguments.
      *
-     * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public static function dispatch(...$arguments)
@@ -23,7 +22,6 @@ trait Dispatchable
      * Dispatch the job with the given arguments if the given truth test passes.
      *
      * @param  bool|\Closure  $boolean
-     * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
     public static function dispatchIf($boolean, ...$arguments)
@@ -45,7 +43,6 @@ trait Dispatchable
      * Dispatch the job with the given arguments unless the given truth test passes.
      *
      * @param  bool|\Closure  $boolean
-     * @param  mixed  ...$arguments
      * @return \Illuminate\Foundation\Bus\PendingDispatch|\Illuminate\Support\Fluent
      */
     public static function dispatchUnless($boolean, ...$arguments)
@@ -67,9 +64,6 @@ trait Dispatchable
      * Dispatch a command to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
-     *
-     * @param  mixed  ...$arguments
-     * @return mixed
      */
     public static function dispatchSync(...$arguments)
     {
@@ -78,9 +72,6 @@ trait Dispatchable
 
     /**
      * Dispatch a command to its appropriate handler after the current process.
-     *
-     * @param  mixed  ...$arguments
-     * @return mixed
      */
     public static function dispatchAfterResponse(...$arguments)
     {
@@ -101,7 +92,6 @@ trait Dispatchable
     /**
      * Create a new pending job dispatch instance.
      *
-     * @param  mixed  $job
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     protected static function newPendingDispatch($job)

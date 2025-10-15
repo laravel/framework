@@ -103,8 +103,6 @@ class File extends UploadedFile
 
     /**
      * Get the size of the file.
-     *
-     * @return int
      */
     public function getSize(): int
     {
@@ -126,8 +124,6 @@ class File extends UploadedFile
 
     /**
      * Get the MIME type of the file.
-     *
-     * @return string
      */
     public function getMimeType(): string
     {

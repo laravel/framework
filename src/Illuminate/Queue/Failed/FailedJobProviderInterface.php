@@ -33,7 +33,6 @@ interface FailedJobProviderInterface
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
      * @return object|null
      */
     public function find($id);
@@ -41,7 +40,6 @@ interface FailedJobProviderInterface
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
      * @return bool
      */
     public function forget($id);

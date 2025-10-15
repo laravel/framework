@@ -10,8 +10,6 @@ trait ResponseTrait
 {
     /**
      * The original content of the response.
-     *
-     * @var mixed
      */
     public $original;
 
@@ -54,8 +52,6 @@ trait ResponseTrait
 
     /**
      * Get the original response content.
-     *
-     * @return mixed
      */
     public function getOriginalContent()
     {
@@ -158,7 +154,6 @@ trait ResponseTrait
     /**
      * Set the exception to attach to the response.
      *
-     * @param  \Throwable  $e
      * @return $this
      */
     public function withException(Throwable $e)
