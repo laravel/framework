@@ -30,10 +30,7 @@ class SqsConnector implements ConnectorInterface
 
             if ($parts !== false && isset($parts['scheme'], $parts['host'])) {
                 $endpoint = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
-
-                if (! empty($endpoint)) {
-                    $config['endpoint'] = $endpoint;
-                }
+                $config['endpoint'] = $endpoint;
             }
         }
 
