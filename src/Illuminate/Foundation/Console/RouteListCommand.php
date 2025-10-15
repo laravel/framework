@@ -547,7 +547,7 @@ class RouteListCommand extends Command
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
             ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file'],
-            ['pretty', null, InputOption::VALUE_NONE, 'Pretty print JSON output when using --output'],
+            ['pretty', null, InputOption::VALUE_NONE, 'Pretty-print JSON output when using --output'],
         ];
     }
 }
