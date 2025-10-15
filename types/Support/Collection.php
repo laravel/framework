@@ -14,7 +14,7 @@ class Users implements Arrayable
     }
 }
 
-$collection = collect([new User]);
+$collection = new Collection([new User]);
 $arrayable = new Users;
 /** @var iterable<int, int> $iterable */
 $iterable = [1];

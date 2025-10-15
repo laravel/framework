@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use _PHPStan_8996d3948\olvlvl\ComposerAttributeCollector\Collection;
 use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
@@ -132,7 +133,7 @@ class TestBroadcastEvent
 
     public function __construct()
     {
-        $this->collection = collect(['foo' => 'bar']);
+        $this->collection = new \Illuminate\Support\Collection(['foo' => 'bar']);
     }
 
     public function broadcastOn()

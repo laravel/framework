@@ -408,10 +408,10 @@ class HttpClientTest extends TestCase
         $response = $this->factory->get('http://foo.com/api');
 
         $this->assertInstanceOf(Collection::class, $response->collect());
-        $this->assertEquals(collect(['result' => ['foo' => 'bar']]), $response->collect());
-        $this->assertEquals(collect(['foo' => 'bar']), $response->collect('result'));
-        $this->assertEquals(collect(['bar']), $response->collect('result.foo'));
-        $this->assertEquals(collect(), $response->collect('missing_key'));
+        $this->assertEquals(new Collection(['result' => ['foo' => 'bar']]), $response->collect());
+        $this->assertEquals(new Collection(['foo' => 'bar']), $response->collect('result'));
+        $this->assertEquals(new Collection(['bar']), $response->collect('result.foo'));
+        $this->assertEquals(new Collection(), $response->collect('missing_key'));
     }
 
     public function testResponseCanBeReturnedAsFluent()
@@ -2343,7 +2343,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->response(['error'], 500),
         ]);
 
-        $whenAttempts = collect();
+        $whenAttempts = new Collection();
 
         [$exception] = $this->factory->pool(fn ($pool) => [
             $pool->retry(2, 1000, function ($exception) use ($whenAttempts) {
@@ -2384,7 +2384,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->response(['error'], 500),
         ]);
 
-        $whenAttempts = collect();
+        $whenAttempts = new Collection();
 
         [$response] = $this->factory->pool(fn ($pool) => [
             $pool->retry(2, 1000, function ($exception) use ($whenAttempts) {
@@ -3027,7 +3027,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->response(['error'], 403),
         ]);
 
-        $hitThrowCallback = collect();
+        $hitThrowCallback = new Collection();
 
         [$exception] = $this->factory->pool(fn ($pool) => [
             $pool->throwIf(function ($response) {
@@ -3056,7 +3056,7 @@ class HttpClientTest extends TestCase
             '*' => $this->factory->response(['error'], 403),
         ]);
 
-        $hitThrowCallback = collect();
+        $hitThrowCallback = new Collection();
 
         [$response] = $this->factory->pool(fn ($pool) => [
             $pool->throwIf(function ($response) {
