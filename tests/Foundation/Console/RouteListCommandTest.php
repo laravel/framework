@@ -221,26 +221,9 @@ class RouteListCommandTest extends TestCase
         unlink($filePath);
     }
 
-    public function testOutputAddsJsonExtensionAutomatically()
+    public function testOutputRespectsUserSpecifiedExtension()
     {
-        $filePath = sys_get_temp_dir() . '/test_routes';
-        $expectedFilePath = $filePath . '.json';
-        
-        $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
-        
-        $this->assertFileExists($expectedFilePath);
-        $this->assertFileDoesNotExist($filePath);
-        
-        $content = file_get_contents($expectedFilePath);
-        $this->assertJson($content);
-        
-        // Clean up
-        unlink($expectedFilePath);
-    }
-
-    public function testOutputKeepsExistingJsonExtension()
-    {
-        $filePath = sys_get_temp_dir() . '/test_routes.json';
+        $filePath = sys_get_temp_dir() . '/test_routes.custom';
         
         $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
         

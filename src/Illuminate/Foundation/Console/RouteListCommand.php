@@ -507,11 +507,6 @@ class RouteListCommand extends Command
      */
     protected function saveToFile($content, $filename)
     {
-        // Automatically add .json extension if using JSON output and filename doesn't have it
-        if ($this->option('json') && !str_ends_with($filename, '.json')) {
-            $filename .= '.json';
-        }
-
         // Ensure directory exists
         $directory = dirname($filename);
         if (!is_dir($directory)) {
@@ -521,7 +516,7 @@ class RouteListCommand extends Command
         file_put_contents($filename, $content);
 
         // Get file size for better feedback
-        $fileSize = Number::fileSize(filesize($filename)), 2);
+        $fileSize = Number::fileSize(filesize($filename), 2);
         $routeCount = count(json_decode($content, true) ?? []);
 
         $this->components->info("Route list saved to: {$filename} ({$routeCount} routes, {$fileSize})");
@@ -546,9 +541,7 @@ class RouteListCommand extends Command
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, definition) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
-            ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file (.json extension is optional)
-            
-            You may combine this option with --pretty for pretty printed JSON'],
+            ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file'],
             ['pretty', null, InputOption::VALUE_NONE, 'Pretty-print JSON output when using --output'],
         ];
     }
