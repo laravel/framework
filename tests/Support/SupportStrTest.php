@@ -766,6 +766,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('这是一...', Str::limit($nonAsciiString, 6, preserveWords: true));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, ''));
         $this->assertSame('这是一', Str::limit($nonAsciiString, 6, '', true));
+
+        $this->assertSame(null, Str::limit(null));
     }
 
     public function testLength()
