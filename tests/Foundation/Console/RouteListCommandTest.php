@@ -252,4 +252,39 @@ class RouteListCommandTest extends TestCase
         // Clean up
         unlink($filePath);
     }
+
+    public function testOutputWithPrettyPrint()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes_pretty.json';
+        
+        $this->app->call('route:list', ['--json' => true, '--output' => $filePath, '--pretty' => true]);
+        
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        // Pretty printed JSON should contain newlines and indentation
+        $this->assertStringContainsString("\n", $content);
+        $this->assertStringContainsString("  ", $content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputCreatesDirectory()
+    {
+        $directory = sys_get_temp_dir() . '/test_route_dir_' . time();
+        $filePath = $directory . '/test_routes.json';
+        
+        $this->assertFalse(is_dir($directory));
+        
+        $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
+        
+        $this->assertTrue(is_dir($directory));
+        $this->assertFileExists($filePath);
+        
+        // Clean up
+        unlink($filePath);
+        rmdir($directory);
+    }
 }

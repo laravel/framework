@@ -243,6 +243,51 @@ class RouteListCommandTest extends TestCase
         // Clean up
         unlink($filePath);
     }
+
+    public function testOutputWithPrettyPrint()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes_pretty.json';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->artisan(RouteListCommand::class, ['--json' => true, '--output' => $filePath, '--pretty' => true])
+            ->assertSuccessful();
+            
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        // Pretty printed JSON should contain newlines and indentation
+        $this->assertStringContainsString("\n", $content);
+        $this->assertStringContainsString("  ", $content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputCreatesDirectory()
+    {
+        $directory = sys_get_temp_dir() . '/test_route_dir_' . time();
+        $filePath = $directory . '/test_routes.json';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->assertFalse(is_dir($directory));
+        
+        $this->artisan(RouteListCommand::class, ['--json' => true, '--output' => $filePath])
+            ->assertSuccessful();
+            
+        $this->assertTrue(is_dir($directory));
+        $this->assertFileExists($filePath);
+        
+        // Clean up
+        unlink($filePath);
+        rmdir($directory);
+    }
 }
 
 class FooController extends Controller

@@ -337,7 +337,7 @@ class RouteListCommand extends Command
      */
     protected function asJson($routes)
     {
-        return $routes
+        $json = $routes
             ->map(function ($route) {
                 $route['middleware'] = empty($route['middleware']) ? [] : explode("\n", $route['middleware']);
 
@@ -345,6 +345,13 @@ class RouteListCommand extends Command
             })
             ->values()
             ->toJson();
+
+        // Apply pretty printing if requested and output is going to a file
+        if ($this->option('output') && $this->option('pretty')) {
+            return json_encode(json_decode($json), JSON_PRETTY_PRINT);
+        }
+
+        return $json;
     }
 
     /**
@@ -505,9 +512,19 @@ class RouteListCommand extends Command
             $filename .= '.json';
         }
 
+        // Ensure directory exists
+        $directory = dirname($filename);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
         file_put_contents($filename, $content);
 
-        $this->components->info("Route list saved to: {$filename}");
+        // Get file size for better feedback
+        $fileSize = number_format(filesize($filename) / 1024, 2);
+        $routeCount = count(json_decode($content, true) ?? []);
+
+        $this->components->info("Route list saved to: {$filename} ({$routeCount} routes, {$fileSize} KB)");
     }
 
     /**
@@ -530,6 +547,7 @@ class RouteListCommand extends Command
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
             ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file'],
+            ['pretty', null, InputOption::VALUE_NONE, 'Pretty print JSON output when using --output'],
         ];
     }
 }
