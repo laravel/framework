@@ -25,6 +25,18 @@ class SqsConnector implements ConnectorInterface
             }
         }
 
+        if (empty($config['endpoint']) && ! empty($config['prefix']) && filter_var($config['prefix'], FILTER_VALIDATE_URL)) {
+            $parts = parse_url($config['prefix']);
+
+            if ($parts !== false && isset($parts['scheme'], $parts['host'])) {
+                $endpoint = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
+
+                if (! empty($endpoint)) {
+                    $config['endpoint'] = $endpoint;
+                }
+            }
+        }
+
         return new SqsQueue(
             new SqsClient(
                 Arr::except($config, ['token'])
