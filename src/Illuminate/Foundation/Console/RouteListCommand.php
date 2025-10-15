@@ -195,9 +195,13 @@ class RouteListCommand extends Command
     {
         $routes = new Collection($routes);
 
-        $this->output->writeln(
-            $this->option('json') ? $this->asJson($routes) : $this->forCli($routes)
-        );
+        $output = $this->option('json') ? $this->asJson($routes) : $this->forCli($routes);
+
+        if ($this->option('output')) {
+            $this->saveToFile($output, $this->option('output'));
+        } else {
+            $this->output->writeln($output);
+        }
     }
 
     /**
@@ -488,6 +492,25 @@ class RouteListCommand extends Command
     }
 
     /**
+     * Save the output to a file.
+     *
+     * @param  string  $content
+     * @param  string  $filename
+     * @return void
+     */
+    protected function saveToFile($content, $filename)
+    {
+        // Automatically add .json extension if using JSON output and filename doesn't have it
+        if ($this->option('json') && !str_ends_with($filename, '.json')) {
+            $filename .= '.json';
+        }
+
+        file_put_contents($filename, $content);
+
+        $this->components->info("Route list saved to: {$filename}");
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -506,6 +529,7 @@ class RouteListCommand extends Command
             ['sort', null, InputOption::VALUE_OPTIONAL, 'The column (domain, method, uri, name, action, middleware, definition) to sort by', 'uri'],
             ['except-vendor', null, InputOption::VALUE_NONE, 'Do not display routes defined by vendor packages'],
             ['only-vendor', null, InputOption::VALUE_NONE, 'Only display routes defined by vendor packages'],
+            ['output', 'o', InputOption::VALUE_OPTIONAL, 'Save the output to a file'],
         ];
     }
 }

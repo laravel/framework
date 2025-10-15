@@ -190,4 +190,66 @@ class RouteListCommandTest extends TestCase
 
         $this->assertJsonStringEqualsJsonString($expectedOrder, $output);
     }
+
+    public function testOutputSavesToFileWithJson()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.json';
+        
+        $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
+        
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputSavesToFileWithCli()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.txt';
+        
+        $this->app->call('route:list', ['--output' => $filePath]);
+        
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertStringContainsString('Showing [3] routes', $content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputAddsJsonExtensionAutomatically()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes';
+        $expectedFilePath = $filePath . '.json';
+        
+        $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
+        
+        $this->assertFileExists($expectedFilePath);
+        $this->assertFileDoesNotExist($filePath);
+        
+        $content = file_get_contents($expectedFilePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($expectedFilePath);
+    }
+
+    public function testOutputKeepsExistingJsonExtension()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.json';
+        
+        $this->app->call('route:list', ['--json' => true, '--output' => $filePath]);
+        
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($filePath);
+    }
 }

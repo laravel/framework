@@ -161,6 +161,88 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
     }
+
+    public function testOutputSavesToFileWithJson()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.json';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->artisan(RouteListCommand::class, ['--json' => true, '--output' => $filePath])
+            ->assertSuccessful();
+            
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputSavesToFileWithCli()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.txt';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->artisan(RouteListCommand::class, ['--output' => $filePath])
+            ->assertSuccessful();
+            
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertStringContainsString('Showing [1] routes', $content);
+        
+        // Clean up
+        unlink($filePath);
+    }
+
+    public function testOutputAddsJsonExtensionAutomatically()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes';
+        $expectedFilePath = $filePath . '.json';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->artisan(RouteListCommand::class, ['--json' => true, '--output' => $filePath])
+            ->assertSuccessful();
+            
+        $this->assertFileExists($expectedFilePath);
+        $this->assertFileDoesNotExist($filePath);
+        
+        $content = file_get_contents($expectedFilePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($expectedFilePath);
+    }
+
+    public function testOutputKeepsExistingJsonExtension()
+    {
+        $filePath = sys_get_temp_dir() . '/test_routes.json';
+        
+        $this->router->get('/', function () {
+            //
+        });
+        
+        $this->artisan(RouteListCommand::class, ['--json' => true, '--output' => $filePath])
+            ->assertSuccessful();
+            
+        $this->assertFileExists($filePath);
+        
+        $content = file_get_contents($filePath);
+        $this->assertJson($content);
+        
+        // Clean up
+        unlink($filePath);
+    }
 }
 
 class FooController extends Controller
