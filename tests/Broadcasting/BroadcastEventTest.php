@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use _PHPStan_8996d3948\olvlvl\ComposerAttributeCollector\Collection;
 use Exception;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Broadcasting\InteractsWithBroadcasting;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactory;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -133,7 +133,7 @@ class TestBroadcastEvent
 
     public function __construct()
     {
-        $this->collection = new \Illuminate\Support\Collection(['foo' => 'bar']);
+        $this->collection = new Collection(['foo' => 'bar']);
     }
 
     public function broadcastOn()
