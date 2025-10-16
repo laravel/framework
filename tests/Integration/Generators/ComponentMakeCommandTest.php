@@ -45,6 +45,20 @@ class ComponentMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('resources/views/components/foo.blade.php');
     }
 
+    public function testItGeneratesInlineComponentWithCorrectHeredocIndentation()
+    {
+        $this->artisan('make:component', ['name' => 'Foo', '--inline' => true]);
+
+        $this->assertFilenameExists('app/View/Components/Foo.php');
+
+        $this->assertFileContains([
+            '            <div>',
+            '                <!--',
+            '            </div>',
+            '            blade',
+        ], 'app/View/Components/Foo.php');
+    }
+
     public function testItCanGenerateComponentFileWithTest()
     {
         $this->artisan('make:component', ['name' => 'Foo', '--test' => true])

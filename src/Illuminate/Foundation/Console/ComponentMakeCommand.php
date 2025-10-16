@@ -102,9 +102,12 @@ class ComponentMakeCommand extends GeneratorCommand
     protected function buildClass($name)
     {
         if ($this->option('inline')) {
+            $indent = '            '; // 12 spaces
+            $quote = Inspiring::quotes()->random();
+
             return str_replace(
                 ['DummyView', '{{ view }}'],
-                "<<<'blade'\n<div>\n    <!-- ".Inspiring::quotes()->random()." -->\n</div>\nblade",
+                "<<<'blade'\n{$indent}<div>\n{$indent}    <!-- {$quote} -->\n{$indent}</div>\n{$indent}blade;",
                 parent::buildClass($name)
             );
         }
