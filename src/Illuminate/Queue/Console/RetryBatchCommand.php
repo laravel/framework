@@ -16,7 +16,8 @@ class RetryBatchCommand extends Command implements Isolatable
      * @var string
      */
     protected $signature = 'queue:retry-batch
-                            {id?* : The ID of the batch whose failed jobs should be retried}';
+                            {id?* : The ID of the batch whose failed jobs should be retried}
+                            {--wait= : Execution wait time in seconds (affects all jobs in the batch)}';
 
     /**
      * The console command description.
@@ -32,6 +33,7 @@ class RetryBatchCommand extends Command implements Isolatable
      */
     public function handle()
     {
+        $waitTime = (int) $this->option('wait');
         $batchesFound = count($ids = $this->getBatchJobIds()) > 0;
 
         if ($batchesFound) {
@@ -50,9 +52,13 @@ class RetryBatchCommand extends Command implements Isolatable
             $this->components->info("Pushing failed queue jobs of the batch [$batchId] back onto the queue.");
 
             foreach ($batch->failedJobIds as $failedJobId) {
+                $arguments = ['id' => $failedJobId];
+                if ($waitTime > 0) {
+                    $arguments['--wait'] = $waitTime;
+                }
                 $this->components->task(
                     $failedJobId,
-                    fn () => $this->callSilent('queue:retry', ['id' => $failedJobId]) == 0
+                    fn () => $this->callSilent('queue:retry', $arguments) == 0
                 );
             }
 
