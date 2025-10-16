@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Process;
 
 use Illuminate\Contracts\Process\ProcessResult;
+use Illuminate\Process\Batch;
+use Illuminate\Process\Exceptions\BatchInProgressException;
 use Illuminate\Process\Exceptions\ProcessFailedException;
 use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Process\Factory;
+use Illuminate\Support\Defer\DeferredCallback;
 use OutOfBoundsException;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
@@ -1079,6 +1082,284 @@ class ProcessTest extends TestCase
         $factory->assertRanTimes(function ($process) {
             return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
         }, 2);
+    }
+
+    public function testBatchNoCallbacks(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $batch = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+            $batch->as('third')->command('exit 1');
+        });
+        
+        $this->assertSame(3, $batch->totalProcesses);
+        $this->assertFalse($batch->finished());
+        
+        $results = $batch->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        $this->assertSame(1, $results['third']->exitCode());
+        
+        $this->assertSame(3, $batch->totalProcesses);
+        $this->assertSame(0, $batch->pendingProcesses);
+        $this->assertSame(1, $batch->failedProcesses);
+        $this->assertTrue($batch->hasFailures());
+        $this->assertTrue($batch->finished());
+    }
+
+    public function testBatchDefer(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $batch = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+            $batch->as('third')->command('exit 1');
+        });
+        
+        $this->assertSame(3, $batch->totalProcesses);
+        $this->assertFalse($batch->finished());
+        
+        $deferredCallback = $batch->defer();
+        
+        $this->assertInstanceOf(DeferredCallback::class, $deferredCallback);
+        $this->assertFalse($batch->finished());
+    }
+
+    public function testCannotAddRequestsToInProgressBatch(): void
+    {
+        $this->expectException(BatchInProgressException::class);
+        
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $batch = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+        });
+        
+        $batch->progress(function (Batch $batch, int|string $key, ProcessResult $result) {
+            $batch->as('third')->command('exit 1');
+        })->run();
+    }
+
+    public function testBatchBeforeHook(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+        ]);
+        
+        $beforeCallback = false;
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+        })->before(function (Batch $batch) use (&$beforeCallback) {
+            $beforeCallback = true;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        $this->assertTrue($beforeCallback);
+    }
+
+    public function testBatchProgressHook(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $progressCallbacks = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+            $batch->as('third')->command('exit 1');
+        })->progress(function (Batch $batch, int|string $key, ProcessResult $result) use (&$progressCallbacks) {
+            $progressCallbacks[$key] = $result;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        $this->assertSame(1, $results['third']->exitCode());
+        
+        $this->assertCount(2, $progressCallbacks);
+        $this->assertArrayHasKey('first', $progressCallbacks);
+        $this->assertArrayHasKey('second', $progressCallbacks);
+        $this->assertArrayNotHasKey('third', $progressCallbacks);
+        
+        $this->assertSame($results['first'], $progressCallbacks['first']);
+        $this->assertSame($results['second'], $progressCallbacks['second']);
+    }
+
+    public function testBatchCatchHook(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $catchCallbacks = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+            $batch->as('third')->command('exit 1');
+        })->catch(function (Batch $batch, int|string $key, ProcessResult|ProcessFailedException|ProcessTimedOutException $result) use (&$catchCallbacks) {
+            $catchCallbacks[$key] = $result;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        $this->assertSame(1, $results['third']->exitCode());
+        
+        $this->assertCount(1, $catchCallbacks);
+        $this->assertArrayNotHasKey('first', $catchCallbacks);
+        $this->assertArrayNotHasKey('second', $catchCallbacks);
+        $this->assertArrayHasKey('third', $catchCallbacks);
+        
+        $this->assertSame($results['third'], $catchCallbacks['third']);
+    }
+
+    public function testBatchThenHookIsCalled(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+        ]);
+        
+        $thenCallback = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+        })->then(function (Batch $batch, array $results) use (&$thenCallback) {
+            $thenCallback = $results;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        
+        $this->assertCount(2, $thenCallback);
+        $this->assertArrayHasKey('first', $thenCallback);
+        $this->assertArrayHasKey('second', $thenCallback);
+        
+        $this->assertSame($results['first'], $thenCallback['first']);
+        $this->assertSame($results['second'], $thenCallback['second']);
+    }
+
+    public function testBatchThenHookIsNotCalled(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $thenCallback = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('exit 1');
+        })->then(function (Batch $batch, array $results) use (&$thenCallback) {
+            $thenCallback = $results;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(1, $results['second']->exitCode());
+        
+        $this->assertCount(0, $thenCallback);
+    }
+
+    public function testBatchFinallyHookIsCalledWithoutErrors(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'echo "Created"' => $factory->result('Created', exitCode: 0),
+        ]);
+        
+        $finallyCallback = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('echo "Created"');
+        })->finally(function (Batch $batch, array $results) use (&$finallyCallback) {
+            $finallyCallback = $results;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(0, $results['second']->exitCode());
+        
+        $this->assertCount(2, $finallyCallback);
+        $this->assertArrayHasKey('first', $finallyCallback);
+        $this->assertArrayHasKey('second', $finallyCallback);
+        
+        $this->assertSame($results['first'], $finallyCallback['first']);
+        $this->assertSame($results['second'], $finallyCallback['second']);
+    }
+
+    public function testBatchFinallyHookIsCalledWithErrors(): void
+    {
+        $factory = new Factory;
+        
+        $factory->fake([
+            'echo "OK"' => $factory->result('OK', exitCode: 0),
+            'exit 1' => $factory->result('Error', exitCode: 1),
+        ]);
+        
+        $finallyCallback = [];
+        
+        $results = $factory->batch(function (Batch $batch) {
+            $batch->as('first')->command('echo "OK"');
+            $batch->as('second')->command('exit 1');
+        })->finally(function (Batch $batch, array $results) use (&$finallyCallback) {
+            $finallyCallback = $results;
+        })->run();
+        
+        $this->assertSame(0, $results['first']->exitCode());
+        $this->assertSame(1, $results['second']->exitCode());
+        
+        $this->assertCount(2, $finallyCallback);
+        $this->assertArrayHasKey('first', $finallyCallback);
+        $this->assertArrayHasKey('second', $finallyCallback);
+        
+        $this->assertSame($results['first'], $finallyCallback['first']);
+        $this->assertSame($results['second'], $finallyCallback['second']);
     }
 
     protected function ls()

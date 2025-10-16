@@ -275,6 +275,17 @@ class Factory
     }
 
     /**
+     * Start defining a batch of processes.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Process\Batch
+     */
+    public function batch(callable $callback)
+    {
+        return new Batch($this, $callback);
+    }
+
+    /**
      * Start defining a series of piped processes.
      *
      * @param  callable|array  $callback
