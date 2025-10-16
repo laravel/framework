@@ -221,7 +221,7 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertTrue(ClassStringDispatchableJob::$ran);
     }
 
-    public function testJobCanBeDispatchedSyncUsingClassString()
+    public function testJobCanBeDispatchedSyncByClassString()
     {
         dispatch_sync(ClassStringDispatchableJob::class);
         $this->assertTrue(ClassStringDispatchableJob::$ran);
@@ -267,7 +267,9 @@ class ClassStringDispatchableJob implements ShouldQueue
 
     public static $ran = false;
 
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     public function handle()
     {
