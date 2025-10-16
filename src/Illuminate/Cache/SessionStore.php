@@ -114,8 +114,6 @@ class SessionStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @template  TValue
-     *
      * @param  string  $key
      * @param  mixed  $value
      * @return int|\Illuminate\Support\HigherOrderTapProxy
