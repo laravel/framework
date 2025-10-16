@@ -218,6 +218,9 @@ class JobDispatchingTest extends QueueTestCase
     public function testJobCanBeDispatchedByClassString()
     {
         dispatch(ClassStringDispatchableJob::class);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
+
         $this->assertTrue(ClassStringDispatchableJob::$ran);
     }
 
