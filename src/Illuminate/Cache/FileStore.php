@@ -168,6 +168,7 @@ class FileStore implements Store, LockProvider
 
     /**
      * Increment the value of an item in the cache.
+     *
      * @template  TValue
      *
      * @param  string  $key
