@@ -138,7 +138,10 @@ class MigrateCommand extends BaseCommand implements Isolatable
     protected function prepareDatabase()
     {
         if (! $this->repositoryExists()) {
-            $this->components->info('Preparing '.$this->migrator->resolveConnection($this->option('database'))->getDriverName().' database.');
+            $this->components->info(sprintf(
+                'Preparing %s database.',
+                $this->migrator->resolveConnection($this->option('database'))->getDriverName()
+            ));
 
             $this->components->task('Creating migration table', function () {
                 return $this->callSilent('migrate:install', array_filter([
