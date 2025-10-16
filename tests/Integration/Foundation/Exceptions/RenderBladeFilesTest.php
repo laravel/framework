@@ -22,9 +22,20 @@ class RenderBladeFilesTest extends TestCase
     {
         $frame = new class
         {
-            public function class() { return null; }
-            public function previous() { return null; }
-            public function source() { return "Foo::bar(1)\nAnother line"; }
+            public function class()
+            {
+                return null;
+            }
+
+            public function previous()
+            {
+                return null;
+            }
+
+            public function source()
+            {
+                return "Foo::bar(1)\nAnother line";
+            }
         };
 
         $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/formatted-source.blade.php');
@@ -38,7 +49,7 @@ class RenderBladeFilesTest extends TestCase
     public function testQueryTooltipRendersMultilineSafely(): void
     {
         $sql = "SELECT * FROM tests\nWHERE id = 1";
-        $queries = [[ 'connectionName' => 'mysql', 'sql' => $sql, 'time' => 1.23 ]];
+        $queries = [['connectionName' => 'mysql', 'sql' => $sql, 'time' => 1.23]];
 
         $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/query.blade.php');
 
@@ -50,7 +61,7 @@ class RenderBladeFilesTest extends TestCase
 
     public function testRequestHeaderTooltipRendersMultilineSafely(): void
     {
-        $headers = [ 'X-Test' => "A\nB<script>bad()</script>" ];
+        $headers = ['X-Test' => "A\nB<script>bad()</script>"];
 
         $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/request-header.blade.php');
 
@@ -63,7 +74,7 @@ class RenderBladeFilesTest extends TestCase
 
     public function testRoutingTooltipRendersMultilineSafely(): void
     {
-        $routing = [ 'URI' => "users/1\nedit" ];
+        $routing = ['URI' => "users/1\nedit"];
 
         $path = package_path('src/Illuminate/Foundation/resources/exceptions/renderer/components/routing.blade.php');
 
@@ -73,5 +84,3 @@ class RenderBladeFilesTest extends TestCase
         $this->assertStringNotContainsString('<br', $html);
     }
 }
-
-
