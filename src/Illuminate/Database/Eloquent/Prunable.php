@@ -23,6 +23,7 @@ trait Prunable
             ->when(static::isSoftDeletable(), function ($query) {
                 $query->withTrashed();
             })->chunkById($chunkSize, function ($models) use (&$total) {
+                DB::beginTransaction();
                 $models->each(function ($model) use (&$total) {
                     try {
                         $model->prune();
@@ -40,6 +41,9 @@ trait Prunable
                 });
 
                 event(new ModelsPruned(static::class, $total));
+
+                DB::commit();
+
             });
 
         return $total;
