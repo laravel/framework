@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Dba\Connection;
 use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
@@ -69,12 +70,15 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
     public function testMigrationRepositoryCreatedWhenNecessary()
     {
         $params = [$migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class)];
+        $connectionMock = m::mock(Connection::class);
+        $connectionMock->shouldReceive('getDriverName')->andReturn('mysql');
         $command = $this->getMockBuilder(MigrateCommand::class)->onlyMethods(['callSilent'])->setConstructorArgs($params)->getMock();
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->shouldReceive('resolveConnection')->andReturn($connectionMock);
         $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
             return $callback();
         });
