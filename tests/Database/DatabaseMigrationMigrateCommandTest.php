@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Dba\Connection;
 use Illuminate\Console\CommandMutex;
+use Illuminate\Database\Connection;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Events\SchemaLoaded;
