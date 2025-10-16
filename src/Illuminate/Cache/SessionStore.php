@@ -118,7 +118,7 @@ class SessionStore implements Store
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int|\Illuminate\Support\HigherOrderTapProxy|TValue
+     * @return int|\Illuminate\Support\HigherOrderTapProxy
      */
     public function increment($key, $value = 1)
     {
