@@ -1419,6 +1419,29 @@ trait HasAttributes
     }
 
     /**
+     * Recursively sort only associative arrays by keys, preserving list order.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected static function canonicalizeAssociativeArrays($value)
+    {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        foreach ($value as $k => $v) {
+            $value[$k] = static::canonicalizeAssociativeArrays($v);
+        }
+
+        if (! array_is_list($value)) {
+            ksort($value);
+        }
+
+        return $value;
+    }
+
+    /**
      * Cast the given attribute to an encrypted string.
      *
      * @param  string  $key
@@ -2287,8 +2310,15 @@ trait HasAttributes
             return $this->fromDateTime($attribute) ===
                 $this->fromDateTime($original);
         } elseif ($this->hasCast($key, ['object', 'collection'])) {
-            return $this->fromJson($attribute) ===
-                $this->fromJson($original);
+            $castedAttribute = $this->fromJson($attribute);
+            $castedOriginal = $this->fromJson($original);
+
+            if (is_array($castedAttribute) && is_array($castedOriginal)) {
+                return static::canonicalizeAssociativeArrays($castedAttribute) ===
+                    static::canonicalizeAssociativeArrays($castedOriginal);
+            }
+
+            return $castedAttribute === $castedOriginal;
         } elseif ($this->hasCast($key, ['real', 'float', 'double'])) {
             if ($original === null) {
                 return false;
@@ -2298,15 +2328,49 @@ trait HasAttributes
         } elseif ($this->isEncryptedCastable($key) && ! empty(static::currentEncrypter()->getPreviousKeys())) {
             return false;
         } elseif ($this->hasCast($key, static::$primitiveCastTypes)) {
-            return $this->castAttribute($key, $attribute) ===
-                $this->castAttribute($key, $original);
+            $castedAttribute = $this->castAttribute($key, $attribute);
+            $castedOriginal = $this->castAttribute($key, $original);
+
+            if (is_array($castedAttribute) && is_array($castedOriginal)) {
+                return static::canonicalizeAssociativeArrays($castedAttribute) ===
+                    static::canonicalizeAssociativeArrays($castedOriginal);
+            }
+
+            return $castedAttribute === $castedOriginal;
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
+            $castedAttribute = $this->fromJson($attribute);
+            $castedOriginal = $this->fromJson($original);
+
+            if (is_array($castedAttribute) && is_array($castedOriginal)) {
+                return static::canonicalizeAssociativeArrays($castedAttribute) ===
+                    static::canonicalizeAssociativeArrays($castedOriginal);
+            }
+
+            return $castedAttribute === $castedOriginal;
         } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
-            return $this->fromJson($attribute) === $this->fromJson($original);
+            $castedAttribute = $this->fromJson($attribute);
+            $castedOriginal = $this->fromJson($original);
+
+            if (is_array($castedAttribute) && is_array($castedOriginal)) {
+                return static::canonicalizeAssociativeArrays($castedAttribute) ===
+                    static::canonicalizeAssociativeArrays($castedOriginal);
+            }
+
+            return $castedAttribute === $castedOriginal;
         } elseif ($this->isClassCastable($key) && $original !== null && Str::startsWith($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             if (empty(static::currentEncrypter()->getPreviousKeys())) {
-                return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);
+                $decryptedAttribute = $this->fromEncryptedString($attribute);
+                $decryptedOriginal = $this->fromEncryptedString($original);
+
+                $decodedAttribute = $this->fromJson($decryptedAttribute);
+                $decodedOriginal = $this->fromJson($decryptedOriginal);
+
+                if (is_array($decodedAttribute) && is_array($decodedOriginal)) {
+                    return static::canonicalizeAssociativeArrays($decodedAttribute) ===
+                        static::canonicalizeAssociativeArrays($decodedOriginal);
+                }
+
+                return $decryptedAttribute === $decryptedOriginal;
             }
 
             return false;

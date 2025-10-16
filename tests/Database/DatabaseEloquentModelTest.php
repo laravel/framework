@@ -182,6 +182,51 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($model->isDirty('collectionAttribute'));
     }
 
+    public function testAssociativeArrayOrderIgnoredForArrayCast()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $first = ['alpha' => 1, 'beta' => 2, 'nested' => ['x' => 1, 'y' => 2]];
+        $second = ['beta' => 2, 'nested' => ['y' => 2, 'x' => 1], 'alpha' => 1];
+
+        $model->arrayAttribute = $first;
+        $model->syncOriginal();
+
+        $model->arrayAttribute = $second;
+
+        $this->assertFalse($model->isDirty('arrayAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('arrayAttribute'));
+    }
+
+    public function testAssociativeArrayOrderIgnoredForJsonCast()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $first = ['a' => ['z' => 1, 'x' => 2], 'b' => ['k' => 3]];
+        $second = ['b' => ['k' => 3], 'a' => ['x' => 2, 'z' => 1]];
+
+        $model->jsonAttribute = $first;
+        $model->syncOriginal();
+
+        $model->jsonAttribute = $second;
+
+        $this->assertFalse($model->isDirty('jsonAttribute'));
+        $this->assertTrue($model->originalIsEquivalent('jsonAttribute'));
+    }
+
+    public function testListArrayOrderRemainsSignificant()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $model->arrayAttribute = [1, 2, 3];
+        $model->syncOriginal();
+
+        $model->arrayAttribute = [3, 2, 1];
+
+        $this->assertTrue($model->isDirty('arrayAttribute'));
+        $this->assertFalse($model->originalIsEquivalent('arrayAttribute'));
+    }
+
     public function testDirtyOnCastedArrayObject()
     {
         $model = new EloquentModelCastingStub;
