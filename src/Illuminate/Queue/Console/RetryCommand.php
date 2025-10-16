@@ -68,7 +68,6 @@ class RetryCommand extends Command
         $jobsFound ? $this->newLine() : $this->components->info('No retryable jobs found.');
     }
 
-
     /**
      * Get the job IDs to be retried.
      *
