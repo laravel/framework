@@ -71,7 +71,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Create a new database store.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
      * @param  string  $table
      * @param  string  $prefix
      * @param  string  $lockTable
@@ -170,7 +169,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -255,7 +253,6 @@ class DatabaseStore implements LockProvider, Store
      *
      * @param  string  $key
      * @param  int|float  $value
-     * @param  \Closure  $callback
      * @return int|false
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
@@ -377,7 +374,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @param  array  $keys
      * @return bool
      */
     protected function forgetMany(array $keys)
@@ -393,8 +389,6 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove all expired items from the given set from the cache.
      *
-     * @param  array  $keys
-     * @param  bool  $prefixed
      * @return bool
      */
     protected function forgetManyIfExpired(array $keys, bool $prefixed = false)

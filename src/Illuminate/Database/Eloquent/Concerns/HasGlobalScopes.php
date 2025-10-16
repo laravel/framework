@@ -70,7 +70,6 @@ trait HasGlobalScopes
     /**
      * Register multiple global scopes on the model.
      *
-     * @param  array  $scopes
      * @return void
      */
     public static function addGlobalScopes(array $scopes)

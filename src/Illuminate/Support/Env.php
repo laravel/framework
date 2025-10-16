@@ -120,10 +120,6 @@ class Env
     /**
      * Write an array of key-value pairs to the environment file.
      *
-     * @param  array  $variables
-     * @param  string  $pathToFile
-     * @param  bool  $overwrite
-     * @return void
      *
      * @throws \RuntimeException
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -148,11 +144,6 @@ class Env
     /**
      * Write a single key-value pair to the environment file.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  string  $pathToFile
-     * @param  bool  $overwrite
-     * @return void
      *
      * @throws \RuntimeException
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -175,12 +166,6 @@ class Env
 
     /**
      * Add a variable to the environment file contents.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  array  $envLines
-     * @param  bool  $overwrite
-     * @return array
      */
     protected static function addVariableToEnvContents(string $key, mixed $value, array $envLines, bool $overwrite): array
     {
@@ -279,7 +264,6 @@ class Env
     /**
      * Wrap a string in quotes, choosing double or single quotes.
      *
-     * @param  string  $input
      * @return string
      */
     protected static function prepareQuotedValue(string $input)
@@ -292,8 +276,6 @@ class Env
     /**
      * Escape a string using addslashes, excluding the specified characters from being escaped.
      *
-     * @param  string  $value
-     * @param  array  $except
      * @return string
      */
     protected static function addSlashesExceptFor(string $value, array $except = [])

@@ -13,8 +13,6 @@ class RouteFileRegistrar
 
     /**
      * Create a new route file registrar instance.
-     *
-     * @param  \Illuminate\Routing\Router  $router
      */
     public function __construct(Router $router)
     {

@@ -46,7 +46,6 @@ class NamespacedItemResolver
     /**
      * Parse an array of basic segments.
      *
-     * @param  array  $segments
      * @return array
      */
     protected function parseBasicSegments(array $segments)

@@ -24,7 +24,6 @@ class MySqlProcessor extends Processor
     /**
      * Process an  "insert get ID" query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
      * @param  array  $values
      * @param  string|null  $sequence
@@ -39,7 +38,7 @@ class MySqlProcessor extends Processor
         return is_numeric($id) ? (int) $id : $id;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processColumns($results)
     {
         return array_map(function ($result) {
@@ -66,7 +65,7 @@ class MySqlProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processIndexes($results)
     {
         return array_map(function ($result) {
@@ -82,7 +81,7 @@ class MySqlProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processForeignKeys($results)
     {
         return array_map(function ($result) {

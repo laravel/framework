@@ -77,8 +77,6 @@ class VendorPublishCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {

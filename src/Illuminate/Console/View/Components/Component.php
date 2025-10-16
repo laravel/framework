@@ -109,7 +109,7 @@ abstract class Component
 
         $currentHelper = $property->isInitialized($this->output)
             ? $property->getValue($this->output)
-            : new SymfonyQuestionHelper();
+            : new SymfonyQuestionHelper;
 
         $property->setValue($this->output, new QuestionHelper);
 

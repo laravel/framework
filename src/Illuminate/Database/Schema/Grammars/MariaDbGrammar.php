@@ -7,7 +7,7 @@ use Illuminate\Support\Fluent;
 
 class MariaDbGrammar extends MySqlGrammar
 {
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         if (version_compare($this->connection->getServerVersion(), '10.5.2', '<')) {
@@ -20,7 +20,6 @@ class MariaDbGrammar extends MySqlGrammar
     /**
      * Create the column definition for a uuid type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeUuid(Fluent $column)
@@ -35,7 +34,6 @@ class MariaDbGrammar extends MySqlGrammar
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeGeometry(Fluent $column)

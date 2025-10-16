@@ -527,7 +527,6 @@ trait EnumeratesValues
      * Calculate the percentage of items that pass a given truth test.
      *
      * @param  (callable(TValue, TKey): bool)  $callback
-     * @param  int  $precision
      * @return float|null
      */
     public function percentage(callable $callback, int $precision = 2)
@@ -831,7 +830,6 @@ trait EnumeratesValues
     /**
      * Reduce the collection to multiple aggregate values.
      *
-     * @param  callable  $callback
      * @param  mixed  ...$initial
      * @return array
      *
@@ -987,7 +985,6 @@ trait EnumeratesValues
     /**
      * Get the collection of items as pretty print formatted JSON.
      *
-     * @param  int  $options
      * @return string
      */
     public function toPrettyJson(int $options = 0)
@@ -1171,7 +1168,6 @@ trait EnumeratesValues
     /**
      * Make a function using another function, by negating its result.
      *
-     * @param  \Closure  $callback
      * @return \Closure
      */
     protected function negate(Closure $callback)

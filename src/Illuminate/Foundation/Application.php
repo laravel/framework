@@ -228,7 +228,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Begin configuring a new Laravel application instance.
      *
-     * @param  string|null  $basePath
      * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
     public static function configure(?string $basePath = null)
@@ -348,7 +347,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Register a callback to run after loading the environment.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function afterLoadingEnvironment(Closure $callback)
@@ -362,7 +360,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register a callback to run before a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  \Closure  $callback
      * @return void
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
@@ -374,7 +371,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Register a callback to run after a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  \Closure  $callback
      * @return void
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)
@@ -780,7 +776,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Detect the application's current environment.
      *
-     * @param  \Closure  $callback
      * @return string
      */
     public function detectEnvironment(Closure $callback)
@@ -1046,7 +1041,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * @template TClass of object
      *
      * @param  string|class-string<TClass>  $abstract
-     * @param  array  $parameters
      * @return ($abstract is class-string<TClass> ? TClass : mixed)
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
@@ -1140,7 +1134,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Boot the given service provider.
      *
-     * @param  \Illuminate\Support\ServiceProvider  $provider
      * @return void
      */
     protected function bootProvider(ServiceProvider $provider)
@@ -1199,8 +1192,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
     /**
      * {@inheritdoc}
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(SymfonyRequest $request, int $type = self::MAIN_REQUEST, bool $catch = true): SymfonyResponse
     {
@@ -1210,7 +1201,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Handle the incoming HTTP request and send the response to the browser.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     public function handleRequest(Request $request)
@@ -1225,7 +1215,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Handle the incoming Artisan command.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return int
      */
     public function handleCommand(InputInterface $input)
@@ -1411,7 +1400,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @param  int  $code
      * @param  string  $message
-     * @param  array  $headers
      * @return never
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -1468,7 +1456,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Determine if the given service provider is loaded.
      *
-     * @param  string  $provider
      * @return bool
      */
     public function providerIsLoaded(string $provider)
@@ -1489,7 +1476,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Set the application's deferred services.
      *
-     * @param  array  $services
      * @return void
      */
     public function setDeferredServices(array $services)
@@ -1511,7 +1497,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Add an array of services to the application's deferred services.
      *
-     * @param  array  $services
      * @return void
      */
     public function addDeferredServices(array $services)
@@ -1522,7 +1507,6 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Remove an array of services from the application's deferred services.
      *
-     * @param  array  $services
      * @return void
      */
     public function removeDeferredServices(array $services)

@@ -11,7 +11,6 @@ class TransformsRequest
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -41,7 +40,6 @@ class TransformsRequest
     /**
      * Clean the data in the parameter bag.
      *
-     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $bag
      * @return void
      */
     protected function cleanParameterBag(ParameterBag $bag)
@@ -52,7 +50,6 @@ class TransformsRequest
     /**
      * Clean the data in the given array.
      *
-     * @param  array  $data
      * @param  string  $keyPrefix
      * @return array
      */

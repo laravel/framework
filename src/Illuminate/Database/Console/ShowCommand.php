@@ -34,7 +34,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $connections
      * @return int
      */
     public function handle(ConnectionResolverInterface $connections)
@@ -70,8 +69,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Get information regarding the tables within the database.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Database\Schema\Builder  $schema
      * @return \Illuminate\Support\Collection
      */
     protected function tables(ConnectionInterface $connection, Builder $schema)
@@ -93,8 +90,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Get information regarding the views within the database.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Database\Schema\Builder  $schema
      * @return \Illuminate\Support\Collection
      */
     protected function views(ConnectionInterface $connection, Builder $schema)
@@ -110,8 +105,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Get information regarding the user-defined types within the database.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Database\Schema\Builder  $schema
      * @return \Illuminate\Support\Collection
      */
     protected function types(ConnectionInterface $connection, Builder $schema)
@@ -128,7 +121,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Render the database information.
      *
-     * @param  array  $data
      * @return void
      */
     protected function display(array $data)
@@ -139,7 +131,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Render the database information as JSON.
      *
-     * @param  array  $data
      * @return void
      */
     protected function displayJson(array $data)
@@ -150,7 +141,6 @@ class ShowCommand extends DatabaseInspectionCommand
     /**
      * Render the database information formatted for the CLI.
      *
-     * @param  array  $data
      * @return void
      */
     protected function displayForCli(array $data)

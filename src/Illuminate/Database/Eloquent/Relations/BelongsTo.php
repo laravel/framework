@@ -74,7 +74,7 @@ class BelongsTo extends Relation
         parent::__construct($query, $child);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getResults()
     {
         if (is_null($this->getForeignKeyFrom($this->child))) {
@@ -101,7 +101,7 @@ class BelongsTo extends Relation
         }
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function addEagerConstraints(array $models)
     {
         // We'll grab the primary key name of the related models since it could be set to
@@ -138,7 +138,7 @@ class BelongsTo extends Relation
         return array_values(array_unique($keys));
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -148,7 +148,7 @@ class BelongsTo extends Relation
         return $models;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function match(array $models, EloquentCollection $results, $relation)
     {
         // First we will get to build a dictionary of the child models by their primary
@@ -231,7 +231,7 @@ class BelongsTo extends Relation
         }
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         if ($parentQuery->getQuery()->from == $query->getQuery()->from) {

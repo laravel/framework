@@ -11,8 +11,6 @@ if (interface_exists(\ParaTest\RunnerInterface::class)) {
 
         /**
          * Runs the test suite.
-         *
-         * @return int
          */
         public function run(): int
         {
@@ -26,8 +24,6 @@ if (interface_exists(\ParaTest\RunnerInterface::class)) {
 
         /**
          * Runs the test suite.
-         *
-         * @return void
          */
         public function run(): void
         {

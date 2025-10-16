@@ -36,8 +36,6 @@ class Attachment
 
     /**
      * Create a mail attachment.
-     *
-     * @param  \Closure  $resolver
      */
     private function __construct(Closure $resolver)
     {
@@ -69,7 +67,6 @@ class Attachment
     /**
      * Create a mail attachment from in-memory data.
      *
-     * @param  \Closure  $data
      * @param  string|null  $name
      * @return static
      */
@@ -83,7 +80,6 @@ class Attachment
     /**
      * Create a mail attachment from an UploadedFile instance.
      *
-     * @param  \Illuminate\Http\UploadedFile  $file
      * @return static
      */
     public static function fromUploadedFile(UploadedFile $file)
@@ -159,8 +155,6 @@ class Attachment
     /**
      * Attach the attachment with the given strategies.
      *
-     * @param  \Closure  $pathStrategy
-     * @param  \Closure  $dataStrategy
      * @return mixed
      */
     public function attachWith(Closure $pathStrategy, Closure $dataStrategy)
@@ -200,7 +194,6 @@ class Attachment
     /**
      * Determine if the given attachment is equivalent to this attachment.
      *
-     * @param  \Illuminate\Mail\Attachment  $attachment
      * @param  array  $options
      * @return bool
      */

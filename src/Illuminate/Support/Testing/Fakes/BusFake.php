@@ -76,17 +76,13 @@ class BusFake implements Fake, QueueingDispatcher
 
     /**
      * Indicates if commands should be serialized and restored when pushed to the Bus.
-     *
-     * @var bool
      */
     protected bool $serializeAndRestore = false;
 
     /**
      * Create a new bus fake instance.
      *
-     * @param  \Illuminate\Contracts\Bus\QueueingDispatcher  $dispatcher
      * @param  array|string  $jobsToFake
-     * @param  \Illuminate\Bus\BatchRepository|null  $batchRepository
      */
     public function __construct(QueueingDispatcher $dispatcher, $jobsToFake = [], ?BatchRepository $batchRepository = null)
     {
@@ -348,7 +344,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Assert if a chain of jobs was dispatched.
      *
-     * @param  array  $expectedChain
      * @return void
      */
     public function assertChained(array $expectedChain)
@@ -488,7 +483,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Create a new assertion about a chained batch.
      *
-     * @param  \Closure  $callback
      * @return \Illuminate\Support\Testing\Fakes\ChainedBatchTruthTest
      */
     public function chainedBatch(Closure $callback)
@@ -499,7 +493,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Assert if a batch was dispatched based on a truth-test callback.
      *
-     * @param  callable  $callback
      * @return void
      */
     public function assertBatched(callable $callback)
@@ -570,7 +563,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Get all of the jobs dispatched synchronously matching a truth-test callback.
      *
-     * @param  string  $command
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
@@ -588,7 +580,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Get all of the jobs dispatched after the response was sent matching a truth-test callback.
      *
-     * @param  string  $command
      * @param  callable|null  $callback
      * @return \Illuminate\Support\Collection
      */
@@ -606,7 +597,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Get all of the pending batches matching a truth-test callback.
      *
-     * @param  callable  $callback
      * @return \Illuminate\Support\Collection
      */
     public function batched(callable $callback)
@@ -747,7 +737,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Attempt to find the batch with the given ID.
      *
-     * @param  string  $batchId
      * @return \Illuminate\Bus\Batch|null
      */
     public function findBatch(string $batchId)
@@ -780,7 +769,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Record the fake pending batch dispatch.
      *
-     * @param  \Illuminate\Bus\PendingBatch  $pendingBatch
      * @return \Illuminate\Bus\Batch
      */
     public function recordPendingBatch(PendingBatch $pendingBatch)
@@ -833,7 +821,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Specify if commands should be serialized and restored when being batched.
      *
-     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)
@@ -868,7 +855,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Set the pipes commands should be piped through before dispatching.
      *
-     * @param  array  $pipes
      * @return $this
      */
     public function pipeThrough(array $pipes)
@@ -903,7 +889,6 @@ class BusFake implements Fake, QueueingDispatcher
     /**
      * Map a command to a handler.
      *
-     * @param  array  $map
      * @return $this
      */
     public function map(array $map)

@@ -22,7 +22,6 @@ trait ConfiguresPrompts
     /**
      * Configure the prompt fallbacks.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @return void
      */
     protected function configurePrompts(InputInterface $input)
@@ -187,8 +186,6 @@ trait ConfiguresPrompts
      * @param  mixed  $field
      * @param  mixed  $value
      * @param  mixed  $rules
-     * @param  array  $messages
-     * @param  array  $attributes
      * @return \Illuminate\Validation\Validator
      */
     protected function getPromptValidatorInstance($field, $value, $rules, array $messages = [], array $attributes = [])

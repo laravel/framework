@@ -48,7 +48,6 @@ trait ManagesComponents
      * Start a component rendering process.
      *
      * @param  \Illuminate\Contracts\View\View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
-     * @param  array  $data
      * @return void
      */
     public function startComponent($view, array $data = [])
@@ -65,8 +64,6 @@ trait ManagesComponents
     /**
      * Get the first view that actually exists from the given list, and start a component.
      *
-     * @param  array  $names
-     * @param  array  $data
      * @return void
      */
     public function startComponentFirst(array $names, array $data = [])

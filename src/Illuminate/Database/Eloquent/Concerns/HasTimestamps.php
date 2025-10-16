@@ -181,7 +181,6 @@ trait HasTimestamps
     /**
      * Disable timestamps for the current class during the given callback scope.
      *
-     * @param  callable  $callback
      * @return mixed
      */
     public static function withoutTimestamps(callable $callback)

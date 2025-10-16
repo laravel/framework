@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 
 class SendQueuedMailable
 {
-    use Queueable, InteractsWithQueue;
+    use InteractsWithQueue, Queueable;
 
     /**
      * The mailable message instance.
@@ -50,8 +50,6 @@ class SendQueuedMailable
 
     /**
      * Create a new job instance.
-     *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      */
     public function __construct(MailableContract $mailable)
     {
@@ -74,7 +72,6 @@ class SendQueuedMailable
     /**
      * Handle the queued job.
      *
-     * @param  \Illuminate\Contracts\Mail\Factory  $factory
      * @return void
      */
     public function handle(MailFactory $factory)

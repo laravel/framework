@@ -15,6 +15,5 @@ abstract class MigrationsEvent implements MigrationEventContract
     public function __construct(
         public $method,
         public array $options = [],
-    ) {
-    }
+    ) {}
 }

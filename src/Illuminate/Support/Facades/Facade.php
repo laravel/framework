@@ -42,7 +42,6 @@ abstract class Facade
     /**
      * Run a Closure when the facade has been resolved.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolved(Closure $callback)

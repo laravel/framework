@@ -61,7 +61,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
         }
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function addEagerConstraints(array $models)
     {
         parent::addEagerConstraints($models);
@@ -72,7 +72,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Create a new instance of the related model. Allow mass-assignment.
      *
-     * @param  array  $attributes
      * @return TRelatedModel
      */
     public function forceCreate(array $attributes = [])
@@ -109,7 +108,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array  $values
      * @param  array|string  $uniqueBy
      * @param  array|null  $update
      * @return int
@@ -127,7 +125,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
         return parent::upsert($values, $uniqueBy, $update);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(

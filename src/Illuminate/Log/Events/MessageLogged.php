@@ -15,6 +15,5 @@ class MessageLogged
         public $level,
         public $message,
         public array $context = [],
-    ) {
-    }
+    ) {}
 }

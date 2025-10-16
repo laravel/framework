@@ -4,7 +4,7 @@ namespace Illuminate\Database\Query\Processors;
 
 class SQLiteProcessor extends Processor
 {
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processColumns($results, $sql = '')
     {
         $hasPrimaryKey = array_sum(array_column($results, 'primary')) === 1;
@@ -51,7 +51,7 @@ class SQLiteProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processIndexes($results)
     {
         $primaryCount = 0;
@@ -79,7 +79,7 @@ class SQLiteProcessor extends Processor
         return $indexes;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processForeignKeys($results)
     {
         return array_map(function ($result) {

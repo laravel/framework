@@ -20,15 +20,10 @@ class Give implements ContextualAttribute
     public function __construct(
         public string $class,
         public array $params = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Resolve the dependency.
-     *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
      */
     public static function resolve(self $attribute, Container $container): mixed
     {

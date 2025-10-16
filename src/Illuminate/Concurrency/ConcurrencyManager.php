@@ -26,7 +26,6 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the process concurrency driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Concurrency\ProcessDriver
      */
     public function createProcessDriver(array $config)
@@ -37,7 +36,6 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the fork concurrency driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Concurrency\ForkDriver
      *
      * @throws \RuntimeException
@@ -58,7 +56,6 @@ class ConcurrencyManager extends MultipleInstanceManager
     /**
      * Create an instance of the sync concurrency driver.
      *
-     * @param  array  $config
      * @return \Illuminate\Concurrency\SyncDriver
      */
     public function createSyncDriver(array $config)

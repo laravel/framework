@@ -93,10 +93,6 @@ class FilesystemAdapter implements CloudFilesystemContract
 
     /**
      * Create a new filesystem adapter instance.
-     *
-     * @param  \League\Flysystem\FilesystemOperator  $driver
-     * @param  \League\Flysystem\FilesystemAdapter  $adapter
-     * @param  array  $config
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [])
     {
@@ -314,7 +310,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $headers
      * @param  string|null  $disposition
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
@@ -349,10 +344,8 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Create a streamed download response for a given file.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function serve(Request $request, $path, $name = null, array $headers = [])
@@ -367,7 +360,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|null  $name
-     * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function download($path, $name = null, array $headers = [])
@@ -798,7 +790,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return string
      *
      * @throws \RuntimeException
@@ -823,7 +814,6 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return array
      *
      * @throws \RuntimeException
@@ -1023,7 +1013,6 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Define a custom callback that generates file download responses.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function serveUsing(Closure $callback)
@@ -1034,7 +1023,6 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Define a custom temporary URL builder callback.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function buildTemporaryUrlsUsing(Closure $callback)
@@ -1044,8 +1032,6 @@ class FilesystemAdapter implements CloudFilesystemContract
 
     /**
      * Determine if Flysystem exceptions should be thrown.
-     *
-     * @return bool
      */
     protected function throwsExceptions(): bool
     {
@@ -1067,8 +1053,6 @@ class FilesystemAdapter implements CloudFilesystemContract
 
     /**
      * Determine if Flysystem exceptions should be reported.
-     *
-     * @return bool
      */
     protected function shouldReport(): bool
     {

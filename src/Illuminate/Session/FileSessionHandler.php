@@ -33,7 +33,6 @@ class FileSessionHandler implements SessionHandlerInterface
     /**
      * Create a new file driven handler instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $path
      * @param  int  $minutes
      */
@@ -46,8 +45,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function open($savePath, $sessionName): bool
     {
@@ -56,8 +53,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function close(): bool
     {
@@ -66,8 +61,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|false
      */
     public function read($sessionId): string|false
     {
@@ -81,8 +74,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function write($sessionId, $data): bool
     {
@@ -93,8 +84,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function destroy($sessionId): bool
     {
@@ -105,8 +94,6 @@ class FileSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function gc($lifetime): int
     {

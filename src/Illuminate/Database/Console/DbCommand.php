@@ -105,7 +105,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the database client command.
      *
-     * @param  array  $connection
      * @return array
      */
     public function commandArguments(array $connection)
@@ -118,7 +117,6 @@ class DbCommand extends Command
     /**
      * Get the environment variables for the database client command.
      *
-     * @param  array  $connection
      * @return array|null
      */
     public function commandEnvironment(array $connection)
@@ -135,7 +133,6 @@ class DbCommand extends Command
     /**
      * Get the database client command to run.
      *
-     * @param  array  $connection
      * @return string
      */
     public function getCommand(array $connection)
@@ -152,7 +149,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the MySQL CLI.
      *
-     * @param  array  $connection
      * @return array
      */
     protected function getMysqlArguments(array $connection)
@@ -177,7 +173,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the MariaDB CLI.
      *
-     * @param  array  $connection
      * @return array
      */
     protected function getMariaDbArguments(array $connection)
@@ -188,7 +183,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the Postgres CLI.
      *
-     * @param  array  $connection
      * @return array
      */
     protected function getPgsqlArguments(array $connection)
@@ -199,7 +193,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the SQLite CLI.
      *
-     * @param  array  $connection
      * @return array
      */
     protected function getSqliteArguments(array $connection)
@@ -210,7 +203,6 @@ class DbCommand extends Command
     /**
      * Get the arguments for the SQL Server CLI.
      *
-     * @param  array  $connection
      * @return array
      */
     protected function getSqlsrvArguments(array $connection)
@@ -228,7 +220,6 @@ class DbCommand extends Command
     /**
      * Get the environment variables for the Postgres CLI.
      *
-     * @param  array  $connection
      * @return array|null
      */
     protected function getPgsqlEnvironment(array $connection)
@@ -244,8 +235,6 @@ class DbCommand extends Command
     /**
      * Get the optional arguments based on the connection configuration.
      *
-     * @param  array  $args
-     * @param  array  $connection
      * @return array
      */
     protected function getOptionalArguments(array $args, array $connection)

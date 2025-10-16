@@ -11,9 +11,6 @@ class ContextLogProcessor implements ContextLogProcessorContract
 {
     /**
      * Add contextual data to the log's "extra" parameter.
-     *
-     * @param  \Monolog\LogRecord  $record
-     * @return \Monolog\LogRecord
      */
     public function __invoke(LogRecord $record): LogRecord
     {

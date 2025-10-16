@@ -10,7 +10,7 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Str;
 
-class RedisQueue extends Queue implements QueueContract, ClearableQueue
+class RedisQueue extends Queue implements ClearableQueue, QueueContract
 {
     /**
      * The Redis factory implementation.
@@ -68,7 +68,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
     /**
      * Create a new Redis queue instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string|null  $connection
      * @param  int  $retryAfter
@@ -218,7 +217,6 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])

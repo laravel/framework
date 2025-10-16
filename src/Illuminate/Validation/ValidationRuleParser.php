@@ -33,8 +33,6 @@ class ValidationRuleParser
 
     /**
      * Create a new validation rule parser.
-     *
-     * @param  array  $data
      */
     public function __construct(array $data)
     {
@@ -256,7 +254,6 @@ class ValidationRuleParser
     /**
      * Parse an array based rule.
      *
-     * @param  array  $rule
      * @return array
      */
     protected static function parseArrayRule(array $rule)
@@ -328,7 +325,6 @@ class ValidationRuleParser
      * Expand the conditional rules in the given array of rules.
      *
      * @param  array  $rules
-     * @param  array  $data
      * @return array
      */
     public static function filterConditionalRules($rules, array $data = [])

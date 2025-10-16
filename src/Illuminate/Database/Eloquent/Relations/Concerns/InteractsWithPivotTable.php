@@ -135,8 +135,6 @@ trait InteractsWithPivotTable
      * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
      *
      * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array|int|string  $ids
-     * @param  array  $values
-     * @param  bool  $detaching
      * @return array{attached: array, detached: array, updated: array}
      */
     public function syncWithPivotValues($ids, array $values, bool $detaching = true)
@@ -149,7 +147,6 @@ trait InteractsWithPivotTable
     /**
      * Format the sync / toggle record list so that it is keyed by ID.
      *
-     * @param  array  $records
      * @return array
      */
     protected function formatRecordsList(array $records)
@@ -170,8 +167,6 @@ trait InteractsWithPivotTable
     /**
      * Attach all of the records that aren't in the given current records.
      *
-     * @param  array  $records
-     * @param  array  $current
      * @param  bool  $touch
      * @return array
      */
@@ -205,7 +200,6 @@ trait InteractsWithPivotTable
      * Update an existing pivot record on the table.
      *
      * @param  mixed  $id
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return int
      */
@@ -234,7 +228,6 @@ trait InteractsWithPivotTable
      * Update an existing pivot record on the table via a custom class.
      *
      * @param  mixed  $id
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return int
      */
@@ -259,7 +252,6 @@ trait InteractsWithPivotTable
      * Attach a model to the parent.
      *
      * @param  mixed  $ids
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return void
      */
@@ -285,7 +277,6 @@ trait InteractsWithPivotTable
      * Attach a model to the parent using a custom class.
      *
      * @param  mixed  $ids
-     * @param  array  $attributes
      * @return void
      */
     protected function attachUsingCustomClass($ids, array $attributes)
@@ -303,7 +294,6 @@ trait InteractsWithPivotTable
      * Create an array of records to insert into the pivot table.
      *
      * @param  array  $ids
-     * @param  array  $attributes
      * @return array
      */
     protected function formatAttachRecords($ids, array $attributes)
@@ -348,7 +338,6 @@ trait InteractsWithPivotTable
      *
      * @param  mixed  $key
      * @param  mixed  $value
-     * @param  array  $attributes
      * @return array
      */
     protected function extractAttachIdAndAttributes($key, $value, array $attributes)
@@ -388,7 +377,6 @@ trait InteractsWithPivotTable
     /**
      * Set the creation and update timestamps on an attach record.
      *
-     * @param  array  $record
      * @param  bool  $exists
      * @return array
      */
@@ -520,7 +508,6 @@ trait InteractsWithPivotTable
     /**
      * Create a new pivot model instance.
      *
-     * @param  array  $attributes
      * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
@@ -540,7 +527,6 @@ trait InteractsWithPivotTable
     /**
      * Create a new existing pivot model instance.
      *
-     * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
     public function newExistingPivot(array $attributes = [])
@@ -647,7 +633,6 @@ trait InteractsWithPivotTable
     /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
-     * @param  array  $keys
      * @return array
      */
     protected function castKeys(array $keys)

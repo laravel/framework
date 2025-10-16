@@ -22,8 +22,6 @@ class PusherBroadcaster extends Broadcaster
 
     /**
      * Create a new broadcaster instance.
-     *
-     * @param  \Pusher\Pusher  $pusher
      */
     public function __construct(Pusher $pusher)
     {
@@ -140,9 +138,7 @@ class PusherBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
      * @param  string  $event
-     * @param  array  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException

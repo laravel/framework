@@ -34,9 +34,6 @@ class Pipe
 
     /**
      * Create a new series of piped processes.
-     *
-     * @param  \Illuminate\Process\Factory  $factory
-     * @param  callable  $callback
      */
     public function __construct(Factory $factory, callable $callback)
     {
@@ -47,7 +44,6 @@ class Pipe
     /**
      * Add a process to the pipe with a key.
      *
-     * @param  string  $key
      * @return \Illuminate\Process\PendingProcess
      */
     public function as(string $key)
@@ -60,7 +56,6 @@ class Pipe
     /**
      * Runs the processes in the pipe.
      *
-     * @param  callable|null  $output
      * @return \Illuminate\Contracts\Process\ProcessResult
      */
     public function run(?callable $output = null)

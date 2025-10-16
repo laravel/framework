@@ -21,7 +21,7 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
 {
     use CanBeOneOfMany, ComparesRelatedModels, SupportsDefaultModels;
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getResults()
     {
         if (is_null($this->getParentKey())) {
@@ -31,7 +31,7 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -41,13 +41,13 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
         return $models;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function match(array $models, EloquentCollection $results, $relation)
     {
         return $this->matchOne($models, $results, $relation);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         if ($this->isOneOfMany()) {
@@ -83,7 +83,6 @@ class MorphOne extends MorphOneOrMany implements SupportsPartialRelations
     /**
      * Add join query constraints for one of many relationships.
      *
-     * @param  \Illuminate\Database\Query\JoinClause  $join
      * @return void
      */
     public function addOneOfManyJoinSubQueryConstraints(JoinClause $join)

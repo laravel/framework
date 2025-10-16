@@ -80,7 +80,6 @@ trait AuthorizesRequests
      *
      * @param  string|array  $model
      * @param  string|array|null  $parameter
-     * @param  array  $options
      * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */

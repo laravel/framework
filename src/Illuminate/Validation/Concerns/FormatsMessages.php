@@ -415,7 +415,6 @@ trait FormatsMessages
      * @param  string  $message
      * @param  string  $attribute
      * @param  string  $placeholder
-     * @param  \Closure|null  $modifier
      * @return string
      */
     protected function replaceIndexOrPositionPlaceholder($message, $attribute, $placeholder, ?Closure $modifier = null)
@@ -448,7 +447,6 @@ trait FormatsMessages
     /**
      * Get the word for a index or position segment.
      *
-     * @param  int  $value
      * @return string
      */
     protected function numberToIndexOrPositionWord(int $value)
@@ -522,7 +520,6 @@ trait FormatsMessages
     /**
      * Transform an array of attributes to their displayable form.
      *
-     * @param  array  $values
      * @return array
      */
     protected function getAttributeList(array $values)

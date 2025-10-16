@@ -217,8 +217,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
 
     /**
      * Determine if the fluent instance is empty.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -227,8 +225,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
 
     /**
      * Determine if the fluent instance is not empty.
-     *
-     * @return bool
      */
     public function isNotEmpty(): bool
     {
@@ -239,7 +235,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Determine if the given offset exists.
      *
      * @param  TKey  $offset
-     * @return bool
      */
     public function offsetExists($offset): bool
     {
@@ -262,7 +257,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      *
      * @param  TKey  $offset
      * @param  TValue  $value
-     * @return void
      */
     public function offsetSet($offset, $value): void
     {
@@ -273,7 +267,6 @@ class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, Jso
      * Unset the value at the given offset.
      *
      * @param  TKey  $offset
-     * @return void
      */
     public function offsetUnset($offset): void
     {

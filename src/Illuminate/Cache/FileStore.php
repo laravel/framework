@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
 
-class FileStore implements Store, LockProvider
+class FileStore implements LockProvider, Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
 
@@ -45,7 +45,6 @@ class FileStore implements Store, LockProvider
     /**
      * Create a new file cache store instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
      * @param  int|null  $filePermission
      */

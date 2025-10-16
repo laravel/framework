@@ -17,7 +17,6 @@ abstract class Controller
      * Register middleware on the controller.
      *
      * @param  \Closure|array|string  $middleware
-     * @param  array  $options
      * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
     public function middleware($middleware, array $options = [])

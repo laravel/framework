@@ -61,7 +61,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Create a new store instance.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $table
      * @param  string  $keyAttribute
      * @param  string  $valueAttribute
@@ -125,7 +124,6 @@ class DynamoDbStore implements LockProvider, Store
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
@@ -175,7 +173,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Determine if the given item is expired.
      *
-     * @param  array  $item
      * @param  \DateTimeInterface|null  $expiration
      * @return bool
      */
@@ -218,7 +215,6 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */

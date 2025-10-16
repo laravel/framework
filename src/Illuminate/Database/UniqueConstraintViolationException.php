@@ -2,6 +2,4 @@
 
 namespace Illuminate\Database;
 
-class UniqueConstraintViolationException extends QueryException
-{
-}
+class UniqueConstraintViolationException extends QueryException {}

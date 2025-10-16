@@ -32,9 +32,6 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
 
     /**
      * Create a new request throttler.
-     *
-     * @param  \Illuminate\Cache\RateLimiter  $limiter
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      */
     public function __construct(RateLimiter $limiter, Redis $redis)
     {
@@ -47,8 +44,6 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  array  $limits
      * @return \Symfony\Component\HttpFoundation\Response
      *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException

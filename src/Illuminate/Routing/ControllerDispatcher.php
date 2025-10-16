@@ -19,8 +19,6 @@ class ControllerDispatcher implements ControllerDispatcherContract
 
     /**
      * Create a new controller dispatcher instance.
-     *
-     * @param  \Illuminate\Container\Container  $container
      */
     public function __construct(Container $container)
     {
@@ -30,7 +28,6 @@ class ControllerDispatcher implements ControllerDispatcherContract
     /**
      * Dispatch a request to a given controller and method.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @param  mixed  $controller
      * @param  string  $method
      * @return mixed
@@ -49,7 +46,6 @@ class ControllerDispatcher implements ControllerDispatcherContract
     /**
      * Resolve the parameters for the controller.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @param  mixed  $controller
      * @param  string  $method
      * @return array

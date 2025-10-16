@@ -50,8 +50,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
 
     /**
      * Create a new mail fake.
-     *
-     * @param  MailManager  $manager
      */
     public function __construct(MailManager $manager)
     {
@@ -479,7 +477,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Send a new message using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return mixed|void
      */
@@ -492,7 +489,6 @@ class MailFake implements Factory, Fake, Mailer, MailQueue
      * Send a new message synchronously using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return void
      */

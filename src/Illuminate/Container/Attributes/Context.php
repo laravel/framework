@@ -13,16 +13,10 @@ class Context implements ContextualAttribute
     /**
      * Create a new attribute instance.
      */
-    public function __construct(public string $key, public mixed $default = null, public bool $hidden = false)
-    {
-    }
+    public function __construct(public string $key, public mixed $default = null, public bool $hidden = false) {}
 
     /**
      * Resolve the context value.
-     *
-     * @param  self  $attribute
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
      */
     public static function resolve(self $attribute, Container $container): mixed
     {

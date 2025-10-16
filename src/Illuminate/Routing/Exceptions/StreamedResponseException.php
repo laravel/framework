@@ -17,8 +17,6 @@ class StreamedResponseException extends RuntimeException
 
     /**
      * Create a new exception instance.
-     *
-     * @param  \Throwable  $originalException
      */
     public function __construct(Throwable $originalException)
     {

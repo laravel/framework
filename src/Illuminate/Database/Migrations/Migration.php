@@ -30,8 +30,6 @@ abstract class Migration
 
     /**
      * Determine if this migration should run.
-     *
-     * @return bool
      */
     public function shouldRun(): bool
     {

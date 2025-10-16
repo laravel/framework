@@ -35,7 +35,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Create a new instance by invoking the callback a given amount of times.
      *
      * @param  int  $number
-     * @param  callable|null  $callback
      * @return static
      */
     public static function times($number, ?callable $callback = null);
@@ -269,7 +268,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Execute a callback over each nested chunk of items.
      *
-     * @param  callable  $callback
      * @return static
      */
     public function eachSpread(callable $callback);
@@ -665,7 +663,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Run a map over each nested chunk of items.
      *
-     * @param  callable  $callback
      * @return static
      */
     public function mapSpread(callable $callback);
@@ -854,7 +851,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Reduce the collection to multiple aggregate values.
      *
-     * @param  callable  $callback
      * @param  mixed  ...$initial
      * @return array
      *
@@ -1214,8 +1210,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
 
     /**
      * Count the number of items in the collection.
-     *
-     * @return int
      */
     public function count(): int;
 
@@ -1256,8 +1250,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
 
     /**
      * Convert the object into something JSON serializable.
-     *
-     * @return mixed
      */
     public function jsonSerialize(): mixed;
 
@@ -1273,7 +1265,6 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * Get the collection of items as pretty print formatted JSON.
      *
      *
-     * @param  int  $options
      * @return string
      */
     public function toPrettyJson(int $options = 0);

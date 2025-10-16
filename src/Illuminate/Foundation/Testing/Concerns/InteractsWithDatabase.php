@@ -85,7 +85,6 @@ trait InteractsWithDatabase
      * Assert the count of table entries.
      *
      * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
-     * @param  int  $count
      * @param  string|null  $connection
      * @return $this
      */

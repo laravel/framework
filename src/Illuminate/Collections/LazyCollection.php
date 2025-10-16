@@ -893,7 +893,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Multiply the items in the collection by the multiplier.
      *
-     * @param  int  $multiplier
      * @return static
      */
     public function multiply(int $multiplier)
@@ -1632,7 +1631,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Take items in the collection until a given point in time, with an optional callback on timeout.
      *
-     * @param  \DateTimeInterface  $timeout
      * @param  callable(TValue|null, TKey|null): mixed|null  $callback
      * @return static<TKey, TValue>
      */
@@ -1805,7 +1803,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     protected function intervalSeconds(DateInterval $interval): int
     {
-        $start = new DateTimeImmutable();
+        $start = new DateTimeImmutable;
 
         return $start->add($interval)->getTimestamp() - $start->getTimestamp();
     }
@@ -1880,8 +1878,6 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * Count the number of items in the collection.
-     *
-     * @return int
      */
     public function count(): int
     {

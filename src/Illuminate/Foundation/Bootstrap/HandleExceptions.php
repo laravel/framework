@@ -35,7 +35,6 @@ class HandleExceptions
     /**
      * Bootstrap the given application.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function bootstrap(Application $app)
@@ -175,7 +174,6 @@ class HandleExceptions
      * the HTTP and Console kernels. But, fatal error exceptions must
      * be handled differently since they are not normal exceptions.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     public function handleException(Throwable $e)
@@ -202,7 +200,6 @@ class HandleExceptions
     /**
      * Render an exception to the console.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     protected function renderForConsole(Throwable $e)
@@ -213,7 +210,6 @@ class HandleExceptions
     /**
      * Render an exception as an HTTP response and send it.
      *
-     * @param  \Throwable  $e
      * @return void
      */
     protected function renderHttpResponse(Throwable $e)
@@ -238,7 +234,6 @@ class HandleExceptions
     /**
      * Create a new fatal error instance from an error array.
      *
-     * @param  array  $error
      * @param  int|null  $traceOffset
      * @return \Symfony\Component\ErrorHandler\Error\FatalError
      */
@@ -306,7 +301,6 @@ class HandleExceptions
     /**
      * Flush the bootstrapper's global state.
      *
-     * @param  \PHPUnit\Framework\TestCase|null  $testCase
      * @return void
      */
     public static function flushState(?TestCase $testCase = null)
@@ -325,7 +319,6 @@ class HandleExceptions
     /**
      * Flush the bootstrapper's global handlers state.
      *
-     * @param  \PHPUnit\Framework\TestCase|null  $testCase
      * @return void
      */
     public static function flushHandlersState(?TestCase $testCase = null)

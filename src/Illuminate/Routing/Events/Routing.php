@@ -11,6 +11,5 @@ class Routing
      */
     public function __construct(
         public $request,
-    ) {
-    }
+    ) {}
 }

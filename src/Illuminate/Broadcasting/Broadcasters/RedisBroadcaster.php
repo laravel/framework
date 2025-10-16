@@ -41,7 +41,6 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string|null  $connection
      * @param  string  $prefix
      */
@@ -107,9 +106,7 @@ class RedisBroadcaster extends Broadcaster
     /**
      * Broadcast the given event.
      *
-     * @param  array  $channels
      * @param  string  $event
-     * @param  array  $payload
      * @return void
      *
      * @throws \Illuminate\Broadcasting\BroadcastException
@@ -180,7 +177,6 @@ LUA;
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
      * @return array
      */
     protected function formatChannels(array $channels)

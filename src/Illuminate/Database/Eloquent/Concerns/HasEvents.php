@@ -143,7 +143,6 @@ trait HasEvents
     /**
      * Set the observable event names.
      *
-     * @param  array  $observables
      * @return $this
      */
     public function setObservableEvents(array $observables)
@@ -418,7 +417,6 @@ trait HasEvents
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      * @return void
      */
     public static function setEventDispatcher(Dispatcher $dispatcher)
@@ -439,7 +437,6 @@ trait HasEvents
     /**
      * Execute a callback without firing any model events for any model type.
      *
-     * @param  callable  $callback
      * @return mixed
      */
     public static function withoutEvents(callable $callback)

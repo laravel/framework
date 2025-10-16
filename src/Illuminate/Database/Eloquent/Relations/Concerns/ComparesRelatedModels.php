@@ -50,7 +50,6 @@ trait ComparesRelatedModels
     /**
      * Get the value of the model's related key.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return mixed
      */
     abstract protected function getRelatedKeyFrom(Model $model);

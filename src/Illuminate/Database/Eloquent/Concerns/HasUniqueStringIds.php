@@ -17,7 +17,6 @@ trait HasUniqueStringIds
      * Determine if given key is valid.
      *
      * @param  mixed  $value
-     * @return bool
      */
     abstract protected function isValidUniqueId($value): bool;
 

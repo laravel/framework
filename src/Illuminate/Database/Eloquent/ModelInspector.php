@@ -44,8 +44,6 @@ class ModelInspector
 
     /**
      * Create a new model inspector instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
      */
     public function __construct(Application $app)
     {
@@ -299,7 +297,6 @@ class ModelInspector
     /**
      * Qualify the given model class base name.
      *
-     * @param  string  $model
      * @return class-string<\Illuminate\Database\Eloquent\Model>
      *
      * @see \Illuminate\Console\GeneratorCommand

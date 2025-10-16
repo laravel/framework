@@ -44,7 +44,6 @@ trait CompilesComponents
     /**
      * Get a new component hash for a component name.
      *
-     * @param  string  $component
      * @return string
      */
     public static function newComponentHash(string $component)
@@ -57,10 +56,6 @@ trait CompilesComponents
     /**
      * Compile a class component opening.
      *
-     * @param  string  $component
-     * @param  string  $alias
-     * @param  string  $data
-     * @param  string  $hash
      * @return string
      */
     public static function compileClassComponentOpening(string $component, string $alias, string $data, string $hash)

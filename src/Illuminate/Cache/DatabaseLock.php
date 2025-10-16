@@ -38,7 +38,6 @@ class DatabaseLock extends Lock
     /**
      * Create a new lock instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
      * @param  string  $name
      * @param  int  $seconds

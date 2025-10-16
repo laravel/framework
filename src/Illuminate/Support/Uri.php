@@ -61,7 +61,6 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      * @param  \BackedEnum|string  $name
      * @param  mixed  $parameters
      * @param  bool  $absolute
-     * @return static
      *
      * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException|\InvalidArgumentException
      */
@@ -77,7 +76,6 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      * @param  mixed  $parameters
      * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
      * @param  bool  $absolute
-     * @return static
      *
      * @throws \InvalidArgumentException
      */
@@ -93,7 +91,6 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      * @param  \DateTimeInterface|\DateInterval|int  $expiration
      * @param  array  $parameters
      * @param  bool  $absolute
-     * @return static
      */
     public static function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true): static
     {
@@ -106,7 +103,6 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
      * @param  string|array  $action
      * @param  mixed  $parameters
      * @param  bool  $absolute
-     * @return static
      *
      * @throws \InvalidArgumentException
      */
@@ -422,8 +418,6 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
 
     /**
      * Convert the object into a value that is JSON serializable.
-     *
-     * @return string
      */
     public function jsonSerialize(): string
     {

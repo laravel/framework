@@ -13,6 +13,5 @@ class RouteMatched
     public function __construct(
         public $route,
         public $request,
-    ) {
-    }
+    ) {}
 }

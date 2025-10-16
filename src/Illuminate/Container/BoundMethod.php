@@ -15,7 +15,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
      *
@@ -42,7 +41,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  string  $target
-     * @param  array  $parameters
      * @param  string|null  $defaultMethod
      * @return mixed
      *
@@ -114,7 +112,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  callable|string  $callback
-     * @param  array  $parameters
      * @return array
      *
      * @throws \ReflectionException
@@ -156,7 +153,6 @@ class BoundMethod
      *
      * @param  \Illuminate\Container\Container  $container
      * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
      * @param  array  $dependencies
      * @return void
      *

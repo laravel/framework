@@ -14,8 +14,7 @@ class PendingEventAttributes
      */
     public function __construct(
         protected Schedule $schedule,
-    ) {
-    }
+    ) {}
 
     /**
      * Do not allow the event to overlap each other.

@@ -28,7 +28,6 @@ class ScheduleTestCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
     public function handle(Schedule $schedule)
@@ -93,7 +92,6 @@ class ScheduleTestCommand extends Command
     /**
      * Get the selected command name by index.
      *
-     * @param  array  $commandNames
      * @return int
      */
     protected function getSelectedCommandByIndex(array $commandNames)

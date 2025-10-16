@@ -34,7 +34,7 @@ class HasMany extends HasOneOrMany
         ));
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getResults()
     {
         return ! is_null($this->getParentKey())
@@ -42,7 +42,7 @@ class HasMany extends HasOneOrMany
             : $this->related->newCollection();
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function initRelation(array $models, $relation)
     {
         foreach ($models as $model) {
@@ -52,7 +52,7 @@ class HasMany extends HasOneOrMany
         return $models;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function match(array $models, EloquentCollection $results, $relation)
     {
         return $this->matchMany($models, $results, $relation);

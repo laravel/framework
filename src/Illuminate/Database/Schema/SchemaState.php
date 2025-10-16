@@ -45,10 +45,6 @@ abstract class SchemaState
 
     /**
      * Create a new dumper instance.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  \Illuminate\Filesystem\Filesystem|null  $files
-     * @param  callable|null  $processFactory
      */
     public function __construct(Connection $connection, ?Filesystem $files = null, ?callable $processFactory = null)
     {
@@ -68,7 +64,6 @@ abstract class SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $path
      * @return void
      */
@@ -95,8 +90,6 @@ abstract class SchemaState
 
     /**
      * Determine if the current connection has a migration table.
-     *
-     * @return bool
      */
     public function hasMigrationTable(): bool
     {
@@ -105,8 +98,6 @@ abstract class SchemaState
 
     /**
      * Get the name of the application's migration table.
-     *
-     * @return string
      */
     protected function getMigrationTable(): string
     {
@@ -116,7 +107,6 @@ abstract class SchemaState
     /**
      * Specify the name of the application's migration table.
      *
-     * @param  string  $table
      * @return $this
      */
     public function withMigrationTable(string $table)
@@ -129,7 +119,6 @@ abstract class SchemaState
     /**
      * Specify the callback that should be used to handle process output.
      *
-     * @param  callable  $output
      * @return $this
      */
     public function handleOutputUsing(callable $output)

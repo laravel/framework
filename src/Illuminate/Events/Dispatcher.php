@@ -92,8 +92,6 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Create a new event dispatcher instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
      */
     public function __construct(?ContainerContract $container = null)
     {
@@ -353,7 +351,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the payload has a broadcastable event.
      *
-     * @param  array  $payload
      * @return bool
      */
     protected function shouldBroadcast(array $payload)
@@ -430,7 +427,6 @@ class Dispatcher implements DispatcherContract
      * Add the listeners for the event's interfaces to the given array.
      *
      * @param  string  $eventName
-     * @param  array  $listeners
      * @return array
      */
     protected function addInterfaceListeners($eventName, array $listeners = [])
@@ -449,7 +445,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Prepare the listeners for a given event.
      *
-     * @param  string  $eventName
      * @return \Closure[]
      */
     protected function prepareListeners(string $eventName)
@@ -767,7 +762,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the queue resolver implementation.
      *
-     * @param  callable  $resolver
      * @return $this
      */
     public function setQueueResolver(callable $resolver)
@@ -790,7 +784,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Set the database transaction manager resolver implementation.
      *
-     * @param  callable  $resolver
      * @return $this
      */
     public function setTransactionManagerResolver(callable $resolver)
@@ -803,8 +796,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Execute the given callback while deferring events, then dispatch all deferred events.
      *
-     * @param  callable  $callback
-     * @param  array|null  $events
      * @return mixed
      */
     public function defer(callable $callback, ?array $events = null)
@@ -837,7 +828,6 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event should be deferred.
      *
-     * @param  string  $event
      * @return bool
      */
     protected function shouldDeferEvent(string $event)

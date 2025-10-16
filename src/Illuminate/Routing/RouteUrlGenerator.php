@@ -175,7 +175,6 @@ class RouteUrlGenerator
     /**
      * Format the array of route parameters.
      *
-     * @param  \Illuminate\Routing\Route  $route
      * @param  mixed  $parameters
      * @return array
      */
@@ -328,7 +327,6 @@ class RouteUrlGenerator
      * Replace all of the wildcard parameters for a route path.
      *
      * @param  string  $path
-     * @param  array  $parameters
      * @return string
      */
     protected function replaceRouteParameters($path, array &$parameters)
@@ -373,7 +371,6 @@ class RouteUrlGenerator
      * Add a query string to the URI.
      *
      * @param  string  $uri
-     * @param  array  $parameters
      * @return mixed
      */
     protected function addQueryString($uri, array $parameters)
@@ -393,7 +390,6 @@ class RouteUrlGenerator
     /**
      * Get the query string for a given route.
      *
-     * @param  array  $parameters
      * @return string
      */
     protected function getRouteQueryString(array $parameters)
@@ -426,7 +422,6 @@ class RouteUrlGenerator
     /**
      * Get the string parameters from a given list.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function getStringParameters(array $parameters)
@@ -437,7 +432,6 @@ class RouteUrlGenerator
     /**
      * Get the numeric parameters from a given list.
      *
-     * @param  array  $parameters
      * @return array
      */
     protected function getNumericParameters(array $parameters)
@@ -448,7 +442,6 @@ class RouteUrlGenerator
     /**
      * Set the default named parameters used by the URL generator.
      *
-     * @param  array  $defaults
      * @return void
      */
     public function defaults(array $defaults)

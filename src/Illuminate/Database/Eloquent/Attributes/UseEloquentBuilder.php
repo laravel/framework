@@ -12,7 +12,5 @@ class UseEloquentBuilder
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Builder>  $builderClass
      */
-    public function __construct(public string $builderClass)
-    {
-    }
+    public function __construct(public string $builderClass) {}
 }

@@ -13,6 +13,5 @@ class ModelsPruned
     public function __construct(
         public $model,
         public $count,
-    ) {
-    }
+    ) {}
 }

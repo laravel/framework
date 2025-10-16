@@ -79,7 +79,6 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's routes.
      *
-     * @param  \Closure  $routesCallback
      * @return $this
      */
     protected function routes(Closure $routesCallback)
@@ -92,7 +91,6 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's routes.
      *
-     * @param  \Closure|null  $routesCallback
      * @return void
      */
     public static function loadRoutesUsing(?Closure $routesCallback)
@@ -103,7 +101,6 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Register the callback that will be used to load the application's cached routes.
      *
-     * @param  \Closure|null  $routesCallback
      * @return void
      */
     public static function loadCachedRoutesUsing(?Closure $routesCallback)

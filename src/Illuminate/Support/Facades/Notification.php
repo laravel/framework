@@ -58,7 +58,6 @@ class Notification extends Facade
     /**
      * Begin sending a notification to an anonymous notifiable on the given channels.
      *
-     * @param  array  $channels
      * @return \Illuminate\Notifications\AnonymousNotifiable
      */
     public static function routes(array $channels)

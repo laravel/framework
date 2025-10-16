@@ -146,7 +146,6 @@ abstract class MultipleInstanceManager
     /**
      * Call a custom instance creator.
      *
-     * @param  array  $config
      * @return mixed
      */
     protected function callCustomCreator(array $config)
@@ -190,7 +189,6 @@ abstract class MultipleInstanceManager
      * Register a custom instance creator Closure.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
      *
      * @param-closure-this  $this  $callback
      *

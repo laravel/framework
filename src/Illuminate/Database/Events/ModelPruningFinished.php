@@ -11,6 +11,5 @@ class ModelPruningFinished
      */
     public function __construct(
         public $models,
-    ) {
-    }
+    ) {}
 }

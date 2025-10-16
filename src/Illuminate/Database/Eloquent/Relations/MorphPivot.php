@@ -156,7 +156,6 @@ class MorphPivot extends Pivot
     /**
      * Get a new query to restore multiple models by their queueable IDs.
      *
-     * @param  array  $ids
      * @return \Illuminate\Database\Eloquent\Builder<static>
      */
     protected function newQueryForCollectionRestoration(array $ids)

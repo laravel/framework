@@ -22,8 +22,6 @@ class SentMessage
 
     /**
      * Create a new SentMessage instance.
-     *
-     * @param  \Symfony\Component\Mailer\SentMessage  $sentMessage
      */
     public function __construct(SymfonySentMessage $sentMessage)
     {
@@ -70,7 +68,6 @@ class SentMessage
     /**
      * Marshal the object from its serialized data.
      *
-     * @param  array  $data
      * @return void
      */
     public function __unserialize(array $data)

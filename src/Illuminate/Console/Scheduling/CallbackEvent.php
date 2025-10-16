@@ -42,9 +42,7 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string|callable  $callback
-     * @param  array  $parameters
      * @param  \DateTimeZone|string|null  $timezone
      *
      * @throws \InvalidArgumentException
@@ -66,7 +64,6 @@ class CallbackEvent extends Event
     /**
      * Run the callback event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return mixed
      *
      * @throws \Throwable

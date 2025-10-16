@@ -13,6 +13,5 @@ class ScheduledBackgroundTaskFinished
      */
     public function __construct(
         public Event $task,
-    ) {
-    }
+    ) {}
 }

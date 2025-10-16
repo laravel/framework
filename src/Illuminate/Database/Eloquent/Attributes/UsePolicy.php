@@ -12,7 +12,5 @@ class UsePolicy
      *
      * @param  class-string<*>  $class
      */
-    public function __construct(public string $class)
-    {
-    }
+    public function __construct(public string $class) {}
 }

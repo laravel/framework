@@ -40,8 +40,6 @@ class Sequence implements Countable
 
     /**
      * Get the current count of the sequence items.
-     *
-     * @return int
      */
     public function count(): int
     {

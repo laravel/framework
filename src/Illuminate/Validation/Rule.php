@@ -229,7 +229,6 @@ class Rule
     /**
      * Get a dimensions rule builder instance.
      *
-     * @param  array  $constraints
      * @return \Illuminate\Validation\Rules\Dimensions
      */
     public static function dimensions(array $constraints = [])

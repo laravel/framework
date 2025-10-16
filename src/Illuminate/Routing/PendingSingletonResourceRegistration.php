@@ -47,10 +47,8 @@ class PendingSingletonResourceRegistration
     /**
      * Create a new pending singleton resource registration instance.
      *
-     * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
      * @param  string  $name
      * @param  string  $controller
-     * @param  array  $options
      */
     public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
     {

@@ -77,15 +77,10 @@ class Envelope
     /**
      * Create a new message envelope instance.
      *
-     * @param  \Illuminate\Mail\Mailables\Address|string|null  $from
      * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $to
      * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $cc
      * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $bcc
      * @param  array<int, \Illuminate\Mail\Mailables\Address|string>  $replyTo
-     * @param  string|null  $subject
-     * @param  array  $tags
-     * @param  array  $metadata
-     * @param  \Closure|array  $using
      *
      * @named-arguments-supported
      */
@@ -118,7 +113,6 @@ class Envelope
     /**
      * Specify who the message will be "from".
      *
-     * @param  \Illuminate\Mail\Mailables\Address|string  $address
      * @param  string|null  $name
      * @return $this
      */
@@ -196,7 +190,6 @@ class Envelope
     /**
      * Set the subject of the message.
      *
-     * @param  string  $subject
      * @return $this
      */
     public function subject(string $subject)
@@ -209,7 +202,6 @@ class Envelope
     /**
      * Add "tags" to the message.
      *
-     * @param  array  $tags
      * @return $this
      */
     public function tags(array $tags)
@@ -222,7 +214,6 @@ class Envelope
     /**
      * Add a "tag" to the message.
      *
-     * @param  string  $tag
      * @return $this
      */
     public function tag(string $tag)
@@ -235,8 +226,6 @@ class Envelope
     /**
      * Add metadata to the message.
      *
-     * @param  string  $key
-     * @param  string|int  $value
      * @return $this
      */
     public function metadata(string $key, string|int $value)
@@ -249,7 +238,6 @@ class Envelope
     /**
      * Add a Symfony Message customization callback to the message.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function using(Closure $callback)
@@ -262,8 +250,6 @@ class Envelope
     /**
      * Determine if the message is from the given address.
      *
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     public function isFrom(string $address, ?string $name = null)
@@ -279,8 +265,6 @@ class Envelope
     /**
      * Determine if the message has the given address as a recipient.
      *
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     public function hasTo(string $address, ?string $name = null)
@@ -291,8 +275,6 @@ class Envelope
     /**
      * Determine if the message has the given address as a "cc" recipient.
      *
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     public function hasCc(string $address, ?string $name = null)
@@ -303,8 +285,6 @@ class Envelope
     /**
      * Determine if the message has the given address as a "bcc" recipient.
      *
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     public function hasBcc(string $address, ?string $name = null)
@@ -315,8 +295,6 @@ class Envelope
     /**
      * Determine if the message has the given address as a "reply to" recipient.
      *
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     public function hasReplyTo(string $address, ?string $name = null)
@@ -327,9 +305,6 @@ class Envelope
     /**
      * Determine if the message has the given recipient.
      *
-     * @param  array  $recipients
-     * @param  string  $address
-     * @param  string|null  $name
      * @return bool
      */
     protected function hasRecipient(array $recipients, string $address, ?string $name = null)
@@ -347,7 +322,6 @@ class Envelope
     /**
      * Determine if the message has the given subject.
      *
-     * @param  string  $subject
      * @return bool
      */
     public function hasSubject(string $subject)
@@ -358,8 +332,6 @@ class Envelope
     /**
      * Determine if the message has the given metadata.
      *
-     * @param  string  $key
-     * @param  string  $value
      * @return bool
      */
     public function hasMetadata(string $key, string $value)

@@ -430,8 +430,6 @@ class Repository
     /**
      * Increment a context counter.
      *
-     * @param  string  $key
-     * @param  int  $amount
      * @return $this
      */
     public function increment(string $key, int $amount = 1)
@@ -447,8 +445,6 @@ class Repository
     /**
      * Decrement a context counter.
      *
-     * @param  string  $key
-     * @param  int  $amount
      * @return $this
      */
     public function decrement(string $key, int $amount = 1)
@@ -459,10 +455,6 @@ class Repository
     /**
      * Determine if the given value is in the given stack.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  bool  $strict
-     * @return bool
      *
      * @throws \RuntimeException
      */
@@ -486,10 +478,6 @@ class Repository
     /**
      * Determine if the given value is in the given hidden stack.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  bool  $strict
-     * @return bool
      *
      * @throws \RuntimeException
      */
@@ -537,7 +525,6 @@ class Repository
     /**
      * Run the callback function with the given context values and restore the original context state when complete.
      *
-     * @param  callable  $callback
      * @param  array<string, mixed>  $data
      * @param  array<string, mixed>  $hidden
      * @return mixed

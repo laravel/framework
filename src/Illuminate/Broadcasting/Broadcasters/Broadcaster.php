@@ -66,7 +66,6 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * See: https://pusher.com/docs/channels/library_auth_reference/auth-signatures/#user-authentication.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function resolveAuthenticatedUserUsing(Closure $callback)
@@ -280,7 +279,6 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Format the channel array into an array of strings.
      *
-     * @param  array  $channels
      * @return array
      */
     protected function formatChannels(array $channels)

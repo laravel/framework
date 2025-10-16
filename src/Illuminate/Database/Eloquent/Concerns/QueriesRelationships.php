@@ -1067,11 +1067,6 @@ trait QueriesRelationships
 
     /**
      * Updates the table name for any columns with a new qualified name.
-     *
-     * @param  array  $wheres
-     * @param  string  $from
-     * @param  string  $to
-     * @return array
      */
     protected function requalifyWhereTables(array $wheres, string $from, string $to): array
     {
@@ -1087,7 +1082,6 @@ trait QueriesRelationships
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $operator
      * @param  int  $count
      * @param  string  $boolean

@@ -35,7 +35,6 @@ class DynamoDbFailedJobProvider implements FailedJobProviderInterface
     /**
      * Create a new DynamoDb failed job provider.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
      * @param  string  $applicationName
      * @param  string  $table
      */

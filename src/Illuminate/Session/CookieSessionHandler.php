@@ -42,7 +42,6 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * Create a new cookie driven handler instance.
      *
-     * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
      * @param  int  $minutes
      * @param  bool  $expireOnClose
      */
@@ -55,8 +54,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function open($savePath, $sessionName): bool
     {
@@ -65,8 +62,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function close(): bool
     {
@@ -75,8 +70,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|false
      */
     public function read($sessionId): string|false
     {
@@ -92,8 +85,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function write($sessionId, $data): bool
     {
@@ -107,8 +98,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return bool
      */
     public function destroy($sessionId): bool
     {
@@ -119,8 +108,6 @@ class CookieSessionHandler implements SessionHandlerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return int
      */
     public function gc($lifetime): int
     {
@@ -130,7 +117,6 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * Set the request instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @return void
      */
     public function setRequest(Request $request)

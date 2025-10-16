@@ -8,17 +8,17 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use Concerns\InteractsWithContainer,
-        Concerns\MakesHttpRequests,
-        Concerns\InteractsWithAuthentication,
+    use Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
+        Concerns\InteractsWithContainer,
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithDeprecationHandling,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
-        Concerns\InteractsWithTime,
         Concerns\InteractsWithTestCaseLifecycle,
-        Concerns\InteractsWithViews;
+        Concerns\InteractsWithTime,
+        Concerns\InteractsWithViews,
+        Concerns\MakesHttpRequests;
 
     /**
      * Creates the application.
@@ -36,8 +36,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Setup the test environment.
-     *
-     * @return void
      */
     protected function setUp(): void
     {
@@ -57,7 +55,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * Clean up the testing environment before the next test.
      *
-     * @return void
      *
      * @throws \Mockery\Exception\InvalidCountException
      */
@@ -68,8 +65,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Clean up the testing environment before the next test case.
-     *
-     * @return void
      */
     public static function tearDownAfterClass(): void
     {

@@ -48,7 +48,6 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Create a new Redis store.
      *
-     * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $prefix
      * @param  string  $connection
      */
@@ -79,7 +78,6 @@ class RedisStore extends TaggableStore implements LockProvider
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
@@ -123,7 +121,6 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
@@ -458,7 +455,6 @@ class RedisStore extends TaggableStore implements LockProvider
      * Determine if the given value should be stored as plain value.
      *
      * @param  mixed  $value
-     * @return bool
      */
     protected function shouldBeStoredWithoutSerialization($value): bool
     {

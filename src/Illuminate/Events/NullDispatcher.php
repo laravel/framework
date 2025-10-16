@@ -18,8 +18,6 @@ class NullDispatcher implements DispatcherContract
 
     /**
      * Create a new event dispatcher instance that does not fire.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
      */
     public function __construct(DispatcherContract $dispatcher)
     {

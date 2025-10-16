@@ -47,7 +47,6 @@ class PackageManifest
     /**
      * Create a new package manifest instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $basePath
      * @param  string  $manifestPath
      */
@@ -168,7 +167,6 @@ class PackageManifest
     /**
      * Write the given manifest array to disk.
      *
-     * @param  array  $manifest
      * @return void
      *
      * @throws \Exception

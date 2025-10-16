@@ -29,9 +29,9 @@ use function Illuminate\Support\enum_value;
 
 class Connection implements ConnectionInterface
 {
-    use DetectsConcurrencyErrors,
+    use Concerns\ManagesTransactions,
+        DetectsConcurrencyErrors,
         DetectsLostConnections,
-        Concerns\ManagesTransactions,
         InteractsWithTime,
         Macroable;
 
@@ -209,7 +209,6 @@ class Connection implements ConnectionInterface
      * @param  \PDO|(\Closure(): \PDO)  $pdo
      * @param  string  $database
      * @param  string  $tablePrefix
-     * @param  array  $config
      */
     public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
@@ -488,7 +487,6 @@ class Connection implements ConnectionInterface
     /**
      * Configure the PDO prepared statement.
      *
-     * @param  \PDOStatement  $statement
      * @return \PDOStatement
      */
     protected function prepared(PDOStatement $statement)
@@ -660,7 +658,6 @@ class Connection implements ConnectionInterface
     /**
      * Execute the given callback without "pretending".
      *
-     * @param  \Closure  $callback
      * @return mixed
      */
     public function withoutPretending(Closure $callback)
@@ -730,7 +727,6 @@ class Connection implements ConnectionInterface
     /**
      * Prepare the query bindings for execution.
      *
-     * @param  array  $bindings
      * @return array
      */
     public function prepareBindings(array $bindings)
@@ -756,7 +752,6 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @param  \Closure  $callback
      * @return mixed
      *
      * @throws \Illuminate\Database\QueryException
@@ -797,7 +792,6 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @param  \Closure  $callback
      * @return mixed
      *
      * @throws \Illuminate\Database\QueryException
@@ -830,7 +824,6 @@ class Connection implements ConnectionInterface
     /**
      * Determine if the given database exception was caused by a unique constraint violation.
      *
-     * @param  \Exception  $exception
      * @return bool
      */
     protected function isUniqueConstraintError(Exception $exception)
@@ -940,10 +933,8 @@ class Connection implements ConnectionInterface
     /**
      * Handle a query exception.
      *
-     * @param  \Illuminate\Database\QueryException  $e
      * @param  string  $query
      * @param  array  $bindings
-     * @param  \Closure  $callback
      * @return mixed
      *
      * @throws \Illuminate\Database\QueryException
@@ -962,10 +953,8 @@ class Connection implements ConnectionInterface
     /**
      * Handle a query exception that occurred during query execution.
      *
-     * @param  \Illuminate\Database\QueryException  $e
      * @param  string  $query
      * @param  array  $bindings
-     * @param  \Closure  $callback
      * @return mixed
      *
      * @throws \Illuminate\Database\QueryException
@@ -1022,7 +1011,6 @@ class Connection implements ConnectionInterface
     /**
      * Register a hook to be run just before a database transaction is started.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function beforeStartingTransaction(Closure $callback)
@@ -1035,7 +1023,6 @@ class Connection implements ConnectionInterface
     /**
      * Register a hook to be run just before a database query is executed.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function beforeExecuting(Closure $callback)
@@ -1048,7 +1035,6 @@ class Connection implements ConnectionInterface
     /**
      * Register a database query listener with the connection.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function listen(Closure $callback)
@@ -1186,7 +1172,6 @@ class Connection implements ConnectionInterface
     /**
      * Set the record modification state.
      *
-     * @param  bool  $value
      * @return $this
      */
     public function setRecordModificationState(bool $value)
@@ -1381,7 +1366,6 @@ class Connection implements ConnectionInterface
     /**
      * Set the query grammar used by the connection.
      *
-     * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
      * @return $this
      */
     public function setQueryGrammar(Query\Grammars\Grammar $grammar)
@@ -1404,7 +1388,6 @@ class Connection implements ConnectionInterface
     /**
      * Set the schema grammar used by the connection.
      *
-     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return $this
      */
     public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
@@ -1427,7 +1410,6 @@ class Connection implements ConnectionInterface
     /**
      * Set the query post processor used by the connection.
      *
-     * @param  \Illuminate\Database\Query\Processors\Processor  $processor
      * @return $this
      */
     public function setPostProcessor(Processor $processor)
@@ -1450,7 +1432,6 @@ class Connection implements ConnectionInterface
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return $this
      */
     public function setEventDispatcher(Dispatcher $events)
@@ -1640,9 +1621,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Execute the given callback without table prefix.
-     *
-     * @param  \Closure  $callback
-     * @return mixed
      */
     public function withoutTablePrefix(Closure $callback): mixed
     {
@@ -1659,8 +1637,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Get the server version for the connection.
-     *
-     * @return string
      */
     public function getServerVersion(): string
     {
@@ -1671,7 +1647,6 @@ class Connection implements ConnectionInterface
      * Register a connection resolver.
      *
      * @param  string  $driver
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolverFor($driver, Closure $callback)

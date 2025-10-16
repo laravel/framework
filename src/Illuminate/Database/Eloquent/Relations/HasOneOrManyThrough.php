@@ -160,7 +160,7 @@ abstract class HasOneOrManyThrough extends Relation
         return $this;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function addEagerConstraints(array $models)
     {
         $whereIn = $this->whereInMethod($this->farParent, $this->localKey);
@@ -196,8 +196,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrNew(array $attributes = [], array $values = [])
@@ -212,8 +210,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Get the first record matching the attributes. If the record is not found, create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
@@ -228,8 +224,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function createOrFirst(array $attributes = [], array $values = [])
@@ -244,8 +238,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TRelatedModel
      */
     public function updateOrCreate(array $attributes, array $values = [])
@@ -443,7 +435,7 @@ abstract class HasOneOrManyThrough extends Relation
         return $callback();
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function get($columns = ['*'])
     {
         $builder = $this->prepareQueryBuilder($columns);
@@ -513,7 +505,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Set the select clause for the relation query.
      *
-     * @param  array  $columns
      * @return array
      */
     protected function shouldSelect(array $columns = ['*'])
@@ -529,7 +520,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of the query.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @return bool
      */
     public function chunk($count, callable $callback)
@@ -541,7 +531,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of a query by comparing numeric IDs.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -559,7 +548,6 @@ abstract class HasOneOrManyThrough extends Relation
      * Chunk the results of a query by comparing IDs in descending order.
      *
      * @param  int  $count
-     * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
@@ -576,7 +564,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Execute a callback over each item while chunking by ID.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @param  string|null  $column
      * @param  string|null  $alias
@@ -604,7 +591,6 @@ abstract class HasOneOrManyThrough extends Relation
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
      * @param  int  $count
      * @return bool
      */
@@ -679,7 +665,7 @@ abstract class HasOneOrManyThrough extends Relation
         );
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         if ($parentQuery->getQuery()->from === $query->getQuery()->from) {

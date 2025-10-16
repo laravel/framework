@@ -20,8 +20,6 @@ abstract class Grammar
 
     /**
      * Create a new grammar instance.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
      */
     public function __construct(Connection $connection)
     {

@@ -57,8 +57,6 @@ class QueueFake extends QueueManager implements Fake, Queue
 
     /**
      * Indicates if items should be serialized and restored when pushed to the queue.
-     *
-     * @var bool
      */
     protected bool $serializeAndRestore = false;
 
@@ -527,7 +525,6 @@ class QueueFake extends QueueManager implements Fake, Queue
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -629,7 +626,6 @@ class QueueFake extends QueueManager implements Fake, Queue
     /**
      * Specify if jobs should be serialized and restored when being "pushed" to the queue.
      *
-     * @param  bool  $serializeAndRestore
      * @return $this
      */
     public function serializeAndRestore(bool $serializeAndRestore = true)

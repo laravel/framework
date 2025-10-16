@@ -149,7 +149,6 @@ class BeanstalkdQueue extends Queue implements QueueContract
      *
      * @param  string  $payload
      * @param  string|null  $queue
-     * @param  array  $options
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])

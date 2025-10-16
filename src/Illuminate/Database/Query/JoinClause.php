@@ -51,7 +51,6 @@ class JoinClause extends Builder
     /**
      * Create a new join clause instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
      */

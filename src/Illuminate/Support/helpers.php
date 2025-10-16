@@ -17,8 +17,6 @@ use Illuminate\Support\Stringable as SupportStringable;
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
-     *
-     * @param  array  $array
      */
     function append_config(array $array): array
     {
@@ -282,7 +280,6 @@ if (! function_exists('preg_replace_array')) {
      * Replace a given pattern with each value in the array in sequentially.
      *
      * @param  string  $pattern
-     * @param  array  $replacements
      * @param  string  $subject
      */
     function preg_replace_array($pattern, array $replacements, $subject): string

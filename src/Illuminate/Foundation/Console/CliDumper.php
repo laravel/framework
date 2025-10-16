@@ -69,9 +69,9 @@ class CliDumper extends BaseCliDumper
      */
     public static function register($basePath, $compiledViewPath)
     {
-        $cloner = tap(new VarCloner())->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
+        $cloner = tap(new VarCloner)->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
-        $dumper = new static(new ConsoleOutput(), $basePath, $compiledViewPath);
+        $dumper = new static(new ConsoleOutput, $basePath, $compiledViewPath);
 
         VarDumper::setHandler(fn ($value) => $dumper->dumpWithSource($cloner->cloneVar($value)));
     }
@@ -79,7 +79,6 @@ class CliDumper extends BaseCliDumper
     /**
      * Dump a variable with its source file / line.
      *
-     * @param  \Symfony\Component\VarDumper\Cloner\Data  $data
      * @return void
      */
     public function dumpWithSource(Data $data)

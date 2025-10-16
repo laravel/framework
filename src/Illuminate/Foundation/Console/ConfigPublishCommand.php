@@ -63,9 +63,6 @@ class ConfigPublishCommand extends Command
     /**
      * Publish the given file to the given destination.
      *
-     * @param  string  $name
-     * @param  string  $file
-     * @param  string  $destination
      * @return void
      */
     protected function publish(string $name, string $file, string $destination)

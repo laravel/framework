@@ -25,7 +25,6 @@ class SqlServerConnection extends Connection
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
      * @param  int  $attempts
      * @return mixed
      *
@@ -78,7 +77,6 @@ class SqlServerConnection extends Connection
     /**
      * Determine if the given database exception was caused by a unique constraint violation.
      *
-     * @param  \Exception  $exception
      * @return bool
      */
     protected function isUniqueConstraintError(Exception $exception)
@@ -123,8 +121,6 @@ class SqlServerConnection extends Connection
     /**
      * Get the schema state for the connection.
      *
-     * @param  \Illuminate\Filesystem\Filesystem|null  $files
-     * @param  callable|null  $processFactory
      *
      * @throws \RuntimeException
      */

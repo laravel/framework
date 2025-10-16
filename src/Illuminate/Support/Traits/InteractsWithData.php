@@ -80,8 +80,6 @@ trait InteractsWithData
      * Apply the callback if the instance contains the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenHas($key, callable $callback, ?callable $default = null)
@@ -158,8 +156,6 @@ trait InteractsWithData
      * Apply the callback if the instance contains a non-empty value for the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenFilled($key, callable $callback, ?callable $default = null)
@@ -192,8 +188,6 @@ trait InteractsWithData
      * Apply the callback if the instance is missing the given key.
      *
      * @param  string  $key
-     * @param  callable  $callback
-     * @param  callable|null  $default
      * @return $this|mixed
      */
     public function whenMissing($key, callable $callback, ?callable $default = null)

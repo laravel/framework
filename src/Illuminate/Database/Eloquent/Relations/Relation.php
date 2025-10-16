@@ -231,7 +231,6 @@ abstract class Relation implements BuilderContract
     /**
      * Run a raw update against the base query.
      *
-     * @param  array  $attributes
      * @return int
      */
     public function rawUpdate(array $attributes = [])
@@ -398,9 +397,6 @@ abstract class Relation implements BuilderContract
     /**
      * Add a whereIn eager constraint for the given set of model keys to be loaded.
      *
-     * @param  string  $whereIn
-     * @param  string  $key
-     * @param  array  $modelKeys
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>|null  $query
      * @return void
      */
@@ -416,7 +412,6 @@ abstract class Relation implements BuilderContract
     /**
      * Get the name of the "where in" method for eager loading.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
      * @return string
      */

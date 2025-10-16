@@ -12,8 +12,6 @@ class AnyOf implements Rule, ValidatorAwareRule
 {
     /**
      * The rules to match against.
-     *
-     * @var array
      */
     protected array $rules = [];
 

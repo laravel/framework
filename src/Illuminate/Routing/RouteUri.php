@@ -20,9 +20,6 @@ class RouteUri
 
     /**
      * Create a new route URI instance.
-     *
-     * @param  string  $uri
-     * @param  array  $bindingFields
      */
     public function __construct(string $uri, array $bindingFields = [])
     {

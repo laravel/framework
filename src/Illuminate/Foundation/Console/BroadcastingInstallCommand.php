@@ -441,8 +441,6 @@ class BroadcastingInstallCommand extends Command
 
     /**
      * Resolve the provider to use based on the user's choice.
-     *
-     * @return string
      */
     protected function resolveDriver(): string
     {
@@ -467,8 +465,6 @@ class BroadcastingInstallCommand extends Command
 
     /**
      * Detect if the user is using a supported framework (React or Vue).
-     *
-     * @return bool
      */
     protected function isUsingSupportedFramework(): bool
     {
@@ -477,8 +473,6 @@ class BroadcastingInstallCommand extends Command
 
     /**
      * Detect if the user is using React.
-     *
-     * @return bool
      */
     protected function appUsesReact(): bool
     {
@@ -487,8 +481,6 @@ class BroadcastingInstallCommand extends Command
 
     /**
      * Detect if the user is using Vue.
-     *
-     * @return bool
      */
     protected function appUsesVue(): bool
     {
@@ -497,8 +489,6 @@ class BroadcastingInstallCommand extends Command
 
     /**
      * Detect if the package is installed.
-     *
-     * @return bool
      */
     protected function packageDependenciesInclude(string $package): bool
     {

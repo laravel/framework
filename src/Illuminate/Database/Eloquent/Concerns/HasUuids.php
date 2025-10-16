@@ -22,7 +22,6 @@ trait HasUuids
      * Determine if given key is valid.
      *
      * @param  mixed  $value
-     * @return bool
      */
     protected function isValidUniqueId($value): bool
     {

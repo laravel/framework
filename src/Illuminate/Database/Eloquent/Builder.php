@@ -167,8 +167,6 @@ class Builder implements BuilderContract
 
     /**
      * Create a new Eloquent query builder instance.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
      */
     public function __construct(QueryBuilder $query)
     {
@@ -178,7 +176,6 @@ class Builder implements BuilderContract
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
      * @return TModel
      */
     public function make(array $attributes = [])
@@ -226,7 +223,6 @@ class Builder implements BuilderContract
     /**
      * Remove all or passed registered global scopes.
      *
-     * @param  array|null  $scopes
      * @return $this
      */
     public function withoutGlobalScopes(?array $scopes = null)
@@ -245,7 +241,6 @@ class Builder implements BuilderContract
     /**
      * Remove all global scopes except the given scopes.
      *
-     * @param  array  $scopes
      * @return $this
      */
     public function withoutGlobalScopesExcept(array $scopes = [])
@@ -459,7 +454,6 @@ class Builder implements BuilderContract
     /**
      * Create a collection of models from plain arrays.
      *
-     * @param  array  $items
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
     public function hydrate(array $items)
@@ -683,8 +677,6 @@ class Builder implements BuilderContract
     /**
      * Get the first record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TModel
      */
     public function firstOrNew(array $attributes = [], array $values = [])
@@ -699,8 +691,6 @@ class Builder implements BuilderContract
     /**
      * Get the first record matching the attributes. If the record is not found, create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TModel
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
@@ -715,8 +705,6 @@ class Builder implements BuilderContract
     /**
      * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TModel
      */
     public function createOrFirst(array $attributes = [], array $values = [])
@@ -731,8 +719,6 @@ class Builder implements BuilderContract
     /**
      * Create or update a record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
      * @return TModel
      */
     public function updateOrCreate(array $attributes, array $values = [])
@@ -747,11 +733,8 @@ class Builder implements BuilderContract
     /**
      * Create a record matching the attributes, or increment the existing record.
      *
-     * @param  array  $attributes
-     * @param  string  $column
      * @param  int|float  $default
      * @param  int|float  $step
-     * @param  array  $extra
      * @return TModel
      */
     public function incrementOrCreate(array $attributes, string $column = 'count', $default = 1, $step = 1, array $extra = [])
@@ -926,9 +909,7 @@ class Builder implements BuilderContract
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array  $models
      * @param  string  $name
-     * @param  \Closure  $constraints
      * @return array
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
@@ -1019,7 +1000,6 @@ class Builder implements BuilderContract
     /**
      * Register a closure to be invoked after the query is executed.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function afterQuery(Closure $callback)
@@ -1210,7 +1190,6 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
      * @return TModel
      */
     public function create(array $attributes = [])
@@ -1223,7 +1202,6 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance without raising model events.
      *
-     * @param  array  $attributes
      * @return TModel
      */
     public function createQuietly(array $attributes = [])
@@ -1234,7 +1212,6 @@ class Builder implements BuilderContract
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array  $attributes
      * @return TModel
      */
     public function forceCreate(array $attributes)
@@ -1247,7 +1224,6 @@ class Builder implements BuilderContract
     /**
      * Save a new model instance with mass assignment without raising model events.
      *
-     * @param  array  $attributes
      * @return TModel
      */
     public function forceCreateQuietly(array $attributes = [])
@@ -1258,7 +1234,6 @@ class Builder implements BuilderContract
     /**
      * Update records in the database.
      *
-     * @param  array  $values
      * @return int
      */
     public function update(array $values)
@@ -1269,7 +1244,6 @@ class Builder implements BuilderContract
     /**
      * Insert new records or update the existing ones.
      *
-     * @param  array  $values
      * @param  array|string  $uniqueBy
      * @param  array|null  $update
      * @return int
@@ -1323,7 +1297,6 @@ class Builder implements BuilderContract
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = [])
@@ -1338,7 +1311,6 @@ class Builder implements BuilderContract
      *
      * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
      * @param  float|int  $amount
-     * @param  array  $extra
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])
@@ -1351,7 +1323,6 @@ class Builder implements BuilderContract
     /**
      * Add the "updated at" column to an array of values.
      *
-     * @param  array  $values
      * @return array
      */
     protected function addUpdatedAtColumn(array $values)
@@ -1393,7 +1364,6 @@ class Builder implements BuilderContract
     /**
      * Add unique IDs to the inserted values.
      *
-     * @param  array  $values
      * @return array
      */
     protected function addUniqueIdsToUpsertValues(array $values)
@@ -1416,7 +1386,6 @@ class Builder implements BuilderContract
     /**
      * Add timestamps to the inserted values.
      *
-     * @param  array  $values
      * @return array
      */
     protected function addTimestampsToUpsertValues(array $values)
@@ -1444,7 +1413,6 @@ class Builder implements BuilderContract
     /**
      * Add the "updated at" column to the updated columns.
      *
-     * @param  array  $update
      * @return array
      */
     protected function addUpdatedAtToUpsertColumns(array $update)
@@ -1493,7 +1461,6 @@ class Builder implements BuilderContract
     /**
      * Register a replacement for the default delete function.
      *
-     * @param  \Closure  $callback
      * @return void
      */
     public function onDelete(Closure $callback)
@@ -1582,8 +1549,6 @@ class Builder implements BuilderContract
     /**
      * Apply the given scope on the current builder instance.
      *
-     * @param  callable  $scope
-     * @param  array  $parameters
      * @return mixed
      */
     protected function callScope(callable $scope, array $parameters = [])
@@ -1612,7 +1577,6 @@ class Builder implements BuilderContract
      * Apply the given named scope on the current builder instance.
      *
      * @param  string  $scope
-     * @param  array  $parameters
      * @return mixed
      */
     protected function callNamedScope($scope, array $parameters = [])
@@ -1625,7 +1589,6 @@ class Builder implements BuilderContract
     /**
      * Nest where conditions by slicing them at the given where count.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  int  $originalWhereCount
      * @return void
      */
@@ -1650,7 +1613,6 @@ class Builder implements BuilderContract
     /**
      * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $whereSlice
      * @return void
      */
@@ -1752,7 +1714,6 @@ class Builder implements BuilderContract
     /**
      * Parse a list of relations into individuals.
      *
-     * @param  array  $relations
      * @return array
      */
     protected function parseWithRelations(array $relations)
@@ -1831,7 +1792,6 @@ class Builder implements BuilderContract
     /**
      * Combine an array of constraints into a single constraint.
      *
-     * @param  array  $constraints
      * @return \Closure
      */
     protected function combineConstraints(array $constraints)
@@ -1909,7 +1869,6 @@ class Builder implements BuilderContract
      *
      * The given key / value pairs will also be added as where conditions to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|array|string  $attributes
      * @param  mixed  $value
      * @param  bool  $asConditions
      * @return $this
@@ -2017,7 +1976,6 @@ class Builder implements BuilderContract
     /**
      * Set the relationships being eagerly loaded.
      *
-     * @param  array  $eagerLoad
      * @return $this
      */
     public function setEagerLoads(array $eagerLoad)
@@ -2030,7 +1988,6 @@ class Builder implements BuilderContract
     /**
      * Indicate that the given relationships should not be eagerly loaded.
      *
-     * @param  array  $relations
      * @return $this
      */
     public function withoutEagerLoad(array $relations)
@@ -2307,7 +2264,6 @@ class Builder implements BuilderContract
     /**
      * Register a closure to be invoked on a clone.
      *
-     * @param  \Closure  $callback
      * @return $this
      */
     public function onClone(Closure $callback)

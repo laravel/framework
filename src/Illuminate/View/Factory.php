@@ -13,14 +13,14 @@ use InvalidArgumentException;
 
 class Factory implements FactoryContract
 {
-    use Macroable,
-        Concerns\ManagesComponents,
+    use Concerns\ManagesComponents,
         Concerns\ManagesEvents,
         Concerns\ManagesFragments,
         Concerns\ManagesLayouts,
         Concerns\ManagesLoops,
         Concerns\ManagesStacks,
-        Concerns\ManagesTranslations;
+        Concerns\ManagesTranslations,
+        Macroable;
 
     /**
      * The engine implementation.
@@ -106,10 +106,6 @@ class Factory implements FactoryContract
 
     /**
      * Create a new view factory instance.
-     *
-     * @param  \Illuminate\View\Engines\EngineResolver  $engines
-     * @param  \Illuminate\View\ViewFinderInterface  $finder
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      */
     public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
     {
@@ -164,7 +160,6 @@ class Factory implements FactoryContract
     /**
      * Get the first view that actually exists from the given list.
      *
-     * @param  array  $views
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  array  $mergeData
      * @return \Illuminate\Contracts\View\View
@@ -393,7 +388,6 @@ class Factory implements FactoryContract
     /**
      * Determine if the given once token has been rendered.
      *
-     * @param  string  $id
      * @return bool
      */
     public function hasRenderedOnce(string $id)
@@ -404,7 +398,6 @@ class Factory implements FactoryContract
     /**
      * Mark the given once token as having been rendered.
      *
-     * @param  string  $id
      * @return void
      */
     public function markAsRenderedOnce(string $id)
@@ -560,7 +553,6 @@ class Factory implements FactoryContract
     /**
      * Set the view finder instance.
      *
-     * @param  \Illuminate\View\ViewFinderInterface  $finder
      * @return void
      */
     public function setFinder(ViewFinderInterface $finder)
@@ -591,7 +583,6 @@ class Factory implements FactoryContract
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
      * @return void
      */
     public function setDispatcher(Dispatcher $events)
@@ -612,7 +603,6 @@ class Factory implements FactoryContract
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)

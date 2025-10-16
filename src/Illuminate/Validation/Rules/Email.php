@@ -11,15 +11,20 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
-class Email implements Rule, DataAwareRule, ValidatorAwareRule
+class Email implements DataAwareRule, Rule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
     public bool $validateMxRecord = false;
+
     public bool $preventSpoofing = false;
+
     public bool $nativeValidation = false;
+
     public bool $nativeValidationWithUnicodeAllowed = false;
+
     public bool $rfcCompliant = false;
+
     public bool $strictRfcCompliant = false;
 
     /**
@@ -95,7 +100,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure that the email is an RFC compliant email address.
      *
-     * @param  bool  $strict
      * @return $this
      */
     public function rfcCompliant(bool $strict = false)
@@ -148,7 +152,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Ensure the email address is valid using PHP's native email validation functions.
      *
-     * @param  bool  $allowUnicode
      * @return $this
      */
     public function withNativeValidation(bool $allowUnicode = false)

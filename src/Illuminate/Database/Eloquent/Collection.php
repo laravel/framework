@@ -282,7 +282,6 @@ class Collection extends BaseCollection implements QueueableCollection
      * Load a relationship path if it is not already eager loaded.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TModel>  $models
-     * @param  array  $path
      * @return void
      */
     protected function loadMissingRelation(self $models, array $path)

@@ -21,9 +21,6 @@ class TaggedCache extends Repository
 
     /**
      * Create a new tagged cache instance.
-     *
-     * @param  \Illuminate\Contracts\Cache\Store  $store
-     * @param  \Illuminate\Cache\TagSet  $tags
      */
     public function __construct(Store $store, TagSet $tags)
     {
@@ -35,7 +32,6 @@ class TaggedCache extends Repository
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int|null  $ttl
      * @return bool
      */

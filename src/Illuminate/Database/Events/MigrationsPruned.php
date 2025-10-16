@@ -29,9 +29,6 @@ class MigrationsPruned
 
     /**
      * Create a new event instance.
-     *
-     * @param  \Illuminate\Database\Connection  $connection
-     * @param  string  $path
      */
     public function __construct(Connection $connection, string $path)
     {

@@ -942,13 +942,13 @@ trait ValidatesAttributes
         $validations = (new Collection($parameters))
             ->unique()
             ->map(fn ($validation) => match (true) {
-                $validation === 'strict' => new NoRFCWarningsValidation(),
-                $validation === 'dns' => new DNSCheckValidation(),
-                $validation === 'spoof' => new SpoofCheckValidation(),
-                $validation === 'filter' => new FilterEmailValidation(),
+                $validation === 'strict' => new NoRFCWarningsValidation,
+                $validation === 'dns' => new DNSCheckValidation,
+                $validation === 'spoof' => new SpoofCheckValidation,
+                $validation === 'filter' => new FilterEmailValidation,
                 $validation === 'filter_unicode' => FilterEmailValidation::unicode(),
                 is_string($validation) && class_exists($validation) => $this->container->make($validation),
-                default => new RFCValidation(),
+                default => new RFCValidation,
             })
             ->values()
             ->all() ?: [new RFCValidation];
@@ -1173,7 +1173,6 @@ trait ValidatesAttributes
     /**
      * Get the extra conditions for a unique / exists rule.
      *
-     * @param  array  $segments
      * @return array
      */
     protected function getExtraConditions(array $segments)
@@ -2524,7 +2523,6 @@ trait ValidatesAttributes
     /**
      * Determine if any of the given attributes fail the required test.
      *
-     * @param  array  $attributes
      * @return bool
      */
     protected function anyFailingRequired(array $attributes)
@@ -2541,7 +2539,6 @@ trait ValidatesAttributes
     /**
      * Determine if all of the given attributes fail the required test.
      *
-     * @param  array  $attributes
      * @return bool
      */
     protected function allFailingRequired(array $attributes)

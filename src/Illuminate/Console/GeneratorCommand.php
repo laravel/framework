@@ -119,8 +119,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
 
     /**
      * Create a new generator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
     public function __construct(Filesystem $files)
     {
@@ -219,7 +217,6 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Qualify the given model class base name.
      *
-     * @param  string  $model
      * @return string
      */
     protected function qualifyModel(string $model)

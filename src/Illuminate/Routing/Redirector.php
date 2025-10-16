@@ -26,8 +26,6 @@ class Redirector
 
     /**
      * Create a new Redirector instance.
-     *
-     * @param  \Illuminate\Routing\UrlGenerator  $generator
      */
     public function __construct(UrlGenerator $generator)
     {
@@ -229,7 +227,6 @@ class Redirector
     /**
      * Set the active session store.
      *
-     * @param  \Illuminate\Session\Store  $session
      * @return void
      */
     public function setSession(SessionStore $session)

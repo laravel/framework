@@ -56,11 +56,8 @@ class Frame
     /**
      * Create a new frame instance.
      *
-     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $exception
      * @param  array<string, string>  $classMap
      * @param  array{file: string, line: int, class?: string, type?: string, function?: string, args?: array}  $frame
-     * @param  string  $basePath
-     * @param  \Illuminate\Foundation\Exceptions\Renderer\Frame|null  $previous
      */
     public function __construct(FlattenException $exception, array $classMap, array $frame, string $basePath, ?Frame $previous = null)
     {

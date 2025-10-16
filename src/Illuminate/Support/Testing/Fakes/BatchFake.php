@@ -26,17 +26,6 @@ class BatchFake extends Batch
 
     /**
      * Create a new batch instance.
-     *
-     * @param  string  $id
-     * @param  string  $name
-     * @param  int  $totalJobs
-     * @param  int  $pendingJobs
-     * @param  int  $failedJobs
-     * @param  array  $failedJobIds
-     * @param  array  $options
-     * @param  \Carbon\CarbonImmutable  $createdAt
-     * @param  \Carbon\CarbonImmutable|null  $cancelledAt
-     * @param  \Carbon\CarbonImmutable|null  $finishedAt
      */
     public function __construct(
         string $id,
@@ -94,7 +83,6 @@ class BatchFake extends Batch
     /**
      * Record that a job within the batch finished successfully, executing any callbacks if necessary.
      *
-     * @param  string  $jobId
      * @return void
      */
     public function recordSuccessfulJob(string $jobId)
@@ -105,7 +93,6 @@ class BatchFake extends Batch
     /**
      * Decrement the pending jobs for the batch.
      *
-     * @param  string  $jobId
      * @return void
      */
     public function decrementPendingJobs(string $jobId)
@@ -116,7 +103,6 @@ class BatchFake extends Batch
     /**
      * Record that a job within the batch failed to finish successfully, executing any callbacks if necessary.
      *
-     * @param  string  $jobId
      * @param  \Throwable  $e
      * @return void
      */
@@ -128,7 +114,6 @@ class BatchFake extends Batch
     /**
      * Increment the failed jobs for the batch.
      *
-     * @param  string  $jobId
      * @return \Illuminate\Bus\UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $jobId)

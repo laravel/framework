@@ -310,7 +310,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Add an array of query string values.
      *
-     * @param  array  $keys
      * @return $this
      */
     protected function appendArray(array $keys)
@@ -512,7 +511,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
     /**
      * Set the current cursor resolver callback.
      *
-     * @param  \Closure  $resolver
      * @return void
      */
     public static function currentCursorResolver(Closure $resolver)
@@ -562,8 +560,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
 
     /**
      * Get the number of items for the current page.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -612,7 +608,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      * Determine if the given item exists.
      *
      * @param  TKey  $key
-     * @return bool
      */
     public function offsetExists($key): bool
     {
@@ -635,7 +630,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      *
      * @param  TKey|null  $key
      * @param  TValue  $value
-     * @return void
      */
     public function offsetSet($key, $value): void
     {
@@ -646,7 +640,6 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
      * Unset the item at the given key.
      *
      * @param  TKey  $key
-     * @return void
      */
     public function offsetUnset($key): void
     {

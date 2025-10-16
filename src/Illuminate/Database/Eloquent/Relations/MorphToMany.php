@@ -90,7 +90,7 @@ class MorphToMany extends BelongsToMany
         return $this;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function addEagerConstraints(array $models)
     {
         parent::addEagerConstraints($models);
@@ -112,7 +112,7 @@ class MorphToMany extends BelongsToMany
         );
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
@@ -149,7 +149,6 @@ class MorphToMany extends BelongsToMany
     /**
      * Create a new pivot model instance.
      *
-     * @param  array  $attributes
      * @param  bool  $exists
      * @return TPivotModel
      */

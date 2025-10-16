@@ -11,7 +11,6 @@ trait DetectsLostConnections
     /**
      * Determine if the given exception was caused by a lost connection.
      *
-     * @param  \Throwable  $e
      * @return bool
      */
     protected function causedByLostConnection(Throwable $e)
@@ -20,7 +19,7 @@ trait DetectsLostConnections
 
         $detector = $container->bound(LostConnectionDetectorContract::class)
             ? $container[LostConnectionDetectorContract::class]
-            : new LostConnectionDetector();
+            : new LostConnectionDetector;
 
         return $detector->causedByLostConnection($e);
     }

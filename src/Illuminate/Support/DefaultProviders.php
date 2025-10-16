@@ -46,7 +46,6 @@ class DefaultProviders
     /**
      * Merge the given providers into the provider collection.
      *
-     * @param  array  $providers
      * @return static
      */
     public function merge(array $providers)
@@ -59,7 +58,6 @@ class DefaultProviders
     /**
      * Replace the given providers with other providers.
      *
-     * @param  array  $replacements
      * @return static
      */
     public function replace(array $replacements)
@@ -78,7 +76,6 @@ class DefaultProviders
     /**
      * Disable the given providers.
      *
-     * @param  array  $providers
      * @return static
      */
     public function except(array $providers)

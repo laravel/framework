@@ -12,7 +12,6 @@ trait Prunable
     /**
      * Prune all prunable models in the database.
      *
-     * @param  int  $chunkSize
      * @return int
      */
     public function pruneAll(int $chunkSize = 1000)

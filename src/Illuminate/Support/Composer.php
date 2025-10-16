@@ -27,7 +27,6 @@ class Composer
     /**
      * Create a new Composer manager instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string|null  $workingPath
      */
     public function __construct(Filesystem $files, $workingPath = null)
@@ -56,8 +55,6 @@ class Composer
      * Install the given Composer packages into the application.
      *
      * @param  array<int, string>  $packages
-     * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -72,21 +69,19 @@ class Composer
                 $command->push('--dev');
             })->all();
 
-        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
+        return $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
-            );
+            ) === 0;
     }
 
     /**
      * Remove the given Composer packages from the application.
      *
      * @param  array<int, string>  $packages
-     * @param  bool  $dev
-     * @param  \Closure|\Symfony\Component\Console\Output\OutputInterface|null  $output
      * @param  string|null  $composerBinary
      * @return bool
      */
@@ -101,13 +96,13 @@ class Composer
                 $command->push('--dev');
             })->all();
 
-        return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
+        return $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
                 $output instanceof OutputInterface
                     ? function ($type, $line) use ($output) {
                         $output->write('    '.$line);
                     } : $output
-            );
+            ) === 0;
     }
 
     /**
@@ -208,8 +203,6 @@ class Composer
     /**
      * Get a new Symfony process instance.
      *
-     * @param  array  $command
-     * @param  array  $env
      * @return \Symfony\Component\Process\Process
      */
     protected function getProcess(array $command, array $env = [])

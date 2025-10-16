@@ -26,9 +26,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @param  \Pheanstalk\Contract\PheanstalkManagerInterface&\Pheanstalk\Contract\PheanstalkPublisherInterface&\Pheanstalk\Contract\PheanstalkSubscriberInterface  $pheanstalk
-     * @param  \Pheanstalk\Contract\JobIdInterface  $job
      * @param  string  $connectionName
      * @param  string  $queue
      */

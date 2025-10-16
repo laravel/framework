@@ -25,8 +25,6 @@ class DatabaseJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Illuminate\Queue\DatabaseQueue  $database
      * @param  \stdClass  $job
      * @param  string  $connectionName
      * @param  string  $queue

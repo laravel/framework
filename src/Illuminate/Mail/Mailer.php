@@ -90,11 +90,6 @@ class Mailer implements MailerContract, MailQueueContract
 
     /**
      * Create a new Mailer instance.
-     *
-     * @param  string  $name
-     * @param  \Illuminate\Contracts\View\Factory  $views
-     * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
-     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $events
      */
     public function __construct(string $name, Factory $views, TransportInterface $transport, ?Dispatcher $events = null)
     {
@@ -227,7 +222,6 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a new message with only a plain part.
      *
      * @param  string  $view
-     * @param  array  $data
      * @param  mixed  $callback
      * @return \Illuminate\Mail\SentMessage|null
      */
@@ -240,7 +234,6 @@ class Mailer implements MailerContract, MailQueueContract
      * Render the given message as a view.
      *
      * @param  string|array  $view
-     * @param  array  $data
      * @return string
      */
     public function render($view, array $data = [])
@@ -261,8 +254,6 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Replace the embedded image attachments with raw, inline image data for browser rendering.
      *
-     * @param  string  $renderedView
-     * @param  array  $attachments
      * @return string
      */
     protected function replaceEmbeddedAttachments(string $renderedView, array $attachments)
@@ -290,7 +281,6 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a new message using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return \Illuminate\Mail\SentMessage|null
      */
@@ -343,7 +333,6 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send the given mailable.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return \Illuminate\Mail\SentMessage|null
      */
     protected function sendMailable(MailableContract $mailable)
@@ -357,7 +346,6 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a new message synchronously using a view.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $mailable
-     * @param  array  $data
      * @param  \Closure|string|null  $callback
      * @return \Illuminate\Mail\SentMessage|null
      */
@@ -549,7 +537,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function createMessage()
     {
-        $message = new Message(new Email());
+        $message = new Message(new Email);
 
         // If a global from address has been specified we will set it on every message
         // instance so the developer does not have to repeat themselves every time
@@ -575,7 +563,6 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send a Symfony Email instance.
      *
-     * @param  \Symfony\Component\Mime\Email  $message
      * @return \Symfony\Component\Mailer\SentMessage|null
      */
     protected function sendSymfonyMessage(Email $message)
@@ -642,7 +629,6 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Set the Symfony Transport instance.
      *
-     * @param  \Symfony\Component\Mailer\Transport\TransportInterface  $transport
      * @return void
      */
     public function setSymfonyTransport(TransportInterface $transport)
@@ -653,7 +639,6 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Set the queue manager instance.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return $this
      */
     public function setQueue(QueueContract $queue)

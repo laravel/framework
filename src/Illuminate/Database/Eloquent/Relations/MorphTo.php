@@ -91,7 +91,7 @@ class MorphTo extends BelongsTo
         parent::__construct($query, $parent, $foreignKey, $ownerKey, $relation);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     #[\Override]
     public function addEagerConstraints(array $models)
     {
@@ -198,7 +198,7 @@ class MorphTo extends BelongsTo
         });
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     #[\Override]
     public function match(array $models, EloquentCollection $results, $relation)
     {
@@ -266,7 +266,7 @@ class MorphTo extends BelongsTo
         return $this->parent->setRelation($this->relationName, null);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     #[\Override]
     public function touch()
     {
@@ -275,7 +275,7 @@ class MorphTo extends BelongsTo
         }
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     #[\Override]
     protected function newRelatedInstanceFor(Model $parent)
     {
@@ -305,7 +305,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relations to load for a given morph type.
      *
-     * @param  array  $with
      * @return $this
      */
     public function morphWith(array $with)
@@ -320,7 +319,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify which relationship counts to load for a given morph type.
      *
-     * @param  array  $withCount
      * @return $this
      */
     public function morphWithCount(array $withCount)
@@ -335,7 +333,6 @@ class MorphTo extends BelongsTo
     /**
      * Specify constraints on the query for a given morph type.
      *
-     * @param  array  $callbacks
      * @return $this
      */
     public function constrain(array $callbacks)
@@ -413,7 +410,7 @@ class MorphTo extends BelongsTo
         return $query;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     #[\Override]
     public function getQualifiedOwnerKeyName()
     {

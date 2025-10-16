@@ -13,6 +13,5 @@ class PreparingResponse
     public function __construct(
         public $request,
         public $response,
-    ) {
-    }
+    ) {}
 }

@@ -17,8 +17,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class VerifyCsrfToken
 {
-    use InteractsWithTime,
-        ExcludesPaths;
+    use ExcludesPaths,
+        InteractsWithTime;
 
     /**
      * The application instance.
@@ -57,9 +57,6 @@ class VerifyCsrfToken
 
     /**
      * Create a new middleware instance.
-     *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
      */
     public function __construct(Application $app, Encrypter $encrypter)
     {
@@ -71,7 +68,6 @@ class VerifyCsrfToken
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      *
      * @throws \Illuminate\Session\TokenMismatchException

@@ -166,7 +166,6 @@ class DateFactory
     /**
      * Execute the given callable on each date creation.
      *
-     * @param  callable  $callable
      * @return void
      */
     public static function useCallable(callable $callable)

@@ -12,7 +12,6 @@ trait InteractsWithUniqueJobs
      * Store unique job information in the context in case we can't resolve the job on the queue side.
      *
      * @param  mixed  $job
-     * @return void
      */
     public function addUniqueJobInformationToContext($job): void
     {
@@ -28,7 +27,6 @@ trait InteractsWithUniqueJobs
      * Remove the unique job information from the context.
      *
      * @param  mixed  $job
-     * @return void
      */
     public function removeUniqueJobInformationFromContext($job): void
     {
@@ -44,7 +42,6 @@ trait InteractsWithUniqueJobs
      * Determine the cache store used by the unique job to acquire locks.
      *
      * @param  mixed  $job
-     * @return string|null
      */
     protected function getUniqueJobCacheStore($job): ?string
     {

@@ -38,11 +38,6 @@ class FakeProcessResult implements ProcessResultContract
 
     /**
      * Create a new process result instance.
-     *
-     * @param  string  $command
-     * @param  int  $exitCode
-     * @param  array|string  $output
-     * @param  array|string  $errorOutput
      */
     public function __construct(string $command = '', int $exitCode = 0, array|string $output = '', array|string $errorOutput = '')
     {
@@ -55,7 +50,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Normalize the given output into a string with newlines.
      *
-     * @param  array|string  $output
      * @return string
      */
     protected function normalizeOutput(array|string $output)
@@ -87,7 +81,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Create a new fake process result with the given command.
      *
-     * @param  string  $command
      * @return self
      */
     public function withCommand(string $command)
@@ -138,7 +131,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Determine if the output contains the given string.
      *
-     * @param  string  $output
      * @return bool
      */
     public function seeInOutput(string $output)
@@ -159,7 +151,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Determine if the error output contains the given string.
      *
-     * @param  string  $output
      * @return bool
      */
     public function seeInErrorOutput(string $output)
@@ -170,7 +161,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Throw an exception if the process failed.
      *
-     * @param  callable|null  $callback
      * @return $this
      *
      * @throws \Illuminate\Process\Exceptions\ProcessFailedException
@@ -193,8 +183,6 @@ class FakeProcessResult implements ProcessResultContract
     /**
      * Throw an exception if the process failed and the given condition is true.
      *
-     * @param  bool  $condition
-     * @param  callable|null  $callback
      * @return $this
      *
      * @throws \Throwable

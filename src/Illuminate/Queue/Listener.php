@@ -80,7 +80,6 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return void
      */
     public function listen($connection, $queue, ListenerOptions $options)
@@ -101,7 +100,6 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return \Symfony\Component\Process\Process
      */
     public function makeProcess($connection, $queue, ListenerOptions $options)
@@ -132,7 +130,6 @@ class Listener
      * Add the environment option to the given command.
      *
      * @param  array  $command
-     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return array
      */
     protected function addEnvironment($command, ListenerOptions $options)
@@ -145,7 +142,6 @@ class Listener
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  \Illuminate\Queue\ListenerOptions  $options
      * @return array
      */
     protected function createCommand($connection, $queue, ListenerOptions $options)
@@ -171,7 +167,6 @@ class Listener
     /**
      * Run the given process.
      *
-     * @param  \Symfony\Component\Process\Process  $process
      * @param  int  $memory
      * @return void
      */
@@ -227,7 +222,6 @@ class Listener
     /**
      * Set the output handler callback.
      *
-     * @param  \Closure  $outputHandler
      * @return void
      */
     public function setOutputHandler(Closure $outputHandler)

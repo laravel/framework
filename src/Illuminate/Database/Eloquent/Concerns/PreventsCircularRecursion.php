@@ -53,7 +53,6 @@ trait PreventsCircularRecursion
      * Remove an entry from the recursion cache for an object.
      *
      * @param  object  $object
-     * @param  string  $hash
      */
     protected static function clearRecursiveCallValue($object, string $hash)
     {
@@ -68,7 +67,6 @@ trait PreventsCircularRecursion
      * Get the stack of methods being called recursively for the current object.
      *
      * @param  object  $object
-     * @return array
      */
     protected static function getRecursiveCallStack($object): array
     {
@@ -84,14 +82,13 @@ trait PreventsCircularRecursion
      */
     protected static function getRecursionCache()
     {
-        return static::$recursionCache ??= new WeakMap();
+        return static::$recursionCache ??= new WeakMap;
     }
 
     /**
      * Set a value in the recursion cache for the given object and method.
      *
      * @param  object  $object
-     * @param  string  $hash
      * @param  mixed  $value
      * @return mixed
      */

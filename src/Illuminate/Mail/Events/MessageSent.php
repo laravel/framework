@@ -20,8 +20,7 @@ class MessageSent
     public function __construct(
         public SentMessage $sent,
         public array $data = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Get the serializable representation of the object.
@@ -42,7 +41,6 @@ class MessageSent
     /**
      * Marshal the object from its serialized data.
      *
-     * @param  array  $data
      * @return void
      */
     public function __unserialize(array $data)

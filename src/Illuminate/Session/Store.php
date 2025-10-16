@@ -67,7 +67,6 @@ class Store implements Session
      * Create a new session instance.
      *
      * @param  string  $name
-     * @param  \SessionHandlerInterface  $handler
      * @param  string|null  $id
      * @param  string  $serialization
      */
@@ -241,7 +240,6 @@ class Store implements Session
     /**
      * Get a subset of the session data.
      *
-     * @param  array  $keys
      * @return array
      */
     public function only(array $keys)
@@ -252,7 +250,6 @@ class Store implements Session
     /**
      * Get all the session data except for a specified array of items.
      *
-     * @param  array  $keys
      * @return array
      */
     public function except(array $keys)
@@ -364,7 +361,6 @@ class Store implements Session
     /**
      * Replace the given session attributes entirely.
      *
-     * @param  array  $attributes
      * @return void
      */
     public function replace(array $attributes)
@@ -394,7 +390,6 @@ class Store implements Session
      * Get an item from the session, or store the default value.
      *
      * @param  string  $key
-     * @param  \Closure  $callback
      * @return mixed
      */
     public function remember($key, Closure $callback)
@@ -453,7 +448,6 @@ class Store implements Session
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -508,7 +502,6 @@ class Store implements Session
     /**
      * Merge new flash keys into the new flash array.
      *
-     * @param  array  $keys
      * @return void
      */
     protected function mergeNewFlashes(array $keys)
@@ -521,7 +514,6 @@ class Store implements Session
     /**
      * Remove the given keys from the old flash data.
      *
-     * @param  array  $keys
      * @return void
      */
     protected function removeFromOldFlashData(array $keys)
@@ -532,7 +524,6 @@ class Store implements Session
     /**
      * Flash an input array to the session.
      *
-     * @param  array  $value
      * @return void
      */
     public function flashInput(array $value)
@@ -812,7 +803,6 @@ class Store implements Session
     /**
      * Set the underlying session handler implementation.
      *
-     * @param  \SessionHandlerInterface  $handler
      * @return \SessionHandlerInterface
      */
     public function setHandler(SessionHandlerInterface $handler)

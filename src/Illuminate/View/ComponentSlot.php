@@ -38,7 +38,6 @@ class ComponentSlot implements Htmlable, Stringable
     /**
      * Set the extra attributes that the slot should make available.
      *
-     * @param  array  $attributes
      * @return $this
      */
     public function withAttributes(array $attributes)
@@ -81,7 +80,6 @@ class ComponentSlot implements Htmlable, Stringable
     /**
      * Determine if the slot has non-comment content.
      *
-     * @param  callable|string|null  $callable
      * @return bool
      */
     public function hasActualContent(callable|string|null $callable = null)

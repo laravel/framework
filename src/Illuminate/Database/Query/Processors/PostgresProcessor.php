@@ -9,7 +9,6 @@ class PostgresProcessor extends Processor
     /**
      * Process an "insert get ID" query.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $sql
      * @param  array  $values
      * @param  string|null  $sequence
@@ -30,7 +29,7 @@ class PostgresProcessor extends Processor
         return is_numeric($id) ? (int) $id : $id;
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processTypes($results)
     {
         return array_map(function ($result) {
@@ -74,7 +73,7 @@ class PostgresProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processColumns($results)
     {
         return array_map(function ($result) {
@@ -103,7 +102,7 @@ class PostgresProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processIndexes($results)
     {
         return array_map(function ($result) {
@@ -119,7 +118,7 @@ class PostgresProcessor extends Processor
         }, $results);
     }
 
-    /** @inheritDoc */
+    /** {@inheritDoc} */
     public function processForeignKeys($results)
     {
         return array_map(function ($result) {

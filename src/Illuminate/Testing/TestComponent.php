@@ -59,7 +59,6 @@ class TestComponent implements Stringable
     /**
      * Assert that the given strings are contained in order within the rendered component.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */
@@ -91,7 +90,6 @@ class TestComponent implements Stringable
     /**
      * Assert that the given strings are contained in order within the rendered component text.
      *
-     * @param  array  $values
      * @param  bool  $escape
      * @return $this
      */

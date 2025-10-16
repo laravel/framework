@@ -13,7 +13,6 @@ trait ReflectsClosures
     /**
      * Get the class name of the first parameter of the given Closure.
      *
-     * @param  \Closure  $closure
      * @return string
      *
      * @throws \ReflectionException
@@ -37,7 +36,6 @@ trait ReflectsClosures
     /**
      * Get the class names of the first parameter of the given Closure, including union types.
      *
-     * @param  \Closure  $closure
      * @return array
      *
      * @throws \ReflectionException
@@ -73,7 +71,6 @@ trait ReflectsClosures
     /**
      * Get the class names / types of the parameters of the given Closure.
      *
-     * @param  \Closure  $closure
      * @return array
      *
      * @throws \ReflectionException

@@ -54,9 +54,6 @@ class BlueprintState
 
     /**
      * Create a new blueprint state instance.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Database\Connection  $connection
      */
     public function __construct(Blueprint $blueprint, Connection $connection)
     {

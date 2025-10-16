@@ -146,7 +146,6 @@ trait BroadcastsEvents
     /**
      * Create a new broadcastable model event for the model.
      *
-     * @param  string  $event
      * @return \Illuminate\Database\Eloquent\BroadcastableModelEventOccurred
      */
     protected function newBroadcastableEvent(string $event)

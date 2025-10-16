@@ -44,7 +44,6 @@ class ScheduleListCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      *
      * @throws \Exception
@@ -75,8 +74,6 @@ class ScheduleListCommand extends Command
     /**
      * Render the scheduled tasks information as JSON.
      *
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \DateTimeZone  $timezone
      * @return void
      */
     protected function displayJson(Collection $events, DateTimeZone $timezone)
@@ -114,8 +111,6 @@ class ScheduleListCommand extends Command
     /**
      * Render the scheduled tasks information formatted for the CLI.
      *
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \DateTimeZone  $timezone
      * @return void
      */
     protected function displayForCli(Collection $events, DateTimeZone $timezone)
@@ -241,8 +236,6 @@ class ScheduleListCommand extends Command
     /**
      * Sort the events by due date if option set.
      *
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Collection
      */
     private function sortEvents(\Illuminate\Support\Collection $events, DateTimeZone $timezone)
@@ -255,8 +248,6 @@ class ScheduleListCommand extends Command
     /**
      * Render the scheduled tasks information.
      *
-     * @param  \Illuminate\Support\Collection  $events
-     * @param  \DateTimeZone  $timezone
      * @return void
      */
     protected function display(Collection $events, DateTimeZone $timezone)
@@ -268,7 +259,6 @@ class ScheduleListCommand extends Command
      * Get the next due date for an event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \DateTimeZone  $timezone
      * @return \Illuminate\Support\Carbon
      */
     private function getNextDueDateForEvent($event, DateTimeZone $timezone)
@@ -319,7 +309,6 @@ class ScheduleListCommand extends Command
     /**
      * Get the file and line number for the event closure.
      *
-     * @param  \Illuminate\Console\Scheduling\CallbackEvent  $event
      * @return string
      */
     private function getClosureLocation(CallbackEvent $event)

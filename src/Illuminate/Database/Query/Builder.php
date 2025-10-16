@@ -35,7 +35,7 @@ use function Illuminate\Support\enum_value;
 class Builder implements BuilderContract
 {
     /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
-    use BuildsWhereDateClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
+    use BuildsQueries, BuildsWhereDateClauses, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -4301,7 +4301,6 @@ class Builder implements BuilderContract
     /**
      * Merge an array of bindings into our bindings.
      *
-     * @param  self  $query
      * @return $this
      */
     public function mergeBindings(self $query)

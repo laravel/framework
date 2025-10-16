@@ -130,10 +130,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         $format = $_SERVER['VAR_DUMPER_FORMAT'] ?? null;
 
         match (true) {
-            'html' == $format => HtmlDumper::register($basePath, $compiledViewPath),
-            'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
-            'server' == $format => null,
-            $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
+            $format == 'html' => HtmlDumper::register($basePath, $compiledViewPath),
+            $format == 'cli' => CliDumper::register($basePath, $compiledViewPath),
+            $format == 'server' => null,
+            $format && parse_url($format, PHP_URL_SCHEME) == 'tcp' => null,
             default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
         };
     }

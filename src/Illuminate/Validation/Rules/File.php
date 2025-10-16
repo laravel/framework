@@ -13,7 +13,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
-class File implements Rule, DataAwareRule, ValidatorAwareRule
+class File implements DataAwareRule, Rule, ValidatorAwareRule
 {
     use Conditionable, Macroable;
 
@@ -112,7 +112,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             ? call_user_func(static::$defaultCallback)
             : static::$defaultCallback;
 
-        return $file instanceof Rule ? $file : new self();
+        return $file instanceof Rule ? $file : new self;
     }
 
     /**
@@ -134,7 +134,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
      */
     public static function types($mimetypes)
     {
-        return tap(new static(), fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
+        return tap(new static, fn ($file) => $file->allowedMimetypes = (array) $mimetypes);
     }
 
     /**

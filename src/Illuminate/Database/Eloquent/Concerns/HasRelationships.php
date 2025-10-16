@@ -95,7 +95,6 @@ trait HasRelationships
      * Define a dynamic relation resolver.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
      * @return void
      */
     public static function resolveRelationUsing($name, Closure $callback)
@@ -119,7 +118,6 @@ trait HasRelationships
     /**
      * Define an automatic relationship autoloader callback for this model and its relations.
      *
-     * @param  \Closure  $callback
      * @param  mixed  $context
      * @return $this
      */
@@ -1116,7 +1114,6 @@ trait HasRelationships
     /**
      * Set the entire relations array on the model.
      *
-     * @param  array  $relations
      * @return $this
      */
     public function setRelations(array $relations)
@@ -1175,7 +1172,6 @@ trait HasRelationships
     /**
      * Set the relationships that are touched on save.
      *
-     * @param  array  $touches
      * @return $this
      */
     public function setTouchedRelations(array $touches)

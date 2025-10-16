@@ -15,8 +15,6 @@ class QuestionHelper extends SymfonyQuestionHelper
 {
     /**
      * {@inheritdoc}
-     *
-     * @return void
      */
     #[\Override]
     protected function writePrompt(OutputInterface $output, Question $question): void
@@ -36,7 +34,7 @@ class QuestionHelper extends SymfonyQuestionHelper
         }
 
         switch (true) {
-            case null === $default:
+            case $default === null:
                 $text = sprintf('<info>%s</info>', $text);
 
                 break;
