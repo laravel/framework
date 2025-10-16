@@ -1101,3 +1101,18 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('bind')) {
+    /**
+     * For binding arguments to method
+     *
+     * @template TReturn
+     * @param  callable(mixed...): TReturn  $callable
+     * @param  mixed...  $args
+     * @return callable(mixed): TReturn
+     */
+    function bind(callable $callable, mixed ...$args): Closure
+    {
+        return static fn (mixed $arg) => $callable($arg, ...$args);
+    }
+}
