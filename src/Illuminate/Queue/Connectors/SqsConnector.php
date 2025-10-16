@@ -20,17 +20,19 @@ class SqsConnector implements ConnectorInterface
 
         if (! empty($config['key']) && ! empty($config['secret'])) {
             $config['credentials'] = Arr::only($config, ['key', 'secret']);
+
             if (! empty($config['token'])) {
                 $config['credentials']['token'] = $config['token'];
             }
         }
 
-        if (empty($config['endpoint']) && ! empty($config['prefix']) && filter_var($config['prefix'], FILTER_VALIDATE_URL)) {
+        if (empty($config['endpoint']) &&
+            ! empty($config['prefix']) &&
+            filter_var($config['prefix'], FILTER_VALIDATE_URL)) {
             $parts = parse_url($config['prefix']);
 
             if ($parts !== false && isset($parts['scheme'], $parts['host'])) {
-                $endpoint = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
-                $config['endpoint'] = $endpoint;
+                $config['endpoint'] = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
             }
         }
 
