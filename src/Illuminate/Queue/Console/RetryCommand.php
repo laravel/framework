@@ -40,7 +40,8 @@ class RetryCommand extends Command
     public function handle()
     {
         $waitTime = (int) $this->option('wait');
-        $jobsFound = count($ids = $this->getJobIds()) > 0;
+        $jobsCounter = count($ids = $this->getJobIds());
+        $jobsFound = $jobsCounter > 0;
 
         if ($jobsFound) {
             $this->components->info('Pushing failed queue jobs back onto the queue.');
@@ -58,7 +59,7 @@ class RetryCommand extends Command
 
                 $this->laravel['queue.failer']->forget($id);
 
-                if ($waitTime > 0 && $jobsFound > 1) {
+                if ($waitTime > 0 && $jobsCounter > 1) {
                     sleep($waitTime);
                 }
             }
@@ -66,6 +67,7 @@ class RetryCommand extends Command
 
         $jobsFound ? $this->newLine() : $this->components->info('No retryable jobs found.');
     }
+
 
     /**
      * Get the job IDs to be retried.
