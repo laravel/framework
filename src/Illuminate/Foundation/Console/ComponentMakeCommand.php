@@ -107,7 +107,7 @@ class ComponentMakeCommand extends GeneratorCommand
 
             return str_replace(
                 ['DummyView', '{{ view }}'],
-                "<<<'blade'\n{$indent}<div>\n{$indent}    <!-- {$quote} -->\n{$indent}</div>\n{$indent}blade;",
+                "<<<'blade'\n{$indent}<div>\n{$indent}    <!-- {$quote} -->\n{$indent}</div>\n{$indent}blade",
                 parent::buildClass($name)
             );
         }
