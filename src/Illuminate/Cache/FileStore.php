@@ -168,10 +168,11 @@ class FileStore implements Store, LockProvider
 
     /**
      * Increment the value of an item in the cache.
+     * @template  TValue
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return int
+     * @return int|\Illuminate\Support\HigherOrderTapProxy|TValue
      */
     public function increment($key, $value = 1)
     {

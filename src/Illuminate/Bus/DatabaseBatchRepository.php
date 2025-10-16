@@ -84,6 +84,8 @@ class DatabaseBatchRepository implements PrunableBatchRepository
         if ($batch) {
             return $this->toBatch($batch);
         }
+
+        return null;
     }
 
     /**

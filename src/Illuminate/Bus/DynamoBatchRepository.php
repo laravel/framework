@@ -152,6 +152,8 @@ class DynamoBatchRepository implements BatchRepository
         if ($batch) {
             return $this->toBatch($batch);
         }
+
+        return null;
     }
 
     /**
