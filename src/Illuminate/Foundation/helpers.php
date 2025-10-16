@@ -456,6 +456,8 @@ if (! function_exists('dispatch')) {
      */
     function dispatch($job): PendingDispatch|PendingClosureDispatch
     {
+        $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+
         return $job instanceof Closure
             ? new PendingClosureDispatch(CallQueuedClosure::create($job))
             : new PendingDispatch($job);
@@ -474,6 +476,8 @@ if (! function_exists('dispatch_sync')) {
      */
     function dispatch_sync($job, $handler = null)
     {
+        $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+
         return app(Dispatcher::class)->dispatchSync($job, $handler);
     }
 }

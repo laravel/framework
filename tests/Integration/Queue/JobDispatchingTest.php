@@ -215,6 +215,18 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertTrue(Job::$ran);
     }
 
+    public function testJobCanBeDispatchedByClassString()
+    {
+        dispatch(ClassStringDispatchableJob::class);
+        $this->assertTrue(ClassStringDispatchableJob::$ran);
+    }
+
+    public function testJobCanBeDispatchedSyncUsingClassString()
+    {
+        dispatch_sync(ClassStringDispatchableJob::class);
+        $this->assertTrue(ClassStringDispatchableJob::$ran);
+    }
+
     /**
      * Helpers.
      */
@@ -246,6 +258,20 @@ class Job implements ShouldQueue
     public function replaceValue($value)
     {
         static::$value = $value;
+    }
+}
+
+class ClassStringDispatchableJob implements ShouldQueue
+{
+    use Dispatchable, Queueable;
+
+    public static $ran = false;
+
+    public function __construct() {}
+
+    public function handle()
+    {
+        static::$ran = true;
     }
 }
 
