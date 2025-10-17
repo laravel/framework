@@ -113,7 +113,7 @@ class MigrationCreator
      */
     protected function getStub($table, $create, $noDown = false)
     {
-        $stubSuffix =  $noDown ? '.nodown.stub' : '.stub';
+        $stubSuffix = $noDown ? '.nodown.stub' : '.stub';
 
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration'.$stubSuffix)
