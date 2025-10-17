@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+class {{ class }}
+{
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+{{ constructorParams }}
+    ) {}
+
+    /**
+     * Create a new DTO instance from an array.
+     *
+     * @param  array  $data
+     * @return static
+     */
+    public static function from(array $data): static
+    {
+        return new static(...$data);
+    }
+
+    /**
+     * Convert the DTO to an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return get_object_vars($this);
+    }
+}

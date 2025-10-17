@@ -108,6 +108,7 @@ use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Console\DtoMakeCommand;
 
 class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -195,6 +196,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConsoleMake' => ConsoleMakeCommand::class,
         'ControllerMake' => ControllerMakeCommand::class,
         'Docs' => DocsCommand::class,
+        'DtoMake' => DtoMakeCommand::class,
         'EnumMake' => EnumMakeCommand::class,
         'EventGenerate' => EventGenerateCommand::class,
         'EventMake' => EventMakeCommand::class,
