@@ -19,6 +19,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
     protected $signature = 'make:migration {name : The name of the migration}
         {--create= : The table to be created}
         {--table= : The table to migrate}
+        {--no-down : Do not add the down method to the migration}
         {--path= : The location where the migration file should be created}
         {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
         {--fullpath : Output the full path of the migration (Deprecated)}';
@@ -76,6 +77,8 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
 
         $create = $this->input->getOption('create') ?: false;
 
+        $noDown = $this->input->getOption('no-down') ?: false;
+
         // If no table was given as an option but a create option is given then we
         // will use the "create" option as the table name. This allows the devs
         // to pass a table name into this option as a short-cut for creating.
@@ -95,7 +98,7 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $table, $create, $noDown);
     }
 
     /**
@@ -104,12 +107,13 @@ class MigrateMakeCommand extends BaseCommand implements PromptsForMissingInput
      * @param  string  $name
      * @param  string  $table
      * @param  bool  $create
+     * @param  bool  $noDown
      * @return void
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $table, $create, $noDown = false)
     {
         $file = $this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $noDown
         );
 
         if (windows_os()) {
