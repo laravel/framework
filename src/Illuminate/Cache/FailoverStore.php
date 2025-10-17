@@ -187,7 +187,7 @@ class FailoverStore extends TaggableStore implements LockProvider
             }
         }
 
-        throw $lastException ?? new RuntimeException('All failover cache connections failed.');
+        throw $lastException ?? new RuntimeException('All failover cache stores failed.');
     }
 
     /**
