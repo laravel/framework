@@ -94,6 +94,7 @@ class FailoverQueue extends Queue implements QueueContract
                 return $this->manager->connection($connection)->push($job, $data, $queue);
             } catch (Throwable $e) {
                 $lastException = $e;
+
                 $this->events->dispatch(new QueueFailedOver($connection, $job));
             }
         }
@@ -141,6 +142,7 @@ class FailoverQueue extends Queue implements QueueContract
                 return $this->manager->connection($connection)->later($delay, $job, $data, $queue);
             } catch (Throwable $e) {
                 $lastException = $e;
+
                 $this->events->dispatch(new QueueFailedOver($connection, $job));
             }
         }
