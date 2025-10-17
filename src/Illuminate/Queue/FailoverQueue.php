@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Events\QueueFailedOver;
+use RuntimeException;
 use Throwable;
 
 class FailoverQueue extends Queue implements QueueContract
@@ -97,7 +98,7 @@ class FailoverQueue extends Queue implements QueueContract
             }
         }
 
-        throw $lastException ?? new \RuntimeException('No available connections to push the job.');
+        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
     }
 
     /**
@@ -119,7 +120,7 @@ class FailoverQueue extends Queue implements QueueContract
             }
         }
 
-        throw $lastException ?? new \RuntimeException('No available connections to push the raw payload.');
+        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
     }
 
     /**
@@ -144,7 +145,7 @@ class FailoverQueue extends Queue implements QueueContract
             }
         }
 
-        throw $lastException ?? new \RuntimeException('No available connections to schedule the job.');
+        throw $lastException ?? new RuntimeException('All failover queue connections failed.');
     }
 
     /**
