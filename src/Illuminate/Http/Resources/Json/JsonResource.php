@@ -43,6 +43,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public $additional = [];
 
     /**
+     * The attributes to exclude from the resource array.
+     *
+     * @var array
+     */
+    protected array $excludes = [];
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string|null
@@ -121,7 +128,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             $data = $data->jsonSerialize();
         }
 
-        return $this->filter((array) $data);
+        return $this->applyExcludes($this->filter((array) $data));
     }
 
     /**
@@ -196,6 +203,38 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
         return $this;
     }
+    /**
+     * Exclude one or more attributes from the resource array.
+     *
+     * Supports dot notation for nested arrays.
+     *
+     * @param  string|array  $fields
+     * @return static
+     */
+    public function except(string|array $fields): static
+    {
+        $this->excludes = array_merge($this->excludes, (array) $fields);
+
+        return $this;
+    }
+
+    /**
+     * Remove excluded attributes from the resolved data.
+     *
+     * @param  array  $data
+     * @return array
+     */
+    protected function applyExcludes(array $data): array
+    {
+        if (! empty($this->excludes)) {
+            foreach ($this->excludes as $field) {
+                data_forget($data, $field);
+            }
+        }
+
+        return $data;
+    }
+
 
     /**
      * Get the JSON serialization options that should be applied to the resource response.
@@ -273,4 +312,4 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return $this->resolve(Container::getInstance()->make('request'));
     }
-}
+} 
