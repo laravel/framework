@@ -339,7 +339,22 @@ class Number
      */
     public static function trim(int|float $number)
     {
-        return json_decode(json_encode($number));
+        if ($number == 0) {
+            return 0;
+        }
+
+        if (is_int($number) || (is_float($number) && stripos(strval($number), 'E') !== false)) {
+            return $number;
+        }
+
+        $strNumber = strval($number);
+        $result = rtrim(rtrim($strNumber, '0'), '.');
+
+        if (stripos($result, '.') !== false) {
+            return (float) $result;
+        }
+
+        return (int) $result;
     }
 
     /**

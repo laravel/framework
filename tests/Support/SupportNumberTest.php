@@ -334,6 +334,12 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+        $this->assertSame(1.33e60, Number::trim(1.33e60));
+        $this->assertSame(1.80e-24, Number::trim(1.80e-24));
+        $this->assertSame(0, Number::trim(0.0));
+        $this->assertSame(0.1, Number::trim(0.10));
+        $this->assertSame(-0.184, Number::trim(-0.18400));
+        $this->assertSame(0.064501, Number::trim(0.0645010));
     }
 
     #[RequiresPhpExtension('intl')]
