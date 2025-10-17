@@ -80,7 +80,7 @@ return [
             'driver' => 'failover',
             'connections' => [
                 'database',
-                'sync',
+                'deferred',
             ],
         ],
 
