@@ -439,4 +439,77 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+
+    /**
+     * Convert a number to its full string representation.
+     *
+     * This method converts numbers (including those in scientific notation)
+     * to their complete string representation without precision loss.
+     * This is particularly useful for BCMath operations which require
+     * string input and don't accept scientific notation.
+     *
+     * @param  int|float|string  $number
+     * @return string
+     */
+    public static function stringify(int|float|string $number): string
+    {
+        if (is_nan($number)) {
+            return 'NAN';
+        }
+
+        if (is_infinite($number)) {
+            return $number > 0 ? 'INF' : '-INF';
+        }
+
+        $stringValue = (string) $number;
+
+        if (stripos($stringValue, 'e') === false) {
+            if (is_float($number) && $number == intval($number)) {
+                $stringValue .= '.0';
+            }
+
+            return $stringValue;
+        }
+
+        return static::expandScientificNotation($stringValue);
+    }
+
+    /**
+     * Expand a number from scientific notation to its full decimal representation.
+     *
+     * @param  string  $scientificNotation
+     * @return string
+     */
+    protected static function expandScientificNotation(string $scientificNotation): string
+    {
+        $isNegative = str_starts_with($scientificNotation, '-');
+        $scientificNotation = ltrim($scientificNotation, '+-');
+
+        [$mantissa, $exponent] = preg_split('/e/i', $scientificNotation) + [null, '0'];
+        $exponent = (int) $exponent;
+
+        $parts = explode('.', $mantissa);
+        $integerPart = $parts[0];
+        $decimalPart = intval($parts[1] ?? '') == 0 ? '' : $parts[1];
+
+        $allDigits = $integerPart.$decimalPart;
+        $allDigits = ltrim($allDigits, '0') ?: '0';
+
+        if ($allDigits === '0') {
+            return '0.0';
+        }
+
+        $decimalPosition = strlen($integerPart) + $exponent;
+        $totalDigits = strlen($allDigits);
+
+        if ($decimalPosition <= 0) {
+            $result = '0.'.str_repeat('0', abs($decimalPosition)).$allDigits;
+        } elseif ($decimalPosition >= $totalDigits) {
+            $result = $allDigits.str_repeat('0', $decimalPosition - $totalDigits).'.0';
+        } else {
+            $result = substr($allDigits, 0, $decimalPosition).'.'.substr($allDigits, $decimalPosition);
+        }
+
+        return ($isNegative ? '-' : '').$result;
+    }
 }

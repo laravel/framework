@@ -370,4 +370,43 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
+
+    public function testStringify()
+    {
+        $this->assertSame('12300000000.0', Number::stringify(1.23e10));
+        $this->assertSame('150000.0', Number::stringify(1.5e5));
+        $this->assertSame('250.0', Number::stringify('2.5e2'));
+
+        $this->assertSame('0.0000123', Number::stringify(1.23e-5));
+        $this->assertSame('0.00000000056', Number::stringify(5.6e-10));
+        $this->assertSame('0.00000001', Number::stringify(1e-8));
+
+        $this->assertSame('-123000.0', Number::stringify(-1.23e5));
+        $this->assertSame('-0.00456', Number::stringify(-4.56e-3));
+
+        $this->assertSame('123', Number::stringify(123));
+        $this->assertSame('123.456', Number::stringify(123.456));
+        $this->assertSame('9.0', Number::stringify(9.0));
+        $this->assertSame('0', Number::stringify(0));
+
+        $this->assertSame('1.0', Number::stringify('1e0'));
+        $this->assertSame('1.0', Number::stringify('1.0e0'));
+        $this->assertSame('0.0', Number::stringify('0.0e0'));
+        $this->assertSame('0.0', Number::stringify('0e0'));
+
+        $this->assertSame('0.00000001', Number::stringify('1.00e-8'));
+        $this->assertSame('123000000000000000000000000000000000000000000000000.0', Number::stringify('1.23e50'));
+        $this->assertSame('0.0000000000000000000000000000000000000000000000000123', Number::stringify('1.23e-50'));
+
+        // underflow numbers
+        $this->assertSame('0.0', Number::stringify(1.5e-400));
+        $this->assertSame('0.0', Number::stringify(15e-400));
+
+        $this->assertSame('INF', Number::stringify(15e400));
+        $this->assertSame('-INF', Number::stringify(-15e400));
+
+        $this->assertSame('INF', Number::stringify(INF));
+        $this->assertSame('-INF', Number::stringify(-INF));
+        $this->assertSame('NAN', Number::stringify(NAN));
+    }
 }
