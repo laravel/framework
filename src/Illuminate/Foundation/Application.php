@@ -174,6 +174,11 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $environmentPath;
 
     /**
+     * The root class name of the database seeder.
+     */
+    protected string $seederRootClass = 'Database\\Seeders\\DatabaseSeeder';
+
+    /**
      * The environment file to load during bootstrapping.
      *
      * @var string
@@ -1715,5 +1720,36 @@ class Application extends Container implements ApplicationContract, CachesConfig
         }
 
         throw new RuntimeException('Unable to detect application namespace.');
+    }
+
+    /**
+     * Set the root class for the database seeders.
+     *
+     * @param  string  $class
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setSeederRootClass(string $class): void
+    {
+        if (! class_exists($class)) {
+            throw new \InvalidArgumentException("The seeder root class [$class] does not exist");
+        }
+
+        if (! is_subclass_of($class, \Illuminate\Database\Seeder::class)) {
+            throw new \InvalidArgumentException("The seeder root class [$class] must be a subclass of Illuminate\\Database\\Seeder");
+        }
+
+        $this->seederRootClass = $class;
+    }
+
+    /**
+     * Get the root class for the database seeders.
+     *
+     * @return string
+     */
+    public function seederRootClass(): string
+    {
+        return $this->seederRootClass;
     }
 }

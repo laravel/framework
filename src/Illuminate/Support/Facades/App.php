@@ -28,6 +28,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Foundation\Application usePublicPath(string $path)
  * @method static string storagePath(string $path = '')
  * @method static \Illuminate\Foundation\Application useStoragePath(string $path)
+ * @method static string seederRootClass()
+ * @method static \Illuminate\Foundation\Application setSeederRootClass(string $path)
  * @method static string resourcePath(string $path = '')
  * @method static string viewPath(string $path = '')
  * @method static string joinPaths(string $basePath, string $path = '')

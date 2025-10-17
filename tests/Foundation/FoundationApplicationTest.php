@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Tests\Foundation\fixtures\CustomDatabaseSeeder;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -608,6 +609,33 @@ class FoundationApplicationTest extends TestCase
         } catch (HttpException $exception) {
             $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
         }
+    }
+
+    public function testSetSeederRootClass()
+    {
+        $app = new Application;
+        $this->assertSame('Database\\Seeders\\DatabaseSeeder', $app->seederRootClass());
+
+        $app->setSeederRootClass(CustomDatabaseSeeder::class);
+        $this->assertSame(CustomDatabaseSeeder::class, $app->seederRootClass());
+    }
+
+    public function testCannotSetInvalidSeederRootClass()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seeder root class [stdClass] must be a subclass of Illuminate\Database\Seeder');
+
+        $app = new Application;
+        $app->setSeederRootClass(\stdClass::class);
+    }
+
+    public function testCannotSetNonExistentSeederRootClass()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The seeder root class [NonExistentClass] does not exist');
+
+        $app = new Application;
+        $app->setSeederRootClass('NonExistentClass');
     }
 }
 
