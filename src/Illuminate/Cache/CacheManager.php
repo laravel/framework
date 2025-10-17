@@ -253,7 +253,11 @@ class CacheManager implements FactoryContract
      */
     protected function createFailoverDriver(array $config)
     {
-        return $this->repository(new FailoverStore($this, $config['stores']));
+        return $this->repository(new FailoverStore(
+            $this,
+            $this->app->make(DispatcherContract::class),
+            $config['stores']
+        ));
     }
 
     /**

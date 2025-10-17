@@ -2,23 +2,21 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Cache\Events\CacheFailedOver;
 use Illuminate\Contracts\Cache\LockProvider;
-use Illuminate\Support\InteractsWithTime;
-use Memcached;
-use ReflectionMethod;
+use Illuminate\Contracts\Events\Dispatcher;
+use RuntimeException;
 use Throwable;
 
 class FailoverStore extends TaggableStore implements LockProvider
 {
     /**
      * Create a new failover store.
-     *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @param  array $stores
      */
-    public function __construct(protected CacheManager $cache, protected array $stores)
-    {
-    }
+    public function __construct(
+        protected CacheManager $cache,
+        protected Dispatcher $events,
+        protected array $stores) {}
 
     /**
      * Retrieve an item from the cache by key.
@@ -28,17 +26,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function get($key)
     {
-        foreach ($this->stores as $store) {
-            try {
-                return $this->store($store)->get($key);
-            } catch (Throwable $e) {
-                $lastException = $e;
-
-                $this->events->dispatch(new CacheFailedOver($store));
-            }
-        }
-
-        throw $lastException ?? new \RuntimeException('No available connections to push the job.');
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -46,28 +34,11 @@ class FailoverStore extends TaggableStore implements LockProvider
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
      * @return array
      */
     public function many(array $keys)
     {
-        $prefixedKeys = array_map(function ($key) {
-            return $this->prefix.$key;
-        }, $keys);
-
-        if ($this->onVersionThree) {
-            $values = $this->memcached->getMulti($prefixedKeys, Memcached::GET_PRESERVE_ORDER);
-        } else {
-            $null = null;
-
-            $values = $this->memcached->getMulti($prefixedKeys, $null, Memcached::GET_PRESERVE_ORDER);
-        }
-
-        if ($this->memcached->getResultCode() != 0) {
-            return array_fill_keys($keys, null);
-        }
-
-        return array_combine($keys, $values);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -80,29 +51,18 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
-        return $this->memcached->set(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
-        );
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
      * @param  int  $seconds
      * @return bool
      */
     public function putMany(array $values, $seconds)
     {
-        $prefixedValues = [];
-
-        foreach ($values as $key => $value) {
-            $prefixedValues[$this->prefix.$key] = $value;
-        }
-
-        return $this->memcached->setMulti(
-            $prefixedValues, $this->calculateExpiration($seconds)
-        );
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -115,9 +75,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function add($key, $value, $seconds)
     {
-        return $this->memcached->add(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
-        );
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -129,7 +87,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function increment($key, $value = 1)
     {
-        return $this->memcached->increment($this->prefix.$key, $value);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -141,7 +99,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function decrement($key, $value = 1)
     {
-        return $this->memcached->decrement($this->prefix.$key, $value);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -153,7 +111,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 0);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -166,7 +124,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function lock($name, $seconds = 0, $owner = null)
     {
-        return new MemcachedLock($this->memcached, $this->prefix.$name, $seconds, $owner);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -178,7 +136,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function restoreLock($name, $owner)
     {
-        return $this->lock($name, 0, $owner);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -189,7 +147,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function forget($key)
     {
-        return $this->memcached->delete($this->prefix.$key);
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
     }
 
     /**
@@ -199,13 +157,42 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     public function flush()
     {
-        return $this->memcached->flush();
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * Get the cache key prefix.
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * Attempt the given method on all stores.
+     */
+    protected function attemptOnAllStores(string $method, array $arguments)
+    {
+        $lastException = null;
+
+        foreach ($this->stores as $store) {
+            try {
+                return $this->store($store)->{$method}(...$arguments);
+            } catch (Throwable $e) {
+                $lastException = $e;
+
+                $this->events->dispatch(new CacheFailedOver($store));
+            }
+        }
+
+        throw $lastException ?? new RuntimeException('All failover cache connections failed.');
     }
 
     /**
      * Get the cache store for the given store name.
      *
-     * @param  string  $store
      * @return \Illuminate\Contracts\Cache\Store
      */
     protected function store(string $store)
