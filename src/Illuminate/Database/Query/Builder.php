@@ -2707,7 +2707,7 @@ class Builder implements BuilderContract
     /**
      * Order the query by a column with a given set of priority values.
      *
-     * @param  array{string|\BackedEnum}|null  $priorities
+     * @param  (string|\BackedEnum|\UnitEnum)[]|null  $priorities
      * @return $this
      */
     public function orderByWithPriority(string $column, ?array $priorities = [], ?string $direction = 'asc')
@@ -2716,14 +2716,10 @@ class Builder implements BuilderContract
             return $this->orderBy($column, $direction);
         }
 
-        // Convert enums to their backing values if needed
-        $priorities = array_map(function ($value) {
-            return $value instanceof \UnitEnum
-                ? ($value instanceof \BackedEnum ? $value->value : $value->name)
-                : $value;
-        }, $priorities);
+        $priorities = array_map(enum_value(...), $priorities);
 
         $bindings = array_map(fn () => '?', $priorities);
+
         $sql = "FIELD({$this->grammar->wrap($column)}, ".implode(',', $bindings).')';
 
         return $this->orderByRaw($sql.' '.$direction, $priorities);
