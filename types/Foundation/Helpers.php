@@ -57,7 +57,7 @@ assertType('mixed', session('foo'));
 assertType('null', session(['foo' => 'bar']));
 
 assertType('Illuminate\Contracts\Translation\Translator', trans());
-assertType('array|string', trans('foo'));
+assertType('mixed', trans('foo'));
 
 assertType('Illuminate\Contracts\Validation\Factory', validator());
 assertType('Illuminate\Contracts\Validation\Validator', validator([]));

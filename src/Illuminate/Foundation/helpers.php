@@ -986,9 +986,9 @@ if (! function_exists('trans')) {
      * @param  string|null  $key
      * @param  array  $replace
      * @param  string|null  $locale
-     * @return ($key is null ? \Illuminate\Contracts\Translation\Translator : array|string)
+     * @return ($key is null ? \Illuminate\Contracts\Translation\Translator : mixed)
      */
-    function trans($key = null, $replace = [], $locale = null): Translator|array|string
+    function trans($key = null, $replace = [], $locale = null): mixed
     {
         if (is_null($key)) {
             return app('translator');
