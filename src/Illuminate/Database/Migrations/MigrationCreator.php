@@ -113,21 +113,21 @@ class MigrationCreator
      */
     protected function getStub($table, $create, $noDown = false)
     {
-        if (is_null($table)) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration')
-                ? $customPath
-                : $this->stubPath().'/migration';
-        } elseif ($create) {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create')
-                ? $customPath
-                : $this->stubPath().'/migration.create';
-        } else {
-            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update')
-                ? $customPath
-                : $this->stubPath().'/migration.update';
-        }
+        $stubSuffix =  $noDown ? '.nodown.stub' : '.stub';
 
-        $stub .= $noDown ? '.nodown.stub' : '.stub';
+        if (is_null($table)) {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration'.$stubSuffix)
+                ? $customPath
+                : $this->stubPath().'/migration'.$stubSuffix;
+        } elseif ($create) {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create'.$stubSuffix)
+                ? $customPath
+                : $this->stubPath().'/migration.create'.$stubSuffix;
+        } else {
+            $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update'.$stubSuffix)
+                ? $customPath
+                : $this->stubPath().'/migration.update'.$stubSuffix;
+        }
 
         return $this->files->get($stub);
     }
