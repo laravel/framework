@@ -102,6 +102,8 @@ return [
         'string' => 'The :attribute field must not be greater than :max characters.',
     ],
     'max_digits' => 'The :attribute field must not have more than :max digits.',
+    'max_word' => 'The :attribute field must not be greater than :max words.',
+
     'mimes' => 'The :attribute field must be a file of type: :values.',
     'mimetypes' => 'The :attribute field must be a file of type: :values.',
     'min' => [
@@ -116,6 +118,7 @@ return [
     'missing_unless' => 'The :attribute field must be missing unless :other is :value.',
     'missing_with' => 'The :attribute field must be missing when :values is present.',
     'missing_with_all' => 'The :attribute field must be missing when :values are present.',
+    'min_word' => 'The :attribute field must have at least :min words.',
     'multiple_of' => 'The :attribute field must be a multiple of :value.',
     'not_in' => 'The selected :attribute is invalid.',
     'not_regex' => 'The :attribute field format is invalid.',
@@ -165,6 +168,8 @@ return [
     'url' => 'The :attribute field must be a valid URL.',
     'ulid' => 'The :attribute field must be a valid ULID.',
     'uuid' => 'The :attribute field must be a valid UUID.',
+
+
 
     /*
     |--------------------------------------------------------------------------
