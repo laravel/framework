@@ -996,6 +996,10 @@ class Str
      */
     public static function plural($value, $count = 2, $prependCount = false)
     {
+        if (is_countable($count)) {
+            $count = count($count);
+        }
+
         return ($prependCount ? Number::format($count).' ' : '').Pluralizer::plural($value, $count);
     }
 
