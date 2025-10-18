@@ -1873,7 +1873,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laracon', Str::plural('Laracon', [2025]));
 
         $this->assertSame('Laracons', Str::plural('Laracon', 3));
-        $this->assertSame('Laracons', Str::plural('Laracon', [2024, 2025));
+        $this->assertSame('Laracons', Str::plural('Laracon', [2024, 2025]));
 
         $this->assertSame('1 Laracon', Str::plural('Laracon', 1, prependCount: true));
         $this->assertSame('1 Laracon', Str::plural('Laracon', [2025], prependCount: true));
