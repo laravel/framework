@@ -1122,19 +1122,79 @@ class Route
             $this->getControllerMethod(),
         ];
 
+        $middleware = [];
+
         if (is_a($controllerClass, HasMiddleware::class, true)) {
-            return $this->staticallyProvidedControllerMiddleware(
+            $middleware = array_merge($middleware, $this->staticallyProvidedControllerMiddleware(
                 $controllerClass, $controllerMethod
-            );
+            ));
         }
 
         if (method_exists($controllerClass, 'getMiddleware')) {
-            return $this->controllerDispatcher()->getMiddleware(
+            $middleware = array_merge($middleware, $this->controllerDispatcher()->getMiddleware(
                 $this->getController(), $controllerMethod
-            );
+            ));
         }
 
-        return [];
+        // Check for authorization attributes and add middleware if found
+        if ($this->hasAuthorizationAttributes($controllerClass, $controllerMethod)) {
+            $middleware[] = \Illuminate\Auth\Middleware\AuthorizeFromAttributes::class;
+        }
+
+        return $middleware;
+    }
+
+    /**
+     * Check if the controller class or method has authorization attributes.
+     *
+     * @param  string  $controllerClass
+     * @param  string  $controllerMethod
+     * @return bool
+     */
+    protected function hasAuthorizationAttributes(string $controllerClass, string $controllerMethod): bool
+    {
+        if (! class_exists($controllerClass)) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($controllerClass);
+
+        // Check class-level authorization attributes
+        if ($this->hasAuthorizationAttributesOnClass($reflection)) {
+            return true;
+        }
+
+        // Check method-level authorization attributes
+        if ($reflection->hasMethod($controllerMethod)) {
+            $method = $reflection->getMethod($controllerMethod);
+            return $this->hasAuthorizationAttributesOnMethod($method);
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if class has authorization attributes.
+     *
+     * @param  \ReflectionClass  $reflection
+     * @return bool
+     */
+    protected function hasAuthorizationAttributesOnClass(\ReflectionClass $reflection): bool
+    {
+        return ! empty($reflection->getAttributes(\Illuminate\Auth\Attributes\Authorize::class)) ||
+               ! empty($reflection->getAttributes(\Illuminate\Auth\Attributes\Gate::class));
+    }
+
+    /**
+     * Check if method has authorization attributes.
+     *
+     * @param  \ReflectionMethod  $method
+     * @return bool
+     */
+    protected function hasAuthorizationAttributesOnMethod(\ReflectionMethod $method): bool
+    {
+        return ! empty($method->getAttributes(\Illuminate\Auth\Attributes\Authorize::class)) ||
+               ! empty($method->getAttributes(\Illuminate\Auth\Attributes\Gate::class));
     }
 
     /**
