@@ -1553,7 +1553,7 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array{0: 'strict'}  $parameters
+     * @param array<int, string> $parameters
      * @return bool
      */
     public function validateInteger($attribute, $value, array $parameters = [])
