@@ -669,6 +669,7 @@ class SupportStrTest extends TestCase
     {
         $this->assertTrue(Str::isUrl('https://laravel.com'));
         $this->assertTrue(Str::isUrl('http://localhost'));
+        $this->assertTrue(Str::isUrl('http://localhost?url=some param'));
         $this->assertFalse(Str::isUrl('invalid url'));
     }
 
