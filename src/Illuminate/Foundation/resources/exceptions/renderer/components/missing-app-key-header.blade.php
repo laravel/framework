@@ -30,15 +30,13 @@
     </div>
 
     <!-- Custom section for MissingAppKeyException -->
-    <div class="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-8">
+    <div class="bg-blue-100 dark:bg-blue-950 dark:border-blue-800 border border-blue-200 rounded-md p-6 mb-8">
         <div class="flex items-start gap-3">
             <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <x-laravel-exceptions-renderer::icons.info class="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div class="flex-1">
-                <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
                     Application Key Missing
                 </h3>
                 <p class="text-blue-800 dark:text-blue-200 mb-4">
@@ -47,7 +45,7 @@
                 <div class="flex gap-3">
                     <button 
                         onclick="generateAppKey()" 
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-700 dark:border-blue-600 dark:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:bg-blue-800 dark:hover:bg-blue-600"
                         id="generate-key-btn"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,11 +55,9 @@
                     </button>
                     <button 
                         onclick="copyCommand()" 
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-100 text-neutral-900 text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 hover:bg-neutral-50 dark:hover:bg-neutral-700 border border-neutral-200"
                     >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
+                        <x-laravel-exceptions-renderer::icons.copy class="w-4 h-4" />
                         Copy Command
                     </button>
                 </div>
@@ -100,7 +96,7 @@ function generateAppKey() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            statusDiv.className = 'mt-3 text-sm text-green-600 dark:text-green-400';
+            statusDiv.className = 'mt-3 text-sm text-emerald-600 dark:text-emerald-400';
             statusDiv.textContent = 'Application key generated successfully! The page will reload in 2 seconds...';
             
             // Reload page after 2 seconds
@@ -112,7 +108,7 @@ function generateAppKey() {
         }
     })
     .catch(error => {
-        statusDiv.className = 'mt-3 text-sm text-red-600 dark:text-red-400';
+        statusDiv.className = 'mt-3 text-sm text-rose-600 dark:text-rose-400';
         statusDiv.textContent = 'Error: ' + error.message;
         
         // Reset button
@@ -130,7 +126,7 @@ function copyCommand() {
     const command = 'php artisan key:generate';
     navigator.clipboard.writeText(command).then(() => {
         const statusDiv = document.getElementById('status-message');
-        statusDiv.className = 'mt-3 text-sm text-green-600 dark:text-green-400';
+        statusDiv.className = 'mt-3 text-sm text-emerald-600 dark:text-emerald-400';
         statusDiv.textContent = 'Command copied to clipboard!';
         
         setTimeout(() => {
@@ -138,7 +134,7 @@ function copyCommand() {
         }, 3000);
     }).catch(() => {
         const statusDiv = document.getElementById('status-message');
-        statusDiv.className = 'mt-3 text-sm text-red-600 dark:text-red-400';
+        statusDiv.className = 'mt-3 text-sm text-rose-600 dark:text-rose-400';
         statusDiv.textContent = 'Failed to copy command to clipboard';
         
         setTimeout(() => {

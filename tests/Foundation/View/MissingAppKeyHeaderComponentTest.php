@@ -41,12 +41,12 @@ class MissingAppKeyHeaderComponentTest extends TestCase
         $componentPath = __DIR__ . '/../../../src/Illuminate/Foundation/resources/exceptions/renderer/components/missing-app-key-header.blade.php';
         $content = file_get_contents($componentPath);
 
-        // Check for Tailwind CSS classes
-        $this->assertStringContainsString('bg-blue-50', $content, 'Component should have blue background');
+        // Check for Tailwind CSS classes matching Laravel's design system
+        $this->assertStringContainsString('bg-blue-100', $content, 'Component should have blue background');
         $this->assertStringContainsString('border-blue-200', $content, 'Component should have blue border');
         $this->assertStringContainsString('text-blue-900', $content, 'Component should have blue text');
-        $this->assertStringContainsString('bg-blue-600', $content, 'Component should have blue button background');
-        $this->assertStringContainsString('hover:bg-blue-700', $content, 'Component should have hover effects');
+        $this->assertStringContainsString('bg-blue-700', $content, 'Component should have blue button background');
+        $this->assertStringContainsString('hover:bg-blue-800', $content, 'Component should have hover effects');
     }
 
     public function testShowTemplateUsesConditionalRendering()
