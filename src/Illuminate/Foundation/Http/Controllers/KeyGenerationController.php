@@ -22,13 +22,14 @@ class KeyGenerationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Key generation is only available in debug mode.',
-            ], 403);
+            ], JsonResponse::HTTP_FORBIDDEN);
         }
 
         try {
+            $app = app();
+            
             // Create a new instance of the KeyGenerateCommand
             $command = new KeyGenerateCommand();
-			$app = app();
             $command->setLaravel($app);
 
             // Generate the key
@@ -39,11 +40,11 @@ class KeyGenerationController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Unable to set application key in environment file.',
-                ], 500);
+                ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
 
             // Update the config cache
-            $app['config']['app.key'] = $key;
+            config(['app.key' => $key]);
 
             return response()->json([
                 'success' => true,
@@ -53,7 +54,7 @@ class KeyGenerationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate application key: '.$e->getMessage(),
-            ], 500);
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
