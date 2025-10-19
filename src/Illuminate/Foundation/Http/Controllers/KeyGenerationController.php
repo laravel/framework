@@ -29,10 +29,10 @@ class KeyGenerationController extends Controller
             // Create a new instance of the KeyGenerateCommand
             $command = new KeyGenerateCommand();
             $command->setLaravel(app());
-            
+
             // Generate the key
             $key = $command->generateRandomKey();
-            
+
             // Set the key in the environment file
             if (!$command->setKeyInEnvironmentFile($key)) {
                 return response()->json([
@@ -40,15 +40,14 @@ class KeyGenerationController extends Controller
                     'message' => 'Unable to set application key in environment file.'
                 ], 500);
             }
-            
+
             // Update the config cache
             app()['config']['app.key'] = $key;
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Application key generated successfully.'
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
