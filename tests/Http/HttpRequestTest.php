@@ -617,6 +617,76 @@ class HttpRequestTest extends TestCase
         $this->assertSame('', $request->string('unknown_key')->value());
     }
 
+    public function testNumberMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'int' => 123,
+            'int_str' => '456',
+            'float' => 123.456,
+            'float_str' => '123.456',
+            'float_zero' => 0.000,
+            'float_str_zero' => '0.000',
+            'empty_str' => '',
+            'null' => null,
+        ]);
+        $this->assertTrue($request->number('int') instanceof \Illuminate\Support\Numberable);
+        $this->assertTrue($request->number('unknown_key') instanceof \Illuminate\Support\Numberable);
+        $this->assertSame(123, $request->number('int')->value());
+        $this->assertSame(456, $request->number('int_str')->value());
+        $this->assertSame(123.456, $request->number('float')->value());
+        $this->assertSame(123.456, $request->number('float_str')->value());
+        $this->assertSame(0.0, $request->number('float_zero')->value());
+        $this->assertSame(0.0, $request->number('float_str_zero')->value());
+        $this->assertSame(0, $request->number('empty_str')->value());
+        $this->assertSame(0, $request->number('null')->value());
+        $this->assertSame(0, $request->number('unknown_key')->value());
+
+        // Test fluent chaining
+        $this->assertSame(246, $request->number('int')->multiply(2)->value());
+        $this->assertSame(579, $request->number('int_str')->add(123)->value());
+        $this->assertSame(true, $request->number('int')->isOdd());
+        $this->assertSame('123', $request->number('int')->format());
+    }
+
+    public function testNumberMethodWithDotNotation()
+    {
+        $request = Request::create('/', 'GET', [
+            'item' => [
+                'quantity' => '5',
+                'price' => '19.99',
+                'details' => [
+                    'weight' => '2.5',
+                    'dimensions' => [
+                        'length' => '10.5'
+                    ]
+                ]
+            ],
+            'invalid' => [
+                'text' => 'not-a-number'
+            ]
+        ]);
+
+        // Test dot notation access
+        $this->assertTrue($request->number('item.quantity') instanceof \Illuminate\Support\Numberable);
+        $this->assertSame(5, $request->number('item.quantity')->value());
+        $this->assertSame(19.99, $request->number('item.price')->value());
+        $this->assertSame(2.5, $request->number('item.details.weight')->value());
+        $this->assertSame(10.5, $request->number('item.details.dimensions.length')->value());
+
+        // Test missing nested keys
+        $this->assertSame(0, $request->number('item.missing')->value());
+        $this->assertSame(0, $request->number('missing.key')->value());
+        $this->assertSame(0, $request->number('item.details.missing.key')->value());
+
+        // Test invalid values in nested structure
+        $this->assertSame(0, $request->number('invalid.text')->value());
+
+        // Test fluent operations with dot notation
+        $total = $request->number('item.quantity')->multiply($request->number('item.price')->value());
+        $this->assertEqualsWithDelta(99.95, $total->value(), 0.001); // Use delta for floating point comparison
+        $this->assertSame('99.95', $total->format());
+    }
+
     public function testBooleanMethod()
     {
         $request = Request::create('/', 'GET', ['with_trashed' => 'false', 'download' => true, 'checked' => 1, 'unchecked' => '0', 'with_on' => 'on', 'with_yes' => 'yes']);
