@@ -1,10 +1,10 @@
-# Correction de la directive @json pour les closures imbriquées
+# Fix Blade @json directive to handle nested closures and arrays
 
-## Problème
+## Problem
 
-La directive `@json` de Blade ne pouvait pas parser correctement les expressions complexes contenant des closures imbriquées. Le problème était causé par la méthode `stripParentheses` qui utilisait simplement `substr($expression, 1, -1)` pour enlever les parenthèses externes, sans tenir compte des parenthèses et crochets imbriqués.
+The Blade `@json` directive could not correctly parse complex expressions containing nested closures. The issue was caused by the `stripParentheses` method which simply used `substr($expression, 1, -1)` to remove outer parentheses, without considering nested parentheses and brackets.
 
-### Exemple du problème
+### Example of the problem
 
 ```blade
 @json([
@@ -17,7 +17,8 @@ La directive `@json` de Blade ne pouvait pas parser correctement les expressions
 ])
 ```
 
-Cette expression était coupée incorrectement, ne gardant que :
+This expression was incorrectly truncated, keeping only:
+
 ```php
 <?php echo json_encode([
     'items' => $helpers['benefit']['getAll']()->map(fn($item) => [
@@ -27,37 +28,39 @@ Cette expression était coupée incorrectement, ne gardant que :
 
 ## Solution
 
-J'ai créé une nouvelle méthode `parseJsonExpression` dans le trait `CompilesJson` qui :
+I created a new `parseJsonExpression` method in the `CompilesJson` trait that:
 
-1. **Parse correctement les parenthèses imbriquées** : Compte les parenthèses et crochets pour déterminer où se termine l'expression de données
-2. **Gère les chaînes de caractères** : Ignore les parenthèses et virgules à l'intérieur des chaînes de caractères
-3. **Sépare les paramètres** : Identifie correctement les paramètres d'options et de profondeur séparés par des virgules au niveau racine
-4. **Maintient la compatibilité** : Fonctionne avec tous les cas d'usage existants
+1. **Correctly parses nested parentheses**: Counts parentheses and brackets to determine where the data expression ends
+2. **Handles string literals**: Ignores parentheses and commas inside string literals
+3. **Separates parameters**: Correctly identifies options and depth parameters separated by commas at root level
+4. **Maintains compatibility**: Works with all existing use cases
 
-### Implémentation
+### Implementation
 
-La nouvelle méthode `parseJsonExpression` :
-- Utilise un parser caractère par caractère
-- Suit l'état des chaînes de caractères (simples et doubles)
-- Compte les parenthèses et crochets pour déterminer le niveau d'imbrication
-- Identifie les virgules au niveau racine pour séparer les paramètres
+The new `parseJsonExpression` method:
+
+-   Uses a character-by-character parser
+-   Tracks string literal state (single and double quotes)
+-   Counts parentheses and brackets to determine nesting level
+-   Identifies commas at root level to separate parameters
 
 ## Tests
 
-J'ai ajouté plusieurs tests pour couvrir :
+I added several tests to cover:
 
-1. **Le cas spécifique de l'issue #56331** : Reproduit exactement le problème rapporté
-2. **Les closures imbriquées complexes** : Teste des structures avec plusieurs niveaux d'imbrication
-3. **Les options personnalisées** : Vérifie que les paramètres d'options et de profondeur fonctionnent
-4. **Les cas limites** : Chaînes avec virgules, guillemets échappés, guillemets mixtes
-5. **La compatibilité descendante** : S'assure que les cas d'usage existants continuent de fonctionner
+1. **The specific case from issue #56331**: Reproduces exactly the reported problem
+2. **Complex nested closures**: Tests structures with multiple nesting levels
+3. **Custom options**: Verifies that options and depth parameters work
+4. **Edge cases**: Strings with commas, escaped quotes, mixed quotes
+5. **Backward compatibility**: Ensures existing use cases continue to work
 
-## Résultat
+## Result
 
-La directive `@json` peut maintenant parser correctement :
-- Des closures imbriquées complexes
-- Des structures avec plusieurs niveaux de parenthèses et crochets
-- Des chaînes contenant des virgules et des guillemets
-- Tous les cas d'usage existants
+The `@json` directive can now correctly parse:
 
-Cette correction résout complètement l'issue #56331 et améliore la robustesse du compilateur Blade pour les expressions JSON complexes.
+-   Complex nested closures
+-   Structures with multiple levels of parentheses and brackets
+-   Strings containing commas and quotes
+-   All existing use cases
+
+This fix completely resolves issue #56331 and improves the robustness of the Blade compiler for complex JSON expressions.
