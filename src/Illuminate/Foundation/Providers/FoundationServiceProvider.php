@@ -76,6 +76,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 $this->app->make(Dispatcher::class)
             );
         }
+
+        $this->registerKeyGenerationRoute();
     }
 
     /**
@@ -288,5 +290,64 @@ class FoundationServiceProvider extends AggregateServiceProvider
             MaintenanceModeContract::class,
             fn () => $this->app->make(MaintenanceModeManager::class)->driver()
         );
+    }
+
+    /**
+     * Register the key generation route for MissingAppKeyException.
+     *
+     * @return void
+     */
+    protected function registerKeyGenerationRoute()
+    {
+        // Only register this route in debug mode
+        if (!$this->app->hasDebugModeEnabled()) {
+            return;
+        }
+
+        // Register the route using a closure to avoid dependency issues
+        $this->app->booted(function () {
+            $router = $this->app->make('router');
+            
+            $router->post('/__laravel_generate_key', function (Request $request) {
+                // Only allow this in debug mode for security
+                if (!config('app.debug')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Key generation is only available in debug mode.'
+                    ], 403);
+                }
+
+                try {
+                    // Create a new instance of the KeyGenerateCommand
+                    $command = new \Illuminate\Foundation\Console\KeyGenerateCommand();
+                    $command->setLaravel(app());
+                    
+                    // Generate the key
+                    $key = $command->generateRandomKey();
+                    
+                    // Set the key in the environment file
+                    if (!$command->setKeyInEnvironmentFile($key)) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Unable to set application key in environment file.'
+                        ], 500);
+                    }
+                    
+                    // Update the config cache
+                    app()['config']['app.key'] = $key;
+                    
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Application key generated successfully.'
+                    ]);
+                    
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to generate application key: ' . $e->getMessage()
+                    ], 500);
+                }
+            })->name('laravel.generate-key');
+        });
     }
 }
