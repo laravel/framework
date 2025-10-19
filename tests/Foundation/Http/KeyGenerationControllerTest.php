@@ -11,7 +11,7 @@ class KeyGenerationControllerTest extends TestCase
     public function testKeyGenerationControllerExists()
     {
         $this->assertTrue(class_exists(KeyGenerationController::class));
-        
+
         $controller = new KeyGenerationController();
         $this->assertTrue(method_exists($controller, 'generateKey'));
     }
@@ -20,16 +20,16 @@ class KeyGenerationControllerTest extends TestCase
     {
         $controller = new KeyGenerationController();
         $reflection = new \ReflectionMethod($controller, 'generateKey');
-        
+
         $this->assertEquals('generateKey', $reflection->getName());
         $this->assertCount(1, $reflection->getParameters());
-        
+
         $paramType = $reflection->getParameters()[0]->getType();
         $returnType = $reflection->getReturnType();
-        
+
         $this->assertInstanceOf(\ReflectionNamedType::class, $paramType);
         $this->assertInstanceOf(\ReflectionNamedType::class, $returnType);
-        
+
         $this->assertEquals('Illuminate\Http\Request', $paramType->getName());
         $this->assertEquals('Illuminate\Http\JsonResponse', $returnType->getName());
     }
