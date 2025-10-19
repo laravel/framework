@@ -8,6 +8,14 @@ use PHPUnit\Framework\Attributes\RequiresPhp;
 #[RequiresPhp('>=8.4')]
 class EloquentModelPropertyHooksTest extends DatabaseTestCase
 {
+    protected function setUp(): void
+    {
+        if (PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('Property hooks require PHP 8.4+');
+        }
+        parent::setUp();
+    }
+
     public function testModelWithPropertyHooksCanBeSerialized()
     {
         $model = new TestModelWithPropertyHooks;
