@@ -28,7 +28,8 @@ class KeyGenerationController extends Controller
         try {
             // Create a new instance of the KeyGenerateCommand
             $command = new KeyGenerateCommand();
-            $command->setLaravel(app());
+			$app = app();
+            $command->setLaravel($app);
 
             // Generate the key
             $key = $command->generateRandomKey();
@@ -42,7 +43,7 @@ class KeyGenerationController extends Controller
             }
 
             // Update the config cache
-            app()['config']['app.key'] = $key;
+            $app['config']['app.key'] = $key;
 
             return response()->json([
                 'success' => true,
