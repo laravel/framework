@@ -5,6 +5,7 @@ namespace Illuminate\Support\Traits;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Numberable;
 use Illuminate\Support\Str;
 use stdClass;
 
@@ -244,6 +245,28 @@ trait InteractsWithData
     public function string($key, $default = null)
     {
         return Str::of($this->data($key, $default));
+    }
+
+    /**
+     * Retrieve data from the instance as a Numberable instance.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Numberable
+     */
+    public function number($key, $default = null)
+    {
+        $value = $this->data($key, $default);
+
+        // Handle null, empty strings, arrays, objects, and non-numeric strings gracefully
+        if (is_null($value) ||
+            is_array($value) ||
+            is_object($value) ||
+            (is_string($value) && (trim($value) === '' || !is_numeric($value)))) {
+            return new Numberable(0);
+        }
+
+        return new Numberable($value);
     }
 
     /**

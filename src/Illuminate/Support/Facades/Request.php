@@ -166,6 +166,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Http\Request|mixed whenMissing(string $key, callable $callback, callable|null $default = null)
  * @method static \Illuminate\Support\Stringable str(string $key, mixed $default = null)
  * @method static \Illuminate\Support\Stringable string(string $key, mixed $default = null)
+ * @method static \Illuminate\Support\Numberable number(string $key, mixed $default = null)
  * @method static bool boolean(string|null $key = null, bool $default = false)
  * @method static int integer(string $key, int $default = 0)
  * @method static float float(string $key, float $default = 0)
