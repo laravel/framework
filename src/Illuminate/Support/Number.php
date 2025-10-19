@@ -25,6 +25,17 @@ class Number
     protected static $currency = 'USD';
 
     /**
+     * Get a new numberable object from the given number.
+     *
+     * @param  int|float|string  $number
+     * @return \Illuminate\Support\Numberable
+     */
+    public static function of($number)
+    {
+        return new Numberable($number);
+    }
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -340,6 +351,205 @@ class Number
     public static function trim(int|float $number)
     {
         return json_decode(json_encode($number));
+    }
+
+    /**
+     * Return the absolute value of the given number.
+     *
+     * @param  int|float  $number
+     * @return int|float
+     */
+    public static function abs(int|float $number)
+    {
+        return abs($number);
+    }
+
+    /**
+     * Round the given number to the specified precision.
+     *
+     * @param  int|float  $number
+     * @param  int  $precision
+     * @param  int  $mode
+     * @return float
+     */
+    public static function round(int|float $number, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
+    {
+        return round($number, $precision, $mode);
+    }
+
+    /**
+     * Round the given number up to the nearest integer.
+     *
+     * @param  int|float  $number
+     * @return float
+     */
+    public static function ceil(int|float $number): float
+    {
+        return ceil($number);
+    }
+
+    /**
+     * Round the given number down to the nearest integer.
+     *
+     * @param  int|float  $number
+     * @return float
+     */
+    public static function floor(int|float $number): float
+    {
+        return floor($number);
+    }
+
+    /**
+     * Determine if the given number is even.
+     *
+     * @param  int  $number
+     * @return bool
+     */
+    public static function isEven(int $number): bool
+    {
+        return $number % 2 === 0;
+    }
+
+    /**
+     * Determine if the given number is odd.
+     *
+     * @param  int  $number
+     * @return bool
+     */
+    public static function isOdd(int $number): bool
+    {
+        return $number % 2 !== 0;
+    }
+
+    /**
+     * Determine if the given number is prime.
+     *
+     * @param  int  $number
+     * @return bool
+     */
+    public static function isPrime(int $number): bool
+    {
+        if ($number <= 1) {
+            return false;
+        }
+
+        if ($number <= 3) {
+            return true;
+        }
+
+        if ($number % 2 === 0 || $number % 3 === 0) {
+            return false;
+        }
+
+        for ($i = 5; $i * $i <= $number; $i += 6) {
+            if ($number % $i === 0 || $number % ($i + 2) === 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Raise the given number to the specified power.
+     *
+     * @param  int|float  $base
+     * @param  int|float  $exponent
+     * @return int|float
+     */
+    public static function power(int|float $base, int|float $exponent): int|float
+    {
+        return pow($base, $exponent);
+    }
+
+    /**
+     * Calculate the square root of the given number.
+     *
+     * @param  int|float  $number
+     * @return float
+     */
+    public static function sqrt(int|float $number): float
+    {
+        return sqrt($number);
+    }
+
+    /**
+     * Calculate the factorial of the given number.
+     *
+     * @param  int  $number
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function factorial(int $number): int
+    {
+        if ($number < 0) {
+            throw new \InvalidArgumentException('Factorial is not defined for negative numbers.');
+        }
+
+        if ($number === 0 || $number === 1) {
+            return 1;
+        }
+
+        $result = 1;
+        for ($i = 2; $i <= $number; $i++) {
+            $result *= $i;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Calculate the greatest common divisor of two numbers.
+     *
+     * @param  int  $a
+     * @param  int  $b
+     * @return int
+     */
+    public static function gcd(int $a, int $b): int
+    {
+        $a = abs($a);
+        $b = abs($b);
+
+        while ($b !== 0) {
+            $temp = $b;
+            $b = $a % $b;
+            $a = $temp;
+        }
+
+        return $a;
+    }
+
+    /**
+     * Calculate the least common multiple of two numbers.
+     *
+     * @param  int  $a
+     * @param  int  $b
+     * @return int
+     */
+    public static function lcm(int $a, int $b): int
+    {
+        if ($a === 0 || $b === 0) {
+            return 0;
+        }
+
+        return abs($a * $b) / static::gcd($a, $b);
+    }
+
+    /**
+     * Check if the given number is a perfect square.
+     *
+     * @param  int  $number
+     * @return bool
+     */
+    public static function isPerfectSquare(int $number): bool
+    {
+        if ($number < 0) {
+            return false;
+        }
+
+        $sqrt = (int) sqrt($number);
+        return $sqrt * $sqrt === $number;
     }
 
     /**
