@@ -126,20 +126,36 @@ class EloquentModelPropertyHooksTest extends DatabaseTestCase
     }
 }
 
-// Test model classes with property hooks
-class TestModelWithPropertyHooks extends Model
+/*
+|--------------------------------------------------------------------------
+| Define the runtime-only test model classes that use PHP 8.4 property
+| hook syntax. Wrapped in a namespace declaration inside eval() so the
+| classes are created in the expected namespace and avoid parse errors
+| on older PHP versions.
+|--------------------------------------------------------------------------
+*/
+
+if (PHP_VERSION_ID >= 80400) {
+    // Only define if not already defined (prevents redeclare errors).
+    if (!class_exists(__NAMESPACE__ . '\\TestModelWithPropertyHooks', false)) {
+        eval(<<<'PHP'
+namespace Illuminate\Tests\Integration\Database;
+
+use Illuminate\Database\Eloquent\Model as EloquentModel;
+
+class TestModelWithPropertyHooks extends EloquentModel
 {
     protected $table = 'test_model2';
     public $timestamps = false;
     protected $fillable = ['first_name', 'last_name', 'middle_name'];
 
-    // Property hook - virtual property
+    // Property hook - virtual property (PHP 8.4)
     public string $full_name {
         get => "{$this->first_name} {$this->last_name}";
     }
 }
 
-class TestModelWithMultiplePropertyHooks extends Model
+class TestModelWithMultiplePropertyHooks extends EloquentModel
 {
     protected $table = 'test_model2';
     public $timestamps = false;
@@ -155,7 +171,7 @@ class TestModelWithMultiplePropertyHooks extends Model
     }
 }
 
-class TestModelWithSetterPropertyHook extends Model
+class TestModelWithSetterPropertyHook extends EloquentModel
 {
     protected $table = 'test_model2';
     public $timestamps = false;
@@ -172,7 +188,7 @@ class TestModelWithSetterPropertyHook extends Model
     }
 }
 
-class TestModelWithMixedPropertiesAndHooks extends Model
+class TestModelWithMixedPropertiesAndHooks extends EloquentModel
 {
     protected $table = 'test_model2';
     public $timestamps = false;
@@ -184,5 +200,9 @@ class TestModelWithMixedPropertiesAndHooks extends Model
     // Property hook (should NOT be serialized as it's virtual)
     public string $display_name {
         get => strtoupper($this->first_name ?? '');
+    }
+}
+PHP
+        );
     }
 }
