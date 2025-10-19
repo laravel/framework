@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation\Http;
 
 use Illuminate\Foundation\Http\Controllers\KeyGenerationController;
-use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 
 class KeyGenerationControllerTest extends TestCase

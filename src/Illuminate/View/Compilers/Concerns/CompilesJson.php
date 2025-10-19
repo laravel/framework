@@ -37,7 +37,7 @@ trait CompilesJson
     {
         $expression = trim($expression);
 
-        if (!str_starts_with($expression, '(') || !str_ends_with($expression, ')')) {
+        if (! str_starts_with($expression, '(') || ! str_ends_with($expression, ')')) {
             return ['data' => $expression, 'options' => null, 'depth' => null];
         }
 
@@ -60,7 +60,7 @@ trait CompilesJson
             $char = $content[$i];
 
             // Handle string literals
-            if (!$inString && ($char === "'" || $char === '"')) {
+            if (! $inString && ($char === "'" || $char === '"')) {
                 $inString = true;
                 $stringChar = $char;
                 $data .= $char;

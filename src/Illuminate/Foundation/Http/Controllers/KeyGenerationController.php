@@ -18,10 +18,10 @@ class KeyGenerationController extends Controller
     public function generateKey(Request $request): JsonResponse
     {
         // Only allow this in debug mode for security
-        if (!config('app.debug')) {
+        if (! config('app.debug')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Key generation is only available in debug mode.'
+                'message' => 'Key generation is only available in debug mode.',
             ], 403);
         }
 
@@ -34,10 +34,10 @@ class KeyGenerationController extends Controller
             $key = $command->generateRandomKey();
 
             // Set the key in the environment file
-            if (!$command->setKeyInEnvironmentFile($key)) {
+            if (! $command->setKeyInEnvironmentFile($key)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Unable to set application key in environment file.'
+                    'message' => 'Unable to set application key in environment file.',
                 ], 500);
             }
 
@@ -46,12 +46,12 @@ class KeyGenerationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Application key generated successfully.'
+                'message' => 'Application key generated successfully.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to generate application key: ' . $e->getMessage()
+                'message' => 'Failed to generate application key: '.$e->getMessage(),
             ], 500);
         }
     }

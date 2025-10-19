@@ -132,7 +132,7 @@ class BladeJsonTest extends AbstractBladeTestCase
     }
 
     /**
-     * Test the simplified version that was working before the fix
+     * Test the simplified version that was working before the fix.
      */
     public function testJsonDirectiveIssue56331Simplified()
     {
@@ -157,7 +157,7 @@ class BladeJsonTest extends AbstractBladeTestCase
     }
 
     /**
-     * Test edge cases to ensure our parser is robust
+     * Test edge cases to ensure our parser is robust.
      */
     public function testJsonDirectiveEdgeCases()
     {
@@ -178,7 +178,7 @@ class BladeJsonTest extends AbstractBladeTestCase
     }
 
     /**
-     * Test that our solution doesn't break existing functionality
+     * Test that our solution doesn't break existing functionality.
      */
     public function testJsonDirectiveBackwardCompatibility()
     {
