@@ -217,10 +217,10 @@ class SupportArrTest extends TestCase
         $this->assertSame([], $array);
 
         $array = Arr::dot(['foo' => []]);
-        $this->assertSame(['foo' => []], $array);
+        $this->assertSame(['foo' => null], $array);
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
-        $this->assertSame(['foo.bar' => []], $array);
+        $this->assertSame(['foo.bar' => null], $array);
 
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);
         $this->assertSame(['name' => 'taylor', 'languages.php' => true], $array);
@@ -243,7 +243,7 @@ class SupportArrTest extends TestCase
         $array = Arr::dot(['foo' => 'bar', 'empty_array' => [], 'user' => ['name' => 'Taylor'], 'key' => 'value']);
         $this->assertSame([
             'foo' => 'bar',
-            'empty_array' => [],
+            'empty_array' => null,
             'user.name' => 'Taylor',
             'key' => 'value',
         ], $array);
