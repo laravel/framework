@@ -1188,6 +1188,20 @@ class SupportStringableTest extends TestCase
         $this->assertSame('fooBarBaz', (string) $this->stringable('foo-bar_baz')->camel());
     }
 
+    public function testToCamelCase()
+    {
+        $this->assertSame('laravelFramework', (string) $this->stringable('laravel_framework')->toCamelCase());
+        $this->assertSame('helloWorld', (string) $this->stringable('hello-world')->toCamelCase());
+        $this->assertSame('testString', (string) $this->stringable('test string')->toCamelCase());
+    }
+
+    public function testToSnakeCase()
+    {
+        $this->assertSame('laravel_framework', (string) $this->stringable('LaravelFramework')->toSnakeCase());
+        $this->assertSame('hello-world', (string) $this->stringable('HelloWorld')->toSnakeCase('-'));
+        $this->assertSame('test_string', (string) $this->stringable('TestString')->toSnakeCase());
+    }
+
     public function testCharAt()
     {
         $this->assertEquals('р', $this->stringable('Привет, мир!')->charAt(1));

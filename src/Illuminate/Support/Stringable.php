@@ -199,6 +199,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Capitalize the first letter of each word in a string.
+     *
+     * @return static
+     */
+    public function capitalize()
+    {
+        return new static(Str::capitalize($this->value));
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string|iterable<string>  $needles
@@ -945,6 +955,111 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function snake($delimiter = '_')
     {
         return new static(Str::snake($this->value, $delimiter));
+    }
+
+    /**
+     * Swap the case of all characters in a string.
+     *
+     * @return static
+     */
+    public function swapCase()
+    {
+        return new static(Str::swapCase($this->value));
+    }
+
+    /**
+     * Alias for camel case conversion.
+     *
+     * @return static
+     */
+    public function toCamelCase()
+    {
+        return new static(Str::toCamelCase($this->value));
+    }
+
+    /**
+     * Alias for snake case conversion.
+     *
+     * @param  string  $delimiter
+     * @return static
+     */
+    public function toSnakeCase($delimiter = '_')
+    {
+        return new static(Str::toSnakeCase($this->value, $delimiter));
+    }
+
+    /**
+     * Remove accents from characters.
+     *
+     * @return static
+     */
+    public function removeAccents()
+    {
+        return new static(Str::removeAccents($this->value));
+    }
+
+    /**
+     * Truncate a string by word count.
+     *
+     * @param  int  $wordCount
+     * @param  string  $end
+     * @return static
+     */
+    public function truncateWords($wordCount = 100, $end = '...')
+    {
+        return new static(Str::truncateWords($this->value, $wordCount, $end));
+    }
+
+    /**
+     * Calculate the similarity between this string and another as a percentage.
+     *
+     * @param  string  $other
+     * @return float
+     */
+    public function similarity($other)
+    {
+        return Str::similarity($this->value, $other);
+    }
+
+    /**
+     * Calculate the Levenshtein distance between this string and another.
+     *
+     * @param  string  $other
+     * @return int
+     */
+    public function levenshtein($other)
+    {
+        return Str::levenshtein($this->value, $other);
+    }
+
+    /**
+     * Calculate the soundex key of this string.
+     *
+     * @return string
+     */
+    public function soundex()
+    {
+        return Str::soundex($this->value);
+    }
+
+    /**
+     * Calculate the metaphone key of this string.
+     *
+     * @return string
+     */
+    public function metaphone()
+    {
+        return Str::metaphone($this->value);
+    }
+
+    /**
+     * Determine if this string is a valid email address.
+     *
+     * @return bool
+     */
+    public function isEmail()
+    {
+        return Str::isEmail($this->value);
     }
 
     /**

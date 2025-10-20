@@ -547,6 +547,45 @@ class SupportStrTest extends TestCase
         $this->assertEmpty($property->getValue());
     }
 
+    public function testCacheSize()
+    {
+        // Test default cache size
+        $this->assertSame(1000, Str::getCacheSize());
+
+        // Test setting cache size
+        Str::setCacheSize(500);
+        $this->assertSame(500, Str::getCacheSize());
+
+        // Test minimum cache size enforcement
+        Str::setCacheSize(50);
+        $this->assertSame(100, Str::getCacheSize());
+
+        // Reset to default
+        Str::setCacheSize(1000);
+    }
+
+    public function testCacheSizeManagement()
+    {
+        // Set a small cache size for testing
+        Str::setCacheSize(5);
+        Str::flushCache();
+
+        $reflection = new ReflectionClass(Str::class);
+        $camelCacheProperty = $reflection->getProperty('camelCache');
+
+        // Fill cache beyond limit
+        for ($i = 0; $i < 10; $i++) {
+            Str::camel("test_string_$i");
+        }
+
+        $cache = $camelCacheProperty->getValue();
+        $this->assertLessThanOrEqual(5, count($cache));
+
+        // Reset to default
+        Str::setCacheSize(1000);
+        Str::flushCache();
+    }
+
     public function testFinish()
     {
         $this->assertSame('abbc', Str::finish('ab', 'bc'));
@@ -1904,6 +1943,106 @@ class SupportStrTest extends TestCase
         };
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
+    }
+    public function testIsEmail()
+    {
+        $this->assertTrue(Str::isEmail('test@example.com'));
+        $this->assertTrue(Str::isEmail('user.name+tag@domain.co.uk'));
+        $this->assertTrue(Str::isEmail('test123@test-domain.com'));
+
+        $this->assertFalse(Str::isEmail('invalid-email'));
+        $this->assertFalse(Str::isEmail('test@'));
+        $this->assertFalse(Str::isEmail('@domain.com'));
+        $this->assertFalse(Str::isEmail(''));
+        $this->assertFalse(Str::isEmail(null));
+        $this->assertFalse(Str::isEmail(123));
+        $this->assertFalse(Str::isEmail([]));
+    }
+
+    public function testRemoveAccents()
+    {
+        $this->assertSame('cafe', Str::removeAccents('café'));
+        $this->assertSame('resume', Str::removeAccents('résumé'));
+        $this->assertSame('naive', Str::removeAccents('naïve'));
+        $this->assertSame('Zurich', Str::removeAccents('Zürich'));
+        $this->assertSame('Francois', Str::removeAccents('François'));
+        $this->assertSame('', Str::removeAccents(''));
+        $this->assertSame('hello world', Str::removeAccents('hello world'));
+    }
+
+    public function testCapitalize()
+    {
+        $this->assertSame('Hello World', Str::capitalize('hello world'));
+        $this->assertSame('Laravel Framework', Str::capitalize('laravel framework'));
+        $this->assertSame('Test String', Str::capitalize('TEST STRING'));
+        $this->assertSame('', Str::capitalize(''));
+        $this->assertSame('A', Str::capitalize('a'));
+    }
+
+    public function testSwapCase()
+    {
+        $this->assertSame('hELLO wORLD', Str::swapCase('Hello World'));
+        $this->assertSame('lARAVEL fRAMEWORK', Str::swapCase('Laravel Framework'));
+        $this->assertSame('tEST sTRING', Str::swapCase('Test String'));
+        $this->assertSame('', Str::swapCase(''));
+        $this->assertSame('123', Str::swapCase('123'));
+        $this->assertSame('!@#', Str::swapCase('!@#'));
+    }
+
+    public function testTruncateWords()
+    {
+        $text = 'The quick brown fox jumps over the lazy dog';
+
+        $this->assertSame('The quick brown...', Str::truncateWords($text, 3));
+        $this->assertSame('The quick brown fox jumps...', Str::truncateWords($text, 5));
+        $this->assertSame($text, Str::truncateWords($text, 10));
+        $this->assertSame('The quick brown***', Str::truncateWords($text, 3, '***'));
+        $this->assertSame('', Str::truncateWords('', 5));
+        $this->assertSame('word', Str::truncateWords('word', 5));
+    }
+
+    public function testSimilarity()
+    {
+        $this->assertSame(100.0, Str::similarity('hello', 'hello'));
+        $this->assertSame(0.0, Str::similarity('hello', 'world'));
+        $this->assertGreaterThan(80.0, Str::similarity('hello', 'hallo'));
+        $this->assertGreaterThan(50.0, Str::similarity('Laravel', 'Larvel'));
+    }
+
+    public function testLevenshtein()
+    {
+        $this->assertSame(0, Str::levenshtein('hello', 'hello'));
+        $this->assertSame(1, Str::levenshtein('hello', 'hallo'));
+        $this->assertSame(3, Str::levenshtein('cat', 'dog'));
+        $this->assertSame(5, Str::levenshtein('hello', ''));
+    }
+
+    public function testSoundex()
+    {
+        $this->assertSame(soundex('hello'), Str::soundex('hello'));
+        $this->assertSame(soundex('world'), Str::soundex('world'));
+        $this->assertSame(Str::soundex('Smith'), Str::soundex('Smyth'));
+    }
+
+    public function testMetaphone()
+    {
+        $this->assertSame(metaphone('hello'), Str::metaphone('hello'));
+        $this->assertSame(metaphone('world'), Str::metaphone('world'));
+        $this->assertSame(Str::metaphone('Smith'), Str::metaphone('Smyth'));
+    }
+
+    public function testToCamelCase()
+    {
+        $this->assertSame('laravelFramework', Str::toCamelCase('laravel_framework'));
+        $this->assertSame('helloWorld', Str::toCamelCase('hello-world'));
+        $this->assertSame('testString', Str::toCamelCase('test string'));
+    }
+
+    public function testToSnakeCase()
+    {
+        $this->assertSame('laravel_framework', Str::toSnakeCase('LaravelFramework'));
+        $this->assertSame('hello-world', Str::toSnakeCase('HelloWorld', '-'));
+        $this->assertSame('test_string', Str::toSnakeCase('TestString'));
     }
 }
 

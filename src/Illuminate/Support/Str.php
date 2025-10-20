@@ -53,6 +53,13 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * Maximum cache size for each cache type to prevent memory leaks.
+     *
+     * @var int
+     */
+    protected static $maxCacheSize = 1000;
+
+    /**
      * The callback that should be used to generate UUIDs.
      *
      * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
@@ -227,6 +234,11 @@ class Str
     {
         if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
+        }
+
+        // Manage cache size to prevent memory leaks
+        if (count(static::$camelCache) >= static::$maxCacheSize) {
+            static::$camelCache = array_slice(static::$camelCache, static::$maxCacheSize / 2, null, true);
         }
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
@@ -1560,6 +1572,11 @@ class Str
             return static::$snakeCache[$key][$delimiter];
         }
 
+        // Manage cache size to prevent memory leaks
+        if (count(static::$snakeCache) >= static::$maxCacheSize) {
+            static::$snakeCache = array_slice(static::$snakeCache, static::$maxCacheSize / 2, null, true);
+        }
+
         if (! ctype_lower($value)) {
             $value = preg_replace('/\s+/u', '', ucwords($value));
 
@@ -1684,6 +1701,11 @@ class Str
 
         if (isset(static::$studlyCache[$key])) {
             return static::$studlyCache[$key];
+        }
+
+        // Manage cache size to prevent memory leaks
+        if (count(static::$studlyCache) >= static::$maxCacheSize) {
+            static::$studlyCache = array_slice(static::$studlyCache, static::$maxCacheSize / 2, null, true);
         }
 
         $words = mb_split('\s+', static::replace(['-', '_'], ' ', $value));
@@ -1862,6 +1884,164 @@ class Str
     public static function wordWrap($string, $characters = 75, $break = "\n", $cutLongWords = false)
     {
         return wordwrap($string, $characters, $break, $cutLongWords);
+    }
+
+    /**
+     * Determine if a given value is a valid email address.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isEmail($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
+     * Remove accents from characters.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function removeAccents($string)
+    {
+        $string = (string) $string;
+
+        // Convert to NFD (Normalization Form Decomposed)
+        if (class_exists('Normalizer')) {
+            $string = \Normalizer::normalize($string, \Normalizer::FORM_D);
+        }
+
+        // Remove combining diacritical marks
+        return preg_replace('/[\x{0300}-\x{036f}]/u', '', $string);
+    }
+
+    /**
+     * Capitalize the first letter of each word in a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function capitalize($string)
+    {
+        return mb_convert_case($string, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    /**
+     * Swap the case of all characters in a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function swapCase($string)
+    {
+        $result = '';
+        $length = mb_strlen($string, 'UTF-8');
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = mb_substr($string, $i, 1, 'UTF-8');
+            $upper = mb_strtoupper($char, 'UTF-8');
+            $lower = mb_strtolower($char, 'UTF-8');
+
+            $result .= ($char === $upper) ? $lower : $upper;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Truncate a string by word count.
+     *
+     * @param  string  $string
+     * @param  int  $wordCount
+     * @param  string  $end
+     * @return string
+     */
+    public static function truncateWords($string, $wordCount = 100, $end = '...')
+    {
+        $words = preg_split('/\s+/u', trim($string));
+
+        if (count($words) <= $wordCount) {
+            return $string;
+        }
+
+        return implode(' ', array_slice($words, 0, $wordCount)) . $end;
+    }
+
+    /**
+     * Calculate the similarity between two strings as a percentage.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @return float
+     */
+    public static function similarity($first, $second)
+    {
+        similar_text($first, $second, $percent);
+        return $percent;
+    }
+
+    /**
+     * Calculate the Levenshtein distance between two strings.
+     *
+     * @param  string  $first
+     * @param  string  $second
+     * @return int
+     */
+    public static function levenshtein($first, $second)
+    {
+        return levenshtein($first, $second);
+    }
+
+    /**
+     * Calculate the soundex key of a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function soundex($string)
+    {
+        return soundex($string);
+    }
+
+    /**
+     * Calculate the metaphone key of a string.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function metaphone($string)
+    {
+        return metaphone($string);
+    }
+
+    /**
+     * Alias for camel case conversion.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function toCamelCase($value)
+    {
+        return static::camel($value);
+    }
+
+    /**
+     * Alias for snake case conversion.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function toSnakeCase($value, $delimiter = '_')
+    {
+        return static::snake($value, $delimiter);
     }
 
     /**
@@ -2099,5 +2279,26 @@ class Str
         static::$snakeCache = [];
         static::$camelCache = [];
         static::$studlyCache = [];
+    }
+
+    /**
+     * Set the maximum cache size for string casing operations.
+     *
+     * @param  int  $size
+     * @return void
+     */
+    public static function setCacheSize($size)
+    {
+        static::$maxCacheSize = max(100, $size); // Minimum cache size of 100
+    }
+
+    /**
+     * Get the current maximum cache size.
+     *
+     * @return int
+     */
+    public static function getCacheSize()
+    {
+        return static::$maxCacheSize;
     }
 }
