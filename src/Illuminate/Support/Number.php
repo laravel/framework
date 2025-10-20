@@ -27,7 +27,7 @@ class Number
     /**
      * Get a new numberable object from the given number.
      *
-     * @param  int|float|string  $number
+     * @param  int|float|numeric-string  $number
      * @return \Illuminate\Support\Numberable
      */
     public static function of($number)
