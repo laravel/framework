@@ -282,11 +282,11 @@ class Validator implements ValidatorContract
     protected $numericRules = ['Numeric', 'Integer', 'Decimal'];
 
     /**
-     * The current placeholder for dots in rule keys.
+     * The current random hash for the validator.
      *
      * @var string
      */
-    protected $dotPlaceholder;
+    protected static $placeholderHash;
 
     /**
      * The exception to throw upon failure.
@@ -308,7 +308,12 @@ class Validator implements ValidatorContract
     public function __construct(Translator $translator, array $data, array $rules,
                                 array $messages = [], array $customAttributes = [])
     {
-        $this->dotPlaceholder = Str::random();
+        // PARCHE CVE-2025-27515 INICIO
+        // Use static placeholder hash to prevent collision with user input
+        if (! isset(static::$placeholderHash)) {
+            static::$placeholderHash = Str::random();
+        }
+        // PARCHE CVE-2025-27515 FIN
 
         $this->initialRules = $rules;
         $this->translator = $translator;
@@ -334,11 +339,14 @@ class Validator implements ValidatorContract
                 $value = $this->parseData($value);
             }
 
+            // PARCHE CVE-2025-27515 INICIO
+            // Use unique placeholder format with hash to prevent collision
             $key = str_replace(
                 ['.', '*'],
-                [$this->dotPlaceholder, '__asterisk__'],
+                ['__dot__'.static::$placeholderHash, '__asterisk__'.static::$placeholderHash],
                 $key
             );
+            // PARCHE CVE-2025-27515 FIN
 
             $newData[$key] = $value;
         }
@@ -373,11 +381,14 @@ class Validator implements ValidatorContract
      */
     protected function replacePlaceholderInString(string $value)
     {
+        // PARCHE CVE-2025-27515 INICIO
+        // Use unique placeholder format with hash
         return str_replace(
-            [$this->dotPlaceholder, '__asterisk__'],
+            ['__dot__'.static::$placeholderHash, '__asterisk__'.static::$placeholderHash],
             ['.', '*'],
             $value
         );
+        // PARCHE CVE-2025-27515 FIN
     }
 
     /**
@@ -678,7 +689,10 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return str_replace('\.', $this->dotPlaceholder, $field);
+            // PARCHE CVE-2025-27515 INICIO
+            // Use unique placeholder format with hash
+            return str_replace('\.', '__dot__'.static::$placeholderHash, $field);
+            // PARCHE CVE-2025-27515 FIN
         }, $parameters);
     }
 
@@ -804,11 +818,35 @@ class Validator implements ValidatorContract
      */
     protected function validateUsingCustomRule($attribute, $value, $rule)
     {
-        $attribute = $this->replacePlaceholderInString($attribute);
+        // PARCHE CVE-2025-27515 INICIO
+        // Store the original attribute with placeholders replaced for display purposes
+        $originalAttribute = $this->replacePlaceholderInString($attribute);
+
+        // For File and Password rules, preserve the internal attribute name with placeholders
+        // This prevents bypass when malicious keys like '.' or '*' are used in array input
+        // Only replace placeholders for other rule types
+        if ($rule instanceof Rules\File || $rule instanceof Rules\Password) {
+            // Keep the internal attribute name (with placeholders) for these security-sensitive rules
+            $attribute = $attribute;
+        } else {
+            // For other rules, use the human-readable attribute name
+            $attribute = $originalAttribute;
+        }
+        // PARCHE CVE-2025-27515 FIN
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
         if ($rule instanceof ValidatorAwareRule) {
+            // PARCHE CVE-2025-27515 INICIO
+            // If attribute differs from original, add custom attribute mapping
+            // This ensures proper error messages while maintaining security
+            if ($attribute !== $originalAttribute) {
+                $this->addCustomAttributes([
+                    $attribute => $this->customAttributes[$originalAttribute] ?? $originalAttribute,
+                ]);
+            }
+            // PARCHE CVE-2025-27515 FIN
+
             $rule->setValidator($this);
         }
 
@@ -821,14 +859,20 @@ class Validator implements ValidatorContract
                 get_class($rule->invokable()) :
                 get_class($rule);
 
-            $this->failedRules[$attribute][$ruleClass] = [];
+            // PARCHE CVE-2025-27515 INICIO
+            // Store failed rules using the original attribute name for consistent error reporting
+            $this->failedRules[$originalAttribute][$ruleClass] = [];
 
-            $messages = $this->getFromLocalArray($attribute, $ruleClass) ?? $rule->message();
+            $messages = $this->getFromLocalArray($originalAttribute, $ruleClass) ?? $rule->message();
+            // PARCHE CVE-2025-27515 FIN
 
             $messages = $messages ? (array) $messages : [$ruleClass];
 
             foreach ($messages as $key => $message) {
-                $key = is_string($key) ? $key : $attribute;
+                // PARCHE CVE-2025-27515 INICIO
+                // Use original attribute for message keys to maintain consistency
+                $key = is_string($key) ? $key : $originalAttribute;
+                // PARCHE CVE-2025-27515 FIN
 
                 $this->messages->add($key, $this->makeReplacements(
                     $message, $key, $ruleClass, []
@@ -1103,11 +1147,14 @@ class Validator implements ValidatorContract
      */
     public function getRulesWithoutPlaceholders()
     {
+        // PARCHE CVE-2025-27515 INICIO
+        // Use unique placeholder format with hash
         return collect($this->rules)
             ->mapWithKeys(fn ($value, $key) => [
-                str_replace($this->dotPlaceholder, '\\.', $key) => $value,
+                str_replace('__dot__'.static::$placeholderHash, '\\.', $key) => $value,
             ])
             ->all();
+        // PARCHE CVE-2025-27515 FIN
     }
 
     /**
@@ -1118,9 +1165,12 @@ class Validator implements ValidatorContract
      */
     public function setRules(array $rules)
     {
+        // PARCHE CVE-2025-27515 INICIO
+        // Use unique placeholder format with hash
         $rules = collect($rules)->mapWithKeys(function ($value, $key) {
-            return [str_replace('\.', $this->dotPlaceholder, $key) => $value];
+            return [str_replace('\.', '__dot__'.static::$placeholderHash, $key) => $value];
         })->toArray();
+        // PARCHE CVE-2025-27515 FIN
 
         $this->initialRules = $rules;
 
