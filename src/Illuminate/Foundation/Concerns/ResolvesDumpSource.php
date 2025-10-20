@@ -23,6 +23,7 @@ trait ResolvesDumpSource
         'netbeans' => 'netbeans://open/?f={file}:{line}',
         'nova' => 'nova://core/open/file?filename={file}&line={line}',
         'phpstorm' => 'phpstorm://open?file={file}&line={line}',
+        'pulsar' => 'pulsar://open?file={file}&line={line}',
         'sublime' => 'subl://open?url=file://{file}&line={line}',
         'textmate' => 'txmt://open?url=file://{file}&line={line}',
         'trae' => 'trae://file/{file}:{line}',
