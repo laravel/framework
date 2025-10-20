@@ -11,8 +11,6 @@ use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
 
-
-
 class AuthorizeFromAttributes
 {
     /**
