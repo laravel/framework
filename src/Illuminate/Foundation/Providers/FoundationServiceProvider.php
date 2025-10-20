@@ -76,6 +76,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
                 $this->app->make(Dispatcher::class)
             );
         }
+
+        $this->registerKeyGenerationRoute();
     }
 
     /**
@@ -288,5 +290,24 @@ class FoundationServiceProvider extends AggregateServiceProvider
             MaintenanceModeContract::class,
             fn () => $this->app->make(MaintenanceModeManager::class)->driver()
         );
+    }
+
+    /**
+     * Register the key generation route for MissingAppKeyException.
+     *
+     * @return void
+     */
+    protected function registerKeyGenerationRoute()
+    {
+        if (! $this->app->hasDebugModeEnabled()) {
+            return;
+        }
+
+        $this->app->booted(function () {
+            $this->app->make('router')
+                ->post('/__laravel_generate_key', [\Illuminate\Foundation\Http\Controllers\KeyGenerationController::class, 'generate'])
+                ->middleware(['web', 'throttle:5,1'])
+                ->name('laravel.generate-key');
+        });
     }
 }

@@ -6,7 +6,11 @@
     <x-laravel-exceptions-renderer::separator />
 
     <x-laravel-exceptions-renderer::section-container class="flex flex-col gap-8 py-0 sm:py-0">
-        <x-laravel-exceptions-renderer::header :$exception />
+        @if($exception->class() === 'Illuminate\Encryption\MissingAppKeyException')
+            <x-laravel-exceptions-renderer::missing-app-key-header :$exception />
+        @else
+            <x-laravel-exceptions-renderer::header :$exception />
+        @endif
     </x-laravel-exceptions-renderer::section-container>
 
     <x-laravel-exceptions-renderer::separator class="-mt-5 -z-10" />
