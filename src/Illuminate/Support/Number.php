@@ -368,7 +368,7 @@ class Number
      * Round the given number to the specified precision.
      *
      * @param  int|float  $number
-     * @param  int  $precision
+     * @param  non-negative-int  $precision
      * @param  int  $mode
      * @return float
      */
