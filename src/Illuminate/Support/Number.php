@@ -369,7 +369,7 @@ class Number
      *
      * @param  int|float  $number
      * @param  non-negative-int  $precision
-     * @param  int  $mode
+     * @param  value-of<PHP_ROUND_*>  $mode
      * @return float
      */
     public static function round(int|float $number, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float
