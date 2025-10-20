@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 use ReflectionClass;
 use ReflectionMethod;
 
-use function Illuminate\Support\enum_value;
+
 
 class AuthorizeFromAttributes
 {
@@ -45,7 +45,6 @@ class AuthorizeFromAttributes
     public function handle($request, Closure $next)
     {
         $route = $request->route();
-        
         if (! $route) {
             return $next($request);
         }

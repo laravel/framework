@@ -1167,6 +1167,7 @@ class Route
         // Check method-level authorization attributes
         if ($reflection->hasMethod($controllerMethod)) {
             $method = $reflection->getMethod($controllerMethod);
+
             return $this->hasAuthorizationAttributesOnMethod($method);
         }
 

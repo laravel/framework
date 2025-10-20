@@ -2,11 +2,9 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Attributes\Authorize;
 use Illuminate\Auth\Attributes\Gate;
 use Illuminate\Auth\Middleware\AuthorizeFromAttributes;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -38,7 +36,7 @@ class AuthorizationAttributesTest extends TestCase
         $attributes = $reflection->getAttributes(Authorize::class);
 
         $this->assertCount(1, $attributes);
-        
+
         $authorize = $attributes[0]->newInstance();
         $this->assertEquals('admin', $authorize->ability);
     }
@@ -50,7 +48,7 @@ class AuthorizationAttributesTest extends TestCase
         $attributes = $method->getAttributes(Authorize::class);
 
         $this->assertCount(1, $attributes);
-        
+
         $authorize = $attributes[0]->newInstance();
         $this->assertEquals('update', $authorize->ability);
         $this->assertEquals('post', $authorize->arguments);
@@ -63,7 +61,7 @@ class AuthorizationAttributesTest extends TestCase
         $attributes = $method->getAttributes(Gate::class);
 
         $this->assertCount(1, $attributes);
-        
+
         $gate = $attributes[0]->newInstance();
         $this->assertEquals('admin', $gate->ability);
     }
@@ -71,18 +69,18 @@ class AuthorizationAttributesTest extends TestCase
     public function testMultipleAttributesCanBeApplied()
     {
         $reflection = new ReflectionClass(TestControllerWithMultipleAttributes::class);
-        
+
         // Class-level attributes
         $classAuthorize = $reflection->getAttributes(Authorize::class);
         $classGate = $reflection->getAttributes(Gate::class);
-        
+
         $this->assertCount(1, $classAuthorize);
         $this->assertCount(1, $classGate);
 
         // Method-level attributes
         $method = $reflection->getMethod('sensitiveAction');
         $methodAuthorize = $method->getAttributes(Authorize::class);
-        
+
         $this->assertCount(1, $methodAuthorize);
     }
 
@@ -90,12 +88,12 @@ class AuthorizationAttributesTest extends TestCase
     {
         $container = new \Illuminate\Container\Container();
         $route = new RoutingRoute(['GET'], '/test', [
-            'uses' => TestControllerWithMethodAuthorization::class.'@update'
+            'uses' => TestControllerWithMethodAuthorization::class.'@update',
         ]);
         $route->setContainer($container);
-        
+
         $middleware = $route->controllerMiddleware();
-        
+
         $this->assertContains(AuthorizeFromAttributes::class, $middleware);
     }
 
@@ -103,12 +101,12 @@ class AuthorizationAttributesTest extends TestCase
     {
         $container = new \Illuminate\Container\Container();
         $route = new RoutingRoute(['GET'], '/test', [
-            'uses' => TestControllerWithoutAttributes::class.'@index'
+            'uses' => TestControllerWithoutAttributes::class.'@index',
         ]);
         $route->setContainer($container);
-        
+
         $middleware = $route->controllerMiddleware();
-        
+
         $this->assertNotContains(AuthorizeFromAttributes::class, $middleware);
     }
 
@@ -120,14 +118,14 @@ class AuthorizationAttributesTest extends TestCase
                  ->with('admin', []);
 
         $middleware = new AuthorizeFromAttributes($gateMock);
-        
+
         $request = new Request();
         $container = new \Illuminate\Container\Container();
         $route = new RoutingRoute(['GET'], '/admin', ['uses' => TestControllerWithClassAuthorization::class.'@index']);
         $route->setContainer($container);
         $controller = new TestControllerWithClassAuthorization();
         $route->controller = $controller;
-        $request->setRouteResolver(fn() => $route);
+        $request->setRouteResolver(fn () => $route);
 
         $middleware->handle($request, function ($req) {
             return 'OK';
