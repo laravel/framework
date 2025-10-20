@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Concerns;
 
+use Illuminate\Support\Str;
 use Throwable;
 
 trait ResolvesDumpSource
@@ -169,7 +170,7 @@ trait ResolvesDumpSource
             : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
 
         if ($basePath = $editor['base_path'] ?? false) {
-            $file = str_replace($this->basePath, $basePath, $file);
+            $file = Str::replaceStart($this->basePath, $basePath, $file);
         }
 
         return str_replace(
