@@ -806,7 +806,11 @@ class Validator implements ValidatorContract
      */
     protected function validateUsingCustomRule($attribute, $value, $rule)
     {
-        $attribute = $this->replacePlaceholderInString($attribute);
+        $originalAttribute = $this->replacePlaceholderInString($attribute);
+
+        if (! ($rule instanceof \Illuminate\Validation\Rules\File || $rule instanceof \Illuminate\Validation\Rules\Password)) {
+            $attribute = $originalAttribute;
+        }
 
         $value = is_array($value) ? $this->replacePlaceholders($value) : $value;
 
@@ -836,6 +840,12 @@ class Validator implements ValidatorContract
                     $message, $key, $ruleClass, []
                 ));
             }
+        }
+
+        if ($attribute !== $originalAttribute) {
+            $this->addCustomAttributes([
+                $attribute => $this->customAttributes[$originalAttribute] ?? $originalAttribute,
+            ]);
         }
     }
 
