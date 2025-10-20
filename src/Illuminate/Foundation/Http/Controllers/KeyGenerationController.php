@@ -12,21 +12,13 @@ use Throwable;
 class KeyGenerationController extends Controller
 {
     /**
-     * The application implementation.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * Create a new controller instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
      * @return void
      */
-    public function __construct(Application $app)
+    public function __construct(protected Application $app)
     {
-        $this->app = $app;
     }
 
     /**
