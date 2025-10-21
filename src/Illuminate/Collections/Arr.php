@@ -64,6 +64,9 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  array|null  $default
      * @return array
      *
      * @throws \InvalidArgumentException
