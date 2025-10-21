@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+
 /**
  * A class representing an anonymous broadcastable event.
  *
