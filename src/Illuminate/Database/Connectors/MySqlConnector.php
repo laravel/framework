@@ -20,7 +20,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
         }
 
         return (new Collection($features))
-            ->mapWithKeys(fn ($value, $key) =>  (string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::'))
+            ->mapWithKeys(fn ($value, $key) => (string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::'))
             ->filter()
             ->all();
     }
