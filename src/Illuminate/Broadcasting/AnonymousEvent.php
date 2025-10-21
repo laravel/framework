@@ -7,7 +7,12 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-
+/**
+ * A class representing an anonymous broadcastable event.
+ *
+ * This class allows for the creation and broadcasting of events over specified channels
+ * with a customizable payload and broadcasting options.
+ */
 class AnonymousEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithBroadcasting, InteractsWithSockets;
