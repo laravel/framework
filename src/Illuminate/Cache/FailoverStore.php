@@ -185,7 +185,7 @@ class FailoverStore extends TaggableStore implements LockProvider
             } catch (Throwable $e) {
                 $lastException = $e;
 
-                $this->events->dispatch(new CacheFailedOver($store));
+                $this->events->dispatch(new CacheFailedOver($store, $e));
             }
         }
 
