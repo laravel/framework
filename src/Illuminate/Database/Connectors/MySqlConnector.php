@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Connectors;
 
-use PDO;
 use Illuminate\Support\Str;
+use PDO;
 
 class MySqlConnector extends Connector implements ConnectorInterface
 {
