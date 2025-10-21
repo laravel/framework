@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,12 +13,15 @@ use Symfony\Component\Finder\SplFileInfo;
 #[AsCommand(name: 'view:cache')]
 class ViewCacheCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'view:cache';
+    protected $signature = 'view:cache
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -33,6 +37,10 @@ class ViewCacheCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return;
+        }
+
         $this->callSilent('view:clear');
 
         $this->paths()->each(function ($path) {

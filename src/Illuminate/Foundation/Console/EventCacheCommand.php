@@ -3,18 +3,22 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'event:cache')]
 class EventCacheCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'event:cache';
+    protected $signature = 'event:cache
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -30,6 +34,10 @@ class EventCacheCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return;
+        }
+
         $this->callSilent('event:clear');
 
         file_put_contents(
