@@ -802,7 +802,7 @@ class Store implements Session
     /**
      * Set the "previous" route name in the session.
      *
-     * @param  string  $route
+     * @param  string|null  $route
      * @return void
      */
     public function setPreviousRoute($route)
