@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Connectors;
 
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class SQLiteConnector extends Connector implements ConnectorInterface

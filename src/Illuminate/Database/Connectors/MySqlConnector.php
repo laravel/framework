@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Connectors;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use PDO;
 
