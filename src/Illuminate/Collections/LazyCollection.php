@@ -1747,12 +1747,24 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     {
         $callback = $this->valueRetriever($key);
 
-        return new static(function () use ($callback, $strict) {
+        return new static(function () use ($callback, $strict, $key) {
             $exists = [];
+            $detectedScalarsOnly = null;
+            $useStrict = $strict;
 
-            foreach ($this as $key => $item) {
-                if (! in_array($id = $callback($item, $key), $exists, $strict)) {
-                    yield $key => $item;
+            foreach ($this as $itemKey => $item) {
+                $id = $callback($item, $itemKey);
+
+                if ($detectedScalarsOnly === null) {
+                    $detectedScalarsOnly = is_scalar($id) || $id === null;
+
+                    if ($key === null && $strict === false && $detectedScalarsOnly) {
+                        $useStrict = true;
+                    }
+                }
+
+                if (! in_array($id, $exists, $useStrict)) {
+                    yield $itemKey => $item;
 
                     $exists[] = $id;
                 }

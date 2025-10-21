@@ -1771,8 +1771,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function unique($key = null, $strict = false)
     {
-        if (is_null($key) && $strict === false) {
-            return new static(array_unique($this->items, SORT_REGULAR));
+        if ($key === null && $strict === false) {
+            foreach ($this->items as $item) {
+                if (! is_scalar($item) && $item !== null) {
+                    return new static(array_unique($this->items, SORT_REGULAR));
+                }
+            }
+
+            return new static(array_unique($this->items));
         }
 
         $callback = $this->valueRetriever($key);

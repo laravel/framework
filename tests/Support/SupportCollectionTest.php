@@ -1695,6 +1695,9 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([[1, 2], [1, 2], [2, 3], [3, 4], [2, 3]]);
         $this->assertEquals([[1, 2], [2, 3], [3, 4]], $c->unique()->values()->all());
+
+        $c = new $collection(['+100', '100', '1100']);
+        $this->assertEquals(['+100', '100', '1100'], $c->unique()->values()->all());
     }
 
     #[DataProvider('collectionClassProvider')]
