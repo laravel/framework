@@ -277,6 +277,32 @@ class ValidationEnumRuleTest extends TestCase
         ];
     }
 
+    public function testCustomMessageUsingDotNotationAndFqcnWorks()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'invalid_value',
+                'status_fqcn' => 'another_invalid',
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+                'status_fqcn' => new Enum(StringStatus::class),
+            ],
+            [
+                'status.enum' => 'Please choose a valid status (dot notation)',
+                'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid status (fqcn)',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+
+        $this->assertSame([
+            'Please choose a valid status (dot notation)',
+            'Please choose a valid status (fqcn)',
+        ], $v->messages()->all());
+    }
+
     protected function setUp(): void
     {
         $container = Container::getInstance();

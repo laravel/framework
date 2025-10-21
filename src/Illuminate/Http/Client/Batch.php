@@ -7,6 +7,9 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Support\Defer\DeferredCallback;
+
+use function Illuminate\Support\defer;
 
 /**
  * @mixin \Illuminate\Http\Client\Factory
@@ -72,7 +75,7 @@ class Batch
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
      */
     protected $catchCallback = null;
 
@@ -129,7 +132,7 @@ class Batch
      * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      *
-     * @throws BatchInProgressException
+     * @throws \Illuminate\Http\Client\BatchInProgressException
      */
     public function as(string $key)
     {
@@ -171,7 +174,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -205,6 +208,16 @@ class Batch
         $this->finallyCallback = $callback;
 
         return $this;
+    }
+
+    /**
+     * Defer the batch to run in the background after the current task has finished.
+     *
+     * @return \Illuminate\Support\Defer\DeferredCallback
+     */
+    public function defer(): DeferredCallback
+    {
+        return defer(fn () => $this->send());
     }
 
     /**
@@ -247,8 +260,11 @@ class Batch
                         return $result;
                     }
 
-                    if (($result instanceof Response && $result->failed()) ||
-                        $result instanceof RequestException) {
+                    if (
+                        ($result instanceof Response && $result->failed()) ||
+                        $result instanceof RequestException ||
+                        $result instanceof ConnectionException
+                    ) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
@@ -261,7 +277,7 @@ class Batch
                 'rejected' => function ($reason, $key) {
                     $this->decrementPendingRequests();
 
-                    if ($reason instanceof RequestException) {
+                    if ($reason instanceof RequestException || $reason instanceof ConnectionException) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {

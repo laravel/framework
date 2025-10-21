@@ -223,6 +223,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't contain a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public function doesntContain($needles, $ignoreCase = false)
+    {
+        return Str::doesntContain($this->value, $needles, $ignoreCase);
+    }
+
+    /**
      * Convert the case of a string.
      *
      * @param  int  $mode

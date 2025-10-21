@@ -1090,7 +1090,7 @@ if (! function_exists('view')) {
      * @param  array  $mergeData
      * @return ($view is null ? \Illuminate\Contracts\View\Factory : \Illuminate\Contracts\View\View)
      */
-    function view($view = null, $data = [], $mergeData = []): ViewContract|ViewFactory
+    function view($view = null, $data = [], $mergeData = []): ViewFactory|ViewContract
     {
         $factory = app(ViewFactory::class);
 
