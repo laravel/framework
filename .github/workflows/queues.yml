@@ -161,7 +161,7 @@ jobs:
 
       - name: Create Redis Cluster
         run: |
-          sudo apt-get install -y redis-server
+          sudo apt-get install -y --fix-missing redis-server
           sudo service redis-server stop
           redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
           redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
