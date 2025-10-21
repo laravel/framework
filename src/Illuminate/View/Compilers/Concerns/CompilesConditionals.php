@@ -50,6 +50,31 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the if-verified statements into valid PHP.
+     *
+     * @param  string|null  $guard
+     * @return string
+     */
+    protected function compileVerified($guard = null)
+    {
+        $guard = is_null($guard) ? '()' : $guard;
+
+        return "<?php if(auth()->guard{$guard}->check() ".
+            "&& auth()->guard{$guard}->user() instanceof \\Illuminate\\Contracts\\Auth\\MustVerifyEmail ".
+            "&& auth()->guard{$guard}->user()->hasVerifiedEmail()): ?>";
+    }
+
+    /**
+     * Compile the end-verified statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndVerified()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the env statements into valid PHP.
      *
      * @param  string  $environments
