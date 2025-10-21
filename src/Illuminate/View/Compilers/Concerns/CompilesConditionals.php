@@ -435,7 +435,7 @@ trait CompilesConditionals
      */
     public function compileFilled($expression)
     {
-        return "<?php if (\Illuminate\Support\Arr::filled{$expression}): ?>";
+        return "<?php if (filled{$expression}): ?>";
     }
 
     /**

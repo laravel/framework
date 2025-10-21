@@ -9,7 +9,7 @@ class BladeFilledStatementsTest extends AbstractBladeTestCase
         $string = '@filled($var)
             <p>Filled</p>
         @endfilled';
-        $expected = '<?php if (\Illuminate\Support\Arr::filled($var)): ?>
+        $expected = '<?php if (filled($var)): ?>
             <p>Filled</p>
         <?php endif; ?>';
 
@@ -23,7 +23,7 @@ class BladeFilledStatementsTest extends AbstractBladeTestCase
         @else
             <p>Empty</p>
         @endfilled';
-        $expected = '<?php if (\Illuminate\Support\Arr::filled($var)): ?>
+        $expected = '<?php if (filled($var)): ?>
             <p>Filled</p>
         <?php else: ?>
             <p>Empty</p>
