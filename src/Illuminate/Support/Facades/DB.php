@@ -12,11 +12,11 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \Illuminate\Database\Connection connection(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Database\ConnectionInterface build(array $config)
  * @method static string calculateDynamicConnectionName(array $config)
- * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
- * @method static void purge(string|null $name = null)
- * @method static void disconnect(string|null $name = null)
- * @method static \Illuminate\Database\Connection reconnect(string|null $name = null)
- * @method static mixed usingConnection(string $name, callable $callback)
+ * @method static \Illuminate\Database\ConnectionInterface connectUsing(\UnitEnum|string $name, array $config, bool $force = false)
+ * @method static void purge(\UnitEnum|string|null $name = null)
+ * @method static void disconnect(\UnitEnum|string|null $name = null)
+ * @method static \Illuminate\Database\Connection reconnect(\UnitEnum|string|null $name = null)
+ * @method static mixed usingConnection(\UnitEnum|string $name, callable $callback)
  * @method static string getDefaultConnection()
  * @method static void setDefaultConnection(string $name)
  * @method static string[] supportedDrivers()
@@ -114,6 +114,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static void rollBack(int|null $toLevel = null)
  * @method static int transactionLevel()
  * @method static void afterCommit(callable $callback)
+ * @method static void afterRollBack(callable $callback)
  *
  * @see \Illuminate\Database\DatabaseManager
  */

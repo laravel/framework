@@ -1706,6 +1706,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testWithHeartbeatIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->withHeartbeat(1, function () {
+                // Heartbeat callback
+            });
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->withHeartbeat(1, function () {
+                // Heartbeat callback
+            })->all();
+        });
+    }
+
     public function testWrapIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {

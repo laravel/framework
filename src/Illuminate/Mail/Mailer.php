@@ -267,7 +267,7 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function replaceEmbeddedAttachments(string $renderedView, array $attachments)
     {
-        if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/i', $renderedView, $matches)) {
+        if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', $renderedView, $matches)) {
             foreach (array_unique($matches[1]) as $image) {
                 foreach ($attachments as $attachment) {
                     if ($attachment->getFilename() === $image) {
@@ -463,7 +463,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new mail message for sending.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailable|string|array  $view
+     * @param  \Illuminate\Contracts\Mail\Mailable  $view
      * @param  \BackedEnum|string|null  $queue
      * @return mixed
      *

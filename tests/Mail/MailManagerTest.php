@@ -11,7 +11,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 class MailManagerTest extends TestCase
 {
     #[DataProvider('emptyTransportConfigDataProvider')]
-    public function testEmptyTransportConfig($transport)
+    public function testEmptyTransportConfig($transport): void
     {
         $this->app['config']->set('mail.mailers.custom_smtp', [
             'transport' => $transport,
@@ -34,7 +34,7 @@ class MailManagerTest extends TestCase
     #[TestWith(['smtp', 2525])]
     #[TestWith(['smtps', 465])]
     #[TestWith(['smtp', 465])]
-    public function testMailUrlConfig($scheme, $port)
+    public function testMailUrlConfig($scheme, $port): void
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
             'scheme' => $scheme,
@@ -59,7 +59,7 @@ class MailManagerTest extends TestCase
     #[TestWith(['smtp', 2525])]
     #[TestWith(['smtps', 465])]
     #[TestWith(['smtp', 465])]
-    public function testMailUrlConfigWithAutoTls($scheme, $port)
+    public function testMailUrlConfigWithAutoTls($scheme, $port): void
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
             'scheme' => $scheme,
@@ -84,7 +84,7 @@ class MailManagerTest extends TestCase
     #[TestWith(['smtp', 2525])]
     #[TestWith(['smtps', 465])]
     #[TestWith(['smtp', 465])]
-    public function testMailUrlConfigWithAutoTlsDisabled($scheme, $port)
+    public function testMailUrlConfigWithAutoTlsDisabled($scheme, $port): void
     {
         $this->app['config']->set('mail.mailers.smtp_url', [
             'scheme' => $scheme,
@@ -103,7 +103,7 @@ class MailManagerTest extends TestCase
         $this->assertSame($port === 465 && $scheme !== 'smtp', $transport->getStream()->isTLS());
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $config = [
             'transport' => 'smtp',

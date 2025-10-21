@@ -28,7 +28,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
     /**
      * @return array<string, array{class-string<\Throwable>, FailOnException, bool}>
      */
-    public static function testMiddlewareDataProvider(): array
+    public static function middlewareDataProvider(): array
     {
         return [
             'exception is in list' => [
@@ -44,7 +44,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
         ];
     }
 
-    #[DataProvider('testMiddlewareDataProvider')]
+    #[DataProvider('middlewareDataProvider')]
     public function test_middleware(
         string $thrown,
         FailOnException $middleware,
@@ -98,9 +98,7 @@ class FailOnExceptionMiddlewareTest extends TestCase
 
 class FailOnExceptionMiddlewareTestJob implements ShouldQueue
 {
-    use InteractsWithQueue;
-    use Queueable;
-    use Dispatchable;
+    use Dispatchable, InteractsWithQueue, Queueable;
 
     public static array $_middleware = [];
 

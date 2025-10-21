@@ -268,12 +268,12 @@ class Dispatcher implements DispatcherContract
         // When the given "event" is actually an object we will assume it is an event
         // object and use the class as the event name and this event itself as the
         // payload to the handler, which makes object based events quite simple.
-        [$isEventObject, $event, $payload] = [
+        [$isEventObject, $parsedEvent, $parsedPayload] = [
             is_object($event),
             ...$this->parseEventAndPayload($event, $payload),
         ];
 
-        if ($this->shouldDeferEvent($event)) {
+        if ($this->shouldDeferEvent($parsedEvent)) {
             $this->deferredEvents[] = func_get_args();
 
             return null;
@@ -283,16 +283,16 @@ class Dispatcher implements DispatcherContract
         // transaction is successful, we'll register a callback which will handle
         // dispatching this event on the next successful DB transaction commit.
         if ($isEventObject &&
-            $payload[0] instanceof ShouldDispatchAfterCommit &&
+            $parsedPayload[0] instanceof ShouldDispatchAfterCommit &&
             ! is_null($transactions = $this->resolveTransactionManager())) {
             $transactions->addCallback(
-                fn () => $this->invokeListeners($event, $payload, $halt)
+                fn () => $this->invokeListeners($parsedEvent, $parsedPayload, $halt)
             );
 
             return null;
         }
 
-        return $this->invokeListeners($event, $payload, $halt);
+        return $this->invokeListeners($parsedEvent, $parsedPayload, $halt);
     }
 
     /**
@@ -587,7 +587,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Determine if the given event handler should be dispatched after all database transactions have committed.
      *
-     * @param  object|mixed  $listener
+     * @param  mixed  $listener
      * @return bool
      */
     protected function handlerShouldBeDispatchedAfterDatabaseTransactions($listener)
@@ -705,7 +705,12 @@ class Dispatcher implements DispatcherContract
             $job->shouldBeEncrypted = $listener instanceof ShouldBeEncrypted;
             $job->timeout = $listener->timeout ?? null;
             $job->failOnTimeout = $listener->failOnTimeout ?? false;
-            $job->tries = $listener->tries ?? null;
+            $job->tries = method_exists($listener, 'tries') ? $listener->tries(...$data) : ($listener->tries ?? null);
+            $job->messageGroup = method_exists($listener, 'messageGroup') ? $listener->messageGroup(...$data) : ($listener->messageGroup ?? null);
+            $job->withDeduplicator(method_exists($listener, 'deduplicator')
+                ? $listener->deduplicator(...$data)
+                : (method_exists($listener, 'deduplicationId') ? $listener->deduplicationId(...) : null)
+            );
 
             $job->through(array_merge(
                 method_exists($listener, 'middleware') ? $listener->middleware(...$data) : [],

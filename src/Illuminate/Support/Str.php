@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\Macroable;
-use JsonException;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
@@ -35,42 +34,42 @@ class Str
     /**
      * The cache of snake-cased words.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected static $snakeCache = [];
 
     /**
      * The cache of camel-cased words.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected static $camelCache = [];
 
     /**
      * The cache of studly-cased words.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected static $studlyCache = [];
 
     /**
      * The callback that should be used to generate UUIDs.
      *
-     * @var callable|null
+     * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
      */
     protected static $uuidFactory;
 
     /**
      * The callback that should be used to generate ULIDs.
      *
-     * @var callable|null
+     * @var (callable(): \Symfony\Component\Uid\Ulid)|null
      */
     protected static $ulidFactory;
 
     /**
      * The callback that should be used to generate random strings.
      *
-     * @var callable|null
+     * @var (callable(int): string)|null
      */
     protected static $randomStringFactory;
 
@@ -570,6 +569,8 @@ class Str
      *
      * @param  mixed  $value
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isJson($value)
     {
@@ -577,17 +578,7 @@ class Str
             return false;
         }
 
-        if (function_exists('json_validate')) {
-            return json_validate($value, 512);
-        }
-
-        try {
-            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-            return false;
-        }
-
-        return true;
+        return json_validate($value, 512);
     }
 
     /**
@@ -596,6 +587,8 @@ class Str
      * @param  mixed  $value
      * @param  array  $protocols
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUrl($value, array $protocols = [])
     {
@@ -639,6 +632,8 @@ class Str
      * @param  mixed  $value
      * @param  int<0, 8>|'nil'|'max'|null  $version
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUuid($value, $version = null)
     {
@@ -680,6 +675,8 @@ class Str
      *
      * @param  mixed  $value
      * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
      */
     public static function isUlid($value)
     {
@@ -937,17 +934,7 @@ class Str
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_BOTH);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-        $shortLeft = floor($short / 2);
-        $shortRight = ceil($short / 2);
-
-        return mb_substr(str_repeat($pad, $shortLeft), 0, $shortLeft).
-               $value.
-               mb_substr(str_repeat($pad, $shortRight), 0, $shortRight);
+        return mb_str_pad($value, $length, $pad, STR_PAD_BOTH);
     }
 
     /**
@@ -960,13 +947,7 @@ class Str
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_LEFT);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-
-        return mb_substr(str_repeat($pad, $short), 0, $short).$value;
+        return mb_str_pad($value, $length, $pad, STR_PAD_LEFT);
     }
 
     /**
@@ -979,13 +960,7 @@ class Str
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        if (function_exists('mb_str_pad')) {
-            return mb_str_pad($value, $length, $pad, STR_PAD_RIGHT);
-        }
-
-        $short = max(0, $length - mb_strlen($value));
-
-        return $value.mb_substr(str_repeat($pad, $short), 0, $short);
+        return mb_str_pad($value, $length, $pad, STR_PAD_RIGHT);
     }
 
     /**
@@ -1016,11 +991,16 @@ class Str
      *
      * @param  string  $value
      * @param  int|array|\Countable  $count
+     * @param  bool  $prependCount
      * @return string
      */
-    public static function plural($value, $count = 2)
+    public static function plural($value, $count = 2, $prependCount = false)
     {
-        return Pluralizer::plural($value, $count);
+        if (is_countable($count)) {
+            $count = count($count);
+        }
+
+        return ($prependCount ? Number::format($count).' ' : '').Pluralizer::plural($value, $count);
     }
 
     /**
@@ -1136,7 +1116,7 @@ class Str
     /**
      * Set the callable that will be used to generate random strings.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(int): string)|null  $factory
      * @return void
      */
     public static function createRandomStringsUsing(?callable $factory = null)
@@ -1484,15 +1464,16 @@ class Str
 
         $minorWords = [
             'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',
-            'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via',
+            'the', 'at', 'by', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via',
             'et', 'ou', 'un', 'une', 'la', 'le', 'les', 'de', 'du', 'des', 'par', 'à',
         ];
 
         $endPunctuation = ['.', '!', '?', ':', '—', ','];
 
         $words = mb_split('\s+', $value);
+        $wordCount = count($words);
 
-        for ($i = 0; $i < count($words); $i++) {
+        for ($i = 0; $i < $wordCount; $i++) {
             $lowercaseWord = mb_strtolower($words[$i]);
 
             if (str_contains($lowercaseWord, '-')) {
@@ -1936,7 +1917,7 @@ class Str
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $factory
      * @return void
      */
     public static function createUuidsUsing(?callable $factory = null)
@@ -1948,7 +1929,7 @@ class Str
      * Set the sequence that will be used to generate UUIDs.
      *
      * @param  array  $sequence
-     * @param  callable|null  $whenMissing
+     * @param  (callable(): \Ramsey\Uuid\UuidInterface)|null  $whenMissing
      * @return void
      */
     public static function createUuidsUsingSequence(array $sequence, $whenMissing = null)
@@ -2043,7 +2024,7 @@ class Str
     /**
      * Set the callable that will be used to generate ULIDs.
      *
-     * @param  callable|null  $factory
+     * @param  (callable(): \Symfony\Component\Uid\Ulid)|null  $factory
      * @return void
      */
     public static function createUlidsUsing(?callable $factory = null)
@@ -2055,7 +2036,7 @@ class Str
      * Set the sequence that will be used to generate ULIDs.
      *
      * @param  array  $sequence
-     * @param  callable|null  $whenMissing
+     * @param  (callable(): \Symfony\Component\Uid\Ulid)|null  $whenMissing
      * @return void
      */
     public static function createUlidsUsingSequence(array $sequence, $whenMissing = null)

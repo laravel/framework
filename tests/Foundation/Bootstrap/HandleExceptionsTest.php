@@ -29,16 +29,14 @@ class HandleExceptionsTest extends TestCase
     protected function handleExceptions()
     {
         return tap(new HandleExceptions(), function ($instance) {
-            with(new ReflectionClass($instance), function ($reflection) use ($instance) {
-                $reflection->getProperty('app')->setValue($instance, $this->app);
-            });
+            (new ReflectionClass($instance))->getProperty('app')->setValue($instance, $this->app);
         });
     }
 
     protected function tearDown(): void
     {
         Application::setInstance(null);
-        HandleExceptions::flushState();
+        HandleExceptions::flushState($this);
 
         m::close();
     }
@@ -381,11 +379,7 @@ class HandleExceptionsTest extends TestCase
     {
         $instance = $this->handleExceptions();
 
-        $appResolver = fn () => with(new ReflectionClass($instance), function ($reflection) use ($instance) {
-            $property = $reflection->getProperty('app');
-
-            return $property->getValue($instance);
-        });
+        $appResolver = fn () => (new ReflectionClass($instance))->getProperty('app')->getValue($instance);
 
         $this->assertNotNull($appResolver());
 
@@ -398,11 +392,7 @@ class HandleExceptionsTest extends TestCase
     {
         $instance = $this->handleExceptions();
 
-        $appResolver = fn () => with(new ReflectionClass($instance), function ($reflection) use ($instance) {
-            $property = $reflection->getProperty('app');
-
-            return $property->getValue($instance);
-        });
+        $appResolver = fn () => (new ReflectionClass($instance))->getProperty('app')->getValue($instance);
 
         $this->assertSame($this->app, $appResolver());
 

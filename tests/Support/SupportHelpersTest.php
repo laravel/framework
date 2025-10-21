@@ -832,6 +832,30 @@ class SupportHelpersTest extends TestCase
         throw_if(true, LogicException::class, 'test');
     }
 
+    public function testThrowClosureException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => new \Exception('test'));
+    }
+
+    public function testThrowClosureWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+    }
+
+    public function testThrowClosureStringWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => \Exception::class, 'test');
+    }
+
     public function testThrowUnless()
     {
         $this->expectException(LogicException::class);
@@ -1493,6 +1517,12 @@ class SupportHelpersTest extends TestCase
             ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'],
             ['//', [], '', ''],
             ['/%s/', ['a'], '', ''],
+            // non-sequential numeric keys → should still consume in natural order
+            ['/%s/', [2 => 'A', 10 => 'B'], '%s %s', 'A B'],
+            // associative keys → order should be insertion order, not keys/pointer
+            ['/%s/', ['first' => 'A', 'second' => 'B'], '%s %s', 'A B'],
+            // values that are "falsy" but must not be treated as empty by mistake, false->'' , null->''
+            ['/%s/', ['0', 0, false, null], '%s|%s|%s|%s', '0|0||'],
             // The internal pointer of this array is not at the beginning
             ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
         ];
@@ -1546,7 +1576,7 @@ trait SupportTestTraitArrayAccess
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->items);
+        return array_key_exists($offset ?? '', $this->items);
     }
 
     public function offsetGet($offset): mixed

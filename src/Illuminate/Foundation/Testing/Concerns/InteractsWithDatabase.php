@@ -18,7 +18,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition exists in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
@@ -50,7 +50,7 @@ trait InteractsWithDatabase
     /**
      * Assert that a given where condition does not exist in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @return $this
@@ -117,7 +117,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
@@ -157,7 +157,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given record has not been "soft deleted".
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
      * @param  array<string, mixed>  $data
      * @param  string|null  $connection
      * @param  string|null  $deletedAtColumn
@@ -197,7 +197,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given model exists in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     protected function assertModelExists($model)
@@ -208,7 +208,7 @@ trait InteractsWithDatabase
     /**
      * Assert the given model does not exist in the database.
      *
-     * @param  \Illuminate\Database\Eloquent\Model[]|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
+     * @param  iterable<\Illuminate\Database\Eloquent\Model>|\Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $model
      * @return $this
      */
     protected function assertModelMissing($model)
@@ -225,22 +225,22 @@ trait InteractsWithDatabase
      */
     public function expectsDatabaseQueryCount($expected, $connection = null)
     {
-        with($this->getConnection($connection), function ($connectionInstance) use ($expected, $connection) {
-            $actual = 0;
+        $connectionInstance = $this->getConnection($connection);
 
-            $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
-                if (is_null($connection) || $connectionInstance === $event->connection) {
-                    $actual++;
-                }
-            });
+        $actual = 0;
 
-            $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
-                $this->assertSame(
-                    $expected,
-                    $actual,
-                    "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
-                );
-            });
+        $connectionInstance->listen(function (QueryExecuted $event) use (&$actual, $connectionInstance, $connection) {
+            if (is_null($connection) || $connectionInstance === $event->connection) {
+                $actual++;
+            }
+        });
+
+        $this->beforeApplicationDestroyed(function () use (&$actual, $expected, $connectionInstance) {
+            $this->assertSame(
+                $expected,
+                $actual,
+                "Expected {$expected} database queries on the [{$connectionInstance->getName()}] connection. {$actual} occurred."
+            );
         });
 
         return $this;
@@ -285,7 +285,7 @@ trait InteractsWithDatabase
      * Get the database connection.
      *
      * @param  string|null  $connection
-     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string  $table
+     * @param  \Illuminate\Database\Eloquent\Model|class-string<\Illuminate\Database\Eloquent\Model>|string|null  $table
      * @return \Illuminate\Database\Connection
      */
     protected function getConnection($connection = null, $table = null)

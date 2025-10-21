@@ -407,7 +407,7 @@ class Blueprint
     /**
      * Indicate that the given columns should be dropped.
      *
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return \Illuminate\Support\Fluent
      */
     public function dropColumn($columns)
@@ -1266,7 +1266,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add nullable creation and update timestampTz columns to the table.
      *
      * @param  int|null  $precision
      * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
@@ -1277,6 +1277,19 @@ class Blueprint
             $this->timestampTz('created_at', $precision)->nullable(),
             $this->timestampTz('updated_at', $precision)->nullable(),
         ]);
+    }
+
+    /**
+     * Add nullable creation and update timestampTz columns to the table.
+     *
+     * Alias for self::timestampsTz().
+     *
+     * @param  int|null  $precision
+     * @return \Illuminate\Support\Collection<int, \Illuminate\Database\Schema\ColumnDefinition>
+     */
+    public function nullableTimestampsTz($precision = null)
+    {
+        return $this->timestampsTz($precision);
     }
 
     /**
@@ -1485,16 +1498,17 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function morphs($name, $indexName = null)
+    public function morphs($name, $indexName = null, $after = null)
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->uuidMorphs($name, $indexName);
+            $this->uuidMorphs($name, $indexName, $after);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->ulidMorphs($name, $indexName);
+            $this->ulidMorphs($name, $indexName, $after);
         } else {
-            $this->numericMorphs($name, $indexName);
+            $this->numericMorphs($name, $indexName, $after);
         }
     }
 
@@ -1503,16 +1517,17 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function nullableMorphs($name, $indexName = null)
+    public function nullableMorphs($name, $indexName = null, $after = null)
     {
         if (Builder::$defaultMorphKeyType === 'uuid') {
-            $this->nullableUuidMorphs($name, $indexName);
+            $this->nullableUuidMorphs($name, $indexName, $after);
         } elseif (Builder::$defaultMorphKeyType === 'ulid') {
-            $this->nullableUlidMorphs($name, $indexName);
+            $this->nullableUlidMorphs($name, $indexName, $after);
         } else {
-            $this->nullableNumericMorphs($name, $indexName);
+            $this->nullableNumericMorphs($name, $indexName, $after);
         }
     }
 
@@ -1521,13 +1536,16 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function numericMorphs($name, $indexName = null)
+    public function numericMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);
 
-        $this->unsignedBigInteger("{$name}_id");
+        $this->unsignedBigInteger("{$name}_id")
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1537,13 +1555,18 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function nullableNumericMorphs($name, $indexName = null)
+    public function nullableNumericMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->unsignedBigInteger("{$name}_id")->nullable();
+        $this->unsignedBigInteger("{$name}_id")
+            ->nullable()
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1553,13 +1576,16 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function uuidMorphs($name, $indexName = null)
+    public function uuidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);
 
-        $this->uuid("{$name}_id");
+        $this->uuid("{$name}_id")
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1569,13 +1595,18 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function nullableUuidMorphs($name, $indexName = null)
+    public function nullableUuidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->uuid("{$name}_id")->nullable();
+        $this->uuid("{$name}_id")
+            ->nullable()
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1585,13 +1616,16 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function ulidMorphs($name, $indexName = null)
+    public function ulidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type");
+        $this->string("{$name}_type")
+            ->after($after);
 
-        $this->ulid("{$name}_id");
+        $this->ulid("{$name}_id")
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1601,13 +1635,18 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
+     * @param  string|null  $after
      * @return void
      */
-    public function nullableUlidMorphs($name, $indexName = null)
+    public function nullableUlidMorphs($name, $indexName = null, $after = null)
     {
-        $this->string("{$name}_type")->nullable();
+        $this->string("{$name}_type")
+            ->nullable()
+            ->after($after);
 
-        $this->ulid("{$name}_id")->nullable();
+        $this->ulid("{$name}_id")
+            ->nullable()
+            ->after(! is_null($after) ? "{$name}_type" : null);
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }

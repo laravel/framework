@@ -307,6 +307,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add constraint "bar" unique nulls distinct ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create unique index concurrently "users_foo_unique" on "users" ("foo")', $statements[0]);
+        $this->assertSame('alter table "users" add constraint "users_foo_unique" unique using index "users_foo_unique"', $statements[1]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -325,6 +336,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index('foo', 'baz')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "baz" on "users" ("foo")', $statements[0]);
     }
 
     public function testAddingFulltextIndex()
@@ -357,6 +378,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "users_body_fulltext" on "users" using gin ((to_tsvector(\'spanish\', "body")))', $statements[0]);
     }
 
+    public function testAddingFulltextIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->fulltext('body')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "users_body_fulltext" on "users" using gin ((to_tsvector(\'english\', "body")))', $statements[0]);
+    }
+
     public function testAddingFulltextIndexWithFluency()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -375,6 +406,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[0]);
+    }
+
+    public function testAddingSpatialIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'geo');
+        $blueprint->spatialIndex('coordinates')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[0]);
     }
 
     public function testAddingFluentSpatialIndex()
@@ -407,6 +448,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index "my_index" on "geo" using gist ("coordinates" point_ops, "location" point_ops)', $statements[0]);
     }
 
+    public function testAddingSpatialIndexWithOperatorClassOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'geo');
+        $blueprint->spatialIndex('coordinates', 'my_index', 'point_ops')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "my_index" on "geo" using gist ("coordinates" point_ops)', $statements[0]);
+    }
+
     public function testAddingRawIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -415,6 +466,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "raw_index" on "users" ((function(column)))', $statements[0]);
+    }
+
+    public function testAddingRawIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->rawIndex('(function(column))', 'raw_index')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "raw_index" on "users" ((function(column)))', $statements[0]);
     }
 
     public function testAddingIncrementingID()
@@ -905,7 +966,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(2, $statements);
         $this->assertSame([
             'alter table "users" add column "foo" integer null',
-            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) virtual',
         ], $statements);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -915,7 +976,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(2, $statements);
         $this->assertSame([
             'alter table "users" add column "foo" integer null',
-            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) virtual',
         ], $statements);
     }
 

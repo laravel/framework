@@ -94,7 +94,7 @@ class Reflector
             ));
         } while ($includeParents && false !== $reflectionClass = $reflectionClass->getParentClass());
 
-        return $includeParents ? new Collection($attributes) : reset($attributes);
+        return $includeParents ? new Collection($attributes) : array_first($attributes);
     }
 
     /**

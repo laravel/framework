@@ -59,7 +59,7 @@ class Listener
      */
     public function onQueryExecuted(QueryExecuted $event)
     {
-        if (count($this->queries) === 100) {
+        if (count($this->queries) === 101) {
             return;
         }
 
@@ -67,7 +67,7 @@ class Listener
             'connectionName' => $event->connectionName,
             'time' => $event->time,
             'sql' => $event->sql,
-            'bindings' => $event->bindings,
+            'bindings' => $event->connection->prepareBindings($event->bindings),
         ];
     }
 }

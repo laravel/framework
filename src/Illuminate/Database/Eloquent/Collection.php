@@ -222,28 +222,28 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        foreach ($relations as $key => $value) {
-            if (is_numeric($key)) {
-                $key = $value;
+        if ($this->isNotEmpty()) {
+            $query = $this->first()->newQueryWithoutRelationships()->with($relations);
+
+            foreach ($query->getEagerLoads() as $key => $value) {
+                $segments = explode('.', explode(':', $key)[0]);
+
+                if (str_contains($key, ':')) {
+                    $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
+                }
+
+                $path = [];
+
+                foreach ($segments as $segment) {
+                    $path[] = [$segment => $segment];
+                }
+
+                if (is_callable($value)) {
+                    $path[count($segments) - 1][array_last($segments)] = $value;
+                }
+
+                $this->loadMissingRelation($this, $path);
             }
-
-            $segments = explode('.', explode(':', $key)[0]);
-
-            if (str_contains($key, ':')) {
-                $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
-            }
-
-            $path = [];
-
-            foreach ($segments as $segment) {
-                $path[] = [$segment => $segment];
-            }
-
-            if (is_callable($value)) {
-                $path[count($segments) - 1][end($segments)] = $value;
-            }
-
-            $this->loadMissingRelation($this, $path);
         }
 
         return $this;
