@@ -10,14 +10,19 @@ class MySqlConnector extends Connector implements ConnectorInterface
     /**
      * Determine of PDO feature constant.
      *
-     * @param  string  $feature
-     * @return mixed
+     * @param  array<string, mixed>  $features
+     * @return array<string, mixed>
      */
-    public static function feature(string $feature)
+    public static function features(array $features)
     {
-        return constant(
-            (string) Str::of($feature)->prepend('ATTR_')->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::')
-        );
+        if (! extension_loaded('pdo_mysql')) {
+            return [];
+        }
+
+        return (new Collection($features))
+            ->mapWithKeys(fn ($value, $key) =>  (string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::'))
+            ->filter()
+            ->all();
     }
 
     /**
