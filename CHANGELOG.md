@@ -1,6 +1,28 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.34.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.35.0...12.x)
+
+## [v12.35.0](https://github.com/laravel/framework/compare/v12.34.0...v12.35.0) - 2025-10-21
+
+* [12.x] Fix `DB::update()` with subqueries is not supported for all databases by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57381
+* [12.x] Ensure custom validation messages work for AnyOf, Can and Enum by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57356
+* Added Neovim editor support in ResolvesDumpSource by [@cseknowledge](https://github.com/cseknowledge) in https://github.com/laravel/framework/pull/57392
+* Add clickable file reference for thrown exception by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/57400
+* [12.x] Render newlines in query tooltip by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57310
+* [12.x] Add SQS FIFO and fair queue messageGroup() method support by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/57421
+* [12.x] Use MariaDB idiomatic `json_value()` by [@crishoj](https://github.com/crishoj) in https://github.com/laravel/framework/pull/57417
+* Deferred queue by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57428
+* Fix validate integer php doc type annotation by [@tei0110](https://github.com/tei0110) in https://github.com/laravel/framework/pull/57435
+* [12.x] Fix passing countable to Number::format() by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/57434
+* [12.x] Update `Route::middleware` to accept null by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57436
+* Only replace first basePath occurrence in dump source href by [@fritz-c](https://github.com/fritz-c) in https://github.com/laravel/framework/pull/57458
+* [12.x] Add missing [@throws](https://github.com/throws) annotations to Encrypter class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57451
+* [12.x] Add missing [@throws](https://github.com/throws) annotations to Database Connection class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57452
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57461
+* Prevent TypeError in validateDigits when attribute value is an array by [@elyass-dehghan](https://github.com/elyass-dehghan) in https://github.com/laravel/framework/pull/57471
+* Bump vite from 7.1.6 to 7.1.11 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/57460
+* Failover cache by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57430
+* Must collect the unparsed event and payload when deferring events by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/57453
 
 ## [v12.34.0](https://github.com/laravel/framework/compare/v12.33.0...v12.34.0) - 2025-10-14
 
