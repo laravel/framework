@@ -21,7 +21,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         }
 
         return (new Collection($features))
-            ->mapWithKeys(fn ($value, $feature) => (string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::SQLITE_' : 'Pdo\Sqlite::'))
+            ->mapWithKeys(fn ($value, $feature) => (string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::SQLITE_' : 'Pdo\Sqlite::') => $value)
             ->filter()
             ->all();
     }
