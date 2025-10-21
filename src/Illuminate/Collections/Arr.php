@@ -88,7 +88,7 @@ class Arr
      * @param  string|int|null  $key
      * @param  bool|null  $default
      * @return bool
-     *
+     * 
      * @throws \InvalidArgumentException
      */
     public static function boolean(ArrayAccess|array $array, string|int|null $key, ?bool $default = null): bool
@@ -100,7 +100,7 @@ class Arr
                 sprintf('Array value for key [%s] must be a boolean, %s found.', $key, gettype($value))
             );
         }
-        
+
         return $value;
     }
 
