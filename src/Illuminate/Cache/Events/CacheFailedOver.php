@@ -2,6 +2,8 @@
 
 namespace Illuminate\Cache\Events;
 
+use Throwable;
+
 class CacheFailedOver
 {
     /**
@@ -11,6 +13,7 @@ class CacheFailedOver
      */
     public function __construct(
         public ?string $storeName,
+        public Throwable $exception,
     ) {
     }
 }
