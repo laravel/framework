@@ -3,9 +3,23 @@
 namespace Illuminate\Database\Connectors;
 
 use Illuminate\Database\SQLiteDatabaseDoesNotExistException;
+use Illuminate\Support\Str;
 
 class SQLiteConnector extends Connector implements ConnectorInterface
 {
+    /**
+     * Determine of PDO feature constant.
+     *
+     * @param  string  $feature
+     * @return mixed
+     */
+    public static function feature(string $feature)
+    {
+        return constant(
+            (string) Str::of($feature)->prepend('ATTR_')->prepend(PHP_VERSION_ID < 80400 ? 'PDO::SQLITE_' : 'Pdo\Sqlite::')
+        );
+    }
+
     /**
      * Establish a database connection.
      *

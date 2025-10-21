@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\Connectors\MariaDbConnector;
+use Illuminate\Database\Connectors\MySqlConnector;
 use Illuminate\Support\Str;
 
 return [
@@ -61,7 +63,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                MySqlConnector::feature('SSL_CA') => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -81,7 +83,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                MariaDbConnector::feature('SSL_CA') => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

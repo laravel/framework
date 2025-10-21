@@ -3,9 +3,23 @@
 namespace Illuminate\Database\Connectors;
 
 use PDO;
+use Illuminate\Support\Str;
 
 class MySqlConnector extends Connector implements ConnectorInterface
 {
+    /**
+     * Determine of PDO feature constant.
+     *
+     * @param  string  $feature
+     * @return mixed
+     */
+    public static function feature(string $feature)
+    {
+        return constant(
+            (string) Str::of($feature)->prepend('ATTR_')->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::')
+        );
+    }
+
     /**
      * Establish a database connection.
      *
