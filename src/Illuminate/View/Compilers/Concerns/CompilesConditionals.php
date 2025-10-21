@@ -426,4 +426,25 @@ trait CompilesConditionals
     {
         return '<?php $__env->stopPush(); endif; ?>';
     }
+
+    /**
+     * Compile the "filled" statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    public function compileFilled($expression)
+    {
+        return "<?php if (\Illuminate\Support\Arr::filled{$expression}): ?>";
+    }
+
+    /**
+     * Compile the "endfilled" statements into valid PHP.
+     *
+     * @return string
+     */
+    public function compileEndfilled()
+    {
+        return '<?php endif; ?>';
+    }
 }
