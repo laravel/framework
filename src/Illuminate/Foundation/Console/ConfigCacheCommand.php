@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -13,12 +14,15 @@ use Throwable;
 #[AsCommand(name: 'config:cache')]
 class ConfigCacheCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'config:cache';
+    protected $signature = 'config:cache
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -55,6 +59,10 @@ class ConfigCacheCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return;
+        }
+
         $this->callSilent('config:clear');
 
         $config = $this->getFreshConfiguration();

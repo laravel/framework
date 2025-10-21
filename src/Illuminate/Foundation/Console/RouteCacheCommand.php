@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Routing\RouteCollection;
@@ -11,12 +12,15 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'route:cache')]
 class RouteCacheCommand extends Command
 {
+    use ConfirmableTrait;
+
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'route:cache';
+    protected $signature = 'route:cache
+                    {--force : Force the operation to run when in production}';
 
     /**
      * The console command description.
@@ -51,6 +55,10 @@ class RouteCacheCommand extends Command
      */
     public function handle()
     {
+        if (! $this->confirmToProceed()) {
+            return;
+        }
+
         $this->callSilent('route:clear');
 
         $routes = $this->getFreshApplicationRoutes();
