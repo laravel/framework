@@ -34,6 +34,9 @@ trait PacksPhpRedisValues
      *
      * @param  array<int|string,string>  $values
      * @return array<int|string,string>
+     *
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
     public function pack(array $values): array
     {
