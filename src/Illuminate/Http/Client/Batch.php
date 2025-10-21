@@ -68,28 +68,28 @@ class Batch
     /**
      * The callback to run after a request from the batch succeeds.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)|null
      */
     protected $progressCallback = null;
 
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
      */
     protected $catchCallback = null;
 
     /**
      * The callback to run if all the requests from the batch succeeded.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $thenCallback = null;
 
     /**
      * The callback to run after all the requests from the batch finish.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $finallyCallback = null;
 
@@ -161,7 +161,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch succeeds.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)  $callback
      * @return Batch
      */
     public function progress(Closure $callback): self
@@ -174,7 +174,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -187,7 +187,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch succeed.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function then(Closure $callback): self
@@ -200,7 +200,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch finish.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function finally(Closure $callback): self
@@ -223,7 +223,7 @@ class Batch
     /**
      * Send all of the requests in the batch.
      *
-     * @return array<int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException>
+     * @return array<int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException>
      */
     public function send(): array
     {
