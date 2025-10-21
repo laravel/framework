@@ -721,7 +721,7 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return ! preg_match('/[^0-9]/', $value)
+        return (is_numeric($value) || is_string($value)) && ! preg_match('/[^0-9]/', $value)
                     && strlen((string) $value) == $parameters[0];
     }
 
