@@ -715,6 +715,21 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
+    public function testUsesRightSeperatorForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+            'root' => 'something',
+            'directory_separator' => '\\',
+        ]);
+
+        $path = $filesystemAdapter->path('different');
+        $this->assertStringContainsString('/', $path);
+        $this->assertStringNotContainsString('\\', $path);
+    }
+
     public function testProvidesTemporaryUrlsForAdapterWithoutTemporaryUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);

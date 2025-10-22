@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\PathPrefixer;
 
 class AwsS3V3Adapter extends FilesystemAdapter
 {
@@ -31,6 +32,10 @@ class AwsS3V3Adapter extends FilesystemAdapter
         parent::__construct($driver, $adapter, $config);
 
         $this->client = $client;
+
+        $this->prefixer = isset($config['prefix'])
+            ? new PathPrefixer($this->prefixer->prefixPath($config['prefix']), '/')
+            : new PathPrefixer($config['root'] ?? '', '/');
     }
 
     /**
