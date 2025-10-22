@@ -188,6 +188,8 @@ class UrlGenerator implements UrlGeneratorContract
             $referrer = $this->getPreviousUrlFromSession();
         }
 
+        // checking the referrer against dangerous schemes (e.g., javascript:, data:, file: etc)
+        // to prevent open redirect vulnerabilities
         if (! $referrer || $this->isDangerousUrl($referrer)) {
             $path = $fallback ? parse_url($this->to($fallback), PHP_URL_PATH) ?? '/' : '/';
             return rtrim($path, '/') ?: '/';
@@ -198,6 +200,7 @@ class UrlGenerator implements UrlGeneratorContract
         $previousUrlComponents = parse_url($previous);
         $appUrlComponents = parse_url($this->to('/'));
 
+        // if the previous URL is not from the same origin, we will use the fallback or root URL
         if (! $this->isSameOrigin($previousUrlComponents, $appUrlComponents)) {
             $previous = $fallback ? $this->to($fallback) : $this->to('/');
         }
