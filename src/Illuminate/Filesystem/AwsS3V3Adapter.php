@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
+use League\Flysystem\PathPrefixer;
 
 class AwsS3V3Adapter extends FilesystemAdapter
 {
@@ -29,6 +30,15 @@ class AwsS3V3Adapter extends FilesystemAdapter
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config, S3Client $client)
     {
         parent::__construct($driver, $adapter, $config);
+
+        // We override the prefixer for the S3 Adapter, because S3 only accepts
+        // the normal / as a separator. On Windows, this causes errors because the
+        // directory separator \\ is used.
+        $this->prefixer = new PathPrefixer($config['root'] ?? '', '/');
+
+        if (isset($config['prefix'])) {
+            $this->prefixer = new PathPrefixer($this->prefixer->prefixPath($config['prefix']), '/');
+        }
 
         $this->client = $client;
     }
