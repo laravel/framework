@@ -294,7 +294,7 @@ class Batch
         // in the same order as the requests were defined, respecting any custom
         // key names that were assigned to this request using the "as" method.
         uksort($results, function ($key1, $key2) {
-            return array_search($key1, array_keys($this->requests), true) <=> 
+            return array_search($key1, array_keys($this->requests), true) <=>
                    array_search($key2, array_keys($this->requests), true);
         });
 
