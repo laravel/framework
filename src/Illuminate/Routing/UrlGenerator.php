@@ -192,6 +192,7 @@ class UrlGenerator implements UrlGeneratorContract
         // to prevent open redirect vulnerabilities
         if (! $referrer || $this->isDangerousUrl($referrer)) {
             $path = $fallback ? parse_url($this->to($fallback), PHP_URL_PATH) ?? '/' : '/';
+            
             return rtrim($path, '/') ?: '/';
         }
 
