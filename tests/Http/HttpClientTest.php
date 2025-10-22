@@ -32,6 +32,7 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -3808,7 +3809,6 @@ class HttpClientTest extends TestCase
         });
 
         $this->assertSame(3, $batch->totalRequests);
-        // $this->assertSame(0, $batch->completion());
         $this->assertFalse($batch->finished());
 
         $responses = $batch->send();
@@ -3820,9 +3820,33 @@ class HttpClientTest extends TestCase
         $this->assertSame(3, $batch->totalRequests);
         $this->assertSame(0, $batch->pendingRequests);
         $this->assertSame(1, $batch->failedRequests);
-        // $this->assertSame(100, $batch->completion());
         $this->assertTrue($batch->hasFailures());
         $this->assertTrue($batch->finished());
+    }
+
+    public function testBatchDefer(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(3, $batch->totalRequests);
+        $this->assertFalse($batch->finished());
+
+        $deferredCallback = $batch->defer();
+
+        $this->assertInstanceOf(DeferredCallback::class, $deferredCallback);
+        $this->assertFalse($batch->finished());
     }
 
     public function testCannotAddRequestsToInProgressBatch(): void

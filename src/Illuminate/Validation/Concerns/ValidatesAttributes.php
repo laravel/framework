@@ -721,8 +721,9 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'digits');
 
-        return ! preg_match('/[^0-9]/', $value)
-                    && strlen((string) $value) == $parameters[0];
+        return (is_numeric($value) || is_string($value)) &&
+            ! preg_match('/[^0-9]/', $value) &&
+            strlen((string) $value) == $parameters[0];
     }
 
     /**
@@ -1553,7 +1554,7 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @param  array{0: 'strict'}  $parameters
+     * @param  array{0?: 'strict'}  $parameters
      * @return bool
      */
     public function validateInteger($attribute, $value, array $parameters = [])

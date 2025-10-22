@@ -242,7 +242,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $messageGroupId = null;
 
         if ($isObject) {
-            $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
+            $messageGroupId = transform($job->messageGroup ?? (method_exists($job, 'messageGroup') ? $job->messageGroup() : null), $transformToString);
         } elseif ($isFifo) {
             $messageGroupId = transform($queue, $transformToString);
         }
