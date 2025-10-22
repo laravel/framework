@@ -175,16 +175,77 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * Get the previous path info for the request.
+     * Get the previous path for the request.
      *
      * @param  mixed  $fallback
      * @return string
      */
     public function previousPath($fallback = false)
     {
-        $previousPath = str_replace($this->to('/'), '', rtrim(preg_replace('/\?.*/', '', $this->previous($fallback)), '/'));
+        $referrer = $this->request->headers->get('referer');
 
-        return $previousPath === '' ? '/' : $previousPath;
+        if (! $referrer) {
+            $referrer = $this->getPreviousUrlFromSession();
+        }
+
+        if (! $referrer || $this->isDangerousUrl($referrer)) {
+            $path = $fallback ? parse_url($this->to($fallback), PHP_URL_PATH) ?? '/' : '/';
+            return rtrim($path, '/') ?: '/';
+        }
+
+        $previous = $this->to($referrer);
+
+        $previousUrlComponents = parse_url($previous);
+        $appUrlComponents = parse_url($this->to('/'));
+
+        if (! $this->isSameOrigin($previousUrlComponents, $appUrlComponents)) {
+            $previous = $fallback ? $this->to($fallback) : $this->to('/');
+        }
+
+        $path = parse_url($previous, PHP_URL_PATH) ?? '/';
+
+        return rtrim($path, '/') ?: '/';
+    }
+
+    /**
+     * Check for dangerous schemes like javascript, data, file, or vbscript.
+     *
+     * @param  string  $url
+     * @return bool
+     */
+    protected function isDangerousUrl($url)
+    {
+        // will return true if the URL starts with javascript, data, file, or vbscript
+        return preg_match('/^(javascript|data|file|vbscript):/i', $url);
+    }
+
+    /**
+     * Determine if two URLs are from the same origin, matching host, scheme, and port.
+     *
+     * @param  array|false  $urlOneComponents
+     * @param  array|false  $urlTwoComponents
+     * @return bool
+     */
+    protected function isSameOrigin($urlOneComponents, $urlTwoComponents)
+    {
+        if ($urlOneComponents === false || $urlTwoComponents === false) {
+            return false;
+        }
+
+        $hostOne = $urlOneComponents['host'] ?? null;
+        $hostTwo = $urlTwoComponents['host'] ?? null;
+        $schemeOne = $urlOneComponents['scheme'] ?? null;
+        $schemeTwo = $urlTwoComponents['scheme'] ?? null;
+        $portOne = $urlOneComponents['port'] ?? null;
+        $portTwo = $urlTwoComponents['port'] ?? null;
+
+        if (! $hostOne || ! $hostTwo || ! $schemeOne || ! $schemeTwo) {
+            return false;
+        }
+
+        return strtolower($hostOne) === strtolower($hostTwo) &&
+            $schemeOne === $schemeTwo &&
+            $portOne === $portTwo;
     }
 
     /**
