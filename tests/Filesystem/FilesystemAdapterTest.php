@@ -26,9 +26,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class FilesystemAdapterTest extends TestCase
 {
     private $tempDir;
-
     private $filesystem;
-
     private $adapter;
 
     protected function setUp(): void
@@ -50,7 +48,7 @@ class FilesystemAdapterTest extends TestCase
         unset($this->tempDir, $this->filesystem, $this->adapter);
     }
 
-    public function test_response()
+    public function testResponse()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -65,7 +63,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('inline; filename=file.txt', $response->headers->get('content-disposition'));
     }
 
-    public function test_mime_type_is_not_called_already_provided_to_response()
+    public function testMimeTypeIsNotCalledAlreadyProvidedToResponse()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
@@ -77,7 +75,7 @@ class FilesystemAdapterTest extends TestCase
         ]);
     }
 
-    public function test_size_is_not_called_already_provided_to_response()
+    public function testSizeIsNotCalledAlreadyProvidedToResponse()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
@@ -89,7 +87,7 @@ class FilesystemAdapterTest extends TestCase
         ]);
     }
 
-    public function test_fallback_name_called_already_provided_to_response()
+    public function testFallbackNameCalledAlreadyProvidedToResponse()
     {
         $this->filesystem->write('file.txt', 'Hello World');
 
@@ -103,7 +101,7 @@ class FilesystemAdapterTest extends TestCase
         ]);
     }
 
-    public function test_download()
+    public function testDownload()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -112,7 +110,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('attachment; filename=hello.txt', $response->headers->get('content-disposition'));
     }
 
-    public function test_download_non_ascii_filename()
+    public function testDownloadNonAsciiFilename()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -121,7 +119,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame("attachment; filename=privet.txt; filename*=utf-8''%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82.txt", $response->headers->get('content-disposition'));
     }
 
-    public function test_download_non_ascii_empty_filename()
+    public function testDownloadNonAsciiEmptyFilename()
     {
         $this->filesystem->write('привет.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -130,7 +128,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('attachment; filename=privet.txt; filename*=utf-8\'\'%D0%BF%D1%80%D0%B8%D0%B2%D0%B5%D1%82.txt', $response->headers->get('content-disposition'));
     }
 
-    public function test_download_percent_in_filename()
+    public function testDownloadPercentInFilename()
     {
         $this->filesystem->write('Hello%World.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -139,7 +137,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('attachment; filename=HelloWorld.txt; filename*=utf-8\'\'Hello%25World.txt', $response->headers->get('content-disposition'));
     }
 
-    public function test_exists()
+    public function testExists()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -147,27 +145,27 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->fileExists('file.txt'));
     }
 
-    public function test_missing()
+    public function testMissing()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->missing('file.txt'));
         $this->assertTrue($filesystemAdapter->fileMissing('file.txt'));
     }
 
-    public function test_directory_exists()
+    public function testDirectoryExists()
     {
         $this->filesystem->write('/foo/bar/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->directoryExists('/foo/bar'));
     }
 
-    public function test_directory_missing()
+    public function testDirectoryMissing()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->directoryMissing('/foo/bar'));
     }
 
-    public function test_path()
+    public function testPath()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, [
@@ -176,48 +174,48 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($this->tempDir.DIRECTORY_SEPARATOR.'file.txt', $filesystemAdapter->path('file.txt'));
     }
 
-    public function test_get()
+    public function testGet()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertSame('Hello World', $filesystemAdapter->get('file.txt'));
     }
 
-    public function test_get_file_not_found()
+    public function testGetFileNotFound()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->get('file.txt'));
     }
 
-    public function test_json_returns_decoded_json_data()
+    public function testJsonReturnsDecodedJsonData()
     {
         $this->filesystem->write('file.json', '{"foo": "bar"}');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertSame(['foo' => 'bar'], $filesystemAdapter->json('file.json'));
     }
 
-    public function test_json_returns_null_if_json_data_is_invalid()
+    public function testJsonReturnsNullIfJsonDataIsInvalid()
     {
         $this->filesystem->write('file.json', '{"foo":');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->json('file.json'));
     }
 
-    public function test_mime_type_not_detected()
+    public function testMimeTypeNotDetected()
     {
         $this->filesystem->write('unknown.mime-type', '');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertFalse($filesystemAdapter->mimeType('unknown.mime-type'));
     }
 
-    public function test_put()
+    public function testPut()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->put('file.txt', 'Something inside');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
     }
 
-    public function test_prepend()
+    public function testPrepend()
     {
         file_put_contents($this->tempDir.'/file.txt', 'World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -225,7 +223,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'World');
     }
 
-    public function test_append()
+    public function testAppend()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello ');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -233,7 +231,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello '.PHP_EOL.'Moon');
     }
 
-    public function test_delete()
+    public function testDelete()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -241,13 +239,13 @@ class FilesystemAdapterTest extends TestCase
         Assert::assertFileDoesNotExist($this->tempDir.'/file.txt');
     }
 
-    public function test_delete_returns_true_when_file_not_found()
+    public function testDeleteReturnsTrueWhenFileNotFound()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
     }
 
-    public function test_copy()
+    public function testCopy()
     {
         $data = '33232';
         mkdir($this->tempDir.'/foo');
@@ -263,7 +261,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
-    public function test_move()
+    public function testMove()
     {
         $data = '33232';
         mkdir($this->tempDir.'/foo');
@@ -278,7 +276,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
-    public function test_stream()
+    public function testStream()
     {
         $this->filesystem->write('file.txt', $original_content = 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -287,7 +285,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($original_content, $filesystemAdapter->get('copy.txt'));
     }
 
-    public function test_stream_between_filesystems()
+    public function testStreamBetweenFilesystems()
     {
         $secondFilesystem = new Filesystem(new LocalFilesystemAdapter($this->tempDir.'/second'));
         $this->filesystem->write('file.txt', $original_content = 'Hello World');
@@ -298,7 +296,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
     }
 
-    public function test_stream_to_existing_file_overwrites()
+    public function testStreamToExistingFileOverwrites()
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $this->filesystem->write('existing.txt', 'Dear Kate');
@@ -308,20 +306,20 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('Hello World', $filesystemAdapter->read('existing.txt'));
     }
 
-    public function test_read_stream_non_existent_file_returns_null()
+    public function testReadStreamNonExistentFileReturnsNull()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertNull($filesystemAdapter->readStream('nonexistent.txt'));
     }
 
-    public function test_stream_invalid_resource_throws()
+    public function testStreamInvalidResourceThrows()
     {
         $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }
 
-    public function test_put_with_stream_interface()
+    public function testPutWithStreamInterface()
     {
         file_put_contents($this->tempDir.'/foo.txt', 'some-data');
 
@@ -334,7 +332,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('some-data', $filesystemAdapter->get('bar.txt'));
     }
 
-    public function test_put_file_as()
+    public function testPutFileAs()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
 
@@ -358,7 +356,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    public function test_put_file_as_with_absolute_file_path()
+    public function testPutFileAsWithAbsoluteFilePath()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
 
@@ -369,7 +367,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 
-    public function test_put_file_as_without_path()
+    public function testPutFileAsWithoutPath()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
 
@@ -380,7 +378,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('normal file content', $filesystemAdapter->read($storagePath));
     }
 
-    public function test_put_file()
+    public function testPutFile()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
 
@@ -402,7 +400,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    public function test_put_file_with_absolute_file_path()
+    public function testPutFileWithAbsoluteFilePath()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
 
@@ -420,7 +418,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    public function test_put_file_without_path()
+    public function testPutFileWithoutPath()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
 
@@ -432,7 +430,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     #[RequiresPhpExtension('ftp')]
-    public function test_create_ftp_driver()
+    public function testCreateFtpDriver()
     {
         $filesystem = new FilesystemManager(new Application);
 
@@ -451,7 +449,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('admin', $config['username']);
     }
 
-    public function test_macroable()
+    public function testMacroable()
     {
         $this->filesystem->write('foo.txt', 'Hello World');
 
@@ -463,7 +461,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('Hello World', $filesystemAdapter->getFoo());
     }
 
-    public function test_temporary_url_with_custom_callback()
+    public function testTemporaryUrlWithCustomCallback()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
@@ -481,7 +479,7 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    public function test_throw_exceptions_for_get()
+    public function testThrowExceptionsForGet()
     {
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
@@ -496,7 +494,7 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    public function test_throw_exceptions_for_read_stream()
+    public function testThrowExceptionsForReadStream()
     {
         $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['throw' => true]);
 
@@ -511,7 +509,7 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    public function test_throw_exceptions_for_put()
+    public function testThrowExceptionsForPut()
     {
         $this->filesystem->write('foo.txt', 'Hello World');
 
@@ -532,7 +530,7 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    public function test_throw_exceptions_for_mime_type()
+    public function testThrowExceptionsForMimeType()
     {
         $this->filesystem->write('unknown.mime-type', '');
 
@@ -549,7 +547,7 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
-    public function test_report_exceptions_for_get()
+    public function testReportExceptionsForGet()
     {
         $container = Container::getInstance();
 
@@ -577,7 +575,7 @@ class FilesystemAdapterTest extends TestCase
         }
     }
 
-    public function test_report_exceptions_for_read_stream()
+    public function testReportExceptionsForReadStream()
     {
         $container = Container::getInstance();
 
@@ -605,7 +603,7 @@ class FilesystemAdapterTest extends TestCase
         }
     }
 
-    public function test_report_exceptions_for_put()
+    public function testReportExceptionsForPut()
     {
         $container = Container::getInstance();
 
@@ -639,7 +637,7 @@ class FilesystemAdapterTest extends TestCase
         }
     }
 
-    public function test_report_exceptions_for_mime_type()
+    public function testReportExceptionsForMimeType()
     {
         $container = Container::getInstance();
 
@@ -669,7 +667,7 @@ class FilesystemAdapterTest extends TestCase
         }
     }
 
-    public function test_get_all_files()
+    public function testGetAllFiles()
     {
         $this->filesystem->write('body.txt', 'Hello World');
         $this->filesystem->write('file1.txt', 'Hello World');
@@ -681,7 +679,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame($filesystemAdapter->files(), ['body.txt', 'existing.txt', 'file.txt', 'file1.txt']);
     }
 
-    public function test_provides_temporary_urls()
+    public function testProvidesTemporaryUrls()
     {
         $localAdapter = new class($this->tempDir) extends LocalFilesystemAdapter
         {
@@ -695,7 +693,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function test_provides_temporary_urls_with_custom_callback()
+    public function testProvidesTemporaryUrlsWithCustomCallback()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
@@ -706,7 +704,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function test_provides_temporary_urls_for_s3_adapter()
+    public function testProvidesTemporaryUrlsForS3Adapter()
     {
         $filesystem = new FilesystemManager(new Application);
         $filesystemAdapter = $filesystem->createS3Driver([
@@ -717,7 +715,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function test_uses_right_separator_for_s3_adapter_urls()
+    public function testUsesRightSeperatorForS3Adapter()
     {
         $filesystem = new FilesystemManager(new Application);
         $filesystemAdapter = $filesystem->createS3Driver([
@@ -732,21 +730,21 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringNotContainsString('\\', $path);
     }
 
-    public function test_provides_temporary_urls_for_adapter_without_temporary_url_support()
+    public function testProvidesTemporaryUrlsForAdapterWithoutTemporaryUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
 
         $this->assertFalse($filesystemAdapter->providesTemporaryUrls());
     }
 
-    public function test_prefixes_urls()
+    public function testPrefixesUrls()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['url' => 'https://example.org/', 'prefix' => 'images']);
 
         $this->assertEquals('https://example.org/images/picture.jpeg', $filesystemAdapter->url('picture.jpeg'));
     }
 
-    public function test_get_checksum()
+    public function testGetChecksum()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->write('path.txt', 'contents of file');
