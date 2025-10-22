@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\UniqueLock;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -169,6 +170,62 @@ class UniqueJobTest extends QueueTestCase
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
     }
+
+    public function testLockUsesJobTypeIdentifierWhenAvailable()
+    {
+        Bus::fake();
+
+        $lockKey = 'laravel_unique_job:App\\Actions\\UniqueTestAction:';
+
+        dispatch(new UniqueTestJobWithJobTypeIdentifier);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        Bus::assertDispatched(UniqueTestJobWithJobTypeIdentifier::class);
+
+        $this->assertFalse(
+            $this->app->get(Cache::class)->lock($lockKey, 10)->get()
+        );
+
+        Bus::assertDispatchedTimes(UniqueTestJobWithJobTypeIdentifier::class);
+        dispatch(new UniqueTestJobWithJobTypeIdentifier);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        Bus::assertDispatchedTimes(UniqueTestJobWithJobTypeIdentifier::class);
+
+        $this->assertFalse(
+            $this->app->get(Cache::class)->lock($lockKey, 10)->get()
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithClassName()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:'.UniqueTestJob::class.':',
+            UniqueLock::getKey(new UniqueTestJob)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithIdAndClassName()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:'.UniqueIdTestJob::class.':unique-id-1',
+            UniqueLock::getKey(new UniqueIdTestJob)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithJobTypeIdentifierWhenAvailable()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            UniqueLock::getKey(new UniqueIdTestJobWithJobTypeIdentifier)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithIdAndJobTypeIdentifierWhenAvailable()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            UniqueLock::getKey(new UniqueIdTestJobWithJobTypeIdentifier)
+        );
+    }
 }
 
 class UniqueTestJob implements ShouldQueue, ShouldBeUnique
@@ -237,5 +294,34 @@ class UniqueViaJob extends UniqueTestJob
     public function uniqueVia(): Cache
     {
         return Container::getInstance()->make(Cache::class);
+    }
+}
+
+class UniqueIdTestJob extends UniqueTestJob
+{
+    public function uniqueId(): string
+    {
+        return 'unique-id-1';
+    }
+}
+
+class UniqueTestJobWithJobTypeIdentifier extends UniqueTestJob
+{
+    public function jobTypeIdentifier(): string
+    {
+        return 'App\\Actions\\UniqueTestAction';
+    }
+}
+
+class UniqueIdTestJobWithJobTypeIdentifier extends UniqueTestJob
+{
+    public function uniqueId(): string
+    {
+        return 'unique-id-2';
+    }
+
+    public function jobTypeIdentifier(): string
+    {
+        return 'App\\Actions\\UniqueTestAction';
     }
 }

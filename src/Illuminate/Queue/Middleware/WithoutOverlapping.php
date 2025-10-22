@@ -154,8 +154,14 @@ class WithoutOverlapping
      */
     public function getLockKey($job)
     {
-        return $this->shareKey
-            ? $this->prefix.$this->key
-            : $this->prefix.get_class($job).':'.$this->key;
+        if ($this->shareKey) {
+            return $this->prefix.$this->key;
+        }
+
+        $jobType = method_exists($job, 'jobTypeIdentifier')
+            ? $job->jobTypeIdentifier()
+            : get_class($job);
+
+        return $this->prefix.$jobType.':'.$this->key;
     }
 }

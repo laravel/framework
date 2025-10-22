@@ -151,6 +151,31 @@ class WithoutOverlappingJobsTest extends QueueTestCase
             (new WithoutOverlapping('key'))->withPrefix('prefix:')->shared()->getLockKey($job)
         );
     }
+
+    public function testGetLockUsesJobTypeIdentifier()
+    {
+        $job = new OverlappingTestJobWithJobTypeIdentifier;
+
+        $this->assertSame(
+            'laravel-queue-overlap:App\\Actions\\WithoutOverlappingTestAction:key',
+            (new WithoutOverlapping('key'))->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'laravel-queue-overlap:key',
+            (new WithoutOverlapping('key'))->shared()->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:App\\Actions\\WithoutOverlappingTestAction:key',
+            (new WithoutOverlapping('key'))->withPrefix('prefix:')->getLockKey($job)
+        );
+
+        $this->assertSame(
+            'prefix:key',
+            (new WithoutOverlapping('key'))->withPrefix('prefix:')->shared()->getLockKey($job)
+        );
+    }
 }
 
 class OverlappingTestJob
@@ -219,5 +244,13 @@ class OverlappingTestJobWithSharedKeyTwo
     public function middleware()
     {
         return [(new WithoutOverlapping)->shared()];
+    }
+}
+
+class OverlappingTestJobWithJobTypeIdentifier extends OverlappingTestJob
+{
+    public function jobTypeIdentifier(): string
+    {
+        return 'App\\Actions\\WithoutOverlappingTestAction';
     }
 }

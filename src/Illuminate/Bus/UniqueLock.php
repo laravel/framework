@@ -69,6 +69,10 @@ class UniqueLock
             ? $job->uniqueId()
             : ($job->uniqueId ?? '');
 
-        return 'laravel_unique_job:'.get_class($job).':'.$uniqueId;
+        $jobType = method_exists($job, 'jobTypeIdentifier')
+            ? $job->jobTypeIdentifier()
+            : get_class($job);
+
+        return 'laravel_unique_job:'.$jobType.':'.$uniqueId;
     }
 }
