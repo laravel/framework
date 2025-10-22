@@ -68,14 +68,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The primary key for the model.
      *
-     * @var string
+     * @var string|array<int, string>
      */
     protected $primaryKey = 'id';
 
     /**
      * The "type" of the primary key ID.
      *
-     * @var string
+     * @var string|array<int, string>
      */
     protected $keyType = 'int';
 
@@ -1354,6 +1354,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     protected function setKeysForSaveQuery($query)
     {
+        if ($this->hasCompositeKey()) {
+            foreach ($this->primaryKey as $key) {
+                $query->where($key, '=', $this->getKeyForSaveQuery($key));
+            }
+
+            return $query;
+        }
+
         $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
         return $query;
@@ -1362,11 +1370,14 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the primary key value for a save query.
      *
+     * @param  string|null  $key
      * @return mixed
      */
-    protected function getKeyForSaveQuery()
+    protected function getKeyForSaveQuery($key = null)
     {
-        return $this->original[$this->getKeyName()] ?? $this->getKey();
+        $key = $key ?? $this->getKeyName();
+
+        return $this->original[$key] ?? $this->getAttribute($key);
     }
 
     /**
@@ -1398,6 +1409,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $attributes = $this->getAttributesForInsert();
 
         if ($this->getIncrementing()) {
+            // Composite keys cannot be auto-incrementing.
+            if ($this->hasCompositeKey()) {
+                throw new LogicException('Composite primary keys cannot be auto-incrementing.');
+            }
+
             $this->insertAndSetId($query, $attributes);
         }
 
@@ -2035,9 +2051,19 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Determine if the model uses a composite primary key.
+     *
+     * @return bool
+     */
+    public function hasCompositeKey()
+    {
+        return is_array($this->primaryKey);
+    }
+
+    /**
      * Get the primary key for the model.
      *
-     * @return string
+     * @return string|array<int, string>
      */
     public function getKeyName()
     {
@@ -2047,7 +2073,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Set the primary key for the model.
      *
-     * @param  string  $key
+     * @param  string|array<int, string>  $key
      * @return $this
      */
     public function setKeyName($key)
@@ -2060,10 +2086,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Get the table qualified key name.
      *
-     * @return string
+     * @return string|array<int, string>
      */
     public function getQualifiedKeyName()
     {
+        if ($this->hasCompositeKey()) {
+            return array_map(
+                fn ($key) => $this->qualifyColumn($key),
+                $this->primaryKey
+            );
+        }
+
         return $this->qualifyColumn($this->getKeyName());
     }
 
@@ -2120,6 +2153,16 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKey()
     {
+        if ($this->hasCompositeKey()) {
+            $keys = [];
+
+            foreach ($this->primaryKey as $key) {
+                $keys[$key] = $this->getAttribute($key);
+            }
+
+            return $keys;
+        }
+
         return $this->getAttribute($this->getKeyName());
     }
 

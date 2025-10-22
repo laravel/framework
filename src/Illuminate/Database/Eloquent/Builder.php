@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
+use InvalidArgumentException;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -279,6 +280,12 @@ class Builder implements BuilderContract
             $id = $id->getKey();
         }
 
+        // Composite key handling
+        if ($this->model->hasCompositeKey()) {
+            return $this->whereCompositeKey($id);
+        }
+
+        // Original single-key logic
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
                 $this->query->whereIntegerInRaw($this->model->getQualifiedKeyName(), $id);
@@ -323,6 +330,62 @@ class Builder implements BuilderContract
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
+    }
+
+    /**
+     * Add a where clause on composite primary key to the query.
+     *
+     * @param  array  $keyValues
+     * @return $this
+     */
+    protected function whereCompositeKey($keyValues)
+    {
+        $qualifiedKeys = $this->model->getQualifiedKeyName();
+        $keyNames = $this->model->getKeyName();
+
+        // Single composite key: ['order_id' => 1, 'product_id' => 5]
+        if ($this->isAssociativeArray($keyValues)) {
+            foreach ($keyNames as $index => $keyName) {
+                if (! array_key_exists($keyName, $keyValues)) {
+                    throw new InvalidArgumentException(
+                        "Missing value for composite key component: {$keyName}"
+                    );
+                }
+
+                $this->query->where($qualifiedKeys[$index], '=', $keyValues[$keyName]);
+            }
+
+            return $this;
+        }
+
+        // Multiple composite keys (for whereIn-style queries)
+        // [['order_id' => 1, 'product_id' => 5], ['order_id' => 2, 'product_id' => 3]]
+        $this->query->where(function ($query) use ($keyValues, $qualifiedKeys, $keyNames) {
+            foreach ($keyValues as $compositeKey) {
+                $query->orWhere(function ($q) use ($compositeKey, $qualifiedKeys, $keyNames) {
+                    foreach ($keyNames as $index => $keyName) {
+                        $q->where($qualifiedKeys[$index], '=', $compositeKey[$keyName]);
+                    }
+                });
+            }
+        });
+
+        return $this;
+    }
+
+    /**
+     * Determine if an array is associative.
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    protected function isAssociativeArray(array $array)
+    {
+        if ([] === $array) {
+            return false;
+        }
+
+        return array_keys($array) !== range(0, count($array) - 1);
     }
 
     /**
