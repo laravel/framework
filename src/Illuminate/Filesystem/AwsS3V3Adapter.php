@@ -31,16 +31,11 @@ class AwsS3V3Adapter extends FilesystemAdapter
     {
         parent::__construct($driver, $adapter, $config);
 
-        // We override the prefixer for the S3 Adapter, because S3 only accepts
-        // the normal / as a separator. On Windows, this causes errors because the
-        // directory separator \\ is used.
-        $this->prefixer = new PathPrefixer($config['root'] ?? '', '/');
-
-        if (isset($config['prefix'])) {
-            $this->prefixer = new PathPrefixer($this->prefixer->prefixPath($config['prefix']), '/');
-        }
-
         $this->client = $client;
+
+        $this->prefixer = isset($config['prefix'])
+            ? new PathPrefixer($this->prefixer->prefixPath($config['prefix']), '/')
+            : new PathPrefixer($config['root'] ?? '', '/');
     }
 
     /**
