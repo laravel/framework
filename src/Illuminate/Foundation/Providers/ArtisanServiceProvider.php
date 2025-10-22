@@ -108,6 +108,7 @@ use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Console\RepositoryMakeCommand;
 
 class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -216,6 +217,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'QueueFailedTable' => FailedTableCommand::class,
         'QueueTable' => TableCommand::class,
         'QueueBatchesTable' => BatchesTableCommand::class,
+        'RepositoryMake' => RepositoryMakeCommand::class,
         'RequestMake' => RequestMakeCommand::class,
         'ResourceMake' => ResourceMakeCommand::class,
         'RuleMake' => RuleMakeCommand::class,
