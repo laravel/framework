@@ -2092,7 +2092,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         if ($this->hasCompositeKey()) {
             return array_map(
-                fn ($key) => $this->qualifyColumn($key),
+                $this->qualifyColumn(...),
                 $this->primaryKey
             );
         }

@@ -344,7 +344,7 @@ class Builder implements BuilderContract
         $keyNames = $this->model->getKeyName();
 
         // Single composite key: ['order_id' => 1, 'product_id' => 5]
-        if ($this->isAssociativeArray($keyValues)) {
+        if (! array_is_list($keyValues)) {
             foreach ($keyNames as $index => $keyName) {
                 if (! array_key_exists($keyName, $keyValues)) {
                     throw new InvalidArgumentException(
@@ -371,21 +371,6 @@ class Builder implements BuilderContract
         });
 
         return $this;
-    }
-
-    /**
-     * Determine if an array is associative.
-     *
-     * @param  array  $array
-     * @return bool
-     */
-    protected function isAssociativeArray(array $array)
-    {
-        if ([] === $array) {
-            return false;
-        }
-
-        return array_keys($array) !== range(0, count($array) - 1);
     }
 
     /**
