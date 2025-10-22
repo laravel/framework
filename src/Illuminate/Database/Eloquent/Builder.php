@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Closure;
 use Exception;
 use Illuminate\Contracts\Database\Eloquent\Builder as BuilderContract;
-use InvalidArgumentException;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
@@ -21,6 +20,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
+use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
 
