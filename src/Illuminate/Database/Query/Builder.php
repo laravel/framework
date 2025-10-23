@@ -263,6 +263,13 @@ class Builder implements BuilderContract
     public $useWritePdo = false;
 
     /**
+     * The comment to be added to the query.
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
      * Create a new query builder instance.
      */
     public function __construct(
@@ -4441,6 +4448,19 @@ class Builder implements BuilderContract
                 $clone->bindings[$type] = [];
             }
         });
+    }
+
+    /**
+     * Add a comment to the query
+     *
+     * @param  string  $comment
+     * @return $this
+     */
+    public function comment($comment)
+    {
+        $this->comment = $comment;
+
+        return $this;
     }
 
     /**

@@ -274,11 +274,12 @@ class SqlServerGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where, $comment)
     {
-        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where, $comment);
 
         return ! is_null($query->limit) && $query->limit > 0 && $query->offset <= 0
             ? Str::replaceFirst('delete', 'delete top ('.$query->limit.')', $sql)
@@ -393,15 +394,16 @@ class SqlServerGrammar extends Grammar
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where)
+    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where, $comment)
     {
         $alias = last(explode(' as ', $table));
 
         $joins = $this->compileJoins($query, $query->joins);
 
-        return "update {$alias} set {$columns} from {$table} {$joins} {$where}";
+        return "update {$alias} set {$columns} from {$table} {$joins} {$where} {$comment}";
     }
 
     /**

@@ -416,11 +416,12 @@ class MySqlGrammar extends Grammar
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where)
+    protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where, $comment)
     {
-        $sql = parent::compileUpdateWithoutJoins($query, $table, $columns, $where);
+        $sql = parent::compileUpdateWithoutJoins($query, $table, $columns, $where, $comment);
 
         if (! empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
@@ -459,11 +460,12 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where, $comment)
     {
-        $sql = parent::compileDeleteWithoutJoins($query, $table, $where);
+        $sql = parent::compileDeleteWithoutJoins($query, $table, $where, $comment);
 
         // When using MySQL, delete statements may contain order by statements and limits
         // so we will compile both of those here. Once we have finished compiling this

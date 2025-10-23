@@ -7092,6 +7092,34 @@ SQL;
         $this->assertSame('select * from "users" where "email" = \'foo\'', $builder->toRawSql());
     }
 
+    public function testAddingCommentToSelects()
+    {
+        $builder = $this->getBuilder();
+        $builder->comment('This is a comment')->from('users');
+        $this->assertSame('select * from "users" /* This is a comment */', $builder->toSql());
+    }
+
+    public function testAddingCommentToInserts()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?) /* This is a comment */', ['foo']);
+        $builder->comment('This is a comment')->from('users')->insert(['email' => 'foo']);
+    }
+
+    public function testAddingCommentToUpdates()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ? /* This is a comment */', ['foo', 'bar', 1]);
+        $builder->comment('This is a comment')->from('users')->where('id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+    }
+
+    public function testAddingCommentToDeletes()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "email" = ? /* This is a comment */', ['foo']);
+        $builder->comment('This is a comment')->from('users')->where('email', '=', 'foo')->delete();
+    }
+
     protected function getConnection(string $prefix = '')
     {
         $connection = m::mock(Connection::class);

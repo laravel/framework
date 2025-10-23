@@ -48,6 +48,7 @@ class Grammar extends BaseGrammar
         'limit',
         'offset',
         'lock',
+        'comment',
     ];
 
     /**
@@ -1185,9 +1186,10 @@ class Grammar extends BaseGrammar
         // simply makes creating the SQL easier for us since we can utilize the same
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
+        $comment = $this->compileComment($query, $query->comment);
 
         if (empty($values)) {
-            return "insert into {$table} default values";
+            return trim("insert into {$table} default values {$comment}");
         }
 
         if (! is_array(array_first($values))) {
@@ -1203,7 +1205,7 @@ class Grammar extends BaseGrammar
             ->map(fn ($record) => '('.$this->parameterize($record).')')
             ->implode(', ');
 
-        return "insert into $table ($columns) values $parameters";
+        return trim("insert into $table ($columns) values $parameters {$comment}");
     }
 
     /**
@@ -1282,10 +1284,12 @@ class Grammar extends BaseGrammar
 
         $where = $this->compileWheres($query);
 
+        $comment = $this->compileComment($query, $query->comment);
+
         return trim(
             isset($query->joins)
-                ? $this->compileUpdateWithJoins($query, $table, $columns, $where)
-                : $this->compileUpdateWithoutJoins($query, $table, $columns, $where)
+                ? $this->compileUpdateWithJoins($query, $table, $columns, $where, $comment)
+                : $this->compileUpdateWithoutJoins($query, $table, $columns, $where, $comment)
         );
     }
 
@@ -1310,11 +1314,12 @@ class Grammar extends BaseGrammar
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where)
+    protected function compileUpdateWithoutJoins(Builder $query, $table, $columns, $where, $comment)
     {
-        return "update {$table} set {$columns} {$where}";
+        return trim("update {$table} set {$columns} {$where} {$comment}");
     }
 
     /**
@@ -1324,13 +1329,14 @@ class Grammar extends BaseGrammar
      * @param  string  $table
      * @param  string  $columns
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where)
+    protected function compileUpdateWithJoins(Builder $query, $table, $columns, $where, $comment)
     {
         $joins = $this->compileJoins($query, $query->joins);
 
-        return "update {$table} {$joins} set {$columns} {$where}";
+        return trim("update {$table} {$joins} set {$columns} {$where} {$comment}");
     }
 
     /**
@@ -1379,10 +1385,12 @@ class Grammar extends BaseGrammar
 
         $where = $this->compileWheres($query);
 
+        $comment = $this->compileComment($query, $query->comment);
+
         return trim(
             isset($query->joins)
-                ? $this->compileDeleteWithJoins($query, $table, $where)
-                : $this->compileDeleteWithoutJoins($query, $table, $where)
+                ? $this->compileDeleteWithJoins($query, $table, $where, $comment)
+                : $this->compileDeleteWithoutJoins($query, $table, $where, $comment)
         );
     }
 
@@ -1392,11 +1400,12 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileDeleteWithoutJoins(Builder $query, $table, $where)
+    protected function compileDeleteWithoutJoins(Builder $query, $table, $where, $comment)
     {
-        return "delete from {$table} {$where}";
+        return trim("delete from {$table} {$where} {$comment}");
     }
 
     /**
@@ -1405,15 +1414,16 @@ class Grammar extends BaseGrammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  string  $table
      * @param  string  $where
+     * @param  string  $comment
      * @return string
      */
-    protected function compileDeleteWithJoins(Builder $query, $table, $where)
+    protected function compileDeleteWithJoins(Builder $query, $table, $where, $comment)
     {
         $alias = last(explode(' as ', $table));
 
         $joins = $this->compileJoins($query, $query->joins);
 
-        return "delete {$alias} from {$table} {$joins} {$where}";
+        return trim("delete {$alias} from {$table} {$joins} {$where} {$comment}");
     }
 
     /**
@@ -1492,6 +1502,17 @@ class Grammar extends BaseGrammar
     public function compileSavepointRollBack($name)
     {
         return 'ROLLBACK TO SAVEPOINT '.$name;
+    }
+
+    /**
+     * Compile the "comment" portion of the query.
+     *
+     * @param  string|null  $comment
+     * @return string
+     */
+    protected function compileComment(Builder $query, $comment)
+    {
+        return $comment ? '/* '.$comment.' */' : '';
     }
 
     /**
