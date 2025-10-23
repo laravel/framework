@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Integration\Database\Fixtures;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 
-class NamedScopeUser extends User
+class ScopeUser extends User
 {
     /** {@inheritdoc} */
     #[\Override]
