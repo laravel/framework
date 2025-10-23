@@ -1735,7 +1735,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  string  $scope
      * @return bool
      */
-    public function hasNamedScope($scope)
+    public function hasScope($scope)
     {
         return method_exists($this, 'scope'.ucfirst($scope)) ||
             static::isScopeMethodWithAttribute($scope);
@@ -1748,7 +1748,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      * @param  array  $parameters
      * @return mixed
      */
-    public function callNamedScope($scope, array $parameters = [])
+    public function callScope($scope, array $parameters = [])
     {
         if ($this->isScopeMethodWithAttribute($scope)) {
             return $this->{$scope}(...$parameters);
