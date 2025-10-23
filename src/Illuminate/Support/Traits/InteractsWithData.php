@@ -2,10 +2,12 @@
 
 namespace Illuminate\Support\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use stdClass;
 
 use function Illuminate\Support\enum_value;
@@ -358,6 +360,26 @@ trait InteractsWithData
     protected function isBackedEnum($enumClass)
     {
         return enum_exists($enumClass) && method_exists($enumClass, 'tryFrom');
+    }
+
+    /**
+     * Retrieve data from the instance as a collection of models.
+     *
+     * @param  string  $key
+     * @param  class-string  $modelClass
+     * @return Collection<Model>
+     *
+     * @throws InvalidArgumentException
+     */
+    public function models($key, $modelClass)
+    {
+        if (! in_array(Model::class, class_parents($modelClass))) {
+            throw new InvalidArgumentException('Model class should be a child of Illuminate\Database\Eloquent\Model');
+        }
+
+        $routeKeyName = (new $modelClass)->getRouteKeyName();
+
+        return $modelClass::whereIn($routeKeyName, $this->array($key))->get();
     }
 
     /**
