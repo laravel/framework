@@ -17,9 +17,6 @@ class FileCacheLockTest extends TestCase
     {
         parent::setUp();
 
-        $this->app['config']->set('cache.default', 'file');
-        $this->app['config']->set('cache.stores.file.lock_path', storage_path('framework/cache/locks'));
-
         // flush lock from previous tests
         Cache::lock('foo')->forceRelease();
     }
