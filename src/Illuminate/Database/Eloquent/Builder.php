@@ -1533,7 +1533,7 @@ class Builder implements BuilderContract
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callScope(
+            $builder = $builder->callNamedScope(
                 $scope, Arr::wrap($parameters)
             );
         }
@@ -1615,10 +1615,10 @@ class Builder implements BuilderContract
      * @param  array  $parameters
      * @return mixed
      */
-    protected function callScope($scope, array $parameters = [])
+    protected function callNamedScope($scope, array $parameters = [])
     {
         return $this->callScope(function (...$parameters) use ($scope) {
-            return $this->model->callScope($scope, $parameters);
+            return $this->model->callNamedScope($scope, $parameters);
         }, $parameters);
     }
 
@@ -2228,7 +2228,7 @@ class Builder implements BuilderContract
         }
 
         if ($this->hasScope($method)) {
-            return $this->callScope($method, $parameters);
+            return $this->callNamedScope($method, $parameters);
         }
 
         if (in_array(strtolower($method), $this->passthru)) {
