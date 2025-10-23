@@ -170,7 +170,7 @@ class FailoverStore extends TaggableStore implements LockProvider
     public function flushStaleTags()
     {
         foreach ($this->stores as $store) {
-            if ($this->store($store) instanceof RedisStore) {
+            if ($this->store($store)->getStore() instanceof RedisStore) {
                 $this->store($store)->flushStaleTags();
 
                 break;
