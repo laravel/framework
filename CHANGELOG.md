@@ -875,7 +875,7 @@
 * [12.x] Added except() method to Model class for excluding attributes by [@vishal2931](https://github.com/vishal2931) in https://github.com/laravel/framework/pull/55072
 * [12.x] fix: add TPivotModel default and define pivot property in {Belongs,Morph}ToMany by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/55086
 * [12.x] remove `@return` docblocks on constructors by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/55076
-* [12.x] Add NamedScope attribute by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/54450
+* [12.x] Add Scope attribute by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/54450
 * [12.x] Improve syntax highlighting for stub type files by [@kayw-geek](https://github.com/kayw-geek) in https://github.com/laravel/framework/pull/55094
 * [12.x] Prefer `new Collection` over `Collection::make` by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/55091
 * [12.x] Fix except() method to support casted values by [@vishal2931](https://github.com/vishal2931) in https://github.com/laravel/framework/pull/55124
