@@ -3,7 +3,6 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Cache\Events\CacheFailedOver;
-use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use RuntimeException;

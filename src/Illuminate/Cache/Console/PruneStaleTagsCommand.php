@@ -3,7 +3,6 @@
 namespace Illuminate\Cache\Console;
 
 use Illuminate\Cache\CacheManager;
-use Illuminate\Cache\RedisStore;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
