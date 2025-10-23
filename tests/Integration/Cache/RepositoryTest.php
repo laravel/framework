@@ -279,4 +279,91 @@ class RepositoryTest extends TestCase
         $this->assertSame('foo', $events[0]->key);
         $this->assertSame(1, $events[0]->seconds);
     }
+
+    public function testDynamicForeverKeepsRevalidating(): void
+    {
+        Carbon::setTestNow('2000-01-01 00:00:00');
+        $cache = Cache::driver('array');
+        $count = 0;
+
+        // Cache is empty. The value should be populated...
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+
+        $this->assertSame(1, $value);
+        $this->assertCount(0, defer());
+        $this->assertSame(1, $cache->get('foo'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // Cache is fresh. The value should be retrieved from the cache and used...
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+        $this->assertSame(1, $value);
+        $this->assertCount(0, defer());
+        $this->assertSame(1, $cache->get('foo'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        Carbon::setTestNow(now()->addSeconds(11));
+
+        // Cache is now "stale". The stored value should be used and a deferred
+        // callback should be registered to refresh the cache.
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+        $this->assertSame(1, $value);
+        $this->assertCount(1, defer());
+        $this->assertSame(1, $cache->get('foo'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // We will hit it again within the same request. This should not queue
+        // up an additional deferred callback as only one can be registered at
+        // a time for each key.
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+        $this->assertSame(1, $value);
+        $this->assertCount(1, defer());
+        $this->assertSame(1, $cache->get('foo'));
+        $this->assertSame(946684800, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // We will now simulate the end of the request lifecycle by executing the
+        // deferred callback. This should refresh the cache.
+        defer()->invoke();
+        $this->assertCount(0, defer());
+        $this->assertSame(2, $cache->get('foo')); // this has been updated!
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo')); // this has been updated!
+
+        // Now the cache is fresh again...
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+        $this->assertSame(2, $value);
+        $this->assertCount(0, defer());
+        $this->assertSame(2, $cache->get('foo'));
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // Let's now progress time in a significant way
+        Carbon::setTestNow(now()->addYears(10));
+
+        // We check the key is still present
+        $this->assertTrue($cache->has('foo'));
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // We should get the stale version here, and trigger defer.
+        $value = $cache->flexibleForever('foo', 10, function () use (&$count) {
+            return ++$count;
+        });
+        $this->assertSame(2, $value);
+        $this->assertCount(1, defer());
+        $this->assertSame(2, $cache->get('foo'));
+        $this->assertSame(946684811, $cache->get('illuminate:cache:flexible:created:foo'));
+
+        // We now simulate end of request
+        defer()->invoke();
+        $this->assertCount(0, defer());
+        $this->assertSame(3, $cache->get('foo')); // this has been updated!
+        $this->assertSame(1262304011, $cache->get('illuminate:cache:flexible:created:foo')); // this has been updated!
+    }
 }
