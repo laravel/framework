@@ -9,7 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[WithMigration]
 class EloquentScopeAttributeTest extends TestCase
 {
-    protected $query = 'select * from "named_scope_users" where "email_verified_at" is not null';
+    protected $query = 'select * from "scope_users" where "email_verified_at" is not null';
 
     protected function setUp(): void
     {
@@ -22,7 +22,7 @@ class EloquentScopeAttributeTest extends TestCase
     }
 
     #[DataProvider('scopeDataProvider')]
-    public function test_it_can_query_named_scoped_from_the_query_builder(string $methodName)
+    public function test_it_can_query_scoped_from_the_query_builder(string $methodName)
     {
         $query = Fixtures\ScopeUser::query()->{$methodName}(true);
 
@@ -30,7 +30,7 @@ class EloquentScopeAttributeTest extends TestCase
     }
 
     #[DataProvider('scopeDataProvider')]
-    public function test_it_can_query_named_scoped_from_static_query(string $methodName)
+    public function test_it_can_query_scoped_from_static_query(string $methodName)
     {
         $query = Fixtures\ScopeUser::{$methodName}(true);
 
