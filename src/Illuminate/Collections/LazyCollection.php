@@ -1761,6 +1761,31 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Return only unique items from the collection array using string comparison.
+     *
+     * @param  (callable(TValue, TKey): string)|string|null  $key
+     * @return static<TKey, TValue>
+     */
+    public function uniqueStrings($key = null)
+    {
+        $callback = $this->valueRetriever($key);
+
+        return new static(function () use ($callback) {
+            $exists = [];
+
+            foreach ($this as $key => $item) {
+                $id = $callback($item, $key);
+
+                if (! isset($exists[$id])) {
+                    yield $key => $item;
+
+                    $exists[$id] = true;
+                }
+            }
+        });
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static<int, TValue>

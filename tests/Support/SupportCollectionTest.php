@@ -1761,6 +1761,163 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testUniqueStrings($collection)
+    {
+        $c = new $collection(['Hello', 'World', 'World', 'Hello']);
+        $this->assertEquals(['Hello', 'World'], $c->uniqueStrings()->all());
+
+        $c = new $collection(['user@example.com', 'admin@example.com', 'user@example.com']);
+        $this->assertEquals(['user@example.com', 'admin@example.com'], $c->uniqueStrings()->all());
+
+        $c = new $collection(['SKU-001', 'SKU-002', 'SKU-001', 'SKU-003']);
+        $this->assertEquals(['SKU-001', 'SKU-002', 'SKU-003'], $c->uniqueStrings()->values()->all());
+
+        $c = new $collection(['5', '10', '5', '3A', '5', '5']);
+        $this->assertEquals(['5', '10', '3A'], $c->uniqueStrings()->values()->all());
+
+        $c = new $collection([
+            'a' => 'foo',
+            'b' => 'bar',
+            'c' => 'foo',
+            'd' => 'baz',
+        ]);
+        $this->assertEquals([
+            'a' => 'foo',
+            'b' => 'bar',
+            'd' => 'baz',
+        ], $c->uniqueStrings()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testUniqueStringsWithKey($collection)
+    {
+        $c = new $collection([
+            1 => ['id' => 1, 'email' => 'taylor@example.com', 'name' => 'Taylor'],
+            2 => ['id' => 2, 'email' => 'abigail@example.com', 'name' => 'Abigail'],
+            3 => ['id' => 3, 'email' => 'taylor@example.com', 'name' => 'Taylor Otwell'],
+            4 => ['id' => 4, 'email' => 'jess@example.com', 'name' => 'Jess'],
+        ]);
+
+        $this->assertEquals([
+            1 => ['id' => 1, 'email' => 'taylor@example.com', 'name' => 'Taylor'],
+            2 => ['id' => 2, 'email' => 'abigail@example.com', 'name' => 'Abigail'],
+            4 => ['id' => 4, 'email' => 'jess@example.com', 'name' => 'Jess'],
+        ], $c->uniqueStrings('email')->all());
+
+        $c = new $collection([
+            ['user' => ['email' => 'foo@example.com']],
+            ['user' => ['email' => 'bar@example.com']],
+            ['user' => ['email' => 'foo@example.com']],
+        ]);
+
+        $result = $c->uniqueStrings('user.email')->values()->all();
+        $this->assertCount(2, $result);
+        $this->assertEquals('foo@example.com', $result[0]['user']['email']);
+        $this->assertEquals('bar@example.com', $result[1]['user']['email']);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testUniqueStringsWithCallback($collection)
+    {
+        $c = new $collection([
+            1 => ['id' => 1, 'sku' => 'SKU-001', 'name' => 'Product 1'],
+            2 => ['id' => 2, 'sku' => 'SKU-002', 'name' => 'Product 2'],
+            3 => ['id' => 3, 'sku' => 'SKU-001', 'name' => 'Product 1 Duplicate'],
+            4 => ['id' => 4, 'sku' => 'SKU-003', 'name' => 'Product 3'],
+        ]);
+
+        // Dedupe by SKU using closure
+        $this->assertEquals([
+            1 => ['id' => 1, 'sku' => 'SKU-001', 'name' => 'Product 1'],
+            2 => ['id' => 2, 'sku' => 'SKU-002', 'name' => 'Product 2'],
+            4 => ['id' => 4, 'sku' => 'SKU-003', 'name' => 'Product 3'],
+        ], $c->uniqueStrings(function ($item) {
+            return $item['sku'];
+        })->all());
+
+        // Concatenating multiple fields
+        $c = new $collection([
+            ['first' => 'Taylor', 'last' => 'Otwell'],
+            ['first' => 'Abigail', 'last' => 'Otwell'],
+            ['first' => 'Taylor', 'last' => 'Otwell'],
+            ['first' => 'Taylor', 'last' => 'Swift'],
+        ]);
+
+        $this->assertEquals([
+            ['first' => 'Taylor', 'last' => 'Otwell'],
+            ['first' => 'Abigail', 'last' => 'Otwell'],
+            ['first' => 'Taylor', 'last' => 'Swift'],
+        ], $c->uniqueStrings(function ($item) {
+            return $item['first'].$item['last'];
+        })->values()->all());
+
+        // With key parameter in closure
+        $c = new $collection([
+            'a' => ['code' => 'A1'],
+            'b' => ['code' => 'B2'],
+            'c' => ['code' => 'A1'],
+            'd' => ['code' => 'D4'],
+        ]);
+
+        $result = $c->uniqueStrings(function ($item, $key) {
+            return $item['code'];
+        })->all();
+
+        $this->assertCount(3, $result);
+        $this->assertArrayHasKey('a', $result);
+        $this->assertArrayHasKey('b', $result);
+        $this->assertArrayHasKey('d', $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testUniqueStringsPreservesKeys($collection)
+    {
+        // Numeric keys
+        $c = new $collection([
+            10 => 'apple',
+            20 => 'banana',
+            30 => 'apple',
+            40 => 'cherry',
+        ]);
+
+        $result = $c->uniqueStrings()->all();
+        $this->assertEquals([
+            10 => 'apple',
+            20 => 'banana',
+            40 => 'cherry',
+        ], $result);
+
+        // String keys
+        $c = new $collection([
+            'first' => 'foo',
+            'second' => 'bar',
+            'third' => 'foo',
+            'fourth' => 'baz',
+        ]);
+
+        $result = $c->uniqueStrings()->all();
+        $this->assertEquals([
+            'first' => 'foo',
+            'second' => 'bar',
+            'fourth' => 'baz',
+        ], $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testUniqueStringsEmptyCollection($collection)
+    {
+        $c = new $collection([]);
+        $this->assertEquals([], $c->uniqueStrings()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testUniqueStringsSingleItem($collection)
+    {
+        $c = new $collection(['only-one']);
+        $this->assertEquals(['only-one'], $c->uniqueStrings()->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCollapse($collection)
     {
         // Normal case: a two-dimensional array with different elements

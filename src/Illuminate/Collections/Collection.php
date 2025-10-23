@@ -1789,6 +1789,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Return only unique items from the collection array using string comparison.
+     *
+     * @param  (callable(TValue, TKey): string)|string|null  $key
+     * @return static
+     */
+    public function uniqueStrings($key = null)
+    {
+        if (is_null($key)) {
+            return new static(array_unique($this->items, SORT_STRING));
+        }
+
+        $callback = $this->valueRetriever($key);
+
+        $exists = [];
+
+        return $this->reject(function ($item, $key) use ($callback, &$exists) {
+            $id = $callback($item, $key);
+
+            if (isset($exists[$id])) {
+                return true;
+            }
+
+            $exists[$id] = true;
+        });
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static<int, TValue>
