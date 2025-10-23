@@ -527,6 +527,23 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Retrieve an item from the cache by key, refreshing it in the background if it is stale, with a fixed "forever-like" higher ttl.
+     *
+     * @template TCacheValue
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @param  (callable(): TCacheValue)  $callback
+     * @param  array{ seconds?: int, owner?: string }|null  $lock
+     * @param  bool  $alwaysDefer
+     * @return TCacheValue
+     */
+    public function flexibleForever($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
+    {
+        return $this->flexible($key, [$ttl, Carbon::now()->addYears(1000)], $callback, $lock, $alwaysDefer);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
