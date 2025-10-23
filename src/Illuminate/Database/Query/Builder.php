@@ -4451,7 +4451,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Add a comment to the query
+     * Add a comment to the query.
      *
      * @param  string  $comment
      * @return $this
