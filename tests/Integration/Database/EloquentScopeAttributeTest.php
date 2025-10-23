@@ -7,7 +7,7 @@ use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[WithMigration]
-class EloquentNamedScopeAttributeTest extends TestCase
+class EloquentScopeAttributeTest extends TestCase
 {
     protected $query = 'select * from "named_scope_users" where "email_verified_at" is not null';
 
@@ -24,7 +24,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_the_query_builder(string $methodName)
     {
-        $query = Fixtures\NamedScopeUser::query()->{$methodName}(true);
+        $query = Fixtures\ScopeUser::query()->{$methodName}(true);
 
         $this->assertSame($this->query, $query->toRawSql());
     }
@@ -32,7 +32,7 @@ class EloquentNamedScopeAttributeTest extends TestCase
     #[DataProvider('scopeDataProvider')]
     public function test_it_can_query_named_scoped_from_static_query(string $methodName)
     {
-        $query = Fixtures\NamedScopeUser::{$methodName}(true);
+        $query = Fixtures\ScopeUser::{$methodName}(true);
 
         $this->assertSame($this->query, $query->toRawSql());
     }
