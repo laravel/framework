@@ -29,10 +29,10 @@ class DatabaseEloquentLocalScopesTest extends TestCase
     {
         $model = new EloquentLocalScopesTestModel;
 
-        $this->assertTrue($model->hasNamedScope('active'));
-        $this->assertTrue($model->hasNamedScope('type'));
+        $this->assertTrue($model->hasScope('active'));
+        $this->assertTrue($model->hasScope('type'));
 
-        $this->assertFalse($model->hasNamedScope('nonExistentLocalScope'));
+        $this->assertFalse($model->hasScope('nonExistentLocalScope'));
     }
 
     public function testLocalScopeIsApplied()
