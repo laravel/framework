@@ -211,10 +211,10 @@ class FailoverStore extends TaggableStore implements LockProvider
     /**
      * Get the cache store for the given store name.
      *
-     * @return \Illuminate\Contracts\Cache\Store
+     * @return \Illuminate\Contracts\Cache\Repository
      */
     protected function store(string $store)
     {
-        return $this->cache->store($store)->getStore();
+        return $this->cache->store($store);
     }
 }
