@@ -1,6 +1,19 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.35.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.35.1...12.x)
+
+## [v12.35.1](https://github.com/laravel/framework/compare/v12.35.0...v12.35.1) - 2025-10-23
+
+* Store previous route name in session by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57477
+* [12.x] Update CSS in minimal exception view. by [@FoksVHox](https://github.com/FoksVHox) in https://github.com/laravel/framework/pull/57490
+* [12.x] Ensure HTTP batch results are returned in the same order as requested by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57483
+* [12.x] Correct `Response` namespace in `Batch` by [@simon-tma](https://github.com/simon-tma) in https://github.com/laravel/framework/pull/57481
+* [12.x] Rename NamedScope to Scope by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57478
+* Fix S3 adapter to use correct path separator and update related tests by [@Kleppinger](https://github.com/Kleppinger) in https://github.com/laravel/framework/pull/57497
+* [12.x] Replace Bootcamp with Laravel Learn by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57506
+* [12.x] Pass exception to `QueueFailedOver` event by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57503
+* [12.x] Add warning when server workers cannot be respected by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/57482
+* [12.x] Emit underlying store name in cache events when using failover by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57505
 
 ## [v12.35.0](https://github.com/laravel/framework/compare/v12.34.0...v12.35.0) - 2025-10-21
 
