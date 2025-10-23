@@ -323,7 +323,9 @@ class LogManager implements LoggerInterface
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config),
-                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false
+                $config['bubble'] ?? true, $config['permission'] ?? null, $config['locking'] ?? false,
+                $config['date_format'] ?? RotatingFileHandler::FILE_PER_DAY,
+                $config['filename_format'] ?? '{filename}-{date}'
             ), $config),
         ], $config['replace_placeholders'] ?? false ? [new PsrLogMessageProcessor()] : []);
     }

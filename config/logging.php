@@ -70,6 +70,8 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
+            'date_format' => env('LOG_DAILY_DATE_FORMAT', 'Y-m-d'),
+            'filename_format' => env('LOG_DAILY_FILENAME_FORMAT', '{filename}-{date}'),
             'replace_placeholders' => true,
         ],
 
