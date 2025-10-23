@@ -927,12 +927,12 @@ class Builder implements BuilderContract
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
+        return $this->whereNested(function ($query) use ($column, $method) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
-                    $query->{$method}(...array_values($value), boolean: $boolean);
+                    $query->{$method}(...array_values($value));
                 } else {
-                    $query->{$method}($key, '=', $value, $boolean);
+                    $query->{$method}($key, '=', $value);
                 }
             }
         }, $boolean);
