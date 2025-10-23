@@ -3,6 +3,7 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Cache\Events\CacheFailedOver;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use RuntimeException;
@@ -160,6 +161,22 @@ class FailoverStore extends TaggableStore implements LockProvider
     public function flush()
     {
         return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+    }
+
+    /**
+     * Remove all expired tag set entries.
+     *
+     * @return void
+     */
+    public function flushStaleTags()
+    {
+        foreach ($this->stores as $store) {
+            if ($this->store($store) instanceof RedisStore) {
+                $this->store($store)->flushStaleTags();
+
+                break;
+            }
+        }
     }
 
     /**
