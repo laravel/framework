@@ -10,7 +10,7 @@ class SupportUriTest extends TestCase
 {
     public function test_can_build_special_urls()
     {
-        Uri::setUrlGeneratorResolver(fn() => new CustomUrlGeneratorResolver);
+        Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
 
         $this->assertEquals('https://laravel.com/current', Uri::current()->value());
         $this->assertEquals('https://laravel.com/to', Uri::to('')->value());
