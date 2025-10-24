@@ -152,9 +152,9 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         );
     }
 
-    public function testGetLockUsesJobTypeIdentifier()
+    public function testGetLockUsesDisplayName()
     {
-        $job = new OverlappingTestJobWithJobTypeIdentifier;
+        $job = new OverlappingTestJobWithDisplayName;
 
         $this->assertSame(
             'laravel-queue-overlap:App\\Actions\\WithoutOverlappingTestAction:key',
@@ -247,9 +247,9 @@ class OverlappingTestJobWithSharedKeyTwo
     }
 }
 
-class OverlappingTestJobWithJobTypeIdentifier extends OverlappingTestJob
+class OverlappingTestJobWithDisplayName extends OverlappingTestJob
 {
-    public function jobTypeIdentifier(): string
+    public function displayName(): string
     {
         return 'App\\Actions\\WithoutOverlappingTestAction';
     }

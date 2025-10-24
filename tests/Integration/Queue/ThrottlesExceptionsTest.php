@@ -384,7 +384,7 @@ class ThrottlesExceptionsTest extends TestCase
         $this->assertTrue($job->released);
     }
 
-    public function testUsesJobTypeIdentifierForCacheKeyWhenAvailable()
+    public function testUsesDisplayNameForCacheKeyWhenAvailable()
     {
         $rateLimiter = $this->mock(RateLimiter::class);
 
@@ -399,7 +399,7 @@ class ThrottlesExceptionsTest extends TestCase
                 return $this;
             }
 
-            public function jobTypeIdentifier(): string
+            public function displayName(): string
             {
                 return 'App\\Actions\\ThrottlesExceptionsTestAction';
             }

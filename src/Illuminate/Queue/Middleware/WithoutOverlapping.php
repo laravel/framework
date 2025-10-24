@@ -158,10 +158,10 @@ class WithoutOverlapping
             return $this->prefix.$this->key;
         }
 
-        $jobType = method_exists($job, 'jobTypeIdentifier')
-            ? $job->jobTypeIdentifier()
+        $jobName = method_exists($job, 'displayName')
+            ? $job->displayName()
             : get_class($job);
 
-        return $this->prefix.$jobType.':'.$this->key;
+        return $this->prefix.$jobName.':'.$this->key;
     }
 }
