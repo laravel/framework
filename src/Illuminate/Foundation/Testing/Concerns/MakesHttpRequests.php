@@ -682,7 +682,10 @@ trait MakesHttpRequests
             }
 
             if (is_array($value)) {
-                $files[$key] = $this->extractFilesFromDataArray($value);
+                $temp = $this->extractFilesFromDataArray($value);
+                if ($temp) {
+                    $files[$key] = $temp;
+                }
 
                 $data[$key] = $value;
             }
