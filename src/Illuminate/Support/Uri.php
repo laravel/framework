@@ -48,6 +48,14 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
     }
 
     /**
+     * Get a URI instance of the URL for the current request.
+     */
+    public static function current(): static
+    {
+        return new static(call_user_func(static::$urlGeneratorResolver)->current());
+    }
+
+    /**
      * Get a URI instance of an absolute URL for the given path.
      */
     public static function to(string $path): static
