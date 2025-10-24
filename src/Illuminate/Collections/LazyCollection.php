@@ -442,6 +442,31 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Return only duplicate items from the collection using string comparison.
+     *
+     * @param  (callable(TValue, TKey): string)|string|null  $key
+     * @return static<TKey, TValue>
+     */
+    public function duplicateStrings($key = null)
+    {
+        $callback = $this->valueRetriever($key);
+
+        return new static(function () use ($callback) {
+            $exists = [];
+
+            foreach ($this as $key => $item) {
+                $id = $callback($item, $key);
+
+                if (isset($exists[$id])) {
+                    yield $key => $item;
+                } else {
+                    $exists[$id] = true;
+                }
+            }
+        });
+    }
+
+    /**
      * Get all items except for those with the specified keys.
      *
      * @param  \Illuminate\Support\Enumerable<array-key, TKey>|array<array-key, TKey>  $keys

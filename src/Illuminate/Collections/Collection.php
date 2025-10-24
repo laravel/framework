@@ -368,6 +368,31 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Return only duplicate items from the collection array using string comparison.
+     *
+     * @param  (callable(TValue, TKey): string)|string|null  $key
+     * @return static
+     */
+    public function duplicateStrings($key = null)
+    {
+        $items = is_null($key) ? $this->items : $this->map($this->valueRetriever($key));
+
+        $exists = [];
+
+        return $this->filter(function ($item, $itemKey) use ($items, $key, &$exists) {
+            $id = is_null($key) ? $item : $items[$itemKey];
+
+            if (isset($exists[$id])) {
+                return true;
+            }
+
+            $exists[$id] = true;
+
+            return false;
+        });
+    }
+
+    /**
      * Get the comparison function to detect duplicates.
      *
      * @param  bool  $strict
