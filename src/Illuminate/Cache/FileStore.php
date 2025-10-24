@@ -218,11 +218,9 @@ class FileStore implements Store, LockProvider
     {
         $this->ensureCacheDirectoryExists($this->lockDirectory ?? $this->directory);
 
-        $lockName = "{$name}:file-store-lock";
-
         return new FileLock(
             new static($this->files, $this->lockDirectory ?? $this->directory, $this->filePermission),
-            $lockName,
+            "file-store-lock:{$name}",
             $seconds,
             $owner
         );
