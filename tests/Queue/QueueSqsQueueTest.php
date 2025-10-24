@@ -261,7 +261,10 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'MessageBody' => $this->mockedPayload,
+        ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
@@ -276,7 +279,10 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload])->andReturn($this->mockedSendMessageResponseModel);
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'MessageBody' => $this->mockedPayload,
+        ])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
@@ -295,7 +301,11 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('createPayload')->with($job, $this->queueName, $this->mockedData)->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->andReturn($this->mockedSendMessageResponseModel);
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'MessageBody' => $this->mockedPayload,
+            'MessageGroupId' => $this->mockedMessageGroupId,
+        ])->andReturn($this->mockedSendMessageResponseModel);
         $id = $queue->push($job, $this->mockedData, $this->queueName);
         $this->assertEquals($this->mockedMessageId, $id);
         $container->shouldHaveReceived('bound')->with('events')->twice();
@@ -309,7 +319,11 @@ class QueueSqsQueueTest extends TestCase
         $queue->setContainer($container = m::spy(Container::class));
         $queue->expects($this->once())->method('createPayload')->with($pendingDispatch->getJob(), $this->queueName, '')->willReturn($this->mockedPayload);
         $queue->expects($this->once())->method('getQueue')->with(null)->willReturn($this->queueUrl);
-        $this->sqs->shouldReceive('sendMessage')->once()->with(['QueueUrl' => $this->queueUrl, 'MessageBody' => $this->mockedPayload, 'MessageGroupId' => $this->mockedMessageGroupId])->andReturn($this->mockedSendMessageResponseModel);
+        $this->sqs->shouldReceive('sendMessage')->once()->with([
+            'QueueUrl' => $this->queueUrl,
+            'MessageBody' => $this->mockedPayload,
+            'MessageGroupId' => $this->mockedMessageGroupId,
+        ])->andReturn($this->mockedSendMessageResponseModel);
 
         $dispatcher = new Dispatcher($container, fn () => $queue);
         app()->instance(DispatcherContract::class, $dispatcher);
