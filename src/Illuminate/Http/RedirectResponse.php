@@ -8,6 +8,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
@@ -158,6 +159,27 @@ class RedirectResponse extends BaseRedirectResponse
         }
 
         return new MessageBag((array) $provider);
+    }
+
+    /**
+     * Enforce the target to be the same origin as the request.
+     */
+    public function enforceSameOrigin(
+        string $fallback,
+        bool   $validateScheme = true,
+        bool   $validatePort = true,
+    ): static {
+        $target = Uri::of($this->targetUrl);
+        $current = Uri::of($this->request->getSchemeAndHttpHost());
+
+        if ($target->host() !== $current->host()
+            || ($validateScheme && $target->scheme() !== $current->scheme())
+            || ($validatePort && $target->port() !== $current->port())
+        ) {
+            $this->setTargetUrl($fallback);
+        }
+
+        return $this;
     }
 
     /**
