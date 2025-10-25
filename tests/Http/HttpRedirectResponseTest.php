@@ -126,6 +126,15 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertSame('https://example.com/foo/bar', $response->getTargetUrl());
     }
 
+    public function testCanEnforceSameOriginWhenSameOriginAndCustomPort()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:1/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('https://example.com:1/foo/bar', $response->getTargetUrl());
+    }
+
     public function testCanEnforceSameOriginWhenNotSameScheme()
     {
         $response = new RedirectResponse('https://example.com/foo/bar');
