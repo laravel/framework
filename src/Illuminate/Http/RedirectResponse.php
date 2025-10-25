@@ -166,8 +166,8 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function enforceSameOrigin(
         string $fallback,
-        bool   $validateScheme = true,
-        bool   $validatePort = true,
+        bool $validateScheme = true,
+        bool $validatePort = true,
     ): static {
         $target = Uri::of($this->targetUrl);
         $current = Uri::of($this->request->getSchemeAndHttpHost());
