@@ -6,7 +6,6 @@ use Aws\S3\S3Client;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
-use League\Flysystem\PathPrefixer;
 
 class AwsS3V3Adapter extends FilesystemAdapter
 {
