@@ -1812,4 +1812,69 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    public function testReturnsItemsThatAreNotInTheSecondArray()
+    {
+        $result = Arr::diff(['a' => 1, 'b' => 2, 'c' => 3], ['b' => 2]);
+
+        $this->assertSame(['a' => 1, 'c' => 3], $result);
+    }
+
+    public function testReturnsEmptyArrayWhenAllValuesMatch()
+    {
+        $result = Arr::diff(['a' => 1, 'b' => 2], ['b' => 2, 'a' => 1]);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testHandlesMultipleArraysForDifference()
+    {
+        $result = Arr::diff(
+            ['a' => 1, 'b' => 2, 'c' => 3, 'd' => 4],
+            ['b' => 2],
+            ['c' => 3, 'e' => 5]
+        );
+
+        $this->assertSame(['a' => 1, 'd' => 4], $result);
+    }
+
+    public function testPreservesOriginalKeys()
+    {
+        $result = Arr::diff(['x' => 10, 'y' => 20, 'z' => 30], ['y' => 20]);
+
+        $this->assertArrayHasKey('x', $result);
+        $this->assertArrayHasKey('z', $result);
+        $this->assertSame(['x' => 10, 'z' => 30], $result);
+    }
+
+    public function testReturnsOriginalArrayWhenOtherArraysAreEmpty()
+    {
+        $result = Arr::diff(['a' => 1, 'b' => 2], []);
+
+        $this->assertSame(['a' => 1, 'b' => 2], $result);
+    }
+
+    public function testReturnsEmptyArrayWhenFirstArrayIsEmpty()
+    {
+        $result = Arr::diff([], ['a' => 1, 'b' => 2]);
+
+        $this->assertSame([], $result);
+    }
+
+    public function testComparesValuesLooselyLikeArrayDiff()
+    {
+        $result = Arr::diff(['a' => '2', 'b' => 3], ['a' => 2]);
+
+        $this->assertSame(['b' => 3], $result);
+    }
+
+    public function testHandlesNestedArraysAsValuesWithoutFlattening()
+    {
+        $result = Arr::diff(
+            ['a' => [1, 2], 'b' => 2],
+            ['a' => [1, 2]]
+        );
+
+        $this->assertSame(['b' => 2], $result);
+    }
 }

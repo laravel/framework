@@ -1233,4 +1233,16 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    /**
+     * Get the values in the first array that are not present in the other given arrays.
+     *
+     * @param  array  $array
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function diff(array $array, array ...$arrays)
+    {
+        return array_diff($array, ...$arrays);
+    }
 }
