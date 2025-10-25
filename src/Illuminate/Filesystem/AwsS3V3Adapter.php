@@ -29,13 +29,11 @@ class AwsS3V3Adapter extends FilesystemAdapter
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config, S3Client $client)
     {
+        $config['directory_separator'] = '/';
+
         parent::__construct($driver, $adapter, $config);
 
         $this->client = $client;
-
-        $this->prefixer = isset($config['prefix'])
-            ? new PathPrefixer($this->prefixer->prefixPath($config['prefix']), '/')
-            : new PathPrefixer($config['root'] ?? '', '/');
     }
 
     /**
