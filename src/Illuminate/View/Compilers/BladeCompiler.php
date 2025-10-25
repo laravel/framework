@@ -618,26 +618,33 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $expression
      * @return bool
      */
+    /**
+     * Determine if the given expression has an even number of parentheses.
+     */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
-        $tokens = token_get_all('<?php '.$expression);
+        try {
+            $tokens = token_get_all('<?php '.$expression);
+        } catch (\ParseError) {
+            // Gracefully handle malformed expressions (e.g., Xdebug interference)
+            return false;
+        }
 
         if (Arr::last($tokens) !== ')') {
             return false;
         }
 
         $opening = 0;
-        $closing = 0;
 
         foreach ($tokens as $token) {
-            if ($token == ')') {
-                $closing++;
-            } elseif ($token == '(') {
+            if ($token === '(') {
                 $opening++;
+            } elseif ($token === ')') {
+                $opening--;
             }
         }
 
-        return $opening === $closing;
+        return $opening === 0;
     }
 
     /**
