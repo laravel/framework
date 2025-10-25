@@ -19,7 +19,6 @@ class ProhibitedIf implements Stringable
      * Create a new prohibited validation rule based on a condition.
      *
      * @param  (\Closure(): bool)|bool  $condition
-     * @return void
      *
      * @throws \InvalidArgumentException
      */
