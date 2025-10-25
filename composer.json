@@ -107,7 +107,6 @@
         "fakerphp/faker": "^1.24",
         "guzzlehttp/promises": "^2.0.3",
         "guzzlehttp/psr7": "^2.4",
-        "laravel/pint": "^1.18",
         "league/flysystem-aws-s3-v3": "^3.25.1",
         "league/flysystem-ftp": "^3.25.1",
         "league/flysystem-path-prefixing": "^3.25.1",
