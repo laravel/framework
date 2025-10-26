@@ -16,8 +16,8 @@ class FailoverStore extends TaggableStore implements LockProvider
     public function __construct(
         protected CacheManager $cache,
         protected Dispatcher $events,
-        protected array $stores)
-    {
+        protected array $stores,
+    ) {
     }
 
     /**
