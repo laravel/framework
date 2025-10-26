@@ -18,14 +18,14 @@ abstract class AbstractHasher
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
+     * @param  string|null  $value
+     * @param  string|null  $hashedValue
      * @param  array  $options
      * @return bool
      */
     public function check(#[\SensitiveParameter] $value, $hashedValue, array $options = [])
     {
-        if (is_null($hashedValue) || strlen($hashedValue) === 0) {
+        if (!is_string($value) || $value === '' || !is_string($hashedValue) || $hashedValue === '') {
             return false;
         }
 
