@@ -206,11 +206,13 @@ class RedirectResponse extends BaseRedirectResponse
      * Set the request instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return void
+     * @return $this
      */
     public function setRequest(Request $request)
     {
         $this->request = $request;
+
+        return $this;
     }
 
     /**
@@ -227,11 +229,13 @@ class RedirectResponse extends BaseRedirectResponse
      * Set the session store instance.
      *
      * @param  \Illuminate\Session\Store  $session
-     * @return void
+     * @return $this
      */
     public function setSession(SessionStore $session)
     {
         $this->session = $session;
+
+        return $this;
     }
 
     /**
