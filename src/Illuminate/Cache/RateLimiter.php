@@ -108,13 +108,9 @@ class RateLimiter
             return false;
         }
 
-        if (is_null($result = $callback())) {
-            $result = true;
-        }
+        $result = $callback() ?? true;
 
-        return tap($result, function () use ($key, $decaySeconds) {
-            $this->hit($key, $decaySeconds);
-        });
+        return tap($result, fn() => $this->hit($key, $decaySeconds));
     }
 
     /**
