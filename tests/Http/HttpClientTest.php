@@ -1910,6 +1910,27 @@ class HttpClientTest extends TestCase
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
     }
 
+    public function testPoolConcurrency()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('200.com'),
+                $pool->get('400.com'),
+                $pool->get('500.com'),
+            ];
+        }, 2);
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(400, $responses[1]->status());
+        $this->assertSame(500, $responses[2]->status());
+    }
+
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
     {
         $events = m::mock(Dispatcher::class);
