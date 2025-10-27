@@ -371,6 +371,7 @@ class MailManager implements FactoryContract
             'postmark+api',
             'default',
             $config['token']
+                ?? $config['key']
                 ?? $this->app['config']->get('services.postmark.token')
                 ?? $this->app['config']->get('services.postmark.key'),
             null,
