@@ -4089,6 +4089,42 @@ class HttpClientTest extends TestCase
         $this->assertSame($responses['second'], $finallyCallback['second']);
     }
 
+    public function testBatchConcurrency(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://202.com' => $this->factory::response('Accepted', 202),
+            'https://203.com' => $this->factory::response('Non-Authoritative Information', 203),
+        ]);
+
+        $executionOrder = [];
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://202.com'),
+                $batch->as('fourth')->get('https://203.com'),
+            ];
+        })->progress(function (Batch $batch, int|string $key, Response $response) use (&$executionOrder) {
+            $executionOrder[] = $key;
+        })->concurrency(2);
+
+        $this->assertSame(4, $batch->totalRequests);
+
+        $responses = $batch->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+        $this->assertSame(202, $responses['third']->status());
+        $this->assertSame(203, $responses['fourth']->status());
+
+        $this->assertSame(4, $batch->totalRequests);
+        $this->assertSame(0, $batch->pendingRequests);
+        $this->assertSame(0, $batch->failedRequests);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [
