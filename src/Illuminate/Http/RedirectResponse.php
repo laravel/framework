@@ -162,27 +162,6 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
-     * Enforce the target to be the same origin as the request.
-     */
-    public function enforceSameOrigin(
-        string $fallback,
-        bool $validateScheme = true,
-        bool $validatePort = true,
-    ): static {
-        $target = Uri::of($this->targetUrl);
-        $current = Uri::of($this->request->getSchemeAndHttpHost());
-
-        if ($target->host() !== $current->host()
-            || ($validateScheme && $target->scheme() !== $current->scheme())
-            || ($validatePort && $target->port() !== $current->port())
-        ) {
-            $this->setTargetUrl($fallback);
-        }
-
-        return $this;
-    }
-
-    /**
      * Add a fragment identifier to the URL.
      *
      * @param  string  $fragment
@@ -202,6 +181,26 @@ class RedirectResponse extends BaseRedirectResponse
     public function withoutFragment()
     {
         return $this->setTargetUrl(Str::before($this->getTargetUrl(), '#'));
+    }
+
+    /**
+     * Enforce that the redirect target must have the same host as the current request.
+     */
+    public function enforceSameOrigin(
+        string $fallback,
+        bool $validateScheme = true,
+        bool $validatePort = true,
+    ): static {
+        $target = Uri::of($this->targetUrl);
+        $current = Uri::of($this->request->getSchemeAndHttpHost());
+
+        if ($target->host() !== $current->host() ||
+            ($validateScheme && $target->scheme() !== $current->scheme()) ||
+            ($validatePort && $target->port() !== $current->port())) {
+            $this->setTargetUrl($fallback);
+        }
+
+        return $this;
     }
 
     /**
