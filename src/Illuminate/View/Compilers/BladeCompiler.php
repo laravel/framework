@@ -625,8 +625,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
         } catch (\ParseError) {
             return false;
         }
-        
-
         if (Arr::last($tokens) !== ')') {
             return false;
         }
