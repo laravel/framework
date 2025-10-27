@@ -110,7 +110,7 @@ class RateLimiter
 
         $result = $callback() ?? true;
 
-        return tap($result, fn() => $this->hit($key, $decaySeconds));
+        return tap($result, fn () => $this->hit($key, $decaySeconds));
     }
 
     /**
