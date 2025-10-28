@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -884,17 +885,38 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
+     * @param  int|null  $concurrency
      * @return array<array-key, \Illuminate\Http\Client\Response>
      */
-    public function pool(callable $callback)
+    public function pool(callable $callback, ?int $concurrency = null)
     {
         $results = [];
 
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
-        foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+        if ($concurrency === null) {
+            foreach ($requests as $key => $item) {
+                $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+            }
+
+            return $results;
         }
+
+        $promises = [];
+
+        foreach ($requests as $key => $item) {
+            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
+        }
+
+        (new EachPromise($promises, [
+            'fulfilled' => function ($result, $key) use (&$results) {
+                $results[$key] = $result;
+            },
+            'rejected' => function ($reason, $key) use (&$results) {
+                $results[$key] = $reason;
+            },
+            'concurrency' => $concurrency,
+        ]))->promise()->wait();
 
         return $results;
     }
