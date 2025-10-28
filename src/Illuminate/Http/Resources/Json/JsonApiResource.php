@@ -104,7 +104,6 @@ abstract class JsonApiResource extends JsonResource
         ];
     }
 
-
     /**
      * Create an HTTP response that represents the object.
      *
