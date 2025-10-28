@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\TwoColumnDetail;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
@@ -35,28 +36,30 @@ class QuestionHelper extends SymfonyQuestionHelper
                 : '<comment>Ctrl+D</comment>');
         }
 
-        switch (true) {
-            case null === $default:
-                $text = sprintf('<info>%s</info>', $text);
+        $text = match (true) {
+            null === $default => sprintf(
+                '<info>%s</info>',
+                $text
+            ),
 
-                break;
+            $question instanceof ConfirmationQuestion => sprintf(
+                '<info>%s (yes/no)</info> [<comment>%s</comment>]',
+                $text,
+                $default ? 'yes' : 'no'
+            ),
 
-            case $question instanceof ConfirmationQuestion:
-                $text = sprintf('<info>%s (yes/no)</info> [<comment>%s</comment>]', $text, $default ? 'yes' : 'no');
+            $question instanceof ChoiceQuestion => sprintf(
+                '<info>%s</info> [<comment>%s</comment>]',
+                $text,
+                OutputFormatter::escape(Arr::get($question->getChoices(), $default, $default)),
+            ),
 
-                break;
-
-            case $question instanceof ChoiceQuestion:
-                $choices = $question->getChoices();
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($choices[$default] ?? $default));
-
-                break;
-
-            default:
-                $text = sprintf('<info>%s</info> [<comment>%s</comment>]', $text, OutputFormatter::escape($default));
-
-                break;
-        }
+            default => sprintf(
+                '<info>%s</info> [<comment>%s</comment>]',
+                $text,
+                OutputFormatter::escape($default)
+            ),
+        };
 
         $output->writeln($text);
 
