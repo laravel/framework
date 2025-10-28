@@ -273,4 +273,15 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     {
         return $this->resolve(Container::getInstance()->make('request'));
     }
+
+    /**
+     * Flush the resource's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$wrap = 'data';
+        static::$forceWrapping = false;
+    }
 }
