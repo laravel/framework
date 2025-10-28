@@ -71,7 +71,7 @@ abstract class JsonApiResource extends JsonResource
      * @param  string  $version
      * @return $this
      */
-    public static function configure(string $version = null, array $ext = [], array $profile = [], array $meta = [])
+    public static function configure(?string $version = null, array $ext = [], array $profile = [], array $meta = [])
     {
         static::$jsonApiInformation = array_filter([
             'version' => $version,
