@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Concerns;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 trait ReplacesAttributes
 {
@@ -21,7 +22,11 @@ trait ReplacesAttributes
 
         $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
 
-        return str_replace([':other', ':value'], $parameters, $message);
+        return str_replace(
+            [':other', ':OTHER', ':Other', ':value', ':VALUE', ':Value'],
+            [$parameters[0], Str::upper($parameters[0]), Str::ucfirst($parameters[0]), $parameters[1], Str::upper($parameters[1]), Str::ucfirst($parameters[1])],
+            $message
+        );
     }
 
     /**
@@ -240,7 +245,15 @@ trait ReplacesAttributes
      */
     protected function replaceMissingWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return str_replace(
+            [':values', ':VALUES', ':Values'],
+            [
+                implode(' / ', $this->getAttributeList($parameters)),
+                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
+                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
+            ],
+            $message
+        );
     }
 
     /**
@@ -286,7 +299,15 @@ trait ReplacesAttributes
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return str_replace(':values', implode(', ', $parameters), $message);
+        return str_replace(
+            [':values', ':VALUES', ':Values'],
+            [
+                implode(', ', $parameters),
+                Str::upper(implode(', ', $parameters)),
+                implode(', ', array_map(Str::ucfirst(...), $parameters)),
+            ],
+            $message,
+        );
     }
 
     /**
@@ -314,7 +335,13 @@ trait ReplacesAttributes
      */
     protected function replaceInArray($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getDisplayableAttribute($parameters[0]), $message);
+        $value = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace(
+            [':other', ':OTHER', ':Other'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
@@ -412,7 +439,15 @@ trait ReplacesAttributes
      */
     protected function replacePresentWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return str_replace(
+            [':values', ':VALUES', ':Values'],
+            [
+                implode(' / ', $this->getAttributeList($parameters)),
+                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
+                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
+            ],
+            $message,
+        );
     }
 
     /**
@@ -440,7 +475,15 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':values', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return str_replace(
+            [':values', ':VALUES', ':Values'],
+            [
+                implode(' / ', $this->getAttributeList($parameters)),
+                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
+                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
+            ],
+            $message,
+        );
     }
 
     /**
@@ -584,9 +627,13 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredIfAccepted($message, $attribute, $rule, $parameters)
     {
-        $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
+        $value = $this->getDisplayableAttribute($parameters[0]);
 
-        return str_replace([':other'], $parameters, $message);
+        return str_replace(
+            [':other', ':OTHER', ':Other'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
@@ -622,7 +669,18 @@ trait ReplacesAttributes
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return str_replace([':other', ':values'], [$other, implode(', ', $values)], $message);
+        return str_replace(
+            [':other', ':OTHER', ':Other', ':values', ':VALUES', ':Values'],
+            [
+                $other,
+                Str::upper($other),
+                Str::ucfirst($other),
+                implode(', ', $values),
+                Str::upper(implode(', ', $values)),
+                implode(', ', array_map(Str::ucfirst(...), $values)),
+            ],
+            $message
+        );
     }
 
     /**
@@ -692,7 +750,15 @@ trait ReplacesAttributes
      */
     protected function replaceProhibits($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', implode(' / ', $this->getAttributeList($parameters)), $message);
+        return str_replace(
+            [':other', ':OTHER', ':Other'],
+            [
+                implode(' / ', $this->getAttributeList($parameters)),
+                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
+                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
+            ],
+            $message
+        );
     }
 
     /**
@@ -706,7 +772,13 @@ trait ReplacesAttributes
      */
     protected function replaceSame($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':other', $this->getDisplayableAttribute($parameters[0]), $message);
+        $value = $this->getDisplayableAttribute($parameters[0]);
+
+        return str_replace(
+            [':other', ':OTHER', ':Other'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
