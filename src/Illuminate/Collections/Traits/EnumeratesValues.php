@@ -1073,7 +1073,7 @@ trait EnumeratesValues
      * Get an operator checker callback.
      *
      * @param  callable|string  $key
-     * @param  string|null  $operator
+     * @param  ?string  $operator
      * @param  mixed  $value
      * @return \Closure
      */
@@ -1095,36 +1095,36 @@ trait EnumeratesValues
             $operator = '=';
         }
 
-        return function ($item) use ($key, $operator, $value) {
+        return static function ($item) use ($key, $operator, $value) {
             $retrieved = enum_value(data_get($item, $key));
             $value = enum_value($value);
 
-            $strings = array_filter([$retrieved, $value], function ($value) {
-                return match (true) {
-                    is_string($value) => true,
-                    $value instanceof \Stringable => true,
+            $strings = array_filter(
+                [$retrieved, $value],
+                static fn ($item): bool => match (true) {
+                    is_string($item) => true,
+                    $item instanceof \Stringable => true,
+
                     default => false,
-                };
-            });
+                }
+            );
 
             if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '!=':
-                case '<>':  return $retrieved != $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '===': return $retrieved === $value;
-                case '!==': return $retrieved !== $value;
-                case '<=>': return $retrieved <=> $value;
-            }
+            return match ($operator) {
+                default => $retrieved == $value,
+                '=', '==' => $retrieved == $value,
+                '!=', '<>' => $retrieved != $value,
+                '<' => $retrieved < $value,
+                '>' => $retrieved > $value,
+                '<=' => $retrieved <= $value,
+                '>=' => $retrieved >= $value,
+                '===' => $retrieved === $value,
+                '!==' => $retrieved !== $value,
+                '<=>' => $retrieved <=> $value,
+            };
         };
     }
 
