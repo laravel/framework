@@ -623,6 +623,19 @@ class Filesystem
     }
 
     /**
+     * Get all the directories within a given directory (recursive).
+     *
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public function allDirectories(string $directory): array
+    {
+        return iterator_to_array(
+            Finder::create()->in($directory)->directories()->sortByName(),
+            false,
+        );
+    }
+
+    /**
      * Ensure a directory exists.
      *
      * @param  string  $path
