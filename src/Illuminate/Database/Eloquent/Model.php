@@ -2599,7 +2599,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (version_compare(PHP_VERSION, '8.4.0') >= 0) {
             foreach ((new \ReflectionClass($this))->getProperties() as $property) {
                 if ($property->hasHooks()) {
-                    unset($keys[$property->getName()]);
+                    unset ($keys[$property->getName()]);
                 }
             }
         }
