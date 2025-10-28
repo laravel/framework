@@ -23,6 +23,8 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -290,7 +292,7 @@ class Builder implements BuilderContract
         }
 
         if ($id !== null && $this->model->getKeyType() === 'string') {
-            $id = (string) $id;
+            $id = (string) enum_value($id);
         }
 
         return $this->where($this->model->getQualifiedKeyName(), '=', $id);
@@ -628,7 +630,7 @@ class Builder implements BuilderContract
 
         if (is_null($result)) {
             throw (new ModelNotFoundException)->setModel(
-                get_class($this->model), $id
+                get_class($this->model), enum_value($id)
             );
         }
 
