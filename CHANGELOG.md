@@ -1,6 +1,23 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.35.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.36.0...12.x)
+
+## [v12.36.0](https://github.com/laravel/framework/compare/v12.35.1...v12.36.0) - 2025-10-28
+
+* [12.x] Remove return void from Http\Client\Batch's constructor by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57518
+* [12.x] Namespace file cache lock keys by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57516
+* [12.x] Remove [@return](https://github.com/return) tag from constructor by [@noir4y](https://github.com/noir4y) in https://github.com/laravel/framework/pull/57536
+* [12.x] Add missing [@throws](https://github.com/throws) annotation by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57535
+* [12.x] allow chaining on setters by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57532
+* [12.x] Stop double prefixing S3 filesystem paths by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57534
+* [12.x] test `Uri` builder methods by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57549
+* [12.x] Refactor `jsonSerialize()` method to use match expression by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/57552
+* [12.x] redirect response enforce same origin by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57533
+* [12.x] Add Eloquent Collection methods: `setAppends` && `withoutAppends` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57561
+* [12.x] Fix buffer overflow when flushing Redis cache tags with many keys by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57562
+* [12.x] Allow validator message placeholers to be capitalized by [@florianraith](https://github.com/florianraith) in https://github.com/laravel/framework/pull/57556
+* Exclude property hooks on return of Model::__sleep() by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57557
+* [12.x] Add concurrency control to Http::pool and Http::batch by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/57555
 
 ## [v12.35.1](https://github.com/laravel/framework/compare/v12.35.0...v12.35.1) - 2025-10-23
 
