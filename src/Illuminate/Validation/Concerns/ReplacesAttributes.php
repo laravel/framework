@@ -939,7 +939,7 @@ trait ReplacesAttributes
         $fn = [Str::lower(...), Str::upper(...), Str::ucfirst(...)];
         $cases = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':' . $fn($placeholder), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
             [],
         );
         $replacements = array_reduce(
