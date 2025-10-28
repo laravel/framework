@@ -936,17 +936,17 @@ trait ReplacesAttributes
      */
     private function replaceKeepCase(string $message, array $mapping): string
     {
-    	$fn = [ Str::lower(...), Str::upper(...), Str::ucfirst(...) ];
-    	$cases = array_reduce(
-    	    array_keys($mapping),
-    	    fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':' . $fn($placeholder), $fn)],
-    	    [],
+        $fn = [Str::lower(...), Str::upper(...), Str::ucfirst(...)];
+        $cases = array_reduce(
+            array_keys($mapping),
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':' . $fn($placeholder), $fn)],
+            [],
         );
-    	$replacements = array_reduce(
-    	    array_values($mapping),
-    	    fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
-    	    [],
+        $replacements = array_reduce(
+            array_values($mapping),
+            fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
+            [],
         );
-    	return str_replace($cases, $replacements, $message);
+        return str_replace($cases, $replacements, $message);
     }
 }
