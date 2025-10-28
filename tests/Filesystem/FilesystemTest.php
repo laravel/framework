@@ -536,7 +536,7 @@ class FilesystemTest extends TestCase
 
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $directories);
 
-        $mappedDirectories = array_map(fn($item) => $item->getPathname(), $directories);
+        $mappedDirectories = array_map(fn ($item) => $item->getPathname(), $directories);
 
         $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $mappedDirectories);
         $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $mappedDirectories);
