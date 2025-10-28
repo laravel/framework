@@ -50,7 +50,7 @@ class JsonApiResourceCollection extends AnonymousResourceCollection
                 ->uniqueStrict(fn (JsonApiResource $resource): array => $resource->uniqueKey($request))
                 ->values()
                 ->all()) ? ['included' => $included] : [],
-            ...($implementation = $this->collects::toServerImplementation($request)) // @TODO
+            ...($implementation = JsonApiResource::$jsonApiInformation) // @TODO
                 ? ['jsonapi' => $implementation] : [],
         ];
     }

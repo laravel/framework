@@ -104,6 +104,19 @@ abstract class JsonApiResource extends JsonResource
         ];
     }
 
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    #[\Override]
+    public function toResponse($request)
+    {
+        return (new JsonApiResourceResponse($this))->toResponse($request);
+    }
+
     /**
      * Customize the outgoing response for the resource.
      */
