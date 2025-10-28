@@ -534,14 +534,10 @@ class FilesystemTest extends TestCase
 
         $directories = (new Filesystem)->allDirectories(self::$tempDir);
 
-        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $directories);
-
-        $mappedDirectories = array_map(fn ($item) => $item->getPathname(), $directories);
-
-        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $mappedDirectories);
-        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $mappedDirectories);
-        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'rock', $mappedDirectories);
-        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'blues', $mappedDirectories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'rock', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'blues', $directories);
     }
 
     public function testMakeDirectory()

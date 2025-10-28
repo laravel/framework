@@ -625,14 +625,17 @@ class Filesystem
     /**
      * Get all the directories within a given directory (recursive).
      *
-     * @return \Symfony\Component\Finder\SplFileInfo[]
+     * @return array
      */
     public function allDirectories(string $directory): array
     {
-        return iterator_to_array(
-            Finder::create()->in($directory)->directories()->sortByName(),
-            false,
-        );
+        $directories = [];
+
+        foreach (Finder::create()->in($directory)->directories()->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+
+        return $directories;
     }
 
     /**
