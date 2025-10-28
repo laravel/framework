@@ -909,13 +909,13 @@ class PendingRequest
         }
 
         (new EachPromise($promises, [
-            'concurrency' => $concurrency,
             'fulfilled' => function ($result, $key) use (&$results) {
                 $results[$key] = $result;
             },
             'rejected' => function ($reason, $key) use (&$results) {
                 $results[$key] = $reason;
             },
+            'concurrency' => $concurrency,
         ]))->promise()->wait();
 
         return $results;
