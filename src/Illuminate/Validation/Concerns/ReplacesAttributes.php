@@ -947,6 +947,7 @@ trait ReplacesAttributes
             fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
             [],
         );
+
         return str_replace($cases, $replacements, $message);
     }
 }
