@@ -736,7 +736,7 @@ class PendingRequest
             $this->throwIfCallback = $condition;
         }
 
-        return $condition ? $this->throw(func_get_args()[1] ?? null) : $this;
+        return $condition ? $this->throw(func_get_args()[1] ?? $this->throwCallback ?? null) : $this;
     }
 
     /**
