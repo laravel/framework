@@ -4,7 +4,7 @@ namespace Illuminate\Http\Resources\JsonApi\Exceptions;
 
 class ResourceIdentificationException extends RuntimeException
 {
-     /**
+    /**
      * Create a new unable to determine Resource ID exception for the given resource.
      *
      * @param  mixed  $resource

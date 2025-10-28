@@ -17,7 +17,8 @@ class Link implements JsonSerializable
         public string $type,
         public string $href,
         public array $meta = []
-    ) {}
+    ) {
+    }
 
     /**
      * @param  array<string, mixed>  $meta
