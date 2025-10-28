@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ abstract class JsonApiResource extends JsonResource
      */
     public static $jsonApiInformation = [];
 
-    public function attributes(Request $request): array
+    public function fields(Request $request)
     {
         return [
             //
@@ -58,7 +59,7 @@ abstract class JsonApiResource extends JsonResource
         throw new RuntimeException('Unable to determine "type"');
     }
 
-    public function links(Request $request)
+    public function toLinks(Request $request)
     {
         return [
             //
@@ -69,7 +70,7 @@ abstract class JsonApiResource extends JsonResource
      * Set the JSON:API version for the request.
      *
      * @param  string  $version
-     * @return $this
+     * @return void
      */
     public static function configure(?string $version = null, array $ext = [], array $profile = [], array $meta = [])
     {
@@ -79,8 +80,6 @@ abstract class JsonApiResource extends JsonResource
             'profile' => $profile,
             'meta' => $meta,
         ]);
-
-        return $this;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Http\Resources\JsonApi\Concerns;
+namespace Illuminate\Http\Resources\Json\Concerns;
 
 use Illuminate\Http\Request;
 
