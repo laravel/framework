@@ -188,7 +188,21 @@ class AboutCommand extends Command
 
         static::addToSection('Drivers', fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
-            'Cache' => config('cache.default'),
+            'Cache' => function ($json) {
+                $cacheStore = config('cache.default');
+
+                if (config('cache.stores.'.$cacheStore.'.driver') === 'failover') {
+                    $secondary = new Collection(config('cache.stores.'.$cacheStore.'.stores'));
+
+                    return value(static::format(
+                        value: $cacheStore,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+                
+                return $cacheStore;
+            },
             'Database' => config('database.default'),
             'Logs' => function ($json) {
                 $logChannel = config('logging.default');
