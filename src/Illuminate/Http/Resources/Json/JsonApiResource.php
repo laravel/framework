@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Collection;
 
 abstract class JsonApiResource extends JsonResource
@@ -47,12 +48,12 @@ abstract class JsonApiResource extends JsonResource
      */
     public function with($request)
     {
-        return [
-            // ...($included = $this->included($request)
-            //     ->uniqueStrict(fn (JsonApiResource $resource): array => $resource->uniqueResourceKey($request))
-            //     ->values()
-            //     ->all()) ? ['included' => $included] : [],
-        ];
+        return array_filter([
+            'included' => $this->resolveResourceIncluded($request),
+            ...($implementation = static::$jsonApiInformation)
+                ? ['jsonapi' => $implementation]
+                : [],
+        ]);
     }
 
     /**
@@ -80,21 +81,17 @@ abstract class JsonApiResource extends JsonResource
     #[\Override]
     public function resolve($request = null)
     {
-        $this->additional(
-            ($implementation = JsonApiResource::$jsonApiInformation)
-                ? ['jsonapi' => $implementation]
-                : []
-        );
-
         return [
-            'id' => $this->id($request),
-            'type' => $this->type($request),
-            ...(new Collection([
-                'attributes' => $this->resolveResourceAttributes($request),
-                // 'relationships' => $this->resolveRelationshipsAsIdentifiers($request)->all(),
-                // 'links' => $this->resolveResourceLinks($request),
-                'meta' => $this->resolveMetaInformations($request),
-            ]))->filter()->map(fn ($value) => (object) $value),
+            'data' => [
+                'id' => $this->resolveResourceIdentifier($request),
+                'type' => $this->resolveResourceType($request),
+                ...(new Collection([
+                    'attributes' => $this->resolveResourceAttributes($request),
+                    'relationships' => $this->resolveResourceRelationships($request),
+                    'links' => $this->resolveResourceLinks($request),
+                    'meta' => $this->resolveMetaInformations($request),
+                ]))->filter()->map(fn ($value) => (object) $value),
+            ],
         ];
     }
 
