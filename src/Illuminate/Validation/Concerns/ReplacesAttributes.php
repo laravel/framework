@@ -917,7 +917,7 @@ trait ReplacesAttributes
             Str::upper(...),
             //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
         ];
-        
+
         $ucwordsReplacement = fn (string $parameter, string $placeholder) => array_key_exists($placeholder, $wordSeparators)
                 ? ucwords($placeholder, $wordSeparators[$placeholder])
                 : ucfirst($parameter);
