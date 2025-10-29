@@ -910,7 +910,7 @@ trait ReplacesAttributes
      * @param  array<string, string>  $mapping
      * @param  array<string, string>  $wordSeparators
      */
-    private function replaceWhileKeepingCase(string $message, array $mapping, $wordSeparators = []): string
+    private function replaceWhileKeepingCase(string $message, array $mapping, array $wordSeparators = []): string
     {
         $fn = [
             Str::lower(...),
