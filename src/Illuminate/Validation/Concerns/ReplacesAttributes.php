@@ -293,7 +293,7 @@ trait ReplacesAttributes
 
         return $this->replaceWhileKeepingCase(
             $message,
-            ['values' => $this->getAttributeList($parameters)],
+            ['values' => $parameters],
             ['values' => ', '],
         );
     }
