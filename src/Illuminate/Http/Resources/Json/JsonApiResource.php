@@ -2,12 +2,9 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use RuntimeException;
 
 abstract class JsonApiResource extends JsonResource
 {
