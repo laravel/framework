@@ -1200,6 +1200,10 @@ class SupportCollectionTest extends TestCase
         $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 200]]);
 
         $this->assertEquals(200, $c->value('balance'));
+
+        $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 0], ['id' => 3, 'balance' => 200]]);
+
+        $this->assertEquals(0, $c->value('balance'));
     }
 
     #[DataProvider('collectionClassProvider')]
