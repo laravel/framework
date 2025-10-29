@@ -200,7 +200,7 @@ class AboutCommand extends Command
                         json: fn () => $secondary->all(),
                     ), $json);
                 }
-                
+
                 return $cacheStore;
             },
             'Database' => config('database.default'),
