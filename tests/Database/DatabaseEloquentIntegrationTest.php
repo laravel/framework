@@ -1078,6 +1078,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFailWithEnum()
     {
+        EloquentTestUser::insert([
+            ['id' => UserEnum::Taylor->value, 'email' => 'taylorotwell@gmail.com'],
+        ]);
+
         $single = EloquentTestUser::findOrFail(UserEnum::Taylor);
 
         $this->assertInstanceOf(EloquentTestUser::class, $single);
