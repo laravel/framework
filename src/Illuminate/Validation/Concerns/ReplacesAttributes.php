@@ -22,7 +22,7 @@ trait ReplacesAttributes
 
         $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
 
-        return $this->replaceKeepCase($message, ['other' => $parameters[0], 'value' => $parameters[1]]);
+        return $this->replaceWhileKeepingCase($message, ['other' => $parameters[0], 'value' => $parameters[1]]);
     }
 
     /**
@@ -333,7 +333,7 @@ trait ReplacesAttributes
     {
         $value = $this->getDisplayableAttribute($parameters[0]);
 
-        return $this->replaceKeepCase($message, ['other' => $value]);
+        return $this->replaceWhileKeepingCase($message, ['other' => $value]);
     }
 
     /**
@@ -621,7 +621,7 @@ trait ReplacesAttributes
     {
         $value = $this->getDisplayableAttribute($parameters[0]);
 
-        return $this->replaceKeepCase($message, ['other' => $value]);
+        return $this->replaceWhileKeepingCase($message, ['other' => $value]);
     }
 
     /**
@@ -762,7 +762,7 @@ trait ReplacesAttributes
     {
         $value = $this->getDisplayableAttribute($parameters[0]);
 
-        return $this->replaceKeepCase($message, ['other' => $value]);
+        return $this->replaceWhileKeepingCase($message, ['other' => $value]);
     }
 
     /**
@@ -932,16 +932,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace the given string while maintaining different casing variants.
+     *
      * @param  array<string, string>  $mapping
      */
-    private function replaceKeepCase(string $message, array $mapping): string
+    private function replaceWhileKeepingCase(string $message, array $mapping): string
     {
         $fn = [Str::lower(...), Str::upper(...), Str::ucfirst(...)];
+
         $cases = array_reduce(
             array_keys($mapping),
             fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
             [],
         );
+
         $replacements = array_reduce(
             array_values($mapping),
             fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
