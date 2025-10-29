@@ -624,7 +624,7 @@ class Filesystem
     /**
      * Get all the directories within a given directory (recursive).
      *
-     * @return array
+     * @return string[]
      */
     public function allDirectories(string $directory): array
     {
