@@ -257,3 +257,28 @@ if (! function_exists('when')) {
         return value($default, $condition);
     }
 }
+
+if (! function_exists('data_has')) {
+    /**
+     * Determine if an key exists on item from an array or object using "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $key
+     * @return bool
+     */
+    function data_has($target, $key): bool
+    {
+        if (Arr::accessible($target)) {
+            return Arr::has($target, $key);
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+        while ($property = array_shift($key)) {
+            if (property_exists($target, $property)) {
+                return $key ? data_has($target->{$property}, $key) : true;
+            }
+        }
+
+        return false;
+    }
+}
