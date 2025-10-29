@@ -8,7 +8,10 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
+
+use function Laravel\Prompts\text;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
@@ -117,6 +120,8 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         '__TRAIT__',
     ];
 
+    protected string $rootNamespace;
+
     /**
      * Create a new generator command instance.
      *
@@ -129,6 +134,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         if (in_array(CreatesMatchingTest::class, class_uses_recursive($this))) {
             $this->addTestOptions();
         }
+
+        $this->getDefinition()->addOption(new InputOption(
+            'in',
+            null,
+            InputOption::VALUE_REQUIRED,
+            "Specify a namespace to generate the {$this->type} class in"
+        ));
 
         $this->files = $files;
     }
@@ -433,7 +445,20 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function rootNamespace()
     {
-        return $this->laravel->getNamespace();
+        if (!empty($this->rootNamespace)) {
+            return $this->rootNamespace;
+        }
+
+        $in = $this->option('in') ?? $this->laravel->getNamespace();
+        if (empty($in)) {
+            $in = text(
+                label: 'What namespace would you like to generate the '.$this->type.' in?',
+                placeholder: 'App',
+                validate: fn ($value) => empty($value) ? "The in option is required when the application namespace is empty." : null,
+            );
+        }
+
+        return $this->rootNamespace = trim($in, '\\').'\\';
     }
 
     /**
