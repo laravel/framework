@@ -11,7 +11,7 @@ use RuntimeException;
 
 abstract class JsonApiResource extends JsonResource
 {
-    use Concerns\InteractsWithMetaInformations;
+    use Concerns\ResolvesJsonApiSpecifications;
 
     /**
      * The resource's "version" for JSON:API.
@@ -43,20 +43,12 @@ abstract class JsonApiResource extends JsonResource
 
     public function id(Request $request)
     {
-        if ($this->resource instanceof Model) {
-            return $this->resource->getKey();
-        }
-
-        throw new RuntimeException('Unable to determine "id"');
+        return $this->resolveResourceIdentifier($request);
     }
 
     public function type(Request $request)
     {
-        if ($this->resource instanceof Model) {
-            return Str::snake(class_basename($this->resource));
-        }
-
-        throw new RuntimeException('Unable to determine "type"');
+        return $this->resolveResourceType($request);
     }
 
     public function toLinks(Request $request)
@@ -95,7 +87,7 @@ abstract class JsonApiResource extends JsonResource
             'id' => $this->id($request),
             'type' => $this->type($request),
             ...(new Collection([
-                // 'attributes' => $this->resolveAttributes($request)->all(),
+                'attributes' => $this->resolveResourceAttributes($request),
                 // 'relationships' => $this->resolveRelationshipsAsIdentifiers($request)->all(),
                 // 'links' => self::parseLinks(array_merge($this->toLinks($request), $this->links)),
                 // 'meta' => $this->resolveMetaInformations($request),
