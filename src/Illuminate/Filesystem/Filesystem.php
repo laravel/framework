@@ -582,7 +582,7 @@ class Filesystem
      * @param  bool  $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function files($directory, $hidden = false, string|int|array $depth = 0)
+    public function files($directory, $hidden = false, array|string|int $depth = 0)
     {
         return iterator_to_array(
             Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth($depth)->sortByName(),
@@ -608,7 +608,7 @@ class Filesystem
      * @param  string  $directory
      * @return array
      */
-    public function directories($directory, string|int|array $depth = 0)
+    public function directories($directory, array|string|int $depth = 0)
     {
         $directories = [];
 
