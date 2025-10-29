@@ -2,11 +2,13 @@
 
 namespace Illuminate\Console;
 
+use Composer\Autoload\ClassLoader;
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Finder\Finder;
@@ -317,9 +319,72 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function getPath($name)
     {
-        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
+        try {
+            return $this->resolvePathForClass($name);
+        } catch (RuntimeException $e) {
+            return $this->laravel['path.base'].'/'.str_replace('\\', '/', $name).'.php';
+        }
+    }
 
-        return $this->laravel['path'].'/'.str_replace('\\', '/', $name).'.php';
+    /**
+     * Resolve the expected path for a class based on Composer autoload mappings.
+     *
+     * @throws \RuntimeException if multiple base paths match or none can be resolved
+     */
+    protected function resolvePathForClass(string $class): string
+    {
+        $namespaceRoots = [];
+
+        // Collect valid PSR-4 and PSR-0 namespace mappings
+        foreach (ClassLoader::getRegisteredLoaders() as $loader) {
+            foreach ([$loader->getPrefixesPsr4(), $loader->getPrefixes()] as $prefixes) {
+                foreach ($prefixes as $ns => $paths) {
+                    foreach ($paths as $path) {
+                        $real = realpath($path);
+                        if ($real !== false) {
+                            $namespaceRoots[rtrim($ns, '\\')][] = $real;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sort by namespace depth (deepest first)
+        uksort($namespaceRoots, fn($a, $b) =>
+            Str::substrCount($b, '\\') <=> Str::substrCount($a, '\\')
+        );
+
+        foreach ($namespaceRoots as $prefix => $paths) {
+            if (!Str::startsWith($class, $prefix)) {
+                continue;
+            }
+
+            // Filter duplicates and invalid entries
+            $paths = array_unique(array_filter($paths));
+
+            if (count($paths) > 1) {
+                throw new RuntimeException(sprintf(
+                    'Multiple base paths found for namespace [%s]: %s',
+                    $prefix,
+                    implode(', ', $paths)
+                ));
+            }
+
+            if (empty($paths)) {
+                continue;
+            }
+
+            $basePath = reset($paths);
+            $relative = ltrim(Str::after($class, $prefix), '\\');
+            $relativePath = str_replace(['\\', '_'], DIRECTORY_SEPARATOR, $relative).'.php';
+
+            return rtrim($basePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$relativePath;
+        }
+
+        throw new RuntimeException(sprintf(
+            'Unable to resolve a base path for class [%s]',
+            $class
+        ));
     }
 
     /**
