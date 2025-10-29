@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\Json\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
