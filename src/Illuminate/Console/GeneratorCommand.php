@@ -338,11 +338,11 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         // Collect valid PSR-4 and PSR-0 namespace mappings
         foreach (ClassLoader::getRegisteredLoaders() as $loader) {
             foreach ([$loader->getPrefixesPsr4(), $loader->getPrefixes()] as $prefixes) {
-                foreach ($prefixes as $ns => $paths) {
+                foreach ($prefixes as $namespace => $paths) {
                     foreach ($paths as $path) {
                         $real = realpath($path);
                         if ($real !== false) {
-                            $namespaceRoots[rtrim($ns, '\\')][] = $real;
+                            $namespaceRoots[rtrim($namespace, '\\')][] = $real;
                         }
                     }
                 }
@@ -350,12 +350,10 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         // Sort by namespace depth (deepest first)
-        uksort($namespaceRoots, fn($a, $b) =>
-            Str::substrCount($b, '\\') <=> Str::substrCount($a, '\\')
-        );
+        uksort($namespaceRoots, fn ($a, $b) => Str::substrCount($b, '\\') <=> Str::substrCount($a, '\\');
 
         foreach ($namespaceRoots as $prefix => $paths) {
-            if (!Str::startsWith($class, $prefix)) {
+            if (! Str::startsWith($class, $prefix)) {
                 continue;
             }
 
@@ -510,7 +508,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      */
     protected function rootNamespace()
     {
-        if (!empty($this->rootNamespace)) {
+        if (! empty($this->rootNamespace)) {
             return $this->rootNamespace;
         }
 
@@ -519,7 +517,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
             $in = text(
                 label: 'What namespace would you like to generate the '.$this->type.' in?',
                 placeholder: 'App',
-                validate: fn ($value) => empty($value) ? "The in option is required when the application namespace is empty." : null,
+                validate: fn ($value) => empty($value) ? 'The in option is required when the application namespace is empty.' : null,
             );
         }
 
