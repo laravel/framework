@@ -340,11 +340,11 @@ trait EnumeratesValues
      */
     public function value($key, $default = null)
     {
-        if ($value = $this->firstWhere($key)) {
-            return data_get($value, $key, $default);
-        }
+        $value = $this->first(function ($target) use ($key) {
+            return data_has($target, $key);
+        });
 
-        return value($default);
+        return data_get($value, $key, $default);
     }
 
     /**
