@@ -1223,7 +1223,7 @@ class SupportCollectionTest extends TestCase
             literal(id: 3, balance: literal(currency: 'USD', value: 200)),
         ]);
 
-        $this->assertEquals(0, $c->value('balance'));
+        $this->assertEquals(0, $c->value('balance.value'));
     }
 
     #[DataProvider('collectionClassProvider')]
