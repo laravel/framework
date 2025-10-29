@@ -929,7 +929,7 @@ trait ReplacesAttributes
 
         $replacements = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => $fn($placeholder, $mapping[$placeholder]), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => $fn($mapping[$placeholder], $placeholder), $fn)],
             [],
         );
 
