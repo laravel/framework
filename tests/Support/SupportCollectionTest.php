@@ -1207,6 +1207,26 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testValueWithObjects($collection)
+    {
+        $c = new $collection([
+            literal(id: 1),
+            literal(id: 2, balance: ''),
+            literal(id: 3, balance: 200),
+        ]);
+
+        $this->assertEquals('', $c->value('balance'));
+
+        $c = new $collection([
+            literal(id: 1),
+            literal(id: 2, balance: literal(currency: 'USD', value: 0)),
+            literal(id: 3, balance: literal(currency: 'USD', value: 200)),
+        ]);
+
+        $this->assertEquals(0, $c->value('balance'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testBetween($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
