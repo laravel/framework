@@ -908,15 +908,16 @@ trait ReplacesAttributes
      * Replace the given string while maintaining different casing variants.
      *
      * @param  array<string, string>  $mapping
+     * @param  array<string, string>  $wordSeparators
      */
-    private function replaceWhileKeepingCase(string $message, array $mapping): string
+    private function replaceWhileKeepingCase(string $message, array $mapping, $wordSeparators = []): string
     {
         $fn = [
             Str::lower(...),
             Str::upper(...),
             //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
             fn (string $placeholder, ?string $parameter = null) => $parameter !== null && array_key_exists($placeholder, $wordSeparators)
-                ? ucwords($parameter ?? $placeholder, $wordSeparators[$placeholder])
+                ? ucwords($parameter, $wordSeparators[$placeholder])
                 : ucfirst($parameter ?? $placeholder),
         ];
 
