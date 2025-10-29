@@ -340,11 +340,7 @@ trait EnumeratesValues
      */
     public function value($key, $default = null)
     {
-        $value = $this->first();
-
-        if ($value && Arr::exists($value, $key)) {
-            return data_get($value, $key);
-        } elseif ($value = $this->firstWhere($key)) {
+        if ($value = $this->firstWhere($key)) {
             return data_get($value, $key, $default);
         }
 
