@@ -1076,6 +1076,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::findOrFail(new Collection([1, 1, 2, 3]));
     }
 
+    public function testFindOrFailWithEnum()
+    {
+        $single = EloquentTestUser::findOrFail(UserEnum::Taylor);
+
+        $this->assertInstanceOf(EloquentTestUser::class, $single);
+        $this->assertSame('taylorotwell@gmail.com', $single->email);
+    }
+
+    public function testFindOrFailWithEnumThrowsModelNotFoundException()
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] ' . UserEnum::Nobody->value);
+        $this->expectExceptionObject(
+            (new ModelNotFoundException())->setModel(EloquentTestUser::class, [UserEnum::Nobody->value]),
+        );
+
+        EloquentTestUser::findOrFail(UserEnum::Nobody);
+    }
+
     public function testOneToOneRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
@@ -3084,4 +3103,10 @@ enum StringBackedRole: string
 {
     case User = 'user';
     case Admin = 'admin';
+}
+
+enum UserEnum: int
+{
+    case Nobody = 0;
+    case Taylor = 1;
 }
