@@ -5,6 +5,7 @@ namespace Illuminate\Http\Resources\Json\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -20,7 +21,13 @@ trait ResolvesJsonApiSpecifications
      */
     protected function resolveResourceAttributes(Request $request): array
     {
-        return Arr::only(parent::toArray($request), $this->fields($request));
+        $data = (new Collection($this->toArray($request)))
+            ->mapWithKeys(
+                fn ($value, $key) => is_int($key) ? [$value => $this->resource[$value]] : [$key => $value]
+            )->transform(fn ($value) => value($value, $request))
+            ->all();
+
+        return $this->filter($data);
     }
 
     /**
@@ -31,7 +38,7 @@ trait ResolvesJsonApiSpecifications
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceIdentifier(Request $request): string|int
+    protected function resolveResourceIdentifier(Request $request): string
     {
         if ($this->resource instanceof Model) {
             return $this->resource->getKey();
@@ -58,6 +65,17 @@ trait ResolvesJsonApiSpecifications
     }
 
     /**
+     * Get unique key for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array{0: string, 1: string}
+     */
+    public function uniqueResourceKey(Request $request): array
+    {
+        return [$this->resolveResourceType($request), $this->resolveResourceIdentifier($request)];
+    }
+
+    /**
      * Resolves `meta` object for the resource.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -65,6 +83,6 @@ trait ResolvesJsonApiSpecifications
      */
     protected function resolveMetaInformations(Request $request): array
     {
-        return array_merge($this->meta($request), $this->meta);
+        return array_merge($this->meta($request), $this->with);
     }
 }

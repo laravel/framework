@@ -37,11 +37,7 @@ class ResourceResponse implements Responsable
             $this->wrap(
                 $this->resource->resolve($request),
                 $this->resource->with($request),
-                [
-                    ...$this->resource->additional,
-                    ...($implementation = JsonApiResource::$jsonApiInformation)
-                        ? ['jsonapi' => $implementation] : [],
-                ]
+                $this->resource->additional
             ),
             $this->calculateStatus(),
             [],

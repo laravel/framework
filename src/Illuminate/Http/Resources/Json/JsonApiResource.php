@@ -48,10 +48,24 @@ abstract class JsonApiResource extends JsonResource
         return $this->resolveResourceType($request);
     }
 
-    public function toLinks(Request $request)
+    public function links(Request $request)
     {
         return [
             //
+        ];
+    }
+
+    /**
+     * @param  Request  $request
+     * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
+     */
+    public function with($request)
+    {
+        return [
+            // ...($included = $this->included($request)
+            //     ->uniqueStrict(fn (JsonApiResource $resource): array => $resource->uniqueResourceKey($request))
+            //     ->values()
+            //     ->all()) ? ['included' => $included] : [],
         ];
     }
 
@@ -72,22 +86,28 @@ abstract class JsonApiResource extends JsonResource
     }
 
     /**
-     * Transform the resource into an array.
+     * Resolve the resource to an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array{id: string, type: string, attributes?: stdClass, relationships?: stdClass, meta?: stdClass, links?: stdClass}
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return array
      */
     #[\Override]
-    public function toArray(Request $request)
+    public function resolve($request = null)
     {
+        $this->additional(
+            ($implementation = JsonApiResource::$jsonApiInformation)
+                ? ['jsonapi' => $implementation]
+                : []
+        );
+
         return [
             'id' => $this->id($request),
             'type' => $this->type($request),
             ...(new Collection([
                 'attributes' => $this->resolveResourceAttributes($request),
                 // 'relationships' => $this->resolveRelationshipsAsIdentifiers($request)->all(),
-                // 'links' => self::parseLinks(array_merge($this->toLinks($request), $this->links)),
-                // 'meta' => $this->resolveMetaInformations($request),
+                // 'links' => $this->resolveResourceLinks($request),
+                'meta' => $this->resolveMetaInformations($request),
             ]))->filter()->map(fn ($value) => (object) $value),
         ];
     }

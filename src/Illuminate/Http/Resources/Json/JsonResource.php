@@ -274,6 +274,11 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
         return $this->resolve(Container::getInstance()->make('request'));
     }
 
+    public function asJsonApi()
+    {
+        return new AnonymousJsonApiResource($this);
+    }
+
     /**
      * Flush the resource's global state.
      *

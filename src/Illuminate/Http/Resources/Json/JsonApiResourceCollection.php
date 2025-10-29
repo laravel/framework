@@ -44,9 +44,9 @@ class JsonApiResourceCollection extends AnonymousResourceCollection
     {
         return [
             ...($included = $this->collection
-                ->map(fn (JsonApiResource $resource): Collection => $resource->included($request))
+                //->map(fn (JsonApiResource $resource): Collection => $resource->included($request))
                 ->flatten()
-                ->uniqueStrict(fn (JsonApiResource $resource): array => $resource->uniqueKey($request))
+                ->uniqueStrict(fn (JsonApiResource $resource): array => $resource->uniqueResourceKey($request))
                 ->values()
                 ->all()) ? ['included' => $included] : [],
             ...($implementation = JsonApiResource::$jsonApiInformation) // @TODO
@@ -63,7 +63,9 @@ class JsonApiResourceCollection extends AnonymousResourceCollection
     #[\Override]
     public function toResponse($request)
     {
-        return tap(parent::toResponse($request)->header('Content-type', 'application/vnd.api+json'), $this->flush(...));
+        return parent::toResponse($request)->header('Content-type', 'application/vnd.api+json');
+
+        // return tap(parent::toResponse($request)->header('Content-type', 'application/vnd.api+json'), $this->flush(...));
     }
 
     /**
