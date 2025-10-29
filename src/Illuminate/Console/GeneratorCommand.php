@@ -350,7 +350,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
         }
 
         // Sort by namespace depth (deepest first)
-        uksort($namespaceRoots, fn ($a, $b) => Str::substrCount($b, '\\') <=> Str::substrCount($a, '\\');
+        uksort($namespaceRoots, fn ($a, $b) => Str::substrCount($b, '\\') <=> Str::substrCount($a, '\\'));
 
         foreach ($namespaceRoots as $prefix => $paths) {
             if (! Str::startsWith($class, $prefix)) {
