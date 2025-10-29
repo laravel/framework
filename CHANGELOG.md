@@ -1,6 +1,13 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.36.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.36.1...12.x)
+
+## [v12.36.1](https://github.com/laravel/framework/compare/v12.36.0...v12.36.1) - 2025-10-29
+
+* [12.x] EnumerateValues::value() support and return negative values if exists #54910 by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57566
+* [12.x] always use the `operator` argument for `version_compare()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57569
+* [12.x] add `allDirectories()` method to `Filesytem` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57565
+* Revert "[12.x] EnumerateValues::value() support and return negative values if exists #54910" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57572
 
 ## [v12.36.0](https://github.com/laravel/framework/compare/v12.35.1...v12.36.0) - 2025-10-28
 

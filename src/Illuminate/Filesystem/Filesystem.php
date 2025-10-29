@@ -623,6 +623,22 @@ class Filesystem
     }
 
     /**
+     * Get all the directories within a given directory (recursive).
+     *
+     * @return array
+     */
+    public function allDirectories(string $directory): array
+    {
+        $directories = [];
+
+        foreach (Finder::create()->in($directory)->directories()->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+
+        return $directories;
+    }
+
+    /**
      * Ensure a directory exists.
      *
      * @param  string  $path
