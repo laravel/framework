@@ -916,20 +916,21 @@ trait ReplacesAttributes
             Str::lower(...),
             Str::upper(...),
             //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
-            fn (string $placeholder, ?string $parameter = null) => $parameter !== null && array_key_exists($placeholder, $wordSeparators)
-                ? ucwords($parameter, $wordSeparators[$placeholder])
-                : ucfirst($parameter ?? $placeholder),
         ];
+        
+        $ucwordsReplacement = fn (string $parameter, string $placeholder) => array_key_exists($placeholder, $wordSeparators)
+                ? ucwords($placeholder, $wordSeparators[$placeholder])
+                : ucfirst($parameter);
 
         $cases = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), [...$fn, ucfirst(...)])],
             [],
         );
 
         $replacements = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => $fn($mapping[$placeholder], $placeholder), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => $fn($mapping[$placeholder], $placeholder), [...$fn, $ucwordsReplacement])],
             [],
         );
 
