@@ -17,14 +17,7 @@ abstract class JsonApiResource extends JsonResource
      */
     public static $jsonApiInformation = [];
 
-    public function fields(Request $request)
-    {
-        return [
-            //
-        ];
-    }
-
-    public function relationships(Request $request)
+    public function links(Request $request)
     {
         return [
             //
@@ -46,13 +39,6 @@ abstract class JsonApiResource extends JsonResource
     public function type(Request $request)
     {
         return $this->resolveResourceType($request);
-    }
-
-    public function links(Request $request)
-    {
-        return [
-            //
-        ];
     }
 
     /**
