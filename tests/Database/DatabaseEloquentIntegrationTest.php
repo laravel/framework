@@ -1087,7 +1087,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testFindOrFailWithEnumThrowsModelNotFoundException()
     {
         $this->expectException(ModelNotFoundException::class);
-        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] ' . UserEnum::Nobody->value);
+        $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\EloquentTestUser] 0');
         $this->expectExceptionObject(
             (new ModelNotFoundException())->setModel(EloquentTestUser::class, [UserEnum::Nobody->value]),
         );
