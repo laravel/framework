@@ -606,14 +606,14 @@ class Filesystem
      * Get all of the directories within a given directory.
      *
      * @param  string  $directory
-     * @return array
+     * @return ($map is true ? array<string> : array<\Symfony\Component\Finder\SplFileInfo>)
      */
-    public function directories($directory, array|string|int $depth = 0)
+    public function directories($directory, array|string|int $depth = 0, bool $map = true)
     {
         $directories = [];
 
         foreach (Finder::create()->in($directory)->directories()->depth($depth)->sortByName() as $dir) {
-            $directories[] = $dir->getPathname();
+            $directories[] = $map ? $dir->getPathname() : $dir;
         }
 
         return $directories;
@@ -622,11 +622,11 @@ class Filesystem
     /**
      * Get all the directories within a given directory (recursive).
      *
-     * @return array
+     * @return ($map is true ? array<string> : array<\Symfony\Component\Finder\SplFileInfo>)
      */
-    public function allDirectories(string $directory): array
+    public function allDirectories(string $directory, bool $map = true): array
     {
-        return $this->directories($directory, []);
+        return $this->directories($directory, [], $map);
     }
 
     /**
