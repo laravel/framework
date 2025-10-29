@@ -912,17 +912,17 @@ trait ReplacesAttributes
     private function replaceWhileKeepingCase(string $message, array $mapping): string
     {
         $fn = [
-           Str::lower(...),
-           Str::upper(...),
-           //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
-           fn (string $placeholder, ?string $parameter = null) => $parameter !== null && array_key_exists($placeholder, $wordSeparators)
-               ? ucwords($parameter ?? $placeholder, $wordSeparators[$placeholder])
-               : ucfirst($parameter ?? $placeholder),
+            Str::lower(...),
+            Str::upper(...),
+            //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
+            fn (string $placeholder, ?string $parameter = null) => $parameter !== null && array_key_exists($placeholder, $wordSeparators)
+                ? ucwords($parameter ?? $placeholder, $wordSeparators[$placeholder])
+                : ucfirst($parameter ?? $placeholder),
         ];
 
         $cases = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':' . $fn($placeholder), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
             [],
         );
 
