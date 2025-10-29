@@ -607,7 +607,7 @@ class Filesystem
      * Get all of the directories within a given directory.
      *
      * @param  string  $directory
-     * @param  string|int|string[]|int[]  $levels
+     * @param  string|int|string[]|int[]  $depth
      * @return array
      */
     public function directories($directory, array|string|int $depth = 0)
