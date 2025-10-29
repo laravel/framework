@@ -580,7 +580,7 @@ class Filesystem
      *
      * @param  string  $directory
      * @param  bool  $hidden
-     * @param  string|int|string[]|int[]  $levels
+     * @param  string|int|string[]|int[]  $depth
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public function files($directory, $hidden = false, array|string|int $depth = 0)
