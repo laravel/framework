@@ -228,7 +228,7 @@ class SQLiteGrammar extends Grammar
     {
         $version = $query->getConnection()->getServerVersion();
 
-        if (version_compare($version, '3.25.0') >= 0) {
+        if (version_compare($version, '3.25.0', '>=')) {
             return parent::compileGroupLimit($query);
         }
 
