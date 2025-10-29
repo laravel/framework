@@ -582,10 +582,10 @@ class Filesystem
      * @param  bool  $hidden
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public function files($directory, $hidden = false)
+    public function files($directory, $hidden = false, string|int|array $depth = 0)
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth($depth)->sortByName(),
             false
         );
     }
@@ -599,10 +599,7 @@ class Filesystem
      */
     public function allFiles($directory, $hidden = false)
     {
-        return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
-            false
-        );
+        return $this->files($directory, $hidden, []);
     }
 
     /**
@@ -611,11 +608,11 @@ class Filesystem
      * @param  string  $directory
      * @return array
      */
-    public function directories($directory)
+    public function directories($directory, string|int|array $depth = 0)
     {
         $directories = [];
 
-        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+        foreach (Finder::create()->in($directory)->directories()->depth($depth)->sortByName() as $dir) {
             $directories[] = $dir->getPathname();
         }
 
@@ -629,13 +626,7 @@ class Filesystem
      */
     public function allDirectories(string $directory): array
     {
-        $directories = [];
-
-        foreach (Finder::create()->in($directory)->directories()->sortByName() as $dir) {
-            $directories[] = $dir->getPathname();
-        }
-
-        return $directories;
+        return $this->directories($directory, []);
     }
 
     /**
