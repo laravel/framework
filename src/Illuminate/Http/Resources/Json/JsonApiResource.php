@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Collection;
 
 abstract class JsonApiResource extends JsonResource
