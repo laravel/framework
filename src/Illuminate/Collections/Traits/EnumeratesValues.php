@@ -340,11 +340,11 @@ trait EnumeratesValues
      */
     public function value($key, $default = null)
     {
-        $value = $this->first(function ($value) use ($key) {
-            return Arr::exists($value, $key);
-        });
+        if ($value = $this->whereStrict($key, func_get_arg(0))) {
+            return data_get($value, $key, $default);
+        }
 
-        return $value ? data_get($value, $key) : value($default);
+        return value($default);
     }
 
     /**
