@@ -49,7 +49,7 @@
         "symfony/finder": "^7.2.0",
         "symfony/http-foundation": "^7.2.0",
         "symfony/http-kernel": "^7.2.0",
-        "symfony/mailer": "^7.2.0",
+        "symfony/mailer": "^7.4.0",
         "symfony/mime": "^7.2.0",
         "symfony/polyfill-php83": "^1.33",
         "symfony/polyfill-php84": "^1.33",
