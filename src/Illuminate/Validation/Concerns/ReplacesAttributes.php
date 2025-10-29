@@ -930,11 +930,12 @@ trait ReplacesAttributes
 
         $replacements = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(function (callable $fn) use($placeholder, $mapping, $wordSeparators) {
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(function (callable $fn) use ($placeholder, $mapping, $wordSeparators) {
                 $parameter = $mapping[$placeholder];
                 if (is_array($parameter) && array_is_list($parameter) && array_key_exists($placeholder, $wordSeparators)) {
                     $parameter = implode($wordSeparators[$placeholder], $parameter);
                 }
+
                 return $fn($parameter, $placeholder);
             }, [...$fn, $ucwordsReplacement])],
             [],
