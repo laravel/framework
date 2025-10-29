@@ -919,7 +919,7 @@ trait ReplacesAttributes
         ];
 
         $ucwordsReplacement = fn (string $parameter, string $placeholder) => array_key_exists($placeholder, $wordSeparators)
-                ? ucwords($placeholder, $wordSeparators[$placeholder])
+                ? ucwords($parameter, $wordSeparators[$placeholder])
                 : ucfirst($parameter);
 
         $cases = array_reduce(
