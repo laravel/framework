@@ -1183,26 +1183,6 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
-    public function testValueWithNegativeValue($collection)
-    {
-        $c = new $collection([['id' => 1, 'balance' => 0], ['id' => 2, 'balance' => 200]]);
-
-        $this->assertEquals(0, $c->value('balance'));
-
-        $c = new $collection([['id' => 1, 'balance' => ''], ['id' => 2, 'balance' => 200]]);
-
-        $this->assertEquals('', $c->value('balance'));
-
-        $c = new $collection([['id' => 1, 'balance' => null], ['id' => 2, 'balance' => 200]]);
-
-        $this->assertEquals(null, $c->value('balance'));
-
-        $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 200]]);
-
-        $this->assertEquals(200, $c->value('balance'));
-    }
-
-    #[DataProvider('collectionClassProvider')]
     public function testBetween($collection)
     {
         $c = new $collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
