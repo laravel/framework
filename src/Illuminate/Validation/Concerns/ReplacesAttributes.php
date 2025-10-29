@@ -241,7 +241,7 @@ trait ReplacesAttributes
      */
     protected function replaceMissingWith($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['values' => $this->getAttributeList($parameters)],
             ['values' => ' / '],
@@ -291,7 +291,7 @@ trait ReplacesAttributes
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['values' => $this->getAttributeList($parameters)],
             ['values' => ', '],
@@ -423,7 +423,7 @@ trait ReplacesAttributes
      */
     protected function replacePresentWith($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['values' => $this->getAttributeList($parameters)],
             ['values' => ' / '],
@@ -455,7 +455,7 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['values' => $this->getAttributeList($parameters)],
             ['values' => ' / '],
@@ -641,7 +641,7 @@ trait ReplacesAttributes
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['other' => $other, 'values' => $values],
             ['values' => ', '],
@@ -715,7 +715,7 @@ trait ReplacesAttributes
      */
     protected function replaceProhibits($message, $attribute, $rule, $parameters)
     {
-        return $this->replaceKeepCase(
+        return $this->replaceWhileKeepingCase(
             $message,
             ['other' => $this->getAttributeList($parameters)],
             ['other' => ' / '],
