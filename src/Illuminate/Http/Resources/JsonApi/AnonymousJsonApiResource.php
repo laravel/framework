@@ -13,9 +13,37 @@ class AnonymousJsonApiResource extends JsonApiResource
      * @param  mixed  $resource
      * @param  \Illuminate\Http\Resources\Json\JsonResource  $jsonResource
      */
-    public function __construct($resource, protected JsonResource $jsonResource)
-    {
+    public function __construct(
+        $resource,
+        protected JsonResource $jsonResource,
+        protected array $jsonApiLinks = [],
+        protected array $jsonApiMeta = [],
+    ) {
         parent::__construct($resource);
+    }
+
+    /**
+     * Resource "links" for JSON:API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    #[\Override]
+    public function links(Request $request)
+    {
+        return $this->jsonApiLinks;
+    }
+
+    /**
+     * Resource "meta" for JSON:API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    #[\Override]
+    public function meta(Request $request)
+    {
+        return $this->jsonApiMeta;
     }
 
     /**

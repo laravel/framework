@@ -280,9 +280,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      *
      * @return \Illuminate\Http\Resources\JsonApi\AnonymousJsonApiResource
      */
-    public function asJsonApi()
+    public function asJsonApi(array $links = [], array $meta = [])
     {
-        return new AnonymousJsonApiResource($this->resource, $this);
+        return new AnonymousJsonApiResource($this->resource, $this, $links, $meta);
     }
 
     /**
