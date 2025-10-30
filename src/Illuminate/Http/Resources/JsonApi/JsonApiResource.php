@@ -4,7 +4,7 @@ namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
@@ -95,7 +95,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public function toResponse($request)
     {
-        return (new JsonApiResourceResponse($this))->toResponse($request);
+        return (new ResourceResponse($this))->toResponse($request);
     }
 
     /**
@@ -107,6 +107,16 @@ class JsonApiResource extends JsonResource
         $response->header('Content-type', 'application/vnd.api+json');
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function asJsonApi()
+    {
+        return $this;
+    }
+
     /**
      * Create a new resource collection instance.
      *
@@ -116,7 +126,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     protected static function newCollection($resource)
     {
-        return new JsonApiResourceCollection($resource, static::class);
+        return new ResourceCollection($resource, static::class);
     }
 
     /**

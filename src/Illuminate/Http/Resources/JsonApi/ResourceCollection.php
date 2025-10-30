@@ -5,7 +5,7 @@ namespace Illuminate\Http\Resources\JsonApi;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class JsonApiResourceCollection extends AnonymousResourceCollection
+class ResourceCollection extends AnonymousResourceCollection
 {
     /**
      * @param  Request  $request

@@ -2,9 +2,7 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
-use Illuminate\Http\Resources\Json\ResourceResponse;
-
-class JsonApiResourceResponse extends ResourceResponse
+class ResourceResponse extends \Illuminate\Http\Resources\Json\ResourceResponse
 {
     /**
      * Get the default data wrapper for the resource.

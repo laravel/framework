@@ -6,7 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonApiResource;
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -123,7 +123,7 @@ trait ResolvesJsonApiSpecifications
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => $resource->toArray($request),
+                'attributes' => $resource->asJsonApi()->toArray($request),
             ]);
         }
 
