@@ -28,22 +28,17 @@ class JsonApiResource extends JsonResource
 
     /**
      * The resource's "links" for JSON:API.
-     *
-     * @var array
      */
     protected array $jsonApiLinks = [];
 
     /**
      * The resource's "meta" for JSON:API.
-     *
-     * @var array
      */
     protected array $jsonApiMeta = [];
 
     /**
      * Set the JSON:API version for the request.
      *
-     * @param  string  $version
      * @return void
      */
     public static function configure(?string $version = null, array $ext = [], array $profile = [], array $meta = [])
@@ -59,7 +54,6 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's ID.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function id(Request $request)
@@ -70,7 +64,6 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's type.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string
      */
     public function type(Request $request)
@@ -81,7 +74,6 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's links.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function links(Request $request)
@@ -92,7 +84,6 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's meta information.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function meta(Request $request)
@@ -133,10 +124,6 @@ class JsonApiResource extends JsonResource
 
     /**
      * Customize the outgoing response for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\JsonResponse  $response
-     * @return void
      */
     #[\Override]
     public function withResponse(Request $request, JsonResponse $response): void
