@@ -10,8 +10,9 @@ class AnonymousJsonApiResource extends JsonApiResource
     /**
      * Create a new resource instance.
      *
-     * @param  mixed  $resource
      * @param  \Illuminate\Http\Resources\Json\JsonResource  $jsonResource
+     * @param  array  $links
+     * @param  array  $meta
      */
     public function __construct(
         protected JsonResource $jsonResource,
