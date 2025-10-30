@@ -11,7 +11,6 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
-use RuntimeException;
 use WeakMap;
 
 trait ResolvesJsonApiSpecifications
