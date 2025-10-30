@@ -113,7 +113,7 @@ trait ResolvesJsonApiSpecifications
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => $resource->asJsonApi()->toArray($request),
+                'attributes' => $resource->toArray($request),
             ]);
         }
 

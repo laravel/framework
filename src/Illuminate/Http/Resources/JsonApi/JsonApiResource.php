@@ -57,54 +57,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Set the string that should wrap the outer-most resource array.
-     *
-     * @param  string  $value
-     * @return never
-     *
-     * @throws \RuntimeException
-     */
-    #[\Override]
-    public static function wrap($value)
-    {
-        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
-    }
-
-    /**
-     * Disable wrapping of the outer-most resource array.
-     *
-     * @return never
-     */
-    #[\Override]
-    public static function withoutWrapping()
-    {
-        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
-    }
-
-    /**
-     * Resource "links" for JSON:API.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function links(Request $request)
-    {
-        return $this->jsonApiLinks;
-    }
-
-    /**
-     * Resource "meta" for JSON:API.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function meta(Request $request)
-    {
-        return $this->jsonApiMeta;
-    }
-
-    /**
-     * Resource "id" for JSON:API.
+     * Get the resource's ID.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
@@ -115,7 +68,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Resource "type" for JSON:API.
+     * Get the resource's type.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
@@ -123,6 +76,28 @@ class JsonApiResource extends JsonResource
     public function type(Request $request)
     {
         return $this->resolveResourceType($request);
+    }
+
+    /**
+     * Get the resource's links.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function links(Request $request)
+    {
+        return $this->jsonApiLinks;
+    }
+
+    /**
+     * Get the resource's meta information.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function meta(Request $request)
+    {
+        return $this->jsonApiMeta;
     }
 
     /**
@@ -166,27 +141,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public function withResponse(Request $request, JsonResponse $response): void
     {
-        $response->header('Content-type', 'application/vnd.api+json');
-    }
-
-    /**
-     * Transform JSON resource to JSON:API.
-     *
-     * @param  array  $links
-     * @param  array  $meta
-     * @return $this
-     */
-    public function asJsonApi(array $links = [], array $meta = [])
-    {
-        if (! empty($links)) {
-            $this->jsonApiLinks = array_merge($this->jsonApiLinks, $links);
-        }
-
-        if (! empty($meta)) {
-            $this->jsonApiMeta = array_merge($this->jsonApiMeta, $meta);
-        }
-
-        return $this;
+        $response->header('Content-Type', 'application/vnd.api+json');
     }
 
     /**
@@ -199,6 +154,31 @@ class JsonApiResource extends JsonResource
     protected static function newCollection($resource)
     {
         return new AnonymousResourceCollection($resource, static::class);
+    }
+
+    /**
+     * Set the string that should wrap the outer-most resource array.
+     *
+     * @param  string  $value
+     * @return never
+     *
+     * @throws \RuntimeException
+     */
+    #[\Override]
+    public static function wrap($value)
+    {
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
+    }
+
+    /**
+     * Disable wrapping of the outer-most resource array.
+     *
+     * @return never
+     */
+    #[\Override]
+    public static function withoutWrapping()
+    {
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
     }
 
     /**
