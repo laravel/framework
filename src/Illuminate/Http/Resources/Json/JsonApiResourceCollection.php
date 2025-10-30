@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 class JsonApiResourceCollection extends AnonymousResourceCollection
 {
