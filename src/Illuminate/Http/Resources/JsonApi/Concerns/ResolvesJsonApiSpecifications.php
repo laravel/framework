@@ -165,17 +165,6 @@ trait ResolvesJsonApiSpecifications
     }
 
     /**
-     * Get unique key for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array{0: string, 1: string}
-     */
-    public function uniqueResourceKey(Request $request): array
-    {
-        return [$this->resolveResourceType($request), $this->resolveResourceIdentifier($request)];
-    }
-
-    /**
      * Resolves `links` object for the resource.
      *
      * @param  \Illuminate\Http\Request  $request
