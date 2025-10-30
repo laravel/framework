@@ -68,7 +68,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public static function wrap($value)
     {
-        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__);
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
     }
 
     /**
@@ -79,7 +79,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public static function withoutWrapping()
     {
-        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__);
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__));
     }
 
     /**
