@@ -107,7 +107,6 @@ class JsonApiResource extends JsonResource
         $response->header('Content-type', 'application/vnd.api+json');
     }
 
-
     /**
      * {@inheritdoc}
      */
