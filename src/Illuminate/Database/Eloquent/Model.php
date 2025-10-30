@@ -2581,6 +2581,23 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this;
     }
 
+    protected function getPropertiesForSerialization(): array
+    {
+        if (version_compare(PHP_VERSION, '8.4.0') < 0) {
+            return array_keys(get_object_vars($this));
+        }
+
+        $keys = [];
+
+        foreach ((new ReflectionClass($this))->getProperties() as $property) {
+            if (!$property->isStatic() && !$property->hasHooks()) {
+                $keys[] = $property->getName();
+            }
+        }
+
+        return $keys;
+    }
+
     /**
      * Prepare the object for serialization.
      *
@@ -2595,17 +2612,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
 
-        $keys = get_object_vars($this);
-
-        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
-            foreach ((new ReflectionClass($this))->getProperties() as $property) {
-                if ($property->hasHooks()) {
-                    unset($keys[$property->getName()]);
-                }
-            }
-        }
-
-        return array_keys($keys);
+        return $this->getPropertiesForSerialization();
     }
 
     /**
