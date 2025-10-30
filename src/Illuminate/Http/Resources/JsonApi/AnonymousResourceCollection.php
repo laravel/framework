@@ -52,6 +52,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     #[\Override]
     public function withResponse(Request $request, JsonResponse $response): void
     {
-        $response->header('Content-type', 'application/vnd.api+json');
+        $response->header('Content-Type', 'application/vnd.api+json');
     }
 }
