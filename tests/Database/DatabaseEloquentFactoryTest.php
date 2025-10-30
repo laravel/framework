@@ -982,6 +982,12 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals('other body', FactoryTestComment::first()->body);
     }
 
+    public function test_factory_can_insert()
+    {
+        (new FactoryTestPostFactory())->count(5)->state(['title' => 'hello'])->insert();
+        $this->assertEquals(5, ($comments = FactoryTestPost::query()->get())->count());
+    }
+
     /**
      * Get a database connection instance.
      *
