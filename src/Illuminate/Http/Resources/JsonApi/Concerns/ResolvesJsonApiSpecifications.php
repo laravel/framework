@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -144,7 +145,7 @@ trait ResolvesJsonApiSpecifications
             return static::getResourceIdFromEloquent($this->resource);
         }
 
-        throw new RuntimeException('Unable to determine "type"');
+        throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
     }
 
     /**
@@ -161,7 +162,7 @@ trait ResolvesJsonApiSpecifications
             return static::getResourceTypeFromEloquent($this->resource);
         }
 
-        throw new RuntimeException('Unable to determine "type"');
+        throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
     }
 
     /**
