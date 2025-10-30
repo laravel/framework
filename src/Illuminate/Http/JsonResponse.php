@@ -93,14 +93,13 @@ class JsonResponse extends BaseJsonResponse
         return $this->update();
     }
 
-    public static function utf8ize( $mixed )
+    public static function utf8ize($mixed)
     {
         if (is_array($mixed)) {
             foreach ($mixed as $key => $value) {
                 $mixed[$key] = self::utf8ize($value);
             }
-        }
-        elseif (is_string($mixed)) {
+        } elseif (is_string($mixed)) {
             return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
         }
         return $mixed;
