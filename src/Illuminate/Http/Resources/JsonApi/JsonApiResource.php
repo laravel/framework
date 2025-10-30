@@ -56,7 +56,6 @@ class JsonApiResource extends JsonResource
         ]);
     }
 
-
     /**
      * Set the string that should wrap the outer-most resource array.
      *
