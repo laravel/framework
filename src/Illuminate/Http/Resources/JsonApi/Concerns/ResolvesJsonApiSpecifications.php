@@ -16,11 +16,14 @@ use WeakMap;
 trait ResolvesJsonApiSpecifications
 {
     /**
+     * Cached loaded relationships map.
+     *
      * @var \WeakMap|null
      */
     protected $cachedLoadedRelationshipsMap;
 
     /**
+     * Cached loaded relationships identifers.
      * @var array
      */
     protected array $cachedLoadedRelationshipsIdentifier = [];
