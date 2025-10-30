@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 
 class JsonApiResourceCollection extends AnonymousResourceCollection
 {
-
     /**
      * @param  Request  $request
      * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
