@@ -84,8 +84,8 @@ class JsonApiResourceTest extends TestCase
             'id' => '2',
             'type' => 'json-api-model',
             'attributes' => [
-                'name' => 'Bob',
-                'email' => 'bob@example.com',
+                'name' => 'Manager',
+                'email' => 'deputy@example.com',
             ],
         ], $responseData['included'][0]);
     }
