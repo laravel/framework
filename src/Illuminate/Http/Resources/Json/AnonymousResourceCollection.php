@@ -38,13 +38,13 @@ class AnonymousResourceCollection extends ResourceCollection
      *
      * @param  array  $links
      * @param  array  $meta
-     * @return $this
+     * @return Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection
      */
     public function asJsonApi(array $links = [], array $meta = [])
     {
         return new JsonApiAnonymousResourceCollection(
             $this->collection->map(fn ($resource) => $resource->asJsonApi($links, $meta)),
-            $this->collects
+            $this->collects,
         );
     }
 }
