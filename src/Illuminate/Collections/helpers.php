@@ -44,19 +44,23 @@ if (! function_exists('data_has')) {
      */
     function data_has($target, $key): bool
     {
-        if (Arr::accessible($target)) {
-            return Arr::has($target, $key);
+        if (empty($key)) {
+            return false;
         }
 
         $key = is_array($key) ? $key : explode('.', $key);
 
-        while ($property = array_shift($key)) {
-            if (property_exists($target, $property)) {
-                return $key ? data_has($target->{$property}, $key) : true;
+        foreach ($key as $segment) {
+            if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && property_exists($target, $segment)) {
+                $target = $target->{$segment};
+            } else {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 }
 
