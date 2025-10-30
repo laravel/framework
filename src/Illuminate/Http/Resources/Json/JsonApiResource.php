@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Collection;
 
-abstract class JsonApiResource extends JsonResource
+class JsonApiResource extends JsonResource
 {
     use Concerns\ResolvesJsonApiSpecifications;
 
@@ -82,16 +82,7 @@ abstract class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => [
-                'id' => $this->resolveResourceIdentifier($request),
-                'type' => $this->resolveResourceType($request),
-                ...(new Collection([
-                    'attributes' => $this->resolveResourceAttributes($request),
-                    'relationships' => $this->resolveResourceRelationships($request),
-                    'links' => $this->resolveResourceLinks($request),
-                    'meta' => $this->resolveMetaInformations($request),
-                ]))->filter()->map(fn ($value) => (object) $value),
-            ],
+            'data' => $this->resolveResourceToJsonApiSchema($request),
         ];
     }
 

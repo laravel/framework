@@ -44,6 +44,20 @@ trait ResolvesJsonApiSpecifications
         return $this->filter($data);
     }
 
+    public function resolveResourceData(Request $request): array
+    {
+        return [
+            'id' => $this->resolveResourceIdentifier($request),
+            'type' => $this->resolveResourceType($request),
+            ...(new Collection([
+                'attributes' => $this->resolveResourceAttributes($request),
+                'relationships' => $this->resolveResourceRelationships($request),
+                'links' => $this->resolveResourceLinks($request),
+                'meta' => $this->resolveMetaInformations($request),
+            ]))->filter()->map(fn ($value) => (object) $value),
+        ];
+    }
+
     protected function resolveResourceRelationships(Request $request): array
     {
         if (! $this->resource instanceof Model) {
@@ -58,6 +72,10 @@ trait ResolvesJsonApiSpecifications
             'data' => (new Collection($this->resource->getRelations()))
                 ->mapWithKeys(function ($relations, $key) {
                     if ($relations instanceof Collection) {
+                        if ($relations->isEmpty()) {
+                            return [$key => $relations];
+                        }
+
                         $key = static::getResourceTypeFromEloquent($relations->first());
 
                         $relations->each(function ($relation) use ($key) {
