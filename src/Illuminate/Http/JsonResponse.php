@@ -79,16 +79,31 @@ class JsonResponse extends BaseJsonResponse
 
         $this->data = match (true) {
             $data instanceof Jsonable => $data->toJson($this->encodingOptions),
-            $data instanceof JsonSerializable => json_encode($data->jsonSerialize(), $this->encodingOptions),
-            $data instanceof Arrayable => json_encode($data->toArray(), $this->encodingOptions),
-            default => json_encode($data, $this->encodingOptions),
+            $data instanceof JsonSerializable => json_encode($data->jsonSerialize(), JSON_THROW_ON_ERROR | $this->encodingOptions),
+            $data instanceof Arrayable => json_encode($data->toArray(), JSON_THROW_ON_ERROR | $this->encodingOptions),
+            default => json_encode($data, JSON_THROW_ON_ERROR | $this->encodingOptions),
         };
 
         if (! $this->hasValidJson(json_last_error())) {
-            throw new InvalidArgumentException(json_last_error_msg());
+            $data = self::utf8ize($data);
+            return $this->setData($data);
+//            throw new InvalidArgumentException(json_last_error_msg());
         }
 
         return $this->update();
+    }
+
+    public static function utf8ize( $mixed )
+    {
+        if (is_array($mixed)) {
+            foreach ($mixed as $key => $value) {
+                $mixed[$key] = self::utf8ize($value);
+            }
+        }
+        elseif (is_string($mixed)) {
+            return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
+        }
+        return $mixed;
     }
 
     /**
