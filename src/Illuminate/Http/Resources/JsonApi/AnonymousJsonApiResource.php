@@ -11,8 +11,9 @@ class AnonymousJsonApiResource extends JsonApiResource
      * Create a new resource instance.
      *
      * @param  mixed  $resource
+     * @param  \Illuminate\Http\Resources\Json\JsonResource  $jsonResource
      */
-    public function __construct($resource, protected JsonResource $source)
+    public function __construct($resource, protected JsonResource $jsonResource)
     {
         parent::__construct($resource);
     }
@@ -25,6 +26,6 @@ class AnonymousJsonApiResource extends JsonApiResource
      */
     public function toArray(Request $request)
     {
-        return $this->source->toArray($request);
+        return $this->jsonResource->toArray($request);
     }
 }
