@@ -221,7 +221,21 @@ class AboutCommand extends Command
 
                 return $logs;
             },
-            'Mail' => config('mail.default'),
+            'Mail' => function ($json) {
+                $mailMailer = config('mail.default');
+
+                if (in_array(config('mail.mailers.'.$mailMailer.'.driver'), ['failover', 'roundrobin'])) {
+                    $secondary = new Collection(config('mail.mailers.'.$mailMailer.'.mailers'));
+
+                    return value(static::format(
+                        value: $mailMailer,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+
+                return $mailMailer;
+            },
             'Octane' => config('octane.server'),
             'Queue' => function ($json) {
                 $queueConnection = config('queue.default');
