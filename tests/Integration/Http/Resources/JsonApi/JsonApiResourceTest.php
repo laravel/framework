@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
@@ -20,8 +21,17 @@ class JsonApiResourceTest extends TestCase
     protected function defineRoutes($router)
     {
         $router->get('users/{userId}', function (Request $request, $userId) {
-            return new UserResource(User::find($userId));
+            return new UserApiResource(User::find($userId));
         });
+    }
+
+    public function testBaseJsonResourceCanBeConvertedToJsonApiResource()
+    {
+        $user = UserFactory::new()->create();
+
+        $resource = (new UserResource($user))->asJsonApi();
+
+        $this->assertInstanceOf(JsonApiResource::class, $resource);
     }
 
     public function testItCanGenerateJsonApiResponse()
@@ -48,9 +58,21 @@ class JsonApiResourceTest extends TestCase
 
 class User extends Authenticatable
 {
+    //
 }
 
-class UserResource extends JsonApiResource
+class UserResource extends JsonResource
+{
+    public function toArray(Request $request)
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+    }
+}
+
+class UserApiResource extends JsonApiResource
 {
     public function toArray(Request $request)
     {
