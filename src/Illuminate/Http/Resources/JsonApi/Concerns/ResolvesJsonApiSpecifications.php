@@ -24,6 +24,7 @@ trait ResolvesJsonApiSpecifications
 
     /**
      * Cached loaded relationships identifers.
+     *
      * @var array
      */
     protected array $cachedLoadedRelationshipsIdentifier = [];
