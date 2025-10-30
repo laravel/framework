@@ -23,6 +23,16 @@ class JsonApiResourceTest extends TestCase
 
     /** {@inheritdoc} */
     #[\Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        JsonResource::flushState();
+        JsonApiResource::flushState();
+    }
+
+    /** {@inheritdoc} */
+    #[\Override]
     protected function defineRoutes($router)
     {
         $router->get('users/{userId}', function (Request $request, $userId) {
