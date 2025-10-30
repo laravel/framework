@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Resources\JsonApi\Exceptions;
 
+use RuntimeException;
+
 class ResourceIdentificationException extends RuntimeException
 {
     /**

@@ -91,9 +91,9 @@ trait ResolvesJsonApiSpecifications
                 }
 
                 return transform(
-                    [static::getResourceTypeFromEloquent($relation), static::getResourceIdFromEloquent($relation)],
-                    function ($uniqueKey) {
-                        $this->cachedLoadedRelationshipsMap[$relation] = $uniqueKey;
+                    [static::getResourceTypeFromEloquent($relations), static::getResourceIdFromEloquent($relations)],
+                    function ($uniqueKey) use ($relations) {
+                        $this->cachedLoadedRelationshipsMap[$relations] = $uniqueKey;
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                     }
