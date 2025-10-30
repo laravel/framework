@@ -87,7 +87,6 @@ class JsonResponse extends BaseJsonResponse
         if (! $this->hasValidJson(json_last_error())) {
             $data = self::utf8ize($data);
             return $this->setData($data);
-//            throw new InvalidArgumentException(json_last_error_msg());
         }
 
         return $this->update();
