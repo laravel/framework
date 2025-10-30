@@ -223,7 +223,21 @@ class AboutCommand extends Command
             },
             'Mail' => config('mail.default'),
             'Octane' => config('octane.server'),
-            'Queue' => config('queue.default'),
+            'Queue' => function ($json) {
+                $queueConnection = config('queue.default');
+
+                if (config('queue.connections.'.$queueConnection.'.driver') === 'failover') {
+                    $secondary = new Collection(config('queue.connections.'.$queueConnection.'.connections'));
+
+                    return value(static::format(
+                        value: $queueConnection,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+
+                return $queueConnection;
+            },
             'Scout' => config('scout.driver'),
             'Session' => config('session.driver'),
         ]));
