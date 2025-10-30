@@ -96,7 +96,7 @@ class JsonApiResource extends JsonResource
      * Get any additional data that should be returned with the resource array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
+     * @return array
      */
     #[\Override]
     public function with($request)
@@ -172,7 +172,7 @@ class JsonApiResource extends JsonResource
      * Create a new resource collection instance.
      *
      * @param  mixed  $resource
-     * @return \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection<int, mixed>
+     * @return \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection
      */
     #[\Override]
     protected static function newCollection($resource)
