@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Query\Builder;
@@ -965,6 +966,69 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $this->assertCount(0, $taylor->self_referencing);
         $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
+    }
+
+    public function testRestoreOrFailRestoresSoftDeletedModel()
+    {
+        [$taylor, $abigail] = $this->createUsers();
+
+        // Taylor is soft-deleted, restore it
+        $restored = SoftDeletesTestUser::restoreOrFail($taylor->id);
+
+        $this->assertInstanceOf(SoftDeletesTestUser::class, $restored);
+        $this->assertEquals($taylor->id, $restored->id);
+        $this->assertEquals($taylor->email, $restored->email);
+        $this->assertNull($restored->deleted_at);
+        $this->assertFalse($restored->trashed());
+
+        // Verify it's now visible in normal queries
+        $this->assertCount(2, SoftDeletesTestUser::all());
+        $this->assertNotNull(SoftDeletesTestUser::find($taylor->id));
+    }
+
+    public function testRestoreOrFailThrowsExceptionWhenModelNotFound()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        SoftDeletesTestUser::restoreOrFail(999);
+    }
+
+    public function testRestoreOrFailThrowsExceptionWhenModelNotTrashed()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        [$taylor, $abigail] = $this->createUsers();
+
+        // Abigail is not soft-deleted, should throw exception
+        SoftDeletesTestUser::restoreOrFail($abigail->id);
+    }
+
+    public function testRestoreOrFailWithSpecificColumns()
+    {
+        [$taylor, $abigail] = $this->createUsers();
+
+        $restored = SoftDeletesTestUser::restoreOrFail($taylor->id, ['id', 'email']);
+
+        $this->assertEquals($taylor->id, $restored->id);
+        $this->assertEquals($taylor->email, $restored->email);
+        $this->assertFalse($restored->trashed());
+    }
+
+    public function testRestoreOrFailReturnsFreshlyRestoredModel()
+    {
+        [$taylor, $abigail] = $this->createUsers();
+
+        $restored = SoftDeletesTestUser::restoreOrFail($taylor->id);
+
+        // Verify the model was restored and is fresh
+        $this->assertFalse($restored->trashed());
+        $this->assertEquals($taylor->id, $restored->id);
+        $this->assertEquals($taylor->email, $restored->email);
+
+        // Verify it can be found without trashed scope
+        $found = SoftDeletesTestUser::find($taylor->id);
+        $this->assertNotNull($found);
+        $this->assertEquals($taylor->id, $found->id);
     }
 
     /**

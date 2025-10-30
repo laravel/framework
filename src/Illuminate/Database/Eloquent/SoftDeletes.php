@@ -10,6 +10,7 @@ use Illuminate\Support\Collection as BaseCollection;
  * @method static \Illuminate\Database\Eloquent\Builder<static> onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
  * @method static static restoreOrCreate(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
+ * @method static static restoreOrFail(mixed $id, array<string>|string $columns = ['*'])
  * @method static static createOrRestore(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
  */
 trait SoftDeletes
