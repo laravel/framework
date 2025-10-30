@@ -1828,6 +1828,24 @@ class Str
     }
 
     /**
+     * Capitalize the first character of each word in a string.
+     *
+     * @param  string  $string
+     * @param  string  $delimiter
+     * @return string
+     */
+    public static function ucwords($string, $delimiter = ' ')
+    {
+        $words = explode($delimiter, $string);
+
+        foreach ($words as &$word) {
+            $word = static::ucfirst($word);
+        }
+
+        return implode($delimiter, $words);
+    }
+
+    /**
      * Split a string into pieces by uppercase characters.
      *
      * @param  string  $string
