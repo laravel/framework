@@ -224,7 +224,7 @@ class AboutCommand extends Command
             'Mail' => function ($json) {
                 $mailMailer = config('mail.default');
 
-                if (in_array(config('mail.mailers.'.$mailMailer.'.driver'), ['failover', 'roundrobin'])) {
+                if (in_array(config('mail.mailers.'.$mailMailer.'.transport'), ['failover', 'roundrobin'])) {
                     $secondary = new Collection(config('mail.mailers.'.$mailMailer.'.mailers'));
 
                     return value(static::format(
