@@ -20,20 +20,64 @@ trait ResolvesJsonApiSpecifications
      *
      * @var \WeakMap|null
      */
-    protected $cachedLoadedRelationshipsMap;
+    protected $loadedRelationshipsMap;
 
     /**
      * Cached loaded relationships identifers.
-     *
-     * @var array
      */
-    protected array $cachedLoadedRelationshipsIdentifier = [];
+    protected array $loadedRelationshipIdentifiers = [];
 
     /**
-     * Resolves `attributes` for the resource's data object.
+     * Resolves `data` for the resource.
+     */
+    public function resolveResourceData(Request $request): array
+    {
+        return [
+            'id' => $this->resolveResourceIdentifier($request),
+            'type' => $this->resolveResourceType($request),
+            ...(new Collection([
+                'attributes' => $this->resolveResourceAttributes($request),
+                'relationships' => $this->resolveResourceRelationshipIdentifiers($request),
+                'links' => $this->resolveResourceLinks($request),
+                'meta' => $this->resolveResourceMetaInformation($request),
+            ]))->filter()->map(fn ($value) => (object) $value),
+        ];
+    }
+
+    /**
+     * Resolve the resource's identifier.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string|int
+     *
+     * @throws ResourceIdentificationException
+     */
+    protected function resolveResourceIdentifier(Request $request): string
+    {
+        if (! $this->resource instanceof Model) {
+            throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
+        }
+
+        return static::resourceIdFromModel($this->resource);
+    }
+
+    /**
+     * Resolve the resource's type.
+     *
+     *
+     * @throws ResourceIdentificationException
+     */
+    protected function resolveResourceType(Request $request): string
+    {
+        if (! $this->resource instanceof Model) {
+            throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
+        }
+
+        return static::resourceTypeFromModel($this->resource);
+    }
+
+    /**
+     * Resolve the resource's attributes.
+     *
      *
      * @throws \RuntimeException
      */
@@ -57,12 +101,11 @@ trait ResolvesJsonApiSpecifications
     /**
      * Resolves `relationships` for the resource's data object.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return string|int
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceRelationshipsIdentifiers(Request $request): array
+    protected function resolveResourceRelationshipIdentifiers(Request $request): array
     {
         if (! $this->resource instanceof Model) {
             return [];
@@ -71,43 +114,60 @@ trait ResolvesJsonApiSpecifications
         $this->compileResourceRelationships($request);
 
         return [
-            ...$this->cachedLoadedRelationshipsIdentifier,
+            ...$this->loadedRelationshipIdentifiers,
         ];
     }
 
     /**
-     * Resolves `data` for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * Compile resource relationships.
      */
-    public function resolveResourceData(Request $request): array
+    protected function compileResourceRelationships(Request $request): void
     {
-        return [
-            'id' => $this->resolveResourceIdentifier($request),
-            'type' => $this->resolveResourceType($request),
-            ...(new Collection([
-                'attributes' => $this->resolveResourceAttributes($request),
-                'relationships' => $this->resolveResourceRelationshipsIdentifiers($request),
-                'links' => $this->resolveResourceLinks($request),
-                'meta' => $this->resolveMetaInformations($request),
-            ]))->filter()->map(fn ($value) => (object) $value),
-        ];
+        if ($this->loadedRelationshipsMap instanceof WeakMap) {
+            return;
+        }
+
+        $this->loadedRelationshipsMap = new WeakMap;
+
+        $this->loadedRelationshipIdentifiers = (new Collection($this->resource->getRelations()))
+            ->mapWithKeys(function ($relations, $key) {
+                if ($relations instanceof Collection) {
+                    if ($relations->isEmpty()) {
+                        return [$key => ['data' => $relations]];
+                    }
+
+                    $key = static::resourceTypeFromModel($relations->first());
+
+                    return [$key => ['data' => $relations->map(function ($relation) use ($key) {
+                        return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation) {
+                            $this->loadedRelationshipsMap[$relation] = $uniqueKey;
+
+                            return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                        });
+                    })]];
+                }
+
+                return [$key => ['data' => transform(
+                    [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
+                    function ($uniqueKey) use ($relations) {
+                        $this->loadedRelationshipsMap[$relations] = $uniqueKey;
+
+                        return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                    }
+                )]];
+            })->all();
     }
 
     /**
      * Resolves `included` for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function resolveResourceIncluded(Request $request): array
+    public function resolveIncludedResources(Request $request): array
     {
         $this->compileResourceRelationships($request);
 
-        $relations = new Collection();
+        $relations = new Collection;
 
-        foreach ($this->cachedLoadedRelationshipsMap as $relation => $uniqueKey) {
+        foreach ($this->loadedRelationshipsMap as $relation => $uniqueKey) {
             $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
 
             $relations->push([
@@ -117,90 +177,14 @@ trait ResolvesJsonApiSpecifications
             ]);
         }
 
-        return $relations->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])->all();
+        return $relations->uniqueStrict(
+            fn ($relation): array => [$relation['id'], $relation['type']]
+        )->all();
     }
 
     /**
-     * Compile resource relationships.
+     * Resolve the links for the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return void
-     */
-    protected function compileResourceRelationships(Request $request): void
-    {
-        if ($this->cachedLoadedRelationshipsMap instanceof WeakMap) {
-            return;
-        }
-
-        $this->cachedLoadedRelationshipsMap = new WeakMap;
-
-        $this->cachedLoadedRelationshipsIdentifier = (new Collection($this->resource->getRelations()))
-            ->mapWithKeys(function ($relations, $key) {
-                if ($relations instanceof Collection) {
-                    if ($relations->isEmpty()) {
-                        return [$key => ['data' => $relations]];
-                    }
-
-                    $key = static::getResourceTypeFromEloquent($relations->first());
-
-                    return [$key => ['data' => $relations->map(function ($relation) use ($key) {
-                        return transform([$key, static::getResourceIdFromEloquent($relation)], function ($uniqueKey) use ($relation) {
-                            $this->cachedLoadedRelationshipsMap[$relation] = $uniqueKey;
-
-                            return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
-                        });
-                    })]];
-                }
-
-                return [$key => ['data' => transform(
-                    [static::getResourceTypeFromEloquent($relations), static::getResourceIdFromEloquent($relations)],
-                    function ($uniqueKey) use ($relations) {
-                        $this->cachedLoadedRelationshipsMap[$relations] = $uniqueKey;
-
-                        return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
-                    }
-                )]];
-            })->all();
-    }
-
-    /**
-     * Resolves `id` for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string|int
-     *
-     * @throws \RuntimeException
-     */
-    protected function resolveResourceIdentifier(Request $request): string
-    {
-        if ($this->resource instanceof Model) {
-            return static::getResourceIdFromEloquent($this->resource);
-        }
-
-        throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
-    }
-
-    /**
-     * Resolves `type` for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    protected function resolveResourceType(Request $request): string
-    {
-        if ($this->resource instanceof Model) {
-            return static::getResourceTypeFromEloquent($this->resource);
-        }
-
-        throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
-    }
-
-    /**
-     * Resolves `links` object for the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<string, mixed>
      */
     protected function resolveResourceLinks(Request $request): array
@@ -209,40 +193,34 @@ trait ResolvesJsonApiSpecifications
     }
 
     /**
-     * Resolves `meta` object for the resource.
+     * Resolve the meta information for the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array<string, mixed>
      */
-    protected function resolveMetaInformations(Request $request): array
+    protected function resolveResourceMetaInformation(Request $request): array
     {
         return $this->meta($request);
     }
 
     /**
-     * Get expected resource ID from eloquent model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string
+     * Get the resource ID from the given Eloquent model.
      */
-    protected static function getResourceIdFromEloquent(Model $model): string
+    protected static function resourceIdFromModel(Model $model): string
     {
         return $model->getKey();
     }
 
     /**
-     * Get expected resource type from eloquent model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return string
+     * Get the resource type from the given Eloquent model.
      */
-    protected static function getResourceTypeFromEloquent(Model $model): string
+    protected static function resourceTypeFromModel(Model $model): string
     {
         $modelClassName = $model::class;
+
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        $modelBaseName = $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName);
-
-        return Str::of($modelBaseName)->snake()->pluralStudly();
+        return Str::of(
+            $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
+        )->snake()->pluralStudly();
     }
 }

@@ -110,7 +110,7 @@ class JsonApiResource extends JsonResource
     public function with($request)
     {
         return array_filter([
-            'included' => $this->resolveResourceIncluded($request),
+            'included' => $this->resolveIncludedResources($request),
             ...($implementation = static::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]
                 : [],
