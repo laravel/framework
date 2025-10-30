@@ -17,8 +17,10 @@ class ResourceResponseTest extends TestCase
     {
         JsonApiResource::wrap('laravel');
 
-        $this->assertSame('data', (new class([]) extends ResourceResponse {
-            public function getWrapper() {
+        $this->assertSame('data', (new class([]) extends ResourceResponse
+        {
+            public function getWrapper()
+            {
                 return $this->wrapper();
             }
         })->getWrapper());
