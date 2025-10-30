@@ -7,22 +7,22 @@ use RuntimeException;
 class ResourceIdentificationException extends RuntimeException
 {
     /**
-     * Create a new unable to determine Resource ID exception for the given resource.
+     * Create an exception indicating we were unable to determine the resource ID for the given resource.
      *
      * @param  mixed  $resource
-     * @return static
+     * @return self
      */
     public static function attemptingToDetermineIdFor($resource)
     {
         $resourceType = is_object($resource) ? $resource::class : gettype($resource);
 
         return new self(sprintf(
-            'Unable to resolve resource object id for [%s].', $resourceType
+            'Unable to resolve resource object ID for [%s].', $resourceType
         ));
     }
 
     /**
-     * Create a new unable to determine Resource type exception for the given resource.
+     * Create an exception indicating we were unable to determine the resource type for the given resource.
      *
      * @param  mixed  $resource
      * @return self
