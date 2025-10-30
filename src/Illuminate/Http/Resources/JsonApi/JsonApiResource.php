@@ -172,12 +172,12 @@ class JsonApiResource extends JsonResource
      * Create a new resource collection instance.
      *
      * @param  mixed  $resource
-     * @return \Illuminate\Http\Resources\JsonApi\JsonApiResourceCollection<int, mixed>
+     * @return \Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection<int, mixed>
      */
     #[\Override]
     protected static function newCollection($resource)
     {
-        return new ResourceCollection($resource, static::class);
+        return new AnonymousResourceCollection($resource, static::class);
     }
 
     /**

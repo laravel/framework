@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection as JsonApiAnonymousResourceCollection;
+
 class AnonymousResourceCollection extends ResourceCollection
 {
     /**
@@ -29,5 +31,20 @@ class AnonymousResourceCollection extends ResourceCollection
         $this->collects = $collects;
 
         parent::__construct($resource);
+    }
+
+    /**
+     * Transform JSON resource to JSON:API.
+     *
+     * @param  array  $links
+     * @param  array  $meta
+     * @return $this
+     */
+    public function asJsonApi(array $links = [], array $meta = [])
+    {
+        return new JsonApiAnonymousResourceCollection(
+            $this->collection->map(fn ($resource) => $resource->asJsonApi($links, $meta)),
+            $this->collects
+        );
     }
 }

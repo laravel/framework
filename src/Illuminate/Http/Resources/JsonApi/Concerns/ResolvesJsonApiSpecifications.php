@@ -124,7 +124,7 @@ trait ResolvesJsonApiSpecifications
      */
     protected function compileResourceRelationships(Request $request): void
     {
-        if ($this->cachedLoadedRelationships instanceof WeakMap) {
+        if ($this->cachedLoadedRelationshipsMap instanceof WeakMap) {
             return;
         }
 

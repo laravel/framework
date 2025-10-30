@@ -14,12 +14,11 @@ class AnonymousJsonApiResource extends JsonApiResource
      * @param  \Illuminate\Http\Resources\Json\JsonResource  $jsonResource
      */
     public function __construct(
-        $resource,
         protected JsonResource $jsonResource,
         array $links = [],
         array $meta = [],
     ) {
-        parent::__construct($resource);
+        parent::__construct($jsonResource->resource);
 
         $this->jsonApiLinks = $links;
         $this->jsonApiMeta = $meta;
