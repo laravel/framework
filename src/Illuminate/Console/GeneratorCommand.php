@@ -321,7 +321,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     {
         try {
             return $this->resolvePathForClass($name);
-        } catch (RuntimeException $e) {
+        } catch (RuntimeException) {
             return $this->laravel['path.base'].'/'.str_replace('\\', '/', $name).'.php';
         }
     }
