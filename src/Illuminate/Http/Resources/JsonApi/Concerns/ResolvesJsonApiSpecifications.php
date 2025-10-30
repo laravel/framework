@@ -26,7 +26,7 @@ trait ResolvesJsonApiSpecifications
     protected array $cachedLoadedRelationshipsIdentifier = [];
 
     /**
-     * Resolves `attributes` for the resource.
+     * Resolves `attributes` for the resource's data object.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string|int
@@ -50,6 +50,33 @@ trait ResolvesJsonApiSpecifications
         return $this->filter($data);
     }
 
+    /**
+     * Resolves `relationships` for the resource's data object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|int
+     *
+     * @throws \RuntimeException
+     */
+    protected function resolveResourceRelationshipsIdentifiers(Request $request): array
+    {
+        if (! $this->resource instanceof Model) {
+            return [];
+        }
+
+        $this->compileResourceRelationships($request);
+
+        return [
+            'data' => $this->cachedLoadedRelationshipsIdentifier,
+        ];
+    }
+
+    /**
+     * Resolves `data` for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     public function resolveResourceData(Request $request): array
     {
         return [
@@ -64,7 +91,37 @@ trait ResolvesJsonApiSpecifications
         ];
     }
 
-    protected function resolveResourceRelationships(Request $request): void
+    /**
+     * Resolves `included` for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function resolveResourceIncluded(Request $request): array
+    {
+        $this->compileResourceRelationships($request);
+
+        $relations = new Collection();
+
+        foreach ($this->cachedLoadedRelationshipsMap as $relation => $uniqueKey) {
+            $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+            $relations->push([
+                'id' => $uniqueKey[1],
+                'type' => $uniqueKey[0],
+                'attributes' => $resource->asJsonApi()->toArray($request),
+            ]);
+        }
+
+        return $relations->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])->all();
+    }
+
+    /**
+     * Compile resource relationships.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function compileResourceRelationships(Request $request): void
     {
         if ($this->cachedLoadedRelationships instanceof WeakMap) {
             return;
@@ -99,35 +156,6 @@ trait ResolvesJsonApiSpecifications
                     }
                 );
             })->all();
-    }
-
-    protected function resolveResourceRelationshipsIdentifiers(Request $request): array
-    {
-        if (! $this->resource instanceof Model) {
-            return [];
-        }
-
-        $this->resolveResourceRelationships($request);
-
-        return [
-            'data' => $this->cachedLoadedRelationshipsIdentifier,
-        ];
-    }
-
-    public function resolveResourceIncluded(Request $request): array
-    {
-        $relations = new Collection();
-
-        foreach ($this->cachedLoadedRelationshipsMap as $relation => $uniqueKey) {
-            $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
-            $relations->push([
-                'id' => $uniqueKey[1],
-                'type' => $uniqueKey[0],
-                'attributes' => $resource->asJsonApi()->toArray($request),
-            ]);
-        }
-
-        return $relations->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])->all();
     }
 
     /**
