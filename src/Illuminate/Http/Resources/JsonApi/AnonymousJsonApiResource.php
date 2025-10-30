@@ -2,10 +2,8 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Arr;
 
 class AnonymousJsonApiResource extends JsonApiResource
 {
