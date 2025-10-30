@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResponse;
 use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
