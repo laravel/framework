@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Database\Eloquent\Attributes\UseResource;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -99,7 +99,7 @@ class JsonApiResourceTest extends TestCase
                             'data' => [
                                 ['id' => (string) $posts[0]->getKey(), 'type' => 'posts'],
                                 ['id' => (string) $posts[1]->getKey(), 'type' => 'posts'],
-                            ]
+                            ],
                         ],
                     ],
                 ],
@@ -149,7 +149,6 @@ class UserApiResource extends JsonApiResource
         ];
     }
 }
-
 
 #[UseResource(PostApiResource::class)]
 class Post extends Model
