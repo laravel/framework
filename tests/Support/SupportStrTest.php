@@ -1905,6 +1905,114 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    #[DataProvider('nullOrEmptyProvider')]
+    public function testNullOrEmpty($value, $expected)
+    {
+        $this->assertEquals($expected, Str::nullOrEmpty($value));
+    }
+
+    #[DataProvider('notNullOrEmptyProvider')]
+    public function testNotNullOrEmpty($value, $expected)
+    {
+        $this->assertEquals($expected, Str::notNullOrEmpty($value));
+    }
+
+    #[DataProvider('nullOrWhitespaceProvider')]
+    public function testNullOrWhitespace($value, $expected)
+    {
+        $this->assertEquals($expected, Str::nullOrWhitespace($value));
+    }
+
+    #[DataProvider('notNullOrWhitespaceProvider')]
+    public function testNotNullOrWhitespace($value, $expected)
+    {
+        $this->assertEquals($expected, Str::notNullOrWhitespace($value));
+    }
+
+    public static function nullOrEmptyProvider()
+    {
+        return [
+            'null value' => [null, true],
+            'empty string' => ['', true],
+            'single space' => [' ', false],
+            'multiple spaces' => ['   ', false],
+            'tab character' => ["\t", false],
+            'newline character' => ["\n", false],
+            'zero string' => ['0', false],
+            'simple text' => ['hello', false],
+            'text with spaces' => ['hello world', false],
+            'single character' => ['a', false],
+            'number string' => ['123', false],
+            'special characters' => ['!@#$', false],
+        ];
+    }
+
+    public static function notNullOrEmptyProvider()
+    {
+        return [
+            'null value' => [null, false],
+            'empty string' => ['', false],
+            'single space' => [' ', true],
+            'multiple spaces' => ['   ', true],
+            'tab character' => ["\t", true],
+            'newline character' => ["\n", true],
+            'zero string' => ['0', true],
+            'simple text' => ['hello', true],
+            'text with spaces' => ['hello world', true],
+            'single character' => ['a', true],
+            'number string' => ['123', true],
+            'special characters' => ['!@#$', true],
+        ];
+    }
+
+    public static function nullOrWhitespaceProvider()
+    {
+        return [
+            'null value' => [null, true],
+            'empty string' => ['', true],
+            'single space' => [' ', true],
+            'multiple spaces' => ['   ', true],
+            'tab character' => ["\t", true],
+            'newline character' => ["\n", true],
+            'carriage return' => ["\r", true],
+            'mixed whitespace' => [" \t\n\r ", true],
+            'zero string' => ['0', false],
+            'simple text' => ['hello', false],
+            'text with spaces' => ['hello world', false],
+            'text with leading space' => [' hello', false],
+            'text with trailing space' => ['hello ', false],
+            'text with surrounding spaces' => [' hello ', false],
+            'single character' => ['a', false],
+            'number string' => ['123', false],
+            'special characters' => ['!@#$', false],
+            'whitespace with period' => [' . ', false],
+        ];
+    }
+
+    public static function notNullOrWhitespaceProvider()
+    {
+        return [
+            'null value' => [null, false],
+            'empty string' => ['', false],
+            'single space' => [' ', false],
+            'multiple spaces' => ['   ', false],
+            'tab character' => ["\t", false],
+            'newline character' => ["\n", false],
+            'carriage return' => ["\r", false],
+            'mixed whitespace' => [" \t\n\r ", false],
+            'zero string' => ['0', true],
+            'simple text' => ['hello', true],
+            'text with spaces' => ['hello world', true],
+            'text with leading space' => [' hello', true],
+            'text with trailing space' => ['hello ', true],
+            'text with surrounding spaces' => [' hello ', true],
+            'single character' => ['a', true],
+            'number string' => ['123', true],
+            'special characters' => ['!@#$', true],
+            'whitespace with period' => [' . ', true],
+        ];
+    }
 }
 
 class StringableObjectStub
