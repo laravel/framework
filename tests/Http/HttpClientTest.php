@@ -81,6 +81,21 @@ class HttpClientTest extends TestCase
         $this->assertTrue($response->ok());
     }
 
+    public function testRequestConvenienceMethodCreatesPendingRequest()
+    {
+        $this->factory->fake([
+            'laravel.com' => $this->factory::response('', HttpResponse::HTTP_NO_CONTENT),
+        ]);
+
+        $pendingRequest = $this->factory->request();
+
+        $this->assertInstanceOf(PendingRequest::class, $pendingRequest);
+
+        $response = $pendingRequest->get('http://laravel.com');
+
+        $this->assertTrue($response->noContent());
+    }
+
     public function testCreatedRequest()
     {
         $this->factory->fake([

@@ -26,6 +26,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void assertSequencesAreEmpty()
  * @method static \Illuminate\Support\Collection recorded(\Closure|callable $callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest createPendingRequest()
+ * @method static \Illuminate\Http\Client\PendingRequest request()
  * @method static \Illuminate\Contracts\Events\Dispatcher|null getDispatcher()
  * @method static array getGlobalMiddleware()
  * @method static void macro(string $name, object|callable $macro)

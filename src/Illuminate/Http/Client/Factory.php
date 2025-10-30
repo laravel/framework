@@ -495,6 +495,16 @@ class Factory
     }
 
     /**
+     * Begin building a new pending request instance.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    public function request()
+    {
+        return $this->createPendingRequest();
+    }
+
+    /**
      * Create a new pending request instance for this factory.
      *
      * @return \Illuminate\Http\Client\PendingRequest
