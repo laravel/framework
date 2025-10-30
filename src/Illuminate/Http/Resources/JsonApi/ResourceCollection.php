@@ -32,7 +32,7 @@ class ResourceCollection extends AnonymousResourceCollection
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array
      */
     #[\Override]
     public function toArray(Request $request)
