@@ -495,10 +495,10 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
                 $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
             }
 
-            if ($key === $value) {
+            if($key === $value) {
                 $string .= ' '.$key;
             } else {
-                $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+                $string .= ' ' . $key . '="' . str_replace('"', '\\"', trim($value)) . '"';
             }
         }
 
