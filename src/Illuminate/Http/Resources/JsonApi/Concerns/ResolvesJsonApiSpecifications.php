@@ -105,6 +105,7 @@ trait ResolvesJsonApiSpecifications
 
         foreach ($this->cachedLoadedRelationshipsMap as $relation => $uniqueKey) {
             $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
