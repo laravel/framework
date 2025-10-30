@@ -8,9 +8,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class ResourceCollection extends AnonymousResourceCollection
 {
     /**
-     * @param  Request  $request
+     * Get any additional data that should be returned with the resource array.
+     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
      */
+    #[\Override]
     public function with($request)
     {
         return array_filter([
@@ -31,6 +34,7 @@ class ResourceCollection extends AnonymousResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
+    #[\Override]
     public function toArray(Request $request)
     {
         return $this->collection
