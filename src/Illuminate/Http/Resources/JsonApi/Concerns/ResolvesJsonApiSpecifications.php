@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Http\Resources\Json\Concerns;
+namespace Illuminate\Http\Resources\JsonApi\Concerns;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;

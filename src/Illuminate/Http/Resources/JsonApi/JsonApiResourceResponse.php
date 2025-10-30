@@ -1,6 +1,8 @@
 <?php
 
-namespace Illuminate\Http\Resources\Json;
+namespace Illuminate\Http\Resources\JsonApi;
+
+use Illuminate\Http\Resources\Json\ResourceResponse;
 
 class JsonApiResourceResponse extends ResourceResponse
 {
