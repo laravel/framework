@@ -48,7 +48,6 @@ class JsonApiResourceTest extends TestCase
 
 class User extends Authenticatable
 {
-
 }
 
 class UserResource extends JsonApiResource
