@@ -11,7 +11,7 @@ class ResourceCollection extends AnonymousResourceCollection
      * Get any additional data that should be returned with the resource array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
+     * @return array
      */
     #[\Override]
     public function with($request)
