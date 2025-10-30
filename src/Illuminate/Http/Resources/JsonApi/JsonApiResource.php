@@ -35,7 +35,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Resource "links" for JSON:API
+     * Resource "links" for JSON:API.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
@@ -48,7 +48,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Resource "meta" for JSON:API
+     * Resource "meta" for JSON:API.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
@@ -61,7 +61,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Resource "id" for JSON:API
+     * Resource "id" for JSON:API.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
@@ -72,7 +72,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Resource "type" for JSON:API
+     * Resource "type" for JSON:API.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
