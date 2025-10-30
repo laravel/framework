@@ -2581,6 +2581,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         return $this;
     }
 
+    /**
+     * Get the properties for serialization.
+     *
+     * @return array
+     */
     protected function getPropertiesForSerialization(): array
     {
         if (version_compare(PHP_VERSION, '8.4.0', '<')) {
