@@ -172,7 +172,7 @@ trait ResolvesJsonApiSpecifications
      */
     protected function resolveResourceLinks(Request $request): array
     {
-        return [];
+        return $this->links($request);
     }
 
     /**

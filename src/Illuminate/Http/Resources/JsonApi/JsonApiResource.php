@@ -34,6 +34,12 @@ class JsonApiResource extends JsonResource
         ]);
     }
 
+    /**
+     * Resource "links" for JSON:API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     public function links(Request $request)
     {
         return [
@@ -41,6 +47,12 @@ class JsonApiResource extends JsonResource
         ];
     }
 
+    /**
+     * Resource "meta" for JSON:API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
     public function meta(Request $request)
     {
         return [
@@ -48,11 +60,23 @@ class JsonApiResource extends JsonResource
         ];
     }
 
+    /**
+     * Resource "id" for JSON:API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
     public function id(Request $request)
     {
         return $this->resolveResourceIdentifier($request);
     }
 
+    /**
+     * Resource "type" for JSON:API
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
     public function type(Request $request)
     {
         return $this->resolveResourceType($request);
@@ -142,6 +166,7 @@ class JsonApiResource extends JsonResource
      *
      * @return void
      */
+    #[\Override]
     public static function flushState()
     {
         parent::flushState();

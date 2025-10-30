@@ -24,6 +24,7 @@ class AnonymousJsonApiResource extends JsonApiResource
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
+    #[\Override]
     public function toArray(Request $request)
     {
         return $this->jsonResource->toArray($request);
