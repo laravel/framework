@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use JsonSerializable;
 use WeakMap;
 
-trait ResolvesJsonApiSpecifications
+trait ResolvesJsonApiElements
 {
     /**
      * Cached loaded relationships map.

@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
 {
-    use Concerns\ResolvesJsonApiSpecifications;
+    use Concerns\ResolvesJsonApiElements;
 
     /**
      * The "data" wrapper that should be applied.
