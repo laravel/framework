@@ -18,6 +18,22 @@ class JsonApiResource extends JsonResource
      */
     public static $jsonApiInformation = [];
 
+    /**
+     * Set the JSON:API version for the request.
+     *
+     * @param  string  $version
+     * @return void
+     */
+    public static function configure(?string $version = null, array $ext = [], array $profile = [], array $meta = [])
+    {
+        static::$jsonApiInformation = array_filter([
+            'version' => $version,
+            'ext' => $ext,
+            'profile' => $profile,
+            'meta' => $meta,
+        ]);
+    }
+
     public function links(Request $request)
     {
         return [
@@ -43,9 +59,12 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * @param  Request  $request
+     * Get any additional data that should be returned with the resource array.
+     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array{included?: array<int, JsonApiResource>, jsonapi: ServerImplementation}
      */
+    #[\Override]
     public function with($request)
     {
         return array_filter([
@@ -53,22 +72,6 @@ class JsonApiResource extends JsonResource
             ...($implementation = static::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]
                 : [],
-        ]);
-    }
-
-    /**
-     * Set the JSON:API version for the request.
-     *
-     * @param  string  $version
-     * @return void
-     */
-    public static function configure(?string $version = null, array $ext = [], array $profile = [], array $meta = [])
-    {
-        static::$jsonApiInformation = array_filter([
-            'version' => $version,
-            'ext' => $ext,
-            'profile' => $profile,
-            'meta' => $meta,
         ]);
     }
 
@@ -100,6 +103,10 @@ class JsonApiResource extends JsonResource
 
     /**
      * Customize the outgoing response for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\JsonResponse  $response
+     * @return void
      */
     #[\Override]
     public function withResponse(Request $request, JsonResponse $response): void
@@ -107,9 +114,10 @@ class JsonApiResource extends JsonResource
         $response->header('Content-type', 'application/vnd.api+json');
     }
 
-
     /**
-     * {@inheritdoc}
+     * Transform JSON resource to JSON:API.
+     *
+     * @return $this
      */
     #[\Override]
     public function asJsonApi()
