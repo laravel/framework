@@ -81,7 +81,7 @@ class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => $this->resolveResourceToJsonApiSchema($request),
+            'data' => $this->resolveResourceData($request),
         ];
     }
 

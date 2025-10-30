@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonApiResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -17,7 +18,12 @@ trait ResolvesJsonApiSpecifications
     /**
      * @var \WeakMap|null
      */
-    protected $cachedLoadedRelationships;
+    protected $cachedLoadedRelationshipsMap;
+
+    /**
+     * @var array
+     */
+    protected array $cachedLoadedRelationshipsIdentifier = [];
 
     /**
      * Resolves `attributes` for the resource.
@@ -51,67 +57,77 @@ trait ResolvesJsonApiSpecifications
             'type' => $this->resolveResourceType($request),
             ...(new Collection([
                 'attributes' => $this->resolveResourceAttributes($request),
-                'relationships' => $this->resolveResourceRelationships($request),
+                'relationships' => $this->resolveResourceRelationshipsIdentifiers($request),
                 'links' => $this->resolveResourceLinks($request),
                 'meta' => $this->resolveMetaInformations($request),
             ]))->filter()->map(fn ($value) => (object) $value),
         ];
     }
 
-    protected function resolveResourceRelationships(Request $request): array
+    protected function resolveResourceRelationships(Request $request): void
+    {
+        if ($this->cachedLoadedRelationships instanceof WeakMap) {
+            return;
+        }
+
+        $this->cachedLoadedRelationshipsMap = new WeakMap;
+
+        $this->cachedLoadedRelationshipsIdentifier = (new Collection($this->resource->getRelations()))
+            ->mapWithKeys(function ($relations, $key) {
+                if ($relations instanceof Collection) {
+                    if ($relations->isEmpty()) {
+                        return [$key => $relations];
+                    }
+
+                    $key = static::getResourceTypeFromEloquent($relations->first());
+
+                    return [$key => $relations->map(function ($relation) use ($key) {
+                        return transform([$key, static::getResourceIdFromEloquent($relation)], function ($uniqueKey) use ($relation) {
+                            $this->cachedLoadedRelationshipsMap[$relation] = $uniqueKey;
+
+                            return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                        });
+                    })];
+                }
+
+                return transform(
+                    [static::getResourceTypeFromEloquent($relation), static::getResourceIdFromEloquent($relation)],
+                    function ($uniqueKey) {
+                        $this->cachedLoadedRelationshipsMap[$relation] = $uniqueKey;
+
+                        return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                    }
+                );
+            })->all();
+    }
+
+    protected function resolveResourceRelationshipsIdentifiers(Request $request): array
     {
         if (! $this->resource instanceof Model) {
             return [];
         }
 
-        if (is_null($this->cachedLoadedRelationships)) {
-            $this->cachedLoadedRelationships = new WeakMap;
-        }
+        $this->resolveResourceRelationships($request);
 
         return [
-            'data' => (new Collection($this->resource->getRelations()))
-                ->mapWithKeys(function ($relations, $key) {
-                    if ($relations instanceof Collection) {
-                        if ($relations->isEmpty()) {
-                            return [$key => $relations];
-                        }
-
-                        $key = static::getResourceTypeFromEloquent($relations->first());
-
-                        $relations->each(function ($relation) use ($key) {
-                            $this->cachedLoadedRelationships[$relation] = [$key, $relation->getKey()];
-                        });
-
-                        return [$key => $relations->map(function ($relation) use ($key) {
-                            return tap([$key, static::getResourceIdFromEloquent($relation)], function ($uniqueKey) use ($relation) {
-                                $this->cachedLoadedRelationships[$relation] = $uniqueKey;
-                            });
-                        })];
-                    }
-
-                    return tap(
-                        [static::getResourceTypeFromEloquent($relation), static::getResourceIdFromEloquent($relation)],
-                        function ($uniqueKey) use ($relations) {
-                            $this->cachedLoadedRelationships[$relations] = $uniqueKey;
-                        }
-                    );
-                }),
+            'data' => $this->cachedLoadedRelationshipsIdentifier,
         ];
     }
 
-    protected function resolveResourceIncluded(Request $request): array
+    public function resolveResourceIncluded(Request $request): array
     {
-        $relations = [];
+        $relations = new Collection();
 
-        foreach ($this->cachedLoadedRelationships as $relation => $uniqueKey) {
-            $relations[] = [
+        foreach ($this->cachedLoadedRelationshipsMap as $relation => $uniqueKey) {
+            $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+            $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => rescue(fn () => $relation->toResource()->toArray($request), $relation->toArray(), false),
-            ];
+                'attributes' => $resource->toArray($request),
+            ]);
         }
 
-        return $relations;
+        return $relations->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])->all();
     }
 
     /**
