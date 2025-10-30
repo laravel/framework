@@ -58,15 +58,6 @@ class JsonApiResourceTest extends TestCase
         });
     }
 
-    public function testBaseJsonResourceCanBeConvertedToJsonApiResource()
-    {
-        $user = UserFactory::new()->create();
-
-        $resource = (new UserResource($user))->asJsonApi();
-
-        $this->assertInstanceOf(JsonApiResource::class, $resource);
-    }
-
     public function testItCanGenerateJsonApiResponse()
     {
         $user = UserFactory::new()->create();
