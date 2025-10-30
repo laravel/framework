@@ -44,7 +44,7 @@ if (! function_exists('data_has')) {
      */
     function data_has($target, $key): bool
     {
-        if (empty($key)) {
+        if (is_null($key) || $key === []) {
             return false;
         }
 

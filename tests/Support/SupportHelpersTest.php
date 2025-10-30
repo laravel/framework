@@ -225,6 +225,7 @@ class SupportHelpersTest extends TestCase
         $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
         $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
         $sameKeyMultiLevel = (object) ['name' => 'Taylor', 'company' => ['name' => 'Laravel']];
+        $plainArray = [1, 2, 3];
 
         $this->assertTrue(data_has($object, 'users.name.0'));
         $this->assertTrue(data_has($array, '0.users.0.name'));
@@ -244,6 +245,13 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(data_has($sameKeyMultiLevel, 'name'));
         $this->assertTrue(data_has($sameKeyMultiLevel, 'company.name'));
         $this->assertFalse(data_has($sameKeyMultiLevel, 'foo.name'));
+        $this->assertTrue(data_has($plainArray, 0));
+        $this->assertTrue(data_has($plainArray, '0'));
+        $this->assertFalse(data_has($plainArray, 4));
+        $this->assertFalse(data_has($plainArray, '4'));
+        $this->assertFalse(data_has($plainArray, ''));
+        $this->assertFalse(data_has($plainArray, []));
+        $this->assertFalse(data_has($plainArray, null));
     }
 
     public function testDataGet()
