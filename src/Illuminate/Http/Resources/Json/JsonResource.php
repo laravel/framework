@@ -12,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\DelegatesToResource;
-use Illuminate\Http\Resources\JsonApi\AnonymousJsonApiResource;
 use JsonException;
 use JsonSerializable;
 
@@ -273,18 +272,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function jsonSerialize(): array
     {
         return $this->resolve(Container::getInstance()->make('request'));
-    }
-
-    /**
-     * Transform JSON resource to JSON:API.
-     *
-     * @param  array  $links
-     * @param  array  $meta
-     * @return \Illuminate\Http\Resources\JsonApi\AnonymousJsonApiResource
-     */
-    public function asJsonApi(array $links = [], array $meta = [])
-    {
-        return new AnonymousJsonApiResource($this, $links, $meta);
     }
 
     /**
