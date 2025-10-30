@@ -86,6 +86,30 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi', 'included']);
     }
 
+    public function testItCanGenerateJsonApiResponseWithEmptyRelationship()
+    {
+        $user = UserFactory::new()->create();
+
+        $this->getJson('/users/'.$user->getKey().'?'.http_build_query(['includes' => ['posts']]))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                    'attributes' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                    ],
+                    'relationships' => [
+                        'posts' => [
+                            'data' => [],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
     public function testItCanGenerateJsonApiResponseWithEagerLoadedRelationship()
     {
         $user = UserFactory::new()->create();
