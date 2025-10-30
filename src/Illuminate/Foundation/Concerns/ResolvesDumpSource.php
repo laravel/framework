@@ -57,7 +57,7 @@ trait ResolvesDumpSource
     /**
      * Resolve the source of the dump call.
      *
-     * @return array{0: string, 1: string, 2: int|null}|null
+     * @return array{0: string, 1: string, 2: int|null}|null|void
      */
     public function resolveDumpSource()
     {
@@ -151,7 +151,7 @@ trait ResolvesDumpSource
      *
      * @param  string  $file
      * @param  int|null  $line
-     * @return string|null
+     * @return string|null|void
      */
     protected function resolveSourceHref($file, $line)
     {

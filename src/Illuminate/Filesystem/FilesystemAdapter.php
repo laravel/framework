@@ -1003,7 +1003,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Parse the given visibility value.
      *
      * @param  string|null  $visibility
-     * @return string|null
+     * @return string|null|void
      *
      * @throws \InvalidArgumentException
      */

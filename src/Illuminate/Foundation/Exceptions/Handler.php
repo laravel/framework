@@ -705,7 +705,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Throwable  $e
-     * @return mixed
+     * @return mixed|void
      *
      * @throws \ReflectionException
      */

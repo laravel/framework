@@ -259,7 +259,7 @@ class RouteListCommand extends Command
      * Filter the route by URI and / or name.
      *
      * @param  array  $route
-     * @return array|null
+     * @return array|null|void
      */
     protected function filterRoute(array $route)
     {
