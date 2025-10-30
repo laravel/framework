@@ -71,7 +71,7 @@ trait ResolvesJsonApiSpecifications
         $this->compileResourceRelationships($request);
 
         return [
-            'data' => $this->cachedLoadedRelationshipsIdentifier,
+            ...$this->cachedLoadedRelationshipsIdentifier,
         ];
     }
 
@@ -138,28 +138,28 @@ trait ResolvesJsonApiSpecifications
             ->mapWithKeys(function ($relations, $key) {
                 if ($relations instanceof Collection) {
                     if ($relations->isEmpty()) {
-                        return [$key => $relations];
+                        return [$key => ['data' => $relations]];
                     }
 
                     $key = static::getResourceTypeFromEloquent($relations->first());
 
-                    return [$key => $relations->map(function ($relation) use ($key) {
+                    return [$key => ['data' => $relations->map(function ($relation) use ($key) {
                         return transform([$key, static::getResourceIdFromEloquent($relation)], function ($uniqueKey) use ($relation) {
                             $this->cachedLoadedRelationshipsMap[$relation] = $uniqueKey;
 
                             return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                         });
-                    })];
+                    })]];
                 }
 
-                return transform(
+                return [$key => ['data' => transform(
                     [static::getResourceTypeFromEloquent($relations), static::getResourceIdFromEloquent($relations)],
                     function ($uniqueKey) use ($relations) {
                         $this->cachedLoadedRelationshipsMap[$relations] = $uniqueKey;
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                     }
-                );
+                )]];
             })->all();
     }
 
