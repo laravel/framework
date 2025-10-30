@@ -278,6 +278,8 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Transform JSON resource to JSON:API.
      *
+     * @param  array  $links
+     * @param  array  $meta
      * @return \Illuminate\Http\Resources\JsonApi\AnonymousJsonApiResource
      */
     public function asJsonApi(array $links = [], array $meta = [])

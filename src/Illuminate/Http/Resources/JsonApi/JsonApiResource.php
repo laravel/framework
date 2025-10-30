@@ -19,6 +19,20 @@ class JsonApiResource extends JsonResource
     public static $jsonApiInformation = [];
 
     /**
+     * The resource's "links" for JSON:API.
+     *
+     * @var array
+     */
+    protected array $jsonApiLinks = [];
+
+    /**
+     * The resource's "meta" for JSON:API.
+     *
+     * @var array
+     */
+    protected array $jsonApiMeta = [];
+
+    /**
      * Set the JSON:API version for the request.
      *
      * @param  string  $version
@@ -42,9 +56,7 @@ class JsonApiResource extends JsonResource
      */
     public function links(Request $request)
     {
-        return [
-            //
-        ];
+        return $this->jsonApiLinks;
     }
 
     /**
@@ -55,9 +67,7 @@ class JsonApiResource extends JsonResource
      */
     public function meta(Request $request)
     {
-        return [
-            //
-        ];
+        return $this->jsonApiMeta;
     }
 
     /**
@@ -138,14 +148,24 @@ class JsonApiResource extends JsonResource
         $response->header('Content-type', 'application/vnd.api+json');
     }
 
+
     /**
      * Transform JSON resource to JSON:API.
      *
+     * @param  array  $links
+     * @param  array  $meta
      * @return $this
      */
-    #[\Override]
-    public function asJsonApi()
+    public function asJsonApi(array $links = [], array $meta = [])
     {
+        if (! empty($links)) {
+            $this->jsonApiLinks = array_merge($this->jsonApiLinks, $links);
+        }
+
+        if (! empty($meta)) {
+            $this->jsonApiMeta = array_merge($this->jsonApiMeta, $meta);
+        }
+
         return $this;
     }
 
