@@ -45,22 +45,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     }
 
     /**
-     * Create an HTTP response that represents the object.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    #[\Override]
-    public function toResponse($request)
-    {
-        if ($this->resource instanceof AbstractPaginator || $this->resource instanceof AbstractCursorPaginator) {
-            return $this->preparePaginatedResponse($request);
-        }
-
-        return (new ResourceResponse($this))->toResponse($request);
-    }
-
-    /**
      * Customize the outgoing response for the resource.
      *
      * @param  \Illuminate\Http\Request  $request

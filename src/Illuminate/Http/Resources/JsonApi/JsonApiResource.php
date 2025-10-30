@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
+use BadMethodCallException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,6 +11,13 @@ use Illuminate\Support\Collection;
 class JsonApiResource extends JsonResource
 {
     use Concerns\ResolvesJsonApiSpecifications;
+
+    /**
+     * The "data" wrapper that should be applied.
+     *
+     * @var string|null
+     */
+    public static $wrap = 'data';
 
     /**
      * The resource's "version" for JSON:API.
@@ -46,6 +54,32 @@ class JsonApiResource extends JsonResource
             'profile' => $profile,
             'meta' => $meta,
         ]);
+    }
+
+
+    /**
+     * Set the string that should wrap the outer-most resource array.
+     *
+     * @param  string  $value
+     * @return never
+     *
+     * @throws \RuntimeException
+     */
+    #[\Override]
+    public static function wrap($value)
+    {
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__);
+    }
+
+    /**
+     * Disable wrapping of the outer-most resource array.
+     *
+     * @return never
+     */
+    #[\Override]
+    public static function withoutWrapping()
+    {
+        throw new BadMethodCallException(sprintf('Using %s() method is not allowed.', __METHOD__);
     }
 
     /**
@@ -121,18 +155,6 @@ class JsonApiResource extends JsonResource
         return [
             'data' => $this->resolveResourceData($request),
         ];
-    }
-
-    /**
-     * Create an HTTP response that represents the object.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    #[\Override]
-    public function toResponse($request)
-    {
-        return (new ResourceResponse($this))->toResponse($request);
     }
 
     /**
