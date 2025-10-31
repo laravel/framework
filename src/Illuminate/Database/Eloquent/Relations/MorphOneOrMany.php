@@ -107,6 +107,26 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
+     * Get the key value of the parent's local key.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        $key = parent::getParentKey();
+
+        try {
+            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
+                return (string) $key;
+            }
+        } catch (\BadMethodCallException $e) {
+            //
+        }
+
+        return $key;
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
