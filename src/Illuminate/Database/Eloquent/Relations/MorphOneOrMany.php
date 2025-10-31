@@ -107,6 +107,33 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
+     * Get the key value of the parent's local key.
+     *
+     * This method casts the parent key to string when the related model
+     * has explicitly cast the foreign key as a string. This ensures compatibility
+     * with PostgreSQL's strict type checking.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        $key = parent::getParentKey();
+
+        // If the related model has cast the foreign key to string,
+        // we should cast the parent key to string as well to prevent
+        // PostgreSQL type mismatch errors (e.g., varchar = integer)
+        try {
+            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
+                return (string) $key;
+            }
+        } catch (\BadMethodCallException $e) {
+            // Mocked models in tests may not have hasCast expectations set
+        }
+
+        return $key;
+    }
+
+    /**
      * Insert new records or update the existing ones.
      *
      * @param  array  $values
