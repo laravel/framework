@@ -18,12 +18,23 @@ use PHPUnit\Framework\TestCase;
 
 class JsonApiResourceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $container = Container::setInstance(new Container);
+        $container->instance(ResponseFactoryContract::class, new ResponseFactory(
+            m::mock(ViewFactory::class),
+            m::mock(Redirector::class)
+        ));
+    }
+
     protected function tearDown(): void
     {
         JsonResource::flushState();
         JsonApiResource::flushState();
-        Container::getInstance()->flush();
         Relation::morphMap([], false);
+
+        Container::setInstance(null);
+        m::close();
     }
 
     public function testResponseWrapperIsHardCodedToData()
@@ -95,11 +106,6 @@ class JsonApiResourceTest extends TestCase
 
     protected function fakeJsonApiResponseForModel(Model $model): array
     {
-        Container::getInstance()->instance(ResponseFactoryContract::class, new ResponseFactory(
-            m::mock(ViewFactory::class),
-            m::mock(Redirector::class)
-        ));
-
         return (new JsonApiResource($model))
             ->toResponse(new Request)
             ->getData(true);
