@@ -2120,7 +2120,7 @@ class Str
      */
     public static function nullOrWhitespace($string)
     {
-        return static::nullOrEmpty($string) || trim($string) === '';
+        return $string === null || trim($string) === '';
     }
 
     /**
