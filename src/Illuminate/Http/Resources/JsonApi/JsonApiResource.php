@@ -54,21 +54,21 @@ class JsonApiResource extends JsonResource
     /**
      * Get the resource's ID.
      *
-     * @return string
+     * @return string|null
      */
-    public function id(Request $request)
+    public function toId(Request $request)
     {
-        return $this->resolveResourceIdentifier($request);
+        return null;
     }
 
     /**
      * Get the resource's type.
      *
-     * @return string
+     * @return string|null
      */
-    public function type(Request $request)
+    public function toType(Request $request)
     {
-        return $this->resolveResourceType($request);
+        return null;
     }
 
     /**
@@ -76,7 +76,7 @@ class JsonApiResource extends JsonResource
      *
      * @return array
      */
-    public function links(Request $request)
+    public function toLinks(Request $request)
     {
         return $this->jsonApiLinks;
     }
@@ -86,7 +86,7 @@ class JsonApiResource extends JsonResource
      *
      * @return array
      */
-    public function meta(Request $request)
+    public function toMeta(Request $request)
     {
         return $this->jsonApiMeta;
     }

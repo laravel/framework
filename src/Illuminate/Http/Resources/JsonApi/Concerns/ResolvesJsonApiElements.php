@@ -53,6 +53,10 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceIdentifier(Request $request): string
     {
+        if (! is_null($resourceType = $this->toId($request))) {
+            return $resourceType;
+        }
+
         if (! $this->resource instanceof Model) {
             throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
         }
@@ -68,6 +72,10 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceType(Request $request): string
     {
+        if (! is_null($resourceType = $this->toType($request))) {
+            return $resourceType;
+        }
+
         if (! $this->resource instanceof Model) {
             throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
         }
@@ -190,7 +198,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceLinks(Request $request): array
     {
-        return $this->links($request);
+        return $this->toLinks($request);
     }
 
     /**
@@ -200,7 +208,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceMetaInformation(Request $request): array
     {
-        return $this->meta($request);
+        return $this->toMeta($request);
     }
 
     /**
