@@ -86,10 +86,14 @@ abstract class Type extends JsonSchema
     /**
      * Restrict the value to one of the provided enumerated values.
      *
-     * @param  array<int, mixed>  $values
+     * @param  class-string<\BackedEnum>|array<int, mixed>  $values
      */
-    public function enum(array $values): static
+    public function enum(string|array $values): static
     {
+        if(is_string($values)) {
+            $values = array_column($values::cases(), 'value');
+        }
+
         // Keep order and allow complex values (arrays/objects) without forcing uniqueness...
         $this->enum = array_values($values);
 
