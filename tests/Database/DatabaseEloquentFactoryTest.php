@@ -989,7 +989,7 @@ class DatabaseEloquentFactoryTest extends TestCase
             ->count(5)
             ->recycle([
                 (new FactoryTestUserFactory())->create(['name' => Name::Taylor]),
-                (new FactoryTestUserFactory())->create(['name' => Name::Shad, 'created_at' => now()])
+                (new FactoryTestUserFactory())->create(['name' => Name::Shad, 'created_at' => now()]),
             ])
             ->state(['title' => 'hello'])
             ->insert();

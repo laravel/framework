@@ -458,8 +458,8 @@ abstract class Factory
     {
         $made = $this->make($attributes, $parent);
 
-        $madeCollection = $made instanceof Collection 
-            ? $made 
+        $madeCollection = $made instanceof Collection
+            ? $made
             : $this->newModel()->newCollection([$made]);
 
         $model = $madeCollection->first();
