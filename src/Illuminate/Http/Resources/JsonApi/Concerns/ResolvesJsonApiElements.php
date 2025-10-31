@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
