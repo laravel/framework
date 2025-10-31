@@ -18,7 +18,7 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     {
         return array_filter([
             'included' => $this->collection
-                ->map(fn ($resource) => $resource->resolveResourceIncluded($request))
+                ->map(fn ($resource) => $resource->resolveIncludedResources($request))
                 ->flatten(depth: 1)
                 ->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])
                 ->all(),
@@ -52,6 +52,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     #[\Override]
     public function withResponse(Request $request, JsonResponse $response): void
     {
-        $response->header('Content-type', 'application/vnd.api+json');
+        $response->header('Content-Type', 'application/vnd.api+json');
     }
 }
