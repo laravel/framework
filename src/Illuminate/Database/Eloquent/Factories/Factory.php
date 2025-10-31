@@ -448,7 +448,7 @@ abstract class Factory
     }
 
     /**
-     * Insert the records in bulk. No model events are emitted.
+     * Insert the model records in bulk. No model events are emitted.
      *
      * @param  array<string, mixed>  $attributes
      * @param  Model|null  $parent
@@ -457,15 +457,22 @@ abstract class Factory
     public function insert(array $attributes = [], ?Model $parent = null): void
     {
         $made = $this->make($attributes, $parent);
-        $madeCollection = $made instanceof Collection ? $made : $this->newModel()->newCollection([$made]);
+
+        $madeCollection = $made instanceof Collection 
+            ? $made 
+            : $this->newModel()->newCollection([$made]);
 
         $model = $madeCollection->first();
+
         if (isset($this->connection)) {
             $model->setConnection($this->connection);
         }
+
         $query = $model->newQueryWithoutScopes();
 
-        $query->fillAndInsert($madeCollection->withoutAppends()->toArray());
+        $query->fillAndInsert(
+            $madeCollection->withoutAppends()->toArray()
+        );
     }
 
     /**
