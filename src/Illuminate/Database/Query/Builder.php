@@ -1456,6 +1456,46 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic where between clause specifically for date ranges.
+     *
+     * @param  string  $column
+     * @param  array  $range
+     * @param  bool  $inclusiveTime
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function whereDateBetween($column, array $range, bool $inclusiveTime = true)
+    {
+        [$start, $end] = $range;
+
+        if ($inclusiveTime) {
+            $start = \Illuminate\Support\Carbon::parse($start)->startOfDay();
+            $end = \Illuminate\Support\Carbon::parse($end)->endOfDay();
+        }
+
+        return $this->whereBetween($column, [$start, $end]);
+    }
+
+    /**
+     * Add an "or where" clause for date ranges.
+     *
+     * @param  string  $column
+     * @param  array  $range
+     * @param  bool  $inclusiveTime
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function orWhereDateBetween($column, array $range, bool $inclusiveTime = true)
+    {
+        [$start, $end] = $range;
+
+        if ($inclusiveTime) {
+            $start = \Illuminate\Support\Carbon::parse($start)->startOfDay();
+            $end = \Illuminate\Support\Carbon::parse($end)->endOfDay();
+        }
+
+        return $this->orWhereBetween($column, [$start, $end]);
+    }
+
+    /**
      * Add a where not between statement using columns to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column

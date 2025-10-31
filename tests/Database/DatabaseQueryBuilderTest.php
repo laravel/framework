@@ -1277,6 +1277,45 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? or 1 not between "created_at" and "updated_at"', $builder->toSql());
     }
 
+    public function testWhereDateBetween()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')
+            ->from('users')
+            ->whereDateBetween('created_at', ['2025-10-01', '2025-10-05']);
+
+        $this->assertSame(
+            'select * from "users" where "created_at" between ? and ?',
+            $builder->toSql()
+        );
+
+        $this->assertCount(2, $builder->getBindings());
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $builder->getBindings()[0]);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $builder->getBindings()[1]);
+    }
+
+    public function testOrWhereDateBetween()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')
+            ->from('users')
+            ->where('id', '=', 1)
+            ->orWhereDateBetween('created_at', ['2025-10-01', '2025-10-05']);
+
+        $this->assertSame(
+            'select * from "users" where "id" = ? or "created_at" between ? and ?',
+            $builder->toSql()
+        );
+
+        $bindings = $builder->getBindings();
+        $this->assertEquals(3, count($bindings));
+        $this->assertEquals(1, $bindings[0]); // from `where('id', '=', 1)`
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $bindings[1]);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $bindings[2]);
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
