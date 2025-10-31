@@ -53,6 +53,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->booted(function () {
             $this->setRootControllerNamespace();
 
+            //
             if ($this->routesAreCached()) {
                 $this->loadCachedRoutes();
             } else {

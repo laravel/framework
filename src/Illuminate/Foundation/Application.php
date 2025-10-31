@@ -1322,7 +1322,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function routesAreCached()
     {
-        return $this['files']->exists($this->getCachedRoutesPath());
+        return ($this->bound('routes.cached') &&
+            $this->make('routes.cached') === true) ||
+        $this['files']->exists($this->getCachedRoutesPath());
     }
 
     /**
