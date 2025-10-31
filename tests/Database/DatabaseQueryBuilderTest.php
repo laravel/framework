@@ -1277,6 +1277,45 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertSame('select * from "users" where "id" = ? or 1 not between "created_at" and "updated_at"', $builder->toSql());
     }
 
+    public function testWhereDateBetween()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')
+            ->from('users')
+            ->whereDateBetween('created_at', ['2025-10-01', '2025-10-05']);
+
+        $this->assertSame(
+            'select * from "users" where "created_at" between ? and ?',
+            $builder->toSql()
+        );
+
+        $this->assertCount(2, $builder->getBindings());
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $builder->getBindings()[0]);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $builder->getBindings()[1]);
+    }
+
+    public function testOrWhereDateBetween()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')
+            ->from('users')
+            ->where('id', '=', 1)
+            ->orWhereDateBetween('created_at', ['2025-10-01', '2025-10-05']);
+
+        $this->assertSame(
+            'select * from "users" where "id" = ? or "created_at" between ? and ?',
+            $builder->toSql()
+        );
+
+        $bindings = $builder->getBindings();
+        $this->assertEquals(3, count($bindings));
+        $this->assertEquals(1, $bindings[0]); // from `where('id', '=', 1)`
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $bindings[1]);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $bindings[2]);
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
@@ -4377,6 +4416,102 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo']));
         $builder->shouldNotHaveReceived('update');
+    }
+
+    public function testFirstOrCreateInsertsRecordWhenNotFound()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([]);
+
+        $builder->getConnection()
+            ->shouldReceive('insert')
+            ->once()
+            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@bar.com', 'Foo'])
+            ->andReturn(true);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Foo']]);
+
+        $result = $builder->from('users')->firstOrCreate(['email' => 'foo@bar.com'], ['name' => 'Foo']);
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Foo', $result->name);
+    }
+
+    public function testUpdateOrCreateUpdatesIfRecordExists()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com']]);
+
+        $builder->getConnection()
+            ->shouldReceive('update')
+            ->once()
+            ->with('update "users" set "name" = ? where ("email" = ?)', ['Updated Foo', 'foo@bar.com'])
+            ->andReturn(1);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Updated Foo']]);
+
+        $result = $builder->from('users')->updateOrCreate(
+            ['email' => 'foo@bar.com'],
+            ['name' => 'Updated Foo']
+        );
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Updated Foo', $result->name);
+    }
+
+    public function testUpdateOrCreateInsertsIfRecordNotFound()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([]);
+
+        $builder->getConnection()
+            ->shouldReceive('insert')
+            ->once()
+            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@giubar.com', 'Foo'])
+            ->andReturn(true);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Foo']]);
+
+        $result = $builder->from('users')->updateOrCreate(
+            ['email' => 'foo@bar.com'],
+            ['name' => 'Foo']
+        );
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Foo', $result->name);
     }
 
     public function testDeleteMethod()

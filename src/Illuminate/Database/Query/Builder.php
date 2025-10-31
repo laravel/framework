@@ -1456,6 +1456,46 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a basic where between clause specifically for date ranges.
+     *
+     * @param  string  $column
+     * @param  array  $range
+     * @param  bool  $inclusiveTime
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function whereDateBetween($column, array $range, bool $inclusiveTime = true)
+    {
+        [$start, $end] = $range;
+
+        if ($inclusiveTime) {
+            $start = \Illuminate\Support\Carbon::parse($start)->startOfDay();
+            $end = \Illuminate\Support\Carbon::parse($end)->endOfDay();
+        }
+
+        return $this->whereBetween($column, [$start, $end]);
+    }
+
+    /**
+     * Add an "or where" clause for date ranges.
+     *
+     * @param  string  $column
+     * @param  array  $range
+     * @param  bool  $inclusiveTime
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function orWhereDateBetween($column, array $range, bool $inclusiveTime = true)
+    {
+        [$start, $end] = $range;
+
+        if ($inclusiveTime) {
+            $start = \Illuminate\Support\Carbon::parse($start)->startOfDay();
+            $end = \Illuminate\Support\Carbon::parse($end)->endOfDay();
+        }
+
+        return $this->orWhereBetween($column, [$start, $end]);
+    }
+
+    /**
      * Add a where not between statement using columns to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -4003,6 +4043,50 @@ class Builder implements BuilderContract
             $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
             $bindings
         );
+    }
+
+    /**
+     * Get the first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \stdClass|null
+     */
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        $record = $this->where($attributes)->first();
+
+        if ($record) {
+            return $record;
+        }
+
+        $this->insert(array_merge($attributes, $values));
+
+        return $this->where($attributes)->first();
+    }
+
+    /**
+     * Update an existing record matching the attributes, or create it if it doesn't exist.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \stdClass|null
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $record = $this->where($attributes)->first();
+
+        if ($record) {
+            $query = $this->newQuery()->from($this->from);
+
+            $query->where($attributes)->update($values);
+
+            return $query->where($attributes)->first();
+        }
+
+        $this->insert(array_merge($attributes, $values));
+
+        return $this->newQuery()->from($this->from)->where($attributes)->first();
     }
 
     /**
