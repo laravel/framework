@@ -32,7 +32,7 @@ class Worker
     /**
      * The name of the worker.
      *
-     * @var string
+     * @var string|null
      */
     protected $name;
 
@@ -363,8 +363,8 @@ class Worker
         $this->raiseBeforeJobPopEvent($connection->getConnectionName());
 
         try {
-            if (isset(static::$popCallbacks[$this->name])) {
-                if (! is_null($job = (static::$popCallbacks[$this->name])($popJobCallback, $queue))) {
+            if (isset(static::$popCallbacks[$this->name ?? ''])) {
+                if (! is_null($job = (static::$popCallbacks[$this->name ?? ''])($popJobCallback, $queue))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
                 }
 

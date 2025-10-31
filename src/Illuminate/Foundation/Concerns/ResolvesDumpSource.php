@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Concerns;
 
+use Illuminate\Support\Str;
 use Throwable;
 
 trait ResolvesDumpSource
@@ -15,19 +16,25 @@ trait ResolvesDumpSource
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
+        'fleet' => 'fleet://open?file={file}&line={line}',
         'idea' => 'idea://open?file={file}&line={line}',
+        'kiro' => 'kiro://file/{file}:{line}',
         'macvim' => 'mvim://open/?url=file://{file}&line={line}',
+        'neovim' => 'nvim://open?url=file://{file}&line={line}',
         'netbeans' => 'netbeans://open/?f={file}:{line}',
         'nova' => 'nova://core/open/file?filename={file}&line={line}',
         'phpstorm' => 'phpstorm://open?file={file}&line={line}',
         'sublime' => 'subl://open?url=file://{file}&line={line}',
         'textmate' => 'txmt://open?url=file://{file}&line={line}',
+        'trae' => 'trae://file/{file}:{line}',
         'vscode' => 'vscode://file/{file}:{line}',
         'vscode-insiders' => 'vscode-insiders://file/{file}:{line}',
         'vscode-insiders-remote' => 'vscode-insiders://vscode-remote/{file}:{line}',
         'vscode-remote' => 'vscode://vscode-remote/{file}:{line}',
         'vscodium' => 'vscodium://file/{file}:{line}',
+        'windsurf' => 'windsurf://file/{file}:{line}',
         'xdebug' => 'xdebug://{file}@{line}',
+        'zed' => 'zed://file/{file}:{line}',
     ];
 
     /**
@@ -163,7 +170,7 @@ trait ResolvesDumpSource
             : ($this->editorHrefs[$editor['name'] ?? $editor] ?? sprintf('%s://open?file={file}&line={line}', $editor['name'] ?? $editor));
 
         if ($basePath = $editor['base_path'] ?? false) {
-            $file = str_replace($this->basePath, $basePath, $file);
+            $file = Str::replaceStart($this->basePath, $basePath, $file);
         }
 
         return str_replace(

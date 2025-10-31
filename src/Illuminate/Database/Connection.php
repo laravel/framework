@@ -1101,6 +1101,8 @@ class Connection implements ConnectionInterface
      * @param  string|float|int|bool|null  $value
      * @param  bool  $binary
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function escape($value, $binary = false)
     {
@@ -1154,6 +1156,8 @@ class Connection implements ConnectionInterface
      *
      * @param  string  $value
      * @return string
+     *
+     * @throws \RuntimeException
      */
     protected function escapeBinary($value)
     {
