@@ -62,6 +62,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\Uri previousUri()
  * @method static string|null previousUrl()
  * @method static void setPreviousUrl(string $url)
+ * @method static string|null previousRoute()
+ * @method static void setPreviousRoute(string|null $route)
  * @method static void passwordConfirmed()
  * @method static \SessionHandlerInterface getHandler()
  * @method static \SessionHandlerInterface setHandler(\SessionHandlerInterface $handler)

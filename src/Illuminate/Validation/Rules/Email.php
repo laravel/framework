@@ -186,10 +186,6 @@ class Email implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $this->messages = [];
 
-        if (! is_string($value) && ! (is_object($value) && method_exists($value, '__toString'))) {
-            return false;
-        }
-
         $validator = Validator::make(
             $this->data,
             [$attribute => $this->buildValidationRules()],
