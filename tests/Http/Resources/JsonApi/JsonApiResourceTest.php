@@ -20,6 +20,8 @@ class JsonApiResourceTest extends TestCase
 {
     protected function setUp(): void
     {
+        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
+
         $container = Container::setInstance(new Container);
         $container->instance(ResponseFactoryContract::class, new ResponseFactory(
             m::mock(ViewFactory::class),
@@ -62,8 +64,6 @@ class JsonApiResourceTest extends TestCase
 
     public function testResourceTypeIsPickedFromMorph()
     {
-        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
-
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
 
         $responseData = $this->fakeJsonApiResponseForModel($model)['data'];
@@ -74,8 +74,6 @@ class JsonApiResourceTest extends TestCase
 
     public function testIncludedResourceDoesNotContainPrimaryKey()
     {
-        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
-
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
         $model->setRelation('manager', new JsonApiModel(['id' => 2, 'name' => 'Manager']));
         $model->setRelation('deputy', new JsonApiModel(['id' => 2, 'email' => 'deputy@example.com']));
@@ -86,8 +84,6 @@ class JsonApiResourceTest extends TestCase
 
     public function testIncludedMatchingResourceAttributesAreMerged()
     {
-        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
-
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
         $model->setRelation('manager', new JsonApiModel(['id' => 2, 'name' => 'Manager']));
         $model->setRelation('deputy', new JsonApiModel(['id' => 2, 'email' => 'deputy@example.com']));
