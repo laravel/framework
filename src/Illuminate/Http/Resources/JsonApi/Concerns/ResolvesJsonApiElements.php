@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -177,12 +178,16 @@ trait ResolvesJsonApiElements
         $relations = new Collection;
 
         foreach ($this->loadedRelationshipsMap as $relation => $uniqueKey) {
-            $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+            $resourceInstance = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+
+            if (! $resourceInstance instanceof JsonApiResource && $resourceInstance instanceof JsonResource) {
+                $resourceInstance = new JsonApiResource($resourceInstance->resource);
+            }
 
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => $resource->resolve($request)['data']['attributes'] ?? [],
+                'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes', []),
             ]);
         }
 
