@@ -1831,18 +1831,16 @@ class Str
      * Capitalize the first character of each word in a string.
      *
      * @param  string  $string
-     * @param  string  $delimiter
+     * @param  string  $separators
      * @return string
      */
-    public static function ucwords($string, $delimiter = ' ')
+    public static function ucwords($string, $separators = " \t\r\n\f\v")
     {
-        $words = explode($delimiter, $string);
+        $pattern = '/(^|['.preg_quote($separators, '/').'])(\p{Ll})/u';
 
-        foreach ($words as &$word) {
-            $word = static::ucfirst($word);
-        }
-
-        return implode($delimiter, $words);
+        return preg_replace_callback($pattern, function ($matches) {
+            return $matches[1].mb_strtoupper($matches[2]);
+        }, $string);
     }
 
     /**
