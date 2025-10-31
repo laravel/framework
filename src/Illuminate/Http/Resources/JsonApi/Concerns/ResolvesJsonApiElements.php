@@ -55,8 +55,8 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceIdentifier(Request $request): string
     {
-        if (! is_null($resourceType = $this->toId($request))) {
-            return $resourceType;
+        if (! is_null($resourceId = $this->toId($request))) {
+            return $resourceId;
         }
 
         if (! $this->resource instanceof Model) {
@@ -181,7 +181,8 @@ trait ResolvesJsonApiElements
         foreach ($this->loadedRelationshipsMap as $relation => $uniqueKey) {
             $resourceInstance = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
 
-            if (! $resourceInstance instanceof JsonApiResource && $resourceInstance instanceof JsonResource) {
+            if (! $resourceInstance instanceof JsonApiResource &&
+                $resourceInstance instanceof JsonResource) {
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
