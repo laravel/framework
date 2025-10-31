@@ -79,7 +79,7 @@ class Str
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
      */
-    public static function of($string)
+    public static function of($string = '')
     {
         return new Stringable($string);
     }
