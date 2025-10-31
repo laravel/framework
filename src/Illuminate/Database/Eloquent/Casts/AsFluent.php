@@ -20,7 +20,7 @@ class AsFluent implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return isset($value) ? new Fluent(Json::decode($value)) : null;
+                return new Fluent(Json::decode($value ?? '[]'));
             }
 
             public function set($model, $key, $value, $attributes)
