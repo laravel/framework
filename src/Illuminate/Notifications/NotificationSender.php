@@ -238,7 +238,7 @@ class NotificationSender
                 $queue = $notification->queue;
 
                 if (method_exists($notification, 'viaQueues')) {
-                    $queue = $notification->viaQueues()[$channel] ?? null;
+                    $queue = $notification->viaQueues()[$channel] ?? $queue;
                 }
 
                 $delay = $notification->delay;
