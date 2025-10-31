@@ -4467,9 +4467,18 @@ class DatabaseQueryBuilderTest extends TestCase
             ->with('update "users" set "name" = ? where ("email" = ?)', ['Updated Foo', 'foo@bar.com'])
             ->andReturn(1);
 
-        $result = $builder->from('users')->updateOrCreate(['email' => 'foo@bar.com'], ['name' => 'Updated Foo']);
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Updated Foo']]);
 
-        $this->assertTrue($result);
+        $result = $builder->from('users')->updateOrCreate(
+            ['email' => 'foo@bar.com'],
+            ['name' => 'Updated Foo']
+        );
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Updated Foo', $result->name);
     }
 
     public function testUpdateOrCreateInsertsIfRecordNotFound()
@@ -4491,9 +4500,18 @@ class DatabaseQueryBuilderTest extends TestCase
             ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@bar.com', 'Foo'])
             ->andReturn(true);
 
-        $result = $builder->from('users')->updateOrCreate(['email' => 'foo@bar.com'], ['name' => 'Foo']);
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Foo']]);
 
-        $this->assertTrue($result);
+        $result = $builder->from('users')->updateOrCreate(
+            ['email' => 'foo@bar.com'],
+            ['name' => 'Foo']
+        );
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Foo', $result->name);
     }
 
     public function testDeleteMethod()

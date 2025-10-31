@@ -4066,11 +4066,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Update an existing record matching the attributes, or create it.
+     * Update an existing record matching the attributes, or create it if it doesn't exist.
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return bool
+     * @return \stdClass|null
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -4079,10 +4079,14 @@ class Builder implements BuilderContract
         if ($record) {
             $query = $this->newQuery()->from($this->from);
 
-            return $query->where($attributes)->update($values) > 0;
+            $query->where($attributes)->update($values);
+
+            return $query->where($attributes)->first();
         }
 
-        return $this->insert(array_merge($attributes, $values));
+        $this->insert(array_merge($attributes, $values));
+
+        return $this->newQuery()->from($this->from)->where($attributes)->first();
     }
 
     /**
