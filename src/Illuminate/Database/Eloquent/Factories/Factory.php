@@ -425,7 +425,7 @@ abstract class Factory
                 return $this->state($attributes)->make([], $parent);
             }
 
-            if ($this->count === null) { //
+            if ($this->count === null) {
                 return tap($this->makeInstance($parent), function ($instance) {
                     $this->callAfterMaking(new Collection([$instance]));
                 });
@@ -448,7 +448,7 @@ abstract class Factory
     }
 
     /**
-     * Insert the records (in bulk) but do not return them.
+     * Insert the records in bulk. No model events are emitted.
      *
      * @param  array<string, mixed>  $attributes
      * @param  Model|null  $parent
@@ -457,7 +457,7 @@ abstract class Factory
     public function insert(array $attributes = [], ?Model $parent = null): void
     {
         $made = $this->make($attributes, $parent);
-        $madeCollection = $made instanceof Collection ? $made : new Collection([$made]);
+        $madeCollection = $made instanceof Collection ? $made : $this->newModel()->newCollection([$made]);
 
         $model = $madeCollection->first();
         if (isset($this->connection)) {
