@@ -1295,8 +1295,10 @@ class SupportStrTest extends TestCase
     {
         $this->assertSame('Laravel', Str::ucwords('laravel'));
         $this->assertSame('Laravel Framework', Str::ucwords('laravel framework'));
+        $this->assertSame('Laravel-Framework', Str::ucwords('laravel-framework', '-'));
         $this->assertSame('Мама', Str::ucwords('мама'));
         $this->assertSame('Мама Мыла Раму', Str::ucwords('мама мыла раму'));
+        $this->assertSame('JJ Watt', Str::ucwords('JJ watt'));
     }
 
     public function testUcsplit()
