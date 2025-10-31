@@ -218,6 +218,42 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($object, object_get($object, '  '));
     }
 
+    public function testDataHas()
+    {
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
+        $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
+        $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
+        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
+        $sameKeyMultiLevel = (object) ['name' => 'Taylor', 'company' => ['name' => 'Laravel']];
+        $plainArray = [1, 2, 3];
+
+        $this->assertTrue(data_has($object, 'users.name.0'));
+        $this->assertTrue(data_has($array, '0.users.0.name'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertTrue(data_has($dottedArray, ['users', 'first.name']));
+        $this->assertTrue(data_has($dottedArray, ['users', 'middle.name']));
+        $this->assertFalse(data_has($dottedArray, ['users', 'last.name']));
+        $this->assertTrue(data_has($arrayAccess, 'price'));
+        $this->assertTrue(data_has($arrayAccess, 'user.name'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertTrue(data_has($arrayAccess, 'email'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'name'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'company.name'));
+        $this->assertFalse(data_has($sameKeyMultiLevel, 'foo.name'));
+        $this->assertTrue(data_has($plainArray, 0));
+        $this->assertTrue(data_has($plainArray, '0'));
+        $this->assertFalse(data_has($plainArray, 4));
+        $this->assertFalse(data_has($plainArray, '4'));
+        $this->assertFalse(data_has($plainArray, ''));
+        $this->assertFalse(data_has($plainArray, []));
+        $this->assertFalse(data_has($plainArray, null));
+    }
+
     public function testDataGet()
     {
         $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
