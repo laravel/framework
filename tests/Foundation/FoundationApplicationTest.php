@@ -9,7 +9,6 @@ use Illuminate\Foundation\Bootstrap\RegisterFacades;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Support\ServiceProvider;
 use Mockery as m;
-use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -621,7 +620,8 @@ class FoundationApplicationTest extends TestCase
     public function test_routes_are_not_cached_by_instance_falls_back_to_file()
     {
         $app = new Application();
-        $files = new class {
+        $files = new class
+        {
             public string $pathRequested;
             public function exists(string $path): bool
             {

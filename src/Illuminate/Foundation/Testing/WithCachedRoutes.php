@@ -10,14 +10,14 @@ trait WithCachedRoutes
 
     protected function setUpWithCachedRoutes(): void
     {
-        $this->app->instance('routes.cached', true);
-
         if ((self::$cachedRoutes ?? null) === null) {
             $routes = $this->app['router']->getRoutes();
             $routes->refreshNameLookups();
             $routes->refreshActionLookups();
             self::$cachedRoutes = $routes;
         }
+
+        $this->app->instance('routes.cached', true);
 
         RouteServiceProvider::loadCachedRoutesUsing(
             static fn () => app('router')->setCompiledRoutes(self::$cachedRoutes)
