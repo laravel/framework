@@ -84,8 +84,8 @@ trait ResolvesJsonApiSpecifications
     public function resolveResourceData(Request $request): array
     {
         return [
-            'id' => $this->resolveResourceIdentifier($request),
-            'type' => $this->resolveResourceType($request),
+            'id' => $this->toId($request),
+            'type' => $this->toType($request),
             ...(new Collection([
                 'attributes' => $this->resolveResourceAttributes($request),
                 'relationships' => $this->resolveResourceRelationshipsIdentifiers($request),
@@ -241,8 +241,10 @@ trait ResolvesJsonApiSpecifications
         $modelClassName = $model::class;
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        $modelBaseName = $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName);
+        if ($morphMap !== $modelClassName) {
+            return Str::of($morphMap)->pluralStudly();
+        }
 
-        return Str::of($modelBaseName)->snake()->pluralStudly();
+        return Str::of($modelClassName)->classBasename()->snake()->pluralStudly();
     }
 }

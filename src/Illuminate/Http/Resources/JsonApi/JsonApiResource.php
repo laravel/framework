@@ -109,7 +109,7 @@ class JsonApiResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return string
      */
-    public function id(Request $request)
+    public function toId(Request $request)
     {
         return $this->resolveResourceIdentifier($request);
     }
@@ -120,7 +120,7 @@ class JsonApiResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return string
      */
-    public function type(Request $request)
+    public function toType(Request $request)
     {
         return $this->resolveResourceType($request);
     }

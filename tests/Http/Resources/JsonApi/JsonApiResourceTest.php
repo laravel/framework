@@ -51,38 +51,41 @@ class JsonApiResourceTest extends TestCase
 
     public function testResourceTypeIsPickedFromMorph()
     {
-        Relation::morphMap([JsonApiModel::class => 'json-api-model']);
+        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
+
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
 
-        $responseData = $this->modelToJsonApiData($model)['data'];
+        $responseData = $this->fakeJsonApiResponseForModel($model)['data'];
 
         $this->assertArrayHasKey('type', $responseData);
-        $this->assertSame('json-api-model', $responseData['type']);
+        $this->assertSame('json-api-models', $responseData['type']);
     }
 
     public function testIncludedResourceDoesNotContainPrimaryKey()
     {
-        Relation::morphMap([JsonApiModel::class => 'json-api-model']);
+        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
+
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
         $model->setRelation('manager', new JsonApiModel(['id' => 2, 'name' => 'Manager']));
         $model->setRelation('deputy', new JsonApiModel(['id' => 2, 'email' => 'deputy@example.com']));
 
-        $responseData = $this->modelToJsonApiData($model);
+        $responseData = $this->fakeJsonApiResponseForModel($model);
         $this->assertArrayNotHasKey('id', $responseData['included'][0]['attributes']);
     }
 
     public function testIncludedMatchingResourceAttributesAreMerged()
     {
-        Relation::morphMap([JsonApiModel::class => 'json-api-model']);
+        Relation::morphMap(['json-api-model' => JsonApiModel::class]);
+
         $model = new JsonApiModel(['id' => 1, 'name' => 'User']);
         $model->setRelation('manager', new JsonApiModel(['id' => 2, 'name' => 'Manager']));
         $model->setRelation('deputy', new JsonApiModel(['id' => 2, 'email' => 'deputy@example.com']));
 
-        $responseData = $this->modelToJsonApiData($model);
+        $responseData = $this->fakeJsonApiResponseForModel($model);
 
         $this->assertEquals([
             'id' => '2',
-            'type' => 'json-api-model',
+            'type' => 'json-api-models',
             'attributes' => [
                 'name' => 'Manager',
                 'email' => 'deputy@example.com',
@@ -90,7 +93,7 @@ class JsonApiResourceTest extends TestCase
         ], $responseData['included'][0]);
     }
 
-    protected function modelToJsonApiData(Model $model): array
+    protected function fakeJsonApiResponseForModel(Model $model): array
     {
         Container::getInstance()->instance(ResponseFactoryContract::class, new ResponseFactory(
             m::mock(ViewFactory::class),
