@@ -6,8 +6,10 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use JsonSerializable;
@@ -53,6 +55,10 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceIdentifier(Request $request): string
     {
+        if (! is_null($resourceId = $this->toId($request))) {
+            return $resourceId;
+        }
+
         if (! $this->resource instanceof Model) {
             throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
         }
@@ -68,6 +74,10 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceType(Request $request): string
     {
+        if (! is_null($resourceType = $this->toType($request))) {
+            return $resourceType;
+        }
+
         if (! $this->resource instanceof Model) {
             throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
         }
@@ -83,7 +93,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceAttributes(Request $request): array
     {
-        $data = $this->toArray($request);
+        $data = $this->toAttributes($request);
 
         if ($data instanceof Arrayable) {
             $data = $data->toArray();
@@ -92,6 +102,7 @@ trait ResolvesJsonApiElements
         }
 
         $data = (new Collection($data))
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->transform(fn ($value) => value($value, $request))
             ->all();
 
@@ -168,12 +179,17 @@ trait ResolvesJsonApiElements
         $relations = new Collection;
 
         foreach ($this->loadedRelationshipsMap as $relation => $uniqueKey) {
-            $resource = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+            $resourceInstance = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+
+            if (! $resourceInstance instanceof JsonApiResource &&
+                $resourceInstance instanceof JsonResource) {
+                $resourceInstance = new JsonApiResource($resourceInstance->resource);
+            }
 
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => $resource->toArray($request),
+                'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes', []),
             ]);
         }
 
@@ -189,7 +205,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceLinks(Request $request): array
     {
-        return $this->links($request);
+        return $this->toLinks($request);
     }
 
     /**
@@ -199,7 +215,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceMetaInformation(Request $request): array
     {
-        return $this->meta($request);
+        return $this->toMeta($request);
     }
 
     /**
