@@ -83,7 +83,7 @@ trait ResolvesJsonApiElements
      */
     protected function resolveResourceAttributes(Request $request): array
     {
-        $data = $this->toArray($request);
+        $data = $this->toAttributes($request);
 
         if ($data instanceof Arrayable) {
             $data = $data->toArray();
@@ -92,6 +92,7 @@ trait ResolvesJsonApiElements
         }
 
         $data = (new Collection($data))
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->transform(fn ($value) => value($value, $request))
             ->all();
 
@@ -173,7 +174,7 @@ trait ResolvesJsonApiElements
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
-                'attributes' => $resource->toArray($request),
+                'attributes' => $resource->resolve($request)['data']['attributes'] ?? [],
             ]);
         }
 

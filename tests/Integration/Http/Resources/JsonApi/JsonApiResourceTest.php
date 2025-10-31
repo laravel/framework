@@ -166,7 +166,7 @@ class UserResource extends JsonResource
 
 class UserApiResource extends JsonApiResource
 {
-    public function toArray(Request $request)
+    public function toAttributes(Request $request)
     {
         return [
             'name' => $this->name,
@@ -186,11 +186,11 @@ class Post extends Model
 
 class PostApiResource extends JsonApiResource
 {
-    public function toArray(Request $request)
+    public function toAttributes(Request $request)
     {
         return [
-            'title' => $this->title,
-            'content' => $this->content,
+            'title',
+            'content',
         ];
     }
 }
