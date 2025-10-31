@@ -4497,7 +4497,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()
             ->shouldReceive('insert')
             ->once()
-            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@bar.com', 'Foo'])
+            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@giubar.com', 'Foo'])
             ->andReturn(true);
 
         $builder->getConnection()
