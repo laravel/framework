@@ -38,6 +38,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesStyles,
         Concerns\CompilesTranslations,
         Concerns\CompilesUseStatements,
+        Concerns\CompilesWhen,
         ReflectsClosures;
 
     /**
