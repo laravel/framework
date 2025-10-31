@@ -4046,6 +4046,46 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Get the first record matching the attributes or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return \stdClass|null
+     */
+    public function firstOrCreate(array $attributes, array $values = [])
+    {
+        $record = $this->where($attributes)->first();
+
+        if ($record) {
+            return $record;
+        }
+
+        $this->insert(array_merge($attributes, $values));
+
+        return $this->where($attributes)->first();
+    }
+
+    /**
+     * Update an existing record matching the attributes, or create it.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return bool
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $record = $this->where($attributes)->first();
+
+        if ($record) {
+            $query = $this->newQuery()->from($this->from);
+
+            return $query->where($attributes)->update($values) > 0;
+        }
+
+        return $this->insert(array_merge($attributes, $values));
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column

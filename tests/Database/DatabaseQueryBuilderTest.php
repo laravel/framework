@@ -4418,6 +4418,84 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldNotHaveReceived('update');
     }
 
+    public function testFirstOrCreateInsertsRecordWhenNotFound()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([]);
+
+        $builder->getConnection()
+            ->shouldReceive('insert')
+            ->once()
+            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@bar.com', 'Foo'])
+            ->andReturn(true);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com', 'name' => 'Foo']]);
+
+        $result = $builder->from('users')->firstOrCreate(['email' => 'foo@bar.com'], ['name' => 'Foo']);
+
+        $this->assertEquals('foo@bar.com', $result->email);
+        $this->assertEquals('Foo', $result->name);
+    }
+
+    public function testUpdateOrCreateUpdatesIfRecordExists()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([(object) ['email' => 'foo@bar.com']]);
+
+        $builder->getConnection()
+            ->shouldReceive('update')
+            ->once()
+            ->with('update "users" set "name" = ? where ("email" = ?)', ['Updated Foo', 'foo@bar.com'])
+            ->andReturn(1);
+
+        $result = $builder->from('users')->updateOrCreate(['email' => 'foo@bar.com'], ['name' => 'Updated Foo']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testUpdateOrCreateInsertsIfRecordNotFound()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->getProcessor()
+            ->shouldReceive('processSelect')
+            ->andReturnUsing(fn ($query, $results) => $results);
+
+        $builder->getConnection()
+            ->shouldReceive('select')
+            ->once()
+            ->andReturn([]);
+
+        $builder->getConnection()
+            ->shouldReceive('insert')
+            ->once()
+            ->with('insert into "users" ("email", "name") values (?, ?)', ['foo@bar.com', 'Foo'])
+            ->andReturn(true);
+
+        $result = $builder->from('users')->updateOrCreate(['email' => 'foo@bar.com'], ['name' => 'Foo']);
+
+        $this->assertTrue($result);
+    }
+
     public function testDeleteMethod()
     {
         $builder = $this->getBuilder();
