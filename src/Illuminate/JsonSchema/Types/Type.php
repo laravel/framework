@@ -90,7 +90,7 @@ abstract class Type extends JsonSchema
      */
     public function enum(string|array $values): static
     {
-        if(is_string($values)) {
+        if (is_string($values)) {
             $values = array_column($values::cases(), 'value');
         }
 
