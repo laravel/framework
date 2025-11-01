@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Client;
 
 use ArrayAccess;
+use Generator;
 use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
@@ -72,6 +73,47 @@ class Response implements ArrayAccess, Stringable
     public function body()
     {
         return (string) $this->response->getBody();
+    }
+
+    /**
+     * Stream the response body in chunks of the given length.
+     *
+     * @param  int  $chuckLength
+     * @return \Generator<string>
+     */
+    public function stream(int $chuckLength = 1): Generator
+    {
+        $stream = $this->getBody();
+
+        while (! $stream->eof()) {
+            yield $stream->read($chuckLength);
+        }
+    }
+
+    /**
+     * Stream the response body line by line, buffering chunks to ensure complete lines.
+     *
+     * @param  int  $chunkLength
+     * @param  string  $separator
+     * @return \Generator<string>
+     */
+    public function streamLines(int $chunkLength = 1, string $separator = "\n"): Generator
+    {
+        $length = max($chunkLength, mb_strlen($separator));
+        $buffer = '';
+
+        foreach ($this->stream($length) as $chunk) {
+            $buffer .= $chunk;
+
+            while (($pos = strpos($buffer, $separator)) !== false) {
+                yield substr($buffer, 0, $pos);
+                $buffer = substr($buffer, $pos + mb_strlen($separator));
+            }
+        }
+
+        if ($buffer !== '') {
+            yield $buffer;
+        }
     }
 
     /**
