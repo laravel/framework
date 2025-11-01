@@ -363,6 +363,34 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertEquals(6, $count);
     }
 
+    public function testChunkByIdWithLastId()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+        $count = 0;
+        $processedIds = [];
+
+        // Start from a specific ID (e.g., 2)
+        $country->posts()->chunkById(2, function ($collection) use (&$i, &$count, &$processedIds) {
+            $i++;
+            $count += $collection->count();
+            foreach ($collection as $post) {
+                $processedIds[] = $post->id;
+            }
+        }, null, null, 2);
+
+        // Should process posts starting from ID 2
+        $this->assertGreaterThan(0, $i);
+        $this->assertGreaterThan(0, $count);
+        // All processed IDs should be greater than 2
+        foreach ($processedIds as $id) {
+            $this->assertGreaterThan(2, $id);
+        }
+    }
+
     public function testCursorReturnsCorrectModels()
     {
         $this->seedData();

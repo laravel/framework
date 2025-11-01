@@ -5646,6 +5646,66 @@ SQL;
         }, 'someIdField');
     }
 
+    public function testChunkByIdWithLastId()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 5, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField', null, 5);
+    }
+
+    public function testChunkByIdWithLastIdOnArrays()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect([['someIdField' => 10], ['someIdField' => 11]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 5, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField', null, 5);
+    }
+
+    public function testChunkByIdWithLastIdAndAlias()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = collect([(object) ['table_id' => 10], (object) ['table_id' => 11]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 5, 'table.id')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'table.id')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'table.id', 'table_id', 5);
+    }
+
     public function testPaginate()
     {
         $perPage = 16;
