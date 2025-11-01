@@ -26,11 +26,20 @@ trait WithCachedRoutes
         $this->markRoutesCached($this->app);
     }
 
+    /**
+     * Reset the route service provider so it's not defaulting to loading cached routes.
+     * Helpful if some of the tests in the suite apply this trait while others do not.
+     *
+     * @return void
+     */
     protected function tearDownWithCachedRoutes(): void
     {
         RouteServiceProvider::loadCachedRoutesUsing(null);
     }
 
+    /**
+     * Inform the container to treat routes as cached.
+     */
     protected function markRoutesCached(Application $app): void
     {
         $app->instance('routes.cached', true);
