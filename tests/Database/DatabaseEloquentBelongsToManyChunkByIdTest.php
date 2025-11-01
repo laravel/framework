@@ -109,16 +109,17 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         $user = BelongsToManyChunkByIdTestTestUser::query()->first();
         $i = 0;
 
-        // Start chunking from ID 2 (descending), so it should skip ID 3 and start from ID 2
+        // Start chunking from ID 3 (descending), so it should skip ID 3 and start from ID 2
+        // We pass lastId=3 so forPageBeforeId uses "where id < 3", which gives us ID 2 and ID 1
         $user->articles()->chunkByIdDesc(1, function (Collection $collection) use (&$i) {
             $i++;
-            // First chunk should start from ID 2
+            // First chunk should start from ID 2 (descending order, so highest ID < 3)
             if ($i === 1) {
                 $this->assertEquals(2, $collection->first()->id);
             } else {
                 $this->assertEquals(1, $collection->first()->id);
             }
-        }, null, null, 2);
+        }, null, null, 3);
 
         // Should process 2 chunks (ID 2 and ID 1), skipping ID 3
         $this->assertSame(2, $i);
