@@ -391,6 +391,34 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         }
     }
 
+    public function testChunkByIdDescWithLastId()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $i = 0;
+        $count = 0;
+        $processedIds = [];
+
+        // Start from a specific ID (e.g., 5) in descending order
+        $country->posts()->chunkByIdDesc(2, function ($collection) use (&$i, &$count, &$processedIds) {
+            $i++;
+            $count += $collection->count();
+            foreach ($collection as $post) {
+                $processedIds[] = $post->id;
+            }
+        }, null, null, 5);
+
+        // Should process posts starting from ID 5 going down
+        $this->assertGreaterThan(0, $i);
+        $this->assertGreaterThan(0, $count);
+        // All processed IDs should be less than 5
+        foreach ($processedIds as $id) {
+            $this->assertLessThan(5, $id);
+        }
+    }
+
     public function testCursorReturnsCorrectModels()
     {
         $this->seedData();

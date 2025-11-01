@@ -5646,6 +5646,26 @@ SQL;
         }, 'someIdField');
     }
 
+    public function testChunkByIdDescWithLastId()
+    {
+        $builder = $this->getMockQueryBuilder();
+        $builder->orders[] = ['column' => 'foobar', 'direction' => 'desc'];
+
+        $chunk1 = collect([(object) ['someIdField' => 5], (object) ['someIdField' => 4]]);
+        $chunk2 = collect([]);
+        $builder->shouldReceive('forPageBeforeId')->once()->with(2, 10, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageBeforeId')->once()->with(2, 4, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkByIdDesc(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField', null, 10);
+    }
+
     public function testChunkByIdWithLastId()
     {
         $builder = $this->getMockQueryBuilder();
