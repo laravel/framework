@@ -14,7 +14,7 @@ trait WithCachedRoutes
             $routes = $this->app['router']->getRoutes();
             $routes->refreshNameLookups();
             $routes->refreshActionLookups();
-            self::$cachedRoutes = $routes;
+            self::$cachedRoutes = $routes->compile();
         }
 
         $this->app->instance('routes.cached', true);
