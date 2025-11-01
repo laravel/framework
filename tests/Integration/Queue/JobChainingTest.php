@@ -396,6 +396,25 @@ class JobChainingTest extends QueueTestCase
         $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
     }
 
+    public function testBatchInChainUsesCorrectQueue()
+    {
+        Bus::chain([
+            (new JobChainingNamedTestJob('c1'))->onQueue('other'),
+            (new JobChainingNamedTestJob('c2'))->onQueue('other'),
+            Bus::batch([
+                new JobChainingTestBatchedJob('b1'),
+                new JobChainingTestBatchedJob('b2'),
+                new JobChainingTestBatchedJob('b3'),
+                new JobChainingTestBatchedJob('b4'),
+            ])->onQueue('other'),
+            (new JobChainingNamedTestJob('c3'))->onQueue('other'),
+        ])->dispatch();
+
+        $this->runQueueWorkerCommand(['--queue' => 'other', '--stop-when-empty' => true]);
+
+        $this->assertEquals(['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results);
+    }
+
     public function testDynamicBatchCanBeAddedToChain()
     {
         Bus::chain([
