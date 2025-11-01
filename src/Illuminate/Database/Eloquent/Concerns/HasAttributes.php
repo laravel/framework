@@ -1905,7 +1905,7 @@ trait HasAttributes
     {
         foreach ($this->classCastCache as $key => $value) {
             if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                 continue;
+                continue;
             }
             
             $caster = $this->resolveCasterClass($key);
@@ -1928,7 +1928,7 @@ trait HasAttributes
     {
         foreach ($this->attributeCastCache as $key => $value) {
             if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                 continue;
+                continue;
             }
             $attribute = $this->{Str::camel($key)}();
 
