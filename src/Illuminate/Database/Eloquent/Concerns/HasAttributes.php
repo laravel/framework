@@ -537,7 +537,7 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        return $this->getAttributes()[$key] ?? null;
+        return $this->getAttributes($key)[$key] ?? null;
     }
 
     /**
@@ -1890,10 +1890,10 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromCachedCasts()
+    protected function mergeAttributesFromCachedCasts(?string $onlyMergeCachedCastsForThisKey = null)
     {
-        $this->mergeAttributesFromClassCasts();
-        $this->mergeAttributesFromAttributeCasts();
+        $this->mergeAttributesFromClassCasts($onlyMergeCachedCastsForThisKey);
+        $this->mergeAttributesFromAttributeCasts($onlyMergeCachedCastsForThisKey);
     }
 
     /**
@@ -1901,9 +1901,13 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromClassCasts()
+    protected function mergeAttributesFromClassCasts(?string $onlyMergeCachedCastsForThisKey = null)
     {
         foreach ($this->classCastCache as $key => $value) {
+            if(!is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
+                continue;
+            }
+            
             $caster = $this->resolveCasterClass($key);
 
             $this->attributes = array_merge(
@@ -1920,9 +1924,12 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromAttributeCasts()
+    protected function mergeAttributesFromAttributeCasts(?string $onlyMergeCachedCastsForThisKey = null)
     {
         foreach ($this->attributeCastCache as $key => $value) {
+            if(!is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
+                continue;
+            }
             $attribute = $this->{Str::camel($key)}();
 
             if ($attribute->get && ! $attribute->set) {
@@ -1959,9 +1966,9 @@ trait HasAttributes
      *
      * @return array<string, mixed>
      */
-    public function getAttributes()
+    public function getAttributes(?string $onlyMergeCachedCastsForThisKey = null)
     {
-        $this->mergeAttributesFromCachedCasts();
+        $this->mergeAttributesFromCachedCasts($onlyMergeCachedCastsForThisKey);
 
         return $this->attributes;
     }
