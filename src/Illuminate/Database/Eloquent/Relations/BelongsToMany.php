@@ -1049,11 +1049,12 @@ class BelongsToMany extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  mixed  $lastId
      * @return bool
      */
-    public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
+    public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null, $lastId = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias, descending: true);
+        return $this->orderedChunkById($count, $callback, $column, $alias, true, $lastId);
     }
 
     /**

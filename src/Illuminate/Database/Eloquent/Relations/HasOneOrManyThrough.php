@@ -563,15 +563,16 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  mixed  $lastId
      * @return bool
      */
-    public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null)
+    public function chunkByIdDesc($count, callable $callback, $column = null, $alias = null, $lastId = null)
     {
         $column ??= $this->getRelated()->getQualifiedKeyName();
 
         $alias ??= $this->getRelated()->getKeyName();
 
-        return $this->prepareQueryBuilder()->chunkByIdDesc($count, $callback, $column, $alias);
+        return $this->prepareQueryBuilder()->chunkByIdDesc($count, $callback, $column, $alias, $lastId);
     }
 
     /**

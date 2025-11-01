@@ -968,6 +968,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals([2, 3, 4], $processedIds);
     }
 
+    public function testChunkByIdDescWithLastId()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'user1@example.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'user2@example.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'user3@example.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'user4@example.com']);
+
+        $processedIds = [];
+
+        // Start from ID 3 (descending), so should process IDs 2, 1 (skipping 4 and 3)
+        EloquentTestUser::query()->chunkByIdDesc(2, function ($users) use (&$processedIds) {
+            foreach ($users as $user) {
+                $processedIds[] = $user->id;
+            }
+        }, null, null, 3);
+
+        $this->assertEquals([2, 1], $processedIds);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
