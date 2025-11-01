@@ -6,7 +6,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 
 trait WithCachedRoutes
 {
-    protected static array $cachedRoutes = [];
+    protected static array $cachedRoutes;
 
     protected function setUpWithCachedRoutes(): void
     {
