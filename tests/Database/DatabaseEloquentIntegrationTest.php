@@ -949,6 +949,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertSame([[' First', 0], [' Second', 1], [' Third', 2]], $users);
     }
 
+    public function testChunkByIdWithLastId()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'user1@example.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'user2@example.com']);
+        EloquentTestUser::create(['id' => 3, 'email' => 'user3@example.com']);
+        EloquentTestUser::create(['id' => 4, 'email' => 'user4@example.com']);
+
+        $processedIds = [];
+
+        // Start from ID 2, so should process IDs 2, 3, 4 (skipping 1)
+        EloquentTestUser::query()->chunkById(2, function ($users) use (&$processedIds) {
+            foreach ($users as $user) {
+                $processedIds[] = $user->id;
+            }
+        }, null, null, 1);
+
+        $this->assertEquals([2, 3, 4], $processedIds);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

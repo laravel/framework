@@ -126,11 +126,12 @@ trait BuildsQueries
      * @param  callable(\Illuminate\Support\Collection<int, TValue>, int): mixed  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  mixed  $lastId
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    public function chunkById($count, callable $callback, $column = null, $alias = null, $lastId = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias);
+        return $this->orderedChunkById($count, $callback, $column, $alias, false, $lastId);
     }
 
     /**
@@ -155,15 +156,15 @@ trait BuildsQueries
      * @param  string|null  $column
      * @param  string|null  $alias
      * @param  bool  $descending
+     * @param  mixed  $lastId
      * @return bool
      *
      * @throws \RuntimeException
      */
-    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
+    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false, $lastId = null)
     {
         $column ??= $this->defaultKeyName();
         $alias ??= $column;
-        $lastId = null;
         $skip = $this->getOffset();
         $remaining = $this->getLimit();
 

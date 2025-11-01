@@ -1034,11 +1034,12 @@ class BelongsToMany extends Relation
      * @param  callable  $callback
      * @param  string|null  $column
      * @param  string|null  $alias
+     * @param  mixed  $lastId
      * @return bool
      */
-    public function chunkById($count, callable $callback, $column = null, $alias = null)
+    public function chunkById($count, callable $callback, $column = null, $alias = null, $lastId = null)
     {
-        return $this->orderedChunkById($count, $callback, $column, $alias);
+        return $this->orderedChunkById($count, $callback, $column, $alias, false, $lastId);
     }
 
     /**
@@ -1083,9 +1084,10 @@ class BelongsToMany extends Relation
      * @param  string|null  $column
      * @param  string|null  $alias
      * @param  bool  $descending
+     * @param  mixed  $lastId
      * @return bool
      */
-    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false)
+    public function orderedChunkById($count, callable $callback, $column = null, $alias = null, $descending = false, $lastId = null)
     {
         $column ??= $this->getRelated()->qualifyColumn(
             $this->getRelatedKeyName()
@@ -1097,7 +1099,7 @@ class BelongsToMany extends Relation
             $this->hydratePivotRelation($results->all());
 
             return $callback($results, $page);
-        }, $column, $alias, $descending);
+        }, $column, $alias, $descending, $lastId);
     }
 
     /**

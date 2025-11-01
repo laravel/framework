@@ -538,6 +538,28 @@ class DatabaseEloquentBuilderTest extends TestCase
         }, 'someIdField');
     }
 
+    public function testChunkPaginatesUsingIdWithLastId()
+    {
+        $builder = m::mock(Builder::class.'[getOffset,getLimit,forPageAfterId,get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->orders[] = ['column' => 'foobar', 'direction' => 'asc'];
+
+        $chunk1 = new Collection([(object) ['someIdField' => 10], (object) ['someIdField' => 11]]);
+        $chunk2 = new Collection([]);
+        $builder->shouldReceive('getOffset')->andReturnNull();
+        $builder->shouldReceive('getLimit')->andReturnNull();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 5, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
+        $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
+
+        $callbackAssertor = m::mock(stdClass::class);
+        $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
+        $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
+
+        $builder->chunkById(2, function ($results) use ($callbackAssertor) {
+            $callbackAssertor->doSomething($results);
+        }, 'someIdField', null, 5);
+    }
+
     public function testLazyWithLastChunkComplete()
     {
         $builder = m::mock(Builder::class.'[forPage,get]', [$this->getMockQueryBuilder()]);

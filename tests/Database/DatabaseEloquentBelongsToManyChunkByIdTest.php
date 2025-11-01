@@ -80,6 +80,28 @@ class DatabaseEloquentBelongsToManyChunkByIdTest extends TestCase
         $this->assertSame(3, $i);
     }
 
+    public function testBelongsToChunkByIdWithLastId()
+    {
+        $this->seedData();
+
+        $user = BelongsToManyChunkByIdTestTestUser::query()->first();
+        $i = 0;
+
+        // Start chunking from ID 1, so it should skip ID 1 and start from ID 2
+        $user->articles()->chunkById(1, function (Collection $collection) use (&$i) {
+            $i++;
+            // First chunk should start from ID 2
+            if ($i === 1) {
+                $this->assertEquals(2, $collection->first()->id);
+            } else {
+                $this->assertEquals(3, $collection->first()->id);
+            }
+        }, null, null, 1);
+
+        // Should process 2 chunks (ID 2 and ID 3), skipping ID 1
+        $this->assertSame(2, $i);
+    }
+
     /**
      * Tear down the database schema.
      *
