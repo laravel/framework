@@ -1904,8 +1904,8 @@ trait HasAttributes
     protected function mergeAttributesFromClassCasts(?string $onlyMergeCachedCastsForThisKey = null)
     {
         foreach ($this->classCastCache as $key => $value) {
-            if(!is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                continue;
+            if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
+                 continue;
             }
             
             $caster = $this->resolveCasterClass($key);
@@ -1927,8 +1927,8 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts(?string $onlyMergeCachedCastsForThisKey = null)
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            if(!is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                continue;
+            if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
+                 continue;
             }
             $attribute = $this->{Str::camel($key)}();
 
