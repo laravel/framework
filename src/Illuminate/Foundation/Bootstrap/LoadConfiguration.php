@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
@@ -11,6 +12,22 @@ use Symfony\Component\Finder\Finder;
 
 class LoadConfiguration
 {
+    /**
+     * @var (Closure(Application): array<array-key, mixed>)|null
+     */
+    protected static ?Closure $alwaysUseConfig = null;
+
+    /**
+     * Set a callback to return the config values.
+     *
+     * @param  (Closure(Application): array<array-key, mixed>)|null  $alwaysUseConfig
+     * @return void
+     */
+    public static function setAlwaysUseConfig(?Closure $alwaysUseConfig): void
+    {
+        static::$alwaysUseConfig = $alwaysUseConfig;
+    }
+
     /**
      * Bootstrap the given application.
      *
@@ -24,7 +41,11 @@ class LoadConfiguration
         // First we will see if we have a cache configuration file. If we do, we'll load
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
-        if (file_exists($cached = $app->getCachedConfigPath())) {
+        if (self::$alwaysUseConfig !== null) {
+            $items = $app->call(self::$alwaysUseConfig);
+
+            $app->instance('config_loaded_from_cache', $loadedFromCache = true);
+        } elseif (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
             $app->instance('config_loaded_from_cache', $loadedFromCache = true);

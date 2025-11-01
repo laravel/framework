@@ -1302,7 +1302,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function configurationIsCached()
     {
-        return is_file($this->getCachedConfigPath());
+        return ($this->bound('config.cached')
+                && $this->make('config.cached') === true)
+            || is_file($this->getCachedConfigPath());
     }
 
     /**
