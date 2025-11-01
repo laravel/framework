@@ -1907,7 +1907,6 @@ trait HasAttributes
             if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
                 continue;
             }
-            
             $caster = $this->resolveCasterClass($key);
 
             $this->attributes = array_merge(
