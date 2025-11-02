@@ -537,7 +537,9 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        return $this->getAttributes($key)[$key] ?? null;
+        $this->mergeAttributeFromCachedCasts($key);
+
+        return $this->attributes[$key] ?? null;
     }
 
     /**
@@ -1890,10 +1892,21 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromCachedCasts(?string $onlyMergeCachedCastsForThisKey = null)
+    protected function mergeAttributesFromCachedCasts()
     {
-        $this->mergeAttributesFromClassCasts($onlyMergeCachedCastsForThisKey);
-        $this->mergeAttributesFromAttributeCasts($onlyMergeCachedCastsForThisKey);
+        $this->mergeAttributesFromClassCasts();
+        $this->mergeAttributesFromAttributeCasts();
+    }
+
+    /**
+     * Merge the a cast class and attribute cast attribute back into the model.
+     *
+     * @return void
+     */
+    protected function mergeAttributeFromCachedCasts(string $key)
+    {
+        $this->mergeAttributeFromClassCasts($key);
+        $this->mergeAttributeFromAttributeCasts($key);
     }
 
     /**
@@ -1901,21 +1914,29 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromClassCasts(?string $onlyMergeCachedCastsForThisKey = null)
+    protected function mergeAttributesFromClassCasts()
     {
         foreach ($this->classCastCache as $key => $value) {
-            if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                continue;
-            }
-            $caster = $this->resolveCasterClass($key);
-
-            $this->attributes = array_merge(
-                $this->attributes,
-                $caster instanceof CastsInboundAttributes
-                    ? [$key => $value]
-                    : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
-            );
+            $this->mergeAttributeFromClassCasts($key);
         }
+    }
+
+    private function mergeAttributeFromClassCasts(string $key): void
+    {
+        if (! isset($this->classCastCache[$key])) {
+            return;
+        }
+
+        $value = $this->classCastCache[$key];
+
+        $caster = $this->resolveCasterClass($key);
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $caster instanceof CastsInboundAttributes
+                ? [$key => $value]
+                : $this->normalizeCastClassResponse($key, $caster->set($this, $key, $value, $this->attributes))
+        );
     }
 
     /**
@@ -1923,29 +1944,37 @@ trait HasAttributes
      *
      * @return void
      */
-    protected function mergeAttributesFromAttributeCasts(?string $onlyMergeCachedCastsForThisKey = null)
+    protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-            if (! is_null($onlyMergeCachedCastsForThisKey) && $key !== $onlyMergeCachedCastsForThisKey) {
-                continue;
-            }
-            $attribute = $this->{Str::camel($key)}();
-
-            if ($attribute->get && ! $attribute->set) {
-                continue;
-            }
-
-            $callback = $attribute->set ?: function ($value) use ($key) {
-                $this->attributes[$key] = $value;
-            };
-
-            $this->attributes = array_merge(
-                $this->attributes,
-                $this->normalizeCastClassResponse(
-                    $key, $callback($value, $this->attributes)
-                )
-            );
+           $this->mergeAttributeFromAttributeCasts($key);
         }
+    }
+
+    private function mergeAttributeFromAttributeCasts(string $key): void
+    {
+        if (! isset($this->attributeCastCache[$key])) {
+            return;
+        }
+
+        $value = $this->attributeCastCache[$key];
+
+        $attribute = $this->{Str::camel($key)}();
+
+        if ($attribute->get && ! $attribute->set) {
+            return;
+        }
+
+        $callback = $attribute->set ?: function ($value) use ($key) {
+            $this->attributes[$key] = $value;
+        };
+
+        $this->attributes = array_merge(
+            $this->attributes,
+            $this->normalizeCastClassResponse(
+                $key, $callback($value, $this->attributes)
+            )
+        );
     }
 
     /**
@@ -1965,9 +1994,9 @@ trait HasAttributes
      *
      * @return array<string, mixed>
      */
-    public function getAttributes(?string $onlyMergeCachedCastsForThisKey = null)
+    public function getAttributes()
     {
-        $this->mergeAttributesFromCachedCasts($onlyMergeCachedCastsForThisKey);
+        $this->mergeAttributesFromCachedCasts();
 
         return $this->attributes;
     }
