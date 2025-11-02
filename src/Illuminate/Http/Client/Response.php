@@ -99,10 +99,9 @@ class Response implements ArrayAccess, Stringable
      */
     public function streamLines(int $chunkLength = 1, string $separator = "\n"): Generator
     {
-        $length = max($chunkLength, mb_strlen($separator));
         $buffer = '';
 
-        foreach ($this->stream($length) as $chunk) {
+        foreach ($this->stream($chunkLength) as $chunk) {
             $buffer .= $chunk;
 
             while (($pos = strpos($buffer, $separator)) !== false) {
