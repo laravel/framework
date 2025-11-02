@@ -26,7 +26,7 @@ class HttpClientStreamTest extends TestCase
     {
         $stream = Http::withOptions(['stream' => true])
             ->get('http://example.test/stream')
-            ->stream(chuckLength: 19);
+            ->stream(chunkLength: 19);
 
         $expectedMessages = [
             "Streamed Message 1\n",
@@ -49,7 +49,7 @@ class HttpClientStreamTest extends TestCase
     {
         $stream = Http::withOptions(['stream' => true])
             ->get('http://example.test/stream')
-            ->stream(chuckLength: 10);
+            ->stream(chunkLength: 10);
 
         $expectedMessages = [
             'Streamed M',
