@@ -78,7 +78,7 @@ class HttpClientStreamTest extends TestCase
         $streams = [
             Http::withOptions(['stream' => true])
                 ->get('http://example.test/stream')
-                ->streamLines(), // reads single byte
+                ->streamLines(), // reads single bytes
             Http::withOptions(['stream' => true])
                 ->get('http://example.test/stream')
                 ->streamLines(chunkLength: 17), // chunk length smaller than line length
