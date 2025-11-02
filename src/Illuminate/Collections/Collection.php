@@ -1047,7 +1047,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function push(...$values)
     {
         foreach ($values as $value) {
-            $this->items[] = $value;
+            $this->add($value);
         }
 
         return $this;
@@ -1918,7 +1918,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function offsetSet($key, $value): void
     {
         if (is_null($key)) {
-            $this->items[] = $value;
+            $this->add($value);
         } else {
             $this->items[$key] = $value;
         }
