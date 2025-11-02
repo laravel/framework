@@ -1947,7 +1947,7 @@ trait HasAttributes
     protected function mergeAttributesFromAttributeCasts()
     {
         foreach ($this->attributeCastCache as $key => $value) {
-           $this->mergeAttributeFromAttributeCasts($key);
+            $this->mergeAttributeFromAttributeCasts($key);
         }
     }
 
