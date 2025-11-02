@@ -1128,6 +1128,19 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Ensure the string is unique, calling the fallback
+     * if the test fails. If no fallback is provided, a
+     * failed test will be appended by a random string.
+     *
+     * @param  (\Closure(Stringable): string|Stringable|null)|string|null  $fallback
+     * @return static
+     */
+    public function unique(string $table, string $column = 'id', mixed $fallback = null, ?string $connection = null, bool $throw = true, int $maxAttempts = 5)
+    {
+        return new static(Str::unique($this->value, $table, $column, $fallback, $connection, $throw, $maxAttempts));
+    }
+
+    /**
      * Execute the given callback if the string contains a given substring.
      *
      * @param  string|iterable<string>  $needles

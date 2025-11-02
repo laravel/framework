@@ -3,6 +3,9 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Container\Container;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -12,10 +15,23 @@ use Illuminate\Support\Uri;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class SupportStringableTest extends TestCase
 {
     protected Container $container;
+
+    protected function setUp(): void
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $this->createSchema();
+    }
 
     /**
      * @param  string  $string
@@ -256,6 +272,27 @@ class SupportStringableTest extends TestCase
         $this->assertSame(['Taylor', 'Otwell'], $this->stringable('TaylorOtwell')->ucsplit()->toArray());
         $this->assertSame(['Hello', 'From', 'Laravel'], $this->stringable('HelloFromLaravel')->ucsplit()->toArray());
         $this->assertSame(['He_llo_', 'World'], $this->stringable('He_llo_World')->ucsplit()->toArray());
+    }
+
+    public function testUnique()
+    {
+        $model = new StringableEloquentModelStub(['id_column' => 1, 'unique' => 'Laravel_Unique']);
+        $model->save();
+
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->unique('table'));
+        $this->assertSame('Laravel', (string) $this->stringable('Laravel')->unique('table', 'unique'));
+
+        $this->assertSame('Laravel_Unique', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', fn ($string) => null));
+        $this->assertSame('Laravel_Unique_Foobar', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', fn ($string) => $string->append('_Foobar')));
+        $this->assertSame('Foobar', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', fn ($string) => 'Foobar'));
+        $this->assertSame('Foobar', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', 'Foobar'));
+
+        $this->assertMatchesRegularExpression('/^Laravel(?:_Unique)?-[a-zA-Z0-9]{16}$/', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to generate unique value for [Laravel_Unique.table.unique] after 1 attempts.');
+        $this->assertSame('Laravel_Unique', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', 'Laravel_Unique', null, true, 1));
+        $this->assertSame('Laravel_Unique', (string) $this->stringable('Laravel_Unique')->unique('table', 'unique', 'Laravel_Unique', null, false, 1));
     }
 
     public function testWhenEndsWith()
@@ -1581,4 +1618,25 @@ class SupportStringableTest extends TestCase
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
     }
+
+    protected function createSchema(): void
+    {
+        $this->connection()->getSchemaBuilder()->create('table', function ($table) {
+            $table->unsignedInteger('id_column');
+            $table->string('unique');
+            $table->timestamps();
+        });
+    }
+
+    protected function connection(): ConnectionInterface
+    {
+        return Model::getConnectionResolver()->connection();
+    }
+}
+
+class StringableEloquentModelStub extends Model
+{
+    protected $table = 'table';
+    protected $primaryKey = 'id_column';
+    protected $guarded = [];
 }

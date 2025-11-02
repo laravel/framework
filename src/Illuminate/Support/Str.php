@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -15,6 +16,7 @@ use Ramsey\Uuid\Generator\CombGenerator;
 use Ramsey\Uuid\Rfc4122\FieldsInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
+use RuntimeException;
 use Symfony\Component\Uid\Ulid;
 use Throwable;
 use Traversable;
@@ -1852,6 +1854,44 @@ class Str
     public static function ucsplit($string)
     {
         return preg_split('/(?=\p{Lu})/u', $string, -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+    /**
+     * Ensure the string is unique, calling the fallback
+     * if the test fails. If no fallback is provided, a
+     * failed test will be appended by a random string.
+     *
+     * @param  (\Closure(Stringable): string|Stringable|null)|string|null  $fallback
+     * @return string
+     *
+     * @throws RuntimeException
+     */
+    public static function unique(string $string, string $table, string $column = 'id', mixed $fallback = null, ?string $connection = null, bool $throw = true, int $maxAttempts = 5)
+    {
+        $connection = Model::resolveConnection($connection);
+
+        $candidate = $string;
+        $attempts = 0;
+
+        while ($connection->table($table)->where($column, $candidate)->exists()) {
+            $attempts++;
+
+            if ($throw && $attempts > $maxAttempts) {
+                throw new RuntimeException("Unable to generate unique value for [$string.$table.$column] after $maxAttempts attempts.");
+            }
+
+            if (! is_null($fallback)) {
+                $candidate = (string) value($fallback, static::of($string));
+            } else {
+                $candidate = $string.'-'.static::random();
+            }
+        }
+
+        if (empty($candidate)) {
+            return $string;
+        }
+
+        return $candidate;
     }
 
     /**

@@ -3,15 +3,31 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
 use ReflectionClass;
+use RuntimeException;
 use ValueError;
 
 class SupportStrTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $db = new DB;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $this->createSchema();
+    }
+
     /** {@inheritdoc} */
     #[\Override]
     protected function tearDown(): void
@@ -1313,6 +1329,27 @@ class SupportStrTest extends TestCase
         $this->assertSame(['Öffentliche', 'Überraschungen'], Str::ucsplit('ÖffentlicheÜberraschungen'));
     }
 
+    public function testUnique()
+    {
+        $model = new StrEloquentModelStub(['id_column' => 1, 'unique' => 'Laravel_Unique']);
+        $model->save();
+
+        $this->assertSame('Laravel', Str::unique('Laravel', 'table'));
+        $this->assertSame('Laravel', Str::unique('Laravel', 'table', 'unique'));
+
+        $this->assertSame('Laravel_Unique', Str::unique('Laravel_Unique', 'table', 'unique', fn ($string) => null));
+        $this->assertSame('Laravel_Unique_Foobar', Str::unique('Laravel_Unique', 'table', 'unique', fn ($string) => $string->append('_Foobar')));
+        $this->assertSame('Foobar', Str::unique('Laravel_Unique', 'table', 'unique', fn ($string) => 'Foobar'));
+        $this->assertSame('Foobar', Str::unique('Laravel_Unique', 'table', 'unique', 'Foobar'));
+
+        $this->assertMatchesRegularExpression('/^Laravel(?:_Unique)?-[a-zA-Z0-9]{16}$/', Str::unique('Laravel_Unique', 'table', 'unique'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unable to generate unique value for [Laravel_Unique.table.unique] after 1 attempts.');
+        $this->assertSame('Laravel_Unique', Str::unique('Laravel_Unique', 'table', 'unique', 'Laravel_Unique', null, true, 1));
+        $this->assertSame('Laravel_Unique', Str::unique('Laravel_Unique', 'table', 'unique', 'Laravel_Unique', null, false, 1));
+    }
+
     public function testUuid()
     {
         $this->assertInstanceOf(UuidInterface::class, Str::uuid());
@@ -1915,6 +1952,20 @@ class SupportStrTest extends TestCase
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
+
+    protected function createSchema(): void
+    {
+        $this->connection()->getSchemaBuilder()->create('table', function ($table) {
+            $table->unsignedInteger('id_column');
+            $table->string('unique');
+            $table->timestamps();
+        });
+    }
+
+    protected function connection(): ConnectionInterface
+    {
+        return Model::getConnectionResolver()->connection();
+    }
 }
 
 class StringableObjectStub
@@ -1930,4 +1981,11 @@ class StringableObjectStub
     {
         return $this->value;
     }
+}
+
+class StrEloquentModelStub extends Model
+{
+    protected $table = 'table';
+    protected $primaryKey = 'id_column';
+    protected $guarded = [];
 }
