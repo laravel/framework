@@ -78,15 +78,15 @@ class Response implements ArrayAccess, Stringable
     /**
      * Stream the response body in chunks of the given length.
      *
-     * @param  int  $chuckLength
+     * @param  int  $chunkLength
      * @return \Generator<string>
      */
-    public function stream(int $chuckLength = 1): Generator
+    public function stream(int $chunkLength = 1): Generator
     {
         $stream = $this->getBody();
 
         while (! $stream->eof()) {
-            yield $stream->read($chuckLength);
+            yield $stream->read($chunkLength);
         }
     }
 
