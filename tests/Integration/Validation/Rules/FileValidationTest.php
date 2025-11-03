@@ -54,7 +54,6 @@ class FileValidationTest extends TestCase
 
     public function test_file_custom_validation_messages()
     {
-
         $validator = Validator::make(
             [
                 'one' => UploadedFile::fake()->create('photo', 1000),
