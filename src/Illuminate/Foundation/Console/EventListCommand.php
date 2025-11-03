@@ -270,6 +270,13 @@ class EventListCommand extends Command
         $cachePath = base_path('bootstrap/cache/events.php');
 
         if (! file_exists($cachePath)) {
+            $tempPath = sys_get_temp_dir().'/events.php';
+            if (file_exists($tempPath)) {
+                $cachePath = $tempPath;
+            }
+        }
+
+        if (! file_exists($cachePath)) {
             $this->warn('Event cache not found. Run `php artisan event:cache` to build it.');
 
             return;

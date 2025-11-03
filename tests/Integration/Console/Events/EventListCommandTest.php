@@ -13,6 +13,7 @@ use Orchestra\Testbench\TestCase;
 class EventListCommandTest extends TestCase
 {
     public $dispatcher;
+
     protected $tempCachePath;
 
     protected function setUp(): void
@@ -119,17 +120,13 @@ class EventListCommandTest extends TestCase
         $this->assertStringNotContainsString('ExampleSubscriberEventName', $output);
     }
 
-    // -------------------------------
-    // Event cache warning tests
-    // -------------------------------
-
     public function testWarnsWhenEventMissingInCache(): void
     {
         if (file_exists($this->tempCachePath)) {
             unlink($this->tempCachePath);
         }
 
-        Event::listen('FakeEvent', fn () => '');
+        $this->dispatcher->listen('FakeEvent', fn () => '');
 
         $this->artisan(EventListCommand::class)
             ->expectsOutputToContain('Event cache not found. Run `php artisan event:cache` to build it.')
@@ -140,7 +137,7 @@ class EventListCommandTest extends TestCase
     {
         file_put_contents($this->tempCachePath, '<?php return ["SomeOtherEvent" => []];');
 
-        Event::listen('FakeEvent', fn () => '');
+        $this->dispatcher->listen('FakeEvent', fn () => '');
 
         $this->artisan(EventListCommand::class)
             ->expectsOutputToContain('⚠️ The following events are registered in EventServiceProvider but missing in cache:')
