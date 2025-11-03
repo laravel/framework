@@ -175,6 +175,7 @@ jobs:
           REDIS_CLIENT: ${{ matrix.client }}
           REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
           REDIS_QUEUE: '{default}'
+          QUEUE_CONNECTION: redis
 
   beanstalkd:
     runs-on: ubuntu-24.04
