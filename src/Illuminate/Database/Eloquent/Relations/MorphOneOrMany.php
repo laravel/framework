@@ -64,30 +64,57 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /** @inheritDoc */
     public function addEagerConstraints(array $models)
     {
-        try {
-            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
-                $whereIn = $this->whereInMethod($this->parent, $this->localKey);
+        parent::addEagerConstraints($models);
 
-                $keys = $this->getKeys($models, $this->localKey);
-                $stringKeys = array_map('strval', $keys);
+        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+    }
 
-                $this->whereInEager(
-                    $whereIn,
-                    $this->foreignKey,
-                    $stringKeys,
-                    $this->getRelationQuery()
-                );
-
-                $this->getRelationQuery()->where($this->morphType, $this->morphClass);
-
-                return;
-            }
-        } catch (\BadMethodCallException) {
-            //
+    /**
+     * Get the name of the "where in" method for eager loading.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string  $key
+     * @return string
+     */
+    protected function whereInMethod(Model $model, $key)
+    {
+        if ($this->shouldCastKey()) {
+            return 'whereIn';
         }
 
-        parent::addEagerConstraints($models);
-        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+        return parent::whereInMethod($model, $key);
+    }
+
+    /**
+     * Get the keys for an eager load of the relation.
+     *
+     * @param  array  $models
+     * @param  string|null  $key
+     * @return array
+     */
+    protected function getKeys(array $models, $key = null)
+    {
+        $keys = parent::getKeys($models, $key);
+
+        if ($this->shouldCastKey()) {
+            return array_map('strval', $keys);
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Determine if the foreign key should be cast to string.
+     *
+     * @return bool
+     */
+    protected function shouldCastKey()
+    {
+        try {
+            return $this->related->hasCast($this->getForeignKeyName(), ['string']);
+        } catch (\BadMethodCallException) {
+            return false;
+        }
     }
 
     /**
@@ -130,26 +157,13 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /**
      * Get the key value of the parent's local key.
      *
-     * When the related model casts the foreign key as a string,
-     * this method ensures the parent key is also returned as a
-     * string to maintain type consistency, particularly important
-     * for PostgreSQL's strict type checking system.
-     *
      * @return mixed
      */
     public function getParentKey()
     {
         $key = parent::getParentKey();
 
-        try {
-            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
-                return (string) $key;
-            }
-        } catch (\BadMethodCallException) {
-            //
-        }
-
-        return $key;
+        return $this->shouldCastKey() ? (string) $key : $key;
     }
 
     /**
