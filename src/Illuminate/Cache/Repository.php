@@ -488,15 +488,20 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
     {
+        $hashKey = substr(md5($key), 0, 4);
+        $valueKey = "{{$hashKey}}:{$key}";
+        $createdKey = "{{$hashKey}}:illuminate:cache:flexible:created:{$key}";
+        $lockKey = "{{$hashKey}}:illuminate:cache:flexible:lock:{$key}";
+
         [
-            $key => $value,
-            "illuminate:cache:flexible:created:{$key}" => $created,
-        ] = $this->many([$key, "illuminate:cache:flexible:created:{$key}"]);
+            $valueKey => $value,
+            $createdKey => $created,
+        ] = $this->many([$valueKey, $createdKey]);
 
         if (in_array(null, [$value, $created], true)) {
             return tap(value($callback), fn ($value) => $this->putMany([
-                $key => $value,
-                "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                $valueKey => $value,
+                $createdKey => Carbon::now()->getTimestamp(),
             ], $ttl[1]));
         }
 
@@ -504,19 +509,19 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $refresh = function () use ($key, $ttl, $callback, $lock, $created) {
+        $refresh = function () use ($valueKey, $createdKey, $lockKey, $ttl, $callback, $created) {
             $this->store->lock(
-                "illuminate:cache:flexible:lock:{$key}",
+                $lockKey,
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
-            )->get(function () use ($key, $callback, $created, $ttl) {
-                if ($created !== $this->get("illuminate:cache:flexible:created:{$key}")) {
+            )->get(function () use ($valueKey, $createdKey, $callback, $created, $ttl) {
+                if ($created !== $this->get($createdKey)) {
                     return;
                 }
 
                 $this->putMany([
-                    $key => value($callback),
-                    "illuminate:cache:flexible:created:{$key}" => Carbon::now()->getTimestamp(),
+                    $valueKey => value($callback),
+                    $createdKey => Carbon::now()->getTimestamp(),
                 ], $ttl[1]);
             });
         };
