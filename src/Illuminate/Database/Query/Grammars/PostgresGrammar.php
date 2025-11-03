@@ -821,7 +821,7 @@ class PostgresGrammar extends Grammar
     public static function customOperators(array $operators)
     {
         static::$customOperators = array_values(
-            array_merge(static::$customOperators, array_filter(array_filter($operators, 'is_string')))
+            array_merge(static::$customOperators, array_filter($operators, fn ($op) => is_string($op) && $op !== ''))
         );
     }
 
