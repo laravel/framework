@@ -332,9 +332,7 @@ trait ConditionallyLoadsAttributes
             return;
         }
 
-        if ($value === null) {
-            $value = value(...);
-        }
+        $value ??= value(...);
 
         return value($value, $this->resource->{$attribute});
     }

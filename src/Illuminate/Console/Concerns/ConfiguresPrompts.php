@@ -268,9 +268,7 @@ trait ConfiguresPrompts
                 ? ['None', ...$options]
                 : ['' => 'None'] + $options;
 
-            if ($default === null) {
-                $default = 'None';
-            }
+            $default ??= 'None';
         }
 
         $answers = $this->components->choice($label, $options, $default, null, true);

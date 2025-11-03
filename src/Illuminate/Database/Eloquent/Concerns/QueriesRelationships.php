@@ -738,9 +738,7 @@ trait QueriesRelationships
             throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
         }
 
-        if ($relationshipName === null) {
-            $relationshipName = Str::camel(class_basename($related));
-        }
+        $relationshipName ??= Str::camel(class_basename($related));
 
         try {
             $relationship = $this->model->{$relationshipName}();
@@ -795,9 +793,7 @@ trait QueriesRelationships
             throw new InvalidArgumentException('Collection given to whereAttachedTo method may not be empty.');
         }
 
-        if ($relationshipName === null) {
-            $relationshipName = Str::plural(Str::camel(class_basename($related)));
-        }
+        $relationshipName ??= Str::plural(Str::camel(class_basename($related)));
 
         try {
             $relationship = $this->model->{$relationshipName}();

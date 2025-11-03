@@ -184,9 +184,7 @@ trait PacksPhpRedisValues
      */
     protected function supportsPacking(): bool
     {
-        if ($this->supportsPacking === null) {
-            $this->supportsPacking = $this->phpRedisVersionAtLeast('5.3.5');
-        }
+        $this->supportsPacking ??= $this->phpRedisVersionAtLeast('5.3.5');
 
         return $this->supportsPacking;
     }
@@ -198,9 +196,7 @@ trait PacksPhpRedisValues
      */
     protected function supportsLzf(): bool
     {
-        if ($this->supportsLzf === null) {
-            $this->supportsLzf = $this->phpRedisVersionAtLeast('4.3.0');
-        }
+        $this->supportsLzf ??= $this->phpRedisVersionAtLeast('4.3.0');
 
         return $this->supportsLzf;
     }
@@ -212,9 +208,7 @@ trait PacksPhpRedisValues
      */
     protected function supportsZstd(): bool
     {
-        if ($this->supportsZstd === null) {
-            $this->supportsZstd = $this->phpRedisVersionAtLeast('5.1.0');
-        }
+        $this->supportsZstd ??= $this->phpRedisVersionAtLeast('5.1.0');
 
         return $this->supportsZstd;
     }
