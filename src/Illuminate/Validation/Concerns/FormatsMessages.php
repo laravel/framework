@@ -106,7 +106,7 @@ trait FormatsMessages
         if ($this->getAttributeType($attribute) !== 'file') {
             $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
 
-            if (! in_array($shortRule, $keys, true)) {
+            if (! in_array($shortRule, $keys)) {
                 $keys[] = $shortRule;
             }
         }
