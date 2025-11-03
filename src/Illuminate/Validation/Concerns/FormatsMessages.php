@@ -3,7 +3,6 @@
 namespace Illuminate\Validation\Concerns;
 
 use Closure;
-use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -104,7 +103,7 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
-        if (class_exists($lowerRule) && ! is_subclass_of($lowerRule, DataAwareRule::class)) {
+        if ($this->getAttributeType($attribute) !== 'file') {
             $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
 
             if (! in_array($shortRule, $keys, true)) {
