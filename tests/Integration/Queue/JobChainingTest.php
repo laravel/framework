@@ -416,6 +416,10 @@ class JobChainingTest extends QueueTestCase
             $this->assertEquals(
                 ['c1', 'c2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
             );
+        } else {
+            $this->assertEquals(
+                ['c1', 'c2', 'b1', 'b2', 'b3', 'b4', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'c3'], JobRunRecorder::$results
+            );
         }
 
         $this->assertCount(11, JobRunRecorder::$results);
@@ -444,6 +448,10 @@ class JobChainingTest extends QueueTestCase
         if ($this->getQueueDriver() === 'sync') {
             $this->assertEquals(
                 ['c1', 'c2', 'bc1', 'bc2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
+            );
+        } else {
+            $this->assertEquals(
+                ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'c3'], JobRunRecorder::$results
             );
         }
 
@@ -477,6 +485,10 @@ class JobChainingTest extends QueueTestCase
         if ($this->getQueueDriver() === 'sync') {
             $this->assertEquals(
                 ['c1', 'c2', 'bc1', 'bc2', 'bb1', 'bb2', 'b1', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'b2', 'b3', 'b4', 'c3'], JobRunRecorder::$results
+            );
+        } else {
+            $this->assertEquals(
+                ['c1', 'c2', 'bc1', 'b1', 'b2', 'b3', 'b4', 'bc2', 'b2-0', 'b2-1', 'b2-2', 'b2-3', 'bb1', 'bb2', 'c3'], JobRunRecorder::$results
             );
         }
 
