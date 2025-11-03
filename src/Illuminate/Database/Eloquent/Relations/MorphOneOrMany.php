@@ -64,21 +64,32 @@ abstract class MorphOneOrMany extends HasOneOrMany
     /** @inheritDoc */
     public function addEagerConstraints(array $models)
     {
-        parent::addEagerConstraints($models);
-
-        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
-
         try {
             if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
-                $whereBindings = $this->query->getRawBindings()['where'];
-                $this->query->setBindings(
-                    array_map('strval', $whereBindings),
-                    'where'
+                $bindingsBeforeCount = count($this->query->getRawBindings()['where'] ?? []);
+
+                parent::addEagerConstraints($models);
+
+                $allBindings = $this->query->getRawBindings()['where'];
+                $newBindings = array_slice($allBindings, $bindingsBeforeCount);
+                $convertedNewBindings = array_map('strval', $newBindings);
+
+                $finalBindings = array_merge(
+                    array_slice($allBindings, 0, $bindingsBeforeCount),
+                    $convertedNewBindings
                 );
+
+                $this->query->setBindings($finalBindings, 'where');
+                $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+
+                return;
             }
         } catch (\BadMethodCallException) {
             //
         }
+
+        parent::addEagerConstraints($models);
+        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
     }
 
     /**
