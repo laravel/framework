@@ -186,13 +186,10 @@ class Post extends Model
 
 class PostApiResource extends JsonApiResource
 {
-    public function toAttributes(Request $request)
-    {
-        return [
-            'title',
-            'content',
-        ];
-    }
+    protected array $attributes = [
+        'title',
+        'content',
+    ];
 }
 
 class PostFactory extends Factory
