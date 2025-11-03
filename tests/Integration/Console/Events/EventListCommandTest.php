@@ -13,6 +13,7 @@ use Orchestra\Testbench\TestCase;
 class EventListCommandTest extends TestCase
 {
     public $dispatcher;
+    protected $tempCachePath;
 
     protected function setUp(): void
     {
@@ -20,7 +21,16 @@ class EventListCommandTest extends TestCase
 
         $this->dispatcher = new Dispatcher();
         EventListCommand::resolveEventsUsing(fn () => $this->dispatcher);
-        $this->tempCachePath = sys_get_temp_dir().'/events.php';
+
+        $this->tempCachePath = sys_get_temp_dir() . '/events.php';
+        $this->mockBasePath();
+    }
+
+    protected function mockBasePath(): void
+    {
+        $this->app->bind('path.base', function () {
+            return sys_get_temp_dir();
+        });
     }
 
     public function testDisplayEmptyList()
@@ -109,6 +119,10 @@ class EventListCommandTest extends TestCase
         $this->assertStringNotContainsString('ExampleSubscriberEventName', $output);
     }
 
+    // -------------------------------
+    // Event cache warning tests
+    // -------------------------------
+
     public function testWarnsWhenEventMissingInCache(): void
     {
         if (file_exists($this->tempCachePath)) {
@@ -117,7 +131,7 @@ class EventListCommandTest extends TestCase
 
         Event::listen('FakeEvent', fn () => '');
 
-        $this->artisan(\Illuminate\Foundation\Console\EventListCommand::class)
+        $this->artisan(EventListCommand::class)
             ->expectsOutputToContain('Event cache not found. Run `php artisan event:cache` to build it.')
             ->assertExitCode(0);
     }
@@ -128,7 +142,7 @@ class EventListCommandTest extends TestCase
 
         Event::listen('FakeEvent', fn () => '');
 
-        $this->artisan(\Illuminate\Foundation\Console\EventListCommand::class)
+        $this->artisan(EventListCommand::class)
             ->expectsOutputToContain('⚠️ The following events are registered in EventServiceProvider but missing in cache:')
             ->expectsOutputToContain('  - FakeEvent')
             ->assertExitCode(0);
