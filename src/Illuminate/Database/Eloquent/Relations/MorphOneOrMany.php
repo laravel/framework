@@ -67,6 +67,18 @@ abstract class MorphOneOrMany extends HasOneOrMany
         parent::addEagerConstraints($models);
 
         $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+
+        try {
+            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
+                $whereBindings = $this->query->getRawBindings()['where'];
+                $this->query->setBindings(
+                    array_map('strval', $whereBindings),
+                    'where'
+                );
+            }
+        } catch (\BadMethodCallException) {
+            //
+        }
     }
 
     /**
@@ -104,6 +116,31 @@ abstract class MorphOneOrMany extends HasOneOrMany
         }
 
         $this->applyInverseRelationToModel($model);
+    }
+
+    /**
+     * Get the key value of the parent's local key.
+     *
+     * When the related model casts the foreign key as a string,
+     * this method ensures the parent key is also returned as a
+     * string to maintain type consistency, particularly important
+     * for PostgreSQL's strict type checking system.
+     *
+     * @return mixed
+     */
+    public function getParentKey()
+    {
+        $key = parent::getParentKey();
+
+        try {
+            if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
+                return (string) $key;
+            }
+        } catch (\BadMethodCallException) {
+            //
+        }
+
+        return $key;
     }
 
     /**
