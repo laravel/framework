@@ -66,20 +66,18 @@ abstract class MorphOneOrMany extends HasOneOrMany
     {
         try {
             if ($this->related->hasCast($this->getForeignKeyName(), ['string'])) {
-                $bindingsBeforeCount = count($this->query->getRawBindings()['where'] ?? []);
+                $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-                parent::addEagerConstraints($models);
+                $keys = $this->getKeys($models, $this->localKey);
+                $stringKeys = array_map('strval', $keys);
 
-                $allBindings = $this->query->getRawBindings()['where'];
-                $newBindings = array_slice($allBindings, $bindingsBeforeCount);
-                $convertedNewBindings = array_map('strval', $newBindings);
-
-                $finalBindings = array_merge(
-                    array_slice($allBindings, 0, $bindingsBeforeCount),
-                    $convertedNewBindings
+                $this->whereInEager(
+                    $whereIn,
+                    $this->foreignKey,
+                    $stringKeys,
+                    $this->getRelationQuery()
                 );
 
-                $this->query->setBindings($finalBindings, 'where');
                 $this->getRelationQuery()->where($this->morphType, $this->morphClass);
 
                 return;
