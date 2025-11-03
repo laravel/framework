@@ -90,7 +90,7 @@ abstract class Type extends JsonSchema
      *
      * @param  class-string<\BackedEnum>|array<int, mixed>  $values
      */
-    public function enum(string|array $values): static
+    public function enum(array|string $values): static
     {
         if (is_string($values)) {
             if (! is_subclass_of($values, BackedEnum::class)) {
@@ -100,7 +100,7 @@ abstract class Type extends JsonSchema
             $values = array_column($values::cases(), 'value');
         }
 
-        // Keep order and allow complex values (arrays/objects) without forcing uniqueness...
+        // Keep order and allow complex values (arrays / objects) without forcing uniqueness...
         $this->enum = array_values($values);
 
         return $this;
