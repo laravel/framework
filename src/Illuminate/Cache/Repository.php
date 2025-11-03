@@ -509,7 +509,7 @@ class Repository implements ArrayAccess, CacheContract
             return $value;
         }
 
-        $refresh = function () use ($valueKey, $createdKey, $lockKey, $ttl, $callback, $created) {
+        $refresh = function () use ($valueKey, $createdKey, $lockKey, $ttl, $callback, $lock, $created) {
             $this->store->lock(
                 $lockKey,
                 $lock['seconds'] ?? 0,
