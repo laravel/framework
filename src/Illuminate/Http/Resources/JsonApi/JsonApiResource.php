@@ -64,7 +64,6 @@ class JsonApiResource extends JsonResource
             return $this->attributes;
         }
 
-
         return $this->toArray($request);
     }
 
