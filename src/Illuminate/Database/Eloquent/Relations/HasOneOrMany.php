@@ -295,7 +295,7 @@ abstract class HasOneOrMany extends Relation
             $values = [$values];
         }
 
-        foreach ($values as $key => $value) {
+        foreach (array_keys($values) as $key) {
             $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
         }
 

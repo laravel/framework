@@ -120,7 +120,7 @@ abstract class MorphOneOrMany extends HasOneOrMany
             $values = [$values];
         }
 
-        foreach ($values as $key => $value) {
+        foreach (array_keys($values) as $key) {
             $values[$key][$this->getMorphType()] = $this->getMorphClass();
         }
 

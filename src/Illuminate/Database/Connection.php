@@ -912,7 +912,7 @@ class Connection implements ConnectionInterface
      */
     public function allowQueryDurationHandlersToRunAgain()
     {
-        foreach ($this->queryDurationHandlers as $key => $queryDurationHandler) {
+        foreach (array_keys($this->queryDurationHandlers) as $key) {
             $this->queryDurationHandlers[$key]['has_run'] = false;
         }
     }
