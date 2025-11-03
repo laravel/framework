@@ -52,22 +52,6 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
-     */
-    #[\Override]
-    public function toAttributes(Request $request)
-    {
-        if (property_exists($this, 'attributes')) {
-            return $this->attributes;
-        }
-
-        return $this->toArray($request);
-    }
-
-    /**
      * Get the resource's ID.
      *
      * @return string|null
@@ -85,6 +69,22 @@ class JsonApiResource extends JsonResource
     public function toType(Request $request)
     {
         return null;
+    }
+
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\Support\Arrayable|\JsonSerializable|array
+     */
+    #[\Override]
+    public function toAttributes(Request $request)
+    {
+        if (property_exists($this, 'attributes')) {
+            return $this->attributes;
+        }
+
+        return $this->toArray($request);
     }
 
     /**
