@@ -51,6 +51,15 @@ class JsonApiResource extends JsonResource
         ]);
     }
 
+    public function toRelationships(Request $request)
+    {
+        if (property_exists($this, 'relationships')) {
+            return $this->relationships;
+        }
+
+        return [];
+    }
+
     /**
      * Get the resource's ID.
      *

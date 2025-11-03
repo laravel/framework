@@ -5,18 +5,21 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\Factories\UserFactory;
 use Orchestra\Testbench\TestCase;
 
 #[WithMigration]
+#[WithConfig('auth.providers.users.model', User::class)]
 class JsonApiResourceTest extends TestCase
 {
     use RefreshDatabase;
@@ -51,10 +54,27 @@ class JsonApiResourceTest extends TestCase
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->index();
             $table->string('title');
             $table->text('content');
             $table->timestamps();
+        });
+
+        Schema::create('teams', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->index();
+            $table->string('name');
+            $table->boolean('personal_team');
+        });
+
+        Schema::create('team_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('team_id');
+            $table->foreignId('user_id');
+            $table->string('role')->nullable();
+            $table->timestamps();
+
+            $table->index(['team_id', 'user_id']);
         });
     }
 
@@ -103,7 +123,15 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithEagerLoadedRelationship()
     {
+        $now = $this->freezeSecond();
         $user = UserFactory::new()->create();
+
+        $team = TeamFactory::new()->create([
+            'name' => 'Laravel Team',
+        ]);
+
+        $user->teams()->attach($team, ['role' => 'Admin']);
+        $user->teams()->attach($team, ['role' => 'Member']);
 
         $posts = PostFactory::new()->times(2)->create([
             'user_id' => $user->getKey(),
@@ -126,6 +154,11 @@ class JsonApiResourceTest extends TestCase
                                 ['id' => (string) $posts[1]->getKey(), 'type' => 'posts'],
                             ],
                         ],
+                        'teams' => [
+                            'data' => [
+                                ['id' => (string) $team->getKey(), 'type' => 'teams'],
+                            ],
+                        ],
                     ],
                 ],
                 'included' => [
@@ -139,6 +172,38 @@ class JsonApiResourceTest extends TestCase
                         'type' => 'posts',
                         'attributes' => ['title' => $posts[1]->title, 'content' => $posts[1]->content],
                     ],
+                    [
+                        'id' => (string) $team->getKey(),
+                        'type' => 'teams',
+                        'attributes' => [
+                            'id' => $team->getKey(),
+                            'membership' => [
+                                'created_at' => $now,
+                                'role' => 'Admin',
+                                'team_id' => $team->getKey(),
+                                'user_id' => $user->getKey(),
+                            ],
+                            'name' => 'Laravel Team',
+                            'personal_team' => true,
+                            'user_id' => $team->user_id,
+                        ],
+                    ],
+                    [
+                        'id' => (string) $team->getKey(),
+                        'type' => 'teams',
+                        'attributes' => [
+                            'id' => $team->getKey(),
+                            'membership' => [
+                                'created_at' => $now,
+                                'role' => 'Member',
+                                'team_id' => $team->getKey(),
+                                'user_id' => $user->getKey(),
+                            ],
+                            'name' => 'Laravel Team',
+                            'personal_team' => true,
+                            'user_id' => $team->user_id,
+                        ],
+                    ],
                 ],
             ]);
     }
@@ -150,6 +215,15 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)
+            ->withPivot('role')
+            ->withTimestamps()
+            ->using(Membership::class)
+            ->as('membership');
     }
 }
 
@@ -166,6 +240,10 @@ class UserResource extends JsonResource
 
 class UserApiResource extends JsonApiResource
 {
+    protected array $relationships = [
+        'teams',
+    ];
+
     public function toAttributes(Request $request)
     {
         return [
@@ -210,5 +288,54 @@ class PostFactory extends Factory
     public function modelName()
     {
         return Post::class;
+    }
+}
+
+class Team extends Model
+{
+    public $timestamps = false;
+
+    protected function casts(): array
+    {
+        return [
+            'personal_team' => 'boolean',
+        ];
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('role')
+            ->withTimestamps()
+            ->using(Membership::class)
+            ->as('membership');
+    }
+}
+
+class Membership extends Pivot
+{
+    protected $table = 'team_user';
+}
+
+class TeamFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => $this->faker->unique()->company(),
+            'user_id' => UserFactory::new(),
+            'personal_team' => true,
+        ];
+    }
+
+    #[\Override]
+    public function modelName()
+    {
+        return Team::class;
     }
 }

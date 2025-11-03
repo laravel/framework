@@ -4,6 +4,8 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -138,6 +140,8 @@ trait ResolvesJsonApiElements
             return;
         }
 
+        $this->resource->loadMissing($this->toRelationships($request));
+
         $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = (new Collection($this->resource->getRelations()))
@@ -158,15 +162,19 @@ trait ResolvesJsonApiElements
                     })]];
                 }
 
+                if ($relations instanceof Pivot || in_array(AsPivot::class, class_uses_recursive($relations), true)) {
+                    return [$key => null];
+                }
+
                 return [$key => ['data' => transform(
-                    [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
-                    function ($uniqueKey) use ($relations) {
-                        $this->loadedRelationshipsMap[$relations] = $uniqueKey;
+                    [static::resourceTypeFromModel($related), static::resourceIdFromModel($related)],
+                    function ($uniqueKey) use ($related) {
+                        $this->loadedRelationshipsMap[$related] = $uniqueKey;
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                     }
                 )]];
-            })->all();
+            })->filter()->all();
     }
 
     /**
@@ -174,6 +182,10 @@ trait ResolvesJsonApiElements
      */
     public function resolveIncludedResources(Request $request): array
     {
+        if (! $this->resource instanceof Model) {
+            return [];
+        }
+
         $this->compileResourceRelationships($request);
 
         $relations = new Collection;
