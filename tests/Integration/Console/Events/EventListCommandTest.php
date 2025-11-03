@@ -22,7 +22,7 @@ class EventListCommandTest extends TestCase
         $this->dispatcher = new Dispatcher();
         EventListCommand::resolveEventsUsing(fn () => $this->dispatcher);
 
-        $this->tempCachePath = sys_get_temp_dir() . '/events.php';
+        $this->tempCachePath = sys_get_temp_dir().'/events.php';
         $this->mockBasePath();
     }
 
