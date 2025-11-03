@@ -52,7 +52,8 @@ class FileValidationTest extends TestCase
         ], $validator->messages()->all());
     }
 
-    public function test_file_custom_validation_messages() {
+    public function test_file_custom_validation_messages()
+    {
 
         $validator = Validator::make(
             [
