@@ -5,12 +5,15 @@ namespace Illuminate\Tests\JsonSchema;
 use Illuminate\JsonSchema\JsonSchema;
 use Illuminate\Tests\JsonSchema\Fixtures\Enums\IntBackedEnum;
 use Illuminate\Tests\JsonSchema\Fixtures\Enums\StringBackedEnum;
+use Illuminate\Tests\JsonSchema\Fixtures\Enums\UnitEnum;
+use InvalidArgumentException;
 use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\SchemaLoader;
 use Opis\JsonSchema\Validator;
 use Opis\Uri\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Stringable;
 
 class TypeTest extends TestCase
@@ -102,6 +105,33 @@ class TypeTest extends TestCase
         ]);
 
         $this->assertInstanceOf(JsonSchema::class, $schema);
+    }
+
+    public function test_throws_with_invalid_enum_string(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum('NonExistentEnumClass');
+    }
+
+    public function test_throws_with_not_an_enum_class(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum(stdClass::class);
+    }
+
+    public function test_throws_with_unit_enum_class(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The provided class must be a BackedEnum.');
+        $this->expectExceptionCode(0);
+
+        JsonSchema::string()->enum(UnitEnum::class);
     }
 
     public static function validSchemasProvider(): array
