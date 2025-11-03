@@ -45,6 +45,8 @@ class EventListCommand extends Command
     {
         $events = $this->getEvents()->sortKeys();
 
+        $this->warnIfEventMissingInCache($events);
+
         if ($events->isEmpty()) {
             if ($this->option('json')) {
                 $this->output->writeln('[]');
@@ -258,4 +260,33 @@ class EventListCommand extends Command
     {
         static::$eventsResolver = $resolver;
     }
+
+    protected function warnIfEventMissingInCache(Collection $events): void
+    {
+        $cachePath = base_path('bootstrap/cache/events.php');
+
+        if (! file_exists($cachePath)) {
+            $this->warn("Event cache not found. Run `php artisan event:cache` to build it.");
+            return;
+        }
+
+        $cachedEvents = include $cachePath;
+
+        $missing = [];
+
+        foreach ($events as $event => $listeners) {
+            if (! isset($cachedEvents[$event])) {
+                $missing[] = $event;
+            }
+        }
+
+        if (! empty($missing)) {
+            $this->warn("⚠️ The following events are registered in EventServiceProvider but missing in cache:");
+            foreach ($missing as $event) {
+                $this->line("  - {$event}");
+            }
+            $this->line("Run `php artisan event:clear` to refresh the event cache.");
+        }
+    }
+
 }

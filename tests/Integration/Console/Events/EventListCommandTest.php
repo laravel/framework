@@ -107,6 +107,36 @@ class EventListCommandTest extends TestCase
         $this->assertStringNotContainsString('ExampleSubscriberEventName', $output);
     }
 
+    public function testWarnsWhenEventMissingInCache()
+    {
+        $cachePath = base_path('bootstrap/cache/events.php');
+        if (file_exists($cachePath)) {
+            unlink($cachePath);
+        }
+
+        $this->dispatcher->listen('FakeEvent', fn () => '');
+
+        $this->artisan(\Illuminate\Foundation\Console\EventListCommand::class)
+            ->expectsOutputToContain('Event cache not found. Run `php artisan event:cache` to build it.')
+            ->assertExitCode(0);
+    }
+
+    public function testWarnsForEventsMissingInCache()
+    {
+        $cachePath = base_path('bootstrap/cache/events.php');
+        file_put_contents($cachePath, '<?php return ["SomeOtherEvent" => []];');
+
+        $this->dispatcher->listen('FakeEvent', fn () => '');
+
+        $this->artisan(\Illuminate\Foundation\Console\EventListCommand::class)
+            ->expectsOutputToContain('⚠️ The following events are registered in EventServiceProvider but missing in cache:')
+            ->expectsOutputToContain('  - FakeEvent')
+            ->assertExitCode(0);
+
+        unlink($cachePath);
+    }
+
+
     protected function tearDown(): void
     {
         parent::tearDown();
