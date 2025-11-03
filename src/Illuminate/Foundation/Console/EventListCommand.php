@@ -271,6 +271,7 @@ class EventListCommand extends Command
 
         if (! file_exists($cachePath)) {
             $this->warn('Event cache not found. Run `php artisan event:cache` to build it.');
+
             return;
         }
 
@@ -292,5 +293,4 @@ class EventListCommand extends Command
             $this->line('Run `php artisan event:clear` to refresh the event cache.');
         }
     }
-
 }

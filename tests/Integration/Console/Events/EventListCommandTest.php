@@ -134,7 +134,6 @@ class EventListCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
-
     protected function tearDown(): void
     {
         parent::tearDown();
