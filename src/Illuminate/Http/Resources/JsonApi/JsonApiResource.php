@@ -51,15 +51,6 @@ class JsonApiResource extends JsonResource
         ]);
     }
 
-    public function toRelationships(Request $request)
-    {
-        if (property_exists($this, 'relationships')) {
-            return $this->relationships;
-        }
-
-        return [];
-    }
-
     /**
      * Get the resource's ID.
      *
@@ -94,6 +85,21 @@ class JsonApiResource extends JsonResource
         }
 
         return $this->toArray($request);
+    }
+
+    /**
+     * Get the resource's relationships.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\Support\Arrayable|array
+     */
+    public function toRelationships(Request $request)
+    {
+        if (property_exists($this, 'relationships')) {
+            return $this->relationships;
+        }
+
+        return [];
     }
 
     /**
