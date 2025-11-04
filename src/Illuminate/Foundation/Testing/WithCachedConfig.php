@@ -14,7 +14,7 @@ trait WithCachedConfig
             CachedState::$cachedConfig = $this->app->make('config')->all();
         }
 
-        $this->markConfigAsCached($this->app);
+        $this->markConfigCached($this->app);
     }
 
     protected function tearDownWithCachedConfig(): void
@@ -25,7 +25,7 @@ trait WithCachedConfig
     /**
      * Inform the container to treat configuration as cached.
      */
-    protected function markConfigAsCached(Application $app): void
+    protected function markConfigCached(Application $app): void
     {
         $app->instance('config_loaded_from_cache', true); // I'm not sure this is actually needed
 
