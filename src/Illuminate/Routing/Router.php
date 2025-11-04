@@ -19,9 +19,9 @@ use Illuminate\Routing\Events\PreparingResponse;
 use Illuminate\Routing\Events\ResponsePrepared;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
+use Illuminate\Session\Store;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
@@ -1334,7 +1334,9 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function previousRouteName()
     {
-        return Session::previousRoute();
+        $store = app(Store::class);
+
+        return method_exists($store, 'previousRoute') ? $store->previousRoute() : null;
     }
 
     /**
