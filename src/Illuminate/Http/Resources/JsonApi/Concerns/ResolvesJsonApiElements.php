@@ -141,13 +141,13 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $this->resource->loadMissing(
-            $resourceRelationships = $this->toRelationships($request)
-        );
+        $resourceRelationships = $this->toRelationships($request);
 
         $resourceRelationshipKeys = array_is_list($resourceRelationships)
             ? array_flip($resourceRelationships)
             : array_flip(array_keys($resourceRelationships));
+
+        $this->resource->loadMissing($resourceRelationshipKeys);
 
         $this->loadedRelationshipsMap = new WeakMap;
 
