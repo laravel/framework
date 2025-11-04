@@ -46,6 +46,7 @@ class ChainedBatch implements ShouldQueue
 
         $this->name = $batch->name;
         $this->options = $batch->options;
+
         $this->queue = $batch->queue();
         $this->connection = $batch->connection();
     }
