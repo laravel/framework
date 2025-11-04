@@ -2432,12 +2432,12 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  $value
-     * @param  string  $collation
-     * @param  string  $charset
+     * Add a where clause with explicit charset and collation.
+     *
+     * @param  mixed  $value  The value to compare against
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereCollation(
         string $column,
@@ -2451,8 +2451,12 @@ class Builder implements BuilderContract
             $operator = '=';
         }
 
-        if (! preg_match('/^[a-zA-Z0-9_]+$/', $charset) || ! preg_match('/^[a-zA-Z0-9_]+$/', str_replace('_', '', $collation))) {
-            throw new InvalidArgumentException('Invalid charset or collation name.');
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $charset)) {
+            throw new InvalidArgumentException("Invalid charset name: {$charset}");
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', str_replace('_', '', $collation))) {
+            throw new InvalidArgumentException("Invalid collation name: {$collation}");
         }
 
         return $this->whereRaw(

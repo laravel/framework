@@ -49,18 +49,22 @@ class DatabaseWhereCollationTest extends TestCase
         $this->assertEquals('https://example.com/fa', $record->url);
     }
 
+    public function test_invalid_charset_name_throws_exception()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid charset name');
+
+        DB::table('_test_collation')->whereCollation('name', '=', 'test', 'utf8mb4', 'invalid-charset');
+    }
+
     public function test_invalid_collation_name_throws_exception()
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid collation name');
 
-        DB::table('_test_collation')->whereCollation(
-            'name',
-            '=',
-            'test',
-            'utf8mb4; DROP TABLE users;',
-            'utf8mb4'
-        );
+        DB::table('_test_collation')->whereCollation('name', '=', 'test', 'invalid_collation', 'utf8mb4');
     }
+
 
     protected function tearDown(): void
     {
