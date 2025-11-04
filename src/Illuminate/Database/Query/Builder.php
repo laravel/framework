@@ -2437,7 +2437,7 @@ class Builder implements BuilderContract
      * @param  $value
      * @param  string  $collation
      * @param  string  $charset
-     * @return  $this
+     * @return $this
      */
     public function whereCollation(
         string $column,

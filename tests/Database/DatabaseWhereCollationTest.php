@@ -2,15 +2,20 @@
 
 namespace Illuminate\Tests\Database;
 
-use InvalidArgumentException;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase;
+use InvalidArgumentException;
 
 class DatabaseWhereCollationTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
+
+        if (DB::getDriverName() === 'sqlite') {
+            $this->markTestSkipped('Collation tests require MySQL or MariaDB.');
+        }
 
         DB::statement('CREATE TEMPORARY TABLE _test_collation (
             id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -59,8 +64,14 @@ class DatabaseWhereCollationTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('DROP TEMPORARY TABLE IF EXISTS _test_collation');
+        }
 
-        DB::statement('DROP TEMPORARY TABLE IF EXISTS _test_collation');
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
+
 }
