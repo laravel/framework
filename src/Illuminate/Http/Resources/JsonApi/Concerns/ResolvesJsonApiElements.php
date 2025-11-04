@@ -145,11 +145,11 @@ trait ResolvesJsonApiElements
             $resourceRelationships = $this->toRelationships($request)
         );
 
-        $this->loadedRelationshipsMap = new WeakMap;
-
         $resourceRelationshipKeys = array_is_list($resourceRelationships)
             ? array_flip($resourceRelationships)
             : array_flip(array_keys($resourceRelationships));
+
+        $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = (new Collection(array_intersect_key($this->resource->getRelations(), $resourceRelationshipKeys)))
             ->mapWithKeys(function ($relations, $key) {
