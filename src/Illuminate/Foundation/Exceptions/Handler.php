@@ -22,7 +22,6 @@ use Illuminate\Database\RecordNotFoundException;
 use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Exceptions\BackedEnumCaseNotFoundException;
@@ -985,7 +984,7 @@ class Handler implements ExceptionHandlerContract
                 $response->getTargetUrl(), $response->getStatusCode(), $response->headers->all()
             );
         } else {
-            $response = new Response(
+            $response = response(
                 $response->getContent(), $response->getStatusCode(), $response->headers->all()
             );
         }
@@ -1002,7 +1001,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
-        return new JsonResponse(
+        return response()->json(
             $this->convertExceptionToArray($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : [],

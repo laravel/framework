@@ -35,7 +35,7 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
      * @return array
      */
     #[\Override]
-    public function toArray(Request $request)
+    public function toAttributes(Request $request)
     {
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))

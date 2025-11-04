@@ -614,6 +614,27 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Sets the appends on every element of the collection, overwriting the existing appends for each.
+     *
+     * @param  array<array-key, mixed>  $appends
+     * @return $this
+     */
+    public function setAppends(array $appends)
+    {
+        return $this->each->setAppends($appends);
+    }
+
+    /**
+     * Remove appended properties from every element in the collection.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
+    }
+
+    /**
      * Get a dictionary keyed by primary keys.
      *
      * @param  iterable<array-key, TModel>|null  $items

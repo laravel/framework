@@ -103,6 +103,12 @@ trait FormatsMessages
 
         $keys = ["{$attribute}.{$lowerRule}", $lowerRule, $attribute];
 
+        $shortRule = "{$attribute}.".Str::snake(class_basename($lowerRule));
+
+        if (! in_array($shortRule, $keys)) {
+            $keys[] = $shortRule;
+        }
+
         // First we will check for a custom message for an attribute specific rule
         // message for the fields, then we will check for a general custom line
         // that is not attribute specific. If we find either we'll return it.

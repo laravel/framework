@@ -3,6 +3,7 @@
 <div class="flex flex-col pt-8 sm:pt-16 overflow-x-auto">
     <div class="flex flex-col gap-5 mb-8">
         <h1 class="text-3xl font-semibold text-neutral-950 dark:text-white">{{ $exception->class() }}</h1>
+        <x-laravel-exceptions-renderer::file-with-line :frame="$exception->frames()->first()" class="-mt-3 text-xs" />
         <p class="text-xl font-light text-neutral-800 dark:text-neutral-300">
             {{ $exception->message() }}
         </p>

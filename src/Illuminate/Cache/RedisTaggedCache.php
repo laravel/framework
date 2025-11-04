@@ -129,14 +129,9 @@ class RedisTaggedCache extends TaggedCache
         $cachePrefix = $redisPrefix.$this->store->getPrefix();
 
         $cacheTags = [];
-        $keysToBeDeleted = [];
 
         foreach ($this->tags->getNames() as $name) {
             $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
-        }
-
-        foreach ($this->tags->entries() as $entry) {
-            $keysToBeDeleted[] = $this->store->getPrefix().$entry;
         }
 
         $script = <<<'LUA'
@@ -152,12 +147,18 @@ class RedisTaggedCache extends TaggedCache
             end
         LUA;
 
-        $connection->eval(
-            $script,
-            count($keysToBeDeleted),
-            ...$keysToBeDeleted,
-            ...[$cachePrefix, ...$cacheTags]
-        );
+        $entries = $this->tags->entries()
+            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->chunk(1000);
+
+        foreach ($entries as $keysToBeDeleted) {
+            $connection->eval(
+                $script,
+                count($keysToBeDeleted),
+                ...$keysToBeDeleted,
+                ...[$cachePrefix, ...$cacheTags]
+            );
+        }
 
         $this->event(new CacheFlushed($this->getName()));
 

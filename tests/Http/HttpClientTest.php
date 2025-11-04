@@ -32,6 +32,7 @@ use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
@@ -1907,6 +1908,27 @@ class HttpClientTest extends TestCase
         $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
 
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
+    public function testPoolConcurrency()
+    {
+        $this->factory->fake([
+            '200.com' => $this->factory::response('', 200),
+            '400.com' => $this->factory::response('', 400),
+            '500.com' => $this->factory::response('', 500),
+        ]);
+
+        $responses = $this->factory->pool(function (Pool $pool) {
+            return [
+                $pool->get('200.com'),
+                $pool->get('400.com'),
+                $pool->get('500.com'),
+            ];
+        }, 2);
+
+        $this->assertSame(200, $responses[0]->status());
+        $this->assertSame(400, $responses[1]->status());
+        $this->assertSame(500, $responses[2]->status());
     }
 
     public function testTheRequestSendingAndResponseReceivedEventsAreFiredWhenARequestIsSent()
@@ -3808,7 +3830,6 @@ class HttpClientTest extends TestCase
         });
 
         $this->assertSame(3, $batch->totalRequests);
-        // $this->assertSame(0, $batch->completion());
         $this->assertFalse($batch->finished());
 
         $responses = $batch->send();
@@ -3820,9 +3841,33 @@ class HttpClientTest extends TestCase
         $this->assertSame(3, $batch->totalRequests);
         $this->assertSame(0, $batch->pendingRequests);
         $this->assertSame(1, $batch->failedRequests);
-        // $this->assertSame(100, $batch->completion());
         $this->assertTrue($batch->hasFailures());
         $this->assertTrue($batch->finished());
+    }
+
+    public function testBatchDefer(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://500.com' => $this->factory::response('Error', 500),
+        ]);
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://500.com'),
+            ];
+        });
+
+        $this->assertSame(3, $batch->totalRequests);
+        $this->assertFalse($batch->finished());
+
+        $deferredCallback = $batch->defer();
+
+        $this->assertInstanceOf(DeferredCallback::class, $deferredCallback);
+        $this->assertFalse($batch->finished());
     }
 
     public function testCannotAddRequestsToInProgressBatch(): void
@@ -4042,6 +4087,42 @@ class HttpClientTest extends TestCase
 
         $this->assertSame($responses['first'], $finallyCallback['first']);
         $this->assertSame($responses['second'], $finallyCallback['second']);
+    }
+
+    public function testBatchConcurrency(): void
+    {
+        $this->factory->fake([
+            'https://200.com' => $this->factory::response('OK', 200),
+            'https://201.com' => $this->factory::response('Created', 201),
+            'https://202.com' => $this->factory::response('Accepted', 202),
+            'https://203.com' => $this->factory::response('Non-Authoritative Information', 203),
+        ]);
+
+        $executionOrder = [];
+
+        $batch = $this->factory->batch(function (Batch $batch) {
+            return [
+                $batch->as('first')->get('https://200.com'),
+                $batch->as('second')->get('https://201.com'),
+                $batch->as('third')->get('https://202.com'),
+                $batch->as('fourth')->get('https://203.com'),
+            ];
+        })->progress(function (Batch $batch, int|string $key, Response $response) use (&$executionOrder) {
+            $executionOrder[] = $key;
+        })->concurrency(2);
+
+        $this->assertSame(4, $batch->totalRequests);
+
+        $responses = $batch->send();
+
+        $this->assertSame(200, $responses['first']->status());
+        $this->assertSame(201, $responses['second']->status());
+        $this->assertSame(202, $responses['third']->status());
+        $this->assertSame(203, $responses['fourth']->status());
+
+        $this->assertSame(4, $batch->totalRequests);
+        $this->assertSame(0, $batch->pendingRequests);
+        $this->assertSame(0, $batch->failedRequests);
     }
 
     public static function methodsReceivingArrayableDataProvider()
