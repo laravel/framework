@@ -21,6 +21,7 @@ use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Routing\Events\Routing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
@@ -1324,6 +1325,16 @@ class Router implements BindingRegistrar, RegistrarContract
     public function currentRouteName()
     {
         return $this->current() ? $this->current()->getName() : null;
+    }
+
+    /**
+     * Get the previous route name.
+     *
+     * @return string|null
+     */
+    public function previousRouteName()
+    {
+        return Session::previousRoute();
     }
 
     /**
