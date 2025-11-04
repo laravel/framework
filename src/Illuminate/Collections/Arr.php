@@ -169,19 +169,15 @@ class Arr
     {
         $results = [];
 
-        $flatten = function ($data, $prefix) use (&$results, &$flatten): void {
-            foreach ($data as $key => $value) {
-                $newKey = $prefix.$key;
+        foreach ($array as $key => $value) {
+            $newKey = $prepend.$key;
 
-                if (is_array($value) && ! empty($value)) {
-                    $flatten($value, $newKey.'.');
-                } else {
-                    $results[$newKey] = $value;
-                }
+            if (is_array($value) && ! empty($value)) {
+                $results += static::dot($value, $newKey.'.');
+            } else {
+                $results[$newKey] = $value;
             }
-        };
-
-        $flatten($array, $prepend);
+        }
 
         return $results;
     }
