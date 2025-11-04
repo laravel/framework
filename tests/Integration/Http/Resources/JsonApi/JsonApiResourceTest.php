@@ -60,6 +60,13 @@ class JsonApiResourceTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('profiles', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->unique();
+            $table->date('date_of_birth')->nullable();
+            $table->string('timezone')->nullable();
+        });
+
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index();
@@ -133,6 +140,11 @@ class JsonApiResourceTest extends TestCase
     {
         $now = $this->freezeSecond();
         $user = UserFactory::new()->create();
+        $profile = ProfileFactory::new()->create([
+            'user_id' => $user->getKey(),
+            'date_of_birth' => '2011-06-09',
+            'timezone' => 'America/Chicago',
+        ]);
 
         $team = TeamFactory::new()->create([
             'name' => 'Laravel Team',
@@ -162,6 +174,11 @@ class JsonApiResourceTest extends TestCase
                                 ['id' => (string) $posts[1]->getKey(), 'type' => 'posts'],
                             ],
                         ],
+                        'profile' => [
+                            'data' => [
+                                ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
+                            ],
+                        ],
                         'teams' => [
                             'data' => [
                                 ['id' => (string) $team->getKey(), 'type' => 'teams'],
@@ -174,12 +191,28 @@ class JsonApiResourceTest extends TestCase
                     [
                         'id' => (string) $posts[0]->getKey(),
                         'type' => 'posts',
-                        'attributes' => ['title' => $posts[0]->title, 'content' => $posts[0]->content],
+                        'attributes' => [
+                            'title' => $posts[0]->title,
+                            'content' => $posts[0]->content,
+                        ],
                     ],
                     [
                         'id' => (string) $posts[1]->getKey(),
                         'type' => 'posts',
-                        'attributes' => ['title' => $posts[1]->title, 'content' => $posts[1]->content],
+                        'attributes' => [
+                            'title' => $posts[1]->title,
+                            'content' => $posts[1]->content,
+                        ],
+                    ],
+                    [
+                        'id' => (string) $profile->getKey(),
+                        'type' => 'profiles',
+                        'attributes' => [
+                            'date_of_birth' => '2011-06-09',
+                            'id' => $profile->getKey(),
+                            'timezone' => 'America/Chicago',
+                            'user_id' => 1,
+                        ],
                     ],
                     [
                         'id' => (string) $team->getKey(),
@@ -223,6 +256,11 @@ class JsonApiResourceTest extends TestCase
 #[UseResource(UserApiResource::class)]
 class User extends Authenticatable
 {
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -252,6 +290,7 @@ class UserResource extends JsonResource
 class UserApiResource extends JsonApiResource
 {
     protected array $relationships = [
+        'profile',
         'teams',
     ];
 
@@ -327,11 +366,6 @@ class Membership extends Pivot
 
 class TeamFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
@@ -345,5 +379,31 @@ class TeamFactory extends Factory
     public function modelName()
     {
         return Team::class;
+    }
+}
+
+class Profile extends Model
+{
+    public $timestamps = false;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+class ProfileFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'user_id' => UserFactory::new(),
+        ];
+    }
+
+    #[\Override]
+    public function modelName()
+    {
+        return Profile::class;
     }
 }

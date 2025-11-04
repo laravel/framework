@@ -167,18 +167,18 @@ trait ResolvesJsonApiElements
                     })]];
                 }
 
-                if ($relations instanceof Pivot || in_array(AsPivot::class, class_uses_recursive($relations), true)) {
+                if (is_null($relations) || $relations instanceof Pivot || in_array(AsPivot::class, class_uses_recursive($relations), true)) {
                     return [$key => null];
                 }
 
-                return [$key => ['data' => transform(
+                return [$key => ['data' => [transform(
                     [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
                     function ($uniqueKey) use ($relations) {
                         $this->loadedRelationshipsMap[$relations] = [...$uniqueKey, true];
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                     }
-                )]];
+                )]]];
             })->filter()->all();
     }
 
