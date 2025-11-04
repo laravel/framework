@@ -2432,6 +2432,36 @@ class Builder implements BuilderContract
     }
 
     /**
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  $value
+     * @param  string  $collation
+     * @param  string  $charset
+     * @return  $this
+     */
+    public function whereCollation(
+        string $column,
+        string $operator = '=',
+               $value = null,
+        string $collation = 'utf8mb4_unicode_ci',
+        string $charset = 'utf8mb4'
+    ): Builder {
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $charset) || ! preg_match('/^[a-zA-Z0-9_]+$/', str_replace('_', '', $collation))) {
+            throw new InvalidArgumentException('Invalid charset or collation name.');
+        }
+
+        return $this->whereRaw(
+            "CONVERT(`{$column}` USING {$charset}) COLLATE {$collation} {$operator} ?",
+            [$value]
+        );
+    }
+
+    /**
      * Add a "group by" clause to the query.
      *
      * @param  array|\Illuminate\Contracts\Database\Query\Expression|string  ...$groups
