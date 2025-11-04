@@ -5,6 +5,7 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\AsPivot;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -151,11 +152,15 @@ trait ResolvesJsonApiElements
                         return [$key => ['data' => $relations]];
                     }
 
+                    $relationship = $this->resource->{$key}();
+
+                    $isUnique = ! $relationship instanceof BelongsToMany;
+
                     $key = static::resourceTypeFromModel($relations->first());
 
-                    return [$key => ['data' => $relations->map(function ($relation) use ($key) {
-                        return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation) {
-                            $this->loadedRelationshipsMap[$relation] = $uniqueKey;
+                    return [$key => ['data' => $relations->map(function ($relation) use ($key, $isUnique) {
+                        return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $isUnique) {
+                            $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
 
                             return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                         });
@@ -167,9 +172,9 @@ trait ResolvesJsonApiElements
                 }
 
                 return [$key => ['data' => transform(
-                    [static::resourceTypeFromModel($related), static::resourceIdFromModel($related)],
-                    function ($uniqueKey) use ($related) {
-                        $this->loadedRelationshipsMap[$related] = $uniqueKey;
+                    [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
+                    function ($uniqueKey) use ($relations) {
+                        $this->loadedRelationshipsMap[$relations] = [...$uniqueKey, true];
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                     }
@@ -201,13 +206,15 @@ trait ResolvesJsonApiElements
             $relations->push([
                 'id' => $uniqueKey[1],
                 'type' => $uniqueKey[0],
+                '_uniqueKey' => $uniqueKey[2] === true ? null : (string) Str::random(),
                 'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes', []),
             ]);
         }
 
         return $relations->uniqueStrict(
-            fn ($relation): array => [$relation['id'], $relation['type']]
-        )->all();
+            fn ($relation): array => [$relation['id'], $relation['type'], $relation['_uniqueKey']]
+        )->map(fn ($relation): array => Arr::except($relation, ['_uniqueKey']))
+        ->all();
     }
 
     /**

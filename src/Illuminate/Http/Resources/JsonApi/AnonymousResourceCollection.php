@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\AnonymousResourceCollection
 {
@@ -20,7 +21,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResources($request))
                 ->flatten(depth: 1)
-                ->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])
                 ->all(),
             ...($implementation = JsonApiResource::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]
