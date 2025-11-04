@@ -330,7 +330,6 @@ class TestEloquentModelWithCustomCast extends Model
         'anniversary_on_without_object_caching' => DateTimezoneCasterWithoutObjectCaching::class.':America/New_York',
     ];
 
-
     /**
      * A computed attribute that depends on another casted attribute.
      *
