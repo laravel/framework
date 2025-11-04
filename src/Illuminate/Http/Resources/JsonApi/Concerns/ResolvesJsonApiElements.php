@@ -151,41 +151,50 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = (new Collection(array_intersect_key($this->resource->getRelations(), $resourceRelationshipKeys)))
-            ->mapWithKeys(function ($relations, $key) {
-                if ($relations instanceof Collection) {
-                    if ($relations->isEmpty()) {
-                        return [$key => ['data' => $relations]];
-                    }
+        $this->loadedRelationshipIdentifiers = (new Collection(
+            array_is_list($resourceRelationships)
+                ? array_intersect_key($this->resource->getRelations(), $resourceRelationshipKeys)
+                : $resourceRelationships
+        ))->mapWithKeys(function ($relations, $key) {
+            $relations = value($relations);
 
-                    $relationship = $this->resource->{$key}();
+            if ($relations instanceof Collection) {
+                $relations = $relations->values();
 
-                    $isUnique = ! $relationship instanceof BelongsToMany;
-
-                    $key = static::resourceTypeFromModel($relations->first());
-
-                    return [$key => ['data' => $relations->map(function ($relation) use ($key, $isUnique) {
-                        return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $isUnique) {
-                            $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
-
-                            return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
-                        });
-                    })]];
+                if ($relations->isEmpty()) {
+                    return [$key => ['data' => $relations]];
                 }
 
-                if (is_null($relations) || $relations instanceof Pivot || in_array(AsPivot::class, class_uses_recursive($relations), true)) {
-                    return [$key => null];
-                }
+                $relationship = $this->resource->{$key}();
 
-                return [$key => ['data' => [transform(
-                    [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
-                    function ($uniqueKey) use ($relations) {
-                        $this->loadedRelationshipsMap[$relations] = [...$uniqueKey, true];
+                $isUnique = ! $relationship instanceof BelongsToMany;
+
+                $key = static::resourceTypeFromModel($relations->first());
+
+                return [$key => ['data' => $relations->map(function ($relation) use ($key, $isUnique) {
+                    return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $isUnique) {
+                        $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
 
                         return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
-                    }
-                )]]];
-            })->filter()->all();
+                    });
+                })]];
+            }
+
+            if (is_null($relations) ||
+                $relations instanceof Pivot ||
+                in_array(AsPivot::class, class_uses_recursive($relations), true)) {
+                return [$key => null];
+            }
+
+            return [$key => ['data' => [transform(
+                [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
+                function ($uniqueKey) use ($relations) {
+                    $this->loadedRelationshipsMap[$relations] = [...$uniqueKey, true];
+
+                    return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                }
+            )]]];
+        })->filter()->all();
     }
 
     /**
