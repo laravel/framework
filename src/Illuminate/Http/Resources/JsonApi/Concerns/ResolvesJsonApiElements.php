@@ -141,11 +141,17 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $this->resource->loadMissing($this->toRelationships($request));
+        $this->resource->loadMissing(
+            $resourceRelationships = $this->toRelationships($request)
+        );
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = (new Collection($this->resource->getRelations()))
+        $resourceRelationshipKeys = array_is_list($resourceRelationships)
+            ? array_flip($resourceRelationships)
+            : array_flip(array_keys($resourceRelationships));
+
+        $this->loadedRelationshipIdentifiers = (new Collection(array_intersect_key($this->resource->getRelations(), $resourceRelationshipKeys)))
             ->mapWithKeys(function ($relations, $key) {
                 if ($relations instanceof Collection) {
                     if ($relations->isEmpty()) {
