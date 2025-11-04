@@ -636,7 +636,7 @@ class QueryBuilderTest extends DatabaseTestCase
         ], DB::table('posts')->pluck('title', 'content')->toArray());
     }
 
-    protected function defineEnvironmentWouldThrowsPDOException($app)
+    protected function defineEnvironmentWouldThrowsPDOException()
     {
         $this->afterApplicationCreated(function () {
             if (in_array($this->driver, ['pgsql', 'sqlsrv'])) {
