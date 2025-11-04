@@ -1572,6 +1572,13 @@ class SupportHelpersTest extends TestCase
             preg_replace_array($pattern, $replacements, $subject)
         );
     }
+
+    public function testToEnglishNumbersConvertsPersianAndArabicDigits()
+    {
+        $this->assertEquals('123', to_english_numbers('۱۲۳'));
+        $this->assertEquals('456', to_english_numbers('٤٥٦'));
+    }
+
 }
 
 trait SupportTestTraitOne
