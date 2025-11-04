@@ -92,6 +92,11 @@ class JsonApiResourceTest extends TestCase
                         'name' => $user->name,
                         'email' => $user->email,
                     ],
+                    'relationships' => [
+                        'teams' => [
+                            'data' => [],
+                        ],
+                    ],
                 ],
             ])
             ->assertJsonMissing(['jsonapi', 'included']);
@@ -113,6 +118,9 @@ class JsonApiResourceTest extends TestCase
                     ],
                     'relationships' => [
                         'posts' => [
+                            'data' => [],
+                        ],
+                        'teams' => [
                             'data' => [],
                         ],
                     ],

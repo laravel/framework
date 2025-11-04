@@ -195,7 +195,7 @@ trait ResolvesJsonApiElements
 
         $relations = new Collection;
 
-        foreach ($this->loadedRelationshipsMap as $relation => $uniqueKey) {
+        foreach ($this->loadedRelationshipsMap as $relation => $value) {
             $resourceInstance = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
 
             if (! $resourceInstance instanceof JsonApiResource &&
@@ -203,18 +203,19 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
+            [$type, $id, $isUnique] = $value;
+
             $relations->push([
-                'id' => $uniqueKey[1],
-                'type' => $uniqueKey[0],
-                '_uniqueKey' => $uniqueKey[2] === true ? null : (string) Str::random(),
+                'id' => $id,
+                'type' => $type,
+                '_uniqueKey' => $isUnique === true ? [$id, $type] : [$id, $type, (string) Str::random()],
                 'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes', []),
             ]);
         }
 
-        return $relations->uniqueStrict(
-            fn ($relation): array => [$relation['id'], $relation['type'], $relation['_uniqueKey']]
-        )->map(fn ($relation): array => Arr::except($relation, ['_uniqueKey']))
-        ->all();
+        return $relations->uniqueStrict(fn ($relation): array => $relation['_uniqueKey'])
+            ->map(fn ($relation): array => Arr::except($relation, ['_uniqueKey']))
+            ->all();
     }
 
     /**
