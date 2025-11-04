@@ -370,4 +370,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
         $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
+
+    #[RequiresPhpExtension('intl')]
+    public function testToEnglishFormat()
+    {
+        $this->assertEquals('123', Number::toEnglishFormat('۱۲۳'));
+        $this->assertEquals('456', Number::toEnglishFormat('٤٥٦'));
+    }
 }

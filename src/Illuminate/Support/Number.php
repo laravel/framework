@@ -439,4 +439,15 @@ class Number
             throw new RuntimeException('The "intl" PHP extension is required to use the ['.$method.'] method.');
         }
     }
+    
+    /**
+     * Converting Persian/Arabic digits to English
+     * @param  mixed $value
+     * @return bool|float|int
+     */
+    public static function toEnglishFormat($value)
+    {
+        $numberFormatter = new NumberFormatter('ar-u-nu-latn', NumberFormatter::DECIMAL);
+        return $numberFormatter->parse($value);
+    }
 }
