@@ -58,7 +58,7 @@ class LoadConfiguration
         // options available to the developer for use in various parts of this app.
         $app->instance('config', $config = new Repository($items));
 
-        if (! isset($loadedFromCache)) {
+        if (! $loadedFromCache) {
             $this->loadConfigurationFiles($app, $config);
         }
 
