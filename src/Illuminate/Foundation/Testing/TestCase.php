@@ -43,7 +43,7 @@ abstract class TestCase extends BaseTestCase
         }
         if (isset(CachedState::$cachedConfig) &&
             isset($this->testUsesTraits[WithCachedConfig::class])) {
-            $app->booting(fn () => $this->markConfigCached($app));
+            $this->markConfigCached($app);
         }
 
         $app->make(Kernel::class)->bootstrap();
