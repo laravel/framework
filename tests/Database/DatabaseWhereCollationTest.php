@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Orchestra\Testbench\TestCase;
-use InvalidArgumentException;
 
 class DatabaseWhereCollationTest extends TestCase
 {
@@ -14,7 +14,7 @@ class DatabaseWhereCollationTest extends TestCase
         parent::setUp();
 
         if (DB::getDriverName() === 'sqlite') {
-            $this->markTestSkipped('Collation tests require MySQL or MariaDB.');
+            $this->markTestSkipped('Collation conversion not supported on SQLite.');
         }
 
         DB::statement('CREATE TEMPORARY TABLE _test_collation (
@@ -51,7 +51,7 @@ class DatabaseWhereCollationTest extends TestCase
 
     public function test_invalid_collation_name_throws_exception()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         DB::table('_test_collation')->whereCollation(
             'name',
@@ -64,14 +64,31 @@ class DatabaseWhereCollationTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
+        try {
             DB::statement('DROP TEMPORARY TABLE IF EXISTS _test_collation');
+        } catch (\Throwable $e) {
+            // ignore
         }
 
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
+        if (class_exists(AliasLoader::class)) {
+            $ref = new \ReflectionClass(AliasLoader::class);
+            if ($ref->hasProperty('instance')) {
+                $instance = $ref->getProperty('instance');
+                $instance->setAccessible(true);
+                $instance->setValue(null, null);
+            }
+        }
+
+        while (set_error_handler(fn () => null)) {
+            restore_error_handler();
+        }
+        while (set_exception_handler(fn () => null)) {
+            restore_exception_handler();
+        }
+
         parent::tearDown();
     }
-
 }
