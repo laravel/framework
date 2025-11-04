@@ -65,7 +65,6 @@ class DatabaseWhereCollationTest extends TestCase
         DB::table('_test_collation')->whereCollation('name', '=', 'test', 'invalid_collation', 'utf8mb4');
     }
 
-
     protected function tearDown(): void
     {
         try {

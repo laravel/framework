@@ -2451,11 +2451,11 @@ class Builder implements BuilderContract
             $operator = '=';
         }
 
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $charset)) {
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', $charset)) {
             throw new InvalidArgumentException("Invalid charset name: {$charset}");
         }
 
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', str_replace('_', '', $collation))) {
+        if (! preg_match('/^[a-zA-Z0-9_]+$/', str_replace('_', '', $collation))) {
             throw new InvalidArgumentException("Invalid collation name: {$collation}");
         }
 
