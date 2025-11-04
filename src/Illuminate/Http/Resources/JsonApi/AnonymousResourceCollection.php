@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\AnonymousResourceCollection
 {
