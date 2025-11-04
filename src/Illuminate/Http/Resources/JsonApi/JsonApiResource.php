@@ -81,6 +81,22 @@ class JsonApiResource extends JsonResource
     }
 
     /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\Support\Arrayable|\JsonSerializable|array
+     */
+    #[\Override]
+    public function toAttributes(Request $request)
+    {
+        if (property_exists($this, 'attributes')) {
+            return $this->attributes;
+        }
+
+        return $this->toArray($request);
+    }
+
+    /**
      * Get the resource's links.
      *
      * @return array
