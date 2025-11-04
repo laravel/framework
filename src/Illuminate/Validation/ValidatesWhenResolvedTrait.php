@@ -33,6 +33,12 @@ trait ValidatesWhenResolvedTrait
         }
 
         $this->passedValidation();
+
+        // Sync the validator data with the current request data after passedValidation()
+        // in case the request data was modified (e.g., via replace() or merge())
+        if (method_exists($this, 'validationData')) {
+            $instance->setData($this->validationData());
+        }
     }
 
     /**

@@ -129,6 +129,15 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'Adam'], $request->all());
     }
 
+    public function testPassedValidationDataIsReflectedInValidatedMethod()
+    {
+        $request = $this->createRequest([], FoundationTestFormRequestHooks::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['name' => 'Adam'], $request->validated());
+    }
+
     public function testValidatedMethodReturnsOnlyRequestedValidatedData()
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
