@@ -3,11 +3,9 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use BadMethodCallException;
-use Illuminate\Container\Container;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
 {
@@ -151,7 +149,7 @@ class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request)),
+            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
         ];
     }
 
@@ -179,12 +177,12 @@ class JsonApiResource extends JsonResource
     /**
      * Resolve the Request instance from Container.
      *
-     * @return \Illuminate\Http\Resources\JsonApi\SparseRequest
+     * @return \Illuminate\Http\Resources\JsonApi\JsonApiRequest
      */
     #[\Override]
     protected function resolveRequestFromContainer()
     {
-        return $this->resolveJsonApiRequestFrom(Container::getInstance()->make('request'));
+        return $this->resolveJsonApiRequestFrom(parent::resolveRequestFromContainer());
     }
 
     /**
