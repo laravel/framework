@@ -144,7 +144,7 @@ trait ResolvesJsonApiElements
         $resourceRelationships = $this->toRelationships($request);
 
         $resourceRelationshipKeys = array_is_list($resourceRelationships)
-            ? array_flip($resourceRelationships)
+            ? $resourceRelationships
             : array_flip(array_keys($resourceRelationships));
 
         $this->resource->loadMissing($resourceRelationshipKeys);
@@ -228,8 +228,8 @@ trait ResolvesJsonApiElements
             ]);
         }
 
-        return $relations->uniqueStrict(fn ($relation): array => $relation['_uniqueKey'])
-            ->map(fn ($relation): array => Arr::except($relation, ['_uniqueKey']))
+        return $relations->uniqueStrict(fn ($relation) => $relation['_uniqueKey'])
+            ->map(fn ($relation) => Arr::except($relation, ['_uniqueKey']))
             ->all();
     }
 
