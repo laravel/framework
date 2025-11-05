@@ -37,11 +37,13 @@ trait ResolvesJsonApiElements
      */
     public function resolveResourceData(JsonApiRequest $request): array
     {
+        $resourceType = $this->resolveResourceType($request);
+
         return [
             'id' => $this->resolveResourceIdentifier($request),
-            'type' => $this->resolveResourceType($request),
+            'type' => $resourceType,
             ...(new Collection([
-                'attributes' => $this->resolveResourceAttributes($request),
+                'attributes' => $this->resolveResourceAttributes($request, $resourceType),
                 'relationships' => $this->resolveResourceRelationshipIdentifiers($request),
                 'links' => $this->resolveResourceLinks($request),
                 'meta' => $this->resolveResourceMetaInformation($request),
@@ -94,7 +96,7 @@ trait ResolvesJsonApiElements
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceAttributes(JsonApiRequest $request): array
+    protected function resolveResourceAttributes(JsonApiRequest $request, string $resourceType): array
     {
         $data = $this->toAttributes($request);
 
@@ -104,8 +106,11 @@ trait ResolvesJsonApiElements
             $data = $data->jsonSerialize();
         }
 
+        $sparseFieldsets = $request->sparseFields($resourceType);
+
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
+            ->when(! empty($sparseFieldsets), fn ($attributes) => $attributes->only($sparseFieldsets))
             ->transform(fn ($value) => value($value, $request))
             ->all();
 

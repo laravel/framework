@@ -39,13 +39,7 @@ class JsonApiResourceTest extends TestCase
     protected function defineRoutes($router)
     {
         $router->get('users/{userId}', function (Request $request, $userId) {
-            $user = User::find($userId);
-
-            if (! empty($includes = $request->array('includes'))) {
-                $user->loadMissing($includes);
-            }
-
-            return $user->toResource();
+            return User::find($userId)->toResource();
         });
     }
 
@@ -98,6 +92,24 @@ class JsonApiResourceTest extends TestCase
                     'attributes' => [
                         'name' => $user->name,
                         'email' => $user->email,
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi', 'included']);
+    }
+
+    public function testItCanGenerateJsonApiResponseWithSparseFieldsets()
+    {
+        $user = UserFactory::new()->create();
+
+        $this->getJson('/users/'.$user->getKey().'?fields[users]=name')
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                    'attributes' => [
+                        'name' => $user->name,
                     ],
                 ],
             ])
