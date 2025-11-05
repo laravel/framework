@@ -71,6 +71,17 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
     }
 
+    public function testValidatedMethodReturnsTheValidatedDataNestedWildcardArrayRules()
+    {
+        $payload = ['nested' => [['bar' => 'baz', 'with' => 'extras'], ['bar' => 'baz2', 'with' => 'extras']]];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedWildcardArrayStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $request->validated());
+    }
+
     public function testValidatedMethodNotValidateTwice()
     {
         $payload = ['name' => 'specified', 'with' => 'extras'];
@@ -376,6 +387,25 @@ class FoundationTestFormRequestNestedArrayStub extends FormRequest
     public function rules()
     {
         return ['nested.*.bar' => 'required'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNestedWildcardArrayStub extends FormRequest
+{
+    public function rules()
+    {
+        return [
+            'nested' => [
+                '*' => [
+                    'bar' => 'required',
+                ],
+            ],
+        ];
     }
 
     public function authorize()
