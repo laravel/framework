@@ -9,7 +9,13 @@ class JsonApiRequest extends Request
 {
     public function sparseIncluded(): array
     {
-        return explode(',', (string) $this->string('included', ''));
+        $included = (string) $this->string('include', '');
+
+        if (empty($included)) {
+            return [];
+        }
+
+        return explode(',', $included);
     }
 
     public function sparseFields(string $key): array

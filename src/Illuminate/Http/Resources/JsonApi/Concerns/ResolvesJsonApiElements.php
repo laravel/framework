@@ -146,22 +146,20 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $resourceRelationships = $this->toRelationships($request);
+        $sparseIncluded = $request->sparseIncluded();
 
-        $resourceRelationshipKeys = array_is_list($resourceRelationships)
-            ? $resourceRelationships
-            : array_flip(array_keys($resourceRelationships));
+        $resourceRelationships = (new Collection($this->toRelationships($request)))
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => fn () => $this->resource->{$value}] : [$key => $value])
+            ->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
 
-        $this->resource->loadMissing($resourceRelationshipKeys);
+        $resourceRelationshipKeys = $resourceRelationships->keys();
+
+        $this->resource->loadMissing($resourceRelationshipKeys->all());
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = (new Collection(
-            array_is_list($resourceRelationships)
-                ? array_intersect_key($this->resource->getRelations(), $resourceRelationshipKeys)
-                : $resourceRelationships
-        ))->mapWithKeys(function ($relations, $key) {
-            $relations = value($relations);
+        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function ($relationResolver, $key) {
+            $relations = value($relationResolver);
 
             if ($relations instanceof Collection) {
                 $relations = $relations->values();

@@ -102,7 +102,7 @@ class JsonApiResourceTest extends TestCase
     {
         $user = UserFactory::new()->create();
 
-        $this->getJson('/users/'.$user->getKey().'?fields[users]=name')
+        $this->getJson('/users/'.$user->getKey().'?'.http_build_query(['fields' => ['users' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [
@@ -156,7 +156,7 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->getJson('/users/'.$user->getKey().'?'.http_build_query(['includes' => ['posts']]))
+        $this->getJson('/users/'.$user->getKey().'?'.http_build_query(['include' => 'profile,posts,teams']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [
@@ -188,6 +188,16 @@ class JsonApiResourceTest extends TestCase
                 ],
                 'included' => [
                     [
+                        'id' => (string) $profile->getKey(),
+                        'type' => 'profiles',
+                        'attributes' => [
+                            'date_of_birth' => '2011-06-09',
+                            'id' => $profile->getKey(),
+                            'timezone' => 'America/Chicago',
+                            'user_id' => 1,
+                        ],
+                    ],
+                    [
                         'id' => (string) $posts[0]->getKey(),
                         'type' => 'posts',
                         'attributes' => [
@@ -201,16 +211,6 @@ class JsonApiResourceTest extends TestCase
                         'attributes' => [
                             'title' => $posts[1]->title,
                             'content' => $posts[1]->content,
-                        ],
-                    ],
-                    [
-                        'id' => (string) $profile->getKey(),
-                        'type' => 'profiles',
-                        'attributes' => [
-                            'date_of_birth' => '2011-06-09',
-                            'id' => $profile->getKey(),
-                            'timezone' => 'America/Chicago',
-                            'user_id' => 1,
                         ],
                     ],
                     [
@@ -290,6 +290,7 @@ class UserApiResource extends JsonApiResource
 {
     protected array $relationships = [
         'profile',
+        'posts',
         'teams',
     ];
 
