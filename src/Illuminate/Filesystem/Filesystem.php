@@ -230,6 +230,8 @@ class Filesystem
 
         file_put_contents($tempPath, $content);
 
+        sleep(1); // Ensure that the modification time will be different...
+
         rename($tempPath, $path);
     }
 
