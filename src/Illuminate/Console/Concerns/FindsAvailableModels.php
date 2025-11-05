@@ -5,14 +5,14 @@ namespace Illuminate\Console\Concerns;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\Finder;
 
-trait InteractsWithModels
+trait FindsAvailableModels
 {
     /**
      * Get a list of possible model names.
      *
      * @return array<int, string>
      */
-    protected function possibleModels()
+    protected function findAvailableModels()
     {
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
 

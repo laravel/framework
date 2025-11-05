@@ -3,7 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
-use Illuminate\Console\Concerns\InteractsWithModels;
+use Illuminate\Console\Concerns\FindsAvailableModels;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -13,7 +13,7 @@ use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
-    use InteractsWithModels;
+    use FindsAvailableModels;
 
     /**
      * The filesystem instance.

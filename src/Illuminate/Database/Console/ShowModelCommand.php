@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Console;
 
-use Illuminate\Console\Concerns\InteractsWithModels;
+use Illuminate\Console\Concerns\FindsAvailableModels;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\ModelInspector;
@@ -15,7 +15,7 @@ use function Laravel\Prompts\suggest;
 #[AsCommand(name: 'model:show')]
 class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMissingInput
 {
-    use InteractsWithModels;
+    use FindsAvailableModels;
 
     /**
      * The console command name.
@@ -226,7 +226,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     protected function promptForMissingArgumentsUsing(): array
     {
         return [
-            'model' => fn (): string => suggest('Which model would you like to show?', $this->possibleModels()),
+            'model' => fn (): string => suggest('Which model would you like to show?', $this->findAvailableModels()),
         ];
     }
 }
