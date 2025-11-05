@@ -17,7 +17,7 @@ trait InteractsWithModels
         $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
 
         return (new Collection(Finder::create()->files()->depth(0)->in($modelPath)))
-            ->map(fn($file) => $file->getBasename('.php'))
+            ->map(fn ($file) => $file->getBasename('.php'))
             ->sort()
             ->values()
             ->all();

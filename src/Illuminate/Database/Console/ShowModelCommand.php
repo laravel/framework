@@ -221,12 +221,12 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     /**
      * Prompt for missing input arguments using the returned questions.
      *
-     * @return array
+     * @return array<string, \Closure(): string>
      */
     protected function promptForMissingArgumentsUsing(): array
     {
         return [
-            'model' => fn() => suggest('Which model would you like to show?', $this->possibleModels()),
+            'model' => fn (): string => suggest('Which model would you like to show?', $this->possibleModels()),
         ];
     }
 }
