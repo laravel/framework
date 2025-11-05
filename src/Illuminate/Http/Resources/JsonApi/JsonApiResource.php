@@ -154,6 +154,15 @@ class JsonApiResource extends JsonResource
     }
 
     /**
+     * Customize the outgoing response for the resource.
+     */
+    #[\Override]
+    public function withResponse(Request $request, JsonResponse $response): void
+    {
+        $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -166,16 +175,7 @@ class JsonApiResource extends JsonResource
     }
 
     /**
-     * Customize the outgoing response for the resource.
-     */
-    #[\Override]
-    public function withResponse(Request $request, JsonResponse $response): void
-    {
-        $response->header('Content-Type', 'application/vnd.api+json');
-    }
-
-    /**
-     * Resolve the Request instance from Container.
+     * Resolve the HTTP request instance from container.
      *
      * @return \Illuminate\Http\Resources\JsonApi\JsonApiRequest
      */

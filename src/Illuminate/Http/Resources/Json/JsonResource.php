@@ -231,6 +231,16 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Resolve the HTTP request instance from container.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    protected function resolveRequestFromContainer()
+    {
+        return Container::getInstance()->make('request');
+    }
+
+    /**
      * Set the string that should wrap the outer-most resource array.
      *
      * @param  string  $value
@@ -283,16 +293,6 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function jsonSerialize(): array
     {
         return $this->resolve($this->resolveRequestFromContainer());
-    }
-
-    /**
-     * Resolve the Request instance from Container.
-     *
-     * @return \Illuminate\Http\Request
-     */
-    protected function resolveRequestFromContainer()
-    {
-        return Container::getInstance()->make('request');
     }
 
     /**

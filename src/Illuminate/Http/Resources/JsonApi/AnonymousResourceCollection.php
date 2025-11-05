@@ -58,7 +58,7 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     }
 
     /**
-     * Resolve the Request instance from Container.
+     * Resolve the HTTP request instance from container.
      *
      * @return \Illuminate\Http\Resources\JsonApi\SparseRequest
      */

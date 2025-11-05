@@ -106,11 +106,11 @@ trait ResolvesJsonApiElements
             $data = $data->jsonSerialize();
         }
 
-        $sparseFieldsets = $request->sparseFields($resourceType);
+        $sparseFieldset = $request->sparseFields($resourceType);
 
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
-            ->when(! empty($sparseFieldsets), fn ($attributes) => $attributes->only($sparseFieldsets))
+            ->when(! empty($sparseFieldset), fn ($attributes) => $attributes->only($sparseFieldset))
             ->transform(fn ($value) => value($value, $request))
             ->all();
 
@@ -159,22 +159,23 @@ trait ResolvesJsonApiElements
         $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function ($relationResolver, $key) {
-            $relations = value($relationResolver);
+            $relatedModels = value($relationResolver);
 
-            if ($relations instanceof Collection) {
-                $relations = $relations->values();
+            // Relationship is a collection of models...
+            if ($relatedModels instanceof Collection) {
+                $relatedModels = $relatedModels->values();
 
-                if ($relations->isEmpty()) {
-                    return [$key => ['data' => $relations]];
+                if ($relatedModels->isEmpty()) {
+                    return [$key => ['data' => $relatedModels]];
                 }
 
                 $relationship = $this->resource->{$key}();
 
                 $isUnique = ! $relationship instanceof BelongsToMany;
 
-                $key = static::resourceTypeFromModel($relations->first());
+                $key = static::resourceTypeFromModel($relatedModels->first());
 
-                return [$key => ['data' => $relations->map(function ($relation) use ($key, $isUnique) {
+                return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $isUnique) {
                     return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $isUnique) {
                         $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
 
@@ -183,16 +184,19 @@ trait ResolvesJsonApiElements
                 })]];
             }
 
-            if (is_null($relations) ||
-                $relations instanceof Pivot ||
-                in_array(AsPivot::class, class_uses_recursive($relations), true)) {
+            // Relationship is a single model...
+            $relatedModel = $relatedModels;
+
+            if (is_null($relatedModel) ||
+                $relatedModel instanceof Pivot ||
+                in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
                 return [$key => null];
             }
 
             return [$key => ['data' => [transform(
-                [static::resourceTypeFromModel($relations), static::resourceIdFromModel($relations)],
-                function ($uniqueKey) use ($relations) {
-                    $this->loadedRelationshipsMap[$relations] = [...$uniqueKey, true];
+                [static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
+                function ($uniqueKey) use ($relatedModel) {
+                    $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, true];
 
                     return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                 }

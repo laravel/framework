@@ -7,25 +7,27 @@ use Illuminate\Support\Arr;
 
 class JsonApiRequest extends Request
 {
-    public function sparseIncluded(): array
-    {
-        $included = (string) $this->string('include', '');
-
-        if (empty($included)) {
-            return [];
-        }
-
-        return explode(',', $included);
-    }
-
+    /**
+     * Get the request's included fields.
+     */
     public function sparseFields(string $key): array
     {
         $fieldsets = Arr::get($this->array('fields'), $key, '');
 
-        if (empty($fieldsets)) {
-            return [];
-        }
+        return empty($fieldsets)
+            ? []
+            : explode(',', $fieldsets);
+    }
 
-        return explode(',', $fieldsets);
+    /**
+     * Get the request's included relationships.
+     */
+    public function sparseIncluded(): array
+    {
+        $included = (string) $this->string('include', '');
+
+        return empty($included)
+            ? []
+            : explode(',', $included);
     }
 }
