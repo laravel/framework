@@ -18,6 +18,7 @@ use Illuminate\Console\Scheduling\ScheduleWorkCommand;
 use Illuminate\Console\Signals;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Database\Console\DbCommand;
+use Illuminate\Database\Console\DbDumpCommand;
 use Illuminate\Database\Console\DumpCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Database\Console\MonitorCommand as DatabaseMonitorCommand;
@@ -126,6 +127,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'ConfigClear' => ConfigClearCommand::class,
         'ConfigShow' => ConfigShowCommand::class,
         'Db' => DbCommand::class,
+        'DbDump' => DbDumpCommand::class,
         'DbMonitor' => DatabaseMonitorCommand::class,
         'DbPrune' => PruneCommand::class,
         'DbShow' => ShowCommand::class,
