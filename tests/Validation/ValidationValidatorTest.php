@@ -1815,7 +1815,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
         $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredIf:first,taylor,dayle']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The last field is required when first is dayle.', $v->messages()->first('last'));
+        $this->assertSame('The last field is required when first is taylor.', $v->messages()->first('last'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
@@ -1826,7 +1826,7 @@ class ValidationValidatorTest extends TestCase
         ]);
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
-        $this->assertSame('The baz field is required when foo is 0.', $v->messages()->first('baz'));
+        $this->assertSame('The baz field is required when foo is false.', $v->messages()->first('baz'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], [
@@ -2022,7 +2022,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.prohibited_if' => 'The :attribute field is prohibited when :other is :value.'], 'en');
         $v = new Validator($trans, ['first' => 'jess', 'last' => 'archer'], ['last' => 'prohibited_if:first,taylor,jess']);
         $this->assertFalse($v->passes());
-        $this->assertSame('The last field is prohibited when first is jess.', $v->messages()->first('last'));
+        $this->assertSame('The last field is prohibited when first is taylor.', $v->messages()->first('last'));
     }
 
     public function testValidateProhibitedAcceptedIf()
@@ -2756,7 +2756,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'no', 'bar' => 'abc'], ['foo' => 'accepted_if:bar,aaa,bbb,abc']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
-        $this->assertSame('The foo field must be accepted when bar is abc.', $v->messages()->first('foo'));
+        $this->assertSame('The foo field must be accepted when bar is aaa.', $v->messages()->first('foo'));
 
         // accepted_if:bar,boolean
         $trans = $this->getIlluminateArrayTranslator();
@@ -3109,7 +3109,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => 'abc'], ['foo' => 'declined_if:bar,aaa,bbb,abc']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
-        $this->assertSame('The foo field must be declined when bar is abc.', $v->messages()->first('foo'));
+        $this->assertSame('The foo field must be declined when bar is aaa.', $v->messages()->first('foo'));
 
         // declined_if:bar,boolean
         $trans = $this->getIlluminateArrayTranslator();
