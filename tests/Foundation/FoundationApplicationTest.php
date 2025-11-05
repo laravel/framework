@@ -623,9 +623,11 @@ class FoundationApplicationTest extends TestCase
         $files = new class
         {
             public string $pathRequested;
+
             public function exists(string $path): bool
             {
                 $this->pathRequested = $path;
+
                 return false;
             }
         };

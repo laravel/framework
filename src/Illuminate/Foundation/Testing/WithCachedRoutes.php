@@ -49,5 +49,4 @@ trait WithCachedRoutes
             static fn () => app('router')->setCompiledRoutes(CachedState::$cachedRoutes)
         );
     }
-
 }
