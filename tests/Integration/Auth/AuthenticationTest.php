@@ -337,6 +337,21 @@ class AuthenticationTest extends TestCase
 
         $this->assertInstanceOf(MyDispatcherLessCustomGuardStub::class, $this->app['auth']->guard('myGuard'));
     }
+
+    public function testAttachesWithQueryFromConfigToEloquentUserProvider()
+    {
+        $called = false;
+
+        $this->app['config']->set([
+            'auth.providers.users.with' => function () use (&$called) {
+                $called = true;
+            },
+        ]);
+
+        $this->app['auth']->loginUsingId(1);
+
+        $this->assertTrue($called);
+    }
 }
 
 class MyCustomGuardStub
