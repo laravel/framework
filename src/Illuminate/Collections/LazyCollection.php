@@ -1633,7 +1633,7 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Take items in the collection until a given point in time, with an optional callback on timeout.
      *
      * @param  \DateTimeInterface  $timeout
-     * @param  callable(TValue|null, TKey|null): mixed|null  $callback
+     * @param  callable(TValue|null, TKey|null): mixed  $callback
      * @return static<TKey, TValue>
      */
     public function takeUntilTimeout(DateTimeInterface $timeout, ?callable $callback = null)
