@@ -29,6 +29,11 @@ abstract class TestCase extends BaseTestCase
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
 
+        if (isset(CachedState::$cachedRoutes) &&
+            in_array(WithCachedRoutes::class, class_uses_recursive(static::class))) {
+            $app->booting(fn () => $this->markRoutesCached($app));
+        }
+
         $app->make(Kernel::class)->bootstrap();
 
         return $app;
