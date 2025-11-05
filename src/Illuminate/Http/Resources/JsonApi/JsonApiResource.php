@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use BadMethodCallException;
+use Illuminate\Container\Container;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -10,7 +11,8 @@ use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
 {
-    use Concerns\ResolvesJsonApiElements;
+    use Concerns\ResolvesJsonApiElements,
+        Concerns\ResolvesJsonApiRequest;
 
     /**
      * The "data" wrapper that should be applied.
@@ -149,8 +151,20 @@ class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => $this->resolveResourceData($request),
+            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request)),
         ];
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    #[\Override]
+    public function toResponse($request)
+    {
+        return parent::toResponse($this->resolveJsonApiRequestFrom($request));
     }
 
     /**
@@ -160,6 +174,17 @@ class JsonApiResource extends JsonResource
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
+     * Resolve the Request instance from Container.
+     *
+     * @return \Illuminate\Http\Resources\JsonApi\SparseRequest
+     */
+    #[\Override]
+    protected function resolveRequestFromContainer()
+    {
+        return $this->resolveJsonApiRequestFrom(Container::getInstance()->make('request'));
     }
 
     /**

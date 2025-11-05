@@ -2,11 +2,14 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
+use Illuminate\Container\Container;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\AnonymousResourceCollection
 {
+    use Concerns\ResolvesJsonApiRequest;
+
     /**
      * Get any additional data that should be returned with the resource array.
      *
@@ -52,5 +55,16 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
+     * Resolve the Request instance from Container.
+     *
+     * @return \Illuminate\Http\Resources\JsonApi\SparseRequest
+     */
+    #[\Override]
+    protected function resolveRequestFromContainer()
+    {
+        return $this->resolveJsonApiRequestFrom(Container::getInstance()->make('request'));
     }
 }

@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Relations\AsPivot;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Support\Arr;
@@ -35,7 +35,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `data` for the resource.
      */
-    public function resolveResourceData(Request $request): array
+    public function resolveResourceData(JsonApiRequest $request): array
     {
         return [
             'id' => $this->resolveResourceIdentifier($request),
@@ -56,7 +56,7 @@ trait ResolvesJsonApiElements
      *
      * @throws ResourceIdentificationException
      */
-    protected function resolveResourceIdentifier(Request $request): string
+    protected function resolveResourceIdentifier(JsonApiRequest $request): string
     {
         if (! is_null($resourceId = $this->toId($request))) {
             return $resourceId;
@@ -75,7 +75,7 @@ trait ResolvesJsonApiElements
      *
      * @throws ResourceIdentificationException
      */
-    protected function resolveResourceType(Request $request): string
+    protected function resolveResourceType(JsonApiRequest $request): string
     {
         if (! is_null($resourceType = $this->toType($request))) {
             return $resourceType;
@@ -94,7 +94,7 @@ trait ResolvesJsonApiElements
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceAttributes(Request $request): array
+    protected function resolveResourceAttributes(JsonApiRequest $request): array
     {
         $data = $this->toAttributes($request);
 
@@ -119,7 +119,7 @@ trait ResolvesJsonApiElements
      *
      * @throws \RuntimeException
      */
-    protected function resolveResourceRelationshipIdentifiers(Request $request): array
+    protected function resolveResourceRelationshipIdentifiers(JsonApiRequest $request): array
     {
         if (! $this->resource instanceof Model) {
             return [];
@@ -135,7 +135,7 @@ trait ResolvesJsonApiElements
     /**
      * Compile resource relationships.
      */
-    protected function compileResourceRelationships(Request $request): void
+    protected function compileResourceRelationships(JsonApiRequest $request): void
     {
         if ($this->loadedRelationshipsMap instanceof WeakMap) {
             return;
@@ -200,7 +200,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `included` for the resource.
      */
-    public function resolveIncludedResources(Request $request): array
+    public function resolveIncludedResources(JsonApiRequest $request): array
     {
         if (! $this->resource instanceof Model) {
             return [];
@@ -238,7 +238,7 @@ trait ResolvesJsonApiElements
      *
      * @return array<string, mixed>
      */
-    protected function resolveResourceLinks(Request $request): array
+    protected function resolveResourceLinks(JsonApiRequest $request): array
     {
         return $this->toLinks($request);
     }
@@ -248,7 +248,7 @@ trait ResolvesJsonApiElements
      *
      * @return array<string, mixed>
      */
-    protected function resolveResourceMetaInformation(Request $request): array
+    protected function resolveResourceMetaInformation(JsonApiRequest $request): array
     {
         return $this->toMeta($request);
     }
