@@ -166,6 +166,7 @@ class ArrayStore extends TaggableStore implements LockProvider
             $removed = array_map(
                 function ($item) {
                     unset($this->storage[$item]);
+
                     return true;
                 },
                 preg_grep('/^'.str_replace('{any}', '(.*)', $key).'$/', array_keys($this->storage))

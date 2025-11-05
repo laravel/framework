@@ -167,6 +167,7 @@ class SessionStore implements Store
             $removed = array_map(
                 function ($item) {
                     $this->session->forget($this->itemKey($item));
+
                     return true;
                 },
                 preg_grep('/^'.str_replace('{any}', '(.*)', $key).'$/', array_keys($this->session->get($this->key)))
