@@ -17,11 +17,17 @@ trait ReplacesAttributes
      */
     protected function replaceAcceptedIf($message, $attribute, $rule, $parameters)
     {
-        $parameters[1] = $this->getDisplayableValue($parameters[0], $parameters[1]);
+        $value = $this->getDisplayableValue($parameters[0], $parameters[1]);
 
         $parameters[0] = $this->getDisplayableAttribute($parameters[0]);
 
-        return $this->replaceWhileKeepingCase($message, ['other' => $parameters[0], 'value' => $parameters[1]]);
+        $message = $this->replaceWhileKeepingCase($message, ['other' => $parameters[0]]);
+
+        return str_replace(
+            [':value', ':VALUE', ':Value'],
+            [$value, Str::upper($value), Str::ucfirst($value)],
+            $message
+        );
     }
 
     /**
