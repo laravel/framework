@@ -488,41 +488,65 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
     {
-        $hashKey = substr(md5($key), 0, 4);
-        $valueKey = "{{$hashKey}}:{$key}";
-        $createdKey = "{{$hashKey}}:illuminate:cache:flexible:created:{$key}";
-        $lockKey = "{{$hashKey}}:illuminate:cache:flexible:lock:{$key}";
+        $createdKey = "illuminate:cache:flexible:created:{$key}";
+        $lockKey = "illuminate:cache:flexible:lock:{$key}";
 
-        [
-            $valueKey => $value,
-            $createdKey => $created,
-        ] = $this->many([$valueKey, $createdKey]);
+        // Check if sequential mode is enabled (for Redis Cluster compatibility)
+        $useSequential = $this->config['flexible_cluster_mode'] ?? false;
+
+        if ($useSequential) {
+            // Sequential operations for Redis Cluster compatibility
+            $value = $this->get($key);
+            $created = $this->get($createdKey);
+        } else {
+            // Bulk operations (default behavior)
+            [
+                $key => $value,
+                $createdKey => $created,
+            ] = $this->many([$key, $createdKey]);
+        }
 
         if (in_array(null, [$value, $created], true)) {
-            return tap(value($callback), fn ($value) => $this->putMany([
-                $valueKey => $value,
-                $createdKey => Carbon::now()->getTimestamp(),
-            ], $ttl[1]));
+            $newValue = value($callback);
+
+            if ($useSequential) {
+                $this->put($key, $newValue, $ttl[1]);
+                $this->put($createdKey, Carbon::now()->getTimestamp(), $ttl[1]);
+            } else {
+                $this->putMany([
+                    $key => $newValue,
+                    $createdKey => Carbon::now()->getTimestamp(),
+                ], $ttl[1]);
+            }
+
+            return $newValue;
         }
 
         if (($created + $this->getSeconds($ttl[0])) > Carbon::now()->getTimestamp()) {
             return $value;
         }
 
-        $refresh = function () use ($valueKey, $createdKey, $lockKey, $ttl, $callback, $lock, $created) {
+        $refresh = function () use ($key, $createdKey, $lockKey, $ttl, $callback, $lock, $created, $useSequential) {
             $this->store->lock(
                 $lockKey,
                 $lock['seconds'] ?? 0,
                 $lock['owner'] ?? null,
-            )->get(function () use ($valueKey, $createdKey, $callback, $created, $ttl) {
+            )->get(function () use ($key, $createdKey, $callback, $created, $ttl, $useSequential) {
                 if ($created !== $this->get($createdKey)) {
                     return;
                 }
 
-                $this->putMany([
-                    $valueKey => value($callback),
-                    $createdKey => Carbon::now()->getTimestamp(),
-                ], $ttl[1]);
+                $newValue = value($callback);
+
+                if ($useSequential) {
+                    $this->put($key, $newValue, $ttl[1]);
+                    $this->put($createdKey, Carbon::now()->getTimestamp(), $ttl[1]);
+                } else {
+                    $this->putMany([
+                        $key => $newValue,
+                        $createdKey => Carbon::now()->getTimestamp(),
+                    ], $ttl[1]);
+                }
             });
         };
 
