@@ -20,7 +20,7 @@ class JsonApiRequest extends Request
 
     public function sparseFields(string $key): array
     {
-        $fieldsets = Arr::get($this->array('fields', []), $key, '');
+        $fieldsets = Arr::get($this->array('fields'), $key, '');
 
         if (empty($fieldsets)) {
             return [];
