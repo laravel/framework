@@ -41,11 +41,11 @@ class ValidationConditionalRuleErrorMessagesTest extends ValidationValidatorTest
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_if' => 'The :attribute field is required when :other is :value.'], 'en');
 
-        $v = new Validator($trans, ['field1' => 'aa', 'field2' => ''], ['field2' => 'required_if:field1,AA']);
+        $v = new Validator($trans, ['field1' => 'aa'], ['field2' => 'required_if:field1,AA']);
         $this->assertTrue($v->fails());
         $this->assertSame('The field2 field is required when field1 is AA.', $v->messages()->first('field2'));
 
-        $v = new Validator($trans, ['field1' => 'AA', 'field2' => ''], ['field2' => 'required_if:field1,AA']);
+        $v = new Validator($trans, ['field1' => 'AA'], ['field2' => 'required_if:field1,AA']);
         $this->assertTrue($v->fails());
         $this->assertSame('The field2 field is required when field1 is AA.', $v->messages()->first('field2'));
     }

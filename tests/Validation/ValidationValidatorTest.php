@@ -1857,7 +1857,7 @@ class ValidationValidatorTest extends TestCase
         ]);
         $this->assertTrue($v->fails());
         $this->assertCount(1, $v->messages());
-        $this->assertSame('The baz field is required when foo is empty.', $v->messages()->first('baz'));
+        $this->assertSame('The baz field is required when foo is null.', $v->messages()->first('baz'));
 
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator(
