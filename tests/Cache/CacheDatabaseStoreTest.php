@@ -129,10 +129,35 @@ class CacheDatabaseStoreTest extends TestCase
         $store = $this->getStore();
         $table = m::mock(stdClass::class);
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
-        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo', 'prefixilluminate:cache:flexible:created:foo'])->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixilluminate:cache:flexible:created:foo')->andReturn($table);
         $table->shouldReceive('delete')->once();
 
         $store->forget('foo');
+    }
+
+    public function testSingleDynamicSegmentItemsMayBeRemovedFromCache()
+    {
+        $store = $this->getStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixfoo_%')->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixilluminate:cache:flexible:created:foo_%')->andReturn($table);
+        $table->shouldReceive('delete')->once();
+
+        $store->forget('foo_{any}');
+    }
+
+    public function testMultipleDynamicSegmentItemsMayBeRemovedFromCache()
+    {
+        $store = $this->getStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixfoo_%_bar_%')->andReturn($table);
+        $table->shouldReceive('orWhereLike')->once()->with('key', 'prefixilluminate:cache:flexible:created:foo_%_bar_%')->andReturn($table);
+        $table->shouldReceive('delete')->once();
+
+        $store->forget('foo_{any}_bar_{any}');
     }
 
     public function testItemsMayBeFlushedFromCache()

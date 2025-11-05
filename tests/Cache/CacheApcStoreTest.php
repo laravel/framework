@@ -124,6 +124,24 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
+    public function testSingleDynamicSegmentForgetMethodProperlyCallsAPC()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['deletePattern'])->getMock();
+        $apc->expects($this->once())->method('deletePattern')->with($this->equalTo('foo_(.*)'))->willReturn(true);
+        $store = new ApcStore($apc);
+        $result = $store->forget('foo_{any}');
+        $this->assertTrue($result);
+    }
+
+    public function testMultipleDynamicSegmentForgetMethodProperlyCallsAPC()
+    {
+        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['deletePattern'])->getMock();
+        $apc->expects($this->once())->method('deletePattern')->with($this->equalTo('foo_(.*)_bar_(.*)'))->willReturn(true);
+        $store = new ApcStore($apc);
+        $result = $store->forget('foo_{any}_bar_{any}');
+        $this->assertTrue($result);
+    }
+
     public function testFlushesCached()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['flush'])->getMock();

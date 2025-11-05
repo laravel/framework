@@ -382,10 +382,14 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function forgetMany(array $keys)
     {
-        $this->table()->whereIn('key', (new Collection($keys))->flatMap(fn ($key) => [
-            $this->prefix.$key,
-            "{$this->prefix}illuminate:cache:flexible:created:{$key}",
-        ])->all())->delete();
+        $query = $this->table();
+
+        (new Collection($keys))->flatMap(function ($key) use ($query) {
+            $query->orWhereLike('key', $this->prefix.str_replace('{any}', '%', $key));
+            $query->orWhereLike('key', "{$this->prefix}illuminate:cache:flexible:created:".str_replace('{any}', '%', $key));
+        });
+
+        $query->delete();
 
         return true;
     }

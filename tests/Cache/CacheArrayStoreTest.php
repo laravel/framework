@@ -162,6 +162,36 @@ class CacheArrayStoreTest extends TestCase
         $this->assertFalse($store->forget('foo'));
     }
 
+    public function testSingleDynamicSegmentItemsCanBeRemoved()
+    {
+        $store = new ArrayStore;
+        $store->put('foo', 'bar', 10);
+        $store->put('foo_1', 'bar', 10);
+        $store->put('foo_2', 'bar', 10);
+        $store->put('foo_3_bar_1', 'bar', 10);
+        $this->assertTrue($store->forget('foo_{any}'));
+        $this->assertNull($store->get('foo_1'));
+        $this->assertNull($store->get('foo_2'));
+        $this->assertNull($store->get('foo_3_bar_1'));
+        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertFalse($store->forget('foo_{any}'));
+    }
+
+    public function testMultipleDynamicSegmentItemsCanBeRemoved()
+    {
+        $store = new ArrayStore;
+        $store->put('foo', 'bar', 10);
+        $store->put('foo_1', 'bar', 10);
+        $store->put('foo_2', 'bar', 10);
+        $store->put('foo_3_bar_1', 'bar', 10);
+        $this->assertTrue($store->forget('foo_{any}_bar_{any}'));
+        $this->assertNull($store->get('foo_3_bar_1'));
+        $this->assertEquals('bar', $store->get('foo'));
+        $this->assertEquals('bar', $store->get('foo_1'));
+        $this->assertEquals('bar', $store->get('foo_2'));
+        $this->assertFalse($store->forget('foo_{any}_bar_{any}'));
+    }
+
     public function testItemsCanBeFlushed()
     {
         $store = new ArrayStore;

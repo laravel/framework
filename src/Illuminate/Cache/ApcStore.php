@@ -100,7 +100,11 @@ class ApcStore extends TaggableStore
      */
     public function forget($key)
     {
-        return $this->apc->delete($this->prefix.$key);
+        if (str_contains($key, '{any}')) {
+            return $this->apc->deletePattern($this->prefix.str_replace('{any}', '(.*)', $key));
+        } else {
+            return $this->apc->delete($this->prefix.$key);
+        }
     }
 
     /**

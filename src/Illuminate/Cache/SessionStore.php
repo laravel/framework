@@ -163,13 +163,25 @@ class SessionStore implements Store
      */
     public function forget($key)
     {
-        if ($this->session->exists($this->itemKey($key))) {
-            $this->session->forget($this->itemKey($key));
+        if (str_contains($key, '{any}')) {
+            $removed = array_map(
+                function ($item) {
+                    $this->session->forget($this->itemKey($item));
+                    return true;
+                },
+                preg_grep('/^'.str_replace('{any}', '(.*)', $key).'$/', array_keys($this->session->get($this->key)))
+            );
 
-            return true;
+            return count($removed) > 0;
+        } else {
+            if ($this->session->exists($this->itemKey($key))) {
+                $this->session->forget($this->itemKey($key));
+
+                return true;
+            }
+
+            return false;
         }
-
-        return false;
     }
 
     /**

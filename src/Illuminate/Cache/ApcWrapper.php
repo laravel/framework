@@ -66,6 +66,17 @@ class ApcWrapper
     }
 
     /**
+     * Remove an item from the cache with APCUIterator.
+     *
+     * @param  string  $pattern
+     * @return bool
+     */
+    public function deletePattern($pattern)
+    {
+        return apcu_delete(new \APCUIterator("/^$pattern$/"));
+    }
+
+    /**
      * Remove all items from the cache.
      *
      * @return bool
