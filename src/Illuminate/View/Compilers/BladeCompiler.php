@@ -279,6 +279,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $value = $callback($value);
         }
 
+        $value = $this->compileColonAttributes($value);
+
         $value = $this->storeUncompiledBlocks($value);
 
         // First we will compile the Blade component tags. This is a precompile style
@@ -317,7 +319,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return str_replace(
             ['##BEGIN-COMPONENT-CLASS##', '##END-COMPONENT-CLASS##'],
             '',
-            $result);
+            $result
+        );
     }
 
     /**
@@ -451,7 +454,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return (new ComponentTagCompiler(
-            $this->classComponentAliases, $this->classComponentNamespaces, $this
+            $this->classComponentAliases,
+            $this->classComponentNamespaces,
+            $this
         ))->compile($value);
     }
 
@@ -492,7 +497,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function addFooters($result)
     {
         return ltrim($result, "\n")
-                ."\n".implode("\n", array_reverse($this->footer));
+            ."\n".implode("\n", array_reverse($this->footer));
     }
 
     /**
@@ -553,9 +558,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
             // Here we check to see if we have properly found the closing parenthesis by
             // regex pattern or not, and will recursively continue on to the next ")"
             // then check again until the tokenizer confirms we find the right one.
-            while (isset($match[4]) &&
-                   Str::endsWith($match[0], ')') &&
-                   ! $this->hasEvenNumberOfParentheses($match[0])) {
+            while (
+                isset($match[4]) &&
+                Str::endsWith($match[0], ')') &&
+                ! $this->hasEvenNumberOfParentheses($match[0])
+            ) {
                 if (($after = Str::after($template, $match[0])) === $template) {
                     break;
                 }
@@ -677,6 +684,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
         }
 
         return call_user_func($this->customDirectives[$name], trim($value));
+    }
+
+    /**
+     * Compile colon-prefixed attributes (:attr="$var") into Blade echos.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileColonAttributes(string $value): string
+    {
+        return preg_replace_callback(
+            '/\s:([a-zA-Z0-9_\-:]+)="([^"]+)"/',
+            fn ($matches) => " {$matches[1]}=\"{{ {$matches[2]} }}\"",
+            $value
+        );
     }
 
     /**

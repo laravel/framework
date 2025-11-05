@@ -214,6 +214,18 @@ class BladeTest extends TestCase
         $this->assertSame('<a href="#">default slot</a>', trim($content));
     }
 
+    public function test_colon_attributes_are_compiled(): void
+    {
+        $content = Blade::render('<img :src="$logo" :alt="$title" :class="$class">');
+
+        $this->assertSame('<img src="{{ $logo }}" alt="{{ $title }}" class="{{ $class }}">', trim($content));
+
+        // Test with function calls
+        $content = Blade::render('<a :href="route(\'home\')">Home</a>');
+
+        $this->assertSame('<a href="{{ route(\'home\') }}">Home</a>', trim($content));
+    }
+
     public function testViewCacheCommandHandlesConfiguredBladeExtensions()
     {
         View::addExtension('sh', 'blade');
