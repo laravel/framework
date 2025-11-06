@@ -205,6 +205,22 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Register many new global scopes.
+     *
+     * @param  array  $scopes
+     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
+     * @return $this
+     */
+    public function withGlobalScopes(array $scopes)
+    {
+        foreach ($scopes as $identifier => $scope) {
+            $this->withGlobalScope($identifier, $scope);
+        }
+
+        return $this;
+    }
+
+    /**
      * Remove a registered global scope.
      *
      * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
