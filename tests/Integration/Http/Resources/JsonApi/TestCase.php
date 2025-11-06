@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;

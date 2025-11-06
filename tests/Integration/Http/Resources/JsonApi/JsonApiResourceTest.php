@@ -2,19 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
-use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\JsonApi\JsonApiResource;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Orchestra\Testbench\Factories\UserFactory;
 
 class JsonApiResourceTest extends TestCase
