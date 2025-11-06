@@ -9,7 +9,7 @@ class SoftDeletingScope implements Scope
      *
      * @var string[]
      */
-    protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed'];
+    protected $extensions = ['Restore', 'RestoreOrCreate', 'CreateOrRestore', 'WithTrashed', 'WithTrashedRelations', 'WithoutTrashed', 'OnlyTrashed'];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -124,6 +124,19 @@ class SoftDeletingScope implements Scope
             }
 
             return $builder->withoutGlobalScope($this);
+        });
+    }
+
+    /**
+     * Add the with-trashed relationships extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder<*>  $builder
+     * @return void
+     */
+    protected function addWithTrashedRelations(Builder $builder)
+    {
+        $builder->macro('withTrashedRelations', function (Builder $builder) {
+            return $builder->withTrashed()->inheritScopes();
         });
     }
 
