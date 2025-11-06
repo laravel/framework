@@ -46,11 +46,11 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi', 'included']);
     }
 
-    public function testItCanGenerateJsonApiResponseWithEmptyRelationship()
+    public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
         $user = User::factory()->create();
 
-        $this->getJson("/users/{$user->getKey()}?".http_build_query(['includes' => ['posts']]))
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [
@@ -60,15 +60,22 @@ class JsonApiResourceTest extends TestCase
                         'name' => $user->name,
                         'email' => $user->email,
                     ],
+                    'relationships' => [
+                        'posts' => [
+                            'data' => [],
+                        ],
+                    ],
                 ],
             ])
             ->assertJsonMissing(['jsonapi', 'included']);
     }
 
-    public function testItCanGenerateJsonApiResponseWithEagerLoadedRelationship()
+    public function testItCanGenerateJsonApiResponseWithRelationshipsUsingSparseIncluded()
     {
         $now = $this->freezeSecond();
+
         $user = User::factory()->create();
+
         $profile = Profile::factory()->create([
             'user_id' => $user->getKey(),
             'date_of_birth' => '2011-06-09',
@@ -86,7 +93,7 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->getJson('/users/'.$user->getKey().'?'.http_build_query(['include' => 'profile,posts,teams']))
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'profile,posts,teams']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [

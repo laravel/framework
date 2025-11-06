@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\AsPivot;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -133,7 +134,7 @@ trait ResolvesJsonApiElements
         $this->compileResourceRelationships($request);
 
         return [
-            ...$this->loadedRelationshipIdentifiers,
+            ...$this->filter($this->loadedRelationshipIdentifiers),
         ];
     }
 
@@ -190,7 +191,7 @@ trait ResolvesJsonApiElements
             if (is_null($relatedModel) ||
                 $relatedModel instanceof Pivot ||
                 in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
-                return [$key => null];
+                return [$key => new MissingValue];
             }
 
             return [$key => ['data' => [transform(
@@ -201,7 +202,7 @@ trait ResolvesJsonApiElements
                     return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                 }
             )]]];
-        })->filter()->all();
+        })->all();
     }
 
     /**
