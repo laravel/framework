@@ -24,6 +24,7 @@ use Illuminate\Foundation\Bus\PendingClosureDispatch;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Foundation\Mix;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Log\Context\Repository as ContextRepository;
@@ -540,6 +541,22 @@ if (! function_exists('info')) {
     function info($message, $context = []): void
     {
         app('log')->info($message, $context);
+    }
+}
+
+if (! function_exists('json')) {
+    /**
+     * @param  mixed  $data
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  array  $options
+     * @return JsonResponse
+     */
+    function json($data = [], $status = 200, array $headers = [], $options = 0): JsonResponse
+    {
+        $factory = app(ResponseFactory::class);
+
+        return $factory->json($data, $status, $headers, $options);
     }
 }
 

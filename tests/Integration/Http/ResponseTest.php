@@ -28,4 +28,24 @@ class ResponseTest extends TestCase
 
         $this->get('/response');
     }
+
+    public function testJsonResponseHelper(): void
+    {
+        $response = json(['message' => 'Hello World']);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertEquals(200, $response->status());
+        $this->assertEquals(['message' => 'Hello World'], $response->getData(true));
+
+        $response = json(['error' => 'Not Found'], 404);
+        $this->assertEquals(404, $response->status());
+        $this->assertEquals(['error' => 'Not Found'], $response->getData(true));
+
+        $response = json(['data' => 'test'], 200, ['X-Custom-Header' => 'TestValue']);
+        $this->assertEquals('TestValue', $response->headers->get('X-Custom-Header'));
+
+        $data = ['url' => 'https://example.com/test'];
+        $response = json($data, 200, [], JSON_UNESCAPED_SLASHES);
+        $this->assertStringNotContainsString('\/', $response->getContent());
+        $this->assertStringContainsString('https://example.com/test', $response->getContent());
+    }
 }
