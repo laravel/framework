@@ -13,7 +13,7 @@ class JsonApiResourceTest extends TestCase
 {
     public function testItCanGenerateJsonApiResponse()
     {
-        $user = UserFactory::new()->create();
+        $user = User::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}")
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -32,7 +32,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithSparseFieldsets()
     {
-        $user = UserFactory::new()->create();
+        $user = User::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['fields' => ['users' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -50,7 +50,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanGenerateJsonApiResponseWithEmptyRelationship()
     {
-        $user = UserFactory::new()->create();
+        $user = User::factory()->create();
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['includes' => ['posts']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
@@ -181,21 +181,5 @@ class JsonApiResourceTest extends TestCase
                     ],
                 ],
             ]);
-    }
-}
-
-class ProfileFactory extends Factory
-{
-    public function definition(): array
-    {
-        return [
-            'user_id' => UserFactory::new(),
-        ];
-    }
-
-    #[\Override]
-    public function modelName()
-    {
-        return Profile::class;
     }
 }
