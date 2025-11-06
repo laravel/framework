@@ -2,12 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
-use Orchestra\Testbench\Factories\UserFactory;
 
 class JsonApiResourceTest extends TestCase
 {
