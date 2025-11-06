@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\Client\StrayRequestException;
 use Illuminate\Validation\NotPwnedVerifier;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -142,5 +143,20 @@ class ValidationNotPwnedVerifierTest extends TestCase
         ]));
 
         unset($container[ExceptionHandler::class]);
+    }
+
+    public function testStrayRequestExceptionIsThrown()
+    {
+        $this->expectException(StrayRequestException::class);
+
+        $httpFactory = new HttpFactory;
+        $httpFactory->preventStrayRequests();
+
+        $verifier = new NotPwnedVerifier($httpFactory);
+
+        $verifier->verify([
+            'value' => 'password',
+            'threshold' => 0,
+        ]);
     }
 }

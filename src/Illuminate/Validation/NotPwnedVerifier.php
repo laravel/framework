@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
+use Illuminate\Http\Client\StrayRequestException;
 use Illuminate\Support\Stringable;
 
 class NotPwnedVerifier implements UncompromisedVerifier
@@ -88,6 +89,8 @@ class NotPwnedVerifier implements UncompromisedVerifier
             ])->timeout($this->timeout)->get(
                 'https://api.pwnedpasswords.com/range/'.$hashPrefix
             );
+        } catch (StrayRequestException $e) {
+            throw $e;
         } catch (Exception $e) {
             report($e);
         }
