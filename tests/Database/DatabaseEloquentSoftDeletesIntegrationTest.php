@@ -967,6 +967,26 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, SoftDeletesTestUser::whereHas('self_referencing')->count());
     }
 
+    public function testAllRelationshipsLoadWithSoftDeletes()
+    {
+        [$taylor, $abigail] = $this->createUsers();
+
+        $post1 = tap($taylor->posts()->create(['title' => 'First Title']))->delete();
+
+        $post2 = $abigail->posts()->create(['title' => 'First Title']);
+        $post3 = tap($abigail->posts()->create(['title' => 'Second Title']))->delete();
+
+        tap($post1->comments()->create(['body' => 'Comment 1']))->delete();
+        $post2->comments()->create(['body' => 'Comment 2']);
+        tap($post2->comments()->create(['body' => 'Comment 3']))->delete();
+        $post3->comments()->create(['body' => 'Comment 4']);
+
+        $users = SoftDeletesTestUser::with('posts.comments')->withTrashedRelations()->get();
+        $this->assertCount(2, $users);
+        $this->assertCount(3, $users->pluck('posts')->collapse());
+        $this->assertCount(4, $users->pluck('posts')->collapse()->pluck('comments')->collapse());
+    }
+
     /**
      * Helpers...
      *
