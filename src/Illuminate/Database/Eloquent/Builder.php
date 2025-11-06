@@ -138,6 +138,13 @@ class Builder implements BuilderContract
     ];
 
     /**
+     * Indicate if the related models should inherit the scopes from the parent.
+     *
+     * @var bool
+     */
+    protected $inheritScopes = false;
+
+    /**
      * Applied global scopes.
      *
      * @var array
@@ -956,6 +963,14 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
+        // Run this before the callback so if the user wanted to they can overwrite it.
+        if ($this->inheritScopes) {
+            $relation
+                ->withGlobalScopes($this->scopes)
+                ->withoutGlobalScopes($this->removedScopes)
+                ->inheritScopes();
+        }
+
         $constraints($relation);
 
         // Once we have the results, we just match those back up to their parent models
@@ -1515,6 +1530,18 @@ class Builder implements BuilderContract
     public function onDelete(Closure $callback)
     {
         $this->onDelete = $callback;
+    }
+
+    /**
+     * Apply current scopes to all relationships.
+     *
+     * @return $this
+     */
+    public function inheritScopes()
+    {
+        $this->inheritScopes = true;
+
+        return $this;
     }
 
     /**
