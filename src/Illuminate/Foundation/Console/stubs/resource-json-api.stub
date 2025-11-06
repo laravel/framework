@@ -10,10 +10,10 @@ class {{ class }} extends JsonApiResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @return list<string>|array<string, mixed>
      */
     public function toAttributes(Request $request): array
     {
-        return parent::toArray($request);
+        return parent::toAttributes($request);
     }
 }
