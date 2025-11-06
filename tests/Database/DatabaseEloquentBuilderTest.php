@@ -858,6 +858,36 @@ class DatabaseEloquentBuilderTest extends TestCase
         unset($_SERVER['__eloquent.constrain']);
     }
 
+    public function testScopedRelationshipEagerLoadProcess()
+    {
+        $builder = m::mock(Builder::class.'[getRelation]', [$this->getMockQueryBuilder()]);
+        $builder->setEagerLoads(['orders' => function ($query) {
+            $_SERVER['__eloquent.constrain'] = $query;
+        }]);
+        $builder->withGlobalScope('test_scope', function ($query) {
+            $query->where('active', 1);
+        });
+        $builder->inheritScopes();
+
+        $relation = m::mock(stdClass::class);
+        $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);
+        $relation->shouldReceive('withGlobalScopes')->once()->with(m::on(function ($scopes) {
+            return isset($scopes['test_scope']);
+        }))->andReturnSelf();
+        $relation->shouldReceive('withoutGlobalScopes')->once()->with(m::type('array'))->andReturnSelf();
+        $relation->shouldReceive('inheritScopes')->once()->andReturnSelf();
+        $relation->shouldReceive('initRelation')->once()->with(['models'], 'orders')->andReturn(['models']);
+        $relation->shouldReceive('getEager')->once()->andReturn(['results']);
+        $relation->shouldReceive('match')->once()->with(['models'], ['results'], 'orders')->andReturn(['models.matched']);
+        $builder->shouldReceive('getRelation')->once()->with('orders')->andReturn($relation);
+
+        $results = $builder->eagerLoadRelations(['models']);
+
+        $this->assertEquals(['models.matched'], $results);
+        $this->assertEquals($relation, $_SERVER['__eloquent.constrain']);
+        unset($_SERVER['__eloquent.constrain']);
+    }
+
     public function testRelationshipEagerLoadProcessForImplicitlyEmpty()
     {
         $queryBuilder = $this->getMockQueryBuilder();
