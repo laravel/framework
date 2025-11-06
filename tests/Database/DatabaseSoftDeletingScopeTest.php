@@ -112,6 +112,24 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $this->assertEquals($givenBuilder, $result);
     }
 
+    public function testWithTrashedRelationsExtension()
+    {
+        $builder = new EloquentBuilder(new BaseBuilder(
+            m::mock(ConnectionInterface::class),
+            m::mock(Grammar::class),
+            m::mock(Processor::class)
+        ));
+        $scope = m::mock(SoftDeletingScope::class.'[remove]');
+        $scope->extend($builder);
+        $callback = $builder->getMacro('withTrashedRelations');
+        $givenBuilder = m::mock(EloquentBuilder::class);
+        $givenBuilder->shouldReceive('withTrashed')->once()->andReturn($givenBuilder);
+        $givenBuilder->shouldReceive('inheritScopes')->once()->andReturn($givenBuilder);
+        $result = $callback($givenBuilder);
+
+        $this->assertEquals($givenBuilder, $result);
+    }
+
     public function testOnlyTrashedExtension()
     {
         $builder = new EloquentBuilder(new BaseBuilder(
