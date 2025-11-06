@@ -544,7 +544,7 @@ if (! function_exists('info')) {
     }
 }
 
-if (! function_exists('json')) {
+if (! function_exists('json_response')) {
     /**
      * @param  mixed  $data
      * @param  int  $status
@@ -552,7 +552,7 @@ if (! function_exists('json')) {
      * @param  array  $options
      * @return JsonResponse
      */
-    function json($data = [], $status = 200, array $headers = [], $options = 0): JsonResponse
+    function json_response($data = [], $status = 200, array $headers = [], $options = 0): JsonResponse
     {
         $factory = app(ResponseFactory::class);
 
