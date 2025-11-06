@@ -1112,9 +1112,9 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      *
      * @return static
      */
-    public function ucwords()
+    public function ucwords($separators = " \t\r\n\f\v")
     {
-        return new static(Str::ucwords($this->value));
+        return new static(Str::ucwords($this->value, $separators));
     }
 
     /**
