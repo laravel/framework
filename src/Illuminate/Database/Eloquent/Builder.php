@@ -280,7 +280,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Register scopes that related model queries should inherit.
+     * Register scopes that related model eager loading queries should inherit.
      *
      * @param  array  $scopes
      * @return $this
