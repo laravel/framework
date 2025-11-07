@@ -609,6 +609,33 @@ class FoundationApplicationTest extends TestCase
             $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
         }
     }
+
+    public function test_routes_are_cached()
+    {
+        $app = new Application();
+        $app->instance('routes.cached', true);
+        $this->assertTrue($app->routesAreCached());
+    }
+
+    public function test_routes_are_not_cached_by_instance_falls_back_to_file()
+    {
+        $app = new Application();
+        $files = new class
+        {
+            public string $pathRequested;
+
+            public function exists(string $path): bool
+            {
+                $this->pathRequested = $path;
+
+                return false;
+            }
+        };
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->routesAreCached());
+        $this->assertStringContainsString('routes-v7.php', $files->pathRequested);
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

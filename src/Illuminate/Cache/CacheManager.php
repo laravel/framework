@@ -257,7 +257,7 @@ class CacheManager implements FactoryContract
             $this,
             $this->app->make(DispatcherContract::class),
             $config['stores']
-        ));
+        ), ['events' => false, ...$config]);
     }
 
     /**

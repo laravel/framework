@@ -790,6 +790,27 @@ class Store implements Session
     }
 
     /**
+     * Get the previous route name from the session.
+     *
+     * @return string|null
+     */
+    public function previousRoute()
+    {
+        return $this->get('_previous.route');
+    }
+
+    /**
+     * Set the "previous" route name in the session.
+     *
+     * @param  string|null  $route
+     * @return void
+     */
+    public function setPreviousRoute($route)
+    {
+        $this->put('_previous.route', $route);
+    }
+
+    /**
      * Specify that the user has confirmed their password.
      *
      * @return void

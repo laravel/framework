@@ -1,6 +1,90 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.34.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.37.0...12.x)
+
+## [v12.37.0](https://github.com/laravel/framework/compare/v12.36.1...v12.37.0) - 2025-11-04
+
+* [12.x] allow passing custom "depth" to `files()` and `directories()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57573
+* [12.x] EnumerateValues::value() support objects and return negative values by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57570
+* [12.x] Move duplicated logic to separate method to be reusable by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/57564
+* [12.x] Refactor unreleased data_has helper by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57580
+* feat: added detailed about for cache failover driver by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57579
+* [12.x] fix data_has empty check by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57586
+* [12.x] Fix: use trim before check empty string by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57583
+* feat: added detailed about for queue failover driver by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57582
+* Feat: add mailers detail for failover or roundrobin by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57590
+* [12.x] Refactor: remove un use var by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57617
+* [12.x] `Factory@insert()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57600
+* Fix ScheduleRunCommandTest failure on Windows by using OS-specific success command by [@Tina-1300](https://github.com/Tina-1300) in https://github.com/laravel/framework/pull/57621
+* [12.x] Add ucwords to Str and Stringable by [@braxey](https://github.com/braxey) in https://github.com/laravel/framework/pull/57581
+* [12.x] improve `Connection@listen()` docblock by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57633
+* [12.x] Fix: Correctly fallback to notification's connection/queue when using viaConnections/viaQueues by [@aydinfatih](https://github.com/aydinfatih) in https://github.com/laravel/framework/pull/57625
+* [12.x] Remove unused closure parameters in DatabaseServiceProvider by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57644
+* [12.x] Queue tests for Redis Cluster missing QUEUE_CONNECTION by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57641
+* refactor: remove unused parameter in ArtisanServiceProvider by [@omarchouman](https://github.com/omarchouman) in https://github.com/laravel/framework/pull/57658
+* [12.x] Ensure custom validation messages work for the File rule by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57656
+* Feature/json schema improvements by [@Anticom](https://github.com/Anticom) in https://github.com/laravel/framework/pull/57609
+* Process queue jobs in background (Concurrently::defer()) by [@barryvdh](https://github.com/barryvdh) in https://github.com/laravel/framework/pull/57648
+* [12.x] ChainedBatch keeps queue and connection of wrapped batch by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57630
+
+## [v12.36.1](https://github.com/laravel/framework/compare/v12.36.0...v12.36.1) - 2025-10-29
+
+* [12.x] EnumerateValues::value() support and return negative values if exists #54910 by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57566
+* [12.x] always use the `operator` argument for `version_compare()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57569
+* [12.x] add `allDirectories()` method to `Filesytem` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57565
+* Revert "[12.x] EnumerateValues::value() support and return negative values if exists #54910" by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57572
+
+## [v12.36.0](https://github.com/laravel/framework/compare/v12.35.1...v12.36.0) - 2025-10-28
+
+* [12.x] Remove return void from Http\Client\Batch's constructor by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57518
+* [12.x] Namespace file cache lock keys by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57516
+* [12.x] Remove [@return](https://github.com/return) tag from constructor by [@noir4y](https://github.com/noir4y) in https://github.com/laravel/framework/pull/57536
+* [12.x] Add missing [@throws](https://github.com/throws) annotation by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57535
+* [12.x] allow chaining on setters by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57532
+* [12.x] Stop double prefixing S3 filesystem paths by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57534
+* [12.x] test `Uri` builder methods by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57549
+* [12.x] Refactor `jsonSerialize()` method to use match expression by [@amirhshokri](https://github.com/amirhshokri) in https://github.com/laravel/framework/pull/57552
+* [12.x] redirect response enforce same origin by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57533
+* [12.x] Add Eloquent Collection methods: `setAppends` && `withoutAppends` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57561
+* [12.x] Fix buffer overflow when flushing Redis cache tags with many keys by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57562
+* [12.x] Allow validator message placeholers to be capitalized by [@florianraith](https://github.com/florianraith) in https://github.com/laravel/framework/pull/57556
+* Exclude property hooks on return of Model::__sleep() by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57557
+* [12.x] Add concurrency control to Http::pool and Http::batch by [@WendellAdriel](https://github.com/WendellAdriel) in https://github.com/laravel/framework/pull/57555
+
+## [v12.35.1](https://github.com/laravel/framework/compare/v12.35.0...v12.35.1) - 2025-10-23
+
+* Store previous route name in session by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57477
+* [12.x] Update CSS in minimal exception view. by [@FoksVHox](https://github.com/FoksVHox) in https://github.com/laravel/framework/pull/57490
+* [12.x] Ensure HTTP batch results are returned in the same order as requested by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57483
+* [12.x] Correct `Response` namespace in `Batch` by [@simon-tma](https://github.com/simon-tma) in https://github.com/laravel/framework/pull/57481
+* [12.x] Rename NamedScope to Scope by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57478
+* Fix S3 adapter to use correct path separator and update related tests by [@Kleppinger](https://github.com/Kleppinger) in https://github.com/laravel/framework/pull/57497
+* [12.x] Replace Bootcamp with Laravel Learn by [@AhmedAlaa4611](https://github.com/AhmedAlaa4611) in https://github.com/laravel/framework/pull/57506
+* [12.x] Pass exception to `QueueFailedOver` event by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57503
+* [12.x] Add warning when server workers cannot be respected by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/57482
+* [12.x] Emit underlying store name in cache events when using failover by [@jessarcher](https://github.com/jessarcher) in https://github.com/laravel/framework/pull/57505
+
+## [v12.35.0](https://github.com/laravel/framework/compare/v12.34.0...v12.35.0) - 2025-10-21
+
+* [12.x] Fix `DB::update()` with subqueries is not supported for all databases by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57381
+* [12.x] Ensure custom validation messages work for AnyOf, Can and Enum by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57356
+* Added Neovim editor support in ResolvesDumpSource by [@cseknowledge](https://github.com/cseknowledge) in https://github.com/laravel/framework/pull/57392
+* Add clickable file reference for thrown exception by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/57400
+* [12.x] Render newlines in query tooltip by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57310
+* [12.x] Add SQS FIFO and fair queue messageGroup() method support by [@patrickcarlohickman](https://github.com/patrickcarlohickman) in https://github.com/laravel/framework/pull/57421
+* [12.x] Use MariaDB idiomatic `json_value()` by [@crishoj](https://github.com/crishoj) in https://github.com/laravel/framework/pull/57417
+* Deferred queue by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57428
+* Fix validate integer php doc type annotation by [@tei0110](https://github.com/tei0110) in https://github.com/laravel/framework/pull/57435
+* [12.x] Fix passing countable to Number::format() by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/57434
+* [12.x] Update `Route::middleware` to accept null by [@avosalmon](https://github.com/avosalmon) in https://github.com/laravel/framework/pull/57436
+* Only replace first basePath occurrence in dump source href by [@fritz-c](https://github.com/fritz-c) in https://github.com/laravel/framework/pull/57458
+* [12.x] Add missing [@throws](https://github.com/throws) annotations to Encrypter class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57451
+* [12.x] Add missing [@throws](https://github.com/throws) annotations to Database Connection class by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57452
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57461
+* Prevent TypeError in validateDigits when attribute value is an array by [@elyass-dehghan](https://github.com/elyass-dehghan) in https://github.com/laravel/framework/pull/57471
+* Bump vite from 7.1.6 to 7.1.11 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/57460
+* Failover cache by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57430
+* Must collect the unparsed event and payload when deferring events by [@moshe-autoleadstar](https://github.com/moshe-autoleadstar) in https://github.com/laravel/framework/pull/57453
 
 ## [v12.34.0](https://github.com/laravel/framework/compare/v12.33.0...v12.34.0) - 2025-10-14
 

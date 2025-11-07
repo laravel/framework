@@ -570,6 +570,27 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['test' => 'test'], $c[0]->toArray());
     }
 
+    public function testSetAppendsSetsAppendedPropertiesOnEntireCollection()
+    {
+        $c = new Collection([new EloquentAppendingTestUserModel]);
+        $c->setAppends(['other_appended_field']);
+
+        $this->assertEquals(
+            [['other_appended_field' => 'bye']],
+            $c->toArray()
+        );
+    }
+
+    public function testWithoutAppendsRemovesAppendsOnEntireCollection()
+    {
+        $this->seedData();
+        $c = EloquentAppendingTestUserModel::query()->get();
+        $this->assertEquals('hello', $c->toArray()[0]['appended_field']);
+
+        $c = $c->withoutAppends();
+        $this->assertArrayNotHasKey('appended_field', $c->toArray()[0]);
+    }
+
     public function testNonModelRelatedMethods()
     {
         $a = new Collection([['foo' => 'bar'], ['foo' => 'baz']]);
@@ -843,5 +864,28 @@ class EloquentTestKey
     public function __toString()
     {
         return $this->key;
+    }
+}
+
+class EloquentAppendingTestUserModel extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $appends = ['appended_field'];
+
+    public function getAppendedFieldAttribute()
+    {
+        return 'hello';
+    }
+
+    public function getOtherAppendedFieldAttribute()
+    {
+        return 'bye';
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
     }
 }

@@ -218,7 +218,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = suggest(
             'What model should this policy apply to? (Optional)',
-            $this->possibleModels(),
+            $this->findAvailableModels(),
         );
 
         if ($model) {

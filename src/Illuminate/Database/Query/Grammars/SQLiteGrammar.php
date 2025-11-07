@@ -44,6 +44,25 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a basic where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBasic(Builder $query, $where)
+    {
+        if ($where['operator'] === '<=>') {
+            $column = $this->wrap($where['column']);
+            $value = $this->parameter($where['value']);
+
+            return "{$column} IS {$value}";
+        }
+
+        return parent::whereBasic($query, $where);
+    }
+
+    /**
      * Compile a "where like" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -228,7 +247,7 @@ class SQLiteGrammar extends Grammar
     {
         $version = $query->getConnection()->getServerVersion();
 
-        if (version_compare($version, '3.25.0') >= 0) {
+        if (version_compare($version, '3.25.0', '>=')) {
             return parent::compileGroupLimit($query);
         }
 
