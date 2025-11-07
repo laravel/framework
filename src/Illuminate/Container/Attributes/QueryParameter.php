@@ -17,7 +17,9 @@ class QueryParameter implements ContextualAttribute
     /**
      * Create a new class instance.
      */
-    public function __construct(public string $parameter, public mixed $default = null) {}
+    public function __construct(public string $parameter, public mixed $default = null)
+    {
+    }
 
     /**
      * Resolve the query parameter.

@@ -1415,8 +1415,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Resolve a dependency based on an attribute.
      *
-     * @param  \ReflectionAttribute $attribute
-     * @param  \ReflectionParameter|null $parameter
+     * @param  \ReflectionAttribute  $attribute
+     * @param  \ReflectionParameter|null  $parameter
      * @return mixed
      */
     public function resolveFromAttribute(ReflectionAttribute $attribute, ?ReflectionParameter $parameter = null)
