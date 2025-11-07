@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Job;
 use Illuminate\Support\Facades\Concurrency;
 
 class BackgroundQueue extends SyncQueue
