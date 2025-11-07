@@ -25,7 +25,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @var array<class-string, int>
      */
-    protected array $testUsesTraits;
+    protected array $traitsUsedByTest;
 
     /**
      * Creates the application.
@@ -36,14 +36,16 @@ abstract class TestCase extends BaseTestCase
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
 
-        $this->testUsesTraits = array_flip(class_uses_recursive(static::class));
-        if (isset(CachedState::$cachedRoutes) &&
-            isset($this->testUsesTraits[WithCachedRoutes::class])) {
-            $app->booting(fn () => $this->markRoutesCached($app));
-        }
+        $this->traitsUsedByTest = array_flip(class_uses_recursive(static::class));
+
         if (isset(CachedState::$cachedConfig) &&
-            isset($this->testUsesTraits[WithCachedConfig::class])) {
+            isset($this->traitsUsedByTest[WithCachedConfig::class])) {
             $this->markConfigCached($app);
+        }
+
+        if (isset(CachedState::$cachedRoutes) &&
+            isset($this->traitsUsedByTest[WithCachedRoutes::class])) {
+            $app->booting(fn () => $this->markRoutesCached($app));
         }
 
         $app->make(Kernel::class)->bootstrap();

@@ -13,20 +13,11 @@ use Symfony\Component\Finder\Finder;
 class LoadConfiguration
 {
     /**
+     * The closure that resolves the permanent, static configuration if applicable.
+     *
      * @var (Closure(Application): array<array-key, mixed>)|null
      */
     protected static ?Closure $alwaysUseConfig = null;
-
-    /**
-     * Set a callback to return the config values.
-     *
-     * @param  (Closure(Application): array<array-key, mixed>)|null  $alwaysUseConfig
-     * @return void
-     */
-    public static function setAlwaysUseConfig(?Closure $alwaysUseConfig): void
-    {
-        static::$alwaysUseConfig = $alwaysUseConfig;
-    }
 
     /**
      * Bootstrap the given application.
@@ -42,6 +33,7 @@ class LoadConfiguration
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
         $loadedFromCache = false;
+
         if (self::$alwaysUseConfig !== null) {
             $items = $app->call(self::$alwaysUseConfig);
 
@@ -51,6 +43,7 @@ class LoadConfiguration
 
             $loadedFromCache = true;
         }
+
         $app->instance('config_loaded_from_cache', $loadedFromCache);
 
         // Next we will spin through all of the configuration files in the configuration
@@ -217,5 +210,16 @@ class LoadConfiguration
         }
 
         return $config;
+    }
+
+    /**
+     * Set a callback to return the permanent, static configuration values.
+     *
+     * @param  (Closure(Application): array<array-key, mixed>)|null  $alwaysUseConfig
+     * @return void
+     */
+    public static function alwaysUse(?Closure $alwaysUseConfig): void
+    {
+        static::$alwaysUseConfig = $alwaysUseConfig;
     }
 }
