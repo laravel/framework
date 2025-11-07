@@ -138,21 +138,21 @@ class Builder implements BuilderContract
     ];
 
     /**
-     * Applied global scopes.
+     * The applied global scopes.
      *
      * @var array
      */
     protected $scopes = [];
 
     /**
-     * Removed global scopes.
+     * The removed global scopes.
      *
      * @var array
      */
     protected $removedScopes = [];
 
     /**
-     * Inherited global scopes.
+     * The inherited global scopes.
      *
      * @var array
      */
@@ -280,7 +280,7 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Register scopes that related models should inherit.
+     * Register scopes that related model queries should inherit.
      *
      * @param  array  $scopes
      * @return $this
@@ -981,7 +981,6 @@ class Builder implements BuilderContract
 
         $relation->addEagerConstraints($models);
 
-        // Run this before the callback so if the user wanted to they can override it.
         if (! empty($this->inheritedScopes)) {
             $relation
                 ->withGlobalScopes($this->inheritedScopes['keep'] ?? [])
