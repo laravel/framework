@@ -982,7 +982,7 @@ class Builder implements BuilderContract
         $relation->addEagerConstraints($models);
 
         // Run this before the callback so if the user wanted to they can override it.
-        if (!empty($this->inheritedScopes)) {
+        if (! empty($this->inheritedScopes)) {
             $relation
                 ->withGlobalScopes($this->inheritedScopes['keep'] ?? [])
                 ->withoutGlobalScopes($this->inheritedScopes['remove'] ?? [])
