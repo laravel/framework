@@ -19,8 +19,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     #[\Override]
     public function with($request)
     {
-        $request = $this->resolveJsonApiRequestFrom($request);
-
         return array_filter([
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResources($request))
@@ -41,8 +39,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     #[\Override]
     public function toAttributes(Request $request)
     {
-        $request = $this->resolveJsonApiRequestFrom($request);
-
         return $this->collection
             ->map(fn ($resource) => $resource->resolveResourceData($request))
             ->all();
@@ -59,6 +55,18 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    #[\Override]
+    public function toResponse($request)
+    {
+        return parent::toResponse($this->resolveJsonApiRequestFrom($request));
     }
 
     /**
