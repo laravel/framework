@@ -8,12 +8,16 @@ use Illuminate\Database\Console\Migrations\FreshCommand;
 use Illuminate\Database\Console\Migrations\InstallCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Console\Migrations\MigrationConflictsCommand;
+use Illuminate\Database\Console\Migrations\MigrationDependenciesCommand;
+use Illuminate\Database\Console\Migrations\MigrationSuggestOrderCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
 use Illuminate\Database\Console\Migrations\StatusCommand;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Database\Migrations\MigrationDependencyResolver;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,6 +37,9 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         'MigrateRollback' => RollbackCommand::class,
         'MigrateStatus' => StatusCommand::class,
         'MigrateMake' => MigrateMakeCommand::class,
+        'MigrationDependencies' => MigrationDependenciesCommand::class,
+        'MigrationConflicts' => MigrationConflictsCommand::class,
+        'MigrationSuggestOrder' => MigrationSuggestOrderCommand::class,
     ];
 
     /**
@@ -47,6 +54,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         $this->registerMigrator();
 
         $this->registerCreator();
+
+        $this->registerDependencyResolver();
 
         $this->registerCommands($this->commands);
     }
@@ -96,6 +105,20 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
         $this->app->singleton('migration.creator', function ($app) {
             return new MigrationCreator($app['files'], $app->basePath('stubs'));
         });
+    }
+
+    /**
+     * Register the migration dependency resolver.
+     *
+     * @return void
+     */
+    protected function registerDependencyResolver()
+    {
+        $this->app->singleton('migration.dependency.resolver', function ($app) {
+            return new MigrationDependencyResolver($app['files'], $app['migrator']);
+        });
+
+        $this->app->bind(MigrationDependencyResolver::class, fn ($app) => $app['migration.dependency.resolver']);
     }
 
     /**
@@ -215,6 +238,42 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     }
 
     /**
+     * Register the migration dependencies command.
+     *
+     * @return void
+     */
+    protected function registerMigrationDependenciesCommand()
+    {
+        $this->app->singleton(MigrationDependenciesCommand::class, function ($app) {
+            return new MigrationDependenciesCommand($app['migrator'], $app['migration.dependency.resolver']);
+        });
+    }
+
+    /**
+     * Register the migration conflicts command.
+     *
+     * @return void
+     */
+    protected function registerMigrationConflictsCommand()
+    {
+        $this->app->singleton(MigrationConflictsCommand::class, function ($app) {
+            return new MigrationConflictsCommand($app['migrator'], $app['migration.dependency.resolver']);
+        });
+    }
+
+    /**
+     * Register the migration suggest order command.
+     *
+     * @return void
+     */
+    protected function registerMigrationSuggestOrderCommand()
+    {
+        $this->app->singleton(MigrationSuggestOrderCommand::class, function ($app) {
+            return new MigrationSuggestOrderCommand($app['migrator'], $app['migration.dependency.resolver']);
+        });
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array
@@ -222,7 +281,8 @@ class MigrationServiceProvider extends ServiceProvider implements DeferrableProv
     public function provides()
     {
         return array_merge([
-            'migrator', 'migration.repository', 'migration.creator', Migrator::class,
+            'migrator', 'migration.repository', 'migration.creator', 'migration.dependency.resolver',
+            Migrator::class, MigrationDependencyResolver::class,
         ], array_values($this->commands));
     }
 }
