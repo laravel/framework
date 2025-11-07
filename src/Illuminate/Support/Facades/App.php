@@ -124,7 +124,7 @@ namespace Illuminate\Support\Facades;
  * @method static object|mixed makeWith(string|callable $abstract, array $parameters = [])
  * @method static object|mixed get(string $id)
  * @method static object build(\Closure|string $concrete)
- * @method static mixed resolveFromAttribute(\ReflectionAttribute $attribute)
+ * @method static mixed resolveFromAttribute(\ReflectionAttribute $attribute, \ReflectionParameter|null $parameter = null)
  * @method static void beforeResolving(\Closure|string $abstract, \Closure|null $callback = null)
  * @method static void resolving(\Closure|string $abstract, \Closure|null $callback = null)
  * @method static void afterResolving(\Closure|string $abstract, \Closure|null $callback = null)
