@@ -24,10 +24,12 @@ class MigrationDependencyCommandsTest extends TestCase
 
         $this->migrator = m::mock(Migrator::class);
         $this->resolver = m::mock(MigrationDependencyResolver::class);
-        $this->container = new Container;
+        $this->container = m::mock(Container::class);
 
-        $this->container->instance('migrator', $this->migrator);
-        $this->container->instance('migration.dependency.resolver', $this->resolver);
+        $this->container->shouldReceive('environment')->andReturn('testing');
+        $this->container->shouldReceive('runningUnitTests')->andReturn(true);
+        $this->container->shouldReceive('make')->with('migrator')->andReturn($this->migrator);
+        $this->container->shouldReceive('make')->with('migration.dependency.resolver')->andReturn($this->resolver);
     }
 
     protected function tearDown(): void
