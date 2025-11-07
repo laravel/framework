@@ -8,12 +8,16 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 class {{ class }} extends JsonApiResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @return list<string>|array<string, mixed>
+     * The resource's attributes.
      */
-    public function toAttributes(Request $request): array
-    {
-        return parent::toAttributes($request);
-    }
+    public $attributes = [
+        // ...
+    ];
+
+    /**
+     * The resource's relationships.
+     */
+    public $relationships = [
+        // ...
+    ];
 }
