@@ -88,7 +88,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
             throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
 
-        return parent::check($value, $hashedValue, $options);
+        return password_verify($value, $hashedValue);
     }
 
     /**

@@ -94,6 +94,7 @@ class HasherTest extends TestCase
     public function testBasicBcryptVerification()
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This password does not use the Bcrypt algorithm.');
 
         $argonHasher = new ArgonHasher(['verify' => true]);
         $argonHashed = $argonHasher->make('password');
@@ -104,6 +105,7 @@ class HasherTest extends TestCase
     public function testBasicArgon2iVerification()
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This password does not use the Argon2i algorithm.');
 
         $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
@@ -114,6 +116,7 @@ class HasherTest extends TestCase
     public function testBasicArgon2idVerification()
     {
         $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This password does not use the Argon2id algorithm.');
 
         $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');

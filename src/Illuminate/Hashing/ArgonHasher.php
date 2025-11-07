@@ -103,7 +103,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
         }
 
-        return parent::check($value, $hashedValue, $options);
+        return password_verify($value, $hashedValue);
     }
 
     /**
