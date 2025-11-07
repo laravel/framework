@@ -56,11 +56,7 @@ class SQLiteGrammar extends Grammar
             $column = $this->wrap($where['column']);
             $value = $this->parameter($where['value']);
 
-            if (is_null($where['value'])) {
-                return "{$column} IS NULL";
-            }
-
-            return "{$column} = {$value}";
+            return "{$column} IS {$value}";
         }
 
         return parent::whereBasic($query, $where);
