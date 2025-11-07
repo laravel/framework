@@ -6,6 +6,5 @@ class JsonApiRequestTest extends TestCase
 {
     public function testItCanResolveSparseFieldset(string $queryString, array $expected)
     {
-
     }
 }
