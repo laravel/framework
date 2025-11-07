@@ -864,10 +864,11 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setEagerLoads(['orders' => function ($query) {
             $_SERVER['__eloquent.constrain'] = $query;
         }]);
-        $builder->withGlobalScope('test_scope', function ($query) {
+        $scope = function ($query) {
             $query->where('active', 1);
-        });
-        $builder->inheritScopes();
+        };
+        $builder->withGlobalScope('test_scope', $scope);
+        $builder->inheritScopes(['test_scope' => $scope]);
 
         $relation = m::mock(stdClass::class);
         $relation->shouldReceive('addEagerConstraints')->once()->with(['models']);

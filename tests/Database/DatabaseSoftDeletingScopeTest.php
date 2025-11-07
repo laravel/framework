@@ -124,7 +124,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $callback = $builder->getMacro('withTrashedRelations');
         $givenBuilder = m::mock(EloquentBuilder::class);
         $givenBuilder->shouldReceive('withTrashed')->once()->andReturn($givenBuilder);
-        $givenBuilder->shouldReceive('inheritScopes')->once()->andReturn($givenBuilder);
+        $givenBuilder->shouldReceive('inheritScopes')->once()->with([], [$scope])->andReturn($givenBuilder);
         $result = $callback($givenBuilder);
 
         $this->assertEquals($givenBuilder, $result);
