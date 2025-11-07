@@ -2,11 +2,14 @@
 
 namespace Illuminate\Http\Resources\JsonApi;
 
+use Illuminate\Container\Container;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\AnonymousResourceCollection
 {
+    use Concerns\ResolvesJsonApiRequest;
+
     /**
      * Get any additional data that should be returned with the resource array.
      *
@@ -20,7 +23,6 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResources($request))
                 ->flatten(depth: 1)
-                ->uniqueStrict(fn ($relation): array => [$relation['id'], $relation['type']])
                 ->all(),
             ...($implementation = JsonApiResource::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]
@@ -53,5 +55,28 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    #[\Override]
+    public function toResponse($request)
+    {
+        return parent::toResponse($this->resolveJsonApiRequestFrom($request));
+    }
+
+    /**
+     * Resolve the HTTP request instance from container.
+     *
+     * @return \Illuminate\Http\Resources\JsonApi\SparseRequest
+     */
+    #[\Override]
+    protected function resolveRequestFromContainer()
+    {
+        return $this->resolveJsonApiRequestFrom(Container::getInstance()->make('request'));
     }
 }

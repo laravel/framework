@@ -112,7 +112,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function resolve($request = null)
     {
         $data = $this->toAttributes(
-            $request ?: Container::getInstance()->make('request')
+            $request ?: $this->resolveRequestFromContainer()
         );
 
         if ($data instanceof Arrayable) {
@@ -231,6 +231,16 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Resolve the HTTP request instance from container.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    protected function resolveRequestFromContainer()
+    {
+        return Container::getInstance()->make('request');
+    }
+
+    /**
      * Set the string that should wrap the outer-most resource array.
      *
      * @param  string  $value
@@ -260,7 +270,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function response($request = null)
     {
         return $this->toResponse(
-            $request ?: Container::getInstance()->make('request')
+            $request ?: $this->resolveRequestFromContainer()
         );
     }
 
@@ -282,7 +292,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function jsonSerialize(): array
     {
-        return $this->resolve(Container::getInstance()->make('request'));
+        return $this->resolve($this->resolveRequestFromContainer());
     }
 
     /**

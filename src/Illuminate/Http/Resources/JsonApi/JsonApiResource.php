@@ -6,11 +6,11 @@ use BadMethodCallException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Collection;
 
 class JsonApiResource extends JsonResource
 {
-    use Concerns\ResolvesJsonApiElements;
+    use Concerns\ResolvesJsonApiElements,
+        Concerns\ResolvesJsonApiRequest;
 
     /**
      * The "data" wrapper that should be applied.
@@ -88,6 +88,21 @@ class JsonApiResource extends JsonResource
     }
 
     /**
+     * Get the resource's relationships.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\Support\Arrayable|array
+     */
+    public function toRelationships(Request $request)
+    {
+        if (property_exists($this, 'relationships')) {
+            return $this->relationships;
+        }
+
+        return [];
+    }
+
+    /**
      * Get the resource's links.
      *
      * @return array
@@ -134,7 +149,7 @@ class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => $this->resolveResourceData($request),
+            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
         ];
     }
 
@@ -145,6 +160,29 @@ class JsonApiResource extends JsonResource
     public function withResponse(Request $request, JsonResponse $response): void
     {
         $response->header('Content-Type', 'application/vnd.api+json');
+    }
+
+    /**
+     * Create an HTTP response that represents the object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    #[\Override]
+    public function toResponse($request)
+    {
+        return parent::toResponse($this->resolveJsonApiRequestFrom($request));
+    }
+
+    /**
+     * Resolve the HTTP request instance from container.
+     *
+     * @return \Illuminate\Http\Resources\JsonApi\JsonApiRequest
+     */
+    #[\Override]
+    protected function resolveRequestFromContainer()
+    {
+        return $this->resolveJsonApiRequestFrom(parent::resolveRequestFromContainer());
     }
 
     /**
