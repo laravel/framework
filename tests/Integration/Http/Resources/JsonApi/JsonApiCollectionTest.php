@@ -138,7 +138,7 @@ class JsonApiCollectionTest extends TestCase
                                 ],
                             ],
                         ],
-                    ]
+                    ],
                 ]
             )->assertJsonPath(
                 'included',
