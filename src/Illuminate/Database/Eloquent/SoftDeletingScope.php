@@ -136,7 +136,7 @@ class SoftDeletingScope implements Scope
     protected function addWithTrashedRelations(Builder $builder)
     {
         $builder->macro('withTrashedRelations', function (Builder $builder) {
-            return $builder->withTrashed()->inheritScopes();
+            return $builder->withTrashed()->inheritScopes(remove: [$this]);
         });
     }
 
