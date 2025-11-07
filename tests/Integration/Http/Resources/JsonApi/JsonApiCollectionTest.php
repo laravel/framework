@@ -7,53 +7,54 @@ use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 
-class JsonApiResourceTest extends TestCase
+class JsonApiCollectionTest extends TestCase
 {
     public function testItCanGenerateJsonApiResponse()
     {
-        $user = User::factory()->create();
+        $users = User::factory()->times(5)->create();
 
-        $this->getJson("/users/{$user->getKey()}")
+        $this->getJson('/users')
             ->assertHeader('Content-type', 'application/vnd.api+json')
-            ->assertExactJson([
-                'data' => [
+            ->assertJsonPath(
+                'data',
+                $users->transform(fn ($user) => [
                     'id' => (string) $user->getKey(),
                     'type' => 'users',
                     'attributes' => [
                         'name' => $user->name,
                         'email' => $user->email,
                     ],
-                ],
-            ])
-            ->assertJsonMissing(['jsonapi', 'included']);
+                ])->all()
+            )->assertJsonMissing(['jsonapi', 'included']);
     }
 
     public function testItCanGenerateJsonApiResponseWithSparseFieldsets()
     {
-        $user = User::factory()->create();
+        $users = User::factory()->times(5)->create();
 
-        $this->getJson("/users/{$user->getKey()}?".http_build_query(['fields' => ['users' => 'name']]))
+        $this->getJson('/users/?'.http_build_query(['fields' => ['users' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
-            ->assertExactJson([
-                'data' => [
+            ->assertJsonPath(
+                'data',
+                $users->transform(fn ($user) => [
                     'id' => (string) $user->getKey(),
                     'type' => 'users',
                     'attributes' => [
                         'name' => $user->name,
                     ],
-                ],
-            ])
-            ->assertJsonMissing(['jsonapi', 'included']);
+                ])->all()
+            )->assertJsonMissing(['jsonapi', 'included']);
     }
 
     public function testItCanGenerateJsonApiResponseWithEmptyRelationshipsUsingSparseIncluded()
     {
-        $user = User::factory()->create();
+        $users = User::factory()->times(5)->create();
 
-        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'posts']))
+        $this->getJson('/users/?'.http_build_query(['include' => 'posts']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
-            ->assertExactJson([
-                'data' => [
+            ->assertJsonPath(
+                'data',
+                $users->transform(fn ($user) => [
                     'id' => (string) $user->getKey(),
                     'type' => 'users',
                     'attributes' => [
@@ -65,15 +66,15 @@ class JsonApiResourceTest extends TestCase
                             'data' => [],
                         ],
                     ],
-                ],
-            ])
-            ->assertJsonMissing(['jsonapi', 'included']);
+                ])->all()
+            )->assertJsonMissing(['jsonapi', 'included']);
     }
 
     public function testItCanGenerateJsonApiResponseWithRelationshipsUsingSparseIncluded()
     {
         $now = $this->freezeSecond();
 
+        $users = User::factory()->times(4)->create();
         $user = User::factory()->create();
 
         $profile = Profile::factory()->create([
@@ -93,45 +94,63 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'profile,posts,teams']))
+        $this->getJson('/users?'.http_build_query(['include' => 'profile,posts,teams']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
-            ->assertExactJson([
-                'data' => [
-                    'id' => (string) $user->getKey(),
-                    'type' => 'users',
-                    'attributes' => [
-                        'name' => $user->name,
-                        'email' => $user->email,
-                    ],
-                    'relationships' => [
-                        'posts' => [
-                            'data' => [
-                                ['id' => (string) $posts[0]->getKey(), 'type' => 'posts'],
-                                ['id' => (string) $posts[1]->getKey(), 'type' => 'posts'],
+            ->assertJsonPath(
+                'data',
+                [
+                    ...$users->transform(fn ($user) => [
+                        'id' => (string) $user->getKey(),
+                        'type' => 'users',
+                        'attributes' => [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                        ],
+                        'relationships' => [
+                            'profile' => ['data' => []],
+                            'posts' => ['data' => []],
+                            'teams' => ['data' => []],
+                        ],
+                    ])->all(),
+                    [
+                        'id' => (string) $user->getKey(),
+                        'type' => 'users',
+                        'attributes' => [
+                            'name' => $user->name,
+                            'email' => $user->email,
+                        ],
+                        'relationships' => [
+                            'profile' => [
+                                'data' => [
+                                    ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
+                                ],
+                            ],
+                            'posts' => [
+                                'data' => [
+                                    ['id' => (string) $posts[0]->getKey(), 'type' => 'posts'],
+                                    ['id' => (string) $posts[1]->getKey(), 'type' => 'posts'],
+                                ],
+                            ],
+                            'teams' => [
+                                'data' => [
+                                    ['id' => (string) $team->getKey(), 'type' => 'teams'],
+                                    ['id' => (string) $team->getKey(), 'type' => 'teams'],
+                                ],
                             ],
                         ],
-                        'profile' => [
-                            'data' => [
-                                ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
-                            ],
-                        ],
-                        'teams' => [
-                            'data' => [
-                                ['id' => (string) $team->getKey(), 'type' => 'teams'],
-                                ['id' => (string) $team->getKey(), 'type' => 'teams'],
-                            ],
-                        ],
-                    ],
-                ],
-                'included' => [
+                    ]
+                ]
+            )->assertJsonPath(
+                'included',
+                [
                     [
                         'id' => (string) $profile->getKey(),
                         'type' => 'profiles',
                         'attributes' => [
-                            'date_of_birth' => '2011-06-09',
                             'id' => $profile->getKey(),
-                            'timezone' => 'America/Chicago',
                             'user_id' => $user->getKey(),
+                            'date_of_birth' => '2011-06-09',
+                            'timezone' => 'America/Chicago',
                         ],
                     ],
                     [
@@ -159,10 +178,10 @@ class JsonApiResourceTest extends TestCase
                             'name' => 'Laravel Team',
                             'personal_team' => true,
                             'membership' => [
-                                'created_at' => $now->toISOString(),
-                                'role' => 'Admin',
-                                'team_id' => $team->getKey(),
                                 'user_id' => $user->getKey(),
+                                'team_id' => $team->getKey(),
+                                'role' => 'Admin',
+                                'created_at' => $now->toISOString(),
                                 'updated_at' => $now->toISOString(),
                             ],
                         ],
@@ -176,15 +195,15 @@ class JsonApiResourceTest extends TestCase
                             'name' => 'Laravel Team',
                             'personal_team' => true,
                             'membership' => [
-                                'created_at' => $now->toISOString(),
-                                'role' => 'Member',
-                                'team_id' => $team->getKey(),
                                 'user_id' => $user->getKey(),
+                                'team_id' => $team->getKey(),
+                                'role' => 'Member',
+                                'created_at' => $now->toISOString(),
                                 'updated_at' => $now->toISOString(),
                             ],
                         ],
                     ],
-                ],
-            ]);
+                ]
+            );
     }
 }

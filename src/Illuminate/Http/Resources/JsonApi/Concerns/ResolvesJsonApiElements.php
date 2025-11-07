@@ -134,7 +134,10 @@ trait ResolvesJsonApiElements
         $this->compileResourceRelationships($request);
 
         return [
-            ...$this->filter($this->loadedRelationshipIdentifiers),
+            ...(new Collection($this->filter($this->loadedRelationshipIdentifiers)))
+                ->map(function ($relation) {
+                    return ! is_null($relation) ? $relation : ['data' => []];
+                })->all(),
         ];
     }
 
@@ -188,8 +191,9 @@ trait ResolvesJsonApiElements
             // Relationship is a single model...
             $relatedModel = $relatedModels;
 
-            if (is_null($relatedModel) ||
-                $relatedModel instanceof Pivot ||
+            if (is_null($relatedModel)) {
+                return [$key => null];
+            } elseif ($relatedModel instanceof Pivot ||
                 in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
                 return [$key => new MissingValue];
             }

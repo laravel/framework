@@ -30,7 +30,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     #[\Override]
     protected function defineRoutes($router)
     {
-        $router->get('users/{userId}', function (Request $request, $userId) {
+        $router->get('users', function () {
+            return User::paginate(5)->toResourceCollection();
+        });
+
+        $router->get('users/{userId}', function ($userId) {
             return User::find($userId)->toResource();
         });
     }
