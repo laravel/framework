@@ -16,6 +16,7 @@ use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
+use Illuminate\Container\Attributes\QueryParameter;
 use Illuminate\Container\Attributes\RouteParameter;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
@@ -239,6 +240,21 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(RouteParameterTest::class);
+    }
+
+    public function testQueryParameterAttribute()
+    {
+        $container = new Container;
+        $container->singleton('request', function () {
+            $request = m::mock(Request::class);
+            $request->shouldReceive('query')->with('search', null)->andReturn('laravel');
+            $request->shouldReceive('query')->with('page', null)->andReturn('5');
+            $request->shouldReceive('query')->with('sort', 'default')->andReturn('default');
+
+            return $request;
+        });
+
+        $container->make(QueryParameterTest::class);
     }
 
     public function testContextAttribute(): void
@@ -530,6 +546,16 @@ final class RouteParameterTest
 {
     public function __construct(#[RouteParameter('foo')] Model $foo, #[RouteParameter('bar')] string $bar)
     {
+    }
+}
+
+final class QueryParameterTest
+{
+    public function __construct(
+        #[QueryParameter('search')] string $search,
+        #[QueryParameter('page')] string $page,
+        #[QueryParameter('sort', 'default')] string $sort
+    ) {
     }
 }
 
