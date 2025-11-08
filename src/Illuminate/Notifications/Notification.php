@@ -23,6 +23,13 @@ class Notification
     public $locale;
 
     /**
+     * The name of the default queue that should be used when queued.
+     *
+     * @var string|null
+     */
+    public static $defaultQueue;
+
+    /**
      * Get the channels the event should broadcast on.
      *
      * @return array

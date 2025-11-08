@@ -15,6 +15,7 @@ use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -25,18 +26,35 @@ class MailableQueuedTest extends TestCase
         m::close();
     }
 
-    public function testQueuedMailableSent(): void
+    public static function defaultQueueDataProvider()
     {
-        $queueFake = new QueueFake(new Application);
-        $mailer = $this->getMockBuilder(Mailer::class)
-            ->setConstructorArgs($this->getMocks())
-            ->onlyMethods(['createMessage', 'to'])
-            ->getMock();
-        $mailer->setQueue($queueFake);
-        $mailable = new MailableQueueableStub;
-        $queueFake->assertNothingPushed();
-        $mailer->send($mailable);
-        $queueFake->assertPushedOn(null, SendQueuedMailable::class);
+        return [
+            ['some-queue'],
+            [null],
+        ];
+    }
+
+    #[DataProvider('defaultQueueDataProvider')]
+    public function testDefaultQueue($queue): void
+    {
+        try {
+            if ($queue) {
+                Mailable::$defaultQueue = $queue;
+            }
+
+            $queueFake = new QueueFake(new Application);
+            $mailer = $this->getMockBuilder(Mailer::class)
+                ->setConstructorArgs($this->getMocks())
+                ->onlyMethods(['createMessage', 'to'])
+                ->getMock();
+            $mailer->setQueue($queueFake);
+            $mailable = new MailableQueueableStub;
+            $queueFake->assertNothingPushed();
+            $mailer->send($mailable);
+            $queueFake->assertPushedOn($queue, SendQueuedMailable::class);
+        } finally {
+            Mailable::$defaultQueue = null;
+        }
     }
 
     public function testQueuedMailableWithAttachmentSent(): void

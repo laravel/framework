@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\NotificationSender;
 use Mockery as m;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -165,6 +166,51 @@ class NotificationSenderTest extends TestCase
         $sender = new NotificationSender($manager, $bus, $events);
 
         $sender->sendNow($notifiable, new DummyNotificationWithViaConnections(), ['mail']);
+    }
+
+    public static function defaultNotificationQueueDataProvider()
+    {
+        return [
+            ['some-queue'],
+            [null],
+        ];
+    }
+
+    #[DataProvider('defaultNotificationQueueDataProvider')]
+    public function testDefaultNotificationQueue($queue)
+    {
+        try {
+            if ($queue) {
+                Notification::$defaultQueue = $queue;
+            }
+
+            $notifiable = new NotifiableUser;
+            $manager = m::mock(ChannelManager::class);
+            $manager->shouldReceive('getContainer')->andReturn(app());
+
+            $dispatchedJob = null;
+            $bus = m::mock(BusDispatcher::class);
+            $bus->shouldReceive('dispatch')
+                ->once()
+                ->withArgs(function ($job) use ($queue, &$dispatchedJob) {
+                    $dispatchedJob = $job;
+
+                    return $job->queue === $queue;
+                });
+
+            $events = m::mock(EventDispatcher::class);
+            $events->shouldReceive('listen')->once();
+
+            $sender = new NotificationSender($manager, $bus, $events);
+
+            $notification = new DummyNotificationWithMiddleware;
+
+            $sender->send($notifiable, $notification);
+
+            $this->assertSame($queue, $dispatchedJob->queue);
+        } finally {
+            Notification::$defaultQueue = null;
+        }
     }
 }
 

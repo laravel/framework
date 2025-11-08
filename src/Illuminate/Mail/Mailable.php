@@ -190,6 +190,13 @@ class Mailable implements MailableContract, Renderable
     public static $viewDataCallback;
 
     /**
+     * The name of the default queue that should be used when queued.
+     *
+     * @var string|null
+     */
+    public static $defaultQueue;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Factory|\Illuminate\Contracts\Mail\Mailer  $mailer
@@ -230,7 +237,7 @@ class Mailable implements MailableContract, Renderable
 
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
+        $queueName = (property_exists($this, 'queue') ? $this->queue : null) ?? static::$defaultQueue;
 
         return $queue->connection($connection)->pushOn(
             $queueName ?: null, $this->newQueuedJob()
@@ -248,7 +255,7 @@ class Mailable implements MailableContract, Renderable
     {
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
+        $queueName = (property_exists($this, 'queue') ? $this->queue : null) ?? static::$defaultQueue;
 
         return $queue->connection($connection)->laterOn(
             $queueName ?: null, $delay, $this->newQueuedJob()
