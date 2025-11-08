@@ -63,12 +63,13 @@ class AwsS3V3Adapter extends FilesystemAdapter
     public function get($path)
     {
         if (str_ends_with($path, '.zip')) {
-            Storage::disk('local')->writeStream(
+            $localDisk = new Filesystem;
+            $localDisk->put(
                 $path,
                 $this->readStream($path)
             );
 
-            return Storage::disk('local')->get($path);
+            return $localDisk->get($path);
         }
 
         return parent::get($path);
@@ -77,12 +78,13 @@ class AwsS3V3Adapter extends FilesystemAdapter
     public function path($path)
     {
         if (str_ends_with($path, '.zip')) {
-            Storage::disk('local')->writeStream(
+            $localDisk = new Filesystem;
+            $localDisk->put(
                 $path,
                 $this->readStream($path)
             );
 
-            return Storage::disk('local')->path($path);
+            return $path;
         }
 
         return parent::path($path);

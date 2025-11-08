@@ -824,10 +824,8 @@ class FilesystemAdapterTest extends TestCase
             return 'processed-zip';
         });
 
-        // Rückgabewert des Callbacks wird korrekt durchgereicht
         $this->assertSame('processed-zip', $result);
 
-        // Callback wurde mit einem Pfad auf eine ZIP-Datei aufgerufen
         $this->assertNotNull($receivedPath);
         $this->assertStringEndsWith('archive.zip', $receivedPath);
     }
