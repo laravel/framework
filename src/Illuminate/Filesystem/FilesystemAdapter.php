@@ -1032,7 +1032,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
-     * .
+     * This method accepts a closure to process the given Path.
      *
      * @return mixed
      */
