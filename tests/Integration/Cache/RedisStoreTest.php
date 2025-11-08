@@ -6,6 +6,7 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
@@ -22,6 +23,12 @@ class RedisStoreTest extends TestCase
     {
         $this->afterApplicationCreated(function () {
             $this->setUpRedis();
+
+            $connection = $this->app['redis']->connection();
+            $this->markTestSkippedWhen(
+                $connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection,
+                'RedisStore currently does not support tags, many and some other on Redis Cluster cluster connections',
+            );
         });
 
         $this->beforeApplicationDestroyed(function () {
