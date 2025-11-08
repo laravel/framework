@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
@@ -96,20 +97,18 @@ class AwsS3V3Adapter extends FilesystemAdapter
     public function processFileUsing($path, $closure, ?string $disk = null)
     {
         $isZip = str_ends_with($path, '.zip');
-        $localPath = null;
         if ($isZip) {
-            Storage::disk('local')->writeStream(
+            $localDisk = new Filesystem();
+            $localDisk->put(
                 $path,
                 $this->readStream($path)
             );
-
-            $localPath = Storage::disk('local')->path($path);
         }
         try {
-            return $closure($localPath ?? $path);
+            return $closure($path);
         } finally {
             if ($isZip) {
-                Storage::disk('local')->delete($path);
+                $localDisk->delete($path);
             }
         }
     }

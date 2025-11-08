@@ -767,4 +767,66 @@ class FilesystemAdapterTest extends TestCase
         $path = $filesystemAdapter->path('different');
         $this->assertEquals('my-root/someprefix/different', $path);
     }
+
+    public function testProcessFileUsingCallbackReceivesPathAndReturnsValue()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $receivedPath = null;
+
+        $result = $filesystemAdapter->processFileUsing('mypath', function ($path) use (&$receivedPath) {
+            $receivedPath = $path;
+
+            return 'myotherpath';
+        });
+
+        $this->assertSame('myotherpath', $result);
+        $this->assertSame('mypath', $receivedPath);
+    }
+
+    public function testProcessFileUsingCallbackReturnsExpectedValuesForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $receivedPath = null;
+
+        $result = $filesystemAdapter->processFileUsing('mypath', function ($path) use (&$receivedPath) {
+            $receivedPath = $path;
+
+            return 'myotherpath';
+        });
+
+        $this->assertSame('myotherpath', $result);
+        $this->assertSame('mypath', $receivedPath);
+    }
+
+    public function testProcessFileUsingCallbackReturnsExpectedValuesForS3AdapterWithZipFile()
+    {
+        $filesystem = new FilesystemManager(new Application);
+
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+        ]);
+
+        $receivedPath = null;
+
+        $result = $filesystemAdapter->processFileUsing('archive.zip', function ($path) use (&$receivedPath) {
+            $receivedPath = $path;
+
+            return 'processed-zip';
+        });
+
+        // Rückgabewert des Callbacks wird korrekt durchgereicht
+        $this->assertSame('processed-zip', $result);
+
+        // Callback wurde mit einem Pfad auf eine ZIP-Datei aufgerufen
+        $this->assertNotNull($receivedPath);
+        $this->assertStringEndsWith('archive.zip', $receivedPath);
+    }
 }
