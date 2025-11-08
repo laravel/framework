@@ -3,7 +3,6 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
@@ -22,11 +21,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
 
     /**
      * Create a new AwsS3V3FilesystemAdapter instance.
-     *
-     * @param  \League\Flysystem\FilesystemOperator  $driver
-     * @param  \League\Flysystem\FilesystemAdapter  $adapter
-     * @param  array  $config
-     * @param  \Aws\S3\S3Client  $client
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config, S3Client $client)
     {
@@ -98,7 +92,7 @@ class AwsS3V3Adapter extends FilesystemAdapter
     {
         $isZip = str_ends_with($path, '.zip');
         if ($isZip) {
-            $localDisk = new Filesystem();
+            $localDisk = new Filesystem;
             $localDisk->put(
                 $path,
                 $this->readStream($path)
@@ -128,7 +122,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return string
      */
     public function temporaryUrl($path, $expiration, array $options = [])
@@ -157,7 +150,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return array
      */
     public function temporaryUploadUrl($path, $expiration, array $options = [])
