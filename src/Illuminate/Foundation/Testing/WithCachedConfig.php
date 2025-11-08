@@ -26,7 +26,7 @@ trait WithCachedConfig
      */
     protected function tearDownWithCachedConfig(): void
     {
-        LoadConfiguration::setAlwaysUseConfig(null);
+        LoadConfiguration::alwaysUse(null);
     }
 
     /**
@@ -34,7 +34,7 @@ trait WithCachedConfig
      */
     protected function markConfigCached(Application $app): void
     {
-        $app->instance('config_loaded_from_cache', true); // I'm not sure this is actually needed
+        $app->instance('config_loaded_from_cache', true);
 
         LoadConfiguration::alwaysUse(static fn () => CachedState::$cachedConfig);
     }
