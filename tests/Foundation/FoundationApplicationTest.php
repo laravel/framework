@@ -649,6 +649,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertStringContainsString('events.php', $files->pathRequested);
         $this->assertTrue($app->bound('events.cached'));
         $this->assertFalse($app->make('events.cached'));
+    }
 
     public function testCoreContainerAliasesAreRegisteredByDefault(): void
     {
