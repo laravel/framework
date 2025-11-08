@@ -1039,7 +1039,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function processFileUsing(string $path, Closure $closure, ?string $disk = null)
     {
         if ($disk) {
-            return Storage::disk($disk)->processFile($path, $closure);
+            return Storage::disk($disk)->processFileUsing($path, $closure);
         }
 
         return $closure($this->path($path));
