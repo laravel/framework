@@ -649,6 +649,17 @@ class FoundationApplicationTest extends TestCase
         $this->assertStringContainsString('events.php', $files->pathRequested);
         $this->assertTrue($app->bound('events.cached'));
         $this->assertFalse($app->make('events.cached'));
+
+    public function testCoreContainerAliasesAreRegisteredByDefault(): void
+    {
+        $app = new Application();
+
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertSame('translator', $app->getAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertSame('auth.password', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
+        $this->assertSame('auth.password.broker', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
     }
 }
 
