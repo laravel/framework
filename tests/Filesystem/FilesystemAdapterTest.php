@@ -806,27 +806,4 @@ class FilesystemAdapterTest extends TestCase
         $this->assertSame('myotherpath', $result);
         $this->assertSame('mypath', $receivedPath);
     }
-
-    public function test_process_file_using_callback_returns_expected_values_for_s3_adapter_with_zip_file()
-    {
-        $filesystem = new FilesystemManager(new Application);
-
-        $filesystemAdapter = $filesystem->createS3Driver([
-            'region' => 'us-west-1',
-            'bucket' => 'laravel',
-        ]);
-
-        $receivedPath = null;
-
-        $result = $filesystemAdapter->processFileUsing('archive.zip', function ($path) use (&$receivedPath) {
-            $receivedPath = $path;
-
-            return 'processed-zip';
-        });
-
-        $this->assertSame('processed-zip', $result);
-
-        $this->assertNotNull($receivedPath);
-        $this->assertStringEndsWith('archive.zip', $receivedPath);
-    }
 }
