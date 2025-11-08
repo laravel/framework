@@ -295,6 +295,18 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Render the mailable into a view and display it, then halt execution.
+     *
+     * @throws \ReflectionException
+     */
+    public function dd()
+    {
+        header('Content-Type: text/html; charset=UTF-8');
+        echo $this->render();
+        exit(1);
+    }
+
+    /**
      * Build the view for the message.
      *
      * @return array|string
