@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use Aws\S3\S3Client;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\FilesystemOperator;
@@ -20,11 +21,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
 
     /**
      * Create a new AwsS3V3FilesystemAdapter instance.
-     *
-     * @param  \League\Flysystem\FilesystemOperator  $driver
-     * @param  \League\Flysystem\FilesystemAdapter  $adapter
-     * @param  array  $config
-     * @param  \Aws\S3\S3Client  $client
      */
     public function __construct(FilesystemOperator $driver, FlysystemAdapter $adapter, array $config, S3Client $client)
     {
@@ -58,6 +54,62 @@ class AwsS3V3Adapter extends FilesystemAdapter
     }
 
     /**
+     * If a ZIP File is requested from S3 Storage,
+     * copy it first to local storage
+     * and then return the local.
+     *
+     * @return string|null
+     */
+    public function get($path)
+    {
+        if (str_ends_with($path, '.zip')) {
+            Storage::disk('local')->writeStream(
+                $path,
+                $this->readStream($path)
+            );
+
+            return Storage::disk('local')->get($path);
+        }
+
+        return parent::get($path);
+    }
+
+    public function path($path)
+    {
+        if (str_ends_with($path, '.zip')) {
+            Storage::disk('local')->writeStream(
+                $path,
+                $this->readStream($path)
+            );
+
+            return Storage::disk('local')->path($path);
+        }
+
+        return parent::path($path);
+    }
+
+    public function processFileUsing($path, $closure, ?string $disk = null)
+    {
+        $isZip = str_ends_with($path, '.zip');
+        $localPath = null;
+        if ($isZip) {
+            Storage::disk('local')->writeStream(
+                $path,
+                $this->readStream($path)
+            );
+
+            $localPath = Storage::disk('local')->path($path);
+        }
+        try {
+            return $closure($localPath ?? $path);
+        } finally {
+            if ($isZip) {
+                Storage::disk('local')->delete($path);
+            }
+        }
+    }
+
+    /**
      * Determine if temporary URLs can be generated.
      *
      * @return bool
@@ -72,7 +124,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return string
      */
     public function temporaryUrl($path, $expiration, array $options = [])
@@ -101,7 +152,6 @@ class AwsS3V3Adapter extends FilesystemAdapter
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
-     * @param  array  $options
      * @return array
      */
     public function temporaryUploadUrl($path, $expiration, array $options = [])
