@@ -1354,7 +1354,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
             return (bool) $this->make('events.cached');
         }
 
-        return $this->instance('events.cached', $this['files']->exists($this->getCachedEventsPath()));
+        return $this->instance(
+            'events.cached', $this['files']->exists($this->getCachedEventsPath())
+        );
     }
 
     /**
