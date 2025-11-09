@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Facades\Cache;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -17,6 +19,12 @@ class PhpRedisCacheLockTest extends TestCase
         parent::setUp();
 
         $this->setUpRedis();
+
+        $connection = $this->app['redis']->connection();
+        $this->markTestSkippedUnless(
+            $connection instanceof PhpRedisConnection || $connection instanceof PhpRedisClusterConnection,
+            'This test is for phpredis only',
+        );
     }
 
     protected function tearDown(): void
@@ -210,7 +218,6 @@ class PhpRedisCacheLockTest extends TestCase
             $this->markTestSkipped('Redis extension is not configured to support the lz4 compression.');
         }
 
-        $this->app['config']->set('database.redis.client', 'phpredis');
         $this->app['config']->set('cache.stores.redis.connection', 'default');
         $this->app['config']->set('cache.stores.redis.lock_connection', 'default');
 
