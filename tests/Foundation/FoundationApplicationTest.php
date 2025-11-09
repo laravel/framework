@@ -620,21 +620,34 @@ class FoundationApplicationTest extends TestCase
     public function test_routes_are_not_cached_by_instance_falls_back_to_file()
     {
         $app = new Application();
-        $files = new class
-        {
-            public string $pathRequested;
-
-            public function exists(string $path): bool
-            {
-                $this->pathRequested = $path;
-
-                return false;
-            }
-        };
+        $files = new FileExistsFake;
         $app->instance('files', $files);
 
         $this->assertFalse($app->routesAreCached());
         $this->assertStringContainsString('routes-v7.php', $files->pathRequested);
+    }
+
+    public function test_events_are_cached_uses_container_instance()
+    {
+        $app = new Application();
+        $app->instance('events.cached', true);
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertTrue($app->eventsAreCached());
+        $this->assertFalse(isset($files->pathRequested));
+    }
+
+    public function test_events_are_cached_checks_filesystem_if_not_set()
+    {
+        $app = new Application();
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->eventsAreCached());
+        $this->assertStringContainsString('events.php', $files->pathRequested);
+        $this->assertTrue($app->bound('events.cached'));
+        $this->assertFalse($app->make('events.cached'));
     }
 
     public function testCoreContainerAliasesAreRegisteredByDefault(): void
@@ -780,5 +793,17 @@ class ConcreteTerminator
     public function terminate()
     {
         return self::$counter++;
+    }
+}
+
+class FileExistsFake
+{
+    public string $pathRequested;
+
+    public function exists(string $path): bool
+    {
+        $this->pathRequested = $path;
+
+        return false;
     }
 }
