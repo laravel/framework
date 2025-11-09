@@ -1,5 +1,4 @@
 <?php
-// routes/console.php
 
 use Illuminate\Support\Facades\Artisan;
 
