@@ -4,9 +4,15 @@ namespace Illuminate\Tests\Integration\Support;
 
 use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Notifications\ChannelManager;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
+use Illuminate\Support\Testing\Fakes\QueueFake;
 use Orchestra\Testbench\TestCase;
 use ReflectionClass;
 
@@ -58,5 +64,23 @@ class FacadesTest extends TestCase
             $reflection = new ReflectionClass($alias);
             $this->assertSame($abstract, $reflection->getName());
         }
+    }
+
+    public function testRealMethod()
+    {
+        Notification::fake();
+        $this->assertInstanceOf(NotificationFake::class, Notification::getFacadeRoot());
+
+        Notification::real();
+        $this->assertInstanceOf(ChannelManager::class, Notification::getFacadeRoot());
+
+        Notification::fake();
+        $this->assertInstanceOf(NotificationFake::class, Notification::getFacadeRoot());
+
+        Queue::fake();
+        $this->assertInstanceOf(QueueFake::class, Queue::getFacadeRoot());
+
+        Queue::real();
+        $this->assertInstanceOf(QueueManager::class, Queue::getFacadeRoot());
     }
 }

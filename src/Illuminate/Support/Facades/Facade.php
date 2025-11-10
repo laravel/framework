@@ -202,6 +202,22 @@ abstract class Facade
     }
 
     /**
+     * If the facade instance is currently faked, switch to the real implementation again.
+     *
+     * @return void
+     */
+    public static function real()
+    {
+        if (static::isFake()) {
+            $name = static::getFacadeAccessor();
+
+            static::clearResolvedInstance($name);
+
+            static::$app?->forgetInstance($name);
+        }
+    }
+
+    /**
      * Get the root object behind the facade.
      *
      * @return mixed
