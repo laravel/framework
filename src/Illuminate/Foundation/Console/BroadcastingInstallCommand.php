@@ -168,7 +168,7 @@ class BroadcastingInstallCommand extends Command
                 $appBootstrapPath,
             );
         } else {
-            $this->components->error('Unable to activate broadcast routes. Please activate them manually in your '.$appBootstrapPath.' file.');
+            $this->components->error('Unable to register broadcast routes. Please register them manually in ['.$appBootstrapPath.'].');
         }
     }
 
