@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Integration\Validation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
