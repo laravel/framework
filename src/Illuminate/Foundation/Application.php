@@ -778,6 +778,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
+     * Determine if the application is in the testing environment.
+     *
+     * @return bool
+     */
+    public function isTesting()
+    {
+        return $this['env'] === 'testing';
+    }
+
+    /**
      * Detect the application's current environment.
      *
      * @param  \Closure  $callback

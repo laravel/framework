@@ -232,6 +232,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($local->isLocal());
         $this->assertFalse($local->isProduction());
         $this->assertFalse($local->runningUnitTests());
+        $this->assertFalse($local->isTesting());
 
         $production = new Application;
         $production['env'] = 'production';
@@ -239,6 +240,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($production->isProduction());
         $this->assertFalse($production->isLocal());
         $this->assertFalse($production->runningUnitTests());
+        $this->assertFalse($production->isTesting());
 
         $testing = new Application;
         $testing['env'] = 'testing';
@@ -246,6 +248,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($testing->runningUnitTests());
         $this->assertFalse($testing->isLocal());
         $this->assertFalse($testing->isProduction());
+        $this->assertTrue($testing->isTesting());
     }
 
     public function testDebugHelper()
