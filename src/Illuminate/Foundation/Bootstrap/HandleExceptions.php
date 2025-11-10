@@ -52,7 +52,7 @@ class HandleExceptions
 
         register_shutdown_function($this->forwardsTo('handleShutdown'));
 
-        if (! $app->isTesting()) {
+        if (! $app->environment('testing')) {
             ini_set('display_errors', 'Off');
         }
     }
