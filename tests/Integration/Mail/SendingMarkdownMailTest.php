@@ -128,6 +128,49 @@ class SendingMarkdownMailTest extends TestCase
         Mail::to('test@mail.com')->send(new BasicMailable());
         $this->assertSame('default', app(Markdown::class)->getTheme());
     }
+
+    public function testEmbeddedImageContentIdConsistencyAcrossMailerFailoverClones()
+    {
+        Mail::to('test@mail.com')->send($mailable = new EmbedImageMailable);
+
+        /** @var \Symfony\Component\Mime\Email $originalEmail */
+        $originalEmail = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage();
+        $expectedContentId = $originalEmail->getAttachments()[0]->getContentId();
+
+        // Simulate failover mailer scenario where email is cloned for retry.
+        // After shallow clone, the CID in HTML and attachment Content-ID header should remain consistent.
+        $firstClonedEmail = quoted_printable_decode((clone $originalEmail)->toString());
+        [$htmlCid, $attachmentContentId] = $this->extractContentIdsFromEmail($firstClonedEmail);
+
+        $this->assertEquals($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header');
+        $this->assertEquals($expectedContentId, $htmlCid, 'Cloned email CID should match original attachment CID');
+
+        // Verify consistency is maintained across multiple clone operations (e.g., multiple retries).
+        $secondClonedEmail = quoted_printable_decode((clone $originalEmail)->toString());
+        [$htmlCid, $attachmentContentId] = $this->extractContentIdsFromEmail($secondClonedEmail);
+
+        $this->assertEquals($htmlCid, $attachmentContentId, 'HTML img src CID should match attachment Content-ID header on subsequent clone');
+        $this->assertEquals($expectedContentId, $htmlCid, 'Multiple clones should preserve original CID');
+    }
+
+    /**
+     * Extract Content IDs from email for embedded image validation.
+     *
+     * @param  string  $rawEmail
+     * @return array{0: string|null, 1: string|null} [HTML image CID, attachment Content-ID]
+     */
+    private function extractContentIdsFromEmail(string $rawEmail): array
+    {
+        // Extract CID from HTML <img src="cid:..."> tag.
+        preg_match('/<img[^>]+src="cid:([^"]+)"/', $rawEmail, $htmlMatches);
+        $htmlImageCid = $htmlMatches[1] ?? null;
+
+        // Extract CID from MIME attachment Content-ID header.
+        preg_match('/Content-ID:\s*<([^>]+)>/', $rawEmail, $headerMatches);
+        $attachmentContentId = $headerMatches[1] ?? null;
+
+        return [$htmlImageCid, $attachmentContentId];
+    }
 }
 
 class BasicMailable extends Mailable
@@ -232,6 +275,26 @@ class EmbedDataMailable extends Mailable
     {
         return new Content(
             markdown: 'embed-data',
+        );
+    }
+}
+
+class EmbedImageMailable extends Mailable
+{
+    public function envelope()
+    {
+        return new Envelope(
+            subject: 'My basic title',
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'embed-image',
+            with: [
+                'image' => __DIR__.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.'empty_image.jpg',
+            ]
         );
     }
 }
