@@ -230,6 +230,150 @@ class HttpResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
+
+    public function testOkHelper()
+    {
+        $response = Response::ok();
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testCreatedHelper()
+    {
+        $response = Response::created();
+        $this->assertSame(201, $response->getStatusCode());
+    }
+
+    public function testAcceptedHelper()
+    {
+        $response = Response::accepted();
+        $this->assertSame(202, $response->getStatusCode());
+    }
+
+    public function testNoContentHelper()
+    {
+        $response = Response::noContent();
+        $this->assertSame(204, $response->getStatusCode());
+    }
+
+    public function testMovePermanentlyHelper()
+    {
+        $response = Response::movePermanently();
+        $this->assertSame(301, $response->getStatusCode());
+    }
+
+    public function testFoundHelper()
+    {
+        $response = Response::found();
+        $this->assertSame(302, $response->getStatusCode());
+    }
+
+    public function testNotModifiedHelper()
+    {
+        $response = Response::notModified();
+        $this->assertSame(304, $response->getStatusCode());
+    }
+
+    public function testTemporaryRedirectHelper()
+    {
+        $response = Response::temporaryRedirect();
+        $this->assertSame(307, $response->getStatusCode());
+    }
+
+    public function testPermanentRedirectHelper()
+    {
+        $response = Response::permanentRedirect();
+        $this->assertSame(308, $response->getStatusCode());
+    }
+
+    public function testBadRequestHelper()
+    {
+        $response = Response::badRequest();
+        $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function testUnauthorizedHelper()
+    {
+        $response = Response::unauthorized();
+        $this->assertSame(401, $response->getStatusCode());
+    }
+
+    public function testPaymentRequiredHelper()
+    {
+        $response = Response::paymentRequired();
+        $this->assertSame(402, $response->getStatusCode());
+    }
+
+    public function testForbiddenHelper()
+    {
+        $response = Response::forbidden();
+        $this->assertSame(403, $response->getStatusCode());
+    }
+
+    public function testNotFoundHelper()
+    {
+        $response = Response::notFound();
+        $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testMethodNotAllowedHelper()
+    {
+        $response = Response::methodNotAllowed();
+        $this->assertSame(405, $response->getStatusCode());
+    }
+
+    public function testNotAcceptableHelper()
+    {
+        $response = Response::notAcceptable();
+        $this->assertSame(406, $response->getStatusCode());
+    }
+
+    public function testRequestTimeoutHelper()
+    {
+        $response = Response::requestTimeout();
+        $this->assertSame(408, $response->getStatusCode());
+    }
+
+    public function testConflictHelper()
+    {
+        $response = Response::conflict();
+        $this->assertSame(409, $response->getStatusCode());
+    }
+
+    public function testGoneHelper()
+    {
+        $response = Response::gone();
+        $this->assertSame(410, $response->getStatusCode());
+    }
+
+    public function testUnsupportedMediaTypeHelper()
+    {
+        $response = Response::unsupportedMediaType();
+        $this->assertSame(415, $response->getStatusCode());
+    }
+
+    public function testUnprocessableEntityHelper()
+    {
+        $response = Response::unprocessableEntity();
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function testTooManyRequestsHelper()
+    {
+        $response = Response::tooManyRequests();
+        $this->assertSame(429, $response->getStatusCode());
+    }
+
+    public function testInternalServerErrorHelper()
+    {
+        $response = Response::internalServerError();
+        $this->assertSame(500, $response->getStatusCode());
+    }
+
+    public function testServiceUnavailableHelper()
+    {
+        $response = Response::serviceUnavailable();
+        $this->assertSame(503, $response->getStatusCode());
+    }
 }
 
 class ArrayableStub implements Arrayable

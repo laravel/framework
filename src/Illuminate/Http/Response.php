@@ -6,6 +6,7 @@ use ArrayObject;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Concerns\ResponseHelpers;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use JsonSerializable;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class Response extends SymfonyResponse
 {
-    use ResponseTrait, Macroable {
+    use ResponseHelpers, ResponseTrait, Macroable {
         Macroable::__call as macroCall;
     }
 
