@@ -52,13 +52,19 @@ class SendingMarkdownMailTest extends TestCase
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
         $cid = explode(' cid:', (new Stringable($email))->explode("\r\n")
-            ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
+            ->filter(fn ($line) => str_contains($line, ' content: cid:'))
+            ->first())[1];
+
+        $filename = explode('Embed file: ', (new Stringable($email))->explode("\r\n")
+            ->filter(fn ($line) => str_contains($line, ' file:'))
             ->first())[1];
 
         $this->assertStringContainsString(<<<EOT
-        Content-Type: application/x-php; name=$cid\r
+        Content-Type: application/x-php; name=$filename\r
         Content-Transfer-Encoding: base64\r
-        Content-Disposition: inline; name=$cid; filename=$cid\r
+        Content-Disposition: inline; name=$filename;\r
+         filename=$filename\r
+        Content-ID: <$cid>\r
         EOT, $email);
     }
 
@@ -66,9 +72,8 @@ class SendingMarkdownMailTest extends TestCase
     {
         Mail::to('test@mail.com')->send($mailable = new EmbedDataMailable());
 
-        $mailable->assertSeeInHtml('Embed data content: cid:foo.jpg');
         $mailable->assertSeeInText('Embed data content: ');
-        $mailable->assertDontSeeInText('Embed data content: cid:foo.jpg');
+        $mailable->assertSeeInHtml('Embed data content: cid:');
 
         $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
 
@@ -87,8 +92,7 @@ class SendingMarkdownMailTest extends TestCase
 
         $this->assertStringContainsString('Embed multiline content: <img', $html);
         $this->assertStringContainsString('alt="multiline image"', $html);
-        $this->assertStringContainsString('data:image/png;base64', $html);
-        $this->assertStringNotContainsString('cid:foo.jpg', $html);
+        $this->assertStringContainsString('<img src="cid:', $html);
     }
 
     public function testMessageAsPublicPropertyMayBeDefinedAsViewData()
