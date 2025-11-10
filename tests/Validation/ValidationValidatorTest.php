@@ -18,6 +18,7 @@ use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -639,6 +640,12 @@ class ValidationValidatorTest extends TestCase
         $v->messages()->setFormat(':message');
         $this->assertSame('The foo field must be accepted when BAR is AAA.', $v->messages()->first('foo'));
 
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aAa'], ['foo' => 'accepted_if:bar,aAa']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be accepted when bar is aAa.', $v->messages()->first('foo'));
+
         // in_array
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :Other.'], 'en');
@@ -715,6 +722,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertSame('The last field is required unless FIRST is in TAYLOR, SVEN.', $v->messages()->first('last'));
 
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
+        $v = new Validator($trans, ['firstName' => 'dAyle', 'lastName' => ''], ['lastName' => 'RequiredUnless:firstName,tAylor,sVen']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last name field is required unless first name is in tAylor, sVen.', $v->messages()->first('lastName'));
+
         // required_with
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.required_with' => 'The :attribute field is required when :Values is present.'], 'en');
@@ -753,6 +766,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
         $this->assertFalse($v->passes());
         $this->assertSame('The url must start with one of the following values HTTP, HTTPS', $v->messages()->first('url'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:hTtp,hTtps']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The url must start with one of the following values hTtp, hTtps', $v->messages()->first('url'));
     }
 
     public function testInputIsReplacedByItsDisplayableValue()
