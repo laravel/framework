@@ -241,14 +241,10 @@ trait ReplacesAttributes
      */
     protected function replaceMissingWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(
-            [':values', ':VALUES', ':Values'],
-            [
-                implode(' / ', $this->getAttributeList($parameters)),
-                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
-                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
-            ],
-            $message
+        return $this->replaceWhileKeepingCase(
+            $message,
+            ['values' => $this->getAttributeList($parameters)],
+            ['values' => ' / '],
         );
     }
 
@@ -295,14 +291,10 @@ trait ReplacesAttributes
             $parameter = $this->getDisplayableValue($attribute, $parameter);
         }
 
-        return str_replace(
-            [':values', ':VALUES', ':Values'],
-            [
-                implode(', ', $parameters),
-                Str::upper(implode(', ', $parameters)),
-                implode(', ', array_map(Str::ucfirst(...), $parameters)),
-            ],
+        return $this->replaceWhileKeepingCase(
             $message,
+            ['values' => $parameters],
+            ['values' => ', '],
         );
     }
 
@@ -431,14 +423,10 @@ trait ReplacesAttributes
      */
     protected function replacePresentWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(
-            [':values', ':VALUES', ':Values'],
-            [
-                implode(' / ', $this->getAttributeList($parameters)),
-                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
-                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
-            ],
+        return $this->replaceWhileKeepingCase(
             $message,
+            ['values' => $this->getAttributeList($parameters)],
+            ['values' => ' / '],
         );
     }
 
@@ -467,14 +455,10 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredWith($message, $attribute, $rule, $parameters)
     {
-        return str_replace(
-            [':values', ':VALUES', ':Values'],
-            [
-                implode(' / ', $this->getAttributeList($parameters)),
-                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
-                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
-            ],
+        return $this->replaceWhileKeepingCase(
             $message,
+            ['values' => $this->getAttributeList($parameters)],
+            ['values' => ' / '],
         );
     }
 
@@ -657,17 +641,10 @@ trait ReplacesAttributes
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
 
-        return str_replace(
-            [':other', ':OTHER', ':Other', ':values', ':VALUES', ':Values'],
-            [
-                $other,
-                Str::upper($other),
-                Str::ucfirst($other),
-                implode(', ', $values),
-                Str::upper(implode(', ', $values)),
-                implode(', ', array_map(Str::ucfirst(...), $values)),
-            ],
-            $message
+        return $this->replaceWhileKeepingCase(
+            $message,
+            ['other' => $other, 'values' => $values],
+            ['values' => ', '],
         );
     }
 
@@ -738,14 +715,10 @@ trait ReplacesAttributes
      */
     protected function replaceProhibits($message, $attribute, $rule, $parameters)
     {
-        return str_replace(
-            [':other', ':OTHER', ':Other'],
-            [
-                implode(' / ', $this->getAttributeList($parameters)),
-                Str::upper(implode(' / ', $this->getAttributeList($parameters))),
-                implode(' / ', array_map(Str::ucfirst(...), $this->getAttributeList($parameters))),
-            ],
-            $message
+        return $this->replaceWhileKeepingCase(
+            $message,
+            ['other' => $this->getAttributeList($parameters)],
+            ['other' => ' / '],
         );
     }
 
@@ -935,20 +908,36 @@ trait ReplacesAttributes
      * Replace the given string while maintaining different casing variants.
      *
      * @param  array<string, string>  $mapping
+     * @param  array<string, string>  $wordSeparators
      */
-    private function replaceWhileKeepingCase(string $message, array $mapping): string
+    private function replaceWhileKeepingCase(string $message, array $mapping, array $wordSeparators = []): string
     {
-        $fn = [Str::lower(...), Str::upper(...), Str::ucfirst(...)];
+        $fn = [
+            Str::lower(...),
+            Str::upper(...),
+            //fn (string $placeholder, ?string $parameter = null) => ucwords($parameter ?? $placeholder, $parameter !== null ? ($wordSeparators[$placeholder] ?? ' ') : ' '),
+        ];
+
+        $ucwordsReplacement = fn (string $parameter, string $placeholder) => array_key_exists($placeholder, $wordSeparators)
+                ? ucwords($parameter, $wordSeparators[$placeholder])
+                : ucfirst($parameter);
 
         $cases = array_reduce(
             array_keys($mapping),
-            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), $fn)],
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(fn (callable $fn) => ':'.$fn($placeholder), [...$fn, ucfirst(...)])],
             [],
         );
 
         $replacements = array_reduce(
-            array_values($mapping),
-            fn (array $carry, string $parameter) => [...$carry, ...array_map(fn (callable $fn) => $fn($parameter), $fn)],
+            array_keys($mapping),
+            fn (array $carry, string $placeholder) => [...$carry, ...array_map(function (callable $fn) use ($placeholder, $mapping, $wordSeparators) {
+                $parameter = $mapping[$placeholder];
+                if (is_array($parameter) && array_is_list($parameter) && array_key_exists($placeholder, $wordSeparators)) {
+                    $parameter = implode($wordSeparators[$placeholder], $parameter);
+                }
+
+                return $fn($parameter, $placeholder);
+            }, [...$fn, $ucwordsReplacement])],
             [],
         );
 
