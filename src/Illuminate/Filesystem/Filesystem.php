@@ -211,9 +211,15 @@ class Filesystem
      * @param  string  $content
      * @param  int|null  $mode
      * @return void
+     * @throws \InvalidArgumentException
      */
     public function replace($path, $content, $mode = null)
     {
+        // Validate path for security
+        if (str_contains($path, '..')) {
+            throw new \InvalidArgumentException('Path traversal detected in file path: ' . $path);
+        }
+
         // If the path already exists and is a symlink, get the real path...
         clearstatcache(true, $path);
 

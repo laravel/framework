@@ -463,6 +463,11 @@ class FilesystemAdapter implements CloudFilesystemContract
             [$path, $file, $name, $options] = ['', $path, $file, $name ?? []];
         }
 
+        // Validate path and name for security
+        if (str_contains($path, '..') || str_contains($name, '..')) {
+            throw new \InvalidArgumentException('Path traversal detected in file path or name.');
+        }
+
         $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
 
         // Next, we will format the path of the file and store the file using a stream since
