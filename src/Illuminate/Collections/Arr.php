@@ -24,7 +24,7 @@ class Arr
      * @param  mixed  $value
      * @return bool
      */
-    public static function accessible($value)
+    public static function accessible($value): bool
     {
         return is_array($value) || $value instanceof ArrayAccess;
     }
@@ -52,7 +52,7 @@ class Arr
      * @param  mixed  $value
      * @return array
      */
-    public static function add($array, $key, $value)
+    public static function add($array, $key, $value): array
     {
         if (is_null(static::get($array, $key))) {
             static::set($array, $key, $value);
@@ -105,7 +105,7 @@ class Arr
      * @param  iterable  $array
      * @return array
      */
-    public static function collapse($array)
+    public static function collapse($array): array
     {
         $results = [];
 
@@ -224,7 +224,7 @@ class Arr
      * @param  string|int|float  $key
      * @return bool
      */
-    public static function exists($array, $key)
+    public static function exists($array, $key): bool
     {
         if ($array instanceof Enumerable) {
             return $array->has($key);
@@ -565,7 +565,7 @@ class Arr
      * @param  (callable(mixed, array-key): bool)  $callback
      * @return bool
      */
-    public static function every($array, callable $callback)
+    public static function every($array, callable $callback): bool
     {
         return array_all($array, $callback);
     }
@@ -577,7 +577,7 @@ class Arr
      * @param  (callable(mixed, array-key): bool)  $callback
      * @return bool
      */
-    public static function some($array, callable $callback)
+    public static function some($array, callable $callback): bool
     {
         return array_any($array, $callback);
     }

@@ -79,7 +79,7 @@ class Str
      * @param  string  $string
      * @return \Illuminate\Support\Stringable
      */
-    public static function of($string)
+    public static function of($string): Stringable
     {
         return new Stringable($string);
     }
@@ -91,7 +91,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function after($subject, $search)
+    public static function after($subject, $search): string
     {
         return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
@@ -103,7 +103,7 @@ class Str
      * @param  string  $search
      * @return string
      */
-    public static function afterLast($subject, $search)
+    public static function afterLast($subject, $search): string
     {
         if ($search === '') {
             return $subject;
@@ -125,7 +125,7 @@ class Str
      * @param  string  $language
      * @return string
      */
-    public static function ascii($value, $language = 'en')
+    public static function ascii($value, $language = 'en'): string
     {
         return ASCII::to_ascii((string) $value, $language, replace_single_chars_only: false);
     }
@@ -223,7 +223,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function camel($value)
+    public static function camel($value): string
     {
         if (isset(static::$camelCache[$value])) {
             return static::$camelCache[$value];
@@ -294,7 +294,7 @@ class Str
      * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function contains($haystack, $needles, $ignoreCase = false)
+    public static function contains($haystack, $needles, $ignoreCase = false): bool
     {
         if (is_null($haystack)) {
             return false;
@@ -559,7 +559,7 @@ class Str
      * @param  string  $value
      * @return bool
      */
-    public static function isAscii($value)
+    public static function isAscii($value): bool
     {
         return ASCII::is_ascii((string) $value);
     }
@@ -572,7 +572,7 @@ class Str
      *
      * @phpstan-assert-if-true =non-empty-string $value
      */
-    public static function isJson($value)
+    public static function isJson($value): bool
     {
         if (! is_string($value)) {
             return false;
