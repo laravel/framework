@@ -19,6 +19,7 @@ use Illuminate\Database\Query\Grammars\Grammar as QueryGrammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Concerns\HandlesExceptions;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use PDO;
@@ -32,6 +33,7 @@ class Connection implements ConnectionInterface
     use DetectsConcurrencyErrors,
         DetectsLostConnections,
         Concerns\ManagesTransactions,
+        HandlesExceptions,
         InteractsWithTime,
         Macroable;
 
@@ -950,6 +952,16 @@ class Connection implements ConnectionInterface
      */
     protected function handleQueryException(QueryException $e, $query, $bindings, Closure $callback)
     {
+        // Use standardized exception reporting with query context
+        $context = [
+            'connection' => $this->getName(),
+            'query' => $query,
+            'bindings' => $bindings,
+            'transaction_level' => $this->transactions,
+        ];
+
+        $this->reportException($e, $context);
+
         if ($this->transactions >= 1) {
             throw $e;
         }

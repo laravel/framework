@@ -11,10 +11,12 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Jobs\SyncJob;
+use Illuminate\Support\Concerns\HandlesExceptions;
 use Throwable;
 
 class SyncQueue extends Queue implements QueueContract
 {
+    use HandlesExceptions;
     /**
      * Create a new sync queue instance.
      *
@@ -201,6 +203,16 @@ class SyncQueue extends Queue implements QueueContract
     protected function handleException(Job $queueJob, Throwable $e)
     {
         $this->raiseExceptionOccurredJobEvent($queueJob, $e);
+
+        // Use standardized exception reporting with job context
+        $context = [
+            'job_id' => $queueJob->getJobId(),
+            'job_name' => $queueJob->getName(),
+            'queue' => $queueJob->getQueue(),
+            'attempts' => $queueJob->attempts(),
+        ];
+
+        $this->reportException($e, $context);
 
         $queueJob->fail($e);
 
