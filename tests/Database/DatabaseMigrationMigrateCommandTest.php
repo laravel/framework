@@ -140,6 +140,24 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--step' => true]);
     }
 
+    public function testLimitMayBeSet()
+    {
+        $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('hasRunAnyMigrations')->andReturn(true);
+        $migrator->shouldReceive('usingConnection')->once()->andReturnUsing(function ($name, $callback) {
+            return $callback();
+        });
+        $migrator->shouldReceive('setOutput')->once()->andReturn($migrator);
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false, 'limit' => '5']);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+
+        $this->runCommand($command, ['--limit' => '5']);
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
