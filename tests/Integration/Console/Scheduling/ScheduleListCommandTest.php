@@ -133,8 +133,8 @@ class ScheduleListCommandTest extends TestCase
         $this->assertCount(1, $data);
 
         $this->assertIsArray($data[0]['environments']);
-        $this->assertContains($data[0]['environments']);
-        $this->assertContains(environment, $data[0]['environments']);
+        $this->assertNotEmpty($data[0]['environments']);
+        $this->assertContains($environment, $data[0]['environments']);
     }
 
     public function testDisplayScheduleWithSortAsJson()
