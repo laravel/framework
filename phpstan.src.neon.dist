@@ -1,17 +1,16 @@
 parameters:
-    level: 1
+    level: 3
     paths:
         - src
     excludePaths:
         - src/Illuminate/Testing/ParallelRunner.php
         - src/*/views/*
     ignoreErrors:
-        - "#\\(void\\) is used#"
+        # Temporarily ignore these while we improve type safety gradually
         - "#Access to an undefined property#"
-        - "#but return statement is missing.#"
         - "#Call to an undefined method#"
         - "#Caught class [a-zA-Z0-9\\\\_]+ not found.#"
         - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
-        - "#has invalid type#"
         - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
+        # Framework-specific patterns that are intentionally dynamic
         - "#Unsafe usage of new static#"
