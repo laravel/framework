@@ -125,7 +125,7 @@ class Migrator
         // Once we grab all of the migration files for the path, we will compare them
         // against the migrations that have already been run for this package then
         // run each of the outstanding migrations against a database connection.
-        $files = $this->getMigrationFiles($paths);
+        $files = $this->getMigrationFiles($paths, $options['limit'] ?? null);
 
         $this->requireFiles($migrations = $this->pendingMigrations(
             $files, $this->repository->getRan()
@@ -567,12 +567,14 @@ class Migrator
     }
 
     /**
-     * Get all of the migration files in a given path.
+     * Get a limited number of migration files in a given path if a
+     * limit is provided, otherwise return all of the files.
      *
      * @param  string|array  $paths
+     * @param  int|null  $limit
      * @return array<string, string>
      */
-    public function getMigrationFiles($paths)
+    public function getMigrationFiles($paths, $limit = null)
     {
         return (new Collection($paths))
             ->flatMap(fn ($path) => str_ends_with($path, '.php') ? [$path] : $this->files->glob($path.'/*_*.php'))
@@ -580,6 +582,7 @@ class Migrator
             ->values()
             ->keyBy(fn ($file) => $this->getMigrationName($file))
             ->sortBy(fn ($file, $key) => $key)
+            ->when(is_int($limit), fn (&$paths) => $paths = $paths->take($limit))
             ->all();
     }
 
