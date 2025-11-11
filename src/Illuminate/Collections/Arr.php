@@ -760,6 +760,45 @@ class Arr
     }
 
     /**
+     * Recursively run a map over each of the items in the array.
+     *
+     * @template TMapRecursiveValue
+     *
+     * @param  array|Arrayable|Enumerable|Traversable|Jsonable|JsonSerializable  $items
+     * @param  callable(mixed, string|int): TMapRecursiveValue  $callback
+     * @param  bool  $preserveKeys
+     * @return array
+     */
+    public static function mapRecursive($items, callable $callback, bool $preserveKeys = true)
+    {
+        $array = static::from($items);
+
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (static::arrayable($value)) {
+                $mappedValue = static::mapRecursive(static::from($value), $callback, $preserveKeys);
+            } elseif ($value instanceof Traversable) {
+                $mappedValue = static::mapRecursive(iterator_to_array($value), $callback, $preserveKeys);
+            } else {
+                try {
+                    $mappedValue = $callback($value, $key);
+                } catch (ArgumentCountError) {
+                    $mappedValue = $callback($value);
+                }
+            }
+
+            if ($preserveKeys) {
+                $result[$key] = $mappedValue;
+            } else {
+                $result[] = $mappedValue;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.

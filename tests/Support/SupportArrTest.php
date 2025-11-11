@@ -997,6 +997,51 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    public function testMapRecursive()
+    {
+        $data = [
+            'name' => '  Taylor ',
+            'tags' => [' php', 'Laravel '],
+            'profile' => [
+                'github' => ' taylorotwell ',
+                'team' => [
+                    'members' => [' Abby  ', ' Dayle '],
+                    'active' => true,
+                ],
+            ],
+            'meta' => null,
+        ];
+
+        $mapped = Arr::mapRecursive($data, function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        });
+
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'tags' => ['php', 'Laravel'],
+            'profile' => [
+                'github' => 'taylorotwell',
+                'team' => [
+                    'members' => ['Abby', 'Dayle'],
+                    'active' => true,
+                ],
+            ],
+            'meta' => null,
+        ], $mapped);
+        $this->assertEquals('  Taylor ', $data['name']);
+        $this->assertEquals([' php', 'Laravel '], $data['tags']);
+    }
+
+    public function testMapRecursiveWithoutPreservingKeys()
+    {
+        $data = ['  foo  ', ['  bar  ', ' baz  '], ' qux '];
+
+        $mapped = Arr::mapRecursive($data, 'trim', false);
+
+        $this->assertEquals(['foo', ['bar', 'baz'], 'qux'], $mapped);
+        $this->assertEquals(['  foo  ', ['  bar  ', ' baz  '], ' qux '], $data);
+    }
+
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');

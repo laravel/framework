@@ -3003,6 +3003,53 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testMapRecursive($collection)
+    {
+        $data = new $collection([
+            'name' => '  Taylor ',
+            'meta' => [
+                ['label' => '  foo ', 'value' => ' bar '],
+                ['label' => ' baz ', 'value' => ' qux '],
+            ],
+            'active' => true,
+        ]);
+
+        $mapped = $data->mapRecursive(function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        });
+
+        $this->assertInstanceOf($collection, $mapped);
+        $this->assertEquals([
+            'name' => 'Taylor',
+            'meta' => [
+                ['label' => 'foo', 'value' => 'bar'],
+                ['label' => 'baz', 'value' => 'qux'],
+            ],
+            'active' => true,
+        ], $mapped->all());
+        $this->assertEquals('  Taylor ', $data->get('name'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testMapRecursiveWithoutPreservingKeys($collection)
+    {
+        $data = new $collection([
+            'first' => ['label' => ' foo '],
+            'second' => ['label' => ' bar '],
+        ]);
+
+        $mapped = $data->mapRecursive(function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        }, false);
+
+        $this->assertInstanceOf($collection, $mapped);
+        $this->assertSame([
+            ['label' => 'foo'],
+            ['label' => 'bar'],
+        ], $mapped->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapSpread($collection)
     {
         $c = new $collection([[1, 'a'], [2, 'b']]);

@@ -810,6 +810,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Recursively run a map over each of the items.
+     *
+     * @template TMapRecursiveValue
+     *
+     * @param  callable(TValue, array-key): TMapRecursiveValue  $callback
+     * @param  bool  $preserveKeys
+     * @return static<array-key, mixed>
+     */
+    public function mapRecursive(callable $callback, bool $preserveKeys = true)
+    {
+        return new static(Arr::mapRecursive($this->items, $callback, $preserveKeys));
+    }
+
+    /**
      * Run a dictionary map over the items.
      *
      * The callback should return an associative array with a single key/value pair.
