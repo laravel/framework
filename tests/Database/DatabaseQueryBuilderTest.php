@@ -1910,6 +1910,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->count();
     }
 
+    public function testGroupByAggregate()
+    {
+        $this->expectException(RuntimeException::class);
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getDatabaseName');
+        $builder->from('posts')->selectSub(function ($query) {
+            $query->from('videos')->select('count(*)')->whereColumn('posts.id', '=', 'videos.post_id');
+        }, 'videos_count')->groupBy('videos_count');
+        $builder->count();
+    }
+
     public function testSubSelectWhereIns()
     {
         $builder = $this->getBuilder();
