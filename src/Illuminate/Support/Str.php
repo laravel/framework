@@ -705,7 +705,7 @@ class Str
      * @param  string|null  $encoding
      * @return int
      */
-    public static function length($value, $encoding = null)
+    public static function length(string $value, ?string $encoding = null): int
     {
         return mb_strlen($value, $encoding);
     }
@@ -746,7 +746,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function lower($value)
+    public static function lower(string $value): string
     {
         return mb_strtolower($value, 'UTF-8');
     }
@@ -1388,7 +1388,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function reverse(string $value)
+    public static function reverse(string $value): string
     {
         return implode(array_reverse(mb_str_split($value)));
     }
@@ -1413,7 +1413,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function upper($value)
+    public static function upper(string $value): string
     {
         return mb_strtoupper($value, 'UTF-8');
     }
@@ -1424,7 +1424,7 @@ class Str
      * @param  string  $value
      * @return string
      */
-    public static function title($value)
+    public static function title(string $value): string
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
