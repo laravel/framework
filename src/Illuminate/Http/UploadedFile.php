@@ -2,17 +2,17 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Testing\FileFactory;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Concerns\InteractsWithContainer;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
 {
-    use FileHelpers, Macroable;
+    use FileHelpers, InteractsWithContainer, Macroable;
 
     /**
      * Begin creating a new file fake.
@@ -91,7 +91,7 @@ class UploadedFile extends SymfonyUploadedFile
 
         $disk = Arr::pull($options, 'disk');
 
-        return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
+        return $this->resolve(FilesystemFactory::class)->disk($disk)->putFileAs(
             $path, $this, $name, $options
         );
     }

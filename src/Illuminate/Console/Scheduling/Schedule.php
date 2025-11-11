@@ -11,6 +11,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
@@ -105,10 +106,11 @@ class Schedule
      * Create a new schedule instance.
      *
      * @param  \DateTimeZone|string|null  $timezone
+     * @param  \Illuminate\Contracts\Container\Container|null  $container
      *
      * @throws \RuntimeException
      */
-    public function __construct($timezone = null)
+    public function __construct($timezone = null, ?ContainerContract $container = null)
     {
         $this->timezone = $timezone;
 
@@ -118,7 +120,7 @@ class Schedule
             );
         }
 
-        $container = Container::getInstance();
+        $container = $container ?? Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
             ? $container->make(EventMutex::class)
