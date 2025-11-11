@@ -600,7 +600,7 @@ class Arr
      * @param  array  $array
      * @return bool
      */
-    public static function isAssoc(array $array)
+    public static function isAssoc(array $array): bool
     {
         return ! array_is_list($array);
     }
@@ -613,7 +613,7 @@ class Arr
      * @param  array  $array
      * @return bool
      */
-    public static function isList($array)
+    public static function isList(array $array): bool
     {
         return array_is_list($array);
     }
@@ -988,7 +988,7 @@ class Arr
      * @param  array  $array
      * @return array
      */
-    public static function shuffle($array)
+    public static function shuffle(array $array): array
     {
         return (new Randomizer)->shuffleArray($array);
     }

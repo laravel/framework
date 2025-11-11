@@ -200,7 +200,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string|null  $default
      * @return string|null
      */
-    public function segment($index, $default = null)
+    public function segment(int $index, $default = null): ?string
     {
         return Arr::get($this->segments(), $index - 1, $default);
     }
@@ -797,7 +797,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  string  $key
      * @return bool
      */
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return ! is_null($this->__get($key));
     }
