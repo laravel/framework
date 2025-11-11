@@ -122,7 +122,7 @@ class ScheduleListCommandTest extends TestCase
     public function testDisplayScheduleAsJsonWithSpecificEnvironment()
     {
         $environment = 'production';
-        $this->schedule->command(FooCommand::class)->quarterly()->environments(environment);
+        $this->schedule->command(FooCommand::class)->quarterly()->environments($environment);
 
         $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
         $output = Artisan::output();
