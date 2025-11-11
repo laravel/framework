@@ -3609,6 +3609,8 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $columns
      * @return int<0, max>
+     *
+     * @throws \RuntimeException
      */
     public function count($columns = '*')
     {
@@ -3620,6 +3622,8 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function min($column)
     {
@@ -3631,6 +3635,8 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function max($column)
     {
@@ -3642,6 +3648,8 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function sum($column)
     {
@@ -3655,6 +3663,8 @@ class Builder implements BuilderContract
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function avg($column)
     {
@@ -3678,9 +3688,15 @@ class Builder implements BuilderContract
      * @param  string  $function
      * @param  array  $columns
      * @return mixed
+     *
+     * @throws \RuntimeException
      */
     public function aggregate($function, $columns = ['*'])
     {
+        if (! empty($this->groups)) {
+            throw new RuntimeException('Aggregate functions cannot be used with a GROUP BY clause.');
+        }
+
         $results = $this->cloneWithout($this->unions || $this->havings ? [] : ['columns'])
             ->cloneWithoutBindings($this->unions || $this->havings ? [] : ['select'])
             ->setAggregate($function, $columns)
@@ -3697,6 +3713,8 @@ class Builder implements BuilderContract
      * @param  string  $function
      * @param  array  $columns
      * @return float|int
+     *
+     * @throws \RuntimeException
      */
     public function numericAggregate($function, $columns = ['*'])
     {
