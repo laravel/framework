@@ -14,7 +14,7 @@ trait DetectsConcurrencyErrors
      * @param  \Throwable  $e
      * @return bool
      */
-    protected function causedByConcurrencyError(Throwable $e)
+    protected function causedByConcurrencyError(Throwable $e): bool
     {
         $container = Container::getInstance();
 

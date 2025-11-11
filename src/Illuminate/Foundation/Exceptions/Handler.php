@@ -206,7 +206,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
@@ -217,7 +217,7 @@ class Handler implements ExceptionHandlerContract
      * @param  callable  $reportUsing
      * @return \Illuminate\Foundation\Exceptions\ReportableHandler
      */
-    public function reportable(callable $reportUsing)
+    public function reportable(callable $reportUsing): ReportableHandler
     {
         if (! $reportUsing instanceof Closure) {
             $reportUsing = Closure::fromCallable($reportUsing);
@@ -234,7 +234,7 @@ class Handler implements ExceptionHandlerContract
      * @param  callable  $renderUsing
      * @return $this
      */
-    public function renderable(callable $renderUsing)
+    public function renderable(callable $renderUsing): static
     {
         if (! $renderUsing instanceof Closure) {
             $renderUsing = Closure::fromCallable($renderUsing);
