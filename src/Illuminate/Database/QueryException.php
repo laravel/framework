@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PDOException;
@@ -105,5 +106,20 @@ class QueryException extends PDOException
     public function getBindings()
     {
         return $this->bindings;
+    }
+
+    /**
+     * Get a collection of keys and their corresponding bindings.
+     *
+     * @return Collection
+     */
+    public function getBindingMap(): Collection
+    {
+        return Str::of($this->getSql())
+            ->after('(')
+            ->before(')')
+            ->replace('"', '')
+            ->explode(', ')
+            ->combine($this->getBindings());
     }
 }
