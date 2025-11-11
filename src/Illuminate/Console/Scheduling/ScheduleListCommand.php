@@ -67,9 +67,7 @@ class ScheduleListCommand extends Command
 
         $events = $this->sortEvents($events, $timezone);
 
-        $this->option('json')
-            ? $this->displayJson($events, $timezone)
-            : $this->displayForCli($events, $timezone);
+        $this->display($events, $timezone);
     }
 
     /**
