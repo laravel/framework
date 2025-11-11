@@ -255,6 +255,32 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertEquals($expected, $migrationsFilesFullPaths);
     }
 
+    public function testMigrationsCanBeTakenUsingLimit()
+    {
+        $migrationsFilesFullPaths = array_values($this->migrator->getMigrationFiles([__DIR__.'/migrations/limit'], 3));
+
+        $expected = [
+            __DIR__.'/migrations/limit/2025_11_11_000000_create_table_one.php',
+            __DIR__.'/migrations/limit/2025_11_11_000001_create_table_two.php',
+            __DIR__.'/migrations/limit/2025_11_11_000002_create_table_three.php',
+        ];
+
+        $this->assertEquals($expected, $migrationsFilesFullPaths);
+    }
+
+    public function testMigrationsCanBeTakenUsingInvertedLimit()
+    {
+        $migrationsFilesFullPaths = array_values($this->migrator->getMigrationFiles([__DIR__.'/migrations/limit'], -3));
+
+        $expected = [
+            __DIR__.'/migrations/limit/2025_11_11_000002_create_table_three.php',
+            __DIR__.'/migrations/limit/2025_11_11_000003_create_table_four.php',
+            __DIR__.'/migrations/limit/2025_11_11_000004_create_table_five.php',
+        ];
+
+        $this->assertEquals($expected, $migrationsFilesFullPaths);
+    }
+
     public function testConnectionPriorToMigrationIsNotChangedAfterMigration()
     {
         $this->migrator->setConnection('default');
