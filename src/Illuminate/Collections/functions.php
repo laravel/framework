@@ -2,6 +2,21 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Database\Eloquent\Model;
+
+if (! function_exists('Illuminate\Support\is_model')) {
+    /**
+     * Determine if the given value is a model.
+     *
+     * @param  TModel  $model
+     * @return bool
+     */
+    function is_model($model)
+    {
+        return $model instanceof Model;
+    }
+}
+
 if (! function_exists('Illuminate\Support\model_key')) {
     /**
      * Return the key for the given model.
@@ -13,9 +28,9 @@ if (! function_exists('Illuminate\Support\model_key')) {
     function model_key($model, $default = null)
     {
         return match (true) {
-            $model instanceof \Illuminate\Database\Eloquent\Model => $model->getKey(),
+            is_model($model) => $model->getKey(),
 
-            default => $value ?? value($default),
+            default => $model ?? value($default, $model),
         };
     }
 }
