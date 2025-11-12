@@ -75,4 +75,29 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSuccessful()
             ->assertSeeText('Hello taylorotwell');
     }
+
+    public function testActingAsGuestClearsTheUser()
+    {
+        Route::get('me', function (Request $request) {
+            return 'Hello '.$request->user()->username;
+        })->middleware(['auth']);
+        Route::get('login', function () {
+            return 'Login';
+        })->name('login');
+
+        $user = User::where('username', '=', 'taylorotwell')->first();
+
+        $this->actingAs($user);
+        $this->assertAuthenticated();
+
+        $this->get('/me')
+            ->assertSuccessful()
+            ->assertSeeText('Hello taylorotwell');
+
+        $this->actingAsGuest();
+        $this->assertGuest();
+
+        $this->get('/me')
+            ->assertRedirect(route('login'));
+    }
 }

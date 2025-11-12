@@ -12,6 +12,7 @@ use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
  * @method static \Illuminate\Foundation\Exceptions\Handler renderable(callable $renderUsing)
  * @method static \Illuminate\Foundation\Exceptions\Handler map(\Closure|string $from, \Closure|string|null $to = null)
  * @method static \Illuminate\Foundation\Exceptions\Handler dontReport(array|string $exceptions)
+ * @method static \Illuminate\Foundation\Exceptions\Handler dontReportWhen(callable $dontReportWhen)
  * @method static \Illuminate\Foundation\Exceptions\Handler ignore(array|string $exceptions)
  * @method static \Illuminate\Foundation\Exceptions\Handler dontFlash(array|string $attributes)
  * @method static \Illuminate\Foundation\Exceptions\Handler level(string $type, string $level)

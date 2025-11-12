@@ -9,7 +9,7 @@ assertType('mixed', app('foo'));
 assertType('Illuminate\Config\Repository', app(Repository::class));
 
 assertType('Illuminate\Contracts\Auth\Factory', auth());
-assertType('Illuminate\Contracts\Auth\StatefulGuard', auth('foo'));
+assertType('Illuminate\Contracts\Auth\Guard', auth('foo'));
 
 assertType('Illuminate\Cache\CacheManager', cache());
 assertType('bool', cache(['foo' => 'bar'], 42));
@@ -29,7 +29,7 @@ assertType('Symfony\Component\HttpFoundation\Cookie', cookie('foo'));
 assertType('Illuminate\Foundation\Bus\PendingDispatch', dispatch('foo'));
 assertType('Illuminate\Foundation\Bus\PendingClosureDispatch', dispatch(fn () => 1));
 
-assertType('Illuminate\Log\LogManager', logger());
+assertType('Psr\Log\LoggerInterface', logger());
 assertType('null', logger('foo'));
 
 assertType('Illuminate\Log\LogManager', logs());

@@ -4,6 +4,10 @@ namespace Illuminate\Cache;
 
 use Illuminate\Cache\Events\CacheFlushed;
 use Illuminate\Cache\Events\CacheFlushing;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
+use Illuminate\Redis\Connections\PhpRedisConnection;
+use Illuminate\Redis\Connections\PredisClusterConnection;
+use Illuminate\Redis\Connections\PredisConnection;
 
 class RedisTaggedCache extends TaggedCache
 {
@@ -107,6 +111,66 @@ class RedisTaggedCache extends TaggedCache
      * @return bool
      */
     public function flush()
+    {
+        $connection = $this->store->connection();
+
+        if ($connection instanceof PredisClusterConnection ||
+            $connection instanceof PhpRedisClusterConnection) {
+            return $this->flushClusteredConnection();
+        }
+
+        $this->event(new CacheFlushing($this->getName()));
+
+        $redisPrefix = match (true) {
+            $connection instanceof PhpRedisConnection => $connection->client()->getOption(\Redis::OPT_PREFIX),
+            $connection instanceof PredisConnection => $connection->client()->getOptions()->prefix,
+        };
+
+        $cachePrefix = $redisPrefix.$this->store->getPrefix();
+
+        $cacheTags = [];
+
+        foreach ($this->tags->getNames() as $name) {
+            $cacheTags[] = $cachePrefix.$this->tags->tagId($name);
+        }
+
+        $script = <<<'LUA'
+            local prefix = table.remove(ARGV, 1)
+
+            for i, key in ipairs(KEYS) do
+                redis.call('DEL', key)
+
+                for j, arg in ipairs(ARGV) do
+                    local zkey = string.gsub(key, prefix, "")
+                    redis.call('ZREM', arg, zkey)
+                end
+            end
+        LUA;
+
+        $entries = $this->tags->entries()
+            ->map(fn (string $key) => $this->store->getPrefix().$key)
+            ->chunk(1000);
+
+        foreach ($entries as $keysToBeDeleted) {
+            $connection->eval(
+                $script,
+                count($keysToBeDeleted),
+                ...$keysToBeDeleted,
+                ...[$cachePrefix, ...$cacheTags]
+            );
+        }
+
+        $this->event(new CacheFlushed($this->getName()));
+
+        return true;
+    }
+
+    /**
+     * Remove all items from the cache.
+     *
+     * @return bool
+     */
+    protected function flushClusteredConnection()
     {
         $this->event(new CacheFlushing($this->getName()));
 

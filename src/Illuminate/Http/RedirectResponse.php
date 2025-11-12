@@ -8,6 +8,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use Illuminate\Support\ViewErrorBag;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
@@ -183,6 +184,26 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
+     * Enforce that the redirect target must have the same host as the current request.
+     */
+    public function enforceSameOrigin(
+        string $fallback,
+        bool $validateScheme = true,
+        bool $validatePort = true,
+    ): static {
+        $target = Uri::of($this->targetUrl);
+        $current = Uri::of($this->request->getSchemeAndHttpHost());
+
+        if ($target->host() !== $current->host() ||
+            ($validateScheme && $target->scheme() !== $current->scheme()) ||
+            ($validatePort && $target->port() !== $current->port())) {
+            $this->setTargetUrl($fallback);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the original response content.
      *
      * @return null
@@ -206,11 +227,13 @@ class RedirectResponse extends BaseRedirectResponse
      * Set the request instance.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return void
+     * @return $this
      */
     public function setRequest(Request $request)
     {
         $this->request = $request;
+
+        return $this;
     }
 
     /**
@@ -227,11 +250,13 @@ class RedirectResponse extends BaseRedirectResponse
      * Set the session store instance.
      *
      * @param  \Illuminate\Session\Store  $session
-     * @return void
+     * @return $this
      */
     public function setSession(SessionStore $session)
     {
         $this->session = $session;
+
+        return $this;
     }
 
     /**

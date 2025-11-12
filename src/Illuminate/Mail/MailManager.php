@@ -312,7 +312,7 @@ class MailManager implements FactoryContract
      * Create an instance of the Resend Transport driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Mail\Transport\ResendTransprot
+     * @return \Illuminate\Mail\Transport\ResendTransport
      */
     protected function createResendTransport(array $config)
     {
@@ -370,7 +370,10 @@ class MailManager implements FactoryContract
         return $factory->create(new Dsn(
             'postmark+api',
             'default',
-            $config['token'] ?? $this->app['config']->get('services.postmark.token'),
+            $config['token']
+                ?? $config['key']
+                ?? $this->app['config']->get('services.postmark.token')
+                ?? $this->app['config']->get('services.postmark.key'),
             null,
             null,
             $options

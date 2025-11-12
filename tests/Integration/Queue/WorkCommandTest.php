@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Exceptions;
@@ -160,6 +161,27 @@ class WorkCommandTest extends QueueTestCase
         $this->assertTrue(ThirdJob::$ran);
         $this->assertFalse(FirstJob::$ran);
         $this->assertFalse(SecondJob::$ran);
+    }
+
+    public function testMemoryExitCode()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Worker::$memoryExceededExitCode = 0;
+
+        Queue::push(new FirstJob);
+        Queue::push(new SecondJob);
+
+        $this->artisan('queue:work', [
+            '--memory' => 0.1,
+        ])->assertExitCode(0);
+
+        // Memory limit isn't checked until after the first job is attempted.
+        $this->assertSame(1, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
+        $this->assertFalse(SecondJob::$ran);
+
+        Worker::$memoryExceededExitCode = null;
     }
 
     public function testFailedJobListenerOnlyRunsOnce()

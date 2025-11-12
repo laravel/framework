@@ -8,9 +8,13 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
+use Laravel\Prompts\Note as PromptsNote;
+use Laravel\Prompts\Prompt as BasePrompt;
+use Laravel\Prompts\Table as PromptsTable;
 use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
@@ -18,6 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class PendingCommand
@@ -248,6 +253,122 @@ class PendingCommand
     }
 
     /**
+     * Specify that the given Prompts info message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsInfo(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'info')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts warning message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsWarning(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'warning')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts error message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsError(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'error')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts alert message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsAlert(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'alert')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts intro message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsIntro(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'intro')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify that the given Prompts outro message should be contained in the command output.
+     *
+     * @return $this
+     */
+    public function expectsPromptsOutro(string $message)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsNote($message, 'outro')
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify a Prompts table that should be printed when the command runs.
+     *
+     * @param  array<int, string|array<int, string>>|Collection<int, string|array<int, string>>  $headers
+     * @param  array<int, array<int, string>>|Collection<int, array<int, string>>|null  $rows
+     * @return $this
+     *
+     * @phpstan-param ($rows is null ? list<list<string>>|Collection<int, list<string>> : list<string|list<string>>|Collection<int, string|list<string>>) $headers
+     */
+    public function expectsPromptsTable(array|Collection $headers, array|Collection|null $rows)
+    {
+        $this->expectOutputToContainPrompt(
+            new PromptsTable($headers, $rows)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Render the given prompt and add the output to the expectations.
+     *
+     * @return void
+     */
+    protected function expectOutputToContainPrompt(BasePrompt $prompt)
+    {
+        $prompt->setOutput($output = new BufferedOutput);
+
+        $prompt->display();
+
+        $this->expectsOutputToContain(trim($output->fetch()));
+    }
+
+    /**
      * Assert that the command has the given exit code.
      *
      * @param  int  $exitCode
@@ -356,6 +477,27 @@ class PendingCommand
         $this->app->offsetUnset(OutputStyle::class);
 
         return $exitCode;
+    }
+
+    /**
+     * Debug the command.
+     *
+     * @return never
+     */
+    public function dd()
+    {
+        $consoleOutput = new OutputStyle(new ArrayInput($this->parameters), new ConsoleOutput());
+        $exitCode = $this->app->make(Kernel::class)->call($this->command, $this->parameters, $consoleOutput);
+
+        $streamOutput = $consoleOutput->getOutput()->getStream();
+        $output = stream_get_contents($streamOutput);
+
+        fclose($streamOutput);
+
+        dd([
+            'exitCode' => $exitCode,
+            'output' => $output,
+        ]);
     }
 
     /**

@@ -80,7 +80,7 @@ class AsCollection implements Castable
      * Specify the collection type for the cast.
      *
      * @param  class-string  $class
-     * @param  array{class-string, string}|class-string  $map
+     * @param  array{class-string, string}|class-string|null  $map
      * @return string
      */
     public static function using($class, $map = null)

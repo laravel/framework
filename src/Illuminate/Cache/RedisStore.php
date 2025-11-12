@@ -286,7 +286,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Begin executing a new tags operation.
      *
-     * @param  array|mixed  $names
+     * @param  mixed  $names
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names)
@@ -462,7 +462,7 @@ class RedisStore extends TaggableStore implements LockProvider
      */
     protected function shouldBeStoredWithoutSerialization($value): bool
     {
-        return is_numeric($value) && ! in_array($value, [INF, -INF]) && ! is_nan($value);
+        return is_numeric($value) && is_finite($value);
     }
 
     /**

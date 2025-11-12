@@ -43,13 +43,19 @@ class SupportStringableTest extends TestCase
     public function testIsUrl()
     {
         $this->assertTrue($this->stringable('https://laravel.com')->isUrl());
+        $this->assertTrue($this->stringable('https://laravel.com')->isUrl(['https']));
+
         $this->assertFalse($this->stringable('invalid url')->isUrl());
+        $this->assertFalse($this->stringable('https://laravel.com')->isUrl(['http']));
     }
 
     public function testIsUuid()
     {
         $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid());
+        $this->assertTrue($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid(4));
+
         $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98')->isUuid());
+        $this->assertFalse($this->stringable('2cdc7039-65a6-4ac7-8e5d-d554a98e7b15')->isUuid(7));
     }
 
     public function testIsUlid()
@@ -172,6 +178,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));
         $this->assertSame('Taylor___', (string) $this->stringable('Taylor Otwell')->words(1, '___'));
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
+    }
+
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('laravel')->ucwords());
+        $this->assertSame('Laravel Framework', (string) $this->stringable('laravel framework')->ucwords());
+        $this->assertSame('Laravel-Framework', (string) $this->stringable('laravel-framework')->ucwords('-'));
+        $this->assertSame('Мама', (string) $this->stringable('мама')->ucwords());
+        $this->assertSame('Мама Мыла Раму', (string) $this->stringable('мама мыла раму')->ucwords());
+        $this->assertSame('JJ Watt', (string) $this->stringable('JJ watt')->ucwords());
     }
 
     public function testUnless()
@@ -840,6 +856,19 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(collect(['taylor', 'otwell'])));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
+    }
+
+    public function testDoesntContain()
+    {
+        $this->assertTrue($this->stringable('taylor')->doesntContain('xxx'));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx', 'yyy']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(collect(['xxx', 'yyy'])));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(''));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('ylo'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('taylor'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['xxx', 'ylo']));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['LOR'], true));
     }
 
     public function testParseCallback()

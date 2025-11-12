@@ -7,6 +7,7 @@ use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Reflector;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 /**
@@ -34,6 +35,9 @@ use InvalidArgumentException;
 class RouteRegistrar
 {
     use CreatesRegularExpressionRouteConstraints;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The router instance.
@@ -117,6 +121,8 @@ class RouteRegistrar
         }
 
         if ($key === 'middleware') {
+            $value = array_filter(Arr::wrap($value));
+
             foreach ($value as $index => $middleware) {
                 $value[$index] = (string) $middleware;
             }
@@ -280,6 +286,10 @@ class RouteRegistrar
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         if (in_array($method, $this->passthru)) {
             return $this->registerRoute($method, ...$parameters);
         }
@@ -287,6 +297,10 @@ class RouteRegistrar
         if (in_array($method, $this->allowedAttributes)) {
             if ($method === 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            }
+
+            if ($method === 'can') {
+                return $this->attribute($method, [$parameters]);
             }
 
             return $this->attribute($method, array_key_exists(0, $parameters) ? $parameters[0] : true);

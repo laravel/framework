@@ -160,7 +160,7 @@ class ShouldDispatchAfterCommitEventTest extends TestCase
 
                 throw new \Exception;
             });
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             //
         }
 

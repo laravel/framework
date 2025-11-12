@@ -80,6 +80,16 @@ class FakeInvokedProcess implements InvokedProcessContract
     }
 
     /**
+     * Get the command line for the process.
+     *
+     * @return string
+     */
+    public function command()
+    {
+        return $this->command;
+    }
+
+    /**
      * Send a signal to the process.
      *
      * @param  int  $signal
@@ -268,6 +278,37 @@ class FakeInvokedProcess implements InvokedProcessContract
         }
 
         while ($this->invokeOutputHandlerWithNextLineOfOutput()) {
+            //
+        }
+
+        $this->remainingRunIterations = 0;
+
+        return $this->process->toProcessResult($this->command);
+    }
+
+    /**
+     * Wait until the given callback returns true.
+     *
+     * @param  callable|null  $output
+     * @return \Illuminate\Contracts\Process\ProcessResult
+     */
+    public function waitUntil(?callable $output = null)
+    {
+        $shouldStop = false;
+
+        $this->outputHandler = $output
+            ? function ($type, $buffer) use ($output, &$shouldStop) {
+                $shouldStop = call_user_func($output, $type, $buffer);
+            }
+        : $this->outputHandler;
+
+        if (! $this->outputHandler) {
+            $this->remainingRunIterations = 0;
+
+            return $this->predictProcessResult();
+        }
+
+        while ($this->running() && ! $shouldStop) {
             //
         }
 

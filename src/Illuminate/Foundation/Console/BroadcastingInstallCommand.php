@@ -161,6 +161,14 @@ class BroadcastingInstallCommand extends Command
                 'commands: __DIR__.\'/../routes/console.php\','.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
                 $appBootstrapPath,
             );
+        } elseif (str_contains($content, '->withRouting(')) {
+            (new Filesystem)->replaceInFile(
+                '->withRouting(',
+                '->withRouting('.PHP_EOL.'        channels: __DIR__.\'/../routes/channels.php\',',
+                $appBootstrapPath,
+            );
+        } else {
+            $this->components->error('Unable to register broadcast routes. Please register them manually in ['.$appBootstrapPath.'].');
         }
     }
 
@@ -341,7 +349,7 @@ class BroadcastingInstallCommand extends Command
             file_put_contents($filePath, $newContents);
         } else {
             // Add Echo configuration after the last import...
-            $lastImport = end($matches[0]);
+            $lastImport = array_last($matches[0]);
 
             $positionOfLastImport = strrpos($contents, $lastImport);
 

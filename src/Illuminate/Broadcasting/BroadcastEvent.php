@@ -51,6 +51,13 @@ class BroadcastEvent implements ShouldQueue
     public $maxExceptions;
 
     /**
+     * Delete the job if its models no longer exist.
+     *
+     * @var bool
+     */
+    public $deleteWhenMissingModels = true;
+
+    /**
      * Create a new job handler instance.
      *
      * @param  mixed  $event
@@ -141,13 +148,13 @@ class BroadcastEvent implements ShouldQueue
      * Get the channels for the given connection.
      *
      * @param  array  $channels
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return array
      */
     protected function getConnectionChannels($channels, $connection)
     {
-        return is_array($channels[$connection] ?? null)
-            ? $channels[$connection]
+        return is_array($channels[$connection ?? ''] ?? null)
+            ? $channels[$connection ?? '']
             : $channels;
     }
 
@@ -155,13 +162,13 @@ class BroadcastEvent implements ShouldQueue
      * Get the payload for the given connection.
      *
      * @param  array  $payload
-     * @param  string  $connection
+     * @param  string|null  $connection
      * @return array
      */
     protected function getConnectionPayload($payload, $connection)
     {
-        $connectionPayload = is_array($payload[$connection] ?? null)
-            ? $payload[$connection]
+        $connectionPayload = is_array($payload[$connection ?? ''] ?? null)
+            ? $payload[$connection ?? '']
             : $payload;
 
         if (isset($payload['socket'])) {
@@ -188,7 +195,7 @@ class BroadcastEvent implements ShouldQueue
     /**
      * Handle a job failure.
      *
-     * @param  \Throwable  $e
+     * @param  \Throwable|null  $e
      * @return void
      */
     public function failed(?Throwable $e = null): void

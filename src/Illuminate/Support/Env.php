@@ -5,7 +5,6 @@ namespace Illuminate\Support;
 use Closure;
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use PhpOption\Option;
 use RuntimeException;
@@ -65,6 +64,8 @@ class Env
         } else {
             static::$customAdapters[] = $callback;
         }
+
+        static::$repository = null;
     }
 
     /**
@@ -124,8 +125,8 @@ class Env
      * @param  bool  $overwrite
      * @return void
      *
-     * @throws RuntimeException
-     * @throws FileNotFoundException
+     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public static function writeVariables(array $variables, string $pathToFile, bool $overwrite = false): void
     {
@@ -153,8 +154,8 @@ class Env
      * @param  bool  $overwrite
      * @return void
      *
-     * @throws RuntimeException
-     * @throws FileNotFoundException
+     * @throws \RuntimeException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public static function writeVariable(string $key, mixed $value, string $pathToFile, bool $overwrite = false): void
     {
@@ -189,12 +190,11 @@ class Env
         $shouldQuote = preg_match('/^[a-zA-z0-9]+$/', $value) === 0;
 
         $lineToAddVariations = [
-            $key.'='.(is_string($value) ? '"'.addslashes($value).'"' : $value),
-            $key.'='.(is_string($value) ? "'".addslashes($value)."'" : $value),
+            $key.'='.(is_string($value) ? self::prepareQuotedValue($value) : $value),
             $key.'='.$value,
         ];
 
-        $lineToAdd = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[2];
+        $lineToAdd = $shouldQuote ? $lineToAddVariations[0] : $lineToAddVariations[1];
 
         if ($value === '') {
             $lineToAdd = $key.'=';
@@ -274,5 +274,36 @@ class Env
 
                 return $value;
             });
+    }
+
+    /**
+     * Wrap a string in quotes, choosing double or single quotes.
+     *
+     * @param  string  $input
+     * @return string
+     */
+    protected static function prepareQuotedValue(string $input)
+    {
+        return str_contains($input, '"')
+            ? "'".self::addSlashesExceptFor($input, ['"'])."'"
+            : '"'.self::addSlashesExceptFor($input, ["'"]).'"';
+    }
+
+    /**
+     * Escape a string using addslashes, excluding the specified characters from being escaped.
+     *
+     * @param  string  $value
+     * @param  array  $except
+     * @return string
+     */
+    protected static function addSlashesExceptFor(string $value, array $except = [])
+    {
+        $escaped = addslashes($value);
+
+        foreach ($except as $character) {
+            $escaped = str_replace('\\'.$character, $character, $escaped);
+        }
+
+        return $escaped;
     }
 }

@@ -7,6 +7,9 @@ use Illuminate\Database\DeadlockException;
 use RuntimeException;
 use Throwable;
 
+/**
+ * @mixin \Illuminate\Database\Connection
+ */
 trait ManagesTransactions
 {
     /**
@@ -148,7 +151,7 @@ trait ManagesTransactions
             $this->reconnectIfMissingConnection();
 
             try {
-                $this->getPdo()->beginTransaction();
+                $this->executeBeginTransactionStatement();
             } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
@@ -184,7 +187,7 @@ trait ManagesTransactions
         if ($this->causedByLostConnection($e)) {
             $this->reconnect();
 
-            $this->getPdo()->beginTransaction();
+            $this->executeBeginTransactionStatement();
         } else {
             throw $e;
         }
@@ -346,6 +349,23 @@ trait ManagesTransactions
     {
         if ($this->transactionsManager) {
             return $this->transactionsManager->addCallback($callback);
+        }
+
+        throw new RuntimeException('Transactions Manager has not been set.');
+    }
+
+    /**
+     * Execute the callback after a transaction rolls back.
+     *
+     * @param  callable  $callback
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function afterRollBack($callback)
+    {
+        if ($this->transactionsManager) {
+            return $this->transactionsManager->addCallbackForRollback($callback);
         }
 
         throw new RuntimeException('Transactions Manager has not been set.');

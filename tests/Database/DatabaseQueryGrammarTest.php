@@ -42,4 +42,40 @@ class DatabaseQueryGrammarTest extends TestCase
 
         $this->assertSame('select * from "users"', $rawQuery);
     }
+
+    public function testCompileOrdersAcceptsExpression()
+    {
+        $builder = m::mock(Builder::class);
+        $grammar = new Grammar(m::mock(Connection::class));
+
+        // compileOrders() calls $query->getGrammar() → return our $grammar
+        $builder->shouldReceive('getGrammar')->andReturn($grammar);
+
+        $orders = [
+            ['sql' => new Expression('length("name") desc')], // mimics orderByRaw(DB::raw(...))
+        ];
+
+        $ref = new \ReflectionClass($grammar);
+        $method = $ref->getMethod('compileOrders'); // protected
+        $sql = $method->invoke($grammar, $builder, $orders);
+
+        $this->assertSame('order by length("name") desc', strtolower($sql));
+    }
+
+    public function testCompileOrdersAcceptsExpressionWithPlaceholders()
+    {
+        $builder = m::mock(Builder::class);
+        $grammar = new Grammar(m::mock(Connection::class));
+        $builder->shouldReceive('getGrammar')->andReturn($grammar);
+
+        $orders = [
+            ['sql' => new Expression('field(status, ?, ?) asc')],
+        ];
+
+        $ref = new \ReflectionClass($grammar);
+        $method = $ref->getMethod('compileOrders');
+        $sql = $method->invoke($grammar, $builder, $orders);
+
+        $this->assertSame('order by field(status, ?, ?) asc', strtolower($sql));
+    }
 }

@@ -170,71 +170,6 @@ class CacheManager implements FactoryContract
     }
 
     /**
-     * Create an instance of the file cache driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Cache\Repository
-     */
-    protected function createFileDriver(array $config)
-    {
-        return $this->repository(
-            (new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null))
-                ->setLockDirectory($config['lock_path'] ?? null),
-            $config
-        );
-    }
-
-    /**
-     * Create an instance of the Memcached cache driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Cache\Repository
-     */
-    protected function createMemcachedDriver(array $config)
-    {
-        $prefix = $this->getPrefix($config);
-
-        $memcached = $this->app['memcached.connector']->connect(
-            $config['servers'],
-            $config['persistent_id'] ?? null,
-            $config['options'] ?? [],
-            array_filter($config['sasl'] ?? [])
-        );
-
-        return $this->repository(new MemcachedStore($memcached, $prefix), $config);
-    }
-
-    /**
-     * Create an instance of the Null cache driver.
-     *
-     * @return \Illuminate\Cache\Repository
-     */
-    protected function createNullDriver()
-    {
-        return $this->repository(new NullStore, []);
-    }
-
-    /**
-     * Create an instance of the Redis cache driver.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Cache\Repository
-     */
-    protected function createRedisDriver(array $config)
-    {
-        $redis = $this->app['redis'];
-
-        $connection = $config['connection'] ?? 'default';
-
-        $store = new RedisStore($redis, $this->getPrefix($config), $connection);
-
-        return $this->repository(
-            $store->setLockConnection($config['lock_connection'] ?? $connection),
-            $config
-        );
-    }
-
-    /**
      * Create an instance of the database cache driver.
      *
      * @param  array  $config
@@ -308,6 +243,121 @@ class CacheManager implements FactoryContract
         }
 
         return new DynamoDbClient($dynamoConfig);
+    }
+
+    /**
+     * Create an instance of the failover cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createFailoverDriver(array $config)
+    {
+        return $this->repository(new FailoverStore(
+            $this,
+            $this->app->make(DispatcherContract::class),
+            $config['stores']
+        ), ['events' => false, ...$config]);
+    }
+
+    /**
+     * Create an instance of the file cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createFileDriver(array $config)
+    {
+        return $this->repository(
+            (new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null))
+                ->setLockDirectory($config['lock_path'] ?? null),
+            $config
+        );
+    }
+
+    /**
+     * Create an instance of the Memcached cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createMemcachedDriver(array $config)
+    {
+        $prefix = $this->getPrefix($config);
+
+        $memcached = $this->app['memcached.connector']->connect(
+            $config['servers'],
+            $config['persistent_id'] ?? null,
+            $config['options'] ?? [],
+            array_filter($config['sasl'] ?? [])
+        );
+
+        return $this->repository(new MemcachedStore($memcached, $prefix), $config);
+    }
+
+    /**
+     * Create an instance of the Null cache driver.
+     *
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createNullDriver()
+    {
+        return $this->repository(new NullStore, []);
+    }
+
+    /**
+     * Create an instance of the Redis cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createRedisDriver(array $config)
+    {
+        $redis = $this->app['redis'];
+
+        $connection = $config['connection'] ?? 'default';
+
+        $store = new RedisStore($redis, $this->getPrefix($config), $connection);
+
+        return $this->repository(
+            $store->setLockConnection($config['lock_connection'] ?? $connection),
+            $config
+        );
+    }
+
+    /**
+     * Create an instance of the session cache driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Cache\Repository
+     */
+    protected function createSessionDriver(array $config)
+    {
+        return $this->repository(
+            new SessionStore(
+                $this->getSession(),
+                $config['key'] ?? '_cache',
+            ),
+            $config
+        );
+    }
+
+    /**
+     * Get the session store implementation.
+     *
+     * @return \Illuminate\Contracts\Session\Session
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getSession()
+    {
+        $session = $this->app['session'] ?? null;
+
+        if (! $session) {
+            throw new InvalidArgumentException('Session store requires session manager to be available in container.');
+        }
+
+        return $session;
     }
 
     /**

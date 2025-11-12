@@ -101,7 +101,15 @@ class ServeCommand extends Command
                 return false;
             }
 
-            return $workers > 1 && ! $this->option('no-reload') ? false : $workers;
+            if ($workers > 1 &&
+                ! $this->option('no-reload') &&
+                ! (int) env('LARAVEL_SAIL', 0)) {
+                $this->components->warn('Unable to respect the `PHP_CLI_SERVER_WORKERS` environment variable without the `--no-reload` flag. Only creating a single server.');
+
+                return false;
+            }
+
+            return $workers;
         });
 
         parent::initialize($input, $output);

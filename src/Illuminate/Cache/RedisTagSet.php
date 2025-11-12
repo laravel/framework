@@ -13,7 +13,7 @@ class RedisTagSet extends TagSet
      *
      * @param  string  $key
      * @param  int|null  $ttl
-     * @param  string  $updateWhen
+     * @param  string|null  $updateWhen
      * @return void
      */
     public function addEntry(string $key, ?int $ttl = null, $updateWhen = null)

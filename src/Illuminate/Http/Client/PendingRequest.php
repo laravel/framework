@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -171,6 +172,13 @@ class PendingRequest
      * @var bool
      */
     protected $preventStrayRequests = false;
+
+    /**
+     * A list of URL patterns that are allowed to bypass the stray request guard.
+     *
+     * @var array<int, string>
+     */
+    protected $allowedStrayRequestUrls = [];
 
     /**
      * The middleware callables added by users that will handle requests.
@@ -472,6 +480,20 @@ class PendingRequest
     }
 
     /**
+     * Specify the NTLM authentication username and password for the request.
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @return $this
+     */
+    public function withNtlmAuth($username, $password)
+    {
+        return tap($this, function () use ($username, $password) {
+            $this->options['auth'] = [$username, $password, 'ntlm'];
+        });
+    }
+
+    /**
      * Specify an authorization token for the request.
      *
      * @param  string  $token
@@ -507,7 +529,7 @@ class PendingRequest
     public function withUrlParameters(array $parameters = [])
     {
         return tap($this, function () use ($parameters) {
-            $this->urlParameters = $parameters;
+            $this->urlParameters = array_merge($this->urlParameters, $parameters);
         });
     }
 
@@ -863,19 +885,51 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  callable  $callback
+     * @param  int|null  $concurrency
      * @return array<array-key, \Illuminate\Http\Client\Response>
      */
-    public function pool(callable $callback)
+    public function pool(callable $callback, ?int $concurrency = null)
     {
         $results = [];
 
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
-        foreach ($requests as $key => $item) {
-            $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+        if ($concurrency === null) {
+            foreach ($requests as $key => $item) {
+                $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+            }
+
+            return $results;
         }
 
+        $promises = [];
+
+        foreach ($requests as $key => $item) {
+            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
+        }
+
+        (new EachPromise($promises, [
+            'fulfilled' => function ($result, $key) use (&$results) {
+                $results[$key] = $result;
+            },
+            'rejected' => function ($reason, $key) use (&$results) {
+                $results[$key] = $reason;
+            },
+            'concurrency' => $concurrency,
+        ]))->promise()->wait();
+
         return $results;
+    }
+
+    /**
+     * Send a pool of asynchronous requests concurrently, with callbacks for introspection.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Http\Client\Batch
+     */
+    public function batch(callable $callback): Batch
+    {
+        return tap(new Batch($this->factory), $callback);
     }
 
     /**
@@ -1021,7 +1075,21 @@ class PendingRequest
     protected function parseMultipartBodyFormat(array $data)
     {
         return (new Collection($data))
-            ->map(fn ($value, $key) => is_array($value) ? $value : ['name' => $key, 'contents' => $value])
+            ->flatMap(function ($value, $key) {
+                if (is_array($value)) {
+                    // If the array has 'name' and 'contents' keys, it's already formatted for multipart...
+                    if (isset($value['name']) && isset($value['contents'])) {
+                        return [$value];
+                    }
+
+                    // Otherwise, treat it as multiple values for the same field name...
+                    return (new Collection($value))->map(function ($item) use ($key) {
+                        return ['name' => $key.'[]', 'contents' => $item];
+                    });
+                }
+
+                return [['name' => $key, 'contents' => $value]];
+            })
             ->values()
             ->all();
     }
@@ -1348,7 +1416,7 @@ class PendingRequest
                     ->first();
 
                 if (is_null($response)) {
-                    if ($this->preventStrayRequests) {
+                    if (! $this->isAllowedRequestUrl((string) $request->getUri())) {
                         throw new StrayRequestException((string) $request->getUri());
                     }
 
@@ -1474,6 +1542,40 @@ class PendingRequest
     }
 
     /**
+     * Allow stray, unfaked requests entirely, or optionally allow only specific URLs.
+     *
+     * @param  array<int, string>  $only
+     * @return $this
+     */
+    public function allowStrayRequests(array $only)
+    {
+        $this->allowedStrayRequestUrls = array_values($only);
+
+        return $this;
+    }
+
+    /**
+     * Determine if the given URL is allowed as a stray request.
+     *
+     * @param  string  $url
+     * @return bool
+     */
+    public function isAllowedRequestUrl($url)
+    {
+        if (! $this->preventStrayRequests) {
+            return true;
+        }
+
+        foreach ($this->allowedStrayRequestUrls as $pattern) {
+            if (Str::is($pattern, $url)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Toggle asynchronicity in requests.
      *
      * @param  bool  $async
@@ -1572,8 +1674,10 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
+        $request = new Request($e->getRequest());
+
         $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
+            $request, null
         );
 
         $this->dispatchConnectionFailedEvent($request, $exception);
@@ -1591,8 +1695,10 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
+        $request = new Request($e->getRequest());
+
         $this->factory?->recordRequestResponsePair(
-            $request = new Request($e->getRequest()), null
+            $request, null
         );
 
         $this->dispatchConnectionFailedEvent($request, $exception);
@@ -1608,9 +1714,11 @@ class PendingRequest
      */
     protected function marshalRequestExceptionWithResponse(RequestException $e)
     {
+        $response = $this->populateResponse($this->newResponse($e->getResponse()));
+
         $this->factory?->recordRequestResponsePair(
             new Request($e->getRequest()),
-            $response = $this->populateResponse($this->newResponse($e->getResponse()))
+            $response
         );
 
         throw $response->toException() ?? new ConnectionException($e->getMessage(), 0, $e);
