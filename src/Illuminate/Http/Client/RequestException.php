@@ -90,8 +90,10 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = static::$truncateAt
-            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
+        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
+
+        $summary = is_int($truncateExceptionsAt)
+            ? Message::bodySummary($response->toPsrResponse(), $truncateExceptionsAt)
             : Message::toString($response->toPsrResponse());
 
         return is_null($summary) ? $message : $message . ":\n{$summary}\n";
