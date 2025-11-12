@@ -37,7 +37,7 @@ class RequestException extends HttpClientException
     {
         parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
 
-        $this->truncateExceptionsAt = $truncateExceptionsAt ?? static::$truncateAt;
+        $this->truncateExceptionsAt = $truncateExceptionsAt;
 
         $this->response = $response;
     }
@@ -80,8 +80,10 @@ class RequestException extends HttpClientException
      */
     public function report(): void
     {
-        $summary = $this->truncateExceptionsAt
-            ? Message::bodySummary($this->response->toPsrResponse(), $this->truncateExceptionsAt)
+        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
+
+        $summary = $truncateExceptionsAt
+            ? Message::bodySummary($this->response->toPsrResponse(), $truncateExceptionsAt)
             : Message::toString($this->response->toPsrResponse());
 
         if (! is_null($summary)) {
