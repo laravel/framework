@@ -1481,7 +1481,7 @@ class Validator implements ValidatorContract
     /**
      * Set the callback used to format attributes.
      *
-     * @param callable|null $formatter
+     * @param  callable|null $formatter
      * @return $this
      */
     public function setDefaultAttributesFormatter(?callable $formatter = null)
