@@ -14,7 +14,14 @@ class RequestException extends HttpClientException
     public $response;
 
     /**
-     * The truncation length for the exception message.
+     * The current truncation length for the exception message.
+     *
+     * @var int|false
+     */
+    public $truncateExceptionsAt;
+
+    /**
+     * The global truncation length for the exception message.
      *
      * @var int|false
      */
@@ -24,10 +31,13 @@ class RequestException extends HttpClientException
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
+     * @param  int|false|null  $truncateExceptionsAt
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, $truncateExceptionsAt = null)
     {
-        parent::__construct($this->prepareMessage($response), $response->status());
+        parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
+
+        $this->truncateExceptionsAt = $truncateExceptionsAt;
 
         $this->response = $response;
     }
@@ -66,17 +76,18 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
-     * @return string
+     * @return void
      */
-    protected function prepareMessage(Response $response)
+    public function report(): void
     {
-        $message = "HTTP request returned status code {$response->status()}";
+        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
 
-        $summary = static::$truncateAt
-            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
-            : Message::toString($response->toPsrResponse());
+        $summary = $truncateExceptionsAt
+            ? Message::bodySummary($this->response->toPsrResponse(), $truncateExceptionsAt)
+            : Message::toString($this->response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        if (! is_null($summary)) {
+            $this->message .= ":\n{$summary}\n";
+        }
     }
 }
