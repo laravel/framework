@@ -28,6 +28,13 @@ class RequestException extends HttpClientException
     public static $truncateAt = 120;
 
     /**
+     * Whether the response has been summarized in the message.
+     *
+     * @var bool
+     */
+    protected $hasBeenSummarized = false;
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
@@ -80,6 +87,10 @@ class RequestException extends HttpClientException
      */
     public function report(): void
     {
+        if ($this->hasBeenSummarized) {
+            return;
+        }
+
         $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
 
         $summary = $truncateExceptionsAt
@@ -89,5 +100,7 @@ class RequestException extends HttpClientException
         if (! is_null($summary)) {
             $this->message .= ":\n{$summary}\n";
         }
+
+        $this->hasBeenSummarized = true;
     }
 }
