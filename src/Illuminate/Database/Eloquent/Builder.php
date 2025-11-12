@@ -1132,6 +1132,43 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Paginate the given query using SQL window functions for efficient total counting.
+     *
+     * Unlike the standard paginate method which requires a separate COUNT query,
+     * this method uses a single query with COUNT(*) OVER() window function to
+     * retrieve both the paginated results and total count in one database roundtrip.
+     *
+     * @param  int|null|\Closure  $perPage
+     * @param  array|string  $columns
+     * @param  string  $pageName
+     * @param  int|null  $page
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function paginateUsingWindow($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    {
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+        $perPage = value($perPage) ?: $this->model->getPerPage();
+
+        $windowColumns = array_merge((array) $columns, [$this->getQuery()->raw('COUNT(*) OVER() as total_count')]);
+
+        $results = $this->forPage($page, $perPage)->get($windowColumns);
+
+        $total = $results->isNotEmpty() ? $results->first()->total_count : 0;
+
+        $results->transform(function ($item) {
+            unset($item->total_count);
+            return $item;
+        });
+
+        return $this->paginator($results, $total, $perPage, $page, [
+            'path' => Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
+    }
+
+    /**
      * Paginate the given query into a simple paginator.
      *
      * @param  int|null  $perPage
