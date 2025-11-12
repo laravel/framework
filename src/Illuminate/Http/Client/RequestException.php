@@ -27,7 +27,7 @@ class RequestException extends HttpClientException
      */
     public function __construct(Response $response)
     {
-        parent::__construct($this->prepareMessage($response), $response->status());
+        parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
 
         $this->response = $response;
     }
@@ -66,17 +66,16 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
-     * @return string
+     * @return void
      */
-    protected function prepareMessage(Response $response)
+    public function report(): void
     {
-        $message = "HTTP request returned status code {$response->status()}";
-
         $summary = static::$truncateAt
-            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
-            : Message::toString($response->toPsrResponse());
+            ? Message::bodySummary($this->response->toPsrResponse(), static::$truncateAt)
+            : Message::toString($this->response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        $this->message = is_null($summary)
+            ? $this->message
+            : $this->message .= ":\n{$summary}\n";
     }
 }
