@@ -16,7 +16,7 @@ class RequestException extends HttpClientException
     /**
      * The current truncation length for the exception message.
      *
-     * @var int|false
+     * @var int|false|null
      */
     public $truncateExceptionsAt;
 
