@@ -2,8 +2,6 @@
 
 namespace Illuminate\Http\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
-
 use function Illuminate\Support\is_model;
 
 trait InteractsWithFlashData

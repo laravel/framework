@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Exceptions\Renderer;
 
 use Closure;
 use Composer\Autoload\ClassLoader;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
