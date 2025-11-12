@@ -1301,9 +1301,10 @@ class HttpClientTest extends TestCase
                 'message' => 'The Request can not be completed',
             ],
         ];
+
         $response = new Psr7Response(403, [], json_encode($error));
 
-        throw new RequestException(new Response($response));
+        throw tap(new RequestException(new Response($response)), fn ($exception) => $exception->report());
     }
 
     public function testRequestExceptionTruncatedSummary()
@@ -1319,7 +1320,7 @@ class HttpClientTest extends TestCase
         ];
         $response = new Psr7Response(403, [], json_encode($error));
 
-        throw new RequestException(new Response($response));
+        throw tap(new RequestException(new Response($response)), fn ($exception) => $exception->report());
     }
 
     public function testRequestExceptionWithoutTruncatedSummary()
@@ -1337,7 +1338,7 @@ class HttpClientTest extends TestCase
         ];
         $response = new Psr7Response(403, [], json_encode($error));
 
-        throw new RequestException(new Response($response));
+        throw tap(new RequestException(new Response($response)), fn ($exception) => $exception->report());
     }
 
     public function testRequestExceptionWithCustomTruncatedSummary()
@@ -1355,7 +1356,7 @@ class HttpClientTest extends TestCase
         ];
         $response = new Psr7Response(403, [], json_encode($error));
 
-        throw new RequestException(new Response($response));
+        throw tap(new RequestException(new Response($response)), fn ($exception) => $exception->report());
     }
 
     public function testRequestLevelTruncationLevelOnRequestException()
@@ -1372,6 +1373,8 @@ class HttpClientTest extends TestCase
         } catch (RequestException $e) {
             $exception = $e;
         }
+
+        $exception->report();
 
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
@@ -1394,6 +1397,8 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
+        $exception->report();
+
         $this->assertEquals("HTTP request returned status code 403:\nHTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\n\r\n[\"error\"]\n", $exception->getMessage());
 
         $this->assertEquals(60, RequestException::$truncateAt);
@@ -1414,6 +1419,8 @@ class HttpClientTest extends TestCase
             $exception = $e;
         }
 
+        $exception->report();
+
         $this->assertEquals("HTTP request returned status code 403:\n[\"e (truncated...)\n", $exception->getMessage());
 
         $this->assertFalse(RequestException::$truncateAt);
@@ -1427,6 +1434,8 @@ class HttpClientTest extends TestCase
         ]);
 
         $exception = $this->factory->async()->throw()->truncateExceptionsAt(4)->get('http://foo.com/json')->wait();
+
+        $exception->report();
 
         $this->assertInstanceOf(RequestException::class, $exception);
         $this->assertEquals("HTTP request returned status code 403:\n[\"er (truncated...)\n", $exception->getMessage());

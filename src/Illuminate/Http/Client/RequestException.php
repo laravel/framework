@@ -14,7 +14,14 @@ class RequestException extends HttpClientException
     public $response;
 
     /**
-     * The truncation length for the exception message.
+     * The current truncation length for the exception message.
+     *
+     * @var int|false
+     */
+    public $truncateExceptionsAt;
+
+    /**
+     * The global truncation length for the exception message.
      *
      * @var int|false
      */
@@ -24,10 +31,13 @@ class RequestException extends HttpClientException
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
+     * @param  int|false|null  $truncateExceptionsAt
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, $truncateExceptionsAt = null)
     {
         parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
+
+        $this->truncateExceptionsAt = $truncateExceptionsAt ?? static::$truncateAt;
 
         $this->response = $response;
     }
@@ -70,12 +80,12 @@ class RequestException extends HttpClientException
      */
     public function report(): void
     {
-        $summary = static::$truncateAt
-            ? Message::bodySummary($this->response->toPsrResponse(), static::$truncateAt)
+        $summary = $this->truncateExceptionsAt
+            ? Message::bodySummary($this->response->toPsrResponse(), $this->truncateExceptionsAt)
             : Message::toString($this->response->toPsrResponse());
 
-        $this->message = is_null($summary)
-            ? $this->message
-            : $this->message .= ":\n{$summary}\n";
+        if (! is_null($summary)) {
+            $this->message .= ":\n{$summary}\n";
+        }
     }
 }
