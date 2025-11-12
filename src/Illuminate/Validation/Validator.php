@@ -104,11 +104,18 @@ class Validator implements ValidatorContract
     protected $implicitAttributes = [];
 
     /**
-     * The callback that should be used to format the attribute.
+     * The callback that should be used to format implicit attributes.
      *
      * @var callable|null
      */
     protected $implicitAttributesFormatter;
+
+    /**
+     * The callback that should be used to format attributes.
+     *
+     * @var callable|null
+     */
+    protected $defaultAttributesFormatter;
 
     /**
      * The cached data for the "distinct" rule.
@@ -1467,6 +1474,19 @@ class Validator implements ValidatorContract
     public function addCustomAttributes(array $attributes)
     {
         $this->customAttributes = array_merge($this->customAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Set the callback used to format attributes.
+     *
+     * @param callable|null $formatter
+     * @return $this
+     */
+    public function setDefaultAttributesFormatter(?callable $formatter = null)
+    {
+        $this->defaultAttributesFormatter = $formatter;
 
         return $this;
     }
