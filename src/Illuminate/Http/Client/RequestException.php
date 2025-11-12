@@ -42,7 +42,7 @@ class RequestException extends HttpClientException
      */
     public function __construct(Response $response, $truncateExceptionsAt = null)
     {
-        parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
+        parent::__construct($this->prepareMessage($response), $response->status());
 
         $this->truncateExceptionsAt = $truncateExceptionsAt;
 
@@ -83,6 +83,23 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return string
+     */
+    protected function prepareMessage(Response $response)
+    {
+        $message = "HTTP request returned status code {$response->status()}";
+
+        $summary = static::$truncateAt
+            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
+            : Message::toString($response->toPsrResponse());
+
+        return is_null($summary) ? $message : $message . ":\n{$summary}\n";
+    }
+
+    /**
+     * Prepare the exception message.
+     *
      * @return void
      */
     public function report(): void
@@ -91,15 +108,7 @@ class RequestException extends HttpClientException
             return;
         }
 
-        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
-
-        $summary = $truncateExceptionsAt
-            ? Message::bodySummary($this->response->toPsrResponse(), $truncateExceptionsAt)
-            : Message::toString($this->response->toPsrResponse());
-
-        if (! is_null($summary)) {
-            $this->message .= ":\n{$summary}\n";
-        }
+        $this->message = $this->prepareMessage($this->response);
 
         $this->hasBeenSummarized = true;
     }
