@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
+use function Illuminate\Support\is_model;
+
 class Exception
 {
     /**
@@ -240,7 +242,7 @@ class Exception
         $parameters = $this->request()->route()?->parameters();
 
         return $parameters ? json_encode(array_map(
-            fn ($value) => $value instanceof Model ? $value->withoutRelations() : $value,
+            fn ($value) => is_model($value) ? $value->withoutRelations() : $value,
             $parameters
         ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) : null;
     }

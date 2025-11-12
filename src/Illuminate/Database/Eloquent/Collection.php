@@ -11,6 +11,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
 use LogicException;
 
+use function Illuminate\Support\is_model;
+use function Illuminate\Support\model_key;
+
 /**
  * @template TKey of array-key
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -32,9 +35,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function find($key, $default = null)
     {
-        if ($key instanceof Model) {
-            $key = $key->getKey();
-        }
+        $key = model_key($key);
 
         if ($key instanceof Arrayable) {
             $key = $key->toArray();
@@ -358,7 +359,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return parent::contains(...func_get_args());
         }
 
-        if ($key instanceof Model) {
+        if (is_model($key)) {
             return parent::contains(fn ($model) => $model->is($key));
         }
 
@@ -417,7 +418,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::map($callback);
 
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+        return $result->contains(fn ($item) => ! is_model($item)) ? $result->toBase() : $result;
     }
 
     /**
@@ -435,7 +436,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::mapWithKeys($callback);
 
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+        return $result->contains(fn ($item) => ! is_model($item)) ? $result->toBase() : $result;
     }
 
     /**

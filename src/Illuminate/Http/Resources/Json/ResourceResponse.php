@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
+use function Illuminate\Support\is_model;
+
 class ResourceResponse implements Responsable
 {
     /**
@@ -119,7 +121,7 @@ class ResourceResponse implements Responsable
      */
     protected function calculateStatus()
     {
-        return $this->resource->resource instanceof Model &&
+        return is_model($this->resource->resource) &&
                $this->resource->resource->wasRecentlyCreated ? 201 : 200;
     }
 }

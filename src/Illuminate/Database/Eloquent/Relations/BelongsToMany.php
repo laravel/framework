@@ -17,6 +17,8 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
+use function Illuminate\Support\is_model;
+
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
@@ -189,7 +191,7 @@ class BelongsToMany extends Relation
 
         $model = new $table;
 
-        if (! $model instanceof Model) {
+        if (! is_model($model)) {
             return $table;
         }
 
@@ -706,7 +708,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (! $id instanceof Model && (is_array($id) || $id instanceof Arrayable)) {
+        if (! is_model($id) && (is_array($id) || $id instanceof Arrayable)) {
             return $this->findMany($id, $columns);
         }
 

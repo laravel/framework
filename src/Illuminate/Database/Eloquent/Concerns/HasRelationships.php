@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+use function Illuminate\Support\is_model;
+
 trait HasRelationships
 {
     /**
@@ -184,7 +186,7 @@ trait HasRelationships
             return;
         }
 
-        if ($models instanceof Model) {
+        if (is_model($models)) {
             $models = [$models];
         }
 

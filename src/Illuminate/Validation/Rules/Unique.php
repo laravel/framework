@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Conditionable;
 use Stringable;
 
+use function Illuminate\Support\is_model;
+
 class Unique implements Stringable
 {
     use Conditionable, DatabaseRule;
@@ -33,7 +35,7 @@ class Unique implements Stringable
      */
     public function ignore($id, $idColumn = null)
     {
-        if ($id instanceof Model) {
+        if (is_model($id)) {
             return $this->ignoreModel($id, $idColumn);
         }
 

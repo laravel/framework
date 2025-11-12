@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 use function Illuminate\Support\enum_value;
+use function Illuminate\Support\is_model;
 
 class Authorize
 {
@@ -73,7 +74,7 @@ class Authorize
         }
 
         return (new Collection($models))
-            ->map(fn ($model) => $model instanceof Model ? $model : $this->getModel($request, $model))
+            ->map(fn ($model) => is_model($model) ? $model : $this->getModel($request, $model))
             ->all();
     }
 

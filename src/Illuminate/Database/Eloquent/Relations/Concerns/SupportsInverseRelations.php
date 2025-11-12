@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\RelationNotFoundException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
+use function Illuminate\Support\is_model;
+
 trait SupportsInverseRelations
 {
     /**
@@ -97,7 +99,7 @@ trait SupportsInverseRelations
         $parent ??= $this->getParent();
 
         foreach ($models as $model) {
-            $model instanceof Model && $this->applyInverseRelationToModel($model, $parent);
+            is_model($model) && $this->applyInverseRelationToModel($model, $parent);
         }
 
         return $models;

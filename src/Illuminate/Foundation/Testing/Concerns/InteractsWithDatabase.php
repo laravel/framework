@@ -13,6 +13,8 @@ use Illuminate\Testing\Constraints\NotSoftDeletedInDatabase;
 use Illuminate\Testing\Constraints\SoftDeletedInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
+use function Illuminate\Support\is_model;
+
 trait InteractsWithDatabase
 {
     /**
@@ -33,7 +35,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if ($table instanceof Model) {
+        if (is_model($table)) {
             $data = [
                 $table->getKeyName() => $table->getKey(),
                 ...$data,
@@ -65,7 +67,7 @@ trait InteractsWithDatabase
             return $this;
         }
 
-        if ($table instanceof Model) {
+        if (is_model($table)) {
             $data = [
                 $table->getKeyName() => $table->getKey(),
                 ...$data,
@@ -254,7 +256,7 @@ trait InteractsWithDatabase
      */
     protected function isSoftDeletableModel($model)
     {
-        return $model instanceof Model && $model::isSoftDeletable();
+        return is_model($model) && $model::isSoftDeletable();
     }
 
     /**
@@ -305,7 +307,7 @@ trait InteractsWithDatabase
      */
     protected function getTable($table)
     {
-        if ($table instanceof Model) {
+        if (is_model($table)) {
             return $table->getTable();
         }
 
@@ -320,7 +322,7 @@ trait InteractsWithDatabase
      */
     protected function getTableConnection($table)
     {
-        if ($table instanceof Model) {
+        if (is_model($table)) {
             return $table->getConnectionName();
         }
 

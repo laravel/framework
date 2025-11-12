@@ -23,6 +23,8 @@ use Illuminate\Support\Traits\ForwardsCalls;
 use ReflectionClass;
 use ReflectionMethod;
 
+use function Illuminate\Support\model_key;
+
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
@@ -275,9 +277,7 @@ class Builder implements BuilderContract
      */
     public function whereKey($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = model_key($id);
 
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
@@ -304,9 +304,7 @@ class Builder implements BuilderContract
      */
     public function whereKeyNot($id)
     {
-        if ($id instanceof Model) {
-            $id = $id->getKey();
-        }
+        $id = model_key($id);
 
         if (is_array($id) || $id instanceof Arrayable) {
             if (in_array($this->model->getKeyType(), ['int', 'integer'])) {
@@ -334,9 +332,9 @@ class Builder implements BuilderContract
     public function except($models)
     {
         return $this->whereKeyNot(
-            $models instanceof Model
-                ? $models->getKey()
-                : Collection::wrap($models)->modelKeys()
+            model_key($models, function ($models) {
+                return Collection::wrap($models)->modelKeys();
+            })
         );
     }
 

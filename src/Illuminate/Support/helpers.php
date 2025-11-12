@@ -14,6 +14,8 @@ use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable as SupportStringable;
 
+use function Illuminate\Support\is_model;
+
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
@@ -60,7 +62,7 @@ if (! function_exists('blank')) {
             return false;
         }
 
-        if ($value instanceof Model) {
+        if (is_model($value)) {
             return false;
         }
 

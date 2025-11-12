@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 use function Illuminate\Support\enum_value;
+use function Illuminate\Support\is_model;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -184,11 +185,11 @@ class BelongsTo extends Relation
      */
     public function associate($model)
     {
-        $ownerKey = $model instanceof Model ? $model->getAttribute($this->ownerKey) : $model;
+        $ownerKey = is_model($model) ? $model->getAttribute($this->ownerKey) : $model;
 
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 
-        if ($model instanceof Model) {
+        if (is_model($model)) {
             $this->child->setRelation($this->relationName, $model);
         } else {
             $this->child->unsetRelation($this->relationName);

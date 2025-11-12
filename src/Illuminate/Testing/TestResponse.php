@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+use function Illuminate\Support\is_model;
+
 /**
  * @template TResponse of \Symfony\Component\HttpFoundation\Response
  *
@@ -1282,7 +1284,7 @@ class TestResponse implements ArrayAccess
             PHPUnit::withResponse($this)->assertTrue(Arr::has($this->original->gatherData(), $key), "Failed asserting that the data contains the key [{$key}].");
         } elseif ($value instanceof Closure) {
             PHPUnit::withResponse($this)->assertTrue($value($actual), "Failed asserting that the value at [{$key}] fulfills the expectations defined by the closure.");
-        } elseif ($value instanceof Model) {
+        } elseif (is_model($value)) {
             PHPUnit::withResponse($this)->assertTrue($value->is($actual), "Failed asserting that the model at [{$key}] matches the given model.");
         } elseif ($value instanceof EloquentCollection) {
             PHPUnit::withResponse($this)->assertInstanceOf(EloquentCollection::class, $actual);

@@ -4,6 +4,8 @@ namespace Illuminate\Http\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 
+use function Illuminate\Support\is_model;
+
 trait InteractsWithFlashData
 {
     /**
@@ -15,7 +17,7 @@ trait InteractsWithFlashData
      */
     public function old($key = null, $default = null)
     {
-        $default = $default instanceof Model ? $default->getAttribute($key) : $default;
+        $default = is_model($default) ? $default->getAttribute($key) : $default;
 
         return $this->hasSession() ? $this->session()->getOldInput($key, $default) : $default;
     }

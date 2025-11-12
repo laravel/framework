@@ -12,6 +12,8 @@ use Illuminate\Testing\Constraints\SeeInOrder;
 use Illuminate\View\View;
 use Stringable;
 
+use function Illuminate\Support\is_model;
+
 class TestView implements Stringable
 {
     use Macroable;
@@ -58,7 +60,7 @@ class TestView implements Stringable
             PHPUnit::assertTrue(Arr::has($this->view->gatherData(), $key));
         } elseif ($value instanceof Closure) {
             PHPUnit::assertTrue($value(Arr::get($this->view->gatherData(), $key)));
-        } elseif ($value instanceof Model) {
+        } elseif (is_model($value)) {
             PHPUnit::assertTrue($value->is(Arr::get($this->view->gatherData(), $key)));
         } elseif ($value instanceof EloquentCollection) {
             $actual = Arr::get($this->view->gatherData(), $key);

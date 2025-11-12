@@ -18,6 +18,8 @@ use Illuminate\Support\Traits\TransformsToResourceCollection;
 use Stringable;
 use Traversable;
 
+use function Illuminate\Support\is_model;
+
 /**
  * @template TKey of array-key
  *
@@ -218,7 +220,7 @@ abstract class AbstractCursorPaginator implements Htmlable, Stringable
                     $item = $item->resource;
                 }
 
-                if ($item instanceof Model &&
+                if (is_model($item) &&
                     ! is_null($parameter = $this->getPivotParameterForItem($item, $parameterName))) {
                     return $parameter;
                 } elseif ($item instanceof ArrayAccess || is_array($item)) {

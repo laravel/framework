@@ -32,6 +32,8 @@ use stdClass;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+use function Illuminate\Support\is_model;
+
 /**
  * @mixin \Illuminate\Routing\RouteRegistrar
  */
@@ -923,7 +925,7 @@ class Router implements BindingRegistrar, RegistrarContract
 
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
+        } elseif (is_model($response) && $response->wasRecentlyCreated) {
             $response = new JsonResponse($response, 201);
         } elseif ($response instanceof Stringable) {
             $response = new Response($response->__toString(), 200, ['Content-Type' => 'text/html']);

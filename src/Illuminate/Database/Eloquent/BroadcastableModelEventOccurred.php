@@ -8,6 +8,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection as BaseCollection;
 
+use function Illuminate\Support\is_model;
+
 class BroadcastableModelEventOccurred implements ShouldBroadcast
 {
     use InteractsWithSockets, SerializesModels;
@@ -78,7 +80,7 @@ class BroadcastableModelEventOccurred implements ShouldBroadcast
             : $this->channels;
 
         return (new BaseCollection($channels))
-            ->map(fn ($channel) => $channel instanceof Model ? new PrivateChannel($channel) : $channel)
+            ->map(fn ($channel) => is_model($channel) ? new PrivateChannel($channel) : $channel)
             ->all();
     }
 

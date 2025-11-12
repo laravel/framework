@@ -12,6 +12,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 
+use function Illuminate\Support\is_model;
+
 class SendQueuedNotifications implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
@@ -100,7 +102,7 @@ class SendQueuedNotifications implements ShouldQueue
     {
         if ($notifiables instanceof Collection) {
             return $notifiables;
-        } elseif ($notifiables instanceof Model) {
+        } elseif (is_model($notifiables)) {
             return EloquentCollection::wrap($notifiables);
         }
 

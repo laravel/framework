@@ -34,6 +34,7 @@ use ReflectionMethod;
 use Stringable;
 
 use function Illuminate\Support\enum_value;
+use function Illuminate\Support\is_model;
 
 abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToString, HasBroadcastChannel, Jsonable, JsonSerializable, QueueableEntity, Stringable, UrlRoutable
 {
@@ -2266,7 +2267,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             $field = $relationship->getRelated()->qualifyColumn($field);
         }
 
-        return $relationship instanceof Model
+        return is_model($relationship)
             ? $relationship->resolveRouteBindingQuery($relationship, $value, $field)
             : $relationship->getRelated()->resolveRouteBindingQuery($relationship, $value, $field);
     }

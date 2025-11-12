@@ -19,6 +19,8 @@ use Throwable;
 use UnitEnum;
 
 use function Illuminate\Support\enum_value;
+use function Illuminate\Support\is_model;
+use function Illuminate\Support\model_key;
 
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
@@ -317,7 +319,7 @@ abstract class Factory
 
         $results = $this->make($attributes, $parent);
 
-        if ($results instanceof Model) {
+        if (is_model($results)) {
             $this->store(new Collection([$results]));
 
             $this->callAfterCreating(new Collection([$results]), $parent);
@@ -555,11 +557,9 @@ abstract class Factory
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
                         ?? $attribute->recycle($this->recycle)->create()->getKey();
-                } elseif ($attribute instanceof Model) {
-                    $attribute = $attribute->getKey();
                 }
 
-                return $attribute;
+                return model_key($attribute);
             })
             ->map(function ($attribute, $key) use (&$definition, $evaluateRelations) {
                 if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
@@ -732,7 +732,7 @@ abstract class Factory
             'recycle' => $this->recycle
                 ->flatten()
                 ->merge(
-                    Collection::wrap($model instanceof Model ? func_get_args() : $model)
+                    Collection::wrap(is_model($model) ? func_get_args() : $model)
                         ->flatten()
                 )->groupBy(fn ($model) => get_class($model)),
         ]);

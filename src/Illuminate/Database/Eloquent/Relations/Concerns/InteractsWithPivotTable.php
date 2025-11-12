@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection as BaseCollection;
 
+use function Illuminate\Support\is_model;
+
 trait InteractsWithPivotTable
 {
     /**
@@ -616,7 +618,7 @@ trait InteractsWithPivotTable
      */
     protected function parseIds($value)
     {
-        if ($value instanceof Model) {
+        if (is_model($value)) {
             return [$value->{$this->relatedKey}];
         }
 
@@ -626,7 +628,7 @@ trait InteractsWithPivotTable
 
         if ($value instanceof BaseCollection || is_array($value)) {
             return (new BaseCollection($value))
-                ->map(fn ($item) => $item instanceof Model ? $item->{$this->relatedKey} : $item)
+                ->map(fn ($item) => is_model($item) ? $item->{$this->relatedKey} : $item)
                 ->all();
         }
 
@@ -641,7 +643,7 @@ trait InteractsWithPivotTable
      */
     protected function parseId($value)
     {
-        return $value instanceof Model ? $value->{$this->relatedKey} : $value;
+        return is_model($value) ? $value->{$this->relatedKey} : $value;
     }
 
     /**

@@ -16,6 +16,8 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
 
+use function Illuminate\Support\is_model;
+
 class NotificationSender
 {
     use Localizable;
@@ -294,7 +296,7 @@ class NotificationSender
     protected function formatNotifiables($notifiables)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
-            return $notifiables instanceof Model
+            return is_model($notifiables)
                 ? new EloquentCollection([$notifiables])
                 : [$notifiables];
         }

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 
+use function Illuminate\Support\is_model;
+
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
  * @template TDeclaringModel of \Illuminate\Database\Eloquent\Model
@@ -234,18 +236,18 @@ class MorphTo extends BelongsTo
     #[\Override]
     public function associate($model)
     {
-        if ($model instanceof Model) {
+        if (is_model($model)) {
             $foreignKey = $this->ownerKey && $model->{$this->ownerKey}
                 ? $this->ownerKey
                 : $model->getKeyName();
         }
 
         $this->parent->setAttribute(
-            $this->foreignKey, $model instanceof Model ? $model->{$foreignKey} : null
+            $this->foreignKey, is_model($model) ? $model->{$foreignKey} : null
         );
 
         $this->parent->setAttribute(
-            $this->morphType, $model instanceof Model ? $model->getMorphClass() : null
+            $this->morphType, is_model($model) ? $model->getMorphClass() : null
         );
 
         return $this->parent->setRelation($this->relationName, $model);
