@@ -8,6 +8,10 @@ if (! function_exists('Illuminate\Support\is_model')) {
     /**
      * Determine if the given value is a model.
      *
+     * @internal
+     *
+     * @template TModel
+     *
      * @param  TModel  $model
      * @return bool
      */
@@ -21,17 +25,21 @@ if (! function_exists('Illuminate\Support\model_key')) {
     /**
      * Return the key for the given model.
      *
+     * @internal
+     *
+     * @template TModel
+     *
      * @param  TModel  $model
-     * @param  TDefault|callable(TModel): TDefault  $default
-     * @return ($model is empty ? TDefault : mixed)
+     * @param  callable(TModel): mixed  $callback
+     * @return mixed
      */
-    function model_key($model, $default = null)
+    function model_key($model, $callback = null)
     {
-        return match (true) {
-            is_model($model) => $model->getKey(),
+        if (is_model($model)) {
+            return $model->getKey();
+        }
 
-            default => $model ?? value($default, $model),
-        };
+        return with($model, $callback);
     }
 }
 
