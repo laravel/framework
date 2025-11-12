@@ -5625,6 +5625,26 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testDotSkippingEmptyArrays($collection)
+    {
+        $data = $collection::make([
+            'foo' => [
+                'bar',
+                'baz',
+                'baz' => 'boom',
+                'empty' => [],
+            ],
+            'empty_array' => [],
+        ])->dot(true);
+
+        $this->assertSame([
+            'foo.0' => 'bar',
+            'foo.1' => 'baz',
+            'foo.baz' => 'boom',
+        ], $data->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testEnsureForScalar($collection)
     {
         $data = $collection::make([1, 2, 3]);

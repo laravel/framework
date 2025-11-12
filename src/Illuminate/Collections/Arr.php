@@ -159,21 +159,32 @@ class Arr
      *
      * @param  iterable  $array
      * @param  string  $prepend
+     * @param  bool  $skipEmptyArrays
      * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot($array, $prepend = '', bool $skipEmptyArrays = false)
     {
         $results = [];
 
-        $flatten = function ($data, $prefix) use (&$results, &$flatten): void {
+        $flatten = function ($data, $prefix) use (&$results, &$flatten, $skipEmptyArrays): void {
             foreach ($data as $key => $value) {
                 $newKey = $prefix.$key;
 
-                if (is_array($value) && ! empty($value)) {
+                if (is_array($value)) {
+                    if (empty($value)) {
+                        if (! $skipEmptyArrays) {
+                            $results[$newKey] = $value;
+                        }
+
+                        continue;
+                    }
+
                     $flatten($value, $newKey.'.');
-                } else {
-                    $results[$newKey] = $value;
+
+                    continue;
                 }
+
+                $results[$newKey] = $value;
             }
         };
 

@@ -447,4 +447,18 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertEquals($expected, $dotted->all());
     }
+
+    public function testDotSkippingEmptyArrays()
+    {
+        $collection = new LazyCollection([
+            'foo' => [
+                'bar' => [],
+            ],
+            'empty_array' => [],
+        ]);
+
+        $dotted = $collection->dot(true);
+
+        $this->assertEquals([], $dotted->all());
+    }
 }

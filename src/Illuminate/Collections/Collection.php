@@ -1746,11 +1746,12 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
+     * @param  bool  $skipEmptyArrays
      * @return static
      */
-    public function dot()
+    public function dot(bool $skipEmptyArrays = false)
     {
-        return new static(Arr::dot($this->all()));
+        return new static(Arr::dot($this->all(), '', $skipEmptyArrays));
     }
 
     /**

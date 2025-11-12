@@ -222,6 +222,25 @@ class SupportArrTest extends TestCase
             'user.name' => 'Taylor',
             'key' => 'value',
         ], $array);
+
+        $array = Arr::dot(['foo' => []], '', true);
+        $this->assertSame([], $array);
+
+        $array = Arr::dot(['foo' => ['bar' => []]], '', true);
+        $this->assertSame([], $array);
+
+        $array = Arr::dot([
+            'foo' => 'bar',
+            'empty_array' => [],
+            'user' => ['name' => 'Taylor'],
+            'key' => 'value',
+        ], '', true);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'user.name' => 'Taylor',
+            'key' => 'value',
+        ], $array);
     }
 
     public function testUndot()
