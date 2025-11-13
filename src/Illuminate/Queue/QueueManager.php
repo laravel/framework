@@ -296,6 +296,63 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Set queue depth threshold for monitoring.
+     *
+     * @param  string  $queue
+     * @param  int  $maxSize
+     * @return $this
+     */
+    public function setDepthThreshold($queue, $maxSize)
+    {
+        $cache = $this->app['cache']->store();
+
+        $cache->forever("queue_depth_threshold:{$queue}", $maxSize);
+
+        return $this;
+    }
+
+    /**
+     * Get queue depth threshold.
+     *
+     * @param  string  $queue
+     * @return int|null
+     */
+    public function getDepthThreshold($queue)
+    {
+        $cache = $this->app['cache']->store();
+
+        return $cache->get("queue_depth_threshold:{$queue}");
+    }
+
+    /**
+     * Check queue depth and dispatch event if threshold exceeded.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return bool
+     */
+    public function checkDepthAndNotify($connection, $queue)
+    {
+        $threshold = $this->getDepthThreshold($queue);
+
+        if (! $threshold) {
+            return false;
+        }
+
+        $size = $this->connection($connection)->size($queue);
+
+        if ($size >= $threshold) {
+            $this->app['events']->dispatch(
+                new \Illuminate\Queue\Events\QueueDepthExceeded($connection, $queue, $size, $threshold)
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Dynamically pass calls to the default connection.
      *
      * @param  string  $method
