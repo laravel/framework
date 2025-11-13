@@ -17,12 +17,14 @@ use Egulias\EmailValidator\Validation\RFCValidation;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Rules\JsonSchema as JsonSchemaRule;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
 use InvalidArgumentException;
@@ -1632,6 +1634,23 @@ trait ValidatesAttributes
         }
 
         return json_validate($value);
+    }
+
+    /**
+     * Validate that an attribute matches a JSON schema.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateJsonSchema($attribute, $value, $parameters): bool
+    {
+        if (! ($parameters[0] ?? null) instanceof Type) {
+            throw new InvalidArgumentException('The json_schema rule requires a JsonSchema Type instance.');
+        }
+
+        return (new JsonSchemaRule($parameters[0]))->passes($attribute, $value);
     }
 
     /**
