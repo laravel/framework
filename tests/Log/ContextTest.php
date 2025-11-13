@@ -7,6 +7,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Log\Context\Contracts\Contextable;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
 use Illuminate\Log\Context\Events\ContextHydrated as Hydrated;
 use Illuminate\Log\Context\Repository;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Monolog\LogRecord;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -138,6 +140,8 @@ class ContextTest extends TestCase
             'backed_enum' => StringBackedSuit::Clubs,
         ]);
         Context::addHidden('number', 55);
+        $contextable = new TestContextable('serialization test', 'this is public');
+        Context::contextable($contextable);
 
         $dehydrated = Context::dehydrate();
 
@@ -157,10 +161,14 @@ class ContextTest extends TestCase
             'hidden' => [
                 'number' => 'i:55;',
             ],
+            'contextables' => [
+                'O:36:"Illuminate\Tests\Log\TestContextable":2:{s:5:"value";s:18:"serialization test";s:15:"somePublicValue";s:14:"this is public";}',
+            ],
         ], $dehydrated);
 
         Context::flush();
         $this->assertNull(Context::get('string'));
+        $this->assertEquals([], Context::getContextables());
 
         Context::hydrate($dehydrated);
 
@@ -175,6 +183,10 @@ class ContextTest extends TestCase
         $this->assertSame(Context::get('enum'), Suit::Clubs);
         $this->assertSame(Context::get('backed_enum'), StringBackedSuit::Clubs);
         $this->assertSame(Context::getHidden('number'), 55);
+
+        $dehydratedContextable = array_first(Context::getContextables());
+        $this->assertEquals('serialization test', $dehydratedContextable->getValue());
+        $this->assertEquals('this is public', $dehydratedContextable->somePublicValue);
     }
 
     public function test_it_can_push_to_list()
@@ -402,6 +414,7 @@ class ContextTest extends TestCase
         Context::add('foo.bar', 123);
         Context::push('bar.baz', 456);
         Context::push('bar.baz', 789);
+        Context::contextable(new TestContextable('hello'));
 
         Log::channel('single')->info('My name is {name}', [
             'name' => 'Tim',
@@ -409,7 +422,7 @@ class ContextTest extends TestCase
         ]);
         $log = Str::after(file_get_contents(storage_path('logs/laravel.log')), '] ');
 
-        $this->assertSame('testing.INFO: My name is Tim {"name":"Tim","framework":"Laravel"} {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789]}', trim($log));
+        $this->assertSame('testing.INFO: My name is Tim {"name":"Tim","framework":"Laravel"} {"trace_id":"expected-trace-id","foo.bar":123,"bar.baz":[456,789],"value":"hello"}', trim($log));
 
         file_put_contents($path, '');
         Str::createUuidsNormally();
@@ -698,6 +711,29 @@ class ContextTest extends TestCase
         Context::rememberHidden('foo', $closure);
         $this->assertSame(1, $closureRunCount);
     }
+
+    public function test_it_can_store_contextable()
+    {
+        $contextable = new TestContextable('hello');
+        Context::contextable($contextable);
+        $this->assertSame($contextable, array_values(Context::getContextables())[0]);
+        Context::add('woody', 'guthrie');
+
+        $this->assertEquals(['value' => 'hello', 'woody' => 'guthrie'], Context::all());
+        Context::forgetContextable($contextable::class);
+        $this->assertEmpty(Context::getContextables());
+        $this->assertEquals(['woody' => 'guthrie'], Context::all());
+    }
+
+    public function test_registering_a_non_contextable_throws_exception()
+    {
+        try {
+            Context::contextable((object) ['foo' => 'bar']);
+            $this->fail('Did not throw expected exception');
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Only Contextable classes can be registered.', $e->getMessage());
+        }
+    }
 }
 
 enum Suit
@@ -734,5 +770,25 @@ class MyAddContextProcessor implements ContextLogProcessor
     public function __invoke(LogRecord $record): LogRecord
     {
         return $record->with(context: array_merge($record->context, ['inside of MyAddContextProcessor' => true]));
+    }
+}
+
+class TestContextable implements Contextable
+{
+    public function __construct(
+        public $value,
+        public $somePublicValue = null
+    ) {
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+    public function context($repository): mixed
+    {
+        return [
+            'value' => $this->value,
+        ];
     }
 }
