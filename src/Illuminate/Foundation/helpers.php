@@ -1,48 +1,49 @@
 <?php
 
 use Carbon\CarbonInterface;
-use Illuminate\Broadcasting\FakePendingBroadcast;
-use Illuminate\Broadcasting\PendingBroadcast;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Factory as AuthFactory;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Cookie\Factory as CookieFactory;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Contracts\View\View as ViewContract;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Foundation\Bus\PendingClosureDispatch;
-use Illuminate\Foundation\Bus\PendingDispatch;
-use Illuminate\Foundation\Mix;
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response as IlluminateResponse;
-use Illuminate\Log\Context\Repository as ContextRepository;
-use Illuminate\Log\LogManager;
-use Illuminate\Queue\CallQueuedClosure;
-use Illuminate\Routing\Redirector;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Defer\DeferredCallback;
-use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\HtmlString;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Uri;
-use League\Uri\Contracts\UriInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Response;
-
+use Illuminate\Foundation\Mix;
+use Illuminate\Log\LogManager;
+use Illuminate\Routing\Router;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\HtmlString;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
+use League\Uri\Contracts\UriInterface;
+use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Auth\Access\Gate;
 use function Illuminate\Support\enum_value;
+use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Broadcasting\PendingBroadcast;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Support\Defer\DeferredCallback;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Broadcasting\FakePendingBroadcast;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Http\Response as IlluminateResponse;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Foundation\Bus\PendingClosureDispatch;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Contracts\Cookie\Factory as CookieFactory;
+use Illuminate\Log\Context\Repository as ContextRepository;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+
+use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 if (! function_exists('abort')) {
     /**
@@ -534,13 +535,13 @@ if (! function_exists('info')) {
     /**
      * Write some information to the log.
      *
-     * @param  string|array|object  $message
+     * @param  string|object  $message
      * @param  array|object  $context
      */
     function info($message, $context = []): void
     {
         [$message, $context] = array_map(function ($item) {
-            return is_object($item) ? (array) $item : $item;
+             return is_scalar($item) || is_null($item) ? $item :  Arr::from($item);
         }, [$message, $context]);
 
         app('log')->info($message, $context);
