@@ -47,7 +47,7 @@
         "symfony/console": "^7.2.0",
         "symfony/error-handler": "^7.2.0",
         "symfony/finder": "^7.2.0",
-        "symfony/http-foundation": "^7.2.0",
+        "symfony/http-foundation": "^7.3.7",
         "symfony/http-kernel": "^7.2.0",
         "symfony/mailer": "^7.2.0",
         "symfony/mime": "^7.2.0",
