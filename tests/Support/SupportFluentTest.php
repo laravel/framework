@@ -6,7 +6,6 @@ use ArrayIterator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Stringable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use PHPUnit\Framework\TestCase;
@@ -181,17 +180,17 @@ class SupportFluentTest extends TestCase
             'empty_str' => '',
             'null' => null,
         ]);
-        $this->assertTrue($fluent->string('int') instanceof Stringable);
-        $this->assertTrue($fluent->string('unknown_key') instanceof Stringable);
-        $this->assertSame('123', $fluent->string('int')->value());
-        $this->assertSame('456', $fluent->string('int_str')->value());
-        $this->assertSame('123.456', $fluent->string('float')->value());
-        $this->assertSame('123.456', $fluent->string('float_str')->value());
-        $this->assertSame('0', $fluent->string('float_zero')->value());
-        $this->assertSame('0.000', $fluent->string('float_str_zero')->value());
-        $this->assertSame('', $fluent->string('empty_str')->value());
-        $this->assertSame('', $fluent->string('null')->value());
-        $this->assertSame('', $fluent->string('unknown_key')->value());
+        $this->assertIsString($fluent->string('int'));
+        $this->assertIsString($fluent->string('unknown_key'));
+        $this->assertSame('123', $fluent->string('int'));
+        $this->assertSame('456', $fluent->string('int_str'));
+        $this->assertSame('123.456', $fluent->string('float'));
+        $this->assertSame('123.456', $fluent->string('float_str'));
+        $this->assertSame('0', $fluent->string('float_zero'));
+        $this->assertSame('0.000', $fluent->string('float_str_zero'));
+        $this->assertSame('', $fluent->string('empty_str'));
+        $this->assertSame('', $fluent->string('null'));
+        $this->assertSame('', $fluent->string('unknown_key'));
     }
 
     public function testBooleanMethod()
