@@ -571,6 +571,39 @@ class CompiledRouteCollectionTest extends TestCase
         ], $this->collection()->getRoutesByMethod());
     }
 
+    public function testActionUrlGenerationChoosesFirstMatchingRouteWithCompiledRoutes()
+    {
+        $this->routeCollection->add($this->newRoute('GET', '{resource}/attachable/{field}', [
+            'controller' => 'MyController',
+        ]));
+
+        $this->routeCollection->add($this->newRoute('GET', '{resource}/{resourceId}/attachable/{field}', [
+            'controller' => 'MyController',
+        ]));
+
+        $routes = $this->collection();
+
+        $url = app('url');
+        $url->setRoutes($routes);
+
+        $result = $url->action('MyController', [
+            'resource' => 'posts',
+            'resourceId' => 1,
+            'field' => 'category',
+            'foo' => 'bar',
+        ]);
+
+        $this->assertStringEndsWith('/posts/attachable/category?resourceId=1&foo=bar', $result);
+
+        $result = $url->action('MyController', [
+            'resource' => 'posts',
+            'field' => 'category',
+            'foo' => 'bar',
+        ]);
+
+        $this->assertStringEndsWith('/posts/attachable/category?foo=bar', $result);
+    }
+
     /**
      * Create a new Route object.
      *
