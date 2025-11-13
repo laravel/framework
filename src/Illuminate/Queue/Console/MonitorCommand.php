@@ -28,7 +28,7 @@ class MonitorCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Monitor the size of the specified queues';
+    protected $description = 'Monitor the size of the specified queues and dispatch events when thresholds are exceeded';
 
     /**
      * The queue manager instance.
