@@ -542,7 +542,7 @@ if (! function_exists('info')) {
         [$message, $context] = array_map(function ($item) {
             return is_object($item) ? (array) $item : $item;
         }, [$message, $context]);
-        
+
         app('log')->info($message, $context);
     }
 }
