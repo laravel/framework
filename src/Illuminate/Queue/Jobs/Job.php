@@ -307,6 +307,16 @@ abstract class Job
     }
 
     /**
+     * Get the maximum number of pending jobs before dispatching a notification.
+     *
+     * @return int|null
+     */
+    public function maxPendingJobs()
+    {
+        return $this->payload()['maxPendingJobs'] ?? null;
+    }
+
+    /**
      * Determine if the job should fail when it timeouts.
      *
      * @return bool

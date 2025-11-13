@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Queue\Events\QueueBusy;
-use Illuminate\Queue\Events\QueueDepthExceeded;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 
@@ -28,7 +27,7 @@ class MonitorCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Monitor the size of the specified queues and dispatch events when thresholds are exceeded';
+    protected $description = 'Monitor the size of the specified queues';
 
     /**
      * The queue manager instance.
@@ -161,16 +160,6 @@ class MonitorCommand extends Command
                     $queue['connection'],
                     $queue['queue'],
                     $queue['size'],
-                )
-            );
-
-            // Also dispatch QueueDepthExceeded event for notification purposes
-            $this->events->dispatch(
-                new QueueDepthExceeded(
-                    $queue['connection'],
-                    $queue['queue'],
-                    $queue['size'],
-                    (int) $this->option('max'),
                 )
             );
         }

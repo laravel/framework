@@ -16,6 +16,7 @@ use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\JobTimedOut;
 use Illuminate\Queue\Events\Looping;
+use Illuminate\Queue\Events\QueueDepthExceeded;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Support\Carbon;
@@ -441,6 +442,9 @@ class Worker
                 $connectionName, $job, (int) $options->maxTries
             );
 
+            // Check if queue depth threshold is exceeded and dispatch notification event
+            $this->checkQueueDepthAndNotify($connectionName, $job);
+
             if ($job->isDeleted()) {
                 return $this->raiseAfterJobEvent($connectionName, $job);
             }
@@ -585,6 +589,58 @@ class Worker
 
             $this->failJob($job, $e);
         }
+    }
+
+    /**
+     * Check queue depth and dispatch notification event if threshold is exceeded.
+     *
+     * @param  string  $connectionName
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return void
+     */
+    protected function checkQueueDepthAndNotify($connectionName, $job)
+    {
+        // Check if the job has a maxPendingJobs threshold configured
+        $maxPendingJobs = $job->maxPendingJobs();
+
+        if (is_null($maxPendingJobs) || $maxPendingJobs <= 0 || ! $this->cache) {
+            return;
+        }
+
+        $queueName = $job->getQueue();
+        $cacheKey = "queue_depth_notified:{$connectionName}:{$queueName}";
+
+        // Get the current queue size
+        $connection = $this->manager->connection($connectionName);
+        $queueSize = $connection->size($queueName);
+
+        // If queue size is below threshold, clear the notification flag
+        if ($queueSize < $maxPendingJobs) {
+            if ($this->cache->has($cacheKey)) {
+                $this->cache->forget($cacheKey);
+            }
+
+            return;
+        }
+
+        // If we've already notified for this queue, don't notify again
+        if ($this->cache->has($cacheKey)) {
+            return;
+        }
+
+        // Dispatch the queue depth exceeded event
+        $this->events->dispatch(
+            new QueueDepthExceeded(
+                $connectionName,
+                $queueName,
+                $queueSize,
+                $maxPendingJobs
+            )
+        );
+
+        // Set cache flag to prevent repeated notifications
+        // Cache for 1 hour - if queue remains high, they won't get spammed
+        $this->cache->put($cacheKey, true, Carbon::now()->addHour());
     }
 
     /**
