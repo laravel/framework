@@ -80,7 +80,7 @@ class CacheCommandMutex implements CommandMutex
             });
         }
 
-        return $this->cache->store($this->store)->has($this->commandMutexName($command));
+        return $store->has($this->commandMutexName($command));
     }
 
     /**
@@ -97,7 +97,7 @@ class CacheCommandMutex implements CommandMutex
             return $store->getStore()->lock($this->commandMutexName($command))->forceRelease();
         }
 
-        return $this->cache->store($this->store)->forget($this->commandMutexName($command));
+        return $store->forget($this->commandMutexName($command));
     }
 
     /**
