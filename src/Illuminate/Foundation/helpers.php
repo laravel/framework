@@ -534,11 +534,15 @@ if (! function_exists('info')) {
     /**
      * Write some information to the log.
      *
-     * @param  string  $message
-     * @param  array  $context
+     * @param  string|object  $message
+     * @param  array|object  $context
      */
     function info($message, $context = []): void
     {
+        [$message, $context] = array_map(function ($item) {
+            return is_object($item) ? (array) $item : $item;
+        }, [$message, $context]);
+        
         app('log')->info($message, $context);
     }
 }
