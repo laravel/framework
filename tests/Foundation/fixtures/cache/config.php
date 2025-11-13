@@ -1,7 +1,7 @@
 <?php
 
-return array(
-    'app' => array(
+return [
+    'app' => [
         'name' => 'Laravel',
-    ),
-);
+    ],
+];

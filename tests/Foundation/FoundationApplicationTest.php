@@ -677,10 +677,11 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->configurationIsCached());
 
         // A config cache file exists.
-        $app = new class extends Application {
+        $app = new class extends Application
+        {
             public function getCachedConfigPath()
             {
-                return __DIR__ . '/fixtures/cache/config.php';
+                return __DIR__.'/fixtures/cache/config.php';
             }
         };
 
