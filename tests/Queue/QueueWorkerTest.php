@@ -499,6 +499,11 @@ class WorkerFakeConnection
         return array_shift($this->jobs[$queue]);
     }
 
+    public function size($queue)
+    {
+        return isset($this->jobs[$queue]) ? count($this->jobs[$queue]) : 0;
+    }
+
     public function getConnectionName()
     {
         return $this->connectionName;
@@ -537,6 +542,7 @@ class WorkerFakeJob implements QueueJobContract
     public $released = false;
     public $maxTries;
     public $maxExceptions;
+    public $maxPendingJobs;
     public $shouldFailOnTimeout = false;
     public $uuid;
     public $backoff;
@@ -579,6 +585,11 @@ class WorkerFakeJob implements QueueJobContract
     public function maxExceptions()
     {
         return $this->maxExceptions;
+    }
+
+    public function maxPendingJobs()
+    {
+        return $this->maxPendingJobs;
     }
 
     public function shouldFailOnTimeout()
