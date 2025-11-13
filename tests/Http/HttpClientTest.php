@@ -1469,7 +1469,7 @@ class HttpClientTest extends TestCase
         $exception->report();
         $exception->report();
 
-        $this->assertStringContainsString('{"error":{"code":403,"message":"The Request can not be completed"}}', $exception->getMessage());
+        $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}')); 
     }
 
     public function testOnErrorDoesntCallClosureOnInformational()
