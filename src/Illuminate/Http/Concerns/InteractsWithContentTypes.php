@@ -86,6 +86,10 @@ trait InteractsWithContentTypes
         $contentTypes = (array) $contentTypes;
 
         foreach ($accepts as $accept) {
+            if ($accept && $pos = strpos($accept, ';')) {
+                $accept = trim(substr($accept, 0, $pos));
+            }
+
             if (in_array($accept, ['*/*', '*'])) {
                 return $contentTypes[0];
             }
