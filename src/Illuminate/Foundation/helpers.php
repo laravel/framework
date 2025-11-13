@@ -534,7 +534,7 @@ if (! function_exists('info')) {
     /**
      * Write some information to the log.
      *
-     * @param  string|object  $message
+     * @param  string|array|object  $message
      * @param  array|object  $context
      */
     function info($message, $context = []): void
