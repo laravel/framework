@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,8 +13,10 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
+use Mockery as m;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 
@@ -182,6 +187,37 @@ class WorkCommandTest extends QueueTestCase
         $this->assertFalse(SecondJob::$ran);
 
         Worker::$memoryExceededExitCode = null;
+    }
+
+    public function testCacheErrorExitCode()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Worker::$cacheFailedExitCode = 100;
+
+        Queue::push(new FirstJob);
+
+        Cache::swap($cacheManager = m::mock(CacheManager::class)->makePartial());
+
+        $repository = m::mock(Repository::class);
+
+        $cacheManager->shouldReceive('driver')
+            ->twice()
+            ->andReturn($repository);
+
+        $repository->shouldReceive('get')
+            ->once()
+            ->with('illuminate:queue:restart')
+            ->andThrow(new Exception('Cache read failed'));
+
+        $this->artisan('queue:work', [
+            '--daemon' => true,
+        ])->assertExitCode(100);
+
+        $this->assertSame(1, Queue::size());
+        $this->assertFalse(FirstJob::$ran);
+
+        Worker::$cacheFailedExitCode = null;
     }
 
     public function testFailedJobListenerOnlyRunsOnce()
