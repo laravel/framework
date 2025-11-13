@@ -200,15 +200,23 @@ class Schedule
                 : $job::class;
         }
 
-        return $this->name($jobName)->call(function () use ($job, $queue, $connection) {
-            $job = is_string($job) ? Container::getInstance()->make($job) : $job;
+        $this->events[] = $event = new CallbackEvent(
+            $this->eventMutex, function () use ($job, $queue, $connection) {
+                $job = is_string($job) ? Container::getInstance()->make($job) : $job;
 
-            if ($job instanceof ShouldQueue) {
-                $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
-            } else {
-                $this->dispatchNow($job);
-            }
-        });
+                if ($job instanceof ShouldQueue) {
+                    $this->dispatchToQueue($job, $queue ?? $job->queue, $connection ?? $job->connection);
+                } else {
+                    $this->dispatchNow($job);
+                }
+            }, [], $this->timezone
+        );
+
+        $event->name($jobName);
+
+        $this->mergePendingAttributes($event);
+
+        return $event;
     }
 
     /**
@@ -424,11 +432,13 @@ class Schedule
     /**
      * Specify the cache store that should be used to store mutexes.
      *
-     * @param  string  $store
+     * @param  \UnitEnum|string  $store
      * @return $this
      */
     public function useCache($store)
     {
+        $store = enum_value($store);
+
         if ($this->eventMutex instanceof CacheAware) {
             $this->eventMutex->useStore($store);
         }

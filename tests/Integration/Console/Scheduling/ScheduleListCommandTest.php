@@ -103,6 +103,8 @@ class ScheduleListCommandTest extends TestCase
         $this->assertStringContainsString('2023-04-01 00:00:00', $data[0]['next_due_date']);
         $this->assertSame('3 months from now', $data[0]['next_due_date_human']);
         $this->assertFalse($data[0]['has_mutex']);
+        $this->assertIsArray($data[0]['environments']);
+        $this->assertEmpty($data[0]['environments']);
 
         $this->assertSame('* * * * *', $data[2]['expression']);
         $this->assertSame('php artisan foobar a='.ProcessUtils::escapeArgument('b'), $data[2]['command']);
@@ -115,6 +117,24 @@ class ScheduleListCommandTest extends TestCase
 
         $this->assertStringContainsString('Closure at:', $data[8]['command']);
         $this->assertStringContainsString('ScheduleListCommandTest.php', $data[8]['command']);
+    }
+
+    public function testDisplayScheduleAsJsonWithSpecificEnvironment()
+    {
+        $environment = 'production';
+        $this->schedule->command(FooCommand::class)->quarterly()->environments($environment);
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+
+        $this->assertIsArray($data[0]['environments']);
+        $this->assertNotEmpty($data[0]['environments']);
+        $this->assertContains($environment, $data[0]['environments']);
     }
 
     public function testDisplayScheduleWithSortAsJson()

@@ -7,6 +7,9 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Support\Defer\DeferredCallback;
+
+use function Illuminate\Support\defer;
 
 /**
  * @mixin \Illuminate\Http\Client\Factory
@@ -65,28 +68,28 @@ class Batch
     /**
      * The callback to run after a request from the batch succeeds.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)|null
      */
     protected $progressCallback = null;
 
     /**
      * The callback to run after a request from the batch fails.
      *
-     * @var (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)|null
+     * @var (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)|null
      */
     protected $catchCallback = null;
 
     /**
      * The callback to run if all the requests from the batch succeeded.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $thenCallback = null;
 
     /**
      * The callback to run after all the requests from the batch finish.
      *
-     * @var (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)|null
+     * @var (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)|null
      */
     protected $finallyCallback = null;
 
@@ -112,9 +115,14 @@ class Batch
     public $finishedAt = null;
 
     /**
-     * Create a new request batch instance.
+     * The maximum number of concurrent requests.
      *
-     * @return void
+     * @var int|null
+     */
+    protected $concurrencyLimit = null;
+
+    /**
+     * Create a new request batch instance.
      */
     public function __construct(?Factory $factory = null)
     {
@@ -129,7 +137,7 @@ class Batch
      * @param  string  $key
      * @return \Illuminate\Http\Client\PendingRequest
      *
-     * @throws BatchInProgressException
+     * @throws \Illuminate\Http\Client\BatchInProgressException
      */
     public function as(string $key)
     {
@@ -158,7 +166,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch succeeds.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response): void)  $callback
      * @return Batch
      */
     public function progress(Closure $callback): self
@@ -171,7 +179,7 @@ class Batch
     /**
      * Register a callback to run after a request from the batch fails.
      *
-     * @param  (\Closure($this, int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException): void)  $callback
+     * @param  (\Closure($this, int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException|\Illuminate\Http\Client\ConnectionException): void)  $callback
      * @return Batch
      */
     public function catch(Closure $callback): self
@@ -184,7 +192,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch succeed.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function then(Closure $callback): self
@@ -197,7 +205,7 @@ class Batch
     /**
      * Register a callback to run after all the requests from the batch finish.
      *
-     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Response>): void)  $callback
+     * @param  (\Closure($this, array<int|string, \Illuminate\Http\Client\Response>): void)  $callback
      * @return Batch
      */
     public function finally(Closure $callback): self
@@ -208,9 +216,32 @@ class Batch
     }
 
     /**
+     * Set the maximum number of concurrent requests.
+     *
+     * @param  int  $limit
+     * @return Batch
+     */
+    public function concurrency(int $limit): self
+    {
+        $this->concurrencyLimit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * Defer the batch to run in the background after the current task has finished.
+     *
+     * @return \Illuminate\Support\Defer\DeferredCallback
+     */
+    public function defer(): DeferredCallback
+    {
+        return defer(fn () => $this->send());
+    }
+
+    /**
      * Send all of the requests in the batch.
      *
-     * @return array<int|string, \Illuminate\Http\Response|\Illuminate\Http\Client\RequestException>
+     * @return array<int|string, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\RequestException>
      */
     public function send(): array
     {
@@ -233,7 +264,7 @@ class Batch
         }
 
         if (! empty($promises)) {
-            (new EachPromise($promises, [
+            $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
 
@@ -247,8 +278,11 @@ class Batch
                         return $result;
                     }
 
-                    if (($result instanceof Response && $result->failed()) ||
-                        $result instanceof RequestException) {
+                    if (
+                        ($result instanceof Response && $result->failed()) ||
+                        $result instanceof RequestException ||
+                        $result instanceof ConnectionException
+                    ) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
@@ -261,7 +295,7 @@ class Batch
                 'rejected' => function ($reason, $key) {
                     $this->decrementPendingRequests();
 
-                    if ($reason instanceof RequestException) {
+                    if ($reason instanceof RequestException || $reason instanceof ConnectionException) {
                         $this->incrementFailedRequests();
 
                         if ($this->catchCallback !== null) {
@@ -271,8 +305,22 @@ class Batch
 
                     return $reason;
                 },
-            ]))->promise()->wait();
+            ];
+
+            if ($this->concurrencyLimit !== null) {
+                $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
+            }
+
+            (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
         }
+
+        // Before returning the results, we must ensure that the results are sorted
+        // in the same order as the requests were defined, respecting any custom
+        // key names that were assigned to this request using the "as" method.
+        uksort($results, function ($key1, $key2) {
+            return array_search($key1, array_keys($this->requests), true) <=>
+                   array_search($key2, array_keys($this->requests), true);
+        });
 
         if (! $this->hasFailures() && $this->thenCallback !== null) {
             call_user_func($this->thenCallback, $this, $results);

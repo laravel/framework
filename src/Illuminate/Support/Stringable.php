@@ -223,6 +223,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string doesn't contain a given substring.
+     *
+     * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
+     * @return bool
+     */
+    public function doesntContain($needles, $ignoreCase = false)
+    {
+        return Str::doesntContain($this->value, $needles, $ignoreCase);
+    }
+
+    /**
      * Convert the case of a string.
      *
      * @param  int  $mode
@@ -1093,6 +1105,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     public function ucfirst()
     {
         return new static(Str::ucfirst($this->value));
+    }
+
+    /**
+     * Capitalize the first character of each word in a string.
+     *
+     * @param  string  $separators
+     * @return static
+     */
+    public function ucwords($separators = " \t\r\n\f\v")
+    {
+        return new static(Str::ucwords($this->value, $separators));
     }
 
     /**

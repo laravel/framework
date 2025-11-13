@@ -135,7 +135,7 @@ class MySqlGrammar extends Grammar
     {
         $version = $query->getConnection()->getServerVersion();
 
-        return ! $query->getConnection()->isMaria() && version_compare($version, '8.0.11') < 0;
+        return ! $query->getConnection()->isMaria() && version_compare($version, '8.0.11', '<');
     }
 
     /**
@@ -450,6 +450,7 @@ class MySqlGrammar extends Grammar
      * @param  array  $values
      * @return array
      */
+    #[\Override]
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = (new Collection($values))

@@ -127,6 +127,23 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
     }
 
+    public function testMiddlewareAsNull()
+    {
+        $this->router->middleware(null)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame([], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(null);
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame([], $this->getRoute()->middleware());
+    }
+
     public function testWithoutMiddlewareRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {

@@ -290,7 +290,7 @@ class FoundationHelpersTest extends TestCase
             $this->fail(
                 sprintf('abort function must throw %s when receiving code as Responable implementation.', HttpResponseException::class)
             );
-        } catch (HttpResponseException $ex) {
+        } catch (HttpResponseException) {
             $this->assertSame($request, $code->request);
         }
     }

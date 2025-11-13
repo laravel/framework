@@ -1291,6 +1291,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
     }
 
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', Str::ucwords('laravel'));
+        $this->assertSame('Laravel Framework', Str::ucwords('laravel framework'));
+        $this->assertSame('Laravel-Framework', Str::ucwords('laravel-framework', '-'));
+        $this->assertSame('Мама', Str::ucwords('мама'));
+        $this->assertSame('Мама Мыла Раму', Str::ucwords('мама мыла раму'));
+        $this->assertSame('JJ Watt', Str::ucwords('JJ watt'));
+    }
+
     public function testUcsplit()
     {
         $this->assertSame(['Laravel_p_h_p_framework'], Str::ucsplit('Laravel_p_h_p_framework'));
@@ -1870,8 +1880,16 @@ class SupportStrTest extends TestCase
     public function testPlural(): void
     {
         $this->assertSame('Laracon', Str::plural('Laracon', 1));
+        $this->assertSame('Laracon', Str::plural('Laracon', [2025]));
+
         $this->assertSame('Laracons', Str::plural('Laracon', 3));
+        $this->assertSame('Laracons', Str::plural('Laracon', [2024, 2025]));
+
+        $this->assertSame('1 Laracon', Str::plural('Laracon', 1, prependCount: true));
+        $this->assertSame('1 Laracon', Str::plural('Laracon', [2025], prependCount: true));
+
         $this->assertSame('1,000 Laracons', Str::plural('Laracon', 1000, prependCount: true));
+        $this->assertSame('2 Laracons', Str::plural('Laracon', [2024, 2025], prependCount: true));
     }
 
     public function testPluralPascal(): void

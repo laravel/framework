@@ -254,6 +254,17 @@ class HtmlDumperTest extends TestCase
             'vscode://file//my-docker-work-directory/app/my-file:1',
             $href,
         );
+
+        // When base path appears elsewhere in the file path
+        $config->set('app.editor', ['name' => 'vscode', 'base_path' => '/my-docker-work-directory']);
+        $href = (fn () => $this->resolveSourceHref(
+            '/my-work-directory/storage/my-work-directory/my-file',
+            10,
+        ))->call($dumper);
+        $this->assertSame(
+            'vscode://file//my-docker-work-directory/storage/my-work-directory/my-file:10',
+            $href,
+        );
     }
 
     protected function dump($value)

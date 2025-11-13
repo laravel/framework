@@ -525,6 +525,21 @@ class FilesystemTest extends TestCase
         $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
     }
 
+    public function testAllDirectoriesFindsDirectories()
+    {
+        mkdir(self::$tempDir.'/film');
+        mkdir(self::$tempDir.'/music');
+        mkdir(self::$tempDir.'/music/rock');
+        mkdir(self::$tempDir.'/music/blues');
+
+        $directories = (new Filesystem)->allDirectories(self::$tempDir);
+
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'rock', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'blues', $directories);
+    }
+
     public function testMakeDirectory()
     {
         $files = new Filesystem;

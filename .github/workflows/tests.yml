@@ -40,7 +40,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.3, 8.4]
-        phpunit: ['11.5.3', '12.0.0', '12.3.0']
+        phpunit: ['11.5.3', '12.0.0', '12.4.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: 8.3
@@ -48,6 +48,9 @@ jobs:
             stability: prefer-stable
           - php: 8.3
             phpunit: '12.2.0'
+            stability: prefer-stable
+          - php: 8.3
+            phpunit: '12.3.0'
             stability: prefer-stable
 
 
@@ -71,15 +74,6 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
-
-      - name: Set Minimum dependencies for `prefer-lowest`
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require opis/string:2.0.1 --no-interaction --no-update
-          shell: bash
-        if: matrix.stability == 'prefer-lowest'
 
       - name: Install dependencies
         uses: nick-fields/retry@v3
@@ -113,7 +107,7 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.3, 8.4]
-        phpunit: ['11.5.3', '12.0.0', '12.3.0']
+        phpunit: ['11.5.3', '12.0.0', '12.4.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: 8.3
@@ -121,6 +115,9 @@ jobs:
             stability: prefer-stable
           - php: 8.3
             phpunit: '12.2.0'
+            stability: prefer-stable
+          - php: 8.3
+            phpunit: '12.3.0'
             stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
@@ -144,15 +141,6 @@ jobs:
 
       - name: Set Framework version
         run: composer config version "13.x-dev"
-
-      - name: Set Minimum dependencies for `prefer-lowest`
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer require opis/string:2.0.1 --no-interaction --no-update
-          shell: bash
-        if: matrix.stability == 'prefer-lowest'
 
       - name: Install dependencies
         uses: nick-fields/retry@v3

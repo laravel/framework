@@ -180,6 +180,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
     }
 
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('laravel')->ucwords());
+        $this->assertSame('Laravel Framework', (string) $this->stringable('laravel framework')->ucwords());
+        $this->assertSame('Laravel-Framework', (string) $this->stringable('laravel-framework')->ucwords('-'));
+        $this->assertSame('Мама', (string) $this->stringable('мама')->ucwords());
+        $this->assertSame('Мама Мыла Раму', (string) $this->stringable('мама мыла раму')->ucwords());
+        $this->assertSame('JJ Watt', (string) $this->stringable('JJ watt')->ucwords());
+    }
+
     public function testUnless()
     {
         $this->assertSame('unless false', (string) $this->stringable('unless')->unless(false, function ($stringable, $value) {
@@ -846,6 +856,19 @@ class SupportStringableTest extends TestCase
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(collect(['taylor', 'otwell'])));
         $this->assertTrue($this->stringable('taylor otwell')->containsAll(['taylor']));
         $this->assertFalse($this->stringable('taylor otwell')->containsAll(['taylor', 'xxx']));
+    }
+
+    public function testDoesntContain()
+    {
+        $this->assertTrue($this->stringable('taylor')->doesntContain('xxx'));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(['xxx', 'yyy']));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(collect(['xxx', 'yyy'])));
+        $this->assertTrue($this->stringable('taylor')->doesntContain(''));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('ylo'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain('taylor'));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['xxx', 'ylo']));
+        $this->assertFalse($this->stringable('taylor')->doesntContain(['LOR'], true));
     }
 
     public function testParseCallback()

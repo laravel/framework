@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as RepositoryContract;
 use Illuminate\Contracts\Foundation\Application;
@@ -11,6 +12,13 @@ use Symfony\Component\Finder\Finder;
 
 class LoadConfiguration
 {
+    /**
+     * The closure that resolves the permanent, static configuration if applicable.
+     *
+     * @var (Closure(Application): array<array-key, mixed>)|null
+     */
+    protected static ?Closure $alwaysUseConfig = null;
+
     /**
      * Bootstrap the given application.
      *
@@ -24,18 +32,26 @@ class LoadConfiguration
         // First we will see if we have a cache configuration file. If we do, we'll load
         // the configuration items from that file so that it is very quick. Otherwise
         // we will need to spin through every configuration file and load them all.
-        if (file_exists($cached = $app->getCachedConfigPath())) {
+        $loadedFromCache = false;
+
+        if (self::$alwaysUseConfig !== null) {
+            $items = $app->call(self::$alwaysUseConfig);
+
+            $loadedFromCache = true;
+        } elseif (file_exists($cached = $app->getCachedConfigPath())) {
             $items = require $cached;
 
-            $app->instance('config_loaded_from_cache', $loadedFromCache = true);
+            $loadedFromCache = true;
         }
+
+        $app->instance('config_loaded_from_cache', $loadedFromCache);
 
         // Next we will spin through all of the configuration files in the configuration
         // directory and load each one into the repository. This will make all of the
         // options available to the developer for use in various parts of this app.
         $app->instance('config', $config = new Repository($items));
 
-        if (! isset($loadedFromCache)) {
+        if (! $loadedFromCache) {
             $this->loadConfigurationFiles($app, $config);
         }
 
@@ -194,5 +210,16 @@ class LoadConfiguration
         }
 
         return $config;
+    }
+
+    /**
+     * Set a callback to return the permanent, static configuration values.
+     *
+     * @param  (Closure(Application): array<array-key, mixed>)|null  $alwaysUseConfig
+     * @return void
+     */
+    public static function alwaysUse(?Closure $alwaysUseConfig): void
+    {
+        static::$alwaysUseConfig = $alwaysUseConfig;
     }
 }

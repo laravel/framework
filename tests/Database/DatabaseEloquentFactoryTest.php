@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\CrossJoinSequence;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -982,6 +983,35 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals('other body', FactoryTestComment::first()->body);
     }
 
+    public function test_factory_can_insert()
+    {
+        (new FactoryTestPostFactory())
+            ->count(5)
+            ->recycle([
+                (new FactoryTestUserFactory())->create(['name' => Name::Taylor]),
+                (new FactoryTestUserFactory())->create(['name' => Name::Shad, 'created_at' => now()]),
+            ])
+            ->state(['title' => 'hello'])
+            ->insert();
+        $this->assertCount(5, $posts = FactoryTestPost::query()->where('title', 'hello')->get());
+        $this->assertEquals(strtoupper($posts[0]->user->name), $posts[0]->upper_case_name);
+        $this->assertEquals(
+            2,
+            ($users = FactoryTestUser::query()->get())->count()
+        );
+        $this->assertCount(1, $users->where('name', 'totwell'));
+        $this->assertCount(1, $users->where('name', 'shaedrich'));
+    }
+
+    public function test_factory_can_insert_with_hidden()
+    {
+        (new FactoryTestUserFactory())->forEachSequence(['name' => Name::Taylor, 'options' => 'abc'])->insert();
+        $user = DB::table('users')->sole();
+        $this->assertEquals('abc', $user->options);
+        $userModel = FactoryTestUser::query()->sole();
+        $this->assertEquals('abc', $userModel->options);
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -1021,6 +1051,9 @@ class FactoryTestUser extends Eloquent
     use HasFactory;
 
     protected $table = 'users';
+    protected $hidden = ['options'];
+    protected $withCount = ['posts'];
+    protected $with = ['posts'];
 
     public function posts()
     {
@@ -1071,6 +1104,13 @@ class FactoryTestPost extends Eloquent
     use SoftDeletes;
 
     protected $table = 'posts';
+
+    protected $appends = ['upper_case_name'];
+
+    public function upperCaseName(): Attribute
+    {
+        return Attribute::get(fn ($attr) => Str::upper($this->user->name));
+    }
 
     public function user()
     {
@@ -1192,4 +1232,10 @@ class FactoryTestUseFactoryAttributeFactory extends Factory
 class FactoryTestUseFactoryAttribute extends Eloquent
 {
     use HasFactory;
+}
+
+enum Name: string
+{
+    case Taylor = 'totwell';
+    case Shad = 'shaedrich';
 }

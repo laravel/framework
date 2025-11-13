@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\Fixtures;
 
-use Illuminate\Database\Eloquent\Attributes\Scope as NamedScope;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 
 class NamedScopeUser extends User
@@ -17,7 +17,7 @@ class NamedScopeUser extends User
         ];
     }
 
-    #[NamedScope]
+    #[Scope]
     protected function verified(Builder $builder, bool $email = true)
     {
         return $builder->when(
@@ -27,7 +27,7 @@ class NamedScopeUser extends User
         );
     }
 
-    #[NamedScope]
+    #[Scope]
     protected function verifiedWithoutReturn(Builder $builder, bool $email = true)
     {
         $this->verified($builder, $email);
