@@ -296,6 +296,88 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause a queue by name.
+     *
+     * @param  string  $queue
+     * @param  int  $ttl
+     * @return void
+     */
+    public function pause($queue, $ttl = 86400)
+    {
+        $cache = $this->app['cache']->store();
+
+        $cache->put("queue_paused:{$queue}", true, $ttl);
+
+        // Add to the list of paused queues
+        $pausedQueues = $this->getPausedQueues();
+
+        if (! in_array($queue, $pausedQueues)) {
+            $pausedQueues[] = $queue;
+            $this->storePausedQueuesList($pausedQueues);
+        }
+    }
+
+    /**
+     * Resume a paused queue by name.
+     *
+     * @param  string  $queue
+     * @return void
+     */
+    public function resume($queue)
+    {
+        $cache = $this->app['cache']->store();
+
+        $cache->forget("queue_paused:{$queue}");
+
+        // Remove from the list of paused queues
+        $pausedQueues = $this->getPausedQueues();
+
+        if (($key = array_search($queue, $pausedQueues)) !== false) {
+            unset($pausedQueues[$key]);
+            $this->storePausedQueuesList(array_values($pausedQueues));
+        }
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param  string  $queue
+     * @return bool
+     */
+    public function isPaused($queue)
+    {
+        $cache = $this->app['cache']->store();
+
+        return (bool) $cache->get("queue_paused:{$queue}", false);
+    }
+
+    /**
+     * Get all paused queues.
+     *
+     * @return array
+     */
+    public function getPausedQueues()
+    {
+        $cache = $this->app['cache']->store();
+
+        // This implementation stores a list of paused queues
+        return $cache->get('queue_paused_list', []);
+    }
+
+    /**
+     * Store the list of paused queues.
+     *
+     * @param  array  $queues
+     * @return void
+     */
+    protected function storePausedQueuesList($queues)
+    {
+        $cache = $this->app['cache']->store();
+
+        $cache->forever('queue_paused_list', $queues);
+    }
+
+    /**
      * Dynamically pass calls to the default connection.
      *
      * @param  string  $method

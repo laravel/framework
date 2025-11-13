@@ -372,6 +372,11 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $index => $queue) {
+                // Skip paused queues
+                if ($this->isQueuePaused($queue)) {
+                    continue;
+                }
+
                 if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
@@ -385,6 +390,21 @@ class Worker
 
             $this->sleep(1);
         }
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param  string  $queue
+     * @return bool
+     */
+    protected function isQueuePaused($queue)
+    {
+        if (! $this->cache) {
+            return false;
+        }
+
+        return (bool) $this->cache->get("queue_paused:{$queue}", false);
     }
 
     /**
