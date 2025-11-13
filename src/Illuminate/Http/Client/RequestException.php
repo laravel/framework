@@ -14,14 +14,7 @@ class RequestException extends HttpClientException
     public $response;
 
     /**
-     * The current truncation length for the exception message.
-     *
-     * @var int|false
-     */
-    public $truncateExceptionsAt;
-
-    /**
-     * The global truncation length for the exception message.
+     * The truncation length for the exception message.
      *
      * @var int|false
      */
@@ -31,13 +24,10 @@ class RequestException extends HttpClientException
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
-     * @param  int|false|null  $truncateExceptionsAt
      */
-    public function __construct(Response $response, $truncateExceptionsAt = null)
+    public function __construct(Response $response)
     {
-        parent::__construct("HTTP request returned status code {$response->status()}", $response->status());
-
-        $this->truncateExceptionsAt = $truncateExceptionsAt;
+        parent::__construct($this->prepareMessage($response), $response->status());
 
         $this->response = $response;
     }
@@ -76,18 +66,17 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
-     * @return void
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return string
      */
-    public function report(): void
+    protected function prepareMessage(Response $response)
     {
-        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
+        $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = $truncateExceptionsAt
-            ? Message::bodySummary($this->response->toPsrResponse(), $truncateExceptionsAt)
-            : Message::toString($this->response->toPsrResponse());
+        $summary = static::$truncateAt
+            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
+            : Message::toString($response->toPsrResponse());
 
-        if (! is_null($summary)) {
-            $this->message .= ":\n{$summary}\n";
-        }
+        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
     }
 }
