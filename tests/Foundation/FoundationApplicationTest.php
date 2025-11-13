@@ -661,6 +661,40 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
         $this->assertSame('auth.password.broker', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
     }
+
+    public function testConfigurationIsCached(): void
+    {
+        // A config cache file does not exist.
+        $app = new Application();
+        $this->assertFalse(is_file($app->getCachedConfigPath()));
+        $this->assertFalse($app->configurationIsCached());
+        $this->assertFalse($app->make('config_loaded_from_cache'));
+
+        $app->instance('config_loaded_from_cache', true);
+        $this->assertTrue($app->configurationIsCached());
+
+        $app->instance('config_loaded_from_cache', false);
+        $this->assertFalse($app->configurationIsCached());
+
+        // A config cache file exists.
+        $app = new class extends Application {
+            public function getCachedConfigPath()
+            {
+                return __DIR__ . '/fixtures/cache/config.php';
+            }
+        };
+
+        // If "config_loaded_from_cache" is not bound to the container and a config cache file exists, the
+        // `configurationIsCached` method will return true, "config_loaded_from_cache" will be bound as true.
+        $this->assertTrue($app->configurationIsCached());
+        $this->assertTrue($app->make('config_loaded_from_cache'));
+
+        $app->instance('config_loaded_from_cache', false);
+
+        // If "config_loaded_from_cache" is bound to the container as false, even a config cache file still exists, the
+        // `configurationIsCached` method will return false.
+        $this->assertFalse($app->configurationIsCached());
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider

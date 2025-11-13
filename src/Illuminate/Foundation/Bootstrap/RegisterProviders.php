@@ -29,8 +29,7 @@ class RegisterProviders
      */
     public function bootstrap(Application $app)
     {
-        if (! $app->bound('config_loaded_from_cache') ||
-            $app->make('config_loaded_from_cache') === false) {
+        if (! $app->configurationIsCached()) {
             $this->mergeAdditionalProviders($app);
         }
 
