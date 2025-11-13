@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.38.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.38.1...12.x)
+
+## [v12.38.1](https://github.com/laravel/framework/compare/v12.38.0...v12.38.1) - 2025-11-13
+
+* [12.x] Fix `GeneratorCommand` missing `possibleModels()` method by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57769
 
 ## [v12.38.0](https://github.com/laravel/framework/compare/v12.37.0...v12.38.0) - 2025-11-12
 
