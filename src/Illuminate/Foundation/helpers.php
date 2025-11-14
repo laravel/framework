@@ -42,8 +42,9 @@ use League\Uri\Contracts\UriInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
-  
+
 use function Illuminate\Support\enum_value;
+
 if (! function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
@@ -534,13 +535,13 @@ if (! function_exists('info')) {
     /**
      * Write some information to the log.
      *
-     * @param  string|object $message
-     * @param  array|Enumerable|Arrayable|WeakMap|Traversable|Jsonable|JsonSerializable|object $context
+     * @param  string|object  $message
+     * @param  array|Enumerable|Arrayable|WeakMap|Traversable|Jsonable|JsonSerializable|object  $context
      */
     function info($message, $context = []): void
     {
         [$message, $context] = array_map(function ($item) {
-            return is_scalar($item) || is_null($item) ? $item :  Arr::from($item);
+            return is_scalar($item) || is_null($item) ? $item : Arr::from($item);
         }, [$message, $context]);
 
         app('log')->info($message, $context);
