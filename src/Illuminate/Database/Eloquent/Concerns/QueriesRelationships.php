@@ -724,7 +724,7 @@ trait QueriesRelationships
      *
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
      */
-    public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
+    public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and', $not = false)
     {
         if (! $related instanceof EloquentCollection) {
             $relatedCollection = $related->newCollection([$related]);
@@ -756,6 +756,7 @@ trait QueriesRelationships
             $relationship->getQualifiedForeignKeyName(),
             $relatedCollection->pluck($relationship->getOwnerKeyName())->toArray(),
             $boolean,
+            $not
         );
 
         return $this;
@@ -773,6 +774,33 @@ trait QueriesRelationships
     public function orWhereBelongsTo($related, $relationshipName = null)
     {
         return $this->whereBelongsTo($related, $relationshipName, 'or');
+    }
+
+    /**
+     * Add a "BelongsTo" relationship with a "where not" clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string|null  $relationshipName
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotBelongsTo($related, $relationshipName = null, $boolean = 'and')
+    {
+        return $this->whereBelongsTo($related, $relationshipName, $boolean, true);
+    }
+
+    /**
+     * Add a "BelongsTo" relationship with a "where not" clause to the query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $related
+     * @param  string|null  $relationshipName
+     * @return $this
+     * 
+     * @throws \RuntimeException
+     */
+    public function orWhereNotBelongsTo($related, $relationshipName = null)
+    {
+        return $this->whereNotBelongsTo($related, $relationshipName, 'or');
     }
 
     /**
