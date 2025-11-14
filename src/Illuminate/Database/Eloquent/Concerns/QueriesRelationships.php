@@ -720,6 +720,7 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model>  $related
      * @param  string|null  $relationshipName
      * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      *
      * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
@@ -790,7 +791,7 @@ trait QueriesRelationships
     }
 
     /**
-     * Add a "BelongsTo" relationship with a "where not" clause to the query.
+     * Add a "BelongsTo" relationship with an "or where not" clause to the query.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
