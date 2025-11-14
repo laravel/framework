@@ -29,8 +29,8 @@ class ManagesStacksTest extends TestCase
     }
 }
 
-class FakeViewFactory {
-
+class FakeViewFactory
+{
     use ManagesStacks;
 
     protected int $renderCount = 0;
