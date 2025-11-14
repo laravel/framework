@@ -61,6 +61,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'allow_referer_header' => true,
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
