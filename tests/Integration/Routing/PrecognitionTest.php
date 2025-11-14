@@ -456,6 +456,51 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
+    public function testClientCanSpecifySimpleArrayWildcardToValidateWhenUsingControllerValidateWithPassingArrayOfRules()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'raw_array' => [123, 'someString'],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'raw_array.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'raw_array.0' => [
+                'The raw_array.0 field must be a string.',
+            ],
+        ]);
+    }
+
+    public function testClientCanSpecifyComplexArrayWildcardToValidateWhenUsingControllerValidateWithPassingArrayOfRules()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested_array' => [
+                ['name' => 123],
+                ['name' => 'someString'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested_array.*.name',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'nested_array.0.name' => [
+                'The nested_array.0.name field must be a string.',
+            ],
+        ]);
+    }
+
     public function testItAppendsAnAdditionalVaryHeaderInsteadOfReplacingAnyExistingVaryHeaders()
     {
         Route::get('test-route', function () {
@@ -1109,6 +1154,22 @@ class PrecognitionTestController
             $this->validate($request, [
                 'nested' => ['required', 'array', 'min:1'],
                 'nested.*.name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereArrayRulesAreValidateViaControllerValidate(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'nested_array' => ['required', 'array', 'min:1'],
+                'nested_array.*.name' => ['required', 'string'],
+                'raw_array' => ['required', 'array', 'min:1'],
+                'raw_array.*' => ['required', 'string'],
             ]);
 
             fail();
