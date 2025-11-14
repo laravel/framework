@@ -13,6 +13,7 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LogicException;
 use ReflectionAttribute;
@@ -718,22 +719,24 @@ class Container implements ArrayAccess, ContainerContract
      * Alias a type to a different name.
      *
      * @param  string  $abstract
-     * @param  string  $alias
+     * @param  array|string  $aliases
      * @return void
      *
      * @throws \LogicException
      */
-    public function alias($abstract, $alias)
+    public function alias($abstract, $aliases)
     {
-        if ($alias === $abstract) {
-            throw new LogicException("[{$abstract}] is aliased to itself.");
+        foreach (Arr::wrap($aliases) as $alias) {
+            if ($alias === $abstract) {
+                throw new LogicException("[{$abstract}] is aliased to itself.");
+            }
+
+            $this->removeAbstractAlias($alias);
+
+            $this->aliases[$alias] = $abstract;
+
+            $this->abstractAliases[$abstract][] = $alias;
         }
-
-        $this->removeAbstractAlias($alias);
-
-        $this->aliases[$alias] = $abstract;
-
-        $this->abstractAliases[$abstract][] = $alias;
     }
 
     /**

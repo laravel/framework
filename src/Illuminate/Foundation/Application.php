@@ -1674,9 +1674,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
             'validator' => [\Illuminate\Validation\Factory::class, \Illuminate\Contracts\Validation\Factory::class],
             'view' => [\Illuminate\View\Factory::class, \Illuminate\Contracts\View\Factory::class],
         ] as $key => $aliases) {
-            foreach ($aliases as $alias) {
-                $this->alias($key, $alias);
-            }
+            $this->alias($key, $aliases);
         }
     }
 

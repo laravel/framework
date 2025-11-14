@@ -27,13 +27,10 @@ class BusServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->registerBatchServices();
 
-        $this->app->alias(
-            Dispatcher::class, DispatcherContract::class
-        );
-
-        $this->app->alias(
-            Dispatcher::class, QueueingDispatcherContract::class
-        );
+        $this->app->alias(Dispatcher::class, [
+            DispatcherContract::class,
+            QueueingDispatcherContract::class,
+        ]);
     }
 
     /**
