@@ -16,18 +16,20 @@ class MySqlSchemaState extends SchemaState
      * @param  string  $path
      * @return void
      */
-    public function dump(Connection $connection, $path)
+    public function dump(Connection $connection, $path, $withData = false)
     {
         $this->executeDumpProcess($this->makeProcess(
-            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" --no-data'
+            $this->baseDumpCommand().' --routines --result-file="${:LARAVEL_LOAD_PATH}" ' . ($withData ? '' : '--no-data')
         ), $this->output, array_merge($this->baseVariables($this->connection->getConfig()), [
             'LARAVEL_LOAD_PATH' => $path,
         ]));
 
-        $this->removeAutoIncrementingState($path);
+        if (!$withData) {
+            $this->removeAutoIncrementingState($path);
 
-        if ($this->hasMigrationTable()) {
-            $this->appendMigrationData($path);
+            if ($this->hasMigrationTable()) {
+                $this->appendMigrationData($path);
+            }
         }
     }
 
