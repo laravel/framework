@@ -305,7 +305,9 @@ trait FormatsMessages
                 : $attribute;
         }
 
-        return str_replace('_', ' ', Str::snake($attribute));
+        return ($formatter = $this->defaultAttributesFormatter)
+            ? $formatter($attribute)
+            : str_replace('_', ' ', Str::snake($attribute));
     }
 
     /**

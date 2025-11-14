@@ -87,6 +87,20 @@ class ValidatorTest extends DatabaseTestCase
         $this->assertSame('name at line 1 must be a string!', $validator->getMessageBag()->all()[0]);
     }
 
+    public function testDefaultAttributeFormatting(): void
+    {
+        $translator = new Translator(new ArrayLoader, 'en');
+        $translator->addLines(['validation.required' => 'The :attribute field is required.'], 'en');
+        $validator = new Validator($translator, [], ['someAttribute' => 'required']);
+        $validator->setDefaultAttributesFormatter(function ($attribute) {
+            return Str::upper(Str::snake($attribute));
+        });
+
+        $validator->passes();
+
+        $this->assertSame('The SOME_ATTRIBUTE field is required.', $validator->getMessageBag()->all()[0]);
+    }
+
     protected function getValidator(array $data, array $rules)
     {
         $translator = new Translator(new ArrayLoader, 'en');
