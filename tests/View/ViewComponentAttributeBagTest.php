@@ -53,8 +53,8 @@ class ViewComponentAttributeBagTest extends TestCase
             'test-empty-string' => '',
         ]);
 
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag->merge());
+        $this->assertSame('test-string="ok" test-true test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
+        $this->assertSame('test-string="ok" test-true test-0="0" test-0-string="0" test-empty-string=""', (string) $bag->merge());
 
         $bag = (new ComponentAttributeBag)
             ->merge([
@@ -74,7 +74,7 @@ class ViewComponentAttributeBagTest extends TestCase
                 'test-empty-string' => '',
             ]);
 
-        $this->assertSame('test-string="ok" test-true="test-true" test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
+        $this->assertSame('test-string="ok" test-true test-0="0" test-0-string="0" test-empty-string=""', (string) $bag);
 
         $bag = (new ComponentAttributeBag)
             ->merge([
@@ -151,7 +151,7 @@ class ViewComponentAttributeBagTest extends TestCase
             'x-data' => true,
         ]);
 
-        $this->assertSame('required="required" x-data=""', (string) $bag);
+        $this->assertSame('required x-data=""', (string) $bag);
     }
 
     public function testItMakesAnExceptionForLivewireWireAttributes()
