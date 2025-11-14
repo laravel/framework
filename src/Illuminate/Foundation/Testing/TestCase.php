@@ -40,7 +40,7 @@ abstract class TestCase extends BaseTestCase
 
         if (isset(CachedState::$cachedConfig) &&
             isset($this->traitsUsedByTest[WithCachedConfig::class])) {
-            $app->booting(fn () => $this->markConfigCached($app));
+            fn () => $this->markConfigCached($app);
         }
 
         if (isset(CachedState::$cachedRoutes) &&
