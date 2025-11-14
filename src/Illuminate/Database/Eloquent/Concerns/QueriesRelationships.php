@@ -796,7 +796,7 @@ trait QueriesRelationships
      * @param  \Illuminate\Database\Eloquent\Model  $related
      * @param  string|null  $relationshipName
      * @return $this
-     * 
+     *
      * @throws \RuntimeException
      */
     public function orWhereNotBelongsTo($related, $relationshipName = null)
