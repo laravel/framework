@@ -353,7 +353,7 @@ class Kernel implements KernelContract
         $paths = array_unique(Arr::wrap($paths));
 
         $paths = array_filter($paths, function ($path) {
-            return is_dir($path);
+            return is_dir($path) || glob($path, GLOB_ONLYDIR) !== false;
         });
 
         if (empty($paths)) {
