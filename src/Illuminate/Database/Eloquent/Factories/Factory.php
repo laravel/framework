@@ -471,7 +471,10 @@ abstract class Factory
         $query = $model->newQueryWithoutScopes();
 
         $query->fillAndInsert(
-            $madeCollection->withoutAppends()->map(fn (Model $model) => $model->attributesToArray())->all()
+            $madeCollection->withoutAppends()
+                ->setHidden([])
+                ->map(static fn (Model $model) => $model->attributesToArray())
+                ->all()
         );
     }
 
