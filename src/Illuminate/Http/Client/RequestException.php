@@ -83,6 +83,22 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
+     * @return void
+     */
+    public function report(): void
+    {
+        if ($this->hasBeenSummarized) {
+            return;
+        }
+
+        $this->message = $this->prepareMessage($this->response);
+
+        $this->hasBeenSummarized = true;
+    }
+
+    /**
+     * Prepare the exception message.
+     *
      * @param  \Illuminate\Http\Client\Response  $response
      * @return string
      */
@@ -97,21 +113,5 @@ class RequestException extends HttpClientException
             : Message::toString($response->toPsrResponse());
 
         return is_null($summary) ? $message : $message.":\n{$summary}\n";
-    }
-
-    /**
-     * Prepare the exception message.
-     *
-     * @return void
-     */
-    public function report(): void
-    {
-        if ($this->hasBeenSummarized) {
-            return;
-        }
-
-        $this->message = $this->prepareMessage($this->response);
-
-        $this->hasBeenSummarized = true;
     }
 }
