@@ -67,9 +67,12 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            $routeBindingMethod = $route?->allowsTrashedBindings() && $instance::isSoftDeletable()
-                ? 'resolveSoftDeletableRouteBinding'
-                : 'resolveRouteBinding';
+            $routeBindingMethod = match (true) {
+                ! $instance::isSoftDeletable() => 'resolveRouteBinding',
+                $route?->allowsOnlyTrashedBindings() => 'resolveTrashedRouteBinding',
+                $route?->allowsTrashedBindings() => 'resolveSoftDeletableRouteBinding',
+                default => 'resolveRouteBinding',
+            };
 
             if ($model = $instance->{$routeBindingMethod}($value)) {
                 return $model;

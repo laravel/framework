@@ -162,6 +162,13 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($route->allowsTrashedBindings());
     }
 
+    public function testGetRouteWithOnlyTrashed()
+    {
+        $route = $this->router->get('users', [RouteRegistrarControllerStub::class, 'index'])->onlyTrashed();
+
+        $this->assertTrue($route->allowsOnlyTrashedBindings());
+    }
+
     public function testResourceWithTrashed()
     {
         $this->router->resource('users', RouteRegistrarControllerStub::class)
@@ -174,6 +181,22 @@ class RouteRegistrarTest extends TestCase
         /** @var \Illuminate\Routing\Route $route */
         foreach ($this->router->getRoutes() as $route) {
             $this->assertTrue($route->allowsTrashedBindings());
+        }
+    }
+
+    public function testResourceWithOnlyTrashed()
+    {
+        $this->router->resource('users', RouteRegistrarControllerStub::class)
+            ->only(['show', 'edit', 'update'])
+            ->onlyTrashed([
+                'show',
+                'edit',
+                'update',
+            ]);
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->router->getRoutes() as $route) {
+            $this->assertTrue($route->allowsOnlyTrashedBindings());
         }
     }
 

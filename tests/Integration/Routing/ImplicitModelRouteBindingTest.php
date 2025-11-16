@@ -140,6 +140,35 @@ PHP);
         $this->assertTrue($user->is($response->baseRequest->route('user')));
     }
 
+    public function testOnlyDeletedModelsCanBeRetrievedUsingOnlyTrashedMethod()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+
+        Route::post('/user/{user}', function (ImplicitBindingUser $user) {
+            return $user;
+        })->middleware(['web'])->onlyTrashed();
+
+        $response = $this->postJson("/user/{$user->id}");
+
+        $response->assertJson([
+            'id' => $user->id,
+            'name' => $user->name,
+        ]);
+
+        $this->assertTrue($user->is($response->baseRequest->route('user')));
+
+        // Test that a non-deleted model is not found
+        $anotherUser = ImplicitBindingUser::create(['name' => 'Another Dries']);
+
+        $response = $this->postJson("/user/{$anotherUser->id}");
+
+        $response->assertStatus(404);
+    }
+
     public function testEnforceScopingImplicitRouteBindings()
     {
         $user = ImplicitBindingUser::create(['name' => 'Dries']);
@@ -172,6 +201,35 @@ PHP);
             Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
                 return [$user, $post];
             })->middleware(['web'])->withTrashed();
+        });
+
+        $response = $this->getJson("/user/{$user->id}/post/{$post->id}");
+        $response->assertOk();
+        $response->assertJson([
+            [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            [
+                'id' => 1,
+                'user_id' => 1,
+            ],
+        ]);
+    }
+
+    public function testEnforceScopingImplicitRouteBindingsOnlyTrashedAndChildWithNoSoftDeleteTrait()
+    {
+        $user = ImplicitBindingUser::create(['name' => 'Dries']);
+
+        $post = $user->posts()->create();
+
+        $user->delete();
+
+        config(['app.key' => str_repeat('a', 32)]);
+        Route::scopeBindings()->group(function () {
+            Route::get('/user/{user}/post/{post}', function (ImplicitBindingUser $user, ImplicitBindingPost $post) {
+                return [$user, $post];
+            })->middleware(['web'])->onlyTrashed();
         });
 
         $response = $this->getJson("/user/{$user->id}/post/{$post->id}");

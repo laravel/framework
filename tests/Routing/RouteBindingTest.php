@@ -46,6 +46,17 @@ class RouteBindingTest extends TestCase
         $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
         $this->assertInstanceOf(ExplicitRouteBindingSoftDeletableUser::class, $callback(1, $route));
     }
+
+    public function test_it_can_resolve_the_explicit_soft_deleted_model_for_the_given_route_with_only_trashed()
+    {
+        $container = Container::getInstance();
+
+        $route = (new Route('GET', '/users/{user}', function () {
+        }))->onlyTrashed();
+
+        $callback = RouteBinding::forModel($container, ExplicitRouteBindingSoftDeletableUser::class);
+        $this->assertInstanceOf(ExplicitRouteBindingSoftDeletableUser::class, $callback(1, $route));
+    }
 }
 
 class ExplicitRouteBindingUser extends Model
