@@ -726,6 +726,19 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::isMatch(['/^[a-zA-Z,!]+$/', '/^(.*(.*(.*)))/'], 'Hello, Laravel!'));
     }
 
+    public function testIsBase64()
+    {
+        $this->assertTrue(Str::isBase64('SGVsbG8gV29ybGQ='));
+        $this->assertTrue(Str::isBase64('TGFyYXZlbA=='));
+
+        $this->assertFalse(Str::isBase64(''));
+        $this->assertFalse(Str::isBase64('invalid!!!'));
+
+        $this->assertFalse(Str::isBase64(null));
+        $this->assertFalse(Str::isBase64([]));
+        $this->assertFalse(Str::isBase64(123));
+    }
+
     public function testKebab()
     {
         $this->assertSame('laravel-php-framework', Str::kebab('LaravelPhpFramework'));

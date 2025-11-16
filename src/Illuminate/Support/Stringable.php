@@ -444,6 +444,16 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Determine if a given string is valid Base64.
+     *
+     * @return bool
+     */
+    public function isBase64()
+    {
+        return Str::isBase64($this->value);
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @return static

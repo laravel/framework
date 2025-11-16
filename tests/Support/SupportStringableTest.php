@@ -7,6 +7,7 @@ use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
@@ -999,6 +1000,17 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable($multilineValue)->is('use Exception;'));
         $this->assertFalse($this->stringable($multilineValue)->is('use Exception;*'));
         $this->assertTrue($this->stringable($multilineValue)->is('*use Exception;'));
+    }
+
+    public function testIsBase64()
+    {
+        $this->assertTrue($this->stringable('SGVsbG8gV29ybGQ=')->isBase64());
+        $this->assertTrue($this->stringable('TGFyYXZlbA==')->isBase64());
+
+        $this->assertFalse($this->stringable('')->isBase64());
+        $this->assertFalse($this->stringable('invalid!!!')->isBase64());
+        $this->assertFalse($this->stringable('Hello World')->isBase64());
+        $this->assertFalse($this->stringable(null)->isBase64());
     }
 
     public function testKebab()

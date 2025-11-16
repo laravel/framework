@@ -688,6 +688,31 @@ class Str
     }
 
     /**
+     * Determine if a given value is valid Base64.
+     *
+     * @param  mixed  $value
+     * @return bool
+     *
+     * @phpstan-assert-if-true =non-empty-string $value
+     */
+    public static function isBase64($value)
+    {
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (! preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+        if ($decoded === false) {
+            return false;
+        }
+        return base64_encode($decoded) === $value;
+    }
+
+    /**
      * Convert a string to kebab case.
      *
      * @param  string  $value
