@@ -1452,6 +1452,26 @@ class HttpClientTest extends TestCase
         throw new RequestException(new Response($response));
     }
 
+    public function testReportingExceptionTwiceDoesNotIncludeSummaryTwice()
+    {
+        RequestException::dontTruncate();
+
+        $error = [
+            'error' => [
+                'code' => 403,
+                'message' => 'The Request can not be completed',
+            ],
+        ];
+
+        $response = new Psr7Response(403, [], json_encode($error));
+
+        $exception = new RequestException(new Response($response));
+        $exception->report();
+        $exception->report();
+
+        $this->assertEquals(1, substr_count($exception->getMessage(), '{"error":{"code":403,"message":"The Request can not be completed"}}')); 
+    }
+
     public function testOnErrorDoesntCallClosureOnInformational()
     {
         $status = 0;
