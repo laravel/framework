@@ -193,7 +193,7 @@ class RouteListCommandTest extends TestCase
 
     public function testFilterByMiddleware()
     {
-        $this->app->call('route:list', ['--json' => true, '--middleware' => 'auth']);
+        $this->app->call('route:list', ['--json' => true, '-v' => true, '--middleware' => 'auth']);
         $output = $this->app->output();
 
         $expectedOrder = '[{"domain":null,"method":"GET|HEAD","uri":"example-group","name":null,"action":"Closure","middleware":["web","auth"]}]';
