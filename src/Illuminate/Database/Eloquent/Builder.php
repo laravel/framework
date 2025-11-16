@@ -1396,7 +1396,7 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return array
      */
-    protected function addUniqueIdsToUpsertValues(array $values)
+    public function addUniqueIdsToUpsertValues(array $values)
     {
         if (! $this->model->usesUniqueIds()) {
             return $values;
@@ -1419,7 +1419,7 @@ class Builder implements BuilderContract
      * @param  array  $values
      * @return array
      */
-    protected function addTimestampsToUpsertValues(array $values)
+    public function addTimestampsToUpsertValues(array $values)
     {
         if (! $this->model->usesTimestamps()) {
             return $values;

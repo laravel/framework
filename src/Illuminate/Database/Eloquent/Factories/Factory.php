@@ -470,9 +470,13 @@ abstract class Factory
 
         $query = $model->newQueryWithoutScopes();
 
-        $query->fillAndInsert(
-            $madeCollection->map(fn (Model $model) => $model->getAttributesForInsert())->all()
-        );
+        $values = $madeCollection->map(fn (Model $model) => $model->getAttributesForInsert())
+            ->all();
+
+        $values = $query->addUniqueIdsToUpsertValues($values);
+        $values = $query->addTimestampsToUpsertValues($values);
+
+        $query->insert($values);
     }
 
     /**
