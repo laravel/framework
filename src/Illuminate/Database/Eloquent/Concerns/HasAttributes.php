@@ -1971,7 +1971,7 @@ trait HasAttributes
      *
      * @return array
      */
-    protected function getAttributesForInsert()
+    public function getAttributesForInsert()
     {
         return $this->getAttributes();
     }
