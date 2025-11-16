@@ -96,7 +96,7 @@ class RequestException extends HttpClientException
             ? Message::bodySummary($response->toPsrResponse(), $truncateExceptionsAt)
             : Message::toString($response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message . ":\n{$summary}\n";
+        return is_null($summary) ? $message : $message.":\n{$summary}\n";
     }
 
     /**
