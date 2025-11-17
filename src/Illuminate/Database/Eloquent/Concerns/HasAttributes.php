@@ -790,6 +790,11 @@ trait HasAttributes
     protected function ensureCastsAreStringValues($casts)
     {
         foreach ($casts as $attribute => $cast) {
+            // Skip unchanged values to avoid copy-on-write memory overhead
+            if (! is_array($cast) && ! is_object($cast)) {
+                continue;
+            }
+
             $casts[$attribute] = match (true) {
                 is_object($cast) => value(function () use ($cast, $attribute) {
                     if ($cast instanceof Stringable) {
