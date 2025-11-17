@@ -777,6 +777,11 @@ trait HasAttributes
     protected function ensureCastsAreStringValues($casts)
     {
         foreach ($casts as $attribute => $cast) {
+            // Skip unchanged values to avoid copy-on-write memory overhead
+            if (! is_array($cast)) {
+                continue;
+            }
+
             $casts[$attribute] = match (true) {
                 is_array($cast) => value(function () use ($cast) {
                     if (count($cast) === 1) {
