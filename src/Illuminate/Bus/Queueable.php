@@ -50,6 +50,20 @@ trait Queueable
     public $delay;
 
     /**
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @var \DateTimeInterface|\DateInterval|array|int|null
+     */
+    public $backoff;
+
+    /**
+     * The timestamp indicating when the job should timeout.
+     *
+     * @var \DateTimeInterface|int|null
+     */
+    public $retryUntil;
+
+    /**
      * Indicates whether the job should be dispatched after all database transactions have committed.
      *
      * @var bool|null
@@ -202,6 +216,36 @@ trait Queueable
     public function withoutDelay()
     {
         $this->delay = 0;
+
+        return $this;
+    }
+
+    /**
+     * Set the number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @param  \DateTimeInterface|\DateInterval|array|int  $delays
+     * @return $this
+     */
+    public function retryWithDelay($delays)
+    {
+        $this->backoff = $delays;
+
+        return $this;
+    }
+
+    /**
+     * Set the timestamp indicating when the job should timeout.
+     *
+     * @param  \DateTimeInterface|int|null  $datetime
+     * @return $this|\DateTimeInterface|int|null
+     */
+    public function retryUntil($datetime = null)
+    {
+        if (func_num_args() === 0) {
+            return $this->retryUntil;
+        }
+
+        $this->retryUntil = $datetime;
 
         return $this;
     }
