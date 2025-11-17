@@ -1016,7 +1016,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         (new FactoryTestUserWithArrayFactory())->count(2)->insert();
         $users = DB::table('users')->get();
-        foreach($users as $user) {
+        foreach ($users as $user) {
             $this->assertEquals(['rtj'], json_decode($user->options, true));
             $createdAt = Carbon::parse($user->created_at);
             $updatedAt = Carbon::parse($user->updated_at);
@@ -1249,6 +1249,7 @@ class FactoryTestUseFactoryAttribute extends Eloquent
 class FactoryTestUserWithArray extends Eloquent
 {
     protected $table = 'users';
+
     protected function casts()
     {
         return ['options' => 'array'];
@@ -1258,6 +1259,7 @@ class FactoryTestUserWithArray extends Eloquent
 class FactoryTestUserWithArrayFactory extends Factory
 {
     protected $model = FactoryTestUserWithArray::class;
+
     public function definition()
     {
         return [
@@ -1266,7 +1268,6 @@ class FactoryTestUserWithArrayFactory extends Factory
         ];
     }
 }
-
 
 enum Name: string
 {
