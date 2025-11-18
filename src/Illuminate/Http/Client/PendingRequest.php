@@ -884,9 +884,9 @@ class PendingRequest
     /**
      * Send a pool of asynchronous requests concurrently.
      *
-     * @param  callable  $callback
+     * @param  (callable(\Illuminate\Http\Client\Pool): mixed)  $callback
      * @param  int|null  $concurrency
-     * @return array<array-key, \Illuminate\Http\Client\Response>
+     * @return array<array-key, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\ConnectionException|\Illuminate\Http\Client\RequestException>
      */
     public function pool(callable $callback, ?int $concurrency = null)
     {
