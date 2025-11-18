@@ -2,7 +2,7 @@
 
 namespace Illuminate\Contracts\Support;
 
-interface Responsable
+interface Responsible
 {
     /**
      * Create an HTTP response that represents the object.
