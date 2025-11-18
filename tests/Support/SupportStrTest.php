@@ -183,6 +183,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
         $this->assertFalse(Str::startsWith(null, 'Marc'));
+        $this->assertTrue(Str::startsWith('Jason', 'jason', true));
+        $this->assertTrue(Str::startsWith('JASON', 'jason', true));
+        $this->assertFalse(Str::startsWith('Jason', 'day', true));
         // Test for multibyte string support
         $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
@@ -191,6 +194,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('你好', '你'));
         $this->assertFalse(Str::startsWith('你好', '好'));
         $this->assertFalse(Str::startsWith('你好', 'a'));
+        $this->assertTrue(Str::startsWith('Malmö', 'malmö', true));
+        $this->assertTrue(Str::startsWith('Jönköping', 'jönköping', true));
+        $this->assertFalse(Str::startsWith('Jönköping', 'jonkoping', true));
+        $this->assertTrue(Str::startsWith('你好', '你', true));
+        $this->assertFalse(Str::startsWith('你好', '好', true));
     }
 
     public function testDoesntStartWith()
@@ -218,6 +226,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::doesntStartWith(7.123, '7.12'));
         $this->assertTrue(Str::doesntStartWith(7.123, '7.13'));
         $this->assertTrue(Str::doesntStartWith(null, 'Marc'));
+        $this->assertFalse(Str::doesntStartWith('Jason', 'jason', true));
+        $this->assertFalse(Str::doesntStartWith('JASON', 'jason', true));
+        $this->assertTrue(Str::doesntStartWith('Jason', 'day', true));
         // Test for multibyte string support
         $this->assertFalse(Str::doesntStartWith('Jönköping', 'Jö'));
         $this->assertFalse(Str::doesntStartWith('Malmö', 'Malmö'));
@@ -226,6 +237,11 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::doesntStartWith('你好', '你'));
         $this->assertTrue(Str::doesntStartWith('你好', '好'));
         $this->assertTrue(Str::doesntStartWith('你好', 'a'));
+        $this->assertFalse(Str::doesntStartWith('Malmö', 'malmö', true));
+        $this->assertFalse(Str::doesntStartWith('Jönköping', 'jönköping', true));
+        $this->assertTrue(Str::doesntStartWith('Jönköping', 'jonkoping', true));
+        $this->assertFalse(Str::doesntStartWith('你好', '你', true));
+        $this->assertTrue(Str::doesntStartWith('你好', '好', true));
     }
 
     public function testEndsWith()
@@ -251,6 +267,9 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
         $this->assertFalse(Str::endsWith(null, 'Marc'));
+        $this->assertTrue(Str::endsWith('Jason', 'jason', true));
+        $this->assertTrue(Str::endsWith('JASON', 'jason', true));
+        $this->assertFalse(Str::endsWith('Jason', 'no', true));
         // Test for multibyte string support
         $this->assertTrue(Str::endsWith('Jönköping', 'öping'));
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
@@ -259,6 +278,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith('你好', '好'));
         $this->assertFalse(Str::endsWith('你好', '你'));
         $this->assertFalse(Str::endsWith('你好', 'a'));
+        $this->assertTrue(Str::endsWith('Malmö', 'MÖ', true));
+        $this->assertTrue(Str::endsWith('Jönköping', 'ÖPING', true));
+        $this->assertFalse(Str::endsWith('Jönköping', 'OPING', true));
+        $this->assertTrue(Str::endsWith('你好', '好', true));
+        $this->assertFalse(Str::endsWith('你好', '你', true));
     }
 
     public function testDoesntEndWith()
@@ -284,6 +308,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::doesntEndWith(0.27, '0.27'));
         $this->assertTrue(Str::doesntEndWith(0.27, '8'));
         $this->assertTrue(Str::doesntEndWith(null, 'Marc'));
+        $this->assertFalse(Str::doesntEndWith('Jason', 'jason', true));
+        $this->assertFalse(Str::doesntEndWith('JASON', 'jason', true));
+        $this->assertTrue(Str::doesntEndWith('Jason', 'no', true));
         // Test for multibyte string support
         $this->assertFalse(Str::doesntEndWith('Jönköping', 'öping'));
         $this->assertFalse(Str::doesntEndWith('Malmö', 'mö'));
@@ -292,6 +319,9 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::doesntEndWith('你好', '好'));
         $this->assertTrue(Str::doesntEndWith('你好', '你'));
         $this->assertTrue(Str::doesntEndWith('你好', 'a'));
+        $this->assertFalse(Str::doesntEndWith('Malmö', 'MÖ', true));
+        $this->assertFalse(Str::doesntEndWith('Jönköping', 'ÖPING', true));
+        $this->assertTrue(Str::doesntEndWith('Jönköping', 'OPING', true));
     }
 
     public function testStrExcerpt()

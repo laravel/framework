@@ -391,12 +391,17 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function endsWith($haystack, $needles)
+    public static function endsWith($haystack, $needles, $ignoreCase = false)
     {
         if (is_null($haystack)) {
             return false;
+        }
+
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
         }
 
         if (! is_iterable($needles)) {
@@ -404,6 +409,10 @@ class Str
         }
 
         foreach ($needles as $needle) {
+            if ($ignoreCase) {
+                $needle = mb_strtolower($needle);
+            }
+
             if ((string) $needle !== '' && str_ends_with($haystack, $needle)) {
                 return true;
             }
@@ -417,11 +426,12 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function doesntEndWith($haystack, $needles)
+    public static function doesntEndWith($haystack, $needles, $ignoreCase = false)
     {
-        return ! static::endsWith($haystack, $needles);
+        return ! static::endsWith($haystack, $needles, $ignoreCase);
     }
 
     /**
@@ -1639,12 +1649,17 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function startsWith($haystack, $needles)
+    public static function startsWith($haystack, $needles, $ignoreCase = false)
     {
         if (is_null($haystack)) {
             return false;
+        }
+
+        if ($ignoreCase) {
+            $haystack = mb_strtolower($haystack);
         }
 
         if (! is_iterable($needles)) {
@@ -1652,6 +1667,10 @@ class Str
         }
 
         foreach ($needles as $needle) {
+            if ($ignoreCase) {
+                $needle = mb_strtolower($needle);
+            }
+
             if ((string) $needle !== '' && str_starts_with($haystack, $needle)) {
                 return true;
             }
@@ -1665,11 +1684,12 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|iterable<string>  $needles
+     * @param  bool  $ignoreCase
      * @return bool
      */
-    public static function doesntStartWith($haystack, $needles)
+    public static function doesntStartWith($haystack, $needles, $ignoreCase = false)
     {
-        return ! static::startsWith($haystack, $needles);
+        return ! static::startsWith($haystack, $needles, $ignoreCase);
     }
 
     /**
