@@ -104,4 +104,16 @@ class EventTest extends TestCase
 
         $this->assertSame('fancy-command-description', $event->mutexName());
     }
+
+    public function testDaysOfMonthMethod()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->daysOfMonth(1, 15);
+        $this->assertSame('0 0 1,15 * *', $event->getExpression());
+
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->daysOfMonth([1, 10, 20, 30]);
+        $this->assertSame('0 0 1,10,20,30 * *', $event->getExpression());
+    }
 }
