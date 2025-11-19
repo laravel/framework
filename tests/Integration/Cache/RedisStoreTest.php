@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
@@ -23,12 +22,6 @@ class RedisStoreTest extends TestCase
     {
         $this->afterApplicationCreated(function () {
             $this->setUpRedis();
-
-            $connection = $this->app['redis']->connection();
-            $this->markTestSkippedWhen(
-                $connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection,
-                'RedisStore currently does not support tags, many and some other on Redis Cluster cluster connections',
-            );
         });
 
         $this->beforeApplicationDestroyed(function () {
@@ -103,6 +96,8 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeAccessed()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
@@ -119,6 +114,8 @@ class RedisStoreTest extends TestCase
 
     public function testTagEntriesCanBeStoredForever()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->forever('name', 'Sally');
@@ -151,6 +148,8 @@ class RedisStoreTest extends TestCase
 
     public function testIncrementedTagEntriesProperlyTurnStale()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->add('person-1', 0, $seconds = 1);
@@ -167,6 +166,8 @@ class RedisStoreTest extends TestCase
 
     public function testPastTtlTagEntriesAreNotAdded()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->add('person-1', 0, new DateTime('yesterday'));
@@ -180,6 +181,8 @@ class RedisStoreTest extends TestCase
 
     public function testPutPastTtlTagEntriesProperlyTurnStale()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->put('person-1', 0, new DateTime('yesterday'));
@@ -191,6 +194,8 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeFlushedBySingleKey()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('person-1', 'Sally', 5);
@@ -207,6 +212,8 @@ class RedisStoreTest extends TestCase
 
     public function testStaleEntriesCanBeFlushed()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('person-1', 'Sally', 1);
@@ -225,6 +232,8 @@ class RedisStoreTest extends TestCase
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         $store = Cache::store('redis');
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
@@ -277,6 +286,8 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeFlushedWithLargeNumberOfKeys()
     {
+        $this->markTestSkippedWithPredisClusterConnection();
+
         Cache::store('redis')->clear();
 
         $tags = ['large-test-'.time()];
@@ -297,5 +308,13 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
+    }
+
+    protected function markTestSkippedWithPredisClusterConnection()
+    {
+        $this->markTestSkippedWhen(
+            $this->app['redis']->connection() instanceof PredisClusterConnection,
+            'This test currently fails on Predis Cluster connection',
+        );
     }
 }
