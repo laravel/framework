@@ -390,7 +390,7 @@ class ValidationFileRuleTest extends TestCase
     public function testEncodingWithInvalidParameter()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Validation rule encoding parameter "FOOBAR" is not a valid encoding.');
+        $this->expectExceptionMessage('Validation rule encoding parameter [FOOBAR] is not a valid encoding.');
 
         // Invalid encoding.
         $this->fails(
