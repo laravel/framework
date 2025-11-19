@@ -93,7 +93,7 @@ class RedisStore extends TaggableStore implements LockProvider
 
         $connection = $this->connection();
 
-        // PredisClusterConnection do not support reading multiple values if the keys hash differently...
+        // PredisClusterConnection does not support reading multiple values if the keys hash differently...
         if ($connection instanceof PredisClusterConnection) {
             return $this->manyAlias($keys);
         }
