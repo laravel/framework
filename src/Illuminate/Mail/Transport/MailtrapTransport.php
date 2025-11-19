@@ -52,6 +52,16 @@ class MailtrapTransport extends AbstractTransport
         }
     }
 
+    /**
+     * Determine the attachments for the email.
+     *
+     * @return list<array{
+     *     content_type: string,
+     *     content: string,
+     *     filename: string|null,
+     *     content_id?: string
+     * }>
+     */
     protected function determineAttachments(Email $email): array
     {
         $attachments = [];
@@ -75,6 +85,7 @@ class MailtrapTransport extends AbstractTransport
                     'filename' => $filename,
                 ];
 
+                // TODO Is this needed?
                 if ($disposition === 'inline') {
                     $item['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
                 }
@@ -86,6 +97,11 @@ class MailtrapTransport extends AbstractTransport
         return $attachments;
     }
 
+    /**
+     * Determine the headers for the email.
+     *
+     * @return array<string, string>
+     */
     protected function determineHeaders(Email $email): array
     {
         $headers = [];
@@ -103,6 +119,9 @@ class MailtrapTransport extends AbstractTransport
         return $headers;
     }
 
+    /**
+     * Build the Mailtrap email instance which will be sent.
+     */
     protected function prepareMailtrapEmail(Email $email, Envelope $envelope): MailtrapEmail
     {
         $mailtrapEmail = (new MailtrapEmail)
