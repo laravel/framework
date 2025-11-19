@@ -357,6 +357,20 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testEncoding()
+    {
+        $this->fails(
+            File::default()->encoding('UTF-8'),
+            UploadedFile::fake()->createWithContent('utf8.txt', "\xf0\x28\x8c\x28"), // Invalid 4 byte UTF-8 sequence.
+            ['validation.encoding'],
+        );
+
+        $this->passes(
+            File::default()->encoding('UTF-8'),
+            UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
+        );
+    }
+
     public function testMacro()
     {
         File::macro('toDocument', function () {
