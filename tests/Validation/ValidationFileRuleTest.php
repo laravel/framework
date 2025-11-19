@@ -361,20 +361,20 @@ class ValidationFileRuleTest extends TestCase
     {
         // ASCII file containing UTF-8.
         $this->fails(
-            File::default()->encoding('ASCII'),
+            File::default()->encoding('ascii'),
             UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
             ['validation.encoding'],
         );
 
         // UTF-8 file containing invalid UTF-8 byte sequence.
         $this->fails(
-            File::default()->encoding('UTF-8'),
+            File::default()->encoding('utf-8'),
             UploadedFile::fake()->createWithContent('utf8.txt', "\xf0\x28\x8c\x28"),
             ['validation.encoding'],
         );
 
         $this->passes(
-            File::default()->encoding('UTF-8'),
+            File::default()->encoding('utf-8'),
             UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
         );
     }
