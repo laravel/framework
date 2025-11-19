@@ -377,6 +377,14 @@ class ValidationFileRuleTest extends TestCase
             File::default()->encoding('utf-8'),
             UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
         );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            [
+                UploadedFile::fake()->createWithContent('utf8-1.txt', '✌️'),
+                UploadedFile::fake()->createWithContent('utf8-2.txt', '👍'),
+            ]
+        );
     }
 
     public function testEncodingWithInvalidParameter()
