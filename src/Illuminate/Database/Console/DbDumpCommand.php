@@ -7,10 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\DatabaseDumped;
-use Illuminate\Database\Events\MigrationsPruned;
-use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:dump')]
@@ -51,7 +48,7 @@ class DbDumpCommand extends Command
 
         $info = 'Database dumped';
 
-        $this->components->info($info.' successfully to ' . $path);
+        $this->components->info($info.' successfully to '.$path);
     }
 
     /**
@@ -76,7 +73,7 @@ class DbDumpCommand extends Command
      */
     protected function path(Connection $connection)
     {
-        return tap($this->option('path') ?: storage_path($connection->getName() . '-' . date("Ymdhis").'.sql'), function ($path) {
+        return tap($this->option('path') ?: storage_path($connection->getName().'-'.date("Ymdhis").'.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
     }

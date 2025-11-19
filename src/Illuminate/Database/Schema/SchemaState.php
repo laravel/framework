@@ -146,7 +146,7 @@ abstract class SchemaState
     /**
      * Indicate that the dumper should include data.
      *
-     * @param bool $data
+     * @param  bool  $data
      * @return $this
      */
     public function withData(bool $data = true)

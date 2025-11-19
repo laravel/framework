@@ -27,7 +27,7 @@ class SqliteSchemaState extends SchemaState
                 //
             ]));
 
-        if (!$this->hasData()) {
+        if (! $this->hasData()) {
             $migrations = preg_replace('/CREATE TABLE sqlite_.+?\);[\r\n]+/is', '', $process->getOutput());
 
             $this->files->put($path, $migrations.PHP_EOL);

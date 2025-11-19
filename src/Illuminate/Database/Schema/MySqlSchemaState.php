@@ -29,7 +29,7 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_PATH' => $path,
         ]));
 
-        if (!$this->hasData()) {
+        if (! $this->hasData()) {
             $this->removeAutoIncrementingState($path);
 
             if ($this->hasMigrationTable()) {

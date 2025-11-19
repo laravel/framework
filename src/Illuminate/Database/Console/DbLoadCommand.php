@@ -9,9 +9,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\DatabaseLoaded;
-use Illuminate\Database\Events\MigrationsPruned;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'db:load')]
@@ -67,7 +64,7 @@ class DbLoadCommand extends Command
 
         $info = 'Database loaded';
 
-        $this->components->info($info.' successfully in database ' . $database);
+        $this->components->info($info.' successfully in database '.$database);
     }
 
     /**
