@@ -5,11 +5,11 @@ namespace Illuminate\Session;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 use SessionHandlerInterface;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerInterface
 {
@@ -155,7 +155,7 @@ class DatabaseSessionHandler implements ExistenceAwareInterface, SessionHandlerI
     {
         try {
             return $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
-        } catch (QueryException) {
+        } catch (UniqueConstraintViolationException) {
             $this->performUpdate($sessionId, $payload);
         }
     }
