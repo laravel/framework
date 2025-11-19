@@ -46,9 +46,9 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $maximumFileSize = null;
 
     /**
-     * The encoding that the file must be.
+     * The required file encoding.
      *
-     * @var null|string
+     * @var string|null
      */
     protected $encoding = null;
 
