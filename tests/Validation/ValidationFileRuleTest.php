@@ -359,7 +359,7 @@ class ValidationFileRuleTest extends TestCase
 
     public function testEncoding()
     {
-        // ACSII file containing UTF-8.
+        // ASCII file containing UTF-8.
         $this->fails(
             File::default()->encoding('ASCII'),
             UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
