@@ -6,9 +6,11 @@ use ArrayAccess;
 use ArrayIterator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Toonable;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\InteractsWithData;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\ToonCast;
 use IteratorAggregate;
 use JsonSerializable;
 use Traversable;
@@ -20,11 +22,14 @@ use Traversable;
  * @implements \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @implements \ArrayAccess<TKey, TValue>
  */
-class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable
+class Fluent implements Arrayable, ArrayAccess, IteratorAggregate, Jsonable, JsonSerializable, Toonable
 {
-    use Conditionable, InteractsWithData, Macroable {
-        __call as macroCall;
-    }
+    use Conditionable,
+        InteractsWithData,
+        ToonCast,
+        Macroable {
+            __call as macroCall;
+        }
 
     /**
      * All of the attributes set on the fluent instance.

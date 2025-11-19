@@ -6,6 +6,7 @@ use CachingIterator;
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Toonable;
 use IteratorAggregate;
 use JsonSerializable;
 use Traversable;
@@ -18,7 +19,7 @@ use Traversable;
  * @extends \Illuminate\Contracts\Support\Arrayable<TKey, TValue>
  * @extends \IteratorAggregate<TKey, TValue>
  */
-interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
+interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable, Toonable
 {
     /**
      * Create a new collection instance if the value isn't one already.
@@ -1277,6 +1278,13 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
      * @return string
      */
     public function toPrettyJson(int $options = 0);
+
+    /**
+     * Convert the object to its TOON representation.
+     *
+     * @return string
+     */
+    public function toToon(): string;
 
     /**
      * Get a CachingIterator instance.

@@ -667,6 +667,16 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testToToon($collection): void
+    {
+        $c = new $collection(['name' => 'Taylor', 'age' => 30]);
+        $result = $c->toToon();
+
+        $this->assertStringContainsString('name: Taylor', $result);
+        $this->assertStringContainsString('age: 30', $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testCastingToStringJsonEncodesTheToArrayResult($collection)
     {
         $c = $this->getMockBuilder($collection)->onlyMethods(['jsonSerialize'])->getMock();

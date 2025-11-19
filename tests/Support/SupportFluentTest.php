@@ -145,6 +145,15 @@ class SupportFluentTest extends TestCase
         $this->assertStringContainsString('    ', $results);
     }
 
+    public function testToToon(): void
+    {
+        $fluent = new Fluent(['name' => 'Taylor', 'age' => 30]);
+        $result = $fluent->toToon();
+
+        $this->assertStringContainsString('name: Taylor', $result);
+        $this->assertStringContainsString('age: 30', $result);
+    }
+
     public function testScope()
     {
         $fluent = new Fluent(['user' => ['name' => 'taylor']]);

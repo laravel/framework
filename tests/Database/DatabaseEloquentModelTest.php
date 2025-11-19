@@ -3481,6 +3481,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertStringContainsString('"number": 123', $results);
     }
 
+    public function testModelToToon(): void
+    {
+        $user = new EloquentModelStub(['name' => 'Mateus', 'active' => true]);
+        $result = $user->toToon();
+
+        $this->assertStringContainsString('name: Mateus', $result);
+        $this->assertStringContainsString('active: true', $result);
+    }
+
     public function testFillableWithMutators()
     {
         $model = new EloquentModelWithMutators;

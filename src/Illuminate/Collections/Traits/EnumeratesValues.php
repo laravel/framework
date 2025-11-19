@@ -56,7 +56,8 @@ use function Illuminate\Support\enum_value;
  */
 trait EnumeratesValues
 {
-    use Conditionable;
+    use Conditionable,
+        ToonCast;
 
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
