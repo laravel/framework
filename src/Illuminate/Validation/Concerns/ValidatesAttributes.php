@@ -1190,6 +1190,20 @@ trait ValidatesAttributes
         return $extra;
     }
 
+    public function validateEncoding($attribute, $value, $parameters)
+    {
+        if (! $this->isValidFileInstance($value)) {
+            return false;
+        }
+
+        try {
+            return @mb_check_encoding($value->getContent(), $parameters[0]);
+        } catch (ValueError) {
+            // An invalid encoding was given.
+            return false;
+        }
+    }
+
     /**
      * Validate the extension of a file upload attribute is in a set of defined extensions.
      *

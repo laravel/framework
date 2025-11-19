@@ -196,6 +196,7 @@ class Validator implements ValidatorContract
         'Mimetypes',
         'Min',
         'Size',
+        'Encoding',
     ];
 
     /**
