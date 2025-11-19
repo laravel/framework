@@ -44,7 +44,7 @@ class DbDumpCommand extends Command
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
         $this->schemaState($connection)->dump(
-            $connection, $path = $this->path($connection), true
+            $connection, $path = $this->path($connection)
         );
 
         $dispatcher->dispatch(new DatabaseDumped($connection, $path));
@@ -63,6 +63,7 @@ class DbDumpCommand extends Command
     protected function schemaState(Connection $connection)
     {
         return $connection->getSchemaState()
+            ->withData()
             ->handleOutputUsing(function ($type, $buffer) {
                 $this->output->write($buffer);
             });

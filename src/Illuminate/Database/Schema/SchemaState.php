@@ -30,6 +30,13 @@ abstract class SchemaState
     protected $migrationTable = 'migrations';
 
     /**
+     * Indicates if the dumper should include data.
+     *
+     * @var bool
+     */
+    protected $data = false;
+
+    /**
      * The process factory callback.
      *
      * @var callable
@@ -122,6 +129,29 @@ abstract class SchemaState
     public function withMigrationTable(string $table)
     {
         $this->migrationTable = $table;
+
+        return $this;
+    }
+
+    /**
+     * Check if the dumper should include data.
+     *
+     * @return bool
+     */
+    public function hasData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Indicate that the dumper should include data.
+     *
+     * @param bool $data
+     * @return $this
+     */
+    public function withData(bool $data = true)
+    {
+        $this->data = $data;
 
         return $this;
     }
