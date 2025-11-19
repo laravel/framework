@@ -1190,6 +1190,14 @@ trait ValidatesAttributes
         return $extra;
     }
 
+    /**
+     * Validate the encoding of an attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
     public function validateEncoding($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'encoding');
