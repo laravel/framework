@@ -35,6 +35,8 @@ class SqliteSchemaState extends SchemaState
             if ($this->hasMigrationTable()) {
                 $this->appendMigrationData($path);
             }
+        } else {
+            $this->files->put($path, $process->getOutput());
         }
     }
 

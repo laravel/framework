@@ -3,12 +3,13 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
-use Illuminate\Database\Events\DatabaseDumped;
+use Illuminate\Database\Events\DatabaseLoaded;
 use Illuminate\Database\Events\MigrationsPruned;
-use Illuminate\Database\Events\SchemaDumped;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -16,14 +17,17 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'db:load')]
 class DbLoadCommand extends Command
 {
+    use ConfirmableTrait, Prohibitable;
+
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'db:load
+    protected $signature = 'db:load {path}
                 {--database= : The database connection to use}
-                {--path= : The path where the schema dump file is stored}';
+                {--force : Force the operation to run when in production}
+                {--drop : Drop the database before loading the dump}';
 
     /**
      * The console command description.
@@ -41,12 +45,25 @@ class DbLoadCommand extends Command
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
+        if ($this->isProhibited() ||
+            ! $this->confirmToProceed()) {
+            return Command::FAILURE;
+        }
+
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
-        $path = $this->input->getOption('path') ?: $this->ask('Path to the schema dump file');
+        $path = $this->argument('path');
+
+        if ($this->input->getOption('drop')) {
+            $this->call('db:wipe', array_filter([
+                '--database' => $database,
+                '--force' => true,
+            ]));
+        }
+
         $this->schemaState($connection)->load($path);
 
-        $dispatcher->dispatch(new DatabaseDumped($connection, $path));
+        $dispatcher->dispatch(new DatabaseLoaded($connection, $path));
 
         $info = 'Database loaded';
 
