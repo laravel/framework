@@ -1194,12 +1194,11 @@ trait ValidatesAttributes
     {
         $this->requireParameterCount(1, $parameters, 'encoding');
 
-        try {
-            return @mb_check_encoding($value instanceof File ? $value->getContent() : $value, $parameters[0]);
-        } catch (ValueError) {
-            // An invalid encoding was given.
-            return false;
+        if (! in_array(mb_strtolower($parameters[0]), array_map(mb_strtolower(...), mb_list_encodings()))) {
+            throw new InvalidArgumentException("Validation rule encoding parameter \"{$parameters[0]}\" is not a valid encoding.");
         }
+
+        return @mb_check_encoding($value instanceof File ? $value->getContent() : $value, $parameters[0]);
     }
 
     /**
