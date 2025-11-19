@@ -1192,12 +1192,10 @@ trait ValidatesAttributes
 
     public function validateEncoding($attribute, $value, $parameters)
     {
-        if (! $this->isValidFileInstance($value)) {
-            return false;
-        }
+        $this->requireParameterCount(1, $parameters, 'encoding');
 
         try {
-            return @mb_check_encoding($value->getContent(), $parameters[0]);
+            return @mb_check_encoding($value instanceof File ? $value->getContent() : $value, $parameters[0]);
         } catch (ValueError) {
             // An invalid encoding was given.
             return false;
