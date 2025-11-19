@@ -215,7 +215,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Indicate that the uploaded file should be in the given encoding.
      *
-     * @param string $encoding
+     * @param  string  $encoding
      * @return $this
      */
     public function encoding($encoding)
