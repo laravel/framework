@@ -46,6 +46,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $maximumFileSize = null;
 
     /**
+     * The required file encoding.
+     *
+     * @var string|null
+     */
+    protected $encoding = null;
+
+    /**
      * An array of custom rules that will be merged into the validation rules.
      *
      * @var array
@@ -206,6 +213,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Indicate that the uploaded file should be in the given encoding.
+     *
+     * @param  string  $encoding
+     * @return $this
+     */
+    public function encoding($encoding)
+    {
+        $this->encoding = $encoding;
+
+        return $this;
+    }
+
+    /**
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
@@ -290,6 +310,10 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             $this->minimumFileSize !== $this->maximumFileSize => "between:{$this->minimumFileSize},{$this->maximumFileSize}",
             default => "size:{$this->minimumFileSize}",
         };
+
+        if ($this->encoding) {
+            $rules[] = 'encoding:'.$this->encoding;
+        }
 
         return array_merge(array_filter($rules), $this->customRules);
     }

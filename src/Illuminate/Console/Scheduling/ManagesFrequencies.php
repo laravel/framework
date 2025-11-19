@@ -569,6 +569,21 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run on specific days of the month.
+     *
+     * @param  array<int<1, 31>>|int<1, 31>  ...$days
+     * @return $this
+     */
+    public function daysOfMonth(...$days)
+    {
+        $days = count($days) === 1 && is_array($days[0]) ? $days[0] : $days;
+
+        $this->dailyAt('0:0');
+
+        return $this->spliceIntoPosition(3, implode(',', $days));
+    }
+
+    /**
      * Schedule the event to run quarterly.
      *
      * @return $this
