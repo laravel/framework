@@ -13,8 +13,6 @@ use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -33,14 +31,9 @@ class MemoizedStoreTest extends TestCase
 
         $this->setUpRedis();
 
-        $connection = $this->app['redis']->connection();
-        $this->markTestSkippedWhen(
-            $connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection,
-            'flushAll and many currently not supported for Redis Cluster connections',
-        );
-
         Config::set('cache.default', 'redis');
-        Redis::flushAll();
+        Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+        Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
     }
 
     protected function tearDown(): void
