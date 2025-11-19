@@ -362,27 +362,27 @@ class ValidationFileRuleTest extends TestCase
         // ASCII file containing UTF-8.
         $this->fails(
             File::default()->encoding('ascii'),
-            UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
             ['validation.encoding'],
         );
 
         // UTF-8 file containing invalid UTF-8 byte sequence.
         $this->fails(
             File::default()->encoding('utf-8'),
-            UploadedFile::fake()->createWithContent('utf8.txt', "\xf0\x28\x8c\x28"),
+            UploadedFile::fake()->createWithContent('foo.txt', "\xf0\x28\x8c\x28"),
             ['validation.encoding'],
         );
 
         $this->passes(
             File::default()->encoding('utf-8'),
-            UploadedFile::fake()->createWithContent('utf8.txt', '✌️'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
         );
 
         $this->passes(
             File::default()->encoding('utf-8'),
             [
-                UploadedFile::fake()->createWithContent('utf8-1.txt', '✌️'),
-                UploadedFile::fake()->createWithContent('utf8-2.txt', '👍'),
+                UploadedFile::fake()->createWithContent('foo-1.txt', '✌️'),
+                UploadedFile::fake()->createWithContent('foo-2.txt', '👍'),
             ]
         );
     }
@@ -395,7 +395,7 @@ class ValidationFileRuleTest extends TestCase
         // Invalid encoding.
         $this->fails(
             File::default()->encoding('FOOBAR'),
-            UploadedFile::fake()->createWithContent('utf8.txt', ''),
+            UploadedFile::fake()->createWithContent('foo.txt', ''),
             ['validation.encoding'],
         );
     }
