@@ -187,7 +187,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['first', 'second'], $values);
 
         // Test dividing an array with null key
-        [$keys, $values] = Arr::divide([null => 'Null', 1 => 'one']);
+        [$keys, $values] = Arr::divide(['' => 'Null', 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals(['Null', 'one'], $values);
 
@@ -197,7 +197,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
 
         // Test dividing an array where the values are arrays
-        [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
+        [$keys, $values] = Arr::divide(['' => ['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
     }
@@ -1044,8 +1044,8 @@ class SupportArrTest extends TestCase
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
 
-        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
-        $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, '');
+        $this->assertEquals(['' => 0, 'one' => 1, 'two' => 2], $array);
 
         $array = Arr::prepend(['one', 'two'], null, '');
         $this->assertEquals(['' => null, 'one', 'two'], $array);
@@ -1547,9 +1547,9 @@ class SupportArrTest extends TestCase
         Arr::forget($array, 'products.desk.final.taxes');
         $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
 
-        $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
+        $array = ['products' => ['desk' => ['price' => 50], '' => 'something']];
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
-        $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+        $this->assertEquals(['products' => ['desk' => [], '' => 'something']], $array);
 
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];
