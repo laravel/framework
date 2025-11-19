@@ -73,7 +73,7 @@ class DbDumpCommand extends Command
      */
     protected function path(Connection $connection)
     {
-        return tap($this->option('path') ?: storage_path($connection->getName().'-'.date("Ymdhis").'.sql'), function ($path) {
+        return tap($this->option('path') ?: storage_path($connection->getName().'-'.date('Ymdhis').'.sql'), function ($path) {
             (new Filesystem)->ensureDirectoryExists(dirname($path));
         });
     }

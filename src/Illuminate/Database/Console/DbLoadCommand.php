@@ -64,7 +64,7 @@ class DbLoadCommand extends Command
 
         $info = 'Database loaded';
 
-        $this->components->info($info.' successfully in database '.$database);
+        $this->components->info($info.' successfully in database '.$connection->getDatabaseName());
     }
 
     /**
