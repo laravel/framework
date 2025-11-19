@@ -28,6 +28,17 @@ class SendingQueuedMailTest extends TestCase
             return $job->middleware[0] instanceof RateLimited;
         });
     }
+
+    public function testMailIsSentWhenDefaultingQueue()
+    {
+        Queue::fake();
+
+        Queue::defaultQueue(Mailable::class, 'mail-queue');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedMailTestMail);
+
+        Queue::assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
 }
 
 class SendingQueuedMailTestMail extends Mailable

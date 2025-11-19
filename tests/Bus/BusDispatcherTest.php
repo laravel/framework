@@ -23,6 +23,9 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
+        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $queueDefaults->shouldReceive('get')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
@@ -36,6 +39,9 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
+        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $queueDefaults->shouldReceive('get')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
@@ -49,6 +55,9 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
+        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $queueDefaults->shouldReceive('get')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('later')->once()->with(10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
@@ -57,6 +66,22 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
+    }
+
+    public function testCommandsAreDispatchedWithDefaultQueue()
+    {
+        $container = new Container;
+        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $queueDefaults->shouldReceive('get')->andReturn('high-priority');
+
+        $mock = m::mock(Queue::class);
+        $mock->shouldReceive('push')->once()->with(BusDispatcherQueueable::class, '', 'high-priority');
+
+        $dispatcher = new Dispatcher($container, function () use ($mock) {
+            return $mock;
+        });
+
+        $dispatcher->dispatch(new BusDispatcherQueueable);
     }
 
     public function testDispatchNowShouldNeverQueue()
@@ -99,6 +124,9 @@ class BusDispatcherTest extends TestCase
                 ],
             ]);
         });
+        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $queueDefaults->shouldReceive('get')->andReturn(null);
+        Container::setInstance($container);
 
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -145,6 +173,11 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 {
     public $queue = 'foo';
     public $delay = 10;
+}
+
+class BusDispatcherQueueable implements ShouldQueue
+{
+    use Queueable;
 }
 
 class StandAloneCommand

@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Queue\Concerns\HasDefaultQueues;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +13,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use HasDefaultQueues;
+
     /**
      * The application instance.
      *
@@ -118,6 +121,16 @@ class QueueManager implements FactoryContract, MonitorContract
     public function stopping($callback)
     {
         $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+    }
+
+    /**
+     * Get the queue defaults instance.
+     *
+     * @return \Illuminate\Queue\QueueDefaults
+     */
+    protected function getQueueDefaults()
+    {
+        return $this->app['queue.defaults'];
     }
 
     /**
