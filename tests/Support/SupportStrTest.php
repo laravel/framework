@@ -1392,6 +1392,40 @@ class SupportStrTest extends TestCase
         $this->assertEquals('❤Multi<br />Byte☆❤☆❤☆❤', Str::wordWrap('❤Multi Byte☆❤☆❤☆❤', 3, '<br />'));
     }
 
+    public function testLines()
+    {
+        $text = "line1\nline2\nline3";
+        $textWithEmpty = "line1\n\nline2\n\nline3";
+        $textWithWhitespace = "line1\n \nline2\n \nline3";
+        $textWindows = "line1\r\nline2\r\nline3";
+        $textWindowsWithEmpty = "line1\r\n\r\nline2\r\n\r\nline3";
+
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($text));
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($text, false));
+
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($textWithEmpty));
+        $this->assertEquals(['line1', '', 'line2', '', 'line3'], Str::lines($textWithEmpty, false));
+
+        $this->assertEquals(['line1', ' ', 'line2', ' ', 'line3'], Str::lines($textWithWhitespace));
+        $this->assertEquals(['line1', ' ', 'line2', ' ', 'line3'], Str::lines($textWithWhitespace, false));
+
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($textWindows));
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($textWindows, false));
+
+        $this->assertEquals(['line1', 'line2', 'line3'], Str::lines($textWindowsWithEmpty));
+        $this->assertEquals(['line1', '', 'line2', '', 'line3'], Str::lines($textWindowsWithEmpty, false));
+
+
+        $this->assertEquals([], Str::lines(''));
+
+        $this->assertEquals(['line1'], Str::lines('line1'));
+
+        $this->assertEquals(['', '', ''], Str::lines("\n\n", false));
+
+        $this->assertEquals(['emoji😀', 'test🎉'], Str::lines("emoji😀\ntest🎉"));
+
+    }
+
     public static function validUuidList()
     {
         return [

@@ -1881,6 +1881,26 @@ class Str
     }
 
     /**
+     * Split a string into lines
+     *
+     * @param string $string
+     * @param bool $skipEmpty
+     * @return array<int, string>
+     */
+    public static function lines($string, $skipEmpty = true)
+    {
+        if ($string === '') {
+            return [];
+        }
+
+        $lines = preg_split('/\r\n|\r|\n/', $string);
+
+        return $skipEmpty
+            ? array_values(array_filter($lines, fn($line) => $line !== ''))
+            : $lines;
+    }
+
+    /**
      * Generate a UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface
