@@ -335,6 +335,7 @@ class MailManager implements FactoryContract
             MailtrapClient::initSendingEmails(
                 $config['key'],
                 $config['is_bulk'],
+                $config['is_sandbox'],
                 $config['inbox_id'],
             ),
         );
