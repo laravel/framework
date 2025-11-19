@@ -75,8 +75,6 @@ class MailtrapTransport extends AbstractTransport
         }
 
         try {
-            // TODO Add headers.
-            // TODO Add attachments.
             $email = (new MailtrapEmail)
                 ->from($envelope->getSender())
                 ->to(...$this->getRecipients($email, $envelope))
@@ -87,11 +85,22 @@ class MailtrapTransport extends AbstractTransport
                 ->html($email->getHtmlBody())
                 ->text($email->getTextBody());
 
-            $this->mailtrap->send($email);
+            foreach ($headers as $headerName => $headerBody) {
+                $email->getHeaders()->addTextHeader($headerName, $headerBody);
+            }
 
-            // TODO Update this exception to be correct
+            foreach ($attachments as $attachment) {
+                $email->attach(
+                    $attachment['content'],
+                    $attachment['filename'],
+                    $attachment['content_type'],
+                );
+            }
+
+            $result = $this->mailtrap->send($email);
+
             throw_if(
-                isset($result['statusCode']) && $result['statusCode'] != Response::HTTP_OK,
+                $result->getStatusCode() !== Response::HTTP_OK,
                 Exception::class,
                 $result['message'],
             );
