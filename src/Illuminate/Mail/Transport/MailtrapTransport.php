@@ -33,18 +33,27 @@ class MailtrapTransport extends AbstractTransport
 
         $envelope = $message->getEnvelope();
 
-        $headers = [];
+        $mailtrapEmail = $this->prepareMailtrapEmail($email, $envelope);
 
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type'];
+        try {
+            $result = $this->mailtrap->send($mailtrapEmail);
 
-        foreach ($email->getHeaders()->all() as $name => $header) {
-            if (in_array($name, $headersToBypass, true)) {
-                continue;
-            }
-
-            $headers[$header->getName()] = $header->getBodyAsString();
+            throw_if(
+                $result->getStatusCode() !== Response::HTTP_OK,
+                Exception::class,
+                $result['message'],
+            );
+        } catch (Exception $exception) {
+            throw new TransportException(
+                sprintf('Request to Mailtrap API failed. Reason: %s.', $exception->getMessage()),
+                is_int($exception->getCode()) ? $exception->getCode() : 0,
+                $exception
+            );
         }
+    }
 
+    protected function determineAttachments(Email $email): array
+    {
         $attachments = [];
 
         if ($email->getAttachments()) {
@@ -54,7 +63,7 @@ class MailtrapTransport extends AbstractTransport
                 $disposition = $attachmentHeaders->getHeaderBody('Content-Disposition');
                 $filename = $attachmentHeaders->getHeaderParameter('Content-Disposition', 'filename');
 
-                if ($contentType == 'text/calendar') {
+                if ($contentType === 'text/calendar') {
                     $content = $attachment->getBody();
                 } else {
                     $content = str_replace("\r\n", '', $attachment->bodyToString());
@@ -74,43 +83,51 @@ class MailtrapTransport extends AbstractTransport
             }
         }
 
-        try {
-            $email = (new MailtrapEmail)
-                ->from($envelope->getSender())
-                ->to(...$this->getRecipients($email, $envelope))
-                ->cc(...$email->getCc())
-                ->bcc(...$email->getBcc())
-                ->replyTo(...$email->getReplyTo())
-                ->subject($email->getSubject())
-                ->html($email->getHtmlBody())
-                ->text($email->getTextBody());
+        return $attachments;
+    }
 
-            foreach ($headers as $headerName => $headerBody) {
-                $email->getHeaders()->addTextHeader($headerName, $headerBody);
+    protected function determineHeaders(Email $email): array
+    {
+        $headers = [];
+
+        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type'];
+
+        foreach ($email->getHeaders()->all() as $name => $header) {
+            if (in_array($name, $headersToBypass, true)) {
+                continue;
             }
 
-            foreach ($attachments as $attachment) {
-                $email->attach(
-                    $attachment['content'],
-                    $attachment['filename'],
-                    $attachment['content_type'],
-                );
-            }
+            $headers[$header->getName()] = $header->getBodyAsString();
+        }
 
-            $result = $this->mailtrap->send($email);
+        return $headers;
+    }
 
-            throw_if(
-                $result->getStatusCode() !== Response::HTTP_OK,
-                Exception::class,
-                $result['message'],
-            );
-        } catch (Exception $exception) {
-            throw new TransportException(
-                sprintf('Request to Mailtrap API failed. Reason: %s.', $exception->getMessage()),
-                is_int($exception->getCode()) ? $exception->getCode() : 0,
-                $exception
+    protected function prepareMailtrapEmail(Email $email, Envelope $envelope): MailtrapEmail
+    {
+        $mailtrapEmail = (new MailtrapEmail)
+            ->from($envelope->getSender())
+            ->to(...$this->getRecipients($email, $envelope))
+            ->cc(...$email->getCc())
+            ->bcc(...$email->getBcc())
+            ->replyTo(...$email->getReplyTo())
+            ->subject($email->getSubject())
+            ->html($email->getHtmlBody())
+            ->text($email->getTextBody());
+
+        foreach ($this->determineHeaders($email) as $headerName => $headerBody) {
+            $email->getHeaders()->addTextHeader($headerName, $headerBody);
+        }
+
+        foreach ($this->determineAttachments($email) as $attachment) {
+            $email->attach(
+                $attachment['content'],
+                $attachment['filename'],
+                $attachment['content_type'],
             );
         }
+
+        return $mailtrapEmail;
     }
 
     /**
