@@ -591,6 +591,20 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
     }
 
+    public function testFluentMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'user' => [
+                'name' => 'Michael',
+                'role' => 'admin',
+            ],
+            'users' => null,
+        ]);
+        $this->assertSame(['name' => 'Michael', 'role' => 'admin'], $request->fluent('user')->toArray());
+        $this->assertSame([], $request->fluent('users')->toArray());
+        $this->assertSame([], $request->fluent('not_found')->toArray());
+    }
+
     public function testStringMethod()
     {
         $request = Request::create('/', 'GET', [
