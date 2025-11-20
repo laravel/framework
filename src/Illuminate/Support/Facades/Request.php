@@ -144,7 +144,7 @@ namespace Illuminate\Support\Facades;
  * @method static array keys()
  * @method static array all(mixed $keys = null)
  * @method static mixed input(string|null $key = null, mixed $default = null)
- * @method static \Illuminate\Support\Fluent fluent(array|string|null $key = null)
+ * @method static \Illuminate\Support\Fluent fluent(array|string|null $key = null, array $default = [])
  * @method static string|array|null query(string|null $key = null, string|array|null $default = null)
  * @method static string|array|null post(string|null $key = null, string|array|null $default = null)
  * @method static bool hasCookie(string $key)
