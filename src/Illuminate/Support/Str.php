@@ -1759,7 +1759,7 @@ class Str
         $start = mb_substr($string, 0, $offset, $encoding);
         $end = mb_substr($string, $offset + $length, $strlen - ($offset + $length), $encoding);
 
-        return $start . $replace . $end;
+        return $start.$replace.$end;
     }
 
     /**
