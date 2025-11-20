@@ -1522,7 +1522,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['10' => 1, 20 => 2], $array);
     }
 
-    #[IgnoreDeprecations]
     public function testForget()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];
@@ -1557,9 +1556,9 @@ class SupportArrTest extends TestCase
         Arr::forget($array, 'products.desk.final.taxes');
         $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
 
-        $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
+        $array = ['products' => ['desk' => ['price' => 50], '' => 'something']];
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
-        $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+        $this->assertEquals(['products' => ['desk' => [], '' => 'something']], $array);
 
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];
