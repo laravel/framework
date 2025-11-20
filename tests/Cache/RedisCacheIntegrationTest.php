@@ -20,6 +20,10 @@ class RedisCacheIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
+        if (! class_exists(Redis::class)) {
+            $this->markTestSkipped('The Redis class/extension is not installed. Please install the extension to enable '.__CLASS__);
+        }
+
         parent::setUp();
         $this->setUpRedis();
     }
