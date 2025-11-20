@@ -979,6 +979,32 @@ if (! function_exists('today')) {
     }
 }
 
+if (! function_exists('tomorrow')) {
+    /**
+     * Create a new Carbon instance for tomorrow.
+     *
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function tomorrow($tz = null): CarbonInterface
+    {
+        return Date::tomorrow(enum_value($tz));
+    }
+}
+
+if (! function_exists('yesterday')) {
+    /**
+     * Create a new Carbon instance for yesterday.
+     *
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function yesterday($tz = null): CarbonInterface
+    {
+        return Date::yesterday(enum_value($tz));
+    }
+}
+
 if (! function_exists('trans')) {
     /**
      * Translate the given message.
