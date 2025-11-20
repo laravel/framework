@@ -350,8 +350,9 @@ class Message
                     return "cid:{$part->getContentId()}";
                 },
                 function ($data) use ($file) {
-                    $part = (new DataPart($data(), $file->as, $file->mime))->asInline();
-                    $this->message->addPart($part);
+                    $this->message->addPart(
+                        $part = $part = (new DataPart($data(), $file->as, $file->mime))->asInline()
+                    );
 
                     return "cid:{$part->getContentId()}";
                 }
@@ -359,9 +360,10 @@ class Message
         }
 
         $fileObject = new File($file);
-        $part = (new DataPart($fileObject, $fileObject->getFilename()))->asInline();
 
-        $this->message->addPart($part);
+        $this->message->addPart(
+            $part = (new DataPart($fileObject, $fileObject->getFilename()))->asInline()
+        );
 
         return "cid:{$part->getContentId()}";
     }
