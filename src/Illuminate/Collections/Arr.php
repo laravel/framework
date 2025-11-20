@@ -849,6 +849,10 @@ class Arr
      */
     public static function prepend($array, $value, $key = '')
     {
+        if (is_null($key) && version_compare(PHP_VERSION, '8.5.0', '>=')) {
+            $key = '';
+        }
+
         if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
