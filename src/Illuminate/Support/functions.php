@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
@@ -55,9 +56,9 @@ if (! function_exists('Illuminate\Support\seconds')) {
     /**
      * Get the current date / time plus the given number of seconds.
      */
-    function seconds(int $seconds): Carbon
+    function seconds(int $seconds): CarbonInterval
     {
-        return Carbon::now()->addSeconds($seconds);
+        return CarbonInterval::seconds($seconds);
     }
 }
 
@@ -65,9 +66,9 @@ if (! function_exists('Illuminate\Support\minutes')) {
     /**
      * Get the current date / time plus the given number of minutes.
      */
-    function minutes(int $minutes): Carbon
+    function minutes(int $minutes): CarbonInterval
     {
-        return Carbon::now()->addMinutes($minutes);
+        return CarbonInterval::minutes($minutes);
     }
 }
 
@@ -75,9 +76,9 @@ if (! function_exists('Illuminate\Support\hours')) {
     /**
      * Get the current date / time plus the given number of hours.
      */
-    function hours(int $hours): Carbon
+    function hours(int $hours): CarbonInterval
     {
-        return Carbon::now()->addHours($hours);
+        return CarbonInterval::hours($hours);
     }
 }
 
@@ -85,9 +86,9 @@ if (! function_exists('Illuminate\Support\days')) {
     /**
      * Get the current date / time plus the given number of days.
      */
-    function days(int $days): Carbon
+    function days(int $days): CarbonInterval
     {
-        return Carbon::now()->addDays($days);
+        return CarbonInterval::days($days);
     }
 }
 
@@ -95,8 +96,8 @@ if (! function_exists('Illuminate\Support\years')) {
     /**
      * Get the current date / time plus the given number of years.
      */
-    function years(int $years): Carbon
+    function years(int $years): CarbonInterval
     {
-        return Carbon::now()->addYears($years);
+        return CarbonInterval::years($years);
     }
 }
