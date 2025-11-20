@@ -1065,11 +1065,17 @@ class SupportArrTest extends TestCase
         $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
         $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
 
-        $array = Arr::prepend(['one', 'two'], ['zero'], null);
+        $array = Arr::prepend(['one', 'two'], ['zero'], '');
         $this->assertEquals(['one', 'two', '' => ['zero']], $array);
 
-        $array = Arr::prepend(['one', 'two', '' => 'three'], ['zero'], null);
+        $array = Arr::prepend(['one', 'two', '' => 'three'], ['zero'], '');
         $this->assertEquals(['one', 'two', '' => ['zero']], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], null);
+        $this->assertEquals(['one', 'two', null => ['zero']], $array);
+
+        $array = Arr::prepend(['one', 'two', '' => 'three'], ['zero'], null);
+        $this->assertEquals(['one', 'two', null => ['zero']], $array);
     }
 
     public function testPull()
