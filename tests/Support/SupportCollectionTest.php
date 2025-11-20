@@ -4236,6 +4236,12 @@ class SupportCollectionTest extends TestCase
             [null => 0, 'one' => 1, 'two' => 2],
             $c->prepend(0, null)->all()
         );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, '')->all()
+        );
     }
 
     public function testPushWithOneItem()
