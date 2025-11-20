@@ -86,6 +86,7 @@ class RedisTagSet extends TagSet
         };
 
         $connection = $this->store->connection();
+
         if ($connection instanceof PhpRedisConnection) {
             $flushStaleEntries($connection);
         } else {
