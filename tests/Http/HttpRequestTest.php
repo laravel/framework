@@ -597,7 +597,7 @@ class HttpRequestTest extends TestCase
             'user' => [
                 'name' => 'Michael',
                 'role' => 'admin',
-            ], 
+            ],
             'users' => null,
         ]);
         $this->assertSame(['name' => 'Michael', 'role' => 'admin'], $request->fluent('user')->toArray());
