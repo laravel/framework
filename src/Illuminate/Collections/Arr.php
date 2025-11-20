@@ -852,7 +852,7 @@ class Arr
         if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
-            $array = [$key => $value] + $array;
+            $array = [($key ?? '') => $value] + $array;
         }
 
         return $array;
