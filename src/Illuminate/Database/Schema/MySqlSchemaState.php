@@ -111,6 +111,7 @@ class MySqlSchemaState extends SchemaState
             ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
             : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
+        /** @phpstan-ignore class.notFound */
         if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA])) {
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
