@@ -1747,11 +1747,19 @@ class Str
      */
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
-        if ($length === null) {
-            $length = mb_strlen($string);
+        $encoding = 'UTF-8';
+        $strlen = mb_strlen($string, $encoding);
+
+        if ($offset < 0) {
+            $offset = $offset < -$strlen ? 0 : $strlen + $offset;
         }
 
-        return substr_replace($string, $replace, $offset, $length);
+        $length = is_null($length) ? $strlen - $offset : max($length, 0);
+
+        $start = mb_substr($string, 0, $offset, $encoding);
+        $end = mb_substr($string, $offset + $length, $strlen - ($offset + $length), $encoding);
+
+        return $start . $replace . $end;
     }
 
     /**

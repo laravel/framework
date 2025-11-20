@@ -1262,6 +1262,8 @@ class SupportStrTest extends TestCase
         $this->assertSame('12:00', Str::substrReplace('1200', ':', 2, 0));
         $this->assertSame('The Laravel Framework', Str::substrReplace('The Framework', 'Laravel ', 4, 0));
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
+        $this->assertSame('Laravel – PHP 框架的网络专家', Str::substrReplace('Laravel 的网络专家', '– PHP 框架', 8, 0));
+        $this->assertSame('Laravel – PHP Фреймворк для веб-мастеров', Str::substrReplace('Laravel для веб-мастеров', ' – PHP Фреймворк', 7, 0));
     }
 
     public function testTake()
