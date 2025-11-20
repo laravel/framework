@@ -79,11 +79,19 @@ class RedisTagSet extends TagSet
      */
     public function flushStaleEntries()
     {
-        $this->store->connection()->pipeline(function ($pipe) {
+        $flushStaleEntries = function ($pipe) {
             foreach ($this->tagIds() as $tagKey) {
                 $pipe->zremrangebyscore($this->store->getPrefix().$tagKey, 0, Carbon::now()->getTimestamp());
             }
-        });
+        };
+
+        $connection = $this->store->connection();
+
+        if ($connection instanceof PhpRedisConnection) {
+            $flushStaleEntries($connection);
+        } else {
+            $connection->pipeline($flushStaleEntries);
+        }
     }
 
     /**
