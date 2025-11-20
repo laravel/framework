@@ -844,10 +844,10 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $value
-     * @param  array-key  $key
+     * @param  mixed  $key
      * @return array
      */
-    public static function prepend($array, $value, $key = '')
+    public static function prepend($array, $value, $key = null)
     {
         if (func_num_args() == 2) {
             array_unshift($array, $value);
