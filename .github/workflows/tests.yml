@@ -131,6 +131,18 @@ jobs:
           - php: 8.2
             phpunit: '12.4.0'
         include:
+          - php: 8.5
+            phpunit: '12.1.0'
+            stability: prefer-stable
+          - php: 8.5
+            phpunit: '12.2.0'
+            stability: prefer-stable
+          - php: 8.5
+            phpunit: '12.3.0'
+            stability: prefer-stable
+          - php: 8.5
+            phpunit: '12.4.0'
+            stability: prefer-stable
           - php: 8.3
             phpunit: '12.1.0'
             stability: prefer-stable
