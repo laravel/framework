@@ -199,6 +199,11 @@ class SupportArrTest extends TestCase
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
 
         // Test dividing an array where the values are arrays
+        [$keys, $values] = Arr::divide(['' => ['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
+
+        // Test dividing an array where the values are arrays (with null key)
         [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
@@ -1046,6 +1051,9 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, '');
+        $this->assertEquals(['' => 0, 'one' => 1, 'two' => 2], $array);
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
