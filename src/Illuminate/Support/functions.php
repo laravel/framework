@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -45,5 +46,57 @@ if (! function_exists('Illuminate\Support\artisan_binary')) {
     function artisan_binary(): string
     {
         return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+    }
+}
+
+// Time functions...
+
+if (! function_exists('Illuminate\Support\seconds')) {
+    /**
+     * Get the current date / time plus the given number of seconds.
+     */
+    function seconds(int $seconds): Carbon
+    {
+        return Carbon::now()->addSeconds($seconds);
+    }
+}
+
+if (! function_exists('Illuminate\Support\minutes')) {
+    /**
+     * Get the current date / time plus the given number of minutes.
+     */
+    function minutes(int $minutes): Carbon
+    {
+        return Carbon::now()->addMinutes($minutes);
+    }
+}
+
+if (! function_exists('Illuminate\Support\hours')) {
+    /**
+     * Get the current date / time plus the given number of hours.
+     */
+    function hours(int $hours): Carbon
+    {
+        return Carbon::now()->addHours($hours);
+    }
+}
+
+if (! function_exists('Illuminate\Support\days')) {
+    /**
+     * Get the current date / time plus the given number of days.
+     */
+    function days(int $days): Carbon
+    {
+        return Carbon::now()->addDays($days);
+    }
+}
+
+if (! function_exists('Illuminate\Support\years')) {
+    /**
+     * Get the current date / time plus the given number of years.
+     */
+    function years(int $years): Carbon
+    {
+        return Carbon::now()->addYears($years);
     }
 }
