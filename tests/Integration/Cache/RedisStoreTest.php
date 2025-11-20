@@ -36,6 +36,8 @@ class RedisStoreTest extends TestCase
         });
 
         parent::setUp();
+
+        $this->withoutExceptionHandling();
     }
 
     public function testCacheTtl(): void
