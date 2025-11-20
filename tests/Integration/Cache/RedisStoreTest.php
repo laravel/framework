@@ -148,8 +148,6 @@ class RedisStoreTest extends TestCase
 
     public function testIncrementedTagEntriesProperlyTurnStale()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->add('person-1', 0, $seconds = 1);
@@ -166,8 +164,6 @@ class RedisStoreTest extends TestCase
 
     public function testPastTtlTagEntriesAreNotAdded()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->add('person-1', 0, new DateTime('yesterday'));
@@ -181,8 +177,6 @@ class RedisStoreTest extends TestCase
 
     public function testPutPastTtlTagEntriesProperlyTurnStale()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['votes'])->put('person-1', 0, new DateTime('yesterday'));
@@ -194,8 +188,6 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeFlushedBySingleKey()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('person-1', 'Sally', 5);
@@ -212,8 +204,6 @@ class RedisStoreTest extends TestCase
 
     public function testStaleEntriesCanBeFlushed()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('person-1', 'Sally', 1);
