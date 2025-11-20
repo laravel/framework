@@ -20,10 +20,6 @@ class RedisCacheIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        if (! class_exists(Redis::class)) {
-            $this->markTestSkipped('The Redis class/extension is not installed. Please install the extension to enable '.__CLASS__);
-        }
-
         parent::setUp();
         $this->setUpRedis();
     }
@@ -170,6 +166,10 @@ class RedisCacheIntegrationTest extends TestCase
 
     public static function phpRedisBackoffAlgorithmsProvider()
     {
+        if (! class_exists(Redis::class)) {
+            return [];
+        }
+
         return [
             ['default', Redis::BACKOFF_ALGORITHM_DEFAULT],
             ['decorrelated_jitter', Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER],
