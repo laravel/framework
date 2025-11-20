@@ -232,8 +232,6 @@ class RedisStoreTest extends TestCase
 
     public function testMultipleItemsCanBeSetAndRetrieved()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         $store = Cache::store('redis');
         $result = $store->put('foo', 'bar', 10);
         $resultMany = $store->putMany([
