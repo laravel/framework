@@ -2,10 +2,30 @@
 
 namespace Illuminate\Database\Connectors;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use PDO;
 
 class MySqlConnector extends Connector implements ConnectorInterface
 {
+    /**
+     * Determine of PDO feature constant.
+     *
+     * @param  array<string, mixed>  $features
+     * @return array<string, mixed>
+     */
+    public static function features(array $features)
+    {
+        if (! extension_loaded('pdo_mysql')) {
+            return [];
+        }
+
+        return (new Collection($features))
+            ->mapWithKeys(fn ($value, $feature) => [(string) Str::of($feature)->prepend(PHP_VERSION_ID < 80400 ? 'PDO::MYSQL_' : 'Pdo\Mysql::') => $value])
+            ->filter()
+            ->all();
+    }
+
     /**
      * Establish a database connection.
      *
