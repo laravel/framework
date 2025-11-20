@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
@@ -51,6 +52,19 @@ if (! function_exists('Illuminate\Support\artisan_binary')) {
 }
 
 // Time functions...
+
+if (! function_exists('Illuminate\Support\now')) {
+    /**
+     * Create a new Carbon instance for the current time.
+     *
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function now($tz = null): CarbonInterface
+    {
+        return \now($tz);
+    }
+}
 
 if (! function_exists('Illuminate\Support\seconds')) {
     /**
