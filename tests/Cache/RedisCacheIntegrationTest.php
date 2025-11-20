@@ -11,9 +11,11 @@ use Illuminate\Redis\RedisManager;
 use Illuminate\Support\Env;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
+#[RequiresPhpExtension('redis')]
 class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
