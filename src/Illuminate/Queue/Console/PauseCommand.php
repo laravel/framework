@@ -14,8 +14,8 @@ class PauseCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:pause {queue : The name of the queue to pause}
-                                       {--ttl=86400 : The TTL for the pause in seconds}';
+    protected $signature = 'queue:pause {queue : The name of the queue to pause (connection:queue format, e.g., redis:default)}
+                                       {--ttl= : The TTL for the pause in seconds (omit for indefinite pause)}';
 
     /**
      * The console command description.
@@ -50,13 +50,32 @@ class PauseCommand extends Command
      */
     public function handle()
     {
-        $queue = $this->argument('queue');
-        $ttl = (int) $this->option('ttl');
+        [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        $this->manager->pause($queue, $ttl);
+        $ttl = $this->option('ttl') !== null ? (int) $this->option('ttl') : null;
 
-        $this->components->info("Queue [{$queue}] has been paused.");
+        $this->manager->pause($connection, $queue, $ttl);
+
+        $this->components->info("Queue [{$connection}:{$queue}] has been paused".($ttl ? " for {$ttl} seconds." : ' indefinitely.'));
 
         return 0;
+    }
+
+    /**
+     * Parse the queue argument into connection and queue name.
+     *
+     * @param  string  $queue
+     * @return array
+     */
+    protected function parseQueue($queue)
+    {
+        [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
+
+        if (! isset($queue)) {
+            $queue = $connection;
+            $connection = $this->laravel['config']['queue.default'];
+        }
+
+        return [$connection, $queue];
     }
 }

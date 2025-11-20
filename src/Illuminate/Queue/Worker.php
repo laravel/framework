@@ -373,7 +373,7 @@ class Worker
 
             foreach (explode(',', $queue) as $index => $queue) {
                 // Skip paused queues
-                if ($this->isQueuePaused($queue)) {
+                if ($this->isQueuePaused($connection->getConnectionName(), $queue)) {
                     continue;
                 }
 
@@ -395,16 +395,17 @@ class Worker
     /**
      * Determine if a queue is paused.
      *
+     * @param  string  $connectionName
      * @param  string  $queue
      * @return bool
      */
-    protected function isQueuePaused($queue)
+    protected function isQueuePaused($connectionName, $queue)
     {
         if (! $this->cache) {
             return false;
         }
 
-        return (bool) $this->cache->get("queue_paused:{$queue}", false);
+        return (bool) $this->cache->get("queue_paused:{$connectionName}:{$queue}", false);
     }
 
     /**

@@ -298,57 +298,82 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Pause a queue by name.
      *
+     * @param  string  $connection
      * @param  string  $queue
-     * @param  int  $ttl
+     * @param  int|null  $ttl
      * @return void
      */
-    public function pause($queue, $ttl = 86400)
+    public function pause($connection, $queue, $ttl = null)
     {
         $cache = $this->app['cache']->store();
 
-        $cache->put("queue_paused:{$queue}", true, $ttl);
+        if ($ttl === null) {
+            $cache->forever("queue_paused:{$connection}:{$queue}", true);
+        } else {
+            $cache->put("queue_paused:{$connection}:{$queue}", true, $ttl);
+        }
 
-        // Add to the list of paused queues
-        $pausedQueues = $this->getPausedQueues();
+        // Add to the list of paused queues using cache lock for atomicity
+        $lock = $cache->lock('queue_paused_list_lock', 10);
 
-        if (! in_array($queue, $pausedQueues)) {
-            $pausedQueues[] = $queue;
-            $this->storePausedQueuesList($pausedQueues);
+        try {
+            $lock->block(5);
+
+            $pausedQueues = $this->getPausedQueues();
+            $queueIdentifier = "{$connection}:{$queue}";
+
+            if (! in_array($queueIdentifier, $pausedQueues)) {
+                $pausedQueues[] = $queueIdentifier;
+                $this->storePausedQueuesList($pausedQueues);
+            }
+        } finally {
+            $lock->release();
         }
     }
 
     /**
      * Resume a paused queue by name.
      *
+     * @param  string  $connection
      * @param  string  $queue
      * @return void
      */
-    public function resume($queue)
+    public function resume($connection, $queue)
     {
         $cache = $this->app['cache']->store();
 
-        $cache->forget("queue_paused:{$queue}");
+        $cache->forget("queue_paused:{$connection}:{$queue}");
 
-        // Remove from the list of paused queues
-        $pausedQueues = $this->getPausedQueues();
+        // Remove from the list of paused queues using cache lock for atomicity
+        $lock = $cache->lock('queue_paused_list_lock', 10);
 
-        if (($key = array_search($queue, $pausedQueues)) !== false) {
-            unset($pausedQueues[$key]);
-            $this->storePausedQueuesList(array_values($pausedQueues));
+        try {
+            $lock->block(5);
+
+            $pausedQueues = $this->getPausedQueues();
+            $queueIdentifier = "{$connection}:{$queue}";
+
+            if (($key = array_search($queueIdentifier, $pausedQueues)) !== false) {
+                unset($pausedQueues[$key]);
+                $this->storePausedQueuesList(array_values($pausedQueues));
+            }
+        } finally {
+            $lock->release();
         }
     }
 
     /**
      * Determine if a queue is paused.
      *
+     * @param  string  $connection
      * @param  string  $queue
      * @return bool
      */
-    public function isPaused($queue)
+    public function isPaused($connection, $queue)
     {
         $cache = $this->app['cache']->store();
 
-        return (bool) $cache->get("queue_paused:{$queue}", false);
+        return (bool) $cache->get("queue_paused:{$connection}:{$queue}", false);
     }
 
     /**
@@ -360,7 +385,6 @@ class QueueManager implements FactoryContract, MonitorContract
     {
         $cache = $this->app['cache']->store();
 
-        // This implementation stores a list of paused queues
         return $cache->get('queue_paused_list', []);
     }
 

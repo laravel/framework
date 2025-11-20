@@ -59,9 +59,19 @@ class PauseListCommand extends Command
 
         $this->components->info('Paused Queues:');
 
+        $tableData = collect($pausedQueues)->map(function ($queue) {
+            // Parse connection:queue format
+            $parts = explode(':', $queue, 2);
+
+            return [
+                'connection' => $parts[0] ?? '',
+                'queue' => $parts[1] ?? $parts[0],
+            ];
+        })->toArray();
+
         $this->table(
-            ['Queue Name'],
-            collect($pausedQueues)->map(fn ($queue) => [$queue])->toArray()
+            ['Connection', 'Queue'],
+            $tableData
         );
 
         return 0;
