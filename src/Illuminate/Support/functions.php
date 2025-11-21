@@ -2,8 +2,11 @@
 
 namespace Illuminate\Support;
 
+use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Date;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 if (! function_exists('Illuminate\Support\defer')) {
@@ -45,5 +48,70 @@ if (! function_exists('Illuminate\Support\artisan_binary')) {
     function artisan_binary(): string
     {
         return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
+    }
+}
+
+// Time functions...
+
+if (! function_exists('Illuminate\Support\now')) {
+    /**
+     * Create a new Carbon instance for the current time.
+     *
+     * @param  \DateTimeZone|\UnitEnum|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function now($tz = null): CarbonInterface
+    {
+        return Date::now(enum_value($tz));
+    }
+}
+
+if (! function_exists('Illuminate\Support\seconds')) {
+    /**
+     * Get the current date / time plus the given number of seconds.
+     */
+    function seconds(int $seconds): CarbonInterval
+    {
+        return CarbonInterval::seconds($seconds);
+    }
+}
+
+if (! function_exists('Illuminate\Support\minutes')) {
+    /**
+     * Get the current date / time plus the given number of minutes.
+     */
+    function minutes(int $minutes): CarbonInterval
+    {
+        return CarbonInterval::minutes($minutes);
+    }
+}
+
+if (! function_exists('Illuminate\Support\hours')) {
+    /**
+     * Get the current date / time plus the given number of hours.
+     */
+    function hours(int $hours): CarbonInterval
+    {
+        return CarbonInterval::hours($hours);
+    }
+}
+
+if (! function_exists('Illuminate\Support\days')) {
+    /**
+     * Get the current date / time plus the given number of days.
+     */
+    function days(int $days): CarbonInterval
+    {
+        return CarbonInterval::days($days);
+    }
+}
+
+if (! function_exists('Illuminate\Support\years')) {
+    /**
+     * Get the current date / time plus the given number of years.
+     */
+    function years(int $years): CarbonInterval
+    {
+        return CarbonInterval::years($years);
     }
 }
