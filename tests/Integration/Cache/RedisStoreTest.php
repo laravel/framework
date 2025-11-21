@@ -6,7 +6,6 @@ use DateTime;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
@@ -96,8 +95,6 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeAccessed()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
@@ -114,8 +111,6 @@ class RedisStoreTest extends TestCase
 
     public function testTagEntriesCanBeStoredForever()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->forever('name', 'Sally');
@@ -274,8 +269,6 @@ class RedisStoreTest extends TestCase
 
     public function testTagsCanBeFlushedWithLargeNumberOfKeys()
     {
-        $this->markTestSkippedWithPredisClusterConnection();
-
         Cache::store('redis')->clear();
 
         $tags = ['large-test-'.time()];
@@ -296,13 +289,5 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
         $this->assertCount(0, $keyCount);
-    }
-
-    protected function markTestSkippedWithPredisClusterConnection()
-    {
-        $this->markTestSkippedWhen(
-            $this->app['redis']->connection() instanceof PredisClusterConnection,
-            'This test currently fails on Predis Cluster connection',
-        );
     }
 }
