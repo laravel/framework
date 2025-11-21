@@ -7,6 +7,7 @@ use Carbon\CarbonInterval;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Date;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 if (! function_exists('Illuminate\Support\defer')) {
@@ -62,7 +63,7 @@ if (! function_exists('Illuminate\Support\now')) {
      */
     function now($tz = null): CarbonInterface
     {
-        return \now($tz);
+        return Date::now(enum_value($tz));
     }
 }
 
