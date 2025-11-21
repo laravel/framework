@@ -400,9 +400,9 @@ class Worker
      */
     protected function queuePaused($connectionName, $queue)
     {
-        return $this->cache && (bool) ($this->cache->get(
+        return $this->cache && (bool) $this->cache->get(
             "illuminate:queue:paused:{$connectionName}:{$queue}", false
-        ));
+        );
     }
 
     /**
