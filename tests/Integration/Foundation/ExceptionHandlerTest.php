@@ -13,12 +13,9 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Testing\Fakes\ExceptionHandlerFake;
-use Mockery;
 use Monolog\Handler\TestHandler;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -291,7 +288,6 @@ EOF, __DIR__.'/../../../', ['APP_RUNNING_IN_CONSOLE' => true]);
 
     public function test_it_reports_request_exceptions()
     {
-        //Exceptions::fake();
         config(['logging.default' => 'test_log']);
         config(['logging.channels.test_log' => [
             'driver' => 'monolog',
