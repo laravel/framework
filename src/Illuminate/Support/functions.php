@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Carbon\CarbonInterface;
 use Carbon\CarbonInterval;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
 use Illuminate\Support\Facades\Date;
