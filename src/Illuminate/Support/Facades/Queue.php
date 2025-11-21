@@ -15,6 +15,9 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void stopping(mixed $callback)
  * @method static bool connected(string|null $name = null)
  * @method static \Illuminate\Contracts\Queue\Queue connection(string|null $name = null)
+ * @method static void pause(string $connection, string $queue)
+ * @method static void resume(string $connection, string $queue)
+ * @method static bool isPaused(string $connection, string $queue)
  * @method static void extend(string $driver, \Closure $resolver)
  * @method static void addConnector(string $driver, \Closure $resolver)
  * @method static string getDefaultDriver()
@@ -62,9 +65,6 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static array pushedJobs()
  * @method static array rawPushes()
  * @method static \Illuminate\Support\Testing\Fakes\QueueFake serializeAndRestore(bool $serializeAndRestore = true)
- * @method static void pause(string $queue, int $ttl = 86400)
- * @method static void resume(string $queue)
- * @method static bool isPaused(string $queue)
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue
