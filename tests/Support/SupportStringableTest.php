@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Support\Str;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
@@ -1590,5 +1591,39 @@ class SupportStringableTest extends TestCase
 
         $this->assertNotSame('foo', $encrypted->value());
         $this->assertSame('foo', $encrypted->decrypt()->value());
+    }
+    
+    public function testUnlessEmpty()
+    {
+        $this->assertSame('', (string) Str::of('')->unlessEmpty(fn ($string) => $string->append('foo')));
+    
+        $this->assertSame('barfoo', (string) Str::of('bar')->unlessEmpty(fn ($string) => $string->append('foo')));
+    
+        $this->assertSame('default', (string) Str::of('')->unlessEmpty(
+            fn ($string) => $string->append('foo'),
+            fn ($string) => $string->append('default')
+        ));
+    
+        $this->assertSame('barfoo', (string) Str::of('bar')->unlessEmpty(
+            fn ($string) => $string->append('foo'),
+            fn ($string) => $string->append('default')
+        ));
+    }
+    
+    public function testUnlessNotEmpty()
+    {
+        $this->assertSame('bar', (string) Str::of('bar')->unlessNotEmpty(fn ($string) => $string->append('foo')));
+    
+        $this->assertSame('foo', (string) Str::of('')->unlessNotEmpty(fn ($string) => $string->append('foo')));
+    
+        $this->assertSame('bardefault', (string) Str::of('bar')->unlessNotEmpty(
+            fn ($string) => $string->append('foo'),
+            fn ($string) => $string->append('default')
+        ));
+    
+        $this->assertSame('foo', (string) Str::of('')->unlessNotEmpty(
+            fn ($string) => $string->append('foo'),
+            fn ($string) => $string->append('default')
+        ));
     }
 }
