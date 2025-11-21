@@ -83,17 +83,17 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
-     * @return void
+     * @return bool
      */
-    public function report(): void
+    public function report()
     {
-        if ($this->hasBeenSummarized) {
-            return;
+        if (! $this->hasBeenSummarized) {
+            $this->message = $this->prepareMessage($this->response);
+
+            $this->hasBeenSummarized = true;
         }
 
-        $this->message = $this->prepareMessage($this->response);
-
-        $this->hasBeenSummarized = true;
+        return false;
     }
 
     /**
