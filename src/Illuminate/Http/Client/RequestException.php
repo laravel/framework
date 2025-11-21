@@ -87,13 +87,11 @@ class RequestException extends HttpClientException
      */
     public function report()
     {
-        if ($this->hasBeenSummarized) {
-            return;
+        if (! $this->hasBeenSummarized) {
+            $this->message = $this->prepareMessage($this->response);
+
+            $this->hasBeenSummarized = true;
         }
-
-        $this->message = $this->prepareMessage($this->response);
-
-        $this->hasBeenSummarized = true;
 
         return false;
     }
