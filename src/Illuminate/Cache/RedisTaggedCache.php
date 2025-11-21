@@ -194,6 +194,7 @@ class RedisTaggedCache extends TaggedCache
             ->chunk(1000);
 
         $connection = $this->store->connection();
+
         foreach ($entries as $cacheKeys) {
             if ($connection instanceof PredisClusterConnection) {
                 $connection->pipeline(function ($connection) use ($cacheKeys) {
