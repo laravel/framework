@@ -20,6 +20,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -4215,6 +4216,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
+    #[IgnoreDeprecations]
     public function testPrepend()
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
@@ -4233,6 +4235,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(
             [null => 0, 'one' => 1, 'two' => 2],
             $c->prepend(0, null)->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, '')->all()
         );
     }
 

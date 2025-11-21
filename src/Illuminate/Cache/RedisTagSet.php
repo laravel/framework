@@ -48,11 +48,17 @@ class RedisTagSet extends TagSet
                 $cursor = $defaultCursorValue;
 
                 do {
-                    [$cursor, $entries] = $connection->zscan(
+                    $results = $connection->zscan(
                         $this->store->getPrefix().$tagKey,
                         $cursor,
                         ['match' => '*', 'count' => 1000]
                     );
+
+                    if (! is_array($results)) {
+                        break;
+                    }
+
+                    [$cursor, $entries] = $results;
 
                     if (! is_array($entries)) {
                         break;

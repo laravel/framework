@@ -11,9 +11,11 @@ use Illuminate\Redis\RedisManager;
 use Illuminate\Support\Env;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Redis;
 
+#[RequiresPhpExtension('redis')]
 class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
@@ -166,6 +168,10 @@ class RedisCacheIntegrationTest extends TestCase
 
     public static function phpRedisBackoffAlgorithmsProvider()
     {
+        if (! class_exists(Redis::class)) {
+            return [];
+        }
+
         return [
             ['default', Redis::BACKOFF_ALGORITHM_DEFAULT],
             ['decorrelated_jitter', Redis::BACKOFF_ALGORITHM_DECORRELATED_JITTER],
