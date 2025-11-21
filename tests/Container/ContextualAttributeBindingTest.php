@@ -17,6 +17,7 @@ use Illuminate\Container\Attributes\Database;
 use Illuminate\Container\Attributes\Give;
 use Illuminate\Container\Attributes\Log;
 use Illuminate\Container\Attributes\RouteParameter;
+use Illuminate\Container\Attributes\Session;
 use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
@@ -183,6 +184,20 @@ class ContextualAttributeBindingTest extends TestCase
         });
 
         $container->make(ConfigTest::class);
+    }
+
+    public function testSessionAttribute()
+    {
+        $container = new Container;
+        $container->singleton('session', function () {
+            $repository = m::mock(Repository::class);
+            $repository->shouldReceive('get')->with('foo', null)->andReturn('foo');
+            $repository->shouldReceive('get')->with('bar', null)->andReturn('bar');
+
+            return $repository;
+        });
+
+        $container->make(SessionTest::class);
     }
 
     public function testDatabaseAttribute()
@@ -487,6 +502,13 @@ final class CacheTest
 final class ConfigTest
 {
     public function __construct(#[Config('foo')] string $foo, #[Config('bar')] string $bar)
+    {
+    }
+}
+
+final class SessionTest
+{
+    public function __construct(#[Session('foo')] string $foo, #[Session('bar')] string $bar)
     {
     }
 }
