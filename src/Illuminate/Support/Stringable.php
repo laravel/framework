@@ -1318,7 +1318,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return $this->when($this->test($pattern), $callback, $default);
     }
 
-     /**
+    /**
      * Execute the given callback unless the string is empty.
      *
      * @param  callable  $callback
@@ -1330,7 +1330,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return $this->unless($this->isEmpty(), $callback, $default);
     }
 
-     /**
+    /**
      * Execute the given callback unless the string is not empty.
      *
      * @param  callable  $callback

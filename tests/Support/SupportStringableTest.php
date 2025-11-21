@@ -1603,7 +1603,7 @@ class SupportStringableTest extends TestCase
             fn ($string) => $string->append('foo'),
             fn ($string) => $string->append('default')
         ));
- 
+
         $this->assertSame('barfoo', (string) Str::of('bar')->unlessEmpty(
             fn ($string) => $string->append('foo'),
             fn ($string) => $string->append('default')
