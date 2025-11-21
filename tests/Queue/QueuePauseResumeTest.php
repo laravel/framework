@@ -99,33 +99,4 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'emails'));
         $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
     }
-
-    public function testGetPausedQueuesReturnsAllPausedQueues()
-    {
-        $this->manager->pause('redis', 'default');
-        $this->manager->pause('database', 'emails');
-        $this->manager->pause('redis', 'notifications');
-
-        $pausedQueues = $this->manager->getPausedQueues();
-
-        $this->assertCount(3, $pausedQueues);
-        $this->assertContains('redis:default', $pausedQueues);
-        $this->assertContains('database:emails', $pausedQueues);
-        $this->assertContains('redis:notifications', $pausedQueues);
-    }
-
-    public function testGetPausedQueuesAfterResume()
-    {
-        $this->manager->pause('redis', 'default');
-        $this->manager->pause('database', 'emails');
-
-        $this->assertCount(2, $this->manager->getPausedQueues());
-
-        $this->manager->resume('redis', 'default');
-
-        $pausedQueues = $this->manager->getPausedQueues();
-        $this->assertCount(1, $pausedQueues);
-        $this->assertContains('database:emails', $pausedQueues);
-        $this->assertNotContains('redis:default', $pausedQueues);
-    }
 }

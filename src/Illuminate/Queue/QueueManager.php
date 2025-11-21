@@ -198,6 +198,48 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause a queue by its connection and name.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return void
+     */
+    public function pause($connection, $queue)
+    {
+        $this->app['cache']
+            ->store()
+            ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+    }
+
+    /**
+     * Resume a paused queue by its connection and name.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return void
+     */
+    public function resume($connection, $queue)
+    {
+        $this->app['cache']
+            ->store()
+            ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return bool
+     */
+    public function isPaused($connection, $queue)
+    {
+        return (bool) $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+    }
+
+    /**
      * Add a queue connection resolver.
      *
      * @param  string  $driver
@@ -293,112 +335,6 @@ class QueueManager implements FactoryContract, MonitorContract
         }
 
         return $this;
-    }
-
-    /**
-     * Pause a queue by name.
-     *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  int|null  $ttl
-     * @return void
-     */
-    public function pause($connection, $queue, $ttl = null)
-    {
-        $cache = $this->app['cache']->store();
-
-        if ($ttl === null) {
-            $cache->forever("queue_paused:{$connection}:{$queue}", true);
-        } else {
-            $cache->put("queue_paused:{$connection}:{$queue}", true, $ttl);
-        }
-
-        // Add to the list of paused queues using cache lock for atomicity
-        $lock = $cache->lock('queue_paused_list_lock', 10);
-
-        try {
-            $lock->block(5);
-
-            $pausedQueues = $this->getPausedQueues();
-            $queueIdentifier = "{$connection}:{$queue}";
-
-            if (! in_array($queueIdentifier, $pausedQueues)) {
-                $pausedQueues[] = $queueIdentifier;
-                $this->storePausedQueuesList($pausedQueues);
-            }
-        } finally {
-            $lock->release();
-        }
-    }
-
-    /**
-     * Resume a paused queue by name.
-     *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @return void
-     */
-    public function resume($connection, $queue)
-    {
-        $cache = $this->app['cache']->store();
-
-        $cache->forget("queue_paused:{$connection}:{$queue}");
-
-        // Remove from the list of paused queues using cache lock for atomicity
-        $lock = $cache->lock('queue_paused_list_lock', 10);
-
-        try {
-            $lock->block(5);
-
-            $pausedQueues = $this->getPausedQueues();
-            $queueIdentifier = "{$connection}:{$queue}";
-
-            if (($key = array_search($queueIdentifier, $pausedQueues)) !== false) {
-                unset($pausedQueues[$key]);
-                $this->storePausedQueuesList(array_values($pausedQueues));
-            }
-        } finally {
-            $lock->release();
-        }
-    }
-
-    /**
-     * Determine if a queue is paused.
-     *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @return bool
-     */
-    public function isPaused($connection, $queue)
-    {
-        $cache = $this->app['cache']->store();
-
-        return (bool) $cache->get("queue_paused:{$connection}:{$queue}", false);
-    }
-
-    /**
-     * Get all paused queues.
-     *
-     * @return array
-     */
-    public function getPausedQueues()
-    {
-        $cache = $this->app['cache']->store();
-
-        return $cache->get('queue_paused_list', []);
-    }
-
-    /**
-     * Store the list of paused queues.
-     *
-     * @param  array  $queues
-     * @return void
-     */
-    protected function storePausedQueuesList($queues)
-    {
-        $cache = $this->app['cache']->store();
-
-        $cache->forever('queue_paused_list', $queues);
     }
 
     /**

@@ -65,7 +65,6 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void pause(string $queue, int $ttl = 86400)
  * @method static void resume(string $queue)
  * @method static bool isPaused(string $queue)
- * @method static array getPausedQueues()
  *
  * @see \Illuminate\Queue\QueueManager
  * @see \Illuminate\Queue\Queue

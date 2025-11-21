@@ -14,14 +14,14 @@ class ResumeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:resume {queue : The name of the queue to resume (connection:queue format, e.g., redis:default)}';
+    protected $signature = 'queue:resume {queue : The name of the queue that should resume processing}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Resume processing for a paused queue';
+    protected $description = 'Resume job processing for a paused queue';
 
     /**
      * The queue manager instance.
@@ -32,8 +32,6 @@ class ResumeCommand extends Command
 
     /**
      * Create a new queue resume command.
-     *
-     * @param  \Illuminate\Contracts\Queue\Factory  $manager
      */
     public function __construct(QueueManager $manager)
     {
@@ -51,15 +49,9 @@ class ResumeCommand extends Command
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        if (! $this->manager->isPaused($connection, $queue)) {
-            $this->components->warn("Queue [{$connection}:{$queue}] is not paused.");
-
-            return 1;
-        }
-
         $this->manager->resume($connection, $queue);
 
-        $this->components->info("Queue [{$connection}:{$queue}] has been resumed.");
+        $this->components->info("Job processing on queue [{$connection}:{$queue}] has been resumed.");
 
         return 0;
     }
@@ -74,11 +66,8 @@ class ResumeCommand extends Command
     {
         [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
 
-        if (! isset($queue)) {
-            $queue = $connection;
-            $connection = $this->laravel['config']['queue.default'];
-        }
-
-        return [$connection, $queue];
+        return isset($queue)
+            ? [$connection, $queue]
+            : [$this->laravel['config']['queue.default'], $connection];
     }
 }
