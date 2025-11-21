@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -74,6 +75,18 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
+    }
+
+    public function testRemainingIsNotNegative(): void
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->with('key', 0)->andReturn(5);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertSame(0, $rateLimiter->remaining('key', 3));
+        $this->assertSame(0, $rateLimiter->retriesLeft('key', 3));
     }
 
     public function testRetriesLeftReturnsCorrectCount()
