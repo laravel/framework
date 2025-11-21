@@ -6,15 +6,15 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:resume')]
-class ResumeCommand extends Command
+#[AsCommand(name: 'queue:continue')]
+class ContinueCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'queue:resume {queue : The name of the queue that should resume processing}';
+    protected $signature = 'queue:continue {queue : The name of the queue that should resume processing}';
 
     /**
      * The console command description.
