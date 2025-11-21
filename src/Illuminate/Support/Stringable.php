@@ -1318,25 +1318,25 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         return $this->when($this->test($pattern), $callback, $default);
     }
 
-    /**
-    * Execute the given callback unless the string is empty.
-    *
-    * @param  callable  $callback
-    * @param  callable|null  $default
-    * @return static
-    */
+     /**
+     * Execute the given callback unless the string is empty.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
     public function unlessEmpty(callable $callback, ?callable $default = null)
     {
         return $this->unless($this->isEmpty(), $callback, $default);
     }
 
-    /**
-    * Execute the given callback unless the string is not empty.
-    *
-    * @param  callable  $callback
-    * @param  callable|null  $default
-    * @return static
-    */
+     /**
+     * Execute the given callback unless the string is not empty.
+     *
+     * @param  callable  $callback
+     * @param  callable|null  $default
+     * @return static
+     */
     public function unlessNotEmpty(callable $callback, ?callable $default = null)
     {
         return $this->unless(! $this->isEmpty(), $callback, $default);
