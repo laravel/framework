@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\RateLimiter;
-use Illuminate\Cache\Repository;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
