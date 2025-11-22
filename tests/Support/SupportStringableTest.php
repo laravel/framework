@@ -1477,13 +1477,14 @@ class SupportStringableTest extends TestCase
         $this->assertFalse($this->stringable('Foo')->exactly('foo'));
         $this->assertFalse($this->stringable('[]')->exactly([]));
         $this->assertFalse($this->stringable('0')->exactly(0));
-        $this->assertTrue($this->stringable('foo')->exactly(new class () implements \Stringable {
+        $this->assertTrue($this->stringable('foo')->exactly(new class() implements \Stringable
+        {
             public function __toString(): string
             {
                 return 'foo';
             }
         }));
-        $this->assertFalse($this->stringable('foo')->exactly(new class () {}));
+        $this->assertFalse($this->stringable('foo')->exactly(new class() {}));
     }
 
     public function testToInteger()
