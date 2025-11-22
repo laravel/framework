@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Cache;
+namespace Illuminate\Tests\Integration\Cache;
 
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RedisStore;
