@@ -8,7 +8,7 @@ trait ParsesQueue
      * Parse the queue argument into connection and queue name.
      *
      * @param  string  $queue
-     * @return array
+     * @return array{string, string}
      */
     protected function parseQueue($queue)
     {
