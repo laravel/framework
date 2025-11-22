@@ -293,13 +293,13 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     /**
      * Determine if the string is an exact match with the given value.
      *
-     * @param  \Illuminate\Support\Stringable|string  $value
+     * @param  BaseStringable|string  $value
      * @return bool
      */
     public function exactly($value)
     {
-        if ($value instanceof Stringable) {
-            $value = $value->toString();
+        if ($value instanceof BaseStringable) {
+            $value = (string) $value;
         }
 
         return $this->value === $value;
