@@ -27,23 +27,6 @@ class PauseCommand extends Command
     protected $description = 'Pause job processing for a specific queue';
 
     /**
-     * The queue manager instance.
-     *
-     * @var \Illuminate\Contracts\Queue\Factory
-     */
-    protected $manager;
-
-    /**
-     * Create a new queue pause command.
-     */
-    public function __construct(QueueManager $manager)
-    {
-        parent::__construct();
-
-        $this->manager = $manager;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
@@ -52,7 +35,7 @@ class PauseCommand extends Command
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        $this->manager->pause($connection, $queue);
+        $manager->pause($connection, $queue);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 

@@ -27,32 +27,15 @@ class ContinueCommand extends Command
     protected $description = 'Resume job processing for a paused queue';
 
     /**
-     * The queue manager instance.
-     *
-     * @var \Illuminate\Contracts\Queue\Factory
-     */
-    protected $manager;
-
-    /**
-     * Create a new queue resume command.
-     */
-    public function __construct(QueueManager $manager)
-    {
-        parent::__construct();
-
-        $this->manager = $manager;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
      */
-    public function handle()
+    public function handle(QueueManager $manager)
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
-        $this->manager->resume($connection, $queue);
+        $manager->resume($connection, $queue);
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been resumed.");
 
