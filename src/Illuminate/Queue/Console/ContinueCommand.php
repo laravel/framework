@@ -4,11 +4,14 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:continue')]
 class ContinueCommand extends Command
 {
+    use ParsesQueue;
+
     /**
      * The console command name.
      *
@@ -54,20 +57,5 @@ class ContinueCommand extends Command
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been resumed.");
 
         return 0;
-    }
-
-    /**
-     * Parse the queue argument into connection and queue name.
-     *
-     * @param  string  $queue
-     * @return array
-     */
-    protected function parseQueue($queue)
-    {
-        [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
-
-        return isset($queue)
-            ? [$connection, $queue]
-            : [$this->laravel['config']['queue.default'], $connection];
     }
 }

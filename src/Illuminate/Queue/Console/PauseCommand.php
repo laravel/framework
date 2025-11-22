@@ -4,11 +4,14 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
+use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:pause')]
 class PauseCommand extends Command
 {
+    use ParsesQueue;
+
     /**
      * The console command name.
      *
@@ -45,7 +48,7 @@ class PauseCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(QueueManager $manager)
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
@@ -54,20 +57,5 @@ class PauseCommand extends Command
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
 
         return 0;
-    }
-
-    /**
-     * Parse the queue argument into the connection and queue name.
-     *
-     * @param  string  $queue
-     * @return array
-     */
-    protected function parseQueue($queue)
-    {
-        [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
-
-        return isset($queue)
-            ? [$connection, $queue]
-            : [$this->laravel['config']['queue.default'], $connection];
     }
 }
