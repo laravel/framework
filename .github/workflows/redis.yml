@@ -50,6 +50,7 @@ jobs:
       - name: Execute Cache tests
         run: vendor/bin/phpunit tests/Integration/Cache
         env:
+          CACHE_STORE: redis
           REDIS_CACHE_CONNECTION: cache
           REDIS_CACHE_LOCK_CONNECTION: cache
           REDIS_CLIENT: ${{ matrix.client }}
@@ -117,6 +118,7 @@ jobs:
       - name: Execute Cache tests
         run: vendor/bin/phpunit tests/Integration/Cache
         env:
+          CACHE_STORE: redis
           REDIS_CACHE_CONNECTION: default
           REDIS_CACHE_LOCK_CONNECTION: default
           REDIS_CLIENT: ${{ matrix.client }}
