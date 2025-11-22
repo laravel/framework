@@ -522,4 +522,9 @@ if (! function_exists('with')) {
     {
         return is_null($callback) ? $value : $callback($value);
     }
+
+    function test()
+    {
+        return 'This function is just built to practive how to contribute to laravel framework';
+    }
 }
