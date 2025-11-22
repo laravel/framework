@@ -22,7 +22,7 @@ class ResumeCommand extends Command
     /**
      * The console command name aliases.
      *
-     * @var array
+     * @var list<string>
      */
     protected $aliases = ['queue:continue'];
 
