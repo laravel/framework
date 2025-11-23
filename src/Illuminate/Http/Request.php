@@ -64,6 +64,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
+     * The cached Accept header value used to detect changes.
+     *
+     * @var string|null
+     */
+    protected $cachedAcceptHeader;
+
+    /**
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
@@ -811,5 +818,24 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function __get($key)
     {
         return Arr::get($this->all(), $key, fn () => $this->route($key));
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Override to clear cache when Accept header changes.
+     */
+    #[\Override]
+    public function getAcceptableContentTypes(): array
+    {
+        $currentAcceptHeader = $this->headers->get('Accept');
+
+        if ($this->cachedAcceptHeader !== $currentAcceptHeader) {
+            $this->acceptableContentTypes = null;
+        }
+
+        $this->cachedAcceptHeader = $currentAcceptHeader;
+
+        return parent::getAcceptableContentTypes();
     }
 }
