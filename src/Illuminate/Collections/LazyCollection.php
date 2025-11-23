@@ -1218,9 +1218,19 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  int  $size
      * @param  int  $step
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function sliding($size = 2, $step = 1)
     {
+        if ($size < 1) {
+            throw new InvalidArgumentException('Size must be at least 1.');
+        }
+
+        if ($step < 1) {
+            throw new InvalidArgumentException('Step must be at least 1.');
+        }
+
         return new static(function () use ($size, $step) {
             $iterator = $this->getIterator();
 
