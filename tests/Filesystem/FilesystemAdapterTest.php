@@ -767,4 +767,16 @@ class FilesystemAdapterTest extends TestCase
         $path = $filesystemAdapter->path('different');
         $this->assertEquals('my-root/someprefix/different', $path);
     }
+
+    public function testSearchFiles()
+    {
+        $this->filesystem->write('body.txt', 'Hello World');
+        $this->filesystem->write('file1.txt', 'Hello World');
+        $this->filesystem->write('file.txt', 'Hello World');
+        $this->filesystem->write('existing.txt', 'Dear Kate');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $this->assertSame($filesystemAdapter->files(null, false, 'file*'), ['file.txt', 'file1.txt']);
+    }
 }

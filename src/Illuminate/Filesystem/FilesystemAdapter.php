@@ -871,13 +871,16 @@ class FilesystemAdapter implements CloudFilesystemContract
      *
      * @param  string|null  $directory
      * @param  bool  $recursive
+     * @param  string|null $search
      * @return array
      */
-    public function files($directory = null, $recursive = false)
+    public function files($directory = null, $recursive = false, $search = null)
     {
         return $this->driver->listContents($directory ?? '', $recursive)
-            ->filter(function (StorageAttributes $attributes) {
-                return $attributes->isFile();
+            ->filter(function (StorageAttributes $attributes) use ($search) {
+                return $attributes->isFile() && (
+                    is_null($search) || Str::is($search, $attributes->path())
+                );
             })
             ->sortByPath()
             ->map(function (StorageAttributes $attributes) {
@@ -890,11 +893,12 @@ class FilesystemAdapter implements CloudFilesystemContract
      * Get all of the files from the given directory (recursive).
      *
      * @param  string|null  $directory
+     * @param  string|null $search
      * @return array
      */
-    public function allFiles($directory = null)
+    public function allFiles($directory = null, $search = null)
     {
-        return $this->files($directory, true);
+        return $this->files($directory, true, $search);
     }
 
     /**
