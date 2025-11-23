@@ -214,7 +214,7 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
             $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
         }
 
-        foreach($fallbackRoutes as $route) {
+        foreach ($fallbackRoutes as $route) {
             $symfonyRoutes = $this->addToSymfonyRoutesCollection($symfonyRoutes, $route);
         }
 
