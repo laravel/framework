@@ -121,6 +121,21 @@ class MemoizedStoreTest extends TestCase
         $this->assertSame($cacheValue, $memoValue);
     }
 
+    public function test_it_uses_correct_keys_for_getMultiple_with_empty_prefix()
+    {
+        Cache::setPrefix(null);
+
+        $data = [
+            '1' => 'one',
+            0 => 'zero',
+        ];
+        Cache::putMany($data);
+
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+        // ensure correct on the second memoized retrieval
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+    }
+
     public function test_null_values_are_memoized_when_retrieving_multiple_values()
     {
         $live = Cache::getMultiple(['name.0', 'name.1']);
