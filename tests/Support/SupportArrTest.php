@@ -1835,4 +1835,29 @@ class SupportArrTest extends TestCase
 
         $this->assertEquals([[0 => 'John', 1 => 'Jane'], [2 => 'Greg']], $result);
     }
+
+    /**
+     * @param  array{0: string, 1: string, 2?: int, 3?: mixed}  $input
+     * @param  list<string|null>  $expected
+     */
+    public function testSafeExplode(array $input, array $expected)
+    {
+        $this->assertEquals($expected, Arr::safeExplode(...$input));
+    }
+
+    /**
+     * @return array{array{0: string, 1: string, 2?: int, 3?: mixed}, list<string|null>}
+     */
+    public static function provideSafeExplode(): array
+    {
+        return [
+            [['foo:bar', ':'], ['foo', 'bar']],
+            [['foo:bar', ':', 2, null], ['foo', 'bar']],
+            [['foo', ':', 2, null], ['foo', null]],
+            [['foo:bar', ':', 1], ['foo:bar']],
+            [['foo:bar', ':', 0], ['foo:bar']],
+            [['foo:bar:baz', ':', -1], ['foo', 'bar']],
+            [['foo:bar', ':', -2, null], [null, null]],
+        ];
+    }
 }
