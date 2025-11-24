@@ -15,7 +15,8 @@ class ListFailedCommand extends Command
      *
      * @var string
      */
-    protected $name = 'queue:failed';
+    protected $signature = 'queue:failed
+                    {--json : Output the failed jobs as JSON}';
 
     /**
      * The console command description.
@@ -38,13 +39,28 @@ class ListFailedCommand extends Command
      */
     public function handle()
     {
-        if (count($jobs = $this->getFailedJobs()) === 0) {
-            return $this->components->info('No failed jobs found.');
+        $jobs = $this->getFailedJobs();
+
+        if (count($jobs) === 0) {
+            if ($this->option('json')) {
+                $this->line(json_encode([
+                    'failed_jobs' => [],
+                    'count' => 0,
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            } else {
+                $this->components->info('No failed jobs found.');
+            }
+
+            return;
         }
 
-        $this->newLine();
-        $this->displayFailedJobs($jobs);
-        $this->newLine();
+        if ($this->option('json')) {
+            $this->displayFailedJobsAsJson($jobs);
+        } else {
+            $this->newLine();
+            $this->displayFailedJobs($jobs);
+            $this->newLine();
+        }
     }
 
     /**
@@ -121,5 +137,34 @@ class ListFailedCommand extends Command
                 sprintf('<fg=gray>%s@%s</> %s', $job[1], $job[2], $job[3])
             ),
         );
+    }
+
+
+    /**
+     * Display the failed jobs as JSON.
+     *
+     * @param  array  $jobs
+     * @return void
+     */
+    protected function displayFailedJobsAsJson(array $jobs)
+    {
+        $failed = $this->laravel['queue.failer']->all();
+
+        $output = (new Collection($failed))->map(function ($job) {
+            return [
+                'id' => $job->id,
+                'uuid' => $job->uuid ?? null,
+                'connection' => $job->connection,
+                'queue' => $job->queue,
+                'class' => $this->extractJobName($job->payload),
+                'failed_at' => $job->failed_at,
+                'exception' => $job->exception,
+            ];
+        })->values()->all();
+
+        $this->line(json_encode([
+            'failed_jobs' => $output,
+            'count' => count($output),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }
