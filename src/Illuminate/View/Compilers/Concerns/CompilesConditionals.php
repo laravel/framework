@@ -182,6 +182,17 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the active statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileActive($condition)
+    {
+        return "<?php if{$condition}: echo 'active'; endif; ?>";
+    }
+
+    /**
      * Compile the else-if statements into valid PHP.
      *
      * @param  string  $expression
