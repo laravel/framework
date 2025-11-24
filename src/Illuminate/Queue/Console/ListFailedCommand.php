@@ -139,7 +139,6 @@ class ListFailedCommand extends Command
         );
     }
 
-
     /**
      * Display the failed jobs as JSON.
      *
