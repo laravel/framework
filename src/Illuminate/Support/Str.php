@@ -469,6 +469,10 @@ class Str
      */
     public static function finish($value, $cap)
     {
+        if ($cap === '') {
+            return $value;
+        }
+
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
