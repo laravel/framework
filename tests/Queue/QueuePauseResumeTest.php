@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\QueueManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -98,5 +99,27 @@ class QueuePauseResumeTest extends TestCase
 
         $this->assertFalse($this->manager->isPaused('redis', 'emails'));
         $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+
+    public function testParsingQueueString()
+    {
+        $parser = new class()
+        {
+            use ParsesQueue;
+
+            private array $laravel = [
+                'config' => ['queue.default' => 'redis'],
+            ];
+
+            public function parse(string $queue)
+            {
+                return $this->parseQueue($queue);
+            }
+        };
+
+        $this->assertSame(['redis', 'default'], $parser->parse(''));
+        $this->assertSame(['redis', 'emails'], $parser->parse('emails'));
+        $this->assertSame(['database', 'notifications'], $parser->parse('database:notifications'));
+        $this->assertSame(['redis', 'foo:bar'], $parser->parse('redis:foo:bar'));
     }
 }
