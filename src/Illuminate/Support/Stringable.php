@@ -324,9 +324,15 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      * @param  int  $limit
      * @return \Illuminate\Support\Collection<int, string>
      */
-    public function explode($delimiter, $limit = PHP_INT_MAX)
+    public function explode($delimiter, $limit = PHP_INT_MAX, $pad = false, $padding = null)
     {
-        return new Collection(explode($delimiter, $this->value, $limit));
+        $exploded = new Collection(explode($delimiter, $this->value, $limit));
+
+        if ($pad) {
+            $exploded->pad($limit, $padding);
+        }
+        
+        return $exploded;
     }
 
     /**
