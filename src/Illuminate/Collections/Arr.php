@@ -1239,9 +1239,11 @@ class Arr
      */
     public static function safeExplode(string $value, string $delimiter, int $limit = PHP_INT_MAX, $fill = null): array
     {
+        $maxSize = substr_count($value, $delimiter) + 1;
         $length = match (true) {
             $limit === 0 => 1,
-            $limit > ($size = substr_count($value, $delimiter) + 1) => $size,
+            $limit < 0 => $maxSize - $limit,
+            $limit > $maxSize => $maxSize,
             default => $limit,
         };
 
