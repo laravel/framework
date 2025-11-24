@@ -329,6 +329,12 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         $exploded = new Collection(explode($delimiter, $this->value, $limit));
 
         if ($pad) {
+            if ($limit === 0) {
+                $limit = 1;
+            } else if ($limit < 0) {
+                $limit = count($exploded) - ($limit - 1);
+            }
+
             $exploded->pad($limit, $padding);
         }
 
