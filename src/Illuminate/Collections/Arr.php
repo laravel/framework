@@ -1233,4 +1233,15 @@ class Arr
 
         return is_array($value) ? $value : [$value];
     }
+
+    public static function safeExplode(string $value, string $delimiter, int $limit = PHP_INT_MAX, $fill = null): array
+    {
+        $length = match ($limit) {
+            $limit > 0 => $limit,
+            $limit === 0 => 1,
+            $limit < 0 => count($exploded) - ($limit - 1),
+        };
+
+        return array_pad(explode($delimiter, $value, $limit), $length, $fill);
+    }
 }
