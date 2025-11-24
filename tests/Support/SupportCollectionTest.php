@@ -2286,6 +2286,14 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForZeroGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be greater than 0.');
+        $collection::times(5)->splitIn(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testChunkWhileOnEqualElements($collection)
     {
         $data = (new $collection(['A', 'A', 'B', 'B', 'C', 'C', 'C']))
@@ -5073,6 +5081,13 @@ class SupportCollectionTest extends TestCase
                 return $chunk->values()->toArray();
             })->toArray()
         );
+    }
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForZeroGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be greater than 0.');
+        $collection::times(5)->split(0);
     }
 
     #[DataProvider('collectionClassProvider')]

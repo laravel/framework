@@ -1349,11 +1349,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Split a collection into a certain number of groups.
      *
-     * @param  int  $numberOfGroups
+     * @param  positive-int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function split($numberOfGroups)
     {
+        if ($numberOfGroups <= 0) {
+            throw new InvalidArgumentException('Number of groups must be greater than 0.');
+        }
+
         if ($this->isEmpty()) {
             return new static;
         }
@@ -1386,11 +1392,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Split a collection into a certain number of groups, and fill the first groups completely.
      *
-     * @param  int  $numberOfGroups
+     * @param  positive-int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function splitIn($numberOfGroups)
     {
+        if ($numberOfGroups <= 0) {
+            throw new InvalidArgumentException('Number of groups must be greater than 0.');
+        }
+
         return $this->chunk((int) ceil($this->count() / $numberOfGroups));
     }
 
