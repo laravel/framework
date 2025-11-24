@@ -18,9 +18,12 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -431,6 +434,67 @@ class CacheRepositoryTest extends TestCase
         $nonTaggableRepo = new Repository($nonTaggable);
 
         $this->assertFalse($nonTaggableRepo->supportsTags());
+    }
+
+    public function testItCanCachePages()
+    {
+        $store = new ArrayStore();
+        $cache = new Repository(new ArrayStore);
+        $users = collect([]);
+        for ($i = 0; $i < 2500; $i++) {
+            $user = new stdClass;
+
+            $user->id = $i;
+
+            $users[] = $user;
+        }
+        $resolved = 0;
+
+        $users = $cache->pages('users', 30, function ($page, $pageSize) use ($users, &$resolved) {
+            $page = $users->shift(1000);
+
+            $resolved += count($page);
+
+            return $page;
+        });
+
+        $this->assertInstanceOf(LazyCollection::class, $users);
+        $this->assertSame(0, $resolved);
+        foreach ($users as $index => $user) {
+            if ($index < 1000) {
+                $this->assertSame(1000, $resolved);
+            } else if ($index < 2000) {
+                $this->assertSame(2000, $resolved);
+            } else if ($index < 3000) {
+                $this->assertSame(2500, $resolved);
+            }
+
+            $this->assertSame($index, $user->id);
+        }
+        $this->assertSame($index, 2499);
+
+        $page = $cache->get('users:page-0|1000');
+        $this->assertCount(1000, $page);
+        $index = null;
+        foreach ($page as $index => $user) {
+            $this->assertSame($index, $user->id);
+        }
+        $this->assertSame(999, $index);
+        $page = $cache->get('users:page-1|1000');
+        $this->assertCount(1000, $page);
+        $index = null;
+        foreach ($page as $index => $user) {
+            $this->assertSame($index + 1000, $user->id);
+        }
+        $this->assertSame(999, $index);
+        $page = $cache->get('users:page-2|1000');
+        $this->assertCount(500, $page);
+        $index = null;
+        foreach ($page as $index => $user) {
+            $this->assertSame($index + 2000, $user->id);
+        }
+        $this->assertSame(499, $index);
+        $this->assertFalse($cache->has('users:page-3|1000'));
     }
 
     protected function getRepository()

@@ -23,10 +23,15 @@ use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Traits\Macroable;
+use RuntimeException;
 
 use function Illuminate\Support\defer;
 
@@ -571,6 +576,56 @@ class Repository implements ArrayAccess, CacheContract
         }
 
         return $result;
+    }
+
+    /**
+     * Chunk it.
+     *
+     * @param  string  $key
+     * @param  callable|\DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param  callable $callback
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function pages($key, $ttl, $callback, $pageSize = 1000)
+    {
+        return new LazyCollection(function () use ($key, $ttl, $callback, $pageSize) {
+            $page = 0;
+
+            while (true) {
+                $items = $this->remember(
+                    key: "{$key}:page-{$page}|{$pageSize}",
+                    // TODO shared TTL via another key? or return Cache::sharedTtl(300) so they all have the same TTL?
+                    ttl: is_callable($ttl)
+                        ? fn ($items) => $ttl($items, $page, $pageSize)
+                        : $ttl,
+                        callback: function () use ($callback, $page, $pageSize) {
+                            $items = $callback($page, $pageSize);
+
+                            if ($items instanceof Builder || $items instanceof EloquentBuilder) {
+                                return $items->forPage($page, $pageSize)->get();
+                            }
+
+                            return $items;
+                        },
+                );
+
+                $items = Arr::from($items);
+
+                if (count($items) > $pageSize) {
+                    throw new RuntimeException("Expected pages of size [{$pageSize}], received [".count($items)."]");
+                }
+
+                foreach ($items as $item) {
+                    yield $item;
+                }
+
+                if (count($items) < $pageSize) {
+                    return;
+                }
+
+                $page++;
+            }
+        });
     }
 
     /**
