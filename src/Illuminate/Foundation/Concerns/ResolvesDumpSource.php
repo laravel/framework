@@ -13,6 +13,7 @@ trait ResolvesDumpSource
      * @var array<string, string>
      */
     protected $editorHrefs = [
+        'antigravity' => 'antigravity://file/{file}:{line}',
         'atom' => 'atom://core/open/file?filename={file}&line={line}',
         'cursor' => 'cursor://file/{file}:{line}',
         'emacs' => 'emacs://open?url=file://{file}&line={line}',
@@ -74,21 +75,23 @@ trait ResolvesDumpSource
         $sourceKey = null;
 
         foreach ($trace as $traceKey => $traceFile) {
-            if (! isset($traceFile['file'])) {
+            if (!isset($traceFile['file'])) {
                 continue;
             }
 
             foreach (self::$adjustableTraces as $name => $key) {
-                if (str_ends_with(
-                    $traceFile['file'],
-                    str_replace('/', DIRECTORY_SEPARATOR, $name)
-                )) {
+                if (
+                    str_ends_with(
+                        $traceFile['file'],
+                        str_replace('/', DIRECTORY_SEPARATOR, $name)
+                    )
+                ) {
                     $sourceKey = $traceKey + $key;
                     break;
                 }
             }
 
-            if (! is_null($sourceKey)) {
+            if (!is_null($sourceKey)) {
                 break;
             }
         }
@@ -161,7 +164,7 @@ trait ResolvesDumpSource
             // ..
         }
 
-        if (! isset($editor)) {
+        if (!isset($editor)) {
             return;
         }
 
