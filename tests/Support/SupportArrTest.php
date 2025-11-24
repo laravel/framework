@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -1840,6 +1841,7 @@ class SupportArrTest extends TestCase
      * @param  array{0: string, 1: string, 2?: int, 3?: mixed}  $input
      * @param  list<string|null>  $expected
      */
+    #[DataProvider('provideSafeExplode')
     public function testSafeExplode(array $input, array $expected)
     {
         $this->assertEquals($expected, Arr::safeExplode(...$input));
