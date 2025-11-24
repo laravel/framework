@@ -1853,13 +1853,13 @@ class SupportArrTest extends TestCase
     public static function provideSafeExplode(): array
     {
         return [
-            [['foo:bar', ':'], ['foo', 'bar']],
-            [['foo:bar', ':', 2, null], ['foo', 'bar']],
-            [['foo', ':', 2, null], ['foo', null]],
-            [['foo:bar', ':', 1], ['foo:bar']],
-            [['foo:bar', ':', 0], ['foo:bar']],
-            [['foo:bar:baz', ':', -1], ['foo', 'bar']],
-            [['foo:bar', ':', -2, null], [null, null]],
+            'no padding needed, use defaults' => [['foo:bar', ':'], ['foo', 'bar']],
+            'no padding needed, explicit values' => [['foo:bar', ':', 2, null], ['foo', 'bar']],
+            'one entry needs to be passed, null padding given' => [['foo', ':', 2, null], ['foo', null]],
+            'limit set to 1, only one entry returned' => [['foo:bar', ':', 1], ['foo:bar']],
+            'limit set to 0, treated the same as with 1' => [['foo:bar', ':', 0], ['foo:bar']],
+            'negative limit given, correctly exploded from end of array, no padding needed' => [['foo:bar:baz', ':', -1], ['foo', 'bar']],
+            'negative limit given, correctly exploded from end of array, both resulting entries correctly padded with null' => [['foo:bar', ':', -2, null], [null, null]],
         ];
     }
 }
