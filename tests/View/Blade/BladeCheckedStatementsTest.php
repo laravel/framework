@@ -44,7 +44,7 @@ class BladeCheckedStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-     public function testActiveStatementsAreCompiled()
+    public function testActiveStatementsAreCompiled()
     {
         $string = '<a @active(request()->routeIs(\'home\'))>Home</a>';
         $expected = "<a <?php if(request()->routeIs('home')): echo 'active'; endif; ?>>Home</a>";
