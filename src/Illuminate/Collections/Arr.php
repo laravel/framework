@@ -1234,6 +1234,9 @@ class Arr
         return is_array($value) ? $value : [$value];
     }
 
+    /**
+     * @return $fill is string ? list<string> : list<mixed>
+     */
     public static function safeExplode(string $value, string $delimiter, int $limit = PHP_INT_MAX, $fill = null): array
     {
         $length = match ($limit) {
