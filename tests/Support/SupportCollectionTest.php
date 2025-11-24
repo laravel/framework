@@ -5082,6 +5082,7 @@ class SupportCollectionTest extends TestCase
             })->toArray()
         );
     }
+    
     #[DataProvider('collectionClassProvider')]
     public function testSplitThrowsExceptionForZeroGroups($collection)
     {
