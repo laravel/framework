@@ -1241,7 +1241,6 @@ class Arr
     {
         $length = match (true) {
             $limit === 0 => 1,
-            $limit < 0 => substr_count($value, $delimiter) - ($limit + 1),
             $limit > ($size = substr_count($value, $delimiter) + 1) => $size,
             default => $limit,
         };
