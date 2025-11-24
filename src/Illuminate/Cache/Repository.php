@@ -594,7 +594,8 @@ class Repository implements ArrayAccess, CacheContract
             while (true) {
                 $items = $this->remember(
                     key: "{$key}:page-{$page}|{$pageSize}",
-                    // TODO shared TTL via another key? or return Cache::sharedTtl(300) so they all have the same TTL?
+                    // TODO should we do more to make this a shared value across pages. Is that
+                    // an opinion the framework should introduce? I think it is.
                     ttl: is_callable($ttl)
                         ? fn ($items) => $ttl($items, $page, $pageSize)
                         : $ttl,

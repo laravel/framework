@@ -525,10 +525,9 @@ class CacheRepositoryTest extends TestCase
             }
         })->chunk(1000);
 
-        $now = now()->toImmutable();
         $users = $cache->pages(
             key: 'users',
-            ttl:  fn ($users, $page, $pageSize) => $now->addSeconds(30),
+            ttl:  fn ($users, $page, $pageSize) => once(fn () => now()->addSeconds(30)),
             callback:  function ($page, $pageSize) use ($userStore) {
                 Carbon::setTestNow(now()->addSeconds(1));
 
@@ -538,9 +537,9 @@ class CacheRepositoryTest extends TestCase
         $this->assertInstanceOf(LazyCollection::class, $users);
         $this->assertCount(2500, $users);
         $this->assertSame([
-            'users:page-1|1000' => (float) $started->addSeconds(30)->getTimestamp(),
-            'users:page-2|1000' => (float) $started->addSeconds(30)->getTimestamp(),
-            'users:page-3|1000' => (float) $started->addSeconds(30)->getTimestamp(),
+            'users:page-1|1000' => (float) $started->addSeconds(30 + 1)->getTimestamp(),
+            'users:page-2|1000' => (float) $started->addSeconds(30 + 1)->getTimestamp(),
+            'users:page-3|1000' => (float) $started->addSeconds(30 + 1)->getTimestamp(),
         ], collect($cache->all())->map->expiresAt->all());
     }
 
