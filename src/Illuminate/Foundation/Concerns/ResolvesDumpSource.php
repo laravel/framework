@@ -75,23 +75,21 @@ trait ResolvesDumpSource
         $sourceKey = null;
 
         foreach ($trace as $traceKey => $traceFile) {
-            if (!isset($traceFile['file'])) {
+            if (! isset($traceFile['file'])) {
                 continue;
             }
 
             foreach (self::$adjustableTraces as $name => $key) {
-                if (
-                    str_ends_with(
-                        $traceFile['file'],
-                        str_replace('/', DIRECTORY_SEPARATOR, $name)
-                    )
-                ) {
+                if (str_ends_with(
+                    $traceFile['file'],
+                    str_replace('/', DIRECTORY_SEPARATOR, $name)
+                )) {
                     $sourceKey = $traceKey + $key;
                     break;
                 }
             }
 
-            if (!is_null($sourceKey)) {
+            if (! is_null($sourceKey)) {
                 break;
             }
         }
@@ -164,7 +162,7 @@ trait ResolvesDumpSource
             // ..
         }
 
-        if (!isset($editor)) {
+        if (! isset($editor)) {
             return;
         }
 
