@@ -331,7 +331,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         if ($pad) {
             $exploded->pad($limit, $padding);
         }
-        
+
         return $exploded;
     }
 
