@@ -438,64 +438,113 @@ class CacheRepositoryTest extends TestCase
 
     public function testItCanCachePages()
     {
-        $store = new ArrayStore();
+        Carbon::setTestNow($started = now()->toImmutable());
         $cache = new Repository(new ArrayStore);
-        $users = collect([]);
+        $userStore = collect([]);
         for ($i = 0; $i < 2500; $i++) {
             $user = new stdClass;
 
             $user->id = $i;
 
-            $users[] = $user;
+            $userStore[] = $user;
         }
         $resolved = 0;
+        $invoked = 0;
 
-        $users = $cache->pages('users', 30, function ($page, $pageSize) use ($users, &$resolved) {
-            $page = $users->shift(1000);
+        $users = $cache->pages('users', 30, function ($page, $pageSize) use ($userStore, &$resolved, &$invoked) {
+            Carbon::setTestNow(now()->addSeconds(10));
+
+            $page = $userStore->shift(1000);
 
             $resolved += count($page);
+            $invoked++;
 
             return $page;
         });
 
         $this->assertInstanceOf(LazyCollection::class, $users);
         $this->assertSame(0, $resolved);
+        $this->assertSame(0, $invoked);
         foreach ($users as $index => $user) {
             if ($index < 1000) {
                 $this->assertSame(1000, $resolved);
+                $this->assertSame(1, $invoked);
             } else if ($index < 2000) {
                 $this->assertSame(2000, $resolved);
+                $this->assertSame(2, $invoked);
             } else if ($index < 3000) {
                 $this->assertSame(2500, $resolved);
+                $this->assertSame(3, $invoked);
             }
 
             $this->assertSame($index, $user->id);
         }
         $this->assertSame($index, 2499);
 
-        $page = $cache->get('users:page-0|1000');
+        $page = $cache->get('users:page-1|1000');
         $this->assertCount(1000, $page);
         $index = null;
         foreach ($page as $index => $user) {
             $this->assertSame($index, $user->id);
         }
         $this->assertSame(999, $index);
-        $page = $cache->get('users:page-1|1000');
+        $page = $cache->get('users:page-2|1000');
         $this->assertCount(1000, $page);
         $index = null;
         foreach ($page as $index => $user) {
             $this->assertSame($index + 1000, $user->id);
         }
         $this->assertSame(999, $index);
-        $page = $cache->get('users:page-2|1000');
+        $page = $cache->get('users:page-3|1000');
         $this->assertCount(500, $page);
         $index = null;
         foreach ($page as $index => $user) {
             $this->assertSame($index + 2000, $user->id);
         }
         $this->assertSame(499, $index);
-        $this->assertFalse($cache->has('users:page-3|1000'));
+        $this->assertFalse($cache->has('users:page-4|1000'));
+        $this->assertSame([
+            'users:page-1|1000' => (float) $started->addSeconds(30 + 10)->getTimestamp(),
+            'users:page-2|1000' => (float) $started->addSeconds(30 + 20)->getTimestamp(),
+            'users:page-3|1000' => (float) $started->addSeconds(30 + 30)->getTimestamp(),
+        ], collect($cache->all())->map->expiresAt->all());
     }
+
+    public function testItCanCachePagesUsingSameTtlForAllPages(): void
+    {
+        Carbon::setTestNow($started = now()->toImmutable());
+        $store = new ArrayStore();
+        $cache = new Repository(new ArrayStore);
+        $userStore = new LazyCollection(function () {
+            for ($i = 0; $i < 2500; $i++) {
+                $user = new stdClass;
+
+                $user->id = $i;
+
+                yield $user;
+            }
+        })->chunk(1000);
+
+        $now = now()->toImmutable();
+        $users = $cache->pages(
+            key: 'users',
+            ttl:  fn ($users, $page, $pageSize) => $now->addSeconds(30),
+            callback:  function ($page, $pageSize) use ($userStore) {
+                Carbon::setTestNow(now()->addSeconds(1));
+
+                return $userStore->get($page - 1);
+            });
+
+        $this->assertInstanceOf(LazyCollection::class, $users);
+        $this->assertCount(2500, $users);
+        $this->assertSame([
+            'users:page-1|1000' => (float) $started->addSeconds(30)->getTimestamp(),
+            'users:page-2|1000' => (float) $started->addSeconds(30)->getTimestamp(),
+            'users:page-3|1000' => (float) $started->addSeconds(30)->getTimestamp(),
+        ], collect($cache->all())->map->expiresAt->all());
+    }
+
+
 
     protected function getRepository()
     {

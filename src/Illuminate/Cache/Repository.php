@@ -589,7 +589,7 @@ class Repository implements ArrayAccess, CacheContract
     public function pages($key, $ttl, $callback, $pageSize = 1000)
     {
         return new LazyCollection(function () use ($key, $ttl, $callback, $pageSize) {
-            $page = 0;
+            $page = 1;
 
             while (true) {
                 $items = $this->remember(
@@ -602,14 +602,12 @@ class Repository implements ArrayAccess, CacheContract
                             $items = $callback($page, $pageSize);
 
                             if ($items instanceof Builder || $items instanceof EloquentBuilder) {
-                                return $items->forPage($page, $pageSize)->get();
+                                return $items->forPage($page, $pageSize)->get()->all(); 
                             }
 
-                            return $items;
+                            return Arr::from($items);
                         },
                 );
-
-                $items = Arr::from($items);
 
                 if (count($items) > $pageSize) {
                     throw new RuntimeException("Expected pages of size [{$pageSize}], received [".count($items)."]");
