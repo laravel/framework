@@ -1841,7 +1841,7 @@ class SupportArrTest extends TestCase
      * @param  array{0: string, 1: string, 2?: int, 3?: mixed}  $input
      * @param  list<string|null>  $expected
      */
-    #[DataProvider('provideSafeExplode')
+    #[DataProvider('provideSafeExplode')]
     public function testSafeExplode(array $input, array $expected)
     {
         $this->assertEquals($expected, Arr::safeExplode(...$input));
