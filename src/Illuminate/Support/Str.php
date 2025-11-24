@@ -1402,6 +1402,10 @@ class Str
      */
     public static function start($value, $prefix)
     {
+        if ($prefix === '') {
+            return $value;
+        }
+
         $quoted = preg_quote($prefix, '/');
 
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
