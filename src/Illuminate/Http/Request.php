@@ -64,7 +64,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
-     * The cached Accept header value used to detect changes.
+     * The cached "Accept" header value.
      *
      * @var string|null
      */
@@ -361,6 +361,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function userAgent()
     {
         return $this->headers->get('User-Agent');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function getAcceptableContentTypes(): array
+    {
+        $currentAcceptHeader = $this->headers->get('Accept');
+
+        if ($this->cachedAcceptHeader !== $currentAcceptHeader) {
+            // Flush acceptable content types so Symfony re-calculates them...
+            $this->acceptableContentTypes = null;
+            $this->cachedAcceptHeader = $currentAcceptHeader;
+        }
+
+        return parent::getAcceptableContentTypes();
     }
 
     /**
@@ -818,23 +835,5 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function __get($key)
     {
         return Arr::get($this->all(), $key, fn () => $this->route($key));
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Override to clear cache when Accept header changes.
-     */
-    #[\Override]
-    public function getAcceptableContentTypes(): array
-    {
-        $currentAcceptHeader = $this->headers->get('Accept');
-
-        if ($this->cachedAcceptHeader !== $currentAcceptHeader) {
-            $this->acceptableContentTypes = null;
-            $this->cachedAcceptHeader = $currentAcceptHeader;
-        }
-
-        return parent::getAcceptableContentTypes();
     }
 }
