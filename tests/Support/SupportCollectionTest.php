@@ -454,14 +454,14 @@ class SupportCollectionTest extends TestCase
             $collection::times(5)->sliding(0, 1)->toArray();
             $this->fail('Expected InvalidArgumentException for size = 0');
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Size must be at least 1.', $e->getMessage());
+            $this->assertSame('Size value must be at least 1.', $e->getMessage());
         }
 
         try {
             $collection::times(5)->sliding(-1, 1)->toArray();
             $this->fail('Expected InvalidArgumentException for size = -1');
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Size must be at least 1.', $e->getMessage());
+            $this->assertSame('Size value must be at least 1.', $e->getMessage());
         }
 
         // Test invalid step parameter (step must be at least 1)
@@ -470,14 +470,14 @@ class SupportCollectionTest extends TestCase
             $collection::times(5)->sliding(2, 0)->toArray();
             $this->fail('Expected InvalidArgumentException for step = 0');
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Step must be at least 1.', $e->getMessage());
+            $this->assertSame('Step value must be at least 1.', $e->getMessage());
         }
 
         try {
             $collection::times(5)->sliding(2, -1)->toArray();
             $this->fail('Expected InvalidArgumentException for step = -1');
         } catch (\InvalidArgumentException $e) {
-            $this->assertSame('Step must be at least 1.', $e->getMessage());
+            $this->assertSame('Step value must be at least 1.', $e->getMessage());
         }
     }
 

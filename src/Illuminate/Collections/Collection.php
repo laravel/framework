@@ -1282,8 +1282,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Create chunks representing a "sliding window" view of the items in the collection.
      *
-     * @param  int  $size
-     * @param  int  $step
+     * @param  positive-int  $size
+     * @param  positive-int  $step
      * @return static<int, static>
      *
      * @throws \InvalidArgumentException
@@ -1291,11 +1291,9 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function sliding($size = 2, $step = 1)
     {
         if ($size < 1) {
-            throw new InvalidArgumentException('Size must be at least 1.');
-        }
-
-        if ($step < 1) {
-            throw new InvalidArgumentException('Step must be at least 1.');
+            throw new InvalidArgumentException('Size value must be at least 1.');
+        } elseif ($step < 1) {
+            throw new InvalidArgumentException('Step value must be at least 1.');
         }
 
         $chunks = floor(($this->count() - $size) / $step) + 1;
