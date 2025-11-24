@@ -1239,10 +1239,10 @@ class Arr
      */
     public static function safeExplode(string $value, string $delimiter, int $limit = PHP_INT_MAX, $fill = null): array
     {
-        $length = match ($limit) {
+        $length = match (true) {
             $limit > 0 => $limit,
             $limit === 0 => 1,
-            $limit < 0 => count($exploded) - ($limit - 1),
+            $limit < 0 => substr_count($value, $delimiter) - ($limit + 1),
         };
 
         return array_pad(explode($delimiter, $value, $limit), $length, $fill);
