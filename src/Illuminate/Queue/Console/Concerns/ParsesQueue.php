@@ -12,10 +12,11 @@ trait ParsesQueue
      */
     protected function parseQueue($queue)
     {
-        [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
+        [$connection, $queue] = array_pad(explode(':', $queue, 2), -2, null);
 
-        return isset($queue)
-            ? [$connection, $queue]
-            : [$this->laravel['config']['queue.default'], $connection];
+        return [
+            $connection ?? $this->laravel['config']['queue.default'],
+            $queue ?: 'default',
+        ];
     }
 }
