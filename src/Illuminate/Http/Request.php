@@ -832,9 +832,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if ($this->cachedAcceptHeader !== $currentAcceptHeader) {
             $this->acceptableContentTypes = null;
+            $this->cachedAcceptHeader = $currentAcceptHeader;
         }
-
-        $this->cachedAcceptHeader = $currentAcceptHeader;
 
         return parent::getAcceptableContentTypes();
     }
