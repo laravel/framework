@@ -1,6 +1,12 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.46.1...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.46.2...11.x)
+
+## [v11.46.2](https://github.com/laravel/framework/compare/v11.46.1...v11.46.2) - 2025-11-25
+
+* [11.x] Avoid duplicate chain catch when nested batch fails on sync queue by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57322
+* [11.x] Supports Symfony 7.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57753
+* [11.x] Fix `Request::getAcceptableContentTypes()` changes in Symfony 7.4 by [@GrahamCampbell](https://github.com/GrahamCampbell) in https://github.com/laravel/framework/pull/57806
 
 ## [v11.46.1](https://github.com/laravel/framework/compare/v11.46.0...v11.46.1) - 2025-09-30
 
