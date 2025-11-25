@@ -1604,6 +1604,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
             ->getMock();
     }
 
+    public function testAddingColumnWithAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name')->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `name` varchar(255) not null, algorithm=instant', $statements[0]);
+    }
+
+    public function testChangingColumnWithAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name', 100)->change()->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` modify `name` varchar(100) not null, algorithm=instant', $statements[0]);
+    }
+
     public function getGrammar(?Connection $connection = null)
     {
         return new MySqlGrammar($connection ?? $this->getConnection());
