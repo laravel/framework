@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.40.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.40.1...12.x)
+
+## [v12.40.1](https://github.com/laravel/framework/compare/v12.40.0...v12.40.1) - 2025-11-25
+
+* Add support for instant column additions by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57907
 
 ## [v12.40.0](https://github.com/laravel/framework/compare/v12.39.0...v12.40.0) - 2025-11-25
 
