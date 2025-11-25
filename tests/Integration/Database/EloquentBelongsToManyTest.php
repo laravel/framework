@@ -475,7 +475,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         try {
             $post->tags()->findSole($tag);
             $this->fail('Expected RecordsNotFoundException was not thrown.');
-        } catch (RecordsNotFoundException $e) {
+        } catch (RecordsNotFoundException) {
             $this->assertTrue(true);
         }
     }

@@ -1637,7 +1637,7 @@ class TestResponseTest extends TestCase
         try {
             $response->assertExactJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo']]], 'foo', 'foobar', 0, 'bars', 'barfoo', 'numeric_keys']);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 
@@ -1651,7 +1651,7 @@ class TestResponseTest extends TestCase
         try {
             $response->assertExactJsonStructure(['*' => ['foo', 'bar']]);
             $failed = false;
-        } catch (AssertionFailedError $e) {
+        } catch (AssertionFailedError) {
             $failed = true;
         }
 

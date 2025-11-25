@@ -182,7 +182,7 @@ class ConnectionFactory
 
                 try {
                     return $this->createConnector($config)->connect($config);
-                } catch (PDOException $e) {
+                } catch (PDOException) {
                     continue;
                 }
             }
