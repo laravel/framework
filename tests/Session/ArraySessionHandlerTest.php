@@ -48,6 +48,7 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
+        Carbon::setTestNow(Carbon::now());
         $handler->write('foo', 'bar');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
