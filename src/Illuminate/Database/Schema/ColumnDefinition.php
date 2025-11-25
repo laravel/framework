@@ -15,6 +15,7 @@ use Illuminate\Support\Fluent;
  * @method $this default(mixed $value) Specify a "default" value for the column
  * @method $this first() Place the column "first" in the table (MySQL)
  * @method $this from(int $startingValue) Set the starting value of an auto-incrementing field (MySQL / PostgreSQL)
+ * @method $this instant() Specify that algorithm=instant should be used for the column operation (MySQL)
  * @method $this generatedAs(string|\Illuminate\Contracts\Database\Query\Expression $expression = null) Create a SQL compliant identity column (PostgreSQL)
  * @method $this index(bool|string $indexName = null) Add an index
  * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
