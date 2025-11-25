@@ -1961,7 +1961,7 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testProxyThrowsExceptionWhenConstructorIsNotCalled()
+    public function testProxyThrowsExceptionWhenObjectIsNotReturned()
     {
         if (version_compare(phpversion(), '8.4.0', '<')) {
             $this->markTestSkipped();
@@ -2040,7 +2040,7 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
-    public function testClosureOnlyProxyThrowsExceptionWhenConstructorIsNotCalled()
+    public function testClosureOnlyProxyThrowsExceptionWhenObjectIsNotReturned()
     {
         if (version_compare(phpversion(), '8.4.0', '<')) {
             $this->markTestSkipped();
