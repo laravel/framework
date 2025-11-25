@@ -330,10 +330,16 @@ class RedisStore extends TaggableStore implements LockProvider
             $cursor = $defaultCursorValue;
 
             do {
-                [$cursor, $tagsChunk] = $connection->scan(
+                $scanResult = $connection->scan(
                     $cursor,
                     ['match' => $prefix.'tag:*:entries', 'count' => $chunkSize]
                 );
+
+                if (! is_array($scanResult)) {
+                    break;
+                }
+
+                [$cursor, $tagsChunk] = $scanResult;
 
                 if (! is_array($tagsChunk)) {
                     break;
