@@ -105,6 +105,18 @@ class CallbackEvent extends Event
     }
 
     /**
+     * Set the additional environment variables for the callback.
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function env(array $environment)
+    {
+        throw new RuntimeException('Scheduled closures can not set environment variables.');
+    }
+
+    /**
      * Run the callback.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container

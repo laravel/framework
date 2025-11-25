@@ -91,6 +91,13 @@ class Event
     public $exitCode;
 
     /**
+     * The additional environment variables for the command.
+     *
+     * @var array
+     */
+    public $environment = [];
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
@@ -198,7 +205,7 @@ class Event
     protected function execute($container)
     {
         return Process::fromShellCommandline(
-            $this->buildCommand(), base_path(), null, null, null
+            $this->buildCommand(), base_path(), $this->environment, null, null
         )->run(
             laravel_cloud()
                 ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)
@@ -472,6 +479,18 @@ class Event
         }
 
         return "Scheduled Job Output For [{$this->command}]";
+    }
+
+    /**
+     * Set the additional environment variables for the command.
+     *
+     * @return $this
+     */
+    public function env(array $environment)
+    {
+        $this->environment = $environment;
+
+        return $this;
     }
 
     /**
