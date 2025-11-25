@@ -181,7 +181,7 @@ class PostgresGrammar extends Grammar
             $mode = 'websearch_to_tsquery';
         }
 
-        if (($where['options']['mode'] ?? []) === 'none') {
+        if (($where['options']['mode'] ?? []) === 'raw') {
             $mode = 'to_tsquery';
         }
 

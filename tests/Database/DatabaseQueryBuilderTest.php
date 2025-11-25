@@ -1559,7 +1559,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['Car Plane'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilderWithProcessor();
-        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Air | Plan:* -Car', ['mode' => 'none']);
+        $builder->select('*')->from('users')->whereFullText(['body', 'title'], 'Air | Plan:* -Car', ['mode' => 'raw']);
         $this->assertSame('select * from "users" where (to_tsvector(\'english\', "body") || to_tsvector(\'english\', "title")) @@ to_tsquery(\'english\', ?)', $builder->toSql());
         $this->assertEquals(['Air | Plan:* -Car'], $builder->getBindings());
     }
