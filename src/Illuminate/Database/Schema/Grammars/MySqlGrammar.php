@@ -531,7 +531,7 @@ class MySqlGrammar extends Grammar
     {
         $columns = $this->prefixArray('drop', $this->wrapArray($command->columns));
 
-        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns).($command->instant ? ', algorithm=instant' : '');
     }
 
     /**

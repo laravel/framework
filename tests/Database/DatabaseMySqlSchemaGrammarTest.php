@@ -1624,6 +1624,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` modify `name` varchar(100) not null, algorithm=instant', $statements[0]);
     }
 
+    public function testDroppingColumnWithAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->dropColumn('name')->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` drop `name`, algorithm=instant', $statements[0]);
+    }
+
     public function getGrammar(?Connection $connection = null)
     {
         return new MySqlGrammar($connection ?? $this->getConnection());
