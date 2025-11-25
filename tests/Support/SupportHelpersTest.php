@@ -1930,10 +1930,9 @@ class SupportHelpersTest extends TestCase
         }
 
         SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
 
-        $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
-            return new SupportLazyClass('foo', 'bar');
-        });
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
 
         $this->assertFalse(SupportLazyClass::$constructorCalled);
         $this->assertSame('foo', $instance->first);
@@ -1950,8 +1949,9 @@ class SupportHelpersTest extends TestCase
         }
 
         SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
 
-        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => new SupportLazyClass('foo', 'bar'));
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
 
         $this->assertFalse(SupportLazyClass::$constructorCalled);
         $this->assertSame('foo', $instance->first);
@@ -2007,9 +2007,10 @@ class SupportHelpersTest extends TestCase
         }
 
         SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
 
-        $instance = proxy(function (SupportLazyClass $proxy) {
-            return new SupportLazyClass('foo', 'bar');
+        $instance = proxy(function (SupportLazyClass $proxy) use ($factory) {
+            return $factory();
         });
 
         $this->assertFalse(SupportLazyClass::$constructorCalled);
@@ -2027,8 +2028,9 @@ class SupportHelpersTest extends TestCase
         }
 
         SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
 
-        $instance = proxy(fn (SupportLazyClass $proxy) => new SupportLazyClass('foo', 'bar'));
+        $instance = proxy(fn (SupportLazyClass $proxy) => $factory());
 
         $this->assertFalse(SupportLazyClass::$constructorCalled);
         $this->assertSame('foo', $instance->first);
