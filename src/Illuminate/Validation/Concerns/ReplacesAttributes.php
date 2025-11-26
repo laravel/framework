@@ -130,6 +130,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the encoding rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceEncoding($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':encoding', $parameters[0], $message);
+    }
+
+    /**
      * Replace all place-holders for the extensions rule.
      *
      * @param  string  $message

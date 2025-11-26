@@ -357,6 +357,49 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testEncoding()
+    {
+        // ASCII file containing UTF-8.
+        $this->fails(
+            File::default()->encoding('ascii'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+            ['validation.encoding'],
+        );
+
+        // UTF-8 file containing invalid UTF-8 byte sequence.
+        $this->fails(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', "\xf0\x28\x8c\x28"),
+            ['validation.encoding'],
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            [
+                UploadedFile::fake()->createWithContent('foo-1.txt', '✌️'),
+                UploadedFile::fake()->createWithContent('foo-2.txt', '👍'),
+            ]
+        );
+    }
+
+    public function testEncodingWithInvalidParameter()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Validation rule encoding parameter [FOOBAR] is not a valid encoding.');
+
+        // Invalid encoding.
+        $this->fails(
+            File::default()->encoding('FOOBAR'),
+            UploadedFile::fake()->createWithContent('foo.txt', ''),
+            ['validation.encoding'],
+        );
+    }
+
     public function testMacro()
     {
         File::macro('toDocument', function () {

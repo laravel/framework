@@ -1,6 +1,26 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.38.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.39.0...12.x)
+
+## [v12.39.0](https://github.com/laravel/framework/compare/v12.38.1...v12.39.0) - 2025-11-18
+
+* [12.x] `ApplicationBuilder@withExceptions()` improvements by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57778
+* Carry `--force` to `make:test` for generators with `--test` by [@CasEbb](https://github.com/CasEbb) in https://github.com/laravel/framework/pull/57777
+* [12.x] Fix `Request::getAcceptableContentTypes()` changes in Symfony 7.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57783
+* [12.x] Accept string bindings in give attribute by [@pjotrvdh](https://github.com/pjotrvdh) in https://github.com/laravel/framework/pull/57747
+* [12.x] Fix `WithCachedConfig` to work with parallel test runs by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57785
+* [12.x] Tailwind pagination styling/accessibility updates by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57793
+* [12.x] `RequestException`: attempt to summarize message before reporting by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57767
+* [12.x] create new `@hasStack` Blade directive by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57788
+* Add `--middleware` filter to `route:list` by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/57797
+* [12.x] Fix stale in-memory SQLite connections after re-migration in RefreshDatabase by [@PouyaPour](https://github.com/PouyaPour) in https://github.com/laravel/framework/pull/57716
+* [12.x] Type-hint the `ResourceCollection::$collection` property as nullable by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/57807
+* [12.x] Fix `Factory@insert()` to allow for array casts by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57794
+* [12.x] Improve typehints for `Http::pool()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57811
+
+## [v12.38.1](https://github.com/laravel/framework/compare/v12.38.0...v12.38.1) - 2025-11-13
+
+* [12.x] Fix `GeneratorCommand` missing `possibleModels()` method by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57769
 
 ## [v12.38.0](https://github.com/laravel/framework/compare/v12.37.0...v12.38.0) - 2025-11-12
 

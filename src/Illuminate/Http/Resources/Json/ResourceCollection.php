@@ -23,7 +23,7 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
     /**
      * The mapped collection instance.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Support\Collection|null
      */
     public $collection;
 

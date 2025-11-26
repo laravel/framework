@@ -960,6 +960,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate the encoding of an attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  array<int, int|string>  $parameters
+     * @return bool
+     */
+    public function validateEncoding($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'encoding');
+
+        if (! in_array(mb_strtolower($parameters[0]), array_map(mb_strtolower(...), mb_list_encodings()))) {
+            throw new InvalidArgumentException("Validation rule encoding parameter [{$parameters[0]}] is not a valid encoding.");
+        }
+
+        return mb_check_encoding($value instanceof File ? $value->getContent() : $value, $parameters[0]);
+    }
+
+    /**
      * Validate the existence of an attribute value in a database table.
      *
      * @param  string  $attribute

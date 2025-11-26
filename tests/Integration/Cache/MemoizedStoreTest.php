@@ -13,8 +13,6 @@ use Illuminate\Cache\Events\RetrievingManyKeys;
 use Illuminate\Cache\Events\WritingKey;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
-use Illuminate\Redis\Connections\PhpRedisClusterConnection;
-use Illuminate\Redis\Connections\PredisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -33,14 +31,9 @@ class MemoizedStoreTest extends TestCase
 
         $this->setUpRedis();
 
-        $connection = $this->app['redis']->connection();
-        $this->markTestSkippedWhen(
-            $connection instanceof PhpRedisClusterConnection || $connection instanceof PredisClusterConnection,
-            'flushAll and many currently not supported for Redis Cluster connections',
-        );
-
         Config::set('cache.default', 'redis');
-        Redis::flushAll();
+        Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+        Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
     }
 
     protected function tearDown(): void
@@ -126,6 +119,21 @@ class MemoizedStoreTest extends TestCase
         $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
 
         $this->assertSame($cacheValue, $memoValue);
+    }
+
+    public function test_it_uses_correct_keys_for_getMultiple_with_empty_prefix()
+    {
+        Cache::setPrefix(null);
+
+        $data = [
+            '1' => 'one',
+            0 => 'zero',
+        ];
+        Cache::putMany($data);
+
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+        // ensure correct on the second memoized retrieval
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
     }
 
     public function test_null_values_are_memoized_when_retrieving_multiple_values()

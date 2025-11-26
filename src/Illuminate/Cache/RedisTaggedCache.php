@@ -193,8 +193,18 @@ class RedisTaggedCache extends TaggedCache
             ->map(fn (string $key) => $this->store->getPrefix().$key)
             ->chunk(1000);
 
+        $connection = $this->store->connection();
+
         foreach ($entries as $cacheKeys) {
-            $this->store->connection()->del(...$cacheKeys);
+            if ($connection instanceof PredisClusterConnection) {
+                $connection->pipeline(function ($connection) use ($cacheKeys) {
+                    foreach ($cacheKeys as $cacheKey) {
+                        $connection->del($cacheKey);
+                    }
+                });
+            } else {
+                $connection->del(...$cacheKeys);
+            }
         }
     }
 

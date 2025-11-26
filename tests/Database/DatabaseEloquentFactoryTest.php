@@ -1012,6 +1012,18 @@ class DatabaseEloquentFactoryTest extends TestCase
         $this->assertEquals('abc', $userModel->options);
     }
 
+    public function test_factory_can_insert_with_array_casts()
+    {
+        (new FactoryTestUserWithArrayFactory())->count(2)->insert();
+        $users = DB::table('users')->get();
+        foreach ($users as $user) {
+            $this->assertEquals(['rtj'], json_decode($user->options, true));
+            $createdAt = Carbon::parse($user->created_at);
+            $updatedAt = Carbon::parse($user->updated_at);
+            $this->assertEquals($updatedAt, $createdAt);
+        }
+    }
+
     /**
      * Get a database connection instance.
      *
@@ -1232,6 +1244,29 @@ class FactoryTestUseFactoryAttributeFactory extends Factory
 class FactoryTestUseFactoryAttribute extends Eloquent
 {
     use HasFactory;
+}
+
+class FactoryTestUserWithArray extends Eloquent
+{
+    protected $table = 'users';
+
+    protected function casts()
+    {
+        return ['options' => 'array'];
+    }
+}
+
+class FactoryTestUserWithArrayFactory extends Factory
+{
+    protected $model = FactoryTestUserWithArray::class;
+
+    public function definition()
+    {
+        return [
+            'name' => 'killer mike',
+            'options' => ['rtj'],
+        ];
+    }
 }
 
 enum Name: string
