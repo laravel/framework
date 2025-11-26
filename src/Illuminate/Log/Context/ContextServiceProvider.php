@@ -23,6 +23,7 @@ class ContextServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->app->resolving(Repository::class, function (Repository $repository) {
                 $context = Env::get('__LARAVEL_CONTEXT');
+
                 if ($context && $context = json_decode($context, associative: true)) {
                     $repository->hydrate($context);
                 }
