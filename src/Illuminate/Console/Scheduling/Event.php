@@ -198,7 +198,7 @@ class Event
      */
     protected function execute($container)
     {
-        $context = escapeshellarg(json_encode($container[Repository::class]->dehydrate()));
+        $context = json_encode($container[Repository::class]->dehydrate());
 
         return Process::fromShellCommandline(
             $this->buildCommand(), base_path(), ['__LARAVEL_CONTEXT' => $context], null, null

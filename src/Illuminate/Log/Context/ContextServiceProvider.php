@@ -20,6 +20,15 @@ class ContextServiceProvider extends ServiceProvider
     {
         $this->app->scoped(Repository::class);
 
+        if ($this->app->runningInConsole()) {
+            $this->app->resolving(Repository::class, function (Repository $repository) {
+                $context = Env::get('__LARAVEL_CONTEXT');
+                if ($context && $context = json_decode($context, associative: true)) {
+                    $repository->hydrate($context);
+                }
+            });
+        }
+
         $this->app->bind(ContextLogProcessorContract::class, fn () => new ContextLogProcessor());
     }
 
@@ -30,10 +39,6 @@ class ContextServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $env = Env::get('__LARAVEL_CONTEXT', '');
-        /** @phpstan-ignore staticMethod.notFound */
-        Context::hydrate(json_decode($env, true));
-
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             /** @phpstan-ignore staticMethod.notFound */
             $context = Context::dehydrate();
