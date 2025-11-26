@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
 #[RequiresPhpExtension('redis')]
 #[WithConfig('cache.default', 'redis')]
-#[WithConfig('cache.prefix', 'laravel-cache-')]
+#[WithConfig('cache.prefix', 'laravel_cache_')]
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -128,7 +128,6 @@ class RedisStoreTest extends TestCase
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
 
-        var_dump($keyCount);
         $this->assertEquals(0, count($keyCount));
     }
 
