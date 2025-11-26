@@ -212,6 +212,21 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause a queue by its connection and name for a given number of seconds.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @param  int  $seconds
+     * @return void
+     */
+    public function pauseFor($connection, $queue, $seconds)
+    {
+        $this->app['cache']
+            ->store()
+            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $seconds);
+    }
+
+    /**
      * Resume a paused queue by its connection and name.
      *
      * @param  string  $connection
