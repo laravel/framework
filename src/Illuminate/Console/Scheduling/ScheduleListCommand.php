@@ -6,6 +6,7 @@ use Closure;
 use Cron\CronExpression;
 use DateTimeZone;
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -23,6 +24,7 @@ class ScheduleListCommand extends Command
      */
     protected $signature = 'schedule:list
         {--timezone= : The timezone that times should be displayed in}
+        {--environment=* : Display the tasks scheduled to run on this environment}
         {--next : Sort the listed tasks by their next due date}
         {--json : Output the scheduled tasks as JSON}
     ';
@@ -52,6 +54,19 @@ class ScheduleListCommand extends Command
     public function handle(Schedule $schedule)
     {
         $events = new Collection($schedule->events());
+
+        $environments = Arr::wrap($this->option('environment'));
+        if (! empty($environments)) {
+            $events = $events->filter(function (Event $event) use ($environments) {
+                foreach ($environments as $environment) {
+                    if ($event->runsInEnvironment($environment)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        }
 
         if ($events->isEmpty()) {
             if ($this->option('json')) {
