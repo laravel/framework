@@ -18,29 +18,32 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithConfig('cache.default', 'redis')]
+#[WithConfig('cache.prefix', 'laravel_cache_')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
+    /** {@inheritdoc} */
+    #[\Override]
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            $this->setUpRedis();
+
+            Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+            Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->tearDownRedis();
+        });
+
         parent::setUp();
-
-        $this->setUpRedis();
-
-        Config::set('cache.default', 'redis');
-        Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
-        Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->tearDownRedis();
     }
 
     public function test_it_can_memoize_when_retrieving_single_value()
