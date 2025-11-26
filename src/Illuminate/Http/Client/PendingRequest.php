@@ -230,6 +230,13 @@ class PendingRequest
     protected $truncateExceptionsAt = null;
 
     /**
+     * The request context.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected array $requestContext = [];
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -360,6 +367,19 @@ class PendingRequest
         return tap($this, function () use ($format) {
             $this->bodyFormat = $format;
         });
+    }
+
+    /**
+     * Add contextual data to be attached to the Response.
+     *
+     * @param  array<array-key, mixed>  $requestContext
+     * @return $this
+     */
+    public function withRequestContext(array $requestContext)
+    {
+        $this->requestContext = array_merge_recursive($this->requestContext, $requestContext);
+
+        return $this;
     }
 
     /**
