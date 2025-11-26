@@ -216,7 +216,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  int  $seconds
+     * @param  \DateInterval|int  $seconds
      * @return void
      */
     public function pauseFor($connection, $queue, $seconds)
