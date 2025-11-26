@@ -56,7 +56,7 @@ class Response implements ArrayAccess, Stringable
 
     /**
      * Contextual data from the request.
-     * 
+     *
      * @var array<array-key, mixed>
      */
     protected array $requestContext = [];
@@ -93,7 +93,7 @@ class Response implements ArrayAccess, Stringable
     {
         return $this->requestContext;
     }
-    
+
     /**
      * Get the body of the response.
      *
