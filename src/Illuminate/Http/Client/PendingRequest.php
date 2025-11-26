@@ -1527,6 +1527,8 @@ class PendingRequest
     protected function newResponse($response)
     {
         return tap(new Response($response), function (Response $laravelResponse) {
+            $laravelResponse->setRequestContext($this->requestContext);
+
             if ($this->truncateExceptionsAt === null) {
                 return;
             }
