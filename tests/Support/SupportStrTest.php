@@ -1275,6 +1275,17 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testSkip()
+    {
+        $this->assertSame('cdef', Str::skip('abcdef', 2));
+        $this->assertSame('abcdef', Str::skip('abcdef', -2));
+        $this->assertSame('abcdef', Str::skip('abcdef', 0));
+        $this->assertSame('', Str::skip('', 2));
+        $this->assertSame('', Str::skip('abcdef', 10));
+        $this->assertSame('', Str::skip('abcdef', 6));
+        $this->assertSame('öä', Str::skip('üöä', 1));
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
@@ -1284,6 +1295,28 @@ class SupportStrTest extends TestCase
         $this->assertSame('abcdef', Str::take('abcdef', 10));
         $this->assertSame('abcdef', Str::take('abcdef', 6));
         $this->assertSame('ü', Str::take('üöä', 1));
+    }
+
+    public function testFirst()
+    {
+        $this->assertSame('ab', Str::first('abcdef', 2));
+        $this->assertSame('ef', Str::first('abcdef', -2));
+        $this->assertSame('', Str::first('abcdef', 0));
+        $this->assertSame('', Str::first('', 2));
+        $this->assertSame('abcdef', Str::first('abcdef', 10));
+        $this->assertSame('abcdef', Str::first('abcdef', 6));
+        $this->assertSame('ü', Str::first('üöä', 1));
+    }
+
+    public function testLast()
+    {
+        $this->assertSame('ef', Str::last('abcdef', 2));
+        $this->assertSame('ab', Str::last('abcdef', -2));
+        $this->assertSame('', Str::last('abcdef', 0));
+        $this->assertSame('', Str::last('', 2));
+        $this->assertSame('abcdef', Str::last('abcdef', 10));
+        $this->assertSame('abcdef', Str::last('abcdef', 6));
+        $this->assertSame('ä', Str::last('üöä', 1));
     }
 
     public function testLcfirst()

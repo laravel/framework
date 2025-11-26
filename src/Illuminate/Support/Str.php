@@ -1767,6 +1767,22 @@ class Str
     }
 
     /**
+     * Skip the first or last {$skip} characters of a string.
+     *
+     * @param  string  $string
+     * @param  int  $skip
+     * @return string
+     */
+    public static function skip($string, int $skip): string
+    {
+        if($skip <= 0) {
+            return $string;
+        }
+
+        return static::substr($string, $skip);
+    }
+
+    /**
      * Take the first or last {$limit} characters of a string.
      *
      * @param  string  $string
@@ -1780,6 +1796,30 @@ class Str
         }
 
         return static::substr($string, 0, $limit);
+    }
+
+    /**
+     * Get the first N characters of a string.
+     *
+     * @param  string  $string
+     * @param  int  $characters
+     * @return string
+     */
+    public static function first($string, int $characters = 1): string
+    {
+        return static::take($string, $characters);
+    }
+
+    /**
+     * Get the last N characters of a string.
+     *
+     * @param  string  $string
+     * @param  int  $characters
+     * @return string
+     */
+    public static function last($string, int $characters = 1): string
+    {
+        return static::take($string, $characters * -1);
     }
 
     /**
