@@ -212,7 +212,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Pause a queue by its connection and name for a given number of seconds.
+     * Pause a queue by its connection and name for a given amount of time.
      *
      * @param  string  $connection
      * @param  string  $queue
