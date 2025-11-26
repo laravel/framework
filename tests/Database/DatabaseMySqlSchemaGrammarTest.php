@@ -9,6 +9,7 @@ use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Tests\Database\Fixtures\Enums\Foo;
+use Illuminate\Tests\Database\Fixtures\Enums\UserRole;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -842,6 +843,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `status` enum(\'bar\') not null', $statements[1]);
     }
 
+    public function testAddingEnumWithBackedEnum()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->enum('role', UserRole::class);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `role` enum(\'admin\', \'member\', \'guest\') not null', $statements[0]);
+    }
+
     public function testAddingSet()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -850,6 +861,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `role` set(\'member\', \'admin\') not null', $statements[0]);
+    }
+
+    public function testAddingSetWithBackedEnum()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->set('role', UserRole::class);
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `role` set(\'admin\', \'member\', \'guest\') not null', $statements[0]);
     }
 
     public function testAddingJson()

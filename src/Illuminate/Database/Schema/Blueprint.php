@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
+use BackedEnum;
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -1098,13 +1099,16 @@ class Blueprint
     /**
      * Create a new enum column on the table.
      *
-     * @param  string  $column
-     * @param  array  $allowed
+     * @param  array<string|\BackedEnum>|class-string<\BackedEnum>  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function enum($column, array $allowed)
+    public function enum(string $column, array|string $allowed)
     {
-        $allowed = array_map(fn ($value) => enum_value($value), $allowed);
+        if (is_string($allowed) && is_subclass_of($allowed, BackedEnum::class)) {
+            $allowed = array_column($allowed::cases(), 'value');
+        } else {
+            $allowed = array_map(fn ($value) => enum_value($value), $allowed);
+        }
 
         return $this->addColumn('enum', $column, compact('allowed'));
     }
@@ -1112,12 +1116,17 @@ class Blueprint
     /**
      * Create a new set column on the table.
      *
-     * @param  string  $column
-     * @param  array  $allowed
+     * @param  array<string|\BackedEnum>|class-string<\BackedEnum>  $allowed
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function set($column, array $allowed)
+    public function set(string $column, array|string $allowed)
     {
+        if (is_string($allowed) && is_subclass_of($allowed, BackedEnum::class)) {
+            $allowed = array_column($allowed::cases(), 'value');
+        } else {
+            $allowed = array_map(fn ($value) => enum_value($value), $allowed);
+        }
+
         return $this->addColumn('set', $column, compact('allowed'));
     }
 
