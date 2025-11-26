@@ -35,6 +35,13 @@ class RequestException extends HttpClientException
     public $hasBeenSummarized = false;
 
     /**
+     * The context passed when creating the request.
+     * 
+     * @var array<array-key, mixed>
+     */
+    public array $requestContext = [];
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
