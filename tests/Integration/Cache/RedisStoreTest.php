@@ -9,10 +9,8 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
-use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
-#[WithConfig('cache.prefix', 'laravel-cache-')]
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
