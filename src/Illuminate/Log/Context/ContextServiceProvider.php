@@ -5,6 +5,7 @@ namespace Illuminate\Log\Context;
 use Illuminate\Contracts\Log\ContextLogProcessor as ContextLogProcessorContract;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Queue;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Context;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,6 +30,10 @@ class ContextServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $env = Env::get('__LARAVEL_CONTEXT', '');
+        /** @phpstan-ignore staticMethod.notFound */
+        Context::hydrate(json_decode($env, true));
+
         Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             /** @phpstan-ignore staticMethod.notFound */
             $context = Context::dehydrate();
