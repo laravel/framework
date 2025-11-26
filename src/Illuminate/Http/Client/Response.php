@@ -55,6 +55,13 @@ class Response implements ArrayAccess, Stringable
     protected $truncateExceptionsAt = null;
 
     /**
+     * Contextual data from the request.
+     * 
+     * @var array<array-key, mixed>
+     */
+    protected array $requestContext = [];
+
+    /**
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface  $response
@@ -64,6 +71,29 @@ class Response implements ArrayAccess, Stringable
         $this->response = $response;
     }
 
+    /**
+     * Set the request's context.
+     *
+     * @param  array<array-key, mixed>  $context
+     * @return $this
+     */
+    public function setRequestContext(array $context)
+    {
+        $this->requestContext = $context;
+
+        return $this;
+    }
+
+    /**
+     * Get the context set on the request.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function getRequestContext(): array
+    {
+        return $this->requestContext;
+    }
+    
     /**
      * Get the body of the response.
      *
