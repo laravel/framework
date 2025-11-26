@@ -9,8 +9,13 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 
+#[RequiresPhpExtension('redis')]
+#[WithConfig('cache.default', 'redis')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -122,6 +127,8 @@ class RedisStoreTest extends TestCase
         Cache::store('redis')->tags(['people', 'author'])->flush();
 
         $keyCount = Cache::store('redis')->connection()->keys('*');
+
+        var_dump($keyCount);
         $this->assertEquals(0, count($keyCount));
     }
 

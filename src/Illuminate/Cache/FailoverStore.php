@@ -142,6 +142,18 @@ class FailoverStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Adjust the expiration time of a cached item.
+     *
+     * @param  string  $key
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function touch($key, $seconds)
+    {
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  string  $key
