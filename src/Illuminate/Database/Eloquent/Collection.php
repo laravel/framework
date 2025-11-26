@@ -912,4 +912,16 @@ class Collection extends BaseCollection implements QueueableCollection
 
         return $model->newModelQuery()->whereKey($this->modelKeys());
     }
+
+    /**
+     * Remember the collection in the cache.
+     *
+     * @param  int  $ttl
+     * @param  string|null  $key
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function remember($ttl = 60, ?string $key = null)
+    {
+        return cache()->remember($key, $ttl, fn () => $this);
+    }
 }
