@@ -209,6 +209,16 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+
+        $pausedQueues = $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused-list:{$connection}", []);
+
+        $this->app['cache']
+            ->store()->put(
+                "illuminate:queue:paused-list:{$connection}",
+                array_values(array_unique(array_merge($pausedQueues,
+                    [$queue]))));
     }
 
     /**
@@ -224,6 +234,30 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+
+        $pausedQueues = $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused-list:{$connection}", []);
+
+        $this->app['cache']
+            ->store()->put(
+            "illuminate:queue:paused-list:{$connection}",
+            array_values(array_unique(array_merge($pausedQueues,
+                [$queue])))
+        );
+    }
+
+    /**
+     * Get a list of paused queues for a given connection.
+     *
+     * @param  string  $connection
+     * @return array
+     */
+    public function getPausedQueueList($connection)
+    {
+        $queues = $this->app['cache']->store()->get("illuminate:queue:paused-list:{$connection}", []);
+
+        return array_values(array_filter($queues, fn ($queue) => $this->isPaused($connection, $queue)));
     }
 
     /**
@@ -238,6 +272,17 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+
+        $pausedQueues = $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused-list:{$connection}", []);
+
+        $this->app['cache']
+            ->store()
+            ->put(
+            "illuminate:queue:paused-list:{$connection}",
+            array_values(array_diff($pausedQueues, [$queue]))
+        );
     }
 
     /**

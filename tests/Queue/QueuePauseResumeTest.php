@@ -131,4 +131,30 @@ class QueuePauseResumeTest extends TestCase
         $this->assertSame(['database', 'notifications'], $parser->parse('database:notifications'));
         $this->assertSame(['redis', 'foo:bar'], $parser->parse('redis:foo:bar'));
     }
+
+    public function testPauseQueueList()
+    {
+        $this->assertEquals([], $this->manager->getPausedQueueList('redis'));
+
+        $this->manager->pause('redis', 'emails');
+        $this->manager->pause('redis', 'notifications');
+
+        $this->assertEquals(['emails', 'notifications'], $this->manager->getPausedQueueList('redis'));
+
+        $this->manager->resume('redis', 'emails');
+
+        $this->assertEquals(['notifications'], $this->manager->getPausedQueueList('redis'));
+
+        Carbon::setTestNow();
+        $this->manager->pauseFor('redis', 'default', 30);
+        $this->assertTrue($this->manager->isPaused('redis', 'default'));
+
+        $this->assertEquals(['notifications', 'default'], $this->manager->getPausedQueueList('redis'));
+
+        Carbon::setTestNow(Carbon::now()->addMinute());
+        $this->assertFalse($this->manager->isPaused('redis', 'default'));
+
+        $this->assertEquals(['notifications'], $this->manager->getPausedQueueList('redis'));
+
+    }
 }

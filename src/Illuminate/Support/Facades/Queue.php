@@ -17,6 +17,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static \Illuminate\Contracts\Queue\Queue connection(string|null $name = null)
  * @method static void pause(string $connection, string $queue)
  * @method static void pauseFor(string $connection, string $queue, \DateTimeInterface|\DateInterval|int $ttl)
+ * @method static array getPausedQueueList(string $connection)
  * @method static void resume(string $connection, string $queue)
  * @method static bool isPaused(string $connection, string $queue)
  * @method static void extend(string $driver, \Closure $resolver)
