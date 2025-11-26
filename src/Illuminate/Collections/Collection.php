@@ -1946,7 +1946,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Update the a timestamp column on all models in the collection.
      *
-     * @param  string|null $column
+     * @param  string|null  $column
      * @return $this
      */
     public function touch($column = null)
