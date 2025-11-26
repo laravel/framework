@@ -216,14 +216,14 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string  $connection
      * @param  string  $queue
-     * @param  \DateInterval|int  $seconds
+     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return void
      */
-    public function pauseFor($connection, $queue, $seconds)
+    public function pauseFor($connection, $queue, $ttl)
     {
         $this->app['cache']
             ->store()
-            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $seconds);
+            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
     }
 
     /**
