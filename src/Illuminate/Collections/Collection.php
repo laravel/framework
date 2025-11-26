@@ -1942,4 +1942,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Update the a timestamp column on all models in the collection.
+     *
+     * @param  string|null $column
+     * @return $this
+     */
+    public function touch($column = null)
+    {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
+        $model = $this->first();
+
+        $updateColumn = $column ?? $model->getUpdatedAtColumn();
+
+        if ($updateColumn) {
+            $model->newModelQuery()
+                ->whereKey($this->modelKeys())
+                ->update([$updateColumn => $model->freshTimestampString()]);
+        }
+
+        return $this;
+    }
 }
