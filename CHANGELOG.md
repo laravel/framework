@@ -1,6 +1,21 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.40.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.40.2...12.x)
+
+## [v12.40.2](https://github.com/laravel/framework/compare/v12.40.1...v12.40.2) - 2025-11-26
+
+* [12.x] Modernize type casting by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/57914
+* [12.x] Improve missing attribute violation callable typehints by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/57910
+* [12.x] Improve discarded attribute violation callable typehints by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/57909
+* [12.x] add support for no mode in postgres full text search by [@opheus2](https://github.com/opheus2) in https://github.com/laravel/framework/pull/57915
+* [12.x] Guard RedisStore::scan() results against boolean failures by [@CicerBro](https://github.com/CicerBro) in https://github.com/laravel/framework/pull/57911
+* [12.x] Fix CallQueuedClosure::displayName after batch chain (#57597) by [@CreareWorks](https://github.com/CreareWorks) in https://github.com/laravel/framework/pull/57881
+* Pass Laravel context through with schedule tasks by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/57918
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57926
+* [12.x] Eloquent Builder: completion for HigherOrderBuilderProxy fields by [@adelf](https://github.com/adelf) in https://github.com/laravel/framework/pull/57928
+* [12.x] fix: continue route matching rather than returning second fallbackRoute by [@ryzr](https://github.com/ryzr) in https://github.com/laravel/framework/pull/57922
+* [12.x] Pause a queue for given seconds by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57917
+* Json Schema Contract by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57934
 
 ## [v12.40.1](https://github.com/laravel/framework/compare/v12.40.0...v12.40.1) - 2025-11-25
 
