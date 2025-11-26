@@ -4219,6 +4219,22 @@ class HttpClientTest extends TestCase
         $this->assertSame(['name' => 'testRequestExceptionHasRequestContext'], $e->requestContext);
     }
 
+    public function testConnectionExceptionHasRequestContext()
+    {
+        $this->factory->fake(['https://laravel.com' => $this->factory::failedConnection('This thang failed')]);
+
+        $pendingRequest = $this->factory->withRequestContext(['name' => 'testConnectionExceptionHasRequestContext']);
+
+        $e = null;
+        try {
+            $pendingRequest->get('https://laravel.com');
+        } catch (ConnectionException $exception) {
+            $e = $exception;
+        }
+
+        $this->assertEquals(['name' => 'testConnectionExceptionHasRequestContext'], $e->requestContext);
+    }
+
     public static function methodsReceivingArrayableDataProvider()
     {
         return [

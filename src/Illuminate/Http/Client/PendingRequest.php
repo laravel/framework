@@ -1697,6 +1697,7 @@ class PendingRequest
     protected function marshalConnectionException(ConnectException $e)
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
+        $exception->requestContext = $this->requestContext;
 
         $request = new Request($e->getRequest());
 
