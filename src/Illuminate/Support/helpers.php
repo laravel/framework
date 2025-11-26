@@ -353,9 +353,10 @@ if (! function_exists('proxy') && version_compare(phpversion(), '8.4.0', '>=')) 
      * @param  class-string<TValue>|(\Closure(TValue): TValue)  $class
      * @param  (\Closure(TValue): TValue)|int  $callback
      * @param  int  $options
+     * @param  array<string, mixed>  $eager
      * @return TValue
      */
-    function proxy($class, $callback = 0, $options = 0)
+    function proxy($class, $callback = 0, $options = 0, $eager = [])
     {
         static $closureReflector;
 
@@ -373,7 +374,19 @@ if (! function_exists('proxy') && version_compare(phpversion(), '8.4.0', '>=')) 
             ? [$class, $callback, $options]
             : [$closureReflector->typeFromParameter($class), $class, $callback ?: $options];
 
-        return (new ReflectionClass($class))->newLazyProxy($callback, $options);
+        $reflectionClass = new ReflectionClass($class);
+
+        $proxy = $reflectionClass->newLazyProxy(function () use ($callback, $eager, &$proxy) {
+            $instance = $callback($proxy, $eager);
+
+            return $instance;
+        }, $options);
+
+        foreach ($eager as $property => $value) {
+            $reflectionClass->getProperty($property)->setRawValueWithoutLazyInitialization($proxy, $value);
+        }
+
+        return $proxy;
     }
 }
 

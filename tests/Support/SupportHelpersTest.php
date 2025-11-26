@@ -1942,6 +1942,56 @@ class SupportHelpersTest extends TestCase
         SupportLazyClass::$constructorCalled = false;
     }
 
+    public function testProxyCanEagerlySetProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn () => $factory(), eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertFalse(isset($instance->eager));
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testProxyCanEagerlySetPropertiesAndThenAlsoSetThemOnActualObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, function ($proxy, $eager) use ($factory) {
+            $instance = $factory();
+
+            foreach ($eager as $prop => $value) {
+                $instance->{$prop} = $value;
+            }
+
+            return $instance;
+        }, eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
     public function testProxyCanAcceptShortClosure(): void
     {
         if (version_compare(phpversion(), '8.4.0', '<')) {
@@ -2192,7 +2242,7 @@ class SupportLazyClass
 {
     public static bool $constructorCalled = false;
 
-    public string $eager = '';
+    public string $eager;
 
     public function __construct(
         public string $first,
@@ -2200,7 +2250,6 @@ class SupportLazyClass
     ) {
         self::$constructorCalled = true;
     }
-    //
 }
 
 class SupportLazyClassWithArrayParameter
@@ -2212,5 +2261,4 @@ class SupportLazyClassWithArrayParameter
     ) {
         self::$constructorCalled = true;
     }
-    //
 }
