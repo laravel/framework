@@ -1751,7 +1751,9 @@ class Str
             $length = strlen($string);
         }
 
-        return substr_replace($string, $replace, $offset, $length);
+        return mb_substr($string, 0, $offset)
+            . $replace
+            . mb_substr($string, $offset + $length);
     }
 
     /**
