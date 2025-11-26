@@ -107,11 +107,11 @@ class FakeProcessSequence
      */
     public function __invoke()
     {
-        if ($this->failWhenEmpty && count($this->processes) === 0) {
+        if ($this->failWhenEmpty && $this->isEmpty()) {
             throw new OutOfBoundsException('A process was invoked, but the process result sequence is empty.');
         }
 
-        if (! $this->failWhenEmpty && count($this->processes) === 0) {
+        if (! $this->failWhenEmpty && $this->isEmpty()) {
             return value($this->emptyProcess ?? new FakeProcessResult);
         }
 
