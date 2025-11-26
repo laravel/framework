@@ -24,7 +24,7 @@ interface JsonSchema
     /**
      * Create a new string property instance.
      *
-     * @return \Illuminate\JsonSchema\Types\String
+     * @return \Illuminate\JsonSchema\Types\StringType
      */
     public function string();
 
