@@ -293,7 +293,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 
