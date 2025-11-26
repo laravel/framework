@@ -32,7 +32,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
@@ -78,7 +78,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
