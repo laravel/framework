@@ -241,10 +241,10 @@ class QueueManager implements FactoryContract, MonitorContract
 
         $this->app['cache']
             ->store()->put(
-            "illuminate:queue:paused-list:{$connection}",
-            array_values(array_unique(array_merge($pausedQueues,
-                [$queue])))
-        );
+                "illuminate:queue:paused-list:{$connection}",
+                array_values(array_unique(array_merge($pausedQueues,
+                    [$queue])))
+            );
     }
 
     /**
@@ -280,9 +280,9 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->put(
-            "illuminate:queue:paused-list:{$connection}",
-            array_values(array_diff($pausedQueues, [$queue]))
-        );
+                "illuminate:queue:paused-list:{$connection}",
+                array_values(array_diff($pausedQueues, [$queue]))
+            );
     }
 
     /**

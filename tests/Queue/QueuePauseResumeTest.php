@@ -155,6 +155,5 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'default'));
 
         $this->assertEquals(['notifications'], $this->manager->getPausedQueueList('redis'));
-
     }
 }
