@@ -197,7 +197,7 @@ if (! function_exists('literal')) {
     }
 }
 
-if (! function_exists('lazy') && version_compare(phpversion(), '8.4.0', '>=')) {
+if (! function_exists('lazy')) {
     /**
      * Create a lazy instance.
      *
@@ -344,7 +344,7 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
-if (! function_exists('proxy') && version_compare(phpversion(), '8.4.0', '>=')) {
+if (! function_exists('proxy')) {
     /**
      * Create a lazy proxy instance.
      *
