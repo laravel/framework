@@ -28,7 +28,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $table->datetime('datetime_field')->nullable();
             $table->date('immutable_date_field')->nullable();
             $table->datetime('immutable_datetime_field')->nullable();
-            $table->timestamps();
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -136,6 +136,8 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
 
             $this->assertSame(['created_at', null], $user->getDates());
 
+            $user->refresh();
+
             $this->assertSame([
                 'id' => $user->getKey(),
                 'date_field' => '2019-10',
@@ -143,7 +145,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
                 'immutable_date_field' => '2019-10',
                 'immutable_datetime_field' => '2019-10 10:15',
                 'created_at' => $now->toISOString(),
-            ], $user->fresh()->toArray());
+            ], $user->attributesToArray());
         });
     }
 }
