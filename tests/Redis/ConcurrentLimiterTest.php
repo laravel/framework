@@ -159,6 +159,67 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1], $store);
     }
 
+    public function testTryAcquireReturnsImmediatelyWhenNoSlotAvailable()
+    {
+        $store = [];
+
+        $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 5);
+
+        $result = $lock->tryAcquire(function () use (&$store) {
+            $store[] = 1;
+        });
+
+        $this->assertTrue($result);
+        $this->assertEquals([1], $store);
+
+        $result = $lock->tryAcquire(function () use (&$store) {
+            $store[] = 2;
+        });
+
+        $this->assertFalse($result);
+        $this->assertEquals([1], $store);
+    }
+
+    public function testTryAcquireReleasesLockAfterCallback()
+    {
+        $lock = new ConcurrencyLimiter($this->redis(), 'key', 1, 5);
+
+        $result = $lock->tryAcquire(function () {
+            return 'success';
+        });
+
+        $this->assertEquals('success', $result);
+
+        $result = $lock->tryAcquire(function () {
+            return 'also success';
+        });
+
+        $this->assertEquals('also success', $result);
+    }
+
+    public function testCurrentLocksReturnsNumberOfOccupiedSlots()
+    {
+        $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 3, 5);
+
+        $this->assertEquals(0, $lock->currentLocks());
+        $this->assertEquals(3, $lock->available());
+
+        $lock->tryAcquire();
+
+        $this->assertEquals(1, $lock->currentLocks());
+        $this->assertEquals(2, $lock->available());
+
+        $lock->tryAcquire();
+
+        $this->assertEquals(2, $lock->currentLocks());
+        $this->assertEquals(1, $lock->available());
+
+        $lock->tryAcquire();
+
+        $this->assertEquals(3, $lock->currentLocks());
+        $this->assertEquals(0, $lock->available());
+    }
+
     private function redis()
     {
         return $this->redis['phpredis']->connection();

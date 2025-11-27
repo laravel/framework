@@ -94,6 +94,67 @@ class ConcurrencyLimiter
     }
 
     /**
+     * Attempt to acquire the lock without blocking.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public function tryAcquire($callback = null)
+    {
+        $id = Str::random(20);
+
+        if (! $slot = $this->acquire($id)) {
+            return false;
+        }
+
+        if (is_callable($callback)) {
+            try {
+                $result = $callback();
+
+                $this->release($slot, $id);
+
+                return $result ?? true;
+            } catch (Throwable $exception) {
+                $this->release($slot, $id);
+
+                throw $exception;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the number of slots currently occupied.
+     *
+     * @return int
+     */
+    public function currentLocks()
+    {
+        $slots = array_map(function ($i) {
+            return $this->name.$i;
+        }, range(1, $this->maxLocks));
+
+        return (int) $this->redis->eval(
+            $this->currentLocksScript(),
+            count($slots),
+            ...$slots
+        );
+    }
+
+    /**
+     * Get the number of available slots.
+     *
+     * @return int
+     */
+    public function available()
+    {
+        return $this->maxLocks - $this->currentLocks();
+    }
+
+    /**
      * Attempt to acquire the lock.
      *
      * @param  string  $id  A unique identifier for this lock
@@ -162,6 +223,26 @@ then
 else
     return 0
 end
+LUA;
+    }
+
+    /**
+     * Get the Lua script for counting current locks.
+     *
+     * KEYS - The keys that represent available slots
+     *
+     * @return string
+     */
+    protected function currentLocksScript()
+    {
+        return <<<'LUA'
+local count = 0
+for index, value in pairs(redis.call('mget', unpack(KEYS))) do
+    if value then
+        count = count + 1
+    end
+end
+return count
 LUA;
     }
 }
