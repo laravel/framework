@@ -99,6 +99,7 @@ assertType('SupportLazyClass', proxy(SupportLazyClass::class, function (SupportL
 }));
 assertType('SupportLazyClass', lazy(fn (SupportLazyClass $instance) => []));
 assertType('SupportLazyClass', proxy(fn (SupportLazyClass $proxy) => new SupportLazyClass));
+assertType('SupportLazyClass', proxy(fn (): SupportLazyClass => new SupportLazyClass));
 
 class SupportLazyClass
 {

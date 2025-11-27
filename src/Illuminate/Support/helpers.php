@@ -364,15 +364,15 @@ if (! function_exists('proxy')) {
         {
             use ReflectsClosures;
 
-            public function typeFromParameter($callback)
+            public function get($callback)
             {
-                return $this->firstClosureParameterType($callback);
+                return $this->closureReturnTypes($callback)[0] ?? $this->firstClosureParameterType($callback);
             }
         };
 
         [$class, $callback, $options] = is_string($class)
             ? [$class, $callback, $options]
-            : [$closureReflector->typeFromParameter($class), $class, $callback ?: $options];
+            : [$closureReflector->get($class), $class, $callback ?: $options];
 
         $reflectionClass = new ReflectionClass($class);
 

@@ -2142,6 +2142,25 @@ class SupportHelpersTest extends TestCase
 
         $instance->first;
     }
+
+    public function testProxyCanUseClosureReturnTypeForClassDetection(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(fn (): SupportLazyClass => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
 }
 
 trait SupportTestTraitOne
