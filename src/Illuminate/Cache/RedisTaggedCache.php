@@ -156,7 +156,7 @@ class RedisTaggedCache extends TaggedCache
                 $script,
                 count($keysToBeDeleted),
                 ...$keysToBeDeleted,
-                ...[$cachePrefix, ...$cacheTags]
+                ...[str_replace('-', '%-', $cachePrefix), ...$cacheTags]
             );
         }
 
