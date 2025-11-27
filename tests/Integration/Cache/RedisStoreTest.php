@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class RedisStoreTest extends TestCase
 {
@@ -93,8 +94,12 @@ class RedisStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testTagsCanBeAccessed()
+    #[TestWith(['laravel_cache_'])]
+    #[TestWith(['laravel-cache-'])]
+    public function testTagsCanBeAccessed(string $cachePrefix)
     {
+        config(['cache.prefix' => $cachePrefix]);
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
