@@ -1748,7 +1748,7 @@ class Str
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
         if ($length === null) {
-            $length = strlen($string);
+            $length = static::length($string);
         }
 
         return mb_substr($string, 0, $offset)
