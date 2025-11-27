@@ -6,6 +6,7 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -51,15 +52,23 @@ class QueuePauseResumeTest extends TestCase
 
     public function testPauseQueueWithTTL()
     {
-        $this->manager->pause('redis', 'default', 60);
+        Carbon::setTestNow();
+        $this->manager->pauseFor('redis', 'default', 30);
 
         $this->assertTrue($this->manager->isPaused('redis', 'default'));
+
+        Carbon::setTestNow(Carbon::now()->addMinute());
+        $this->assertFalse($this->manager->isPaused('redis', 'default'));
     }
 
     public function testPauseQueueIndefinitely()
     {
-        $this->manager->pause('redis', 'default', null);
+        Carbon::setTestNow();
+        $this->manager->pause('redis', 'default');
 
+        $this->assertTrue($this->manager->isPaused('redis', 'default'));
+
+        Carbon::setTestNow(Carbon::now()->addYear());
         $this->assertTrue($this->manager->isPaused('redis', 'default'));
     }
 

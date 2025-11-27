@@ -83,8 +83,8 @@ abstract class AbstractRouteCollection implements Countable, IteratorAggregate, 
 
         foreach ($routes as $route) {
             if ($route->matches($request, $includingMethod)) {
-                if ($route->isFallback && $fallbackRoute === null) {
-                    $fallbackRoute = $route;
+                if ($route->isFallback) {
+                    $fallbackRoute ??= $route;
 
                     continue;
                 }
