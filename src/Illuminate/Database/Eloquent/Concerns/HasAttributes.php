@@ -250,7 +250,9 @@ trait HasAttributes
      */
     protected function addDateAttributesToArray(array $attributes)
     {
-        foreach ($this->getDates() as $key) {
+        $dates = array_filter($this->getDates());
+
+        foreach ($dates as $key) {
             if (! isset($attributes[$key])) {
                 continue;
             }
