@@ -53,20 +53,13 @@ class ScheduleListCommand extends Command
      */
     public function handle(Schedule $schedule)
     {
-        $events = new Collection($schedule->events());
-
         $environments = Arr::wrap($this->option('environment'));
-        if (! empty($environments)) {
-            $events = $events->filter(function (Event $event) use ($environments) {
-                foreach ($environments as $environment) {
-                    if ($event->runsInEnvironment($environment)) {
-                        return true;
-                    }
-                }
 
-                return false;
-            });
-        }
+        $events = new Collection(
+            empty($environments)
+                ? $schedule->events()
+                : $schedule->eventsForEnvironments($environments)
+        );
 
         if ($events->isEmpty()) {
             if ($this->option('json')) {

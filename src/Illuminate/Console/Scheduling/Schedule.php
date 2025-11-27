@@ -430,6 +430,28 @@ class Schedule
     }
 
     /**
+     * Get all of the events on the schedule which run on the provided environments.
+     *
+     * @param  list<string>  $environments
+     * @return \Illuminate\Console\Scheduling\Event[]
+     */
+    public function eventsForEnvironments(array $environments): array
+    {
+        return array_values(array_filter(
+            $this->events(),
+            function (Event $event) use ($environments) {
+                foreach ($environments as $environment) {
+                    if ($event->runsInEnvironment($environment)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        ));
+    }
+
+    /**
      * Specify the cache store that should be used to store mutexes.
      *
      * @param  \UnitEnum|string  $store
