@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Redis;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Redis\Limiters\DurationLimiter;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -23,6 +24,7 @@ class DurationLimiterTest extends TestCase
     {
         parent::tearDown();
 
+        Carbon::setTestNow();
         $this->tearDownRedis();
     }
 
@@ -48,7 +50,7 @@ class DurationLimiterTest extends TestCase
 
         $this->assertEquals([1, 2], $store);
 
-        sleep(2);
+        Carbon::setTestNow(now()->addSeconds(2));
 
         (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 3;
@@ -127,7 +129,7 @@ class DurationLimiterTest extends TestCase
         $this->assertSame(0, max(0, $limiter->remaining));
 
         // After decay window, attempts should be allowed again
-        sleep(1);
+        Carbon::setTestNow(now()->addSeconds(1));
         $this->assertFalse($limiter->tooManyAttempts());
     }
 
@@ -157,7 +159,7 @@ class DurationLimiterTest extends TestCase
         $this->assertTrue($limiter->acquire());
         $this->assertFalse($limiter->acquire());
 
-        sleep(1);
+        Carbon::setTestNow(now()->addSeconds(1));
 
         $this->assertTrue($limiter->acquire());
         $this->assertSame(0, $limiter->remaining);
