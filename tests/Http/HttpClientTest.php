@@ -3188,6 +3188,35 @@ class HttpClientTest extends TestCase
         $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
     }
 
+    public function testRequestExceptionIsThrownWhenUnlessConditionIsNotSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response('', 400),
+        ]);
+
+        $exception = null;
+
+        try {
+            $this->factory->get('http://foo.com/api')->throwUnless(false);
+        } catch (RequestException $e) {
+            $exception = $e;
+        }
+
+        $this->assertNotNull($exception);
+        $this->assertInstanceOf(RequestException::class, $exception);
+    }
+
+    public function testRequestExceptionIsNotThrownWhenUnlessConditionIsSatisfied()
+    {
+        $this->factory->fake([
+            '*' => $this->factory::response(['result' => ['foo' => 'bar']], 400),
+        ]);
+
+        $response = $this->factory->get('http://foo.com/api')->throwUnless(true);
+
+        $this->assertSame('{"result":{"foo":"bar"}}', $response->body());
+    }
+
     public function testRequestExceptionIsThrowIfConditionClosureIsSatisfied()
     {
         $this->factory->fake([

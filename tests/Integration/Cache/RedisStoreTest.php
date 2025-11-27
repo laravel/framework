@@ -12,6 +12,7 @@ use Mockery as m;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 
 #[RequiresPhpExtension('redis')]
 #[WithConfig('cache.default', 'redis')]
@@ -98,8 +99,12 @@ class RedisStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testTagsCanBeAccessed()
+    #[TestWith(['laravel_cache_'])]
+    #[TestWith(['laravel-cache-'])]
+    public function testTagsCanBeAccessed(string $cachePrefix)
     {
+        config(['cache.prefix' => $cachePrefix]);
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);

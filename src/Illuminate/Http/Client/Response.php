@@ -344,6 +344,19 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * Throw an exception if a server or client error occurred and the given condition evaluates to false.
+     *
+     * @param  \Closure|bool  $condition
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwUnless($condition)
+    {
+        return $this->throwIf(! $condition);
+    }
+
+    /**
      * Throw an exception if the response status code matches the given code.
      *
      * @param  int|(\Closure(int, \Illuminate\Http\Client\Response): bool)|callable  $statusCode

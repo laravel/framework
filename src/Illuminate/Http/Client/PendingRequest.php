@@ -790,7 +790,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -806,7 +806,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -822,7 +822,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -838,7 +838,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -854,7 +854,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -870,7 +870,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -968,32 +968,34 @@ class PendingRequest
 
                     $this->dispatchResponseReceivedEvent($response);
 
-                    if (! $response->successful()) {
-                        try {
-                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                        } catch (Exception $exception) {
-                            $shouldRetry = false;
+                    if ($response->successful()) {
+                        return;
+                    }
 
-                            throw $exception;
-                        }
+                    try {
+                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                    } catch (Exception $exception) {
+                        $shouldRetry = false;
 
-                        if ($this->throwCallback &&
-                            ($this->throwIfCallback === null ||
-                             call_user_func($this->throwIfCallback, $response))) {
-                            $response->throw($this->throwCallback);
-                        }
+                        throw $exception;
+                    }
 
-                        $potentialTries = is_array($this->tries)
-                            ? count($this->tries) + 1
-                            : $this->tries;
+                    if ($this->throwCallback &&
+                        ($this->throwIfCallback === null ||
+                         call_user_func($this->throwIfCallback, $response))) {
+                        $response->throw($this->throwCallback);
+                    }
 
-                        if ($attempt < $potentialTries && $shouldRetry) {
-                            $response->throw();
-                        }
+                    $potentialTries = is_array($this->tries)
+                        ? count($this->tries) + 1
+                        : $this->tries;
 
-                        if ($potentialTries > 1 && $this->retryThrow) {
-                            $response->throw();
-                        }
+                    if ($attempt < $potentialTries && $shouldRetry) {
+                        $response->throw();
+                    }
+
+                    if ($potentialTries > 1 && $this->retryThrow) {
+                        $response->throw();
                     }
                 });
             } catch (TransferException $e) {

@@ -1275,6 +1275,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testSubstrReplaceWithMultibyte()
+    {
+        $this->assertSame('kengä', Str::substrReplace('kenkä', 'ng', -3, 2));
+        $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
