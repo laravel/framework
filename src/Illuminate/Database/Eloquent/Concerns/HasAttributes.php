@@ -1622,7 +1622,7 @@ trait HasAttributes
     /**
      * Get the attributes that should be converted to dates.
      *
-     * @return array
+     * @return array<int, string|null>
      */
     public function getDates()
     {
