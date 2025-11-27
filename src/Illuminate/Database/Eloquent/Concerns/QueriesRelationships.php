@@ -290,6 +290,7 @@ trait QueriesRelationships
                         ->whereHas($belongsTo, $callback, $operator, $count);
                 });
             }
+
             $query->when($checkMorphNull, fn (self $query) => $query->orWhereMorphedTo($relation, null));
         }, null, null, $boolean);
     }
