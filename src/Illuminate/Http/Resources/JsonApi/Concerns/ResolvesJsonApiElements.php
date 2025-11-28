@@ -154,7 +154,7 @@ trait ResolvesJsonApiElements
         $sparseIncluded = $request->sparseIncluded();
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => fn () => $this->resource->{$value}] : [$key => $value])
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => fn ($resource) => $resource->getRelation($value)] : [$key => $value])
             ->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
@@ -164,7 +164,7 @@ trait ResolvesJsonApiElements
         $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function ($relationResolver, $key) {
-            $relatedModels = value($relationResolver);
+            $relatedModels = value($relationResolver, $this->resource);
 
             // Relationship is a collection of models...
             if ($relatedModels instanceof Collection) {
