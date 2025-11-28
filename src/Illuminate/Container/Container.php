@@ -13,16 +13,13 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\ReflectsClosures;
 use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
-use ReflectionIntersectionType;
 use ReflectionParameter;
-use ReflectionUnionType;
 use TypeError;
 
 class Container implements ArrayAccess, ContainerContract
