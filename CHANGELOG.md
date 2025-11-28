@@ -1,6 +1,10 @@
 # Release Notes for 11.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v11.46.2...11.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v11.47.0...11.x)
+
+## [v11.47.0](https://github.com/laravel/framework/compare/v11.46.2...v11.47.0) - 2025-11-28
+
+* [11.x] Backport JsonSchema Contract by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/framework/pull/57939
 
 ## [v11.46.2](https://github.com/laravel/framework/compare/v11.46.1...v11.46.2) - 2025-11-25
 
