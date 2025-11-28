@@ -1198,7 +1198,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\FluentPromise
      *
      * @throws \Exception
      */
@@ -1222,7 +1222,7 @@ class PendingRequest
         ], $options));
 
         $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
-        if ($result instanceof PromiseInterface) {
+        if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
             $result = new FluentPromise($result);
         }
 
