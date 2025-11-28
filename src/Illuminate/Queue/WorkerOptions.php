@@ -82,6 +82,13 @@ class WorkerOptions
     public $maxTime;
 
     /**
+     * Indicates if the worker should ignore reset signal. This is used when you want decrease cache queries on illuminate:queue:restart.
+     *
+     * @var bool
+     */
+    public $ignoreResetSignal;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  string  $name
@@ -108,6 +115,7 @@ class WorkerOptions
         $maxJobs = 0,
         $maxTime = 0,
         $rest = 0,
+        $ignoreResetSignal = false,
     ) {
         $this->name = $name;
         $this->backoff = $backoff;
@@ -120,5 +128,6 @@ class WorkerOptions
         $this->stopWhenEmpty = $stopWhenEmpty;
         $this->maxJobs = $maxJobs;
         $this->maxTime = $maxTime;
+        $this->ignoreResetSignal = $ignoreResetSignal;
     }
 }

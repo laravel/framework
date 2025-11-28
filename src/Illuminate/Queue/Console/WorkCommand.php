@@ -36,6 +36,7 @@ class WorkCommand extends Command
                             {--queue= : The names of the queues to work}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
+                            {--ignore-reset-signal : Ignore reset signal in order to reduce cache call}
                             {--stop-when-empty : Stop when the queue is empty}
                             {--delay=0 : The number of seconds to delay failed jobs (Deprecated)}
                             {--backoff=0 : The number of seconds to wait before retrying a job that encountered an uncaught exception}
@@ -169,6 +170,7 @@ class WorkCommand extends Command
             $this->option('max-jobs'),
             $this->option('max-time'),
             $this->option('rest'),
+            $this->option('ignore-reset-signal'),
         );
     }
 
