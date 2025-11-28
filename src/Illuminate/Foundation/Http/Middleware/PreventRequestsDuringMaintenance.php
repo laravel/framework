@@ -100,7 +100,7 @@ class PreventRequestsDuringMaintenance
 
             throw new HttpException(
                 $data['status'] ?? 503,
-                'Service Unavailable',
+                __('Service Unavailable'),
                 null,
                 $this->getHeaders($data)
             );
