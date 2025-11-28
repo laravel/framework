@@ -481,28 +481,6 @@ abstract class ServiceProvider
     }
 
     /**
-     * Get a short descriptive key for the current service provider.
-     *
-     * @param  string|null  $key
-     * @return string
-     */
-    protected function getProviderKey(?string $key = null): string
-    {
-        $key ??= (string) Str::of(get_class($this))
-            ->classBasename()
-            ->before('ServiceProvider')
-            ->kebab()
-            ->lower()
-            ->trim();
-
-        if (empty($key)) {
-            $key = class_basename(get_class($this));
-        }
-
-        return $key;
-    }
-
-    /**
      * Register commands that should run on "optimize" or "optimize:clear".
      *
      * @param  string|null  $optimize
@@ -535,6 +513,28 @@ abstract class ServiceProvider
         $key = $this->getProviderKey($key);
 
         static::$reloadCommands[$key] = $reload;
+    }
+
+    /**
+     * Get a short descriptive key for the current service provider.
+     *
+     * @param  string|null  $key
+     * @return string
+     */
+    protected function getProviderKey(?string $key = null): string
+    {
+        $key ??= (string) Str::of(get_class($this))
+            ->classBasename()
+            ->before('ServiceProvider')
+            ->kebab()
+            ->lower()
+            ->trim();
+
+        if (empty($key)) {
+            $key = class_basename(get_class($this));
+        }
+
+        return $key;
     }
 
     /**

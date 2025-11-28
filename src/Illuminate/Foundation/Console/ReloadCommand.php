@@ -32,7 +32,7 @@ class ReloadCommand extends Command
      */
     public function handle()
     {
-        $this->components->info('Reloading running services..');
+        $this->components->info('Reloading services.');
 
         $exceptions = Collection::wrap(explode(',', $this->option('except') ?? ''))
             ->map(fn ($except) => trim($except))
