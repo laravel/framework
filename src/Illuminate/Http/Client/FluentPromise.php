@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -16,10 +15,20 @@ class FluentPromise implements PromiseInterface
     /**
      * Create a new fluent promise instance.
      *
-     * @param  PromiseInterface  $guzzlePromise
+     * @param  \GuzzleHttp\Promise\PromiseInterface  $guzzlePromise
      */
-    public function __construct(public PromiseInterface $guzzlePromise)
+    public function __construct(protected PromiseInterface $guzzlePromise)
     {
+    }
+
+    /**
+     * Get the underlying Guzzle promise.
+     *
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function getGuzzlePromise(): PromiseInterface
+    {
+        return $this->guzzlePromise;
     }
 
     /**
