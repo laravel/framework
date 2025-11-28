@@ -112,6 +112,7 @@ trait ResolvesJsonApiElements
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->when(! empty($sparseFieldset), fn ($attributes) => $attributes->only($sparseFieldset))
+            ->reject(fn ($value, $key) => $key === $this->resource->getKey())
             ->transform(fn ($value) => value($value, $request))
             ->all();
 
@@ -232,12 +233,12 @@ trait ResolvesJsonApiElements
 
             [$type, $id, $isUnique] = $value;
 
-            $relations->push([
+            $relations->push(array_filter([
                 'id' => $id,
                 'type' => $type,
                 '_uniqueKey' => $isUnique === true ? [$id, $type] : [$id, $type, (string) Str::random()],
-                'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes', []),
-            ]);
+                'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes'),
+            ]));
         }
 
         return $relations->uniqueStrict(fn ($relation) => $relation['_uniqueKey'])
