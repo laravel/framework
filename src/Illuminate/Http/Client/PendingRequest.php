@@ -1222,6 +1222,7 @@ class PendingRequest
         ], $options));
 
         $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+
         if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
             $result = new FluentPromise($result);
         }
