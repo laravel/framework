@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Client\Events\RequestSending;
-use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
