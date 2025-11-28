@@ -45,11 +45,19 @@ class Pool
      * Add a request to the pool with a key.
      *
      * @param  string  $key
+     * @param  (callable(\Illuminate\Http\Client\PendingRequest): ?\Illuminate\Http\Client\PendingRequest)|null  $callback
+     *
      * @return \Illuminate\Http\Client\PendingRequest
      */
-    public function as(string $key)
+    public function as(string $key, ?callable $callback = null)
     {
-        return $this->pool[$key] = $this->asyncRequest();
+        if ($callback === null) {
+            return $this->pool[$key] = $this->asyncRequest();
+        }
+
+        $newRequest = $this->asyncRequest();
+
+        return $this->pool[$key] = $callback($newRequest) ?? $newRequest;
     }
 
     /**
