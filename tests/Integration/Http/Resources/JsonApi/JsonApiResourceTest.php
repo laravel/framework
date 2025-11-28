@@ -112,7 +112,8 @@ class JsonApiResourceTest extends TestCase
                         ],
                         'profile' => [
                             'data' => [
-                                ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
+                                'id' => (string) $profile->getKey(),
+                                'type' => 'profiles',
                             ],
                         ],
                         'teams' => [

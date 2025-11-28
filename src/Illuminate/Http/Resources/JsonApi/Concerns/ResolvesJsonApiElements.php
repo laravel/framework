@@ -199,14 +199,14 @@ trait ResolvesJsonApiElements
                 return [$key => new MissingValue];
             }
 
-            return [$key => ['data' => [transform(
+            return [$key => ['data' => transform(
                 [static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
                 function ($uniqueKey) use ($relatedModel) {
                     $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, true];
 
                     return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
                 }
-            )]]];
+            )]];
         })->all();
     }
 
