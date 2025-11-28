@@ -23,7 +23,7 @@ use Orchestra\Testbench\TestCase;
 use Throwable;
 
 #[WithConfig('cache.default', 'redis')]
-#[WithConfig('cache.prefix', 'laravel_cache_')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
@@ -296,7 +296,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 
