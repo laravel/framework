@@ -4,7 +4,6 @@ namespace Illuminate\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -344,31 +343,29 @@ class Message
         if ($file instanceof Attachment) {
             return $file->attachWith(
                 function ($path) use ($file) {
-                    $cid = $file->as ?? Str::random();
+                    $part = (new DataPart(new File($path), $file->as, $file->mime))->asInline();
 
-                    $this->message->addPart(
-                        (new DataPart(new File($path), $cid, $file->mime))->asInline()
-                    );
+                    $this->message->addPart($part);
 
-                    return "cid:{$cid}";
+                    return "cid:{$part->getContentId()}";
                 },
                 function ($data) use ($file) {
                     $this->message->addPart(
-                        (new DataPart($data(), $file->as, $file->mime))->asInline()
+                        $part = $part = (new DataPart($data(), $file->as, $file->mime))->asInline()
                     );
 
-                    return "cid:{$file->as}";
+                    return "cid:{$part->getContentId()}";
                 }
             );
         }
 
-        $cid = Str::random(10);
+        $fileObject = new File($file);
 
         $this->message->addPart(
-            (new DataPart(new File($file), $cid))->asInline()
+            $part = (new DataPart($fileObject, $fileObject->getFilename()))->asInline()
         );
 
-        return "cid:$cid";
+        return "cid:{$part->getContentId()}";
     }
 
     /**
@@ -381,11 +378,11 @@ class Message
      */
     public function embedData($data, $name, $contentType = null)
     {
-        $this->message->addPart(
-            (new DataPart($data, $name, $contentType))->asInline()
-        );
+        $part = (new DataPart($data, $name, $contentType))->asInline();
 
-        return "cid:$name";
+        $this->message->addPart($part);
+
+        return "cid:{$part->getContentId()}";
     }
 
     /**

@@ -1,0 +1,134 @@
+name: Redis and Redis Cluster
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+
+jobs:
+  redis:
+    runs-on: ubuntu-24.04
+
+    services:
+      redis:
+        image: redis:7.0
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+    strategy:
+      fail-fast: true
+      matrix:
+        client: ['phpredis', 'predis']
+
+    name: Redis (${{ matrix.client}}) Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Framework version
+        run: composer config version "12.x-dev"
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Execute Cache tests
+        run: vendor/bin/phpunit tests/Integration/Cache
+        env:
+          CACHE_STORE: redis
+          REDIS_CACHE_CONNECTION: cache
+          REDIS_CACHE_LOCK_CONNECTION: cache
+          REDIS_CLIENT: ${{ matrix.client }}
+
+      - name: Execute Queue tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          REDIS_CLIENT: ${{ matrix.client }}
+          QUEUE_CONNECTION: redis
+
+  redis-cluster:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: true
+      matrix:
+        client: ['phpredis', 'predis']
+
+    name: Redis Cluster (${{ matrix.client}}) Driver
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
+          tools: composer:v2
+          coverage: none
+
+      - name: Set Framework version
+        run: composer config version "12.x-dev"
+
+      - name: Install dependencies
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Create Redis Cluster
+        run: |
+          sudo apt update
+          sudo apt-get install -y --fix-missing redis-server
+          sudo service redis-server stop
+          redis-server --daemonize yes --port 7000 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7000.conf
+          redis-server --daemonize yes --port 7001 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7001.conf
+          redis-server --daemonize yes --port 7002 --appendonly yes --cluster-enabled yes --cluster-config-file nodes-7002.conf
+          redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes
+
+      - name: Check Redis Cluster is ready
+        uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 5
+          max_attempts: 5
+          retry_wait_seconds: 5
+          retry_on: error
+          command: |
+            redis-cli -c -h 127.0.0.1 -p 7000 cluster info | grep "cluster_state:ok"
+            redis-cli -c -h 127.0.0.1 -p 7001 cluster info | grep "cluster_state:ok"
+            redis-cli -c -h 127.0.0.1 -p 7002 cluster info | grep "cluster_state:ok"
+
+      - name: Execute Cache tests
+        run: vendor/bin/phpunit tests/Integration/Cache
+        env:
+          CACHE_STORE: redis
+          REDIS_CACHE_CONNECTION: default
+          REDIS_CACHE_LOCK_CONNECTION: default
+          REDIS_CLIENT: ${{ matrix.client }}
+          REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
+
+      - name: Execute Queue Tests
+        run: vendor/bin/phpunit tests/Integration/Queue
+        env:
+          REDIS_CLIENT: ${{ matrix.client }}
+          REDIS_CLUSTER_HOSTS_AND_PORTS: 127.0.0.1:7000,127.0.0.1:7001,127.0.0.1:7002
+          REDIS_QUEUE: '{default}'
+          QUEUE_CONNECTION: redis
+

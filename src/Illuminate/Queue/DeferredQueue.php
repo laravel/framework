@@ -2,8 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Contracts\Queue\Job;
-
 class DeferredQueue extends SyncQueue
 {
     /**

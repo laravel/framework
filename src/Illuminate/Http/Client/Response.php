@@ -304,19 +304,7 @@ class Response implements ArrayAccess, Stringable
     public function toException()
     {
         if ($this->failed()) {
-            $originalTruncateAt = RequestException::$truncateAt;
-
-            try {
-                if ($this->truncateExceptionsAt !== null) {
-                    $this->truncateExceptionsAt === false
-                        ? RequestException::dontTruncate()
-                        : RequestException::truncateAt($this->truncateExceptionsAt);
-                }
-
-                return new RequestException($this);
-            } finally {
-                RequestException::$truncateAt = $originalTruncateAt;
-            }
+            return new RequestException($this, $this->truncateExceptionsAt);
         }
     }
 
@@ -353,6 +341,19 @@ class Response implements ArrayAccess, Stringable
     public function throwIf($condition)
     {
         return value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+    }
+
+    /**
+     * Throw an exception if a server or client error occurred and the given condition evaluates to false.
+     *
+     * @param  \Closure|bool  $condition
+     * @return $this
+     *
+     * @throws \Illuminate\Http\Client\RequestException
+     */
+    public function throwUnless($condition)
+    {
+        return $this->throwIf(! $condition);
     }
 
     /**

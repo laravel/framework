@@ -20,6 +20,13 @@ trait TestDatabases
     protected static $schemaIsUpToDate = false;
 
     /**
+     * The root database name prior to concatenating the token.
+     *
+     * @var null|string
+     */
+    protected static $originalDatabaseName = null;
+
+    /**
      * Boot a test database.
      *
      * @return void
@@ -186,6 +193,12 @@ trait TestDatabases
      */
     protected function testDatabase($database)
     {
+        if (! isset(self::$originalDatabaseName)) {
+            self::$originalDatabaseName = $database;
+        } else {
+            $database = self::$originalDatabaseName;
+        }
+
         $token = ParallelTesting::token();
 
         return "{$database}_test_{$token}";

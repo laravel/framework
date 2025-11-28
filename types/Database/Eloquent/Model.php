@@ -38,6 +38,7 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->withoutTrashed());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->prunable());
     assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Notifications\DatabaseNotification, User>', $user->notifications());
+    assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Notifications\DatabaseNotification, User>', $user->unreadNotifications());
 
     assertType('Illuminate\Database\Eloquent\Collection<(int|string), User>', $user->newCollection([new User()]));
     assertType('Illuminate\Types\Model\Posts<(int|string), Illuminate\Types\Model\Post>', $post->newCollection(['foo' => new Post()]));

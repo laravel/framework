@@ -59,6 +59,7 @@ class DatabaseSessionHandlerTest extends DatabaseTestCase
         $connection = $this->app['db']->connection();
 
         $handler = new DatabaseSessionHandler($connection, 'sessions', 1, $this->app);
+        Carbon::setTestNow(Carbon::now());
         $handler->write('simple_id_1', 'abcd');
         $this->assertEquals(0, $handler->gc(1));
 

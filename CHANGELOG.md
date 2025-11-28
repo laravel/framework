@@ -1,6 +1,139 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.36.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.40.2...12.x)
+
+## [v12.40.2](https://github.com/laravel/framework/compare/v12.40.1...v12.40.2) - 2025-11-26
+
+* [12.x] Modernize type casting by [@lucasmichot](https://github.com/lucasmichot) in https://github.com/laravel/framework/pull/57914
+* [12.x] Improve missing attribute violation callable typehints by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/57910
+* [12.x] Improve discarded attribute violation callable typehints by [@mosabbirrakib](https://github.com/mosabbirrakib) in https://github.com/laravel/framework/pull/57909
+* [12.x] add support for no mode in postgres full text search by [@opheus2](https://github.com/opheus2) in https://github.com/laravel/framework/pull/57915
+* [12.x] Guard RedisStore::scan() results against boolean failures by [@CicerBro](https://github.com/CicerBro) in https://github.com/laravel/framework/pull/57911
+* [12.x] Fix CallQueuedClosure::displayName after batch chain (#57597) by [@CreareWorks](https://github.com/CreareWorks) in https://github.com/laravel/framework/pull/57881
+* Pass Laravel context through with schedule tasks by [@jradtilbrook](https://github.com/jradtilbrook) in https://github.com/laravel/framework/pull/57918
+* [12.x] Test Improvements by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57926
+* [12.x] Eloquent Builder: completion for HigherOrderBuilderProxy fields by [@adelf](https://github.com/adelf) in https://github.com/laravel/framework/pull/57928
+* [12.x] fix: continue route matching rather than returning second fallbackRoute by [@ryzr](https://github.com/ryzr) in https://github.com/laravel/framework/pull/57922
+* [12.x] Pause a queue for given seconds by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57917
+* Json Schema Contract by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57934
+
+## [v12.40.1](https://github.com/laravel/framework/compare/v12.40.0...v12.40.1) - 2025-11-25
+
+* Add support for instant column additions by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57907
+
+## [v12.40.0](https://github.com/laravel/framework/compare/v12.39.0...v12.40.0) - 2025-11-25
+
+* [12.x] Improve return type of `Str::replace()` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/57820
+* [12.x] Fixup PHP 8.5 deprecations in `SupportArrTest` by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/57822
+* Add daysOfMonth() method to schedule tasks on specific days by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/57817
+* [12.x] Add `encoding` validation rule for uploaded files by [@ziadoz](https://github.com/ziadoz) in https://github.com/laravel/framework/pull/57823
+* [12.x] Allow CachedState properties to be nullable by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57826
+* [12.x] Resolve failing encoding test  by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57827
+* [12.x] Fixing MemoizedStore with Redis Cluster by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57828
+* [12.x] Update encoding validation message by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57834
+* [12.x] Use `scopedIf` in `CacheManager::memo()` by [@angelej](https://github.com/angelej) in https://github.com/laravel/framework/pull/57833
+* [12.x] Fixing RedisTaggedCache::flushStale with PhpRedisClusterConnection by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57837
+* [12.x] Add default parameter support to `Request::fluent()` method by [@michaelnabil230](https://github.com/michaelnabil230) in https://github.com/laravel/framework/pull/57840
+* [12.x] Fix embedded image Content-ID inconsistency in cloned emails by [@yinheli](https://github.com/yinheli) in https://github.com/laravel/framework/pull/57726
+* [12.x] PredisClusterConnection::keys() by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57841
+* [12.x] PHP 8.5 Compatibility by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57835
+* [12.x] RateLimiter remaining to 0 to prevent negative values. by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/57851
+* [12.x] Update RequestException@report() to return false by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57847
+* Time by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/57856
+* Feature/queue pause resume by [@yousefkadah](https://github.com/yousefkadah) in https://github.com/laravel/framework/pull/57800
+* [12.x] Fixing RedisTaggedCache::flushValues with PredisClusterConnection by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57848
+* [12.x] Improve typehints for `QueriesRelationships` by [@CasEbb](https://github.com/CasEbb) in https://github.com/laravel/framework/pull/57830
+* [12.x] Fix flaky test by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57864
+* [12.x] optimize `AbstractRouteCollection@toSymfonyRouteCollection()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57870
+* [12.x] optimize `AbstractRouteCollection@matchAgainstRoute()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57871
+* [12.x] Moving redis integration tests by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57860
+* [12.x] Incorrect result of MemoizedStore::many with numeric keys and empty prefix by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57862
+* [12.x] Add testWrapEdgeCases for Str::wrap edge cases by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/57861
+* [12.x] Add parameter validation to Collection::sliding() method. by [@Button99](https://github.com/Button99) in https://github.com/laravel/framework/pull/57875
+* [12.x] Update `path` method return type to always be a non-null string by [@IsmailBourbie](https://github.com/IsmailBourbie) in https://github.com/laravel/framework/pull/57873
+* Added Google's antigravity IDE support in ResolvesDumpSource.php by [@yeasherarafath](https://github.com/yeasherarafath) in https://github.com/laravel/framework/pull/57885
+* [12.x] Clean up queue pausing by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57863
+* [12.x] Simplify `ParsesQueue@parseQueue` logic by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57886
+* [12.x] Improve lazy loading violation callable typehints by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57896
+* [12.x] Fix Accept header cache invalidation when header is modified by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57874
+* [12.x] Fix flaky test in CacheArrayStore (increment) by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57905
+* [12.x] Fix flaky test in ArraySessionHandler (garbage collection) by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57904
+* [12.x] Fix flaky test in ArraySessionHandler (almost expired session) by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57903
+* [12.x] Fix flaky test in ArraySessionHandler (expired session) by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57902
+
+## [v12.39.0](https://github.com/laravel/framework/compare/v12.38.1...v12.39.0) - 2025-11-18
+
+* [12.x] `ApplicationBuilder@withExceptions()` improvements by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57778
+* Carry `--force` to `make:test` for generators with `--test` by [@CasEbb](https://github.com/CasEbb) in https://github.com/laravel/framework/pull/57777
+* [12.x] Fix `Request::getAcceptableContentTypes()` changes in Symfony 7.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57783
+* [12.x] Accept string bindings in give attribute by [@pjotrvdh](https://github.com/pjotrvdh) in https://github.com/laravel/framework/pull/57747
+* [12.x] Fix `WithCachedConfig` to work with parallel test runs by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57785
+* [12.x] Tailwind pagination styling/accessibility updates by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57793
+* [12.x] `RequestException`: attempt to summarize message before reporting by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57767
+* [12.x] create new `@hasStack` Blade directive by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57788
+* Add `--middleware` filter to `route:list` by [@jasonmccreary](https://github.com/jasonmccreary) in https://github.com/laravel/framework/pull/57797
+* [12.x] Fix stale in-memory SQLite connections after re-migration in RefreshDatabase by [@PouyaPour](https://github.com/PouyaPour) in https://github.com/laravel/framework/pull/57716
+* [12.x] Type-hint the `ResourceCollection::$collection` property as nullable by [@lorenzolosa](https://github.com/lorenzolosa) in https://github.com/laravel/framework/pull/57807
+* [12.x] Fix `Factory@insert()` to allow for array casts by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57794
+* [12.x] Improve typehints for `Http::pool()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57811
+
+## [v12.38.1](https://github.com/laravel/framework/compare/v12.38.0...v12.38.1) - 2025-11-13
+
+* [12.x] Fix `GeneratorCommand` missing `possibleModels()` method by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57769
+
+## [v12.38.0](https://github.com/laravel/framework/compare/v12.37.0...v12.38.0) - 2025-11-12
+
+* [12.x] Cache the result of `configurationIsCached()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57665
+* [12.x] model:show command prompt for missing input with model suggestion by [@mrazinshaikh](https://github.com/mrazinshaikh) in https://github.com/laravel/framework/pull/57671
+* Don't call Model::toArray() to get attributes for factory insert by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/57670
+* [12.x] Introduce `WithCachedRoutes` testing trait by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57623
+* [12.x] Add missing separators to `Stringable::ucwords` by [@kichetof](https://github.com/kichetof) in https://github.com/laravel/framework/pull/57688
+* [12.x] Cache result of `Application@routesAreCached()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57687
+* fix phpdoc return of HasAttributes::getArrayAttributeWithValue by [@chuckadams](https://github.com/chuckadams) in https://github.com/laravel/framework/pull/57691
+* [12.x] Remove unnecessary imports from BackgroundQueue and DeferredQueue. by [@seriquynh](https://github.com/seriquynh) in https://github.com/laravel/framework/pull/57699
+* [12.x] add SQLite support for whereNotMorphedTo method by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57698
+* [12.x] Handle AWS ElasticCache failover by reconnecting when READONLY by [@wsamoht](https://github.com/wsamoht) in https://github.com/laravel/framework/pull/57685
+* [12.x] Introduce `WithCachedConfig` testing trait by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57663
+* [12.x] Fix WithCachedConfig@tearDownWithCachedConfig() by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57708
+* [12.x] Reorder some core aliases in alphabetical order. by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/57706
+* Allow Resend ^1.0 by [@ziming](https://github.com/ziming) in https://github.com/laravel/framework/pull/57713
+* [12.x] memoize result of `Application@eventsAreCached()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57709
+* [12.x] Test `Factory@insert()` with hidden by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57722
+* [12.x] Separate workflow for Redis integration tests by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57710
+* [12.x] Types: HasDatabaseNotifications read/unread notifications by [@liamduckett](https://github.com/liamduckett) in https://github.com/laravel/framework/pull/57718
+* [12.x] Supports Symfony 7.4 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57724
+* [12.x] Revert lowercasing validation message placeholders by [@florianraith](https://github.com/florianraith) in https://github.com/laravel/framework/pull/57733
+* [12.x] try another way to activate Broadcast routes by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57734
+* [12.x] Add environment information to json output of schedule:list command by [@mmachatschek](https://github.com/mmachatschek) in https://github.com/laravel/framework/pull/57741
+* [12.x] Make DumpCommand prohibitable by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57735
+* [12.x] Clean ConsoleApplicationTest by [@seriquynh](https://github.com/seriquynh) in https://github.com/laravel/framework/pull/57761
+* [12.x] Fix the docblock of the BroadcastManager::purge method. by [@seriquynh](https://github.com/seriquynh) in https://github.com/laravel/framework/pull/57758
+* [12.x] Fix setting request exception truncating doesn't work on HTTP layer when configured inside `bootstrap/app.php` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/57759
+
+## [v12.37.0](https://github.com/laravel/framework/compare/v12.36.1...v12.37.0) - 2025-11-04
+
+* [12.x] allow passing custom "depth" to `files()` and `directories()` by [@browner12](https://github.com/browner12) in https://github.com/laravel/framework/pull/57573
+* [12.x] EnumerateValues::value() support objects and return negative values by [@rafaelqueiroz](https://github.com/rafaelqueiroz) in https://github.com/laravel/framework/pull/57570
+* [12.x] Move duplicated logic to separate method to be reusable by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/57564
+* [12.x] Refactor unreleased data_has helper by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57580
+* feat: added detailed about for cache failover driver by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57579
+* [12.x] fix data_has empty check by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/57586
+* [12.x] Fix: use trim before check empty string by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57583
+* feat: added detailed about for queue failover driver by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57582
+* Feat: add mailers detail for failover or roundrobin by [@chinmaypurav](https://github.com/chinmaypurav) in https://github.com/laravel/framework/pull/57590
+* [12.x] Refactor: remove un use var by [@alipowerful7](https://github.com/alipowerful7) in https://github.com/laravel/framework/pull/57617
+* [12.x] `Factory@insert()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57600
+* Fix ScheduleRunCommandTest failure on Windows by using OS-specific success command by [@Tina-1300](https://github.com/Tina-1300) in https://github.com/laravel/framework/pull/57621
+* [12.x] Add ucwords to Str and Stringable by [@braxey](https://github.com/braxey) in https://github.com/laravel/framework/pull/57581
+* [12.x] improve `Connection@listen()` docblock by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57633
+* [12.x] Fix: Correctly fallback to notification's connection/queue when using viaConnections/viaQueues by [@aydinfatih](https://github.com/aydinfatih) in https://github.com/laravel/framework/pull/57625
+* [12.x] Remove unused closure parameters in DatabaseServiceProvider by [@sumaiazaman](https://github.com/sumaiazaman) in https://github.com/laravel/framework/pull/57644
+* [12.x] Queue tests for Redis Cluster missing QUEUE_CONNECTION by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57641
+* refactor: remove unused parameter in ArtisanServiceProvider by [@omarchouman](https://github.com/omarchouman) in https://github.com/laravel/framework/pull/57658
+* [12.x] Ensure custom validation messages work for the File rule by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/57656
+* Feature/json schema improvements by [@Anticom](https://github.com/Anticom) in https://github.com/laravel/framework/pull/57609
+* Process queue jobs in background (Concurrently::defer()) by [@barryvdh](https://github.com/barryvdh) in https://github.com/laravel/framework/pull/57648
+* [12.x] ChainedBatch keeps queue and connection of wrapped batch by [@vadimonus](https://github.com/vadimonus) in https://github.com/laravel/framework/pull/57630
 
 ## [v12.36.1](https://github.com/laravel/framework/compare/v12.36.0...v12.36.1) - 2025-10-29
 

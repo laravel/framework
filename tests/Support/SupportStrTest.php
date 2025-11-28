@@ -560,6 +560,17 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
     }
 
+    public function testWrapEdgeCases()
+    {
+        $this->assertSame('[]mid[]', Str::wrap('mid', '[]'));
+        $this->assertSame('(mid', Str::wrap('mid', '(', ''));
+        $this->assertSame('<mid<', Str::wrap('mid', '<'));
+        $this->assertSame('value', Str::wrap('value', ''));
+        $this->assertSame('[][]', Str::wrap('', '[]'));
+        $this->assertSame('«値»', Str::wrap('値', '«', '»'));
+        $this->assertSame('🧪X🧪', Str::wrap('X', '🧪'));
+    }
+
     public function testUnwrap()
     {
         $this->assertEquals('value', Str::unwrap('"value"', '"'));
@@ -1264,6 +1275,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testSubstrReplaceWithMultibyte()
+    {
+        $this->assertSame('kengä', Str::substrReplace('kenkä', 'ng', -3, 2));
+        $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
@@ -1289,6 +1306,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertSame('Мама', Str::ucfirst('мама'));
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', Str::ucwords('laravel'));
+        $this->assertSame('Laravel Framework', Str::ucwords('laravel framework'));
+        $this->assertSame('Laravel-Framework', Str::ucwords('laravel-framework', '-'));
+        $this->assertSame('Мама', Str::ucwords('мама'));
+        $this->assertSame('Мама Мыла Раму', Str::ucwords('мама мыла раму'));
+        $this->assertSame('JJ Watt', Str::ucwords('JJ watt'));
     }
 
     public function testUcsplit()

@@ -198,6 +198,63 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Pause a queue by its connection and name.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return void
+     */
+    public function pause($connection, $queue)
+    {
+        $this->app['cache']
+            ->store()
+            ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+    }
+
+    /**
+     * Pause a queue by its connection and name for a given amount of time.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @return void
+     */
+    public function pauseFor($connection, $queue, $ttl)
+    {
+        $this->app['cache']
+            ->store()
+            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+    }
+
+    /**
+     * Resume a paused queue by its connection and name.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return void
+     */
+    public function resume($connection, $queue)
+    {
+        $this->app['cache']
+            ->store()
+            ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return bool
+     */
+    public function isPaused($connection, $queue)
+    {
+        return (bool) $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+    }
+
+    /**
      * Add a queue connection resolver.
      *
      * @param  string  $driver

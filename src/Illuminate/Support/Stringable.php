@@ -1108,6 +1108,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Capitalize the first character of each word in a string.
+     *
+     * @param  string  $separators
+     * @return static
+     */
+    public function ucwords($separators = " \t\r\n\f\v")
+    {
+        return new static(Str::ucwords($this->value, $separators));
+    }
+
+    /**
      * Split a string by uppercase characters.
      *
      * @return \Illuminate\Support\Collection<int, string>
