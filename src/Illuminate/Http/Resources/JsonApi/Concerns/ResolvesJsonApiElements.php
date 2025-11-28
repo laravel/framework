@@ -233,11 +233,16 @@ trait ResolvesJsonApiElements
 
             [$type, $id, $isUnique] = $value;
 
+            $relationsData = $resourceInstance->resolve($request);
+
             $relations->push(array_filter([
                 'id' => $id,
                 'type' => $type,
                 '_uniqueKey' => $isUnique === true ? [$id, $type] : [$id, $type, (string) Str::random()],
-                'attributes' => Arr::get($resourceInstance->resolve($request), 'data.attributes'),
+                'attributes' => Arr::get($relationsData, 'data.attributes'),
+                'relationships' => Arr::get($relationsData, 'data.relationships'),
+                'links' => Arr::get($relationsData, 'data.links'),
+                'meta' => Arr::get($relationsData, 'data.meta'),
             ]));
         }
 
