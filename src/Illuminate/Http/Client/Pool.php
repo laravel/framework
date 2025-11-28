@@ -45,7 +45,7 @@ class Pool
      * Add a request to the pool with a key.
      *
      * @param  string  $key
-     * @param  (callable(\Illuminate\Http\Client\PendingRequest): ?\Illuminate\Http\Client\PendingRequest)|null  $callback
+     * @param  (callable(\Illuminate\Http\Client\PendingRequest): \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\PromiseInterface|null)|null  $callback
      *
      * @return \Illuminate\Http\Client\PendingRequest
      */
