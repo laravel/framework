@@ -137,7 +137,7 @@ trait ResolvesJsonApiElements
         return [
             ...(new Collection($this->filter($this->loadedRelationshipIdentifiers)))
                 ->map(function ($relation) {
-                    return ! is_null($relation) ? $relation : ['data' => []];
+                    return ! is_null($relation) ? $relation : ['data' => null];
                 })->all(),
         ];
     }
