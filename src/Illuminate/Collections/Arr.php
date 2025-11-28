@@ -271,6 +271,8 @@ class Arr
             return value($default);
         }
 
+        $array = static::from($array);
+
         $key = array_find_key($array, $callback);
 
         return $key !== null ? $array[$key] : value($default);
