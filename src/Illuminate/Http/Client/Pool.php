@@ -46,7 +46,6 @@ class Pool
      *
      * @param  string  $key
      * @param  (callable(\Illuminate\Http\Client\PendingRequest): \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\PromiseInterface|null)|null  $callback
-     *
      * @return \Illuminate\Http\Client\PendingRequest
      */
     public function as(string $key, ?callable $callback = null)
