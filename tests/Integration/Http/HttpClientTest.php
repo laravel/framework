@@ -59,7 +59,7 @@ class HttpClientTest extends TestCase
                     ->then(fn (Response $response): int => strlen($response->getBody()))
             );
             $pool->as('nightwatch')->get('https://nightwatch.laravel.com');
-        });
+        }, 3);
 
         $this->assertInstanceOf(Response::class, $responses['laravel']);
         $this->assertEquals(5, $responses['forge']);
