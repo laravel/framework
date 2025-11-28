@@ -3,6 +3,9 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Client\Events\RequestSending;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
@@ -36,5 +39,53 @@ class HttpClientTest extends TestCase
         Facade::clearResolvedInstances();
 
         $this->assertCount(2, Http::getGlobalMiddleware());
+    }
+
+    public function testPoolCanForwardToUnderlyingPromise()
+    {
+        Http::fake([
+            'https://laravel.com*' => Http::response('Laravel'),
+            'https://forge.laravel.com*' => Http::response('Forge'),
+            'https://nightwatch.laravel.com*' => Http::response('Tim n Jess'),
+        ]);
+
+        $responses = Http::pool(function (Pool $pool) {
+            $pool->as('laravel')->get('https://laravel.com');
+
+            $pool->as('forge')
+                ->get('https://forge.laravel.com')
+                ->then(function (Response $response): int {
+                    return strlen($response->getBody());
+                });
+
+            $pool->as('nightwatch')
+                ->get('https://nightwatch.laravel.com')
+                ->then(fn (): int => 1)
+                ->then(fn ($i): int => $i + 199);
+        }, 3);
+
+        $this->assertInstanceOf(Response::class, $responses['laravel']);
+        $this->assertEquals(5, $responses['forge']);
+        $this->assertEquals(200, $responses['nightwatch']);
+
+        $this->assertCount(3, Http::recorded());
+    }
+
+    public function testForwardsCallsToPromise()
+    {
+        Http::fake(['*' => Http::response('faked response')]);
+
+        $myFakedResponse = null;
+        $r = Http::async()
+            ->get('https://laravel.com')
+            ->then(function (Response $response) use (&$myFakedResponse): string {
+                $myFakedResponse = $response->getBody();
+
+                return 'stub';
+            })
+            ->wait();
+
+        $this->assertEquals('faked response', $myFakedResponse);
+        $this->assertEquals('stub', $r);
     }
 }
