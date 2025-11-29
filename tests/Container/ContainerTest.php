@@ -236,6 +236,17 @@ class ContainerTest extends TestCase
         $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
     }
 
+    public function testObjectWithLazyDependencies()
+    {
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ClassWithLazyDependencies::class);
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+        $this->assertTrue((new ReflectionClass(ContainerDependentStub::class))->isUninitializedLazyObject($class->stubby));
+        $this->assertTrue($class->stubbyIsSet());
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+    }
+
     public function testContainerIsPassedToResolvers()
     {
         $container = new Container;
@@ -1121,9 +1132,7 @@ class WildcardConcrete implements WildcardOnlyInterface
 {
 }
 
-/*
- * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
- */
+// The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
 #[Bind(FallbackConcrete::class)]
 #[Bind(ProdConcrete::class, environments: 'prod')]
 interface WildcardAndProdInterface
@@ -1235,6 +1244,20 @@ class ProxyDependenciesClass
 {
     public function __construct(
         public IContainerContractStub $stubby
+    ) {
+    }
+
+    public function stubbyIsSet(): bool
+    {
+        return isset($this->stubby);
+    }
+}
+
+class ClassWithLazyDependencies
+{
+    public function __construct(
+        #[Lazy]
+        public ContainerDependentStub $stubby
     ) {
     }
 

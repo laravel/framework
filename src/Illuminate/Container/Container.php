@@ -20,6 +20,7 @@ use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionNamedType;
 use ReflectionParameter;
 use TypeError;
 
@@ -1243,8 +1244,9 @@ class Container implements ArrayAccess, ContainerContract
 
             $result = null;
 
+            //
             if (! is_null($attribute = Util::getContextualAttributeFromDependency($dependency))) {
-                $result = $this->resolveFromAttribute($attribute);
+                $result = $this->resolveFromAttribute($attribute, $dependency->getType());
             }
 
             // If the class is null, it means the dependency is a string or some other
@@ -1395,7 +1397,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \ReflectionAttribute  $attribute
      * @return mixed
      */
-    public function resolveFromAttribute(ReflectionAttribute $attribute)
+    public function resolveFromAttribute(ReflectionAttribute $attribute, ?ReflectionNamedType $type = null)
     {
         $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
 
@@ -1409,7 +1411,7 @@ class Container implements ArrayAccess, ContainerContract
             throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
         }
 
-        return $handler($instance, $this);
+        return $handler($instance, $this, $type);
     }
 
     /**
