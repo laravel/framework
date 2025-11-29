@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Container\Attributes\Bind;
-use Illuminate\Container\Attributes\Proxy;
+use Illuminate\Container\Attributes\Lazy;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
@@ -232,7 +232,7 @@ class ContainerTest extends TestCase
         $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
         $class = $container->make(ProxyDependenciesClass::class);
         $this->assertTrue((new ReflectionClass($class))->isUninitializedLazyObject($class));
-        $class->stubby;
+        $this->assertTrue($class->stubbyIsSet());
         $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
     }
 
@@ -1230,12 +1230,16 @@ class RequestDtoDependency implements RequestDtoDependencyContract
     }
 }
 
-#[Proxy]
+#[Lazy]
 class ProxyDependenciesClass
 {
     public function __construct(
         public IContainerContractStub $stubby
     ) {
-        //dd('i have been constructed!');
+    }
+
+    public function stubbyIsSet(): bool
+    {
+        return isset($this->stubby);
     }
 }

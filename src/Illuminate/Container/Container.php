@@ -6,7 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Container\Attributes\Bind;
-use Illuminate\Container\Attributes\Proxy;
+use Illuminate\Container\Attributes\Lazy;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -1165,7 +1165,7 @@ class Container implements ArrayAccess, ContainerContract
             return $instance;
         }
 
-        if (! in_array($concrete, $withoutLazyFor) && ! empty($reflector->getAttributes(Proxy::class))) {
+        if (! in_array($concrete, $withoutLazyFor) && ! empty($reflector->getAttributes(Lazy::class))) {
             return proxy($concrete, fn () => $this->build($concrete, [$concrete]));
         }
 
