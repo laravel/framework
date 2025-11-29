@@ -3527,14 +3527,14 @@ class HttpClientTest extends TestCase
         $this->assertSame(200, $responses[0]->status());
         $this->assertSame(200, $responses[1]->status());
 
-        $this->expectException(StrayRequestException::class);
-        $this->expectExceptionMessage('Attempted request to [https://laravel.com] without a matching fake.');
-
-        $this->factory->pool(function (Pool $pool) {
+        [$exception] = $this->factory->pool(function (Pool $pool) {
             return [
                 $pool->get('https://laravel.com'),
             ];
-        }, null);
+        });
+
+        $this->assertInstanceOf(StrayRequestException::class, $exception);
+        $this->assertEquals('Attempted request to [https://laravel.com] without a matching fake.', $exception->getMessage());
     }
 
     public function testPreventingStrayRequests()
