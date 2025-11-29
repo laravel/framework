@@ -228,6 +228,10 @@ class ContainerTest extends TestCase
 
     public function testLazyObjects()
     {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
         $container = new Container;
         $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
         $class = $container->make(ProxyDependenciesClass::class);
@@ -238,6 +242,10 @@ class ContainerTest extends TestCase
 
     public function testObjectWithLazyDependencies()
     {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
         $container = new Container;
         $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
         $class = $container->make(ClassWithLazyDependencies::class);
