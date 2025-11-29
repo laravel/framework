@@ -6,6 +6,7 @@ use ArrayAccess;
 use Closure;
 use Exception;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Proxy;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -1108,12 +1109,13 @@ class Container implements ArrayAccess, ContainerContract
      * @template TClass of object
      *
      * @param  \Closure(static, array): TClass|class-string<TClass>  $concrete
+     * @param  array<class-string>  $withoutLazyFor
      * @return TClass
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      * @throws \Illuminate\Contracts\Container\CircularDependencyException
      */
-    public function build($concrete)
+    public function build($concrete, $withoutLazyFor = [])
     {
         // If the concrete type is actually a Closure, we will just execute it and
         // hand back the results of the functions, which allows functions to be
@@ -1161,6 +1163,10 @@ class Container implements ArrayAccess, ContainerContract
             );
 
             return $instance;
+        }
+
+        if (! in_array($concrete, $withoutLazyFor) && ! empty($reflector->getAttributes(Proxy::class))) {
+            return proxy($concrete, fn () => $this->build($concrete, [$concrete]));
         }
 
         $dependencies = $constructor->getParameters();

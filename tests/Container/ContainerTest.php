@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Container;
 
 use Attribute;
 use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Proxy;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
+use ReflectionClass;
 use stdClass;
 use TypeError;
 
@@ -222,6 +224,16 @@ class ContainerTest extends TestCase
         $class = $container->make(ContainerNestedDependentStub::class);
         $this->assertInstanceOf(ContainerDependentStub::class, $class->inner);
         $this->assertInstanceOf(ContainerImplementationStub::class, $class->inner->impl);
+    }
+
+    public function testLazyObjects()
+    {
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ProxyDependenciesClass::class);
+        $this->assertTrue((new ReflectionClass($class))->isUninitializedLazyObject($class));
+        $class->stubby;
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
     }
 
     public function testContainerIsPassedToResolvers()
@@ -1215,5 +1227,15 @@ class RequestDtoDependency implements RequestDtoDependencyContract
     public function __construct()
     {
         $this->userId = $_SERVER['__withFactory.userId'];
+    }
+}
+
+#[Proxy]
+class ProxyDependenciesClass
+{
+    public function __construct(
+        public IContainerContractStub $stubby
+    ) {
+        //dd('i have been constructed!');
     }
 }
