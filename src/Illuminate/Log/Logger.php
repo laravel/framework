@@ -219,6 +219,22 @@ class Logger implements LoggerInterface
     }
 
     /**
+     * Execute the callback with extra scoped log context.
+     *
+     * @param  array  $context
+     * @param  callable  $callback
+     */
+    public function withScopedContext(array $context, callable $callback)
+    {
+        try {
+            $this->withContext($context);
+            $callback();
+        } finally {
+            $this->withoutContext(array_keys($context));
+        }
+    }
+
+    /**
      * Register a new callback handler for when a log event is triggered.
      *
      * @param  \Closure  $callback

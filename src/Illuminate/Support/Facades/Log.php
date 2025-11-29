@@ -28,6 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Log\LogManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static void write(string $level, \Illuminate\Contracts\Support\Arrayable|\Illuminate\Contracts\Support\Jsonable|\Illuminate\Support\Stringable|array|string $message, array $context = [])
  * @method static \Illuminate\Log\Logger withContext(array $context = [])
+ * @method static void withScopedContext(array $context, callable $callback)
  * @method static void listen(\Closure $callback)
  * @method static \Psr\Log\LoggerInterface getLogger()
  * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()

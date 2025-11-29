@@ -58,6 +58,47 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
+    public function testContextCanBeScopedToLogsInACallback()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz']);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+        $monolog->shouldReceive('warning')->once()->with('qux', [
+            'bar' => 'baz',
+            'scoped' => 'context',
+        ]);
+        $monolog->shouldReceive('info')->once()->with('quux', ['bar' => 'baz']);
+
+        $writer->error('foo');
+        $writer->withScopedContext(['scoped' => 'context'], fn () => $writer->warning('qux'));
+        $writer->info('quux');
+    }
+
+    public function testContextIsAlsoScopedWhenTheCallbackThrowsAnException()
+    {
+        $writer = new Logger($monolog = m::mock(Monolog::class));
+        $writer->withContext(['bar' => 'baz']);
+
+        $monolog->shouldReceive('error')->once()->with('foo', ['bar' => 'baz']);
+        $monolog->shouldReceive('warning')->once()->with('qux', [
+            'bar' => 'baz',
+            'scoped' => 'context',
+        ]);
+        $monolog->shouldReceive('info')->once()->with('quux', ['bar' => 'baz']);
+
+        $writer->error('foo');
+        try {
+            $writer->withScopedContext(['scoped' => 'context'], function () use ($writer) {
+                $writer->warning('qux');
+                throw new RuntimeException;
+            });
+        } catch (RuntimeException) {
+            // Ignore exception
+        }
+        $writer->info('quux');
+    }
+
     public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class), $events = new Dispatcher);
