@@ -3534,7 +3534,7 @@ class HttpClientTest extends TestCase
             return [
                 $pool->get('https://laravel.com'),
             ];
-        });
+        }, null);
     }
 
     public function testPreventingStrayRequests()
