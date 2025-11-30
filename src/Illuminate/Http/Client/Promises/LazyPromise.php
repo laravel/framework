@@ -18,19 +18,24 @@ class LazyPromise implements PromiseInterface
      */
     protected array $pending = [];
 
+    /**
+     * The promise built by the creator.
+     *
+     * @var \GuzzleHttp\Promise\PromiseInterface
+     */
     protected PromiseInterface $guzzlePromise;
 
     /**
      * Create a new lazy promise instance.
      *
-     * @param  (\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $promiseBuilder
+     * @param  (\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $promiseBuilder  The callback to build a new PromiseInterface.
      */
     public function __construct(protected Closure $promiseBuilder)
     {
     }
 
     /**
-     * Build the promise from the lazy promise builder.
+     * Build the promise from the promise builder.
      *
      * @return \GuzzleHttp\Promise\PromiseInterface
      *
@@ -44,7 +49,7 @@ class LazyPromise implements PromiseInterface
 
         $this->guzzlePromise = call_user_func($this->promiseBuilder);
 
-        foreach($this->pending as $pendingCallback) {
+        foreach ($this->pending as $pendingCallback) {
             $pendingCallback($this->guzzlePromise);
         }
 
