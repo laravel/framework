@@ -957,7 +957,7 @@ class PendingRequest
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->makePromise($method, $url, $options);
+            return $this->promise = new FluentPromise(fn () => $this->makePromise($method, $url, $options));
         }
 
         $shouldRetry = null;
