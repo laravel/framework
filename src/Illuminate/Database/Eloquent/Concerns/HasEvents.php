@@ -18,7 +18,7 @@ trait HasEvents
      *
      * Allows for object-based events for native Eloquent events.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $dispatchesEvents = [];
 
@@ -398,7 +398,7 @@ trait HasEvents
     /**
      * Get the event map for the model.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function dispatchesEvents()
     {

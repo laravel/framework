@@ -47,6 +47,8 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     assertType('bool', $user->restore());
     assertType('User', $user->restoreOrCreate());
     assertType('User', $user->createOrRestore());
+
+    assertType('array<string, string>', $user->dispatchesEvents());
 }
 
 class Post extends Model
