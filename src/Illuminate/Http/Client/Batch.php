@@ -252,18 +252,19 @@ class Batch
         }
 
         $results = [];
-        $promises = [];
 
-        foreach ($this->requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
+        if (! empty($this->requests)) {
+            // Create a generator that yields promises on-demand for proper concurrency control
+            $promiseGenerator = function () {
+                foreach ($this->requests as $key => $item) {
+                    yield $key => match (true) {
+                        $item instanceof Closure => $item(),
+                        $item instanceof PendingRequest => $item->getPromise(),
+                        default => $item,
+                    };
+                }
             };
 
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
             $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
@@ -311,7 +312,7 @@ class Batch
                 $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
             }
 
-            (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
+            (new EachPromise($promiseGenerator(), $eachPromiseOptions))->promise()->wait();
         }
 
         // Before returning the results, we must ensure that the results are sorted
@@ -432,6 +433,7 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
+        // Store a closure that creates the promise on-demand for proper concurrency control
+        return $this->requests[] = fn () => $this->asyncRequest()->$method(...$parameters);
     }
 }
