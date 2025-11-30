@@ -7,6 +7,8 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Http\Client\Promises\LazyPromise;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Defer\DeferredCallback;
 
 use function Illuminate\Support\defer;
@@ -252,18 +254,8 @@ class Batch
         }
 
         $results = [];
-        $promises = [];
 
-        foreach ($this->requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
-            };
-
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
+        if (! empty($this->requests)) {
             $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
@@ -307,11 +299,18 @@ class Batch
                 },
             ];
 
-            if ($this->concurrencyLimit !== null) {
-                $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
-            }
+            $concurrency = $this->concurrencyLimit ?? count($this->requests);
 
-            (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
+            (new Collection($this->requests))
+                ->chunk($concurrency)
+                ->each(function (Collection $requestsChunk) use (&$results, $eachPromiseOptions) {
+                    $promises = [];
+                    foreach ($requestsChunk as $key => $item) {
+                        $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
+                        $promises[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                    }
+                    (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
+            });
         }
 
         // Before returning the results, we must ensure that the results are sorted
