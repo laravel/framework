@@ -12,11 +12,13 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Promises\FluentPromise;
 use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -1228,7 +1230,13 @@ class PendingRequest
             'on_stats' => $onStats,
         ], $options));
 
-        return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+        $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+
+        if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
+            $result = new FluentPromise($result);
+        }
+
+        return $result;
     }
 
     /**
