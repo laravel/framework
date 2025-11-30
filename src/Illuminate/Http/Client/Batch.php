@@ -303,14 +303,14 @@ class Batch
 
             (new Collection($this->requests))
                 ->chunk($concurrency)
-                ->each(function (Collection $requestsChunk) use (&$results, $eachPromiseOptions) {
+                ->each(function (Collection $requestsChunk) use ($eachPromiseOptions) {
                     $promises = [];
                     foreach ($requestsChunk as $key => $item) {
                         $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
                         $promises[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
                     }
                     (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
-            });
+                });
         }
 
         // Before returning the results, we must ensure that the results are sorted
