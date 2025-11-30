@@ -898,6 +898,14 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
+            (new Collection($requests))->each(function ($item) {
+                if ($item instanceof static) {
+                    $item = $item->getPromise();
+                }
+                if ($item instanceof LazyPromise) {
+                    $item->buildPromise();
+                }
+            });
             foreach ($requests as $key => $item) {
                 $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
             }
