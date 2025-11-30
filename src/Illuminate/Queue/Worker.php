@@ -107,7 +107,7 @@ class Worker
     public static $memoryExceededExitCode;
 
     /**
-     * Indicates if the worker should check for restart.
+     * Indicates if the worker should check for the last restart.
      *
      * @var bool
      */
