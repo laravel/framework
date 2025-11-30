@@ -187,11 +187,11 @@ class WorkCommandTest extends QueueTestCase
         Worker::$memoryExceededExitCode = null;
     }
 
-    public function testDisableRestartCheck()
+    public function testDisableLastRestartCheck()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
-        Worker::$checkRestart = false;
+        Worker::$checkLastRestart = false;
 
         $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
@@ -209,14 +209,14 @@ class WorkCommandTest extends QueueTestCase
             '--stop-when-empty' => true,
         ]);
 
-        Worker::$checkRestart = true;
+        Worker::$checkLastRestart = true;
     }
 
     public function testDisablePauseCheck()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
-        Worker::$checkPaused = false;
+        Worker::$checkPausedQueues = false;
 
         $cache = m::mock(Repository::class);
 
@@ -237,7 +237,7 @@ class WorkCommandTest extends QueueTestCase
             '--stop-when-empty' => true,
         ]);
 
-        Worker::$checkPaused = true;
+        Worker::$checkPausedQueues = true;
     }
 
     public function testFailedJobListenerOnlyRunsOnce()

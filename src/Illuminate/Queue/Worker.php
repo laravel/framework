@@ -111,14 +111,14 @@ class Worker
      *
      * @var bool
      */
-    public static $checkRestart = true;
+    public static $checkLastRestart = true;
 
     /**
      * Indicates if the worker should check for paused queues.
      *
      * @var bool
      */
-    public static $checkPaused = true;
+    public static $checkPausedQueues = true;
 
     /**
      * Create a new queue worker.
@@ -386,7 +386,7 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $index => $queue) {
-                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
+                if (static::$checkPausedQueues && $this->queuePaused($connection->getConnectionName(), $queue)) {
                     continue;
                 }
 
@@ -414,10 +414,6 @@ class Worker
      */
     protected function queuePaused($connectionName, $queue)
     {
-        if (! static::$checkPaused) {
-            return false;
-        }
-
         return $this->cache && (bool) $this->cache->get(
             "illuminate:queue:paused:{$connectionName}:{$queue}", false
         );
@@ -758,6 +754,10 @@ class Worker
      */
     protected function queueShouldRestart($lastRestart)
     {
+        if (! static::$checkLastRestart) {
+            return false;
+        }
+
         return $this->getTimestampOfLastQueueRestart() != $lastRestart;
     }
 
@@ -768,7 +768,7 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
-        if (! static::$checkRestart) {
+        if (! static::$checkLastRestart) {
             return null;
         }
 
