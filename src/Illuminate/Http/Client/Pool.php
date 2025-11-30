@@ -81,6 +81,7 @@ class Pool
      */
     public function __call($method, $parameters)
     {
-        return $this->pool[] = $this->asyncRequest()->$method(...$parameters);
+        // Store a closure that creates the promise on-demand for proper concurrency control
+        return $this->pool[] = fn () => $this->asyncRequest()->$method(...$parameters);
     }
 }

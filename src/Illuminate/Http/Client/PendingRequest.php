@@ -12,7 +12,6 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -791,7 +790,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -807,7 +806,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -823,7 +822,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -839,7 +838,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -855,7 +854,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -871,7 +870,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -903,13 +902,18 @@ class PendingRequest
             return $results;
         }
 
-        $promises = [];
+        // Use a generator to create promises on-demand for proper concurrency control
+        $promiseGenerator = function () use ($requests) {
+            foreach ($requests as $key => $item) {
+                yield $key => match (true) {
+                    $item instanceof Closure => $item(),
+                    $item instanceof static => $item->getPromise(),
+                    default => $item,
+                };
+            }
+        };
 
-        foreach ($requests as $key => $item) {
-            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
-        }
-
-        (new EachPromise($promises, [
+        (new EachPromise($promiseGenerator(), [
             'fulfilled' => function ($result, $key) use (&$results) {
                 $results[$key] = $result;
             },
@@ -969,34 +973,32 @@ class PendingRequest
 
                     $this->dispatchResponseReceivedEvent($response);
 
-                    if ($response->successful()) {
-                        return;
-                    }
+                    if (! $response->successful()) {
+                        try {
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        } catch (Exception $exception) {
+                            $shouldRetry = false;
 
-                    try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                    } catch (Exception $exception) {
-                        $shouldRetry = false;
+                            throw $exception;
+                        }
 
-                        throw $exception;
-                    }
+                        if ($this->throwCallback &&
+                            ($this->throwIfCallback === null ||
+                             call_user_func($this->throwIfCallback, $response))) {
+                            $response->throw($this->throwCallback);
+                        }
 
-                    if ($this->throwCallback &&
-                        ($this->throwIfCallback === null ||
-                         call_user_func($this->throwIfCallback, $response))) {
-                        $response->throw($this->throwCallback);
-                    }
+                        $potentialTries = is_array($this->tries)
+                            ? count($this->tries) + 1
+                            : $this->tries;
 
-                    $potentialTries = is_array($this->tries)
-                        ? count($this->tries) + 1
-                        : $this->tries;
+                        if ($attempt < $potentialTries && $shouldRetry) {
+                            $response->throw();
+                        }
 
-                    if ($attempt < $potentialTries && $shouldRetry) {
-                        $response->throw();
-                    }
-
-                    if ($potentialTries > 1 && $this->retryThrow) {
-                        $response->throw();
+                        if ($potentialTries > 1 && $this->retryThrow) {
+                            $response->throw();
+                        }
                     }
                 });
             } catch (TransferException $e) {
@@ -1198,7 +1200,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\FluentPromise
+     * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Exception
      */
@@ -1221,13 +1223,7 @@ class PendingRequest
             'on_stats' => $onStats,
         ], $options));
 
-        $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
-
-        if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
-            $result = new FluentPromise($result);
-        }
-
-        return $result;
+        return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
     }
 
     /**
