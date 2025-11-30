@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\Attributes\WithMigration;
 use RuntimeException;
 
@@ -193,10 +193,10 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$checkRestart = false;
 
-        $cache = Mockery::mock(Repository::class);
+        $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
 
-        $cacheManager = Mockery::mock(CacheManager::class);
+        $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);
         $cacheManager->shouldReceive('store')->andReturn($cache);
 
@@ -218,13 +218,13 @@ class WorkCommandTest extends QueueTestCase
 
         Worker::$checkPaused = false;
 
-        $cache = Mockery::mock(Repository::class);
+        $cache = m::mock(Repository::class);
 
         $cache->shouldReceive('get')->with('illuminate:queue:restart')->andReturn(null);
 
-        $cache->shouldNotReceive('get')->with(Mockery::pattern('/^illuminate:queue:paused:/'), false);
+        $cache->shouldNotReceive('m')->with(m::pattern('/^illuminate:queue:paused:/'), false);
 
-        $cacheManager = Mockery::mock(CacheManager::class);
+        $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);
         $cacheManager->shouldReceive('store')->andReturn($cache);
 
