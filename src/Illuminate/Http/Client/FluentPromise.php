@@ -16,7 +16,7 @@ class FluentPromise implements PromiseInterface
     /**
      * Create a new fluent promise instance.
      *
-     * @param  \GuzzleHttp\Promise\PromiseInterface|\Closure  $guzzlePromise
+     * @param  \GuzzleHttp\Promise\PromiseInterface|(\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $guzzlePromise
      */
     public function __construct(protected PromiseInterface|Closure $guzzlePromise)
     {
@@ -37,19 +37,19 @@ class FluentPromise implements PromiseInterface
     #[\Override]
     public function resolve($value): void
     {
-        $this->guzzlePromise->resolve($value);
+        $this->__call('resolve', [$value]);
     }
 
     #[\Override]
     public function reject($reason): void
     {
-        $this->guzzlePromise->reject($reason);
+        $this->__call('reject', [$reason]);
     }
 
     #[\Override]
     public function cancel(): void
     {
-        $this->guzzlePromise->cancel();
+        $this->__call('cancel', []);
     }
 
     #[\Override]
@@ -61,15 +61,19 @@ class FluentPromise implements PromiseInterface
     #[\Override]
     public function getState(): string
     {
+        if (! $this->guzzlePromise instanceof PromiseInterface) {
+            return PromiseInterface::PENDING;
+        }
+
         return $this->guzzlePromise->getState();
     }
 
     /**
      * Get the underlying Guzzle promise.
      *
-     * @return \GuzzleHttp\Promise\PromiseInterface
+     * @return \GuzzleHttp\Promise\PromiseInterface|(\Closure(): \GuzzleHttp\Promise\PromiseInterface)
      */
-    public function getGuzzlePromise(): PromiseInterface
+    public function getGuzzlePromise(): PromiseInterface|Closure
     {
         return $this->guzzlePromise;
     }
