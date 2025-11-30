@@ -2,6 +2,7 @@
 
 namespace Illuminate\Http\Client;
 
+use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Traits\ForwardsCalls;
 
@@ -15,9 +16,9 @@ class FluentPromise implements PromiseInterface
     /**
      * Create a new fluent promise instance.
      *
-     * @param  \GuzzleHttp\Promise\PromiseInterface  $guzzlePromise
+     * @param  \GuzzleHttp\Promise\PromiseInterface|\Closure  $guzzlePromise
      */
-    public function __construct(protected PromiseInterface $guzzlePromise)
+    public function __construct(protected PromiseInterface|Closure $guzzlePromise)
     {
     }
 
@@ -82,6 +83,10 @@ class FluentPromise implements PromiseInterface
      */
     public function __call($method, $parameters)
     {
+        if (is_callable($this->guzzlePromise)) {
+            $this->guzzlePromise = call_user_func($this->guzzlePromise);
+        }
+
         $result = $this->forwardCallTo($this->guzzlePromise, $method, $parameters);
 
         if (! $result instanceof PromiseInterface) {
