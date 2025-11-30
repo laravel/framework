@@ -195,6 +195,7 @@ class WorkCommandTest extends QueueTestCase
 
         $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
+        $cache->shouldReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
 
         $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);
@@ -221,8 +222,7 @@ class WorkCommandTest extends QueueTestCase
         $cache = m::mock(Repository::class);
 
         $cache->shouldReceive('get')->with('illuminate:queue:restart')->andReturn(null);
-
-        $cache->shouldNotReceive('m')->with(m::pattern('/^illuminate:queue:paused:/'), false);
+        $cache->shouldNotReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
 
         $cacheManager = m::mock(CacheManager::class);
         $cacheManager->shouldReceive('driver')->andReturn($cache);
