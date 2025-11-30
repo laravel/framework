@@ -895,8 +895,19 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
+            // First, create all promises to start all requests in parallel
+            $promises = [];
             foreach ($requests as $key => $item) {
-                $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+                $promises[$key] = match (true) {
+                    $item instanceof Closure => $item(),
+                    $item instanceof static => $item->getPromise(),
+                    default => $item,
+                };
+            }
+
+            // Then wait for all promises to complete
+            foreach ($promises as $key => $promise) {
+                $results[$key] = $promise->wait();
             }
 
             return $results;

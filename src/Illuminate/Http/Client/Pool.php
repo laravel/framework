@@ -45,11 +45,11 @@ class Pool
      * Add a request to the pool with a key.
      *
      * @param  string  $key
-     * @return \Illuminate\Http\Client\PendingRequest
+     * @return \Illuminate\Http\Client\DeferredRequest
      */
     public function as(string $key)
     {
-        return $this->pool[$key] = $this->asyncRequest();
+        return new DeferredRequest($this->pool, $key, $this->factory, $this->handler);
     }
 
     /**

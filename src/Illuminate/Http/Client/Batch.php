@@ -135,7 +135,7 @@ class Batch
      * Add a request to the batch with a key.
      *
      * @param  string  $key
-     * @return \Illuminate\Http\Client\PendingRequest
+     * @return \Illuminate\Http\Client\DeferredRequest
      *
      * @throws \Illuminate\Http\Client\BatchInProgressException
      */
@@ -147,7 +147,7 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        return $this->requests[$key] = $this->asyncRequest();
+        return new DeferredRequest($this->requests, $key, $this->factory, $this->handler);
     }
 
     /**
