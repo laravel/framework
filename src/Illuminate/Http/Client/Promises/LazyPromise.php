@@ -4,13 +4,10 @@ namespace Illuminate\Http\Client\Promises;
 
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Support\Traits\ForwardsCalls;
 use RuntimeException;
 
 class LazyPromise implements PromiseInterface
 {
-    use ForwardsCalls;
-
     /**
      * The callbacks to execute after the Guzzle Promise has been built.
      *
