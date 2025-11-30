@@ -18,6 +18,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Promises\FluentPromise;
+use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -903,21 +905,26 @@ class PendingRequest
             return $results;
         }
 
-        $promises = [];
+        $concurrency = $concurrency === 0 ? count($requests) : $concurrency;
 
-        foreach ($requests as $key => $item) {
-            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
-        }
+        (new Collection($requests))->chunk($concurrency)
+            ->each(static function (Collection $requests) use ($concurrency, &$results) {
+                $promises = [];
+                foreach ($requests as $key => $item) {
+                    $promise = $item instanceof static ? $item->getPromise() : $item;
+                    $promise[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                }
 
-        (new EachPromise($promises, [
-            'fulfilled' => function ($result, $key) use (&$results) {
-                $results[$key] = $result;
-            },
-            'rejected' => function ($reason, $key) use (&$results) {
-                $results[$key] = $reason;
-            },
-            'concurrency' => $concurrency,
-        ]))->promise()->wait();
+                (new EachPromise($promises, [
+                    'fulfilled' => function ($result, $key) use (&$results) {
+                        $results[$key] = $result;
+                    },
+                    'rejected' => function ($reason, $key) use (&$results) {
+                        $results[$key] = $reason;
+                    },
+                    'concurrency' => $concurrency,
+                ]))->promise()->wait();
+            });
 
         return $results;
     }
@@ -939,7 +946,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\Illuminate\Http\Client\Promises\LazyPromise
      *
      * @throws \Exception
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -957,7 +964,9 @@ class PendingRequest
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->promise = new FluentPromise(fn () => $this->makePromise($method, $url, $options));
+            return $this->promise = new LazyPromise(
+                fn () => $this->makePromise($method, $url, $options)
+            );
         }
 
         $shouldRetry = null;
@@ -1198,7 +1207,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\FluentPromise
+     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\Promises\FluentPromise
      *
      * @throws \Exception
      */

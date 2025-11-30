@@ -1,0 +1,124 @@
+<?php
+
+namespace Illuminate\Http\Client\Promises;
+
+use Closure;
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Support\Traits\ForwardsCalls;
+
+class LazyPromise implements PromiseInterface
+{
+    use ForwardsCalls;
+
+    /**
+     * @var list<array{?callable, ?callable}>
+     */
+    protected array $pendingThens = [];
+
+    /**
+     * @var list<callable>
+     */
+    protected array $pendingOtherwises = [];
+
+    protected PromiseInterface $guzzlePromise;
+
+    /**
+     * Create a new fluent promise instance.
+     *
+     * @param  \Closure(): \GuzzleHttp\Promise\PromiseInterface  $promiseBuilder
+     */
+    public function __construct(protected Closure $promiseBuilder)
+    {
+    }
+
+    public function buildPromise(): PromiseInterface
+    {
+        if (isset($this->guzzlePromise)) {
+            throw new \RuntimeException('Promise already built');
+        }
+
+        $this->guzzlePromise = call_user_func($this->promiseBuilder);
+
+        if ($this->pendingThens !== []) {
+            array_map(fn (array $pendingThen) => $this->guzzlePromise->then(...$pendingThen), $this->pendingThens);
+            $this->pendingThens = [];
+        }
+
+        if ($this->pendingOtherwises !== []) {
+            array_map(fn (callable $pendingOtherwise) => $this->guzzlePromise->otherwise($pendingOtherwise), $this->pendingOtherwises);
+            $this->pendingOtherwises = [];
+        }
+
+        return $this->guzzlePromise;
+    }
+
+    public function isLazy(): bool
+    {
+        return ! isset($this->guzzlePromise);
+    }
+
+    #[\Override]
+    public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
+    {
+        $this->pendingThens[] = [$onFulfilled, $onRejected];
+
+        return $this;
+    }
+
+    #[\Override]
+    public function otherwise(callable $onRejected): PromiseInterface
+    {
+        $this->pendingOtherwises[] = $onRejected;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    public function getState(): string
+    {
+        return PromiseInterface::PENDING;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    public function resolve($value): void
+    {
+        throw new \LogicException('Cannot resolve a lazy promise.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    public function reject($reason): void
+    {
+        throw new \LogicException('Cannot reject a lazy promise.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    public function cancel(): void
+    {
+        throw new \LogicException('Cannot cancel a lazy promise.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    #[\Override]
+    public function wait(bool $unwrap = true)
+    {
+        if ($this->isLazy()) {
+            $this->buildPromise();
+        }
+
+        return $this->guzzlePromise->wait($unwrap);
+    }
+}
