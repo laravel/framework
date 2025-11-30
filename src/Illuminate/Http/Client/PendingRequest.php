@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Promise\EachPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\UriTemplate\UriTemplate;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
@@ -790,7 +791,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -806,7 +807,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -822,7 +823,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -838,7 +839,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -854,7 +855,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -870,7 +871,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -895,7 +896,6 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
-            // First, create all promises to start all requests in parallel
             $promises = [];
             foreach ($requests as $key => $item) {
                 $promises[$key] = match (true) {
@@ -905,7 +905,6 @@ class PendingRequest
                 };
             }
 
-            // Then wait for all promises to complete
             foreach ($promises as $key => $promise) {
                 $results[$key] = $promise->wait();
             }
@@ -1211,7 +1210,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\FluentPromise
      *
      * @throws \Exception
      */
@@ -1234,7 +1233,13 @@ class PendingRequest
             'on_stats' => $onStats,
         ], $options));
 
-        return $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+        $result = $this->buildClient()->$clientMethod($method, $url, $mergedOptions);
+
+        if ($result instanceof PromiseInterface && ! $result instanceof FluentPromise) {
+            $result = new FluentPromise($result);
+        }
+
+        return $result;
     }
 
     /**

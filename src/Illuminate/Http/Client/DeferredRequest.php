@@ -2,12 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-/**
- * Deferred request wrapper for proper concurrency control.
- *
- * This class wraps PendingRequest to defer execution until the request
- * is actually needed by the batch/pool concurrency manager.
- */
 class DeferredRequest
 {
     /**
@@ -39,8 +33,6 @@ class DeferredRequest
     protected $handler;
 
     /**
-     * Create a new deferred request instance.
-     *
      * @param  array  &$requests  Reference to the pool/batch requests array
      * @param  string|int  $key  The key for this request
      * @param  \Illuminate\Http\Client\Factory  $factory
