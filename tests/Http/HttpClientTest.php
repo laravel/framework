@@ -1939,6 +1939,33 @@ class HttpClientTest extends TestCase
         $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
     }
 
+    public function testMiddlewareRunsInBatch()
+    {
+        $this->factory->fake(function (Request $request) {
+            return $this->factory->response('Fake');
+        });
+
+        $history = [];
+
+        $middleware = Middleware::history($history);
+
+        $batch = $this->factory->batch(fn (Batch $batch) => [
+            $batch->withMiddleware($middleware)->post('https://example.com', ['hyped-for' => 'laravel-movie']),
+        ]);
+
+        $responses = $batch->send();
+
+        $response = $responses[0];
+
+        $this->assertSame('Fake', $response->body());
+
+        $this->assertCount(1, $history);
+
+        $this->assertSame('Fake', tap($history[0]['response']->getBody())->rewind()->getContents());
+
+        $this->assertSame(['hyped-for' => 'laravel-movie'], json_decode(tap($history[0]['request']->getBody())->rewind()->getContents(), true));
+    }
+
     public function testPoolConcurrency()
     {
         $this->factory->fake([

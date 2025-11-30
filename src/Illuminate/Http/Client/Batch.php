@@ -423,7 +423,7 @@ class Batch
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     * @return \Illuminate\Http\Client\DeferredRequest
      */
     public function __call(string $method, array $parameters)
     {
@@ -433,7 +433,12 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        // Store a closure that creates the promise on-demand for proper concurrency control
-        return $this->requests[] = fn () => $this->asyncRequest()->$method(...$parameters);
+        // Get the next numeric index and create a DeferredRequest for method chaining
+        $key = count($this->requests);
+
+        $deferred = new DeferredRequest($this->requests, $key, $this->factory, $this->handler);
+
+        // Call the method on the DeferredRequest to start accumulating calls
+        return $deferred->$method(...$parameters);
     }
 }
