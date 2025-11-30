@@ -12,7 +12,7 @@ class LazyPromise implements PromiseInterface
     use ForwardsCalls;
 
     /**
-     * The callbacks to execute after the Promise has been built.
+     * The callbacks to execute after the Guzzle Promise has been built.
      *
      * @var list<callable>
      */
@@ -21,7 +21,7 @@ class LazyPromise implements PromiseInterface
     protected PromiseInterface $guzzlePromise;
 
     /**
-     * Create a new fluent promise instance.
+     * Create a new lazy promise instance.
      *
      * @param  (\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $promiseBuilder
      */
