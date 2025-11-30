@@ -77,11 +77,16 @@ class Pool
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     * @return \Illuminate\Http\Client\DeferredRequest
      */
     public function __call($method, $parameters)
     {
-        // Store a closure that creates the promise on-demand for proper concurrency control
-        return $this->pool[] = fn () => $this->asyncRequest()->$method(...$parameters);
+        // Get the next numeric index and create a DeferredRequest for method chaining
+        $key = count($this->pool);
+
+        $deferred = new DeferredRequest($this->pool, $key, $this->factory, $this->handler);
+
+        // Call the method on the DeferredRequest to start accumulating calls
+        return $deferred->$method(...$parameters);
     }
 }
