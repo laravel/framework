@@ -210,6 +210,9 @@ class WorkCommandTest extends QueueTestCase
             '--stop-when-empty' => true,
         ]);
 
+        $this->assertSame(0, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
+
         Worker::$checkLastRestart = true;
     }
 
@@ -236,6 +239,9 @@ class WorkCommandTest extends QueueTestCase
             '--max-jobs' => 1,
             '--stop-when-empty' => true,
         ]);
+
+        $this->assertSame(0, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
 
         Worker::$checkPausedQueues = true;
     }
