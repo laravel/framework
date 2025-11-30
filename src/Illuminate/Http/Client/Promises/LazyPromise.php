@@ -12,17 +12,9 @@ class LazyPromise implements PromiseInterface
     use ForwardsCalls;
 
     /**
-     * @var list<array{?callable, ?callable}>
-     */
-    protected array $pendingThens = [];
-
-    /**
+     * The callbacks to execute after the Promise has been built.
+     *
      * @var list<callable>
-     */
-    protected array $pendingOtherwises = [];
-
-    /**
-     * @var list<array{method: "then"|"otherwise", params: list<?callable>}>
      */
     protected array $pending = [];
 
@@ -31,7 +23,7 @@ class LazyPromise implements PromiseInterface
     /**
      * Create a new fluent promise instance.
      *
-     * @param  \Closure(): \GuzzleHttp\Promise\PromiseInterface  $promiseBuilder
+     * @param  (\Closure(): \GuzzleHttp\Promise\PromiseInterface)  $promiseBuilder
      */
     public function __construct(protected Closure $promiseBuilder)
     {
@@ -52,15 +44,8 @@ class LazyPromise implements PromiseInterface
 
         $this->guzzlePromise = call_user_func($this->promiseBuilder);
 
-
-        if ($this->pendingThens !== []) {
-            array_map(fn (array $pendingThen) => $this->guzzlePromise->then(...$pendingThen), $this->pendingThens);
-            $this->pendingThens = [];
-        }
-
-        if ($this->pendingOtherwises !== []) {
-            array_map(fn (callable $pendingOtherwise) => $this->guzzlePromise->otherwise($pendingOtherwise), $this->pendingOtherwises);
-            $this->pendingOtherwises = [];
+        foreach($this->pending as $pendingCallback) {
+            $pendingCallback($this->guzzlePromise);
         }
 
         return $this->guzzlePromise;
@@ -79,10 +64,7 @@ class LazyPromise implements PromiseInterface
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
-        $this->pending[] = [
-            'method' => 'then',
-            'params' => [$onFulfilled, $onRejected],
-        ];
+        $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
 
         return $this;
     }
@@ -90,10 +72,7 @@ class LazyPromise implements PromiseInterface
     #[\Override]
     public function otherwise(callable $onRejected): PromiseInterface
     {
-        $this->pending[] = [
-            'method' => 'otherwise',
-            'params' => [$onRejected],
-        ];
+        $this->pending[] = static fn (PromiseInterface $promise) => $promise->otherwise($onRejected);
 
         return $this;
     }
