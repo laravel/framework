@@ -910,7 +910,7 @@ class PendingRequest
                 $promises = [];
                 foreach ($requests as $key => $item) {
                     $promise = $item instanceof static ? $item->getPromise() : $item;
-                    $promise[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                    $promises[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
                 }
 
                 (new EachPromise($promises, [

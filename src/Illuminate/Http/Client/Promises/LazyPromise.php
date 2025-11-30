@@ -32,13 +32,13 @@ class LazyPromise implements PromiseInterface
     /**
      * Build the promise from the lazy promise builder.
      *
-     * @return PromiseInterface
+     * @return \GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \RuntimeException If the promise has already been built
      */
     public function buildPromise(): PromiseInterface
     {
-        if (isset($this->guzzlePromise)) {
+        if (! $this->promiseNeedsBuilt()) {
             throw new RuntimeException('Promise already built');
         }
 
@@ -80,7 +80,11 @@ class LazyPromise implements PromiseInterface
     #[\Override]
     public function getState(): string
     {
-        return PromiseInterface::PENDING;
+        if ($this->promiseNeedsBuilt()) {
+            return PromiseInterface::PENDING;
+        }
+
+        return $this->guzzlePromise->getState();
     }
 
     #[\Override]
