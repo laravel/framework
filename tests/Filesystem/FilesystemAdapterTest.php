@@ -143,6 +143,8 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->exists('file.txt'));
         $this->assertTrue($filesystemAdapter->fileExists('file.txt'));
+        $this->assertFalse($filesystemAdapter->exists(null));
+        $this->assertTrue($filesystemAdapter->fileExists(null));
     }
 
     public function testMissing()
@@ -150,6 +152,8 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->missing('file.txt'));
         $this->assertTrue($filesystemAdapter->fileMissing('file.txt'));
+        $this->assertFalse($filesystemAdapter->missing(null));
+        $this->assertTrue($filesystemAdapter->fileMissing(null));
     }
 
     public function testDirectoryExists()
@@ -157,12 +161,14 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('/foo/bar/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->directoryExists('/foo/bar'));
+        $this->assertFalse($filesystemAdapter->directoryExists(null));
     }
 
     public function testDirectoryMissing()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->directoryMissing('/foo/bar'));
+        $this->assertFalse($filesystemAdapter->directoryMissing(null));
     }
 
     public function testPath()

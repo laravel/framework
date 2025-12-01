@@ -209,7 +209,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function exists($path)
     {
-        return $this->driver->has($path);
+        return ! empty($path) && $this->driver->has($path);
     }
 
     /**
@@ -220,7 +220,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function missing($path)
     {
-        return ! $this->exists($path);
+        return ! empty($path) && ! $this->exists($path);
     }
 
     /**
@@ -231,7 +231,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function fileExists($path)
     {
-        return $this->driver->fileExists($path);
+        return ! empty($path) && $this->driver->fileExists($path);
     }
 
     /**
@@ -242,7 +242,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function fileMissing($path)
     {
-        return ! $this->fileExists($path);
+        return ! empty($path) && ! $this->fileExists($path);
     }
 
     /**
@@ -253,7 +253,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directoryExists($path)
     {
-        return $this->driver->directoryExists($path);
+        return ! empty($path) && $this->driver->directoryExists($path);
     }
 
     /**
@@ -264,7 +264,7 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function directoryMissing($path)
     {
-        return ! $this->directoryExists($path);
+        return ! empty($path) && ! $this->directoryExists($path);
     }
 
     /**
