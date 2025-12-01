@@ -107,18 +107,18 @@ class Worker
     public static $memoryExceededExitCode;
 
     /**
-     * Indicates if the worker should check for the last restart.
+     * Indicates if the worker should disable the check for the last restart.
      *
      * @var bool
      */
-    public static $checkLastRestart = true;
+    public static $disableLastRestartCheck = false;
 
     /**
-     * Indicates if the worker should check for paused queues.
+     * Indicates if the worker should disable the check for paused queues.
      *
      * @var bool
      */
-    public static $checkPausedQueues = true;
+    public static $disablePausedQueueCheck = false;
 
     /**
      * Create a new queue worker.
@@ -414,7 +414,7 @@ class Worker
      */
     protected function queuePaused($connectionName, $queue)
     {
-        if (! static::$checkPausedQueues) {
+        if (static::$disablePausedQueueCheck) {
             return false;
         }
 
@@ -758,7 +758,7 @@ class Worker
      */
     protected function queueShouldRestart($lastRestart)
     {
-        if (! static::$checkLastRestart) {
+        if (static::$disableLastRestartCheck) {
             return false;
         }
 
@@ -772,7 +772,7 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
-        if (! static::$checkLastRestart) {
+        if (static::$disableLastRestartCheck) {
             return null;
         }
 
