@@ -931,28 +931,8 @@ class PendingRequest
             },
             'concurrency' => $concurrency,
         ]))->promise()->wait();
-        /*
-        (new Collection($requests))->chunk($concurrency)
-            ->each(static function (Collection $requests) use ($concurrency, &$results) {
-                $promises = [];
-                foreach ($requests as $key => $item) {
-                    $promise = $item instanceof static ? $item->getPromise() : $item;
-                    $promises[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
-                }
-
-                (new EachPromise($promises, [
-                    'fulfilled' => function ($result, $key) use (&$results) {
-                        $results[$key] = $result;
-                    },
-                    'rejected' => function ($reason, $key) use (&$results) {
-                        $results[$key] = $reason;
-                    },
-                    'concurrency' => $concurrency,
-                ]))->promise()->wait();
-            });
 
         return $results;
-        */
     }
 
     /**
