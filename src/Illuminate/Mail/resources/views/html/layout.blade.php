@@ -4,9 +4,92 @@
 <title>{{ config('app.name') }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="color-scheme" content="light">
-<meta name="supported-color-schemes" content="light">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
 <style>
+@media (prefers-color-scheme: dark) {
+body,
+.wrapper,
+.body {
+background-color: #18181b !important;
+}
+
+.inner-body {
+background-color: #27272a !important;
+border-color: #3f3f46 !important;
+}
+
+p,
+ul,
+ol,
+blockquote,
+span,
+td {
+color: #e4e4e7 !important;
+}
+
+a {
+color: #a5b4fc !important;
+}
+
+h1,
+h2,
+h3,
+.header a {
+color: #fafafa !important;
+}
+
+.logo {
+    filter: invert(23%) sepia(5%) saturate(531%) hue-rotate(202deg) brightness(96%) contrast(91%) !important;
+}
+
+.button-primary,
+.button-blue {
+background-color: #fafafa !important;
+border-color: #fafafa !important;
+color: #18181b !important;
+}
+
+.button-success,
+.button-green {
+background-color: #22c55e !important;
+border-color: #22c55e !important;
+color: #fff !important;
+}
+
+.button-error,
+.button-red {
+background-color: #ef4444 !important;
+border-color: #ef4444 !important;
+color: #fff !important;
+}
+
+.footer p,
+.footer a {
+color: #71717a !important;
+}
+
+.panel-content {
+background-color: #3f3f46 !important;
+}
+
+.panel-content p {
+color: #e4e4e7 !important;
+}
+
+.panel {
+border-color: #fff !important;
+}
+
+.subcopy {
+border-top-color: #3f3f46 !important;
+}
+
+.table th {
+border-bottom-color: #3f3f46 !important;
+}
+}
+
 @media only screen and (max-width: 600px) {
 .inner-body {
 width: 100% !important;
