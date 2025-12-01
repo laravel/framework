@@ -144,7 +144,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->exists('file.txt'));
         $this->assertTrue($filesystemAdapter->fileExists('file.txt'));
         $this->assertFalse($filesystemAdapter->exists(null));
-        $this->assertTrue($filesystemAdapter->fileExists(null));
+        $this->assertFalse($filesystemAdapter->fileExists(null));
     }
 
     public function testMissing()
@@ -153,7 +153,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->missing('file.txt'));
         $this->assertTrue($filesystemAdapter->fileMissing('file.txt'));
         $this->assertFalse($filesystemAdapter->missing(null));
-        $this->assertTrue($filesystemAdapter->fileMissing(null));
+        $this->assertFalse($filesystemAdapter->fileMissing(null));
     }
 
     public function testDirectoryExists()
