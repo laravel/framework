@@ -11,11 +11,18 @@ class AuthorApiResource extends JsonApiResource
         'profile',
     ];
 
+    #[\Override]
     public function toAttributes(Request $request)
     {
         return [
             'name' => $this->name,
             'email' => $this->email,
         ];
+    }
+
+    #[\Override]
+    public function toType(Request $request)
+    {
+        return 'authors';
     }
 }

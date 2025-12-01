@@ -13,6 +13,7 @@ class UserApiResource extends JsonApiResource
         'teams',
     ];
 
+    #[\Override]
     public function toAttributes(Request $request)
     {
         return [
