@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class RelationResolver
 {
     /**
-     * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model)
+     * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)
      */
     public Closure $relationResolver;
 
@@ -24,7 +24,7 @@ class RelationResolver
     /**
      * Construct a new resource relationship resolver.
      *
-     * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
+     * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
      */
     public function __construct(
         public string $relationName,
