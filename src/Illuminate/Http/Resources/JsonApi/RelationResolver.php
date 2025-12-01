@@ -16,7 +16,7 @@ class RelationResolver
     /**
      * @var class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null
      */
-    public ?string $relationResourceClass;
+    public ?string $relationResourceClass = null;
 
     /**
      * Construct a new resource relationship resolver.
