@@ -386,7 +386,7 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $index => $queue) {
-                if (static::$checkPausedQueues && $this->queuePaused($connection->getConnectionName(), $queue)) {
+                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
                     continue;
                 }
 
@@ -414,6 +414,10 @@ class Worker
      */
     protected function queuePaused($connectionName, $queue)
     {
+        if (! static::$checkPausedQueues) {
+            return false;
+        }
+
         return $this->cache && (bool) $this->cache->get(
             "illuminate:queue:paused:{$connectionName}:{$queue}", false
         );
