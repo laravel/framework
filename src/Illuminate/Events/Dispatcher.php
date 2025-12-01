@@ -552,6 +552,7 @@ class Dispatcher implements DispatcherContract
      *
      * @param  class-string  $class
      * @return bool
+     *
      * @phpstan-assert-if-true \Illuminate\Contracts\Queue\ShouldQueue $class
      */
     protected function handlerShouldBeQueued($class)
@@ -669,6 +670,7 @@ class Dispatcher implements DispatcherContract
      * Create the listener and job for a queued listener.
      *
      * @template TListener
+     *
      * @param  class-string<TListener>  $class
      * @param  string  $method
      * @param  array  $arguments
@@ -806,6 +808,7 @@ class Dispatcher implements DispatcherContract
      * Execute the given callback while deferring events, then dispatch all deferred events.
      *
      * @template TResult
+     *
      * @param  callable(): TResult  $callback
      * @param  string[]|null  $events
      * @return TResult
