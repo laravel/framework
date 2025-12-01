@@ -299,18 +299,20 @@ class Batch
                 },
             ];
 
-            $concurrency = $this->concurrencyLimit ?? count($this->requests);
+            if ($this->concurrencyLimit !== null) {
+                $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
+            }
 
-            (new Collection($this->requests))
-                ->chunk($concurrency)
-                ->each(function (Collection $requestsChunk) use ($eachPromiseOptions) {
-                    $promises = [];
-                    foreach ($requestsChunk as $key => $item) {
-                        $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
-                        $promises[$key] = $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
-                    }
-                    (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
-                });
+            $promiseGenerator = function () {
+                foreach ($this->requests as $key => $item) {
+                    $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
+                    yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                }
+            };
+
+            (new EachPromise($promiseGenerator(), $eachPromiseOptions))
+                ->promise()
+                ->wait();
         }
 
         // Before returning the results, we must ensure that the results are sorted
