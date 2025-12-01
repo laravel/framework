@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Config;
 
 use Illuminate\Config\Repository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Stringable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -29,6 +31,7 @@ class RepositoryTest extends TestCase
             'boolean' => true,
             'integer' => 1,
             'float' => 1.1,
+            'uri' => 'https://laravel.com',
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -303,6 +306,22 @@ class RepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('#^Configuration value for key \[a\] must be a string, (.*) given.#');
 
         $this->repository->string('a');
+    }
+
+    public function testItGetsAsStringable(): void
+    {
+        $stringable = $this->repository->stringable('a.b');
+
+        $this->assertInstanceOf(Stringable::class, $stringable);
+        $this->assertSame('c', (string) $stringable);
+    }
+
+    public function testItGetsAsUri(): void
+    {
+        $uri = $this->repository->uri('uri');
+
+        $this->assertInstanceOf(Uri::class, $uri);
+        $this->assertSame('https://laravel.com', (string) $uri);
     }
 
     public function testItGetsAsArray(): void

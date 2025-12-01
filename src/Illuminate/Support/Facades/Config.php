@@ -12,6 +12,8 @@ namespace Illuminate\Support\Facades;
  * @method static bool boolean(string $key, \Closure|bool|null $default = null)
  * @method static array array(string $key, \Closure|array|null $default = null)
  * @method static \Illuminate\Support\Collection collection(string $key, \Closure|array|null $default = null)
+ * @method static \Illuminate\Support\Stringable stringable(string $key, \Closure|array|null $default = null)
+ * @method static \Illuminate\Support\Uri uri(string $key, \Closure|array|null $default = null)
  * @method static void set(array|string $key, mixed $value = null)
  * @method static void prepend(string $key, mixed $value)
  * @method static void push(string $key, mixed $value)

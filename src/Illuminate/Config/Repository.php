@@ -6,7 +6,10 @@ use ArrayAccess;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Uri;
 use InvalidArgumentException;
 
 class Repository implements ArrayAccess, ConfigContract
@@ -198,6 +201,30 @@ class Repository implements ArrayAccess, ConfigContract
     public function collection(string $key, $default = null): Collection
     {
         return new Collection($this->array($key, $default));
+    }
+
+    /**
+     * Get the specified string configuration value as a stringable instance.
+     *
+     * @param  string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return Stringable
+     */
+    public function stringable(string $key, $default = null): Stringable
+    {
+        return Str::of($this->string($key, $default));
+    }
+
+    /**
+     * Get the specified string configuration value as a URI instance.
+     *
+     * @param  string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return Uri
+     */
+    public function uri(string $key, $default = null): Uri
+    {
+        return Uri::of($this->string($key, $default));
     }
 
     /**
