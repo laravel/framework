@@ -12,8 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\JsonApi\RelationResolver;
 use Illuminate\Http\Resources\MissingValue;
-use Illuminate\Http\Resources\RelationResolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -155,8 +155,11 @@ trait ResolvesJsonApiElements
         $sparseIncluded = $request->sparseIncluded();
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => new RelationResolver($value)] : [$key => new RelationResolver($key, $value)])
-            ->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
+            ->mapWithKeys(
+                fn ($value, $key) => is_int($key) ? [$value => new RelationResolver($value)] : [$key => new RelationResolver($key, $value)]
+            )->filter(
+                fn ($value, $key) => in_array($key, $sparseIncluded)
+            );
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
 
@@ -166,6 +169,7 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) {
             $relatedModels = $relationResolver->handle($this->resource);
+            $relatedResourceClass = $relationResolver->relationResourceClass;
 
             // Relationship is a collection of models...
             if ($relatedModels instanceof Collection) {
@@ -181,11 +185,15 @@ trait ResolvesJsonApiElements
 
                 $key = static::resourceTypeFromModel($relatedModels->first());
 
-                return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $isUnique) {
-                    return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $isUnique) {
+                return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
+                    return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
                         $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
 
-                        return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                        return [
+                            'id' => $uniqueKey[1],
+                            'type' => $uniqueKey[0],
+                            'class' => $relatedResourceClass,
+                        ];
                     });
                 })]];
             }
@@ -202,10 +210,14 @@ trait ResolvesJsonApiElements
 
             return [$key => ['data' => transform(
                 [static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
-                function ($uniqueKey) use ($relatedModel) {
+                function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
                     $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, true];
 
-                    return ['id' => $uniqueKey[1], 'type' => $uniqueKey[0]];
+                    return [
+                        'id' => $uniqueKey[1],
+                        'type' => $uniqueKey[0],
+                        'class' => $relatedResourceClass,
+                    ];
                 }
             )]];
         })->all();
