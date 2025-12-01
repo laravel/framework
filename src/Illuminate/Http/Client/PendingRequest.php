@@ -915,6 +915,23 @@ class PendingRequest
 
         $concurrency = $concurrency === 0 ? count($requests) : $concurrency;
 
+        $promiseGenerator = function () use ($requests) {
+            foreach ($requests as $key => $item) {
+                $promise = $item instanceof static ? $item->getPromise() : $item;
+                yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+            }
+        };
+
+        (new EachPromise($promiseGenerator(), [
+            'fulfilled' => function ($result, $key) use (&$results) {
+                $results[$key] = $result;
+            },
+            'rejected' => function ($reason, $key) use (&$results) {
+                $results[$key] = $reason;
+            },
+            'concurrency' => $concurrency,
+        ]))->promise()->wait();
+        /*
         (new Collection($requests))->chunk($concurrency)
             ->each(static function (Collection $requests) use ($concurrency, &$results) {
                 $promises = [];
@@ -935,6 +952,7 @@ class PendingRequest
             });
 
         return $results;
+        */
     }
 
     /**
