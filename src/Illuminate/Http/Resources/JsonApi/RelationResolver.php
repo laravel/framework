@@ -20,8 +20,8 @@ class RelationResolver
     /**
      * Construct a new resource relationship resolver.
      *
-     * @param string  $relationName
-     * @param \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null   $resolver
+     * @param  string  $relationName
+     * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
      */
     public function __construct(
         public string $relationName,
