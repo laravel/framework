@@ -265,9 +265,9 @@ class Dispatcher implements DispatcherContract
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
-        // When the given "event" is actually an object we will assume it is an event
-        // object and use the class as the event name and this event itself as the
-        // payload to the handler, which makes object based events quite simple.
+        // When the given "event" is actually an object, we will assume it is an event
+        // object, and use the class as the event name and this event itself as the
+        // payload to the handler, which makes object-based events quite simple.
         [$isEventObject, $parsedEvent, $parsedPayload] = [
             is_object($event),
             ...$this->parseEventAndPayload($event, $payload),
