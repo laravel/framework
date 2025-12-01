@@ -91,6 +91,78 @@ class DurationLimiterTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
+    public function testAcquireSetsDecaysAtAndRemaining()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'acquire-key', 2, 2);
+
+        $acquired1 = $limiter->acquire();
+        $this->assertTrue($acquired1);
+        $this->assertGreaterThanOrEqual(time(), $limiter->decaysAt);
+        $this->assertSame(1, $limiter->remaining);
+
+        $acquired2 = $limiter->acquire();
+        $this->assertTrue($acquired2);
+        $this->assertSame(0, $limiter->remaining);
+
+        $acquired3 = $limiter->acquire();
+        $this->assertFalse($acquired3);
+        $this->assertSame(0, $limiter->remaining);
+    }
+
+    public function testTooManyAttemptsReportsCorrectly()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'too-many-key', 2, 1);
+
+        // Initially, should not have too many attempts
+        $this->assertFalse($limiter->tooManyAttempts());
+        $this->assertSame(0, $limiter->decaysAt); // As per script for non-existing key
+        $this->assertGreaterThan(0, $limiter->remaining); // Remaining is positive future timestamp placeholder
+
+        // Use up the available slots
+        $this->assertTrue($limiter->acquire());
+        $this->assertTrue($limiter->acquire());
+
+        // Now, too many attempts within the same window
+        $this->assertTrue($limiter->tooManyAttempts());
+        $this->assertSame(0, max(0, $limiter->remaining));
+
+        // After decay window, attempts should be allowed again
+        sleep(1);
+        $this->assertFalse($limiter->tooManyAttempts());
+    }
+
+    public function testClearResetsLimiter()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'clear-key', 1, 2);
+
+        $this->assertTrue($limiter->acquire());
+        $this->assertFalse($limiter->acquire());
+
+        // Clear and try again
+        $limiter->clear();
+        $this->assertTrue($limiter->acquire());
+    }
+
+    public function testBlockReturnsTrueWithoutCallback()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'no-callback-key', 1, 1);
+
+        $this->assertTrue($limiter->block(1));
+    }
+
+    public function testAcquireResetsAfterDecay()
+    {
+        $limiter = new DurationLimiter($this->redis(), 'reset-after-decay-key', 1, 1);
+
+        $this->assertTrue($limiter->acquire());
+        $this->assertFalse($limiter->acquire());
+
+        sleep(1);
+
+        $this->assertTrue($limiter->acquire());
+        $this->assertSame(0, $limiter->remaining);
+    }
+
     private function redis()
     {
         return $this->redis['phpredis']->connection();
