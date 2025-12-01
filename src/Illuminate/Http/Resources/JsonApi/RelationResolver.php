@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @internal
+ */
 class RelationResolver
 {
     /**
@@ -21,7 +24,6 @@ class RelationResolver
     /**
      * Construct a new resource relationship resolver.
      *
-     * @param  string  $relationName
      * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
      */
     public function __construct(
@@ -38,6 +40,9 @@ class RelationResolver
         }
     }
 
+    /**
+     * Resolve relation for a resource.
+     */
     public function handle(mixed $resource): Collection|Model|null
     {
         return value($this->relationResolver, $resource);
