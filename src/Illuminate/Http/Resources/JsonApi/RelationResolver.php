@@ -15,6 +15,7 @@ class RelationResolver
     ) {
         $this->relationResolver = $resolver ?? fn ($resource) => $resource->getRelation($this->relationName);
     }
+
     public function handle(mixed $resource): Collection|Model
     {
         return value($this->relationResolver, $resource);
