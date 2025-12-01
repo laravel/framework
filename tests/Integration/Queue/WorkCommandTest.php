@@ -191,7 +191,7 @@ class WorkCommandTest extends QueueTestCase
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
-        Worker::$disableLastRestartCheck = true;
+        Worker::$restartable = false;
 
         $cache = m::mock(Repository::class);
         $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
@@ -213,14 +213,14 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
 
-        Worker::$disableLastRestartCheck = false;
+        Worker::$restartable = true;
     }
 
     public function testDisablePauseQueueCheck()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
 
-        Worker::$disablePausedQueueCheck = true;
+        Worker::$pausable = false;
 
         $cache = m::mock(Repository::class);
 
@@ -243,7 +243,7 @@ class WorkCommandTest extends QueueTestCase
         $this->assertSame(0, Queue::size());
         $this->assertTrue(FirstJob::$ran);
 
-        Worker::$disablePausedQueueCheck = false;
+        Worker::$pausable = true;
     }
 
     public function testFailedJobListenerOnlyRunsOnce()
