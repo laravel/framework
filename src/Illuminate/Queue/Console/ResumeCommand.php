@@ -5,6 +5,8 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
+use Illuminate\Queue\Worker;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:resume', aliases: ['queue:continue'])]
@@ -40,6 +42,10 @@ class ResumeCommand extends Command
      */
     public function handle(QueueManager $manager)
     {
+        if (! Worker::$pausable) {
+            throw new RuntimeException('Worker::$pausable must be set to true to use this command.');
+        }
+
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
 
         $manager->resume($connection, $queue);

@@ -4,7 +4,9 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Queue\Worker;
 use Illuminate\Support\InteractsWithTime;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:restart')]
@@ -52,6 +54,10 @@ class RestartCommand extends Command
      */
     public function handle()
     {
+        if (! Worker::$restartable) {
+            throw new RuntimeException('Worker::$restartable must be set to true to use this command.');
+        }
+
         $this->cache->forever('illuminate:queue:restart', $this->currentTime());
 
         $this->components->info('Broadcasting queue restart signal.');
