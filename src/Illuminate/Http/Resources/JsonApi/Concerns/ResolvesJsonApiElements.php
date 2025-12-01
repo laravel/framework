@@ -12,6 +12,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\RelationResolver;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -154,7 +155,7 @@ trait ResolvesJsonApiElements
         $sparseIncluded = $request->sparseIncluded();
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => fn ($resource) => $resource->getRelation($value)] : [$key => $value])
+            ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => new RelationResolver($value)] : [$key => new RelationResolver($key, $value)])
             ->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
@@ -163,8 +164,8 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function ($relationResolver, $key) {
-            $relatedModels = value($relationResolver, $this->resource);
+        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) {
+            $relatedModels = $relationResolver->handle($this->resource);
 
             // Relationship is a collection of models...
             if ($relatedModels instanceof Collection) {
