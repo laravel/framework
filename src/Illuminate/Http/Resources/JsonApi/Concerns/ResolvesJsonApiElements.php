@@ -187,12 +187,11 @@ trait ResolvesJsonApiElements
 
                 return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
                     return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
-                        $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $isUnique];
+                        $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $relatedResourceClass, $isUnique];
 
                         return [
                             'id' => $uniqueKey[1],
                             'type' => $uniqueKey[0],
-                            'class' => $relatedResourceClass,
                         ];
                     });
                 })]];
@@ -211,12 +210,11 @@ trait ResolvesJsonApiElements
             return [$key => ['data' => transform(
                 [static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
                 function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
-                    $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, true];
+                    $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $relatedResourceClass, true];
 
                     return [
                         'id' => $uniqueKey[1],
                         'type' => $uniqueKey[0],
-                        'class' => $relatedResourceClass,
                     ];
                 }
             )]];
@@ -237,14 +235,14 @@ trait ResolvesJsonApiElements
         $relations = new Collection;
 
         foreach ($this->loadedRelationshipsMap as $relation => $value) {
-            $resourceInstance = rescue(fn () => $relation->toResource(), new JsonApiResource($relation), false);
+            [$type, $id, $relatedResourceClass, $isUnique] = $value;
+
+            $resourceInstance = rescue(fn () => $relation->toResource($relatedResourceClass), new JsonApiResource($relation), false);
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
-
-            [$type, $id, $isUnique] = $value;
 
             $relationsData = $resourceInstance->resolve($request);
 
