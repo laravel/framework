@@ -282,8 +282,10 @@ trait ResolvesJsonApiElements
 
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        return Str::of(
-            $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
-        )->snake()->pluralStudly();
+        if ($morphMap !== $modelClassName) {
+            return Str::of($morphMap)->pluralStudly();
+        }
+
+        return Str::of($modelClassName)->classBasename()->snake()->pluralStudly();
     }
 }
