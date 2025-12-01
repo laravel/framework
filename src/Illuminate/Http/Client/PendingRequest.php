@@ -898,7 +898,7 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
-            (new Collection($requests))->each(function ($item) {
+            (new Collection($requests))->each(static function ($item) {
                 if ($item instanceof static) {
                     $item = $item->getPromise();
                 }
@@ -915,7 +915,7 @@ class PendingRequest
 
         $concurrency = $concurrency === 0 ? count($requests) : $concurrency;
 
-        $promiseGenerator = function () use ($requests) {
+        $promiseGenerator = static function () use ($requests) {
             foreach ($requests as $key => $item) {
                 $promise = $item instanceof static ? $item->getPromise() : $item;
                 yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
