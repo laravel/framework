@@ -4,14 +4,10 @@ namespace Illuminate\Mail\Transport;
 
 use Exception;
 use Mailtrap\Api\EmailsSendApiInterface;
-use Mailtrap\Mime\MailtrapEmail;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\MessageConverter;
 
 class MailtrapTransport extends AbstractTransport
@@ -31,12 +27,8 @@ class MailtrapTransport extends AbstractTransport
     {
         $email = MessageConverter::toEmail($message->getOriginalMessage());
 
-        $envelope = $message->getEnvelope();
-
-        $mailtrapEmail = $this->prepareMailtrapEmail($email, $envelope);
-
         try {
-            $result = $this->mailtrap->send($mailtrapEmail);
+            $result = $this->mailtrap->send($email);
 
             throw_if(
                 $result->getStatusCode() !== Response::HTTP_OK,
@@ -50,113 +42,6 @@ class MailtrapTransport extends AbstractTransport
                 $exception
             );
         }
-    }
-
-    /**
-     * Determine the attachments for the email.
-     *
-     * @return list<array{
-     *     content_type: string,
-     *     content: string,
-     *     filename: string|null,
-     *     content_id?: string
-     * }>
-     */
-    protected function determineAttachments(Email $email): array
-    {
-        $attachments = [];
-
-        if ($email->getAttachments()) {
-            foreach ($email->getAttachments() as $attachment) {
-                $attachmentHeaders = $attachment->getPreparedHeaders();
-                $contentType = $attachmentHeaders->get('Content-Type')->getBody();
-                $disposition = $attachmentHeaders->getHeaderBody('Content-Disposition');
-                $filename = $attachmentHeaders->getHeaderParameter('Content-Disposition', 'filename');
-
-                if ($contentType === 'text/calendar') {
-                    $content = $attachment->getBody();
-                } else {
-                    $content = str_replace("\r\n", '', $attachment->bodyToString());
-                }
-
-                $item = [
-                    'content_type' => $contentType,
-                    'content' => $content,
-                    'filename' => $filename,
-                ];
-
-                // TODO Is this needed?
-                if ($disposition === 'inline') {
-                    $item['content_id'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
-                }
-
-                $attachments[] = $item;
-            }
-        }
-
-        return $attachments;
-    }
-
-    /**
-     * Determine the headers for the email.
-     *
-     * @return array<string, string>
-     */
-    protected function determineHeaders(Email $email): array
-    {
-        $headers = [];
-
-        $headersToBypass = ['from', 'to', 'cc', 'bcc', 'reply-to', 'sender', 'subject', 'content-type'];
-
-        foreach ($email->getHeaders()->all() as $name => $header) {
-            if (in_array($name, $headersToBypass, true)) {
-                continue;
-            }
-
-            $headers[$header->getName()] = $header->getBodyAsString();
-        }
-
-        return $headers;
-    }
-
-    /**
-     * Build the Mailtrap email instance which will be sent.
-     */
-    protected function prepareMailtrapEmail(Email $email, Envelope $envelope): MailtrapEmail
-    {
-        $mailtrapEmail = (new MailtrapEmail)
-            ->from($envelope->getSender())
-            ->to(...$this->getRecipients($email, $envelope))
-            ->cc(...$email->getCc())
-            ->bcc(...$email->getBcc())
-            ->replyTo(...$email->getReplyTo())
-            ->subject($email->getSubject())
-            ->html($email->getHtmlBody())
-            ->text($email->getTextBody());
-
-        foreach ($this->determineHeaders($email) as $headerName => $headerBody) {
-            $email->getHeaders()->addTextHeader($headerName, $headerBody);
-        }
-
-        foreach ($this->determineAttachments($email) as $attachment) {
-            $email->attach(
-                $attachment['content'],
-                $attachment['filename'],
-                $attachment['content_type'],
-            );
-        }
-
-        return $mailtrapEmail;
-    }
-
-    /**
-     * Get the recipients without CC or BCC.
-     */
-    protected function getRecipients(Email $email, Envelope $envelope): array
-    {
-        return array_filter($envelope->getRecipients(), function (Address $address) use ($email): bool {
-            return in_array($address, array_merge($email->getCc(), $email->getBcc()), true) === false;
-        });
     }
 
     /**
