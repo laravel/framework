@@ -167,9 +167,10 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) {
+        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) use ($request) {
             $relatedModels = $relationResolver->handle($this->resource);
-            $relatedResourceClass = $relationResolver->relationResourceClass;
+            $relatedResourceType = $relationResolver->resourceType($relatedModels, $request);
+            $relatedResourceClass = $relationResolver->resourceClass();
 
             // Relationship is a collection of models...
             if ($relatedModels instanceof Collection) {
@@ -183,7 +184,7 @@ trait ResolvesJsonApiElements
 
                 $isUnique = ! $relationship instanceof BelongsToMany;
 
-                $key = static::resourceTypeFromModel($relatedModels->first());
+                $key = $relatedResourceType ?? static::resourceTypeFromModel($relatedModels->first());
 
                 return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
                     return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
@@ -208,7 +209,7 @@ trait ResolvesJsonApiElements
             }
 
             return [$key => ['data' => transform(
-                [static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
+                [$relatedResourceType ?? static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
                 function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
                     $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $relatedResourceClass, true];
 
@@ -285,7 +286,7 @@ trait ResolvesJsonApiElements
     /**
      * Get the resource ID from the given Eloquent model.
      */
-    protected static function resourceIdFromModel(Model $model): string
+    public static function resourceIdFromModel(Model $model): string
     {
         return $model->getKey();
     }
@@ -293,7 +294,7 @@ trait ResolvesJsonApiElements
     /**
      * Get the resource type from the given Eloquent model.
      */
-    protected static function resourceTypeFromModel(Model $model): string
+    public static function resourceTypeFromModel(Model $model): string
     {
         $modelClassName = $model::class;
 

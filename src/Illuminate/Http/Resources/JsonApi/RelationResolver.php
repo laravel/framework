@@ -47,4 +47,25 @@ class RelationResolver
     {
         return value($this->relationResolver, $resource);
     }
+
+    /**
+     * Get the resource class.
+     *
+     * @return class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null
+     */
+    public function resourceClass(): ?string
+    {
+        return $this->relationResourceClass;
+    }
+
+    public function resourceType(Collection|Model|null $resources, JsonApiRequest $request): ?string
+    {
+        if (is_null($resourceClass = $this->resourceClass())) {
+            return null;
+        }
+
+        $resource = $resources instanceof Collection ? $resources->first() : $resources;
+
+        return (new $resourceClass($resource))->toType($request);
+    }
 }
