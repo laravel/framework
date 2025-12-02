@@ -169,7 +169,6 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) use ($request) {
             $relatedModels = $relationResolver->handle($this->resource);
-            $relatedResourceType = $relationResolver->resourceType($relatedModels, $request);
             $relatedResourceClass = $relationResolver->resourceClass();
 
             // Relationship is a collection of models...
@@ -184,7 +183,7 @@ trait ResolvesJsonApiElements
 
                 $isUnique = ! $relationship instanceof BelongsToMany;
 
-                $key = $relatedResourceType ?? static::resourceTypeFromModel($relatedModels->first());
+                $key = $relationResolver->resourceType($relatedModels, $request);
 
                 return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
                     return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
@@ -209,7 +208,7 @@ trait ResolvesJsonApiElements
             }
 
             return [$key => ['data' => transform(
-                [$relatedResourceType ?? static::resourceTypeFromModel($relatedModel), static::resourceIdFromModel($relatedModel)],
+                [$relationResolver->resourceType($relatedModel, $request), static::resourceIdFromModel($relatedModel)],
                 function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
                     $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $relatedResourceClass, true];
 

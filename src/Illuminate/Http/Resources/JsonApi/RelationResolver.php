@@ -60,11 +60,13 @@ class RelationResolver
 
     public function resourceType(Collection|Model|null $resources, JsonApiRequest $request): ?string
     {
-        if (is_null($resourceClass = $this->resourceClass())) {
-            return null;
-        }
-
         $resource = $resources instanceof Collection ? $resources->first() : $resources;
+
+        if (is_null($resource)) {
+            return null;
+        } elseif (is_null($resourceClass = $this->resourceClass())) {
+            return JsonApiResource::resourceTypeFromModel($resource);
+        }
 
         return (new $resourceClass($resource))->toType($request);
     }
