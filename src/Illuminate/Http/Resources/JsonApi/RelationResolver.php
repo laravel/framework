@@ -12,11 +12,15 @@ use Illuminate\Database\Eloquent\Model;
 class RelationResolver
 {
     /**
+     * The relation resolver.
+     *
      * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)
      */
     public Closure $relationResolver;
 
     /**
+     * The relation resource class.
+     *
      * @var class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null
      */
     public ?string $relationResourceClass = null;
