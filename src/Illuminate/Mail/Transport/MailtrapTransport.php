@@ -4,7 +4,6 @@ namespace Illuminate\Mail\Transport;
 
 use Exception;
 use Mailtrap\Api\EmailsSendApiInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
