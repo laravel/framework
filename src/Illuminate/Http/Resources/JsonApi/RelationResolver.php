@@ -58,6 +58,9 @@ class RelationResolver
         return $this->relationResourceClass;
     }
 
+    /**
+     * Get the relation resource type.
+     */
     public function resourceType(Collection|Model|null $resources, JsonApiRequest $request): ?string
     {
         $resource = $resources instanceof Collection ? $resources->first() : $resources;
