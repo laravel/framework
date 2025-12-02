@@ -132,6 +132,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toAttributes(Request $request)
     {
+        return $this->resolveResourceDataToArray($request);
+    }
+
+    /**
+     * Resolve the resource data to an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function resolveResourceDataToArray(Request $request)
+    {
         return $this->toArray($request);
     }
 

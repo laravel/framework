@@ -149,8 +149,20 @@ class JsonApiResource extends JsonResource
     public function resolve($request = null)
     {
         return [
-            'data' => $this->resolveResourceData($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
+            'data' => $this->resolveResourceDataToArray($this->resolveJsonApiRequestFrom($request ?? $this->resolveRequestFromContainer())),
         ];
+    }
+
+    /**
+     * Resolve the resource data to an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    #[\Override]
+    public function resolveResourceDataToArray(Request $request)
+    {
+        return $this->resolveResourceData($request);
     }
 
     /**
