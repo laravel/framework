@@ -50,6 +50,8 @@ class LazyPromise implements PromiseInterface
             $pendingCallback($this->guzzlePromise);
         }
 
+        $this->pending = [];
+
         return $this->guzzlePromise;
     }
 
@@ -66,17 +68,25 @@ class LazyPromise implements PromiseInterface
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
-        $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
+        if ($this->promiseNeedsBuilt()) {
+            $this->pending[] = static fn (PromiseInterface $promise) => $promise->then($onFulfilled, $onRejected);
 
-        return $this;
+            return $this;
+        }
+
+        return $this->guzzlePromise->then($onFulfilled, $onRejected);
     }
 
     #[\Override]
     public function otherwise(callable $onRejected): PromiseInterface
     {
-        $this->pending[] = static fn (PromiseInterface $promise) => $promise->otherwise($onRejected);
+        if ($this->promiseNeedsBuilt()) {
+            $this->pending[] = static fn (PromiseInterface $promise) => $promise->otherwise($onRejected);
 
-        return $this;
+            return $this;
+        }
+
+        return $this->guzzlePromise->otherwise($onRejected);
     }
 
     #[\Override]
