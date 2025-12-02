@@ -66,6 +66,26 @@ if (! function_exists('Illuminate\Support\now')) {
     }
 }
 
+if (! function_exists('Illuminate\Support\microseconds')) {
+    /**
+     * Get the current date / time plus the given number of microseconds.
+     */
+    function microseconds(int $microseconds): CarbonInterval
+    {
+        return CarbonInterval::microseconds($microseconds);
+    }
+}
+
+if (! function_exists('Illuminate\Support\milliseconds')) {
+    /**
+     * Get the current date / time plus the given number of milliseconds.
+     */
+    function milliseconds(int $milliseconds): CarbonInterval
+    {
+        return CarbonInterval::milliseconds($milliseconds);
+    }
+}
+
 if (! function_exists('Illuminate\Support\seconds')) {
     /**
      * Get the current date / time plus the given number of seconds.
@@ -103,6 +123,26 @@ if (! function_exists('Illuminate\Support\days')) {
     function days(int $days): CarbonInterval
     {
         return CarbonInterval::days($days);
+    }
+}
+
+if (! function_exists('Illuminate\Support\weeks')) {
+    /**
+     * Get the current date / time plus the given number of weeks.
+     */
+    function weeks(int $weeks): CarbonInterval
+    {
+        return CarbonInterval::weeks($weeks);
+    }
+}
+
+if (! function_exists('Illuminate\Support\months')) {
+    /**
+     * Get the current date / time plus the given number of months.
+     */
+    function months(int $months): CarbonInterval
+    {
+        return CarbonInterval::months($months);
     }
 }
 
