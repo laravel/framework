@@ -28,13 +28,7 @@ class MailtrapTransport extends AbstractTransport
         $email = MessageConverter::toEmail($message->getOriginalMessage());
 
         try {
-            $result = $this->mailtrap->send($email);
-
-            throw_if(
-                $result->getStatusCode() !== Response::HTTP_OK,
-                Exception::class,
-                $result['message'],
-            );
+            $this->mailtrap->send($email);
         } catch (Exception $exception) {
             throw new TransportException(
                 sprintf('Request to Mailtrap API failed. Reason: %s.', $exception->getMessage()),
