@@ -15,3 +15,5 @@ parameters:
         - "#has invalid type#"
         - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
         - "#Unsafe usage of new static#"
+        - '#^Call to static method initSendingEmails\(\) on an unknown class Mailtrap\\MailtrapClient\.$#'
+        - '#^Property Illuminate\\Mail\\Transport\\MailtrapTransport\:\:\$mailtrap has unknown class Mailtrap\\Api\\EmailsSendApiInterface as its type\.$#'
