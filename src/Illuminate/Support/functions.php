@@ -66,6 +66,16 @@ if (! function_exists('Illuminate\Support\now')) {
     }
 }
 
+if (! function_exists('Illuminate\Support\microseconds')) {
+    /**
+     * Get the current date / time plus the given number of microseconds.
+     */
+    function microseconds(int $microseconds): CarbonInterval
+    {
+        return CarbonInterval::microseconds($microseconds);
+    }
+}
+
 if (! function_exists('Illuminate\Support\milliseconds')) {
     /**
      * Get the current date / time plus the given number of milliseconds.
