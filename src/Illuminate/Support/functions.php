@@ -70,7 +70,7 @@ if (! function_exists('Illuminate\Support\milliseconds')) {
     /**
      * Get the current date / time plus the given number of milliseconds.
      */
-    function milliseconds(int|float $milliseconds): CarbonInterval
+    function milliseconds(int $milliseconds): CarbonInterval
     {
         return CarbonInterval::milliseconds($milliseconds);
     }
