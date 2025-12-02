@@ -227,8 +227,8 @@ class JsonApiResourceTest extends TestCase
                                 'id' => (string) $user->getKey(),
                                 'type' => 'authors',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
                 'included' => [
                     [

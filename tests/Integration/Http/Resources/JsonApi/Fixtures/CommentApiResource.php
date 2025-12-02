@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 class CommentApiResource extends JsonApiResource
