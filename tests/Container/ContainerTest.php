@@ -226,35 +226,6 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(ContainerImplementationStub::class, $class->inner->impl);
     }
 
-    public function testLazyObjects()
-    {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
-        $container = new Container;
-        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
-        $class = $container->make(ProxyDependenciesClass::class);
-        $this->assertTrue((new ReflectionClass($class))->isUninitializedLazyObject($class));
-        $this->assertTrue($class->stubbyIsSet());
-        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
-    }
-
-    public function testObjectWithLazyDependencies()
-    {
-        if (version_compare(phpversion(), '8.4.0', '<')) {
-            $this->markTestSkipped();
-        }
-
-        $container = new Container;
-        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
-        $class = $container->make(ClassWithLazyDependencies::class);
-        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
-        $this->assertTrue((new ReflectionClass(ContainerDependentStub::class))->isUninitializedLazyObject($class->stubby));
-        $this->assertTrue($class->stubbyIsSet());
-        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
-    }
-
     public function testContainerIsPassedToResolvers()
     {
         $container = new Container;
@@ -945,6 +916,73 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $r->email);
     }
 
+    public function testLazyObjects()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped('Lazy objects are only available in 8.4 and later');
+        }
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ProxyDependenciesClass::class);
+        $this->assertTrue((new ReflectionClass($class))->isUninitializedLazyObject($class));
+        $this->assertTrue($class->stubbyIsSet());
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+    }
+
+    public function testObjectWithLazyDependencies()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped('Lazy objects are only available in 8.4 and later');
+        }
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ClassWithLazyDependencies::class);
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+        $this->assertTrue((new ReflectionClass(ContainerDependentStub::class))->isUninitializedLazyObject($class->stubby));
+        $this->assertTrue($class->stubbyIsSet());
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+    }
+
+    public function testLazyObjectWithLazyDependency()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped('Lazy objects are only available in 8.4 and later');
+        }
+
+        ConstructionNotices::reset();
+
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $class = $container->make(LazyClassWithLazyDependency::class);
+        // The object and its dependency are both lazy
+        $this->assertCount(0, ConstructionNotices::$constructed);
+        $this->assertTrue((new ReflectionClass($class))->isUninitializedLazyObject($class));
+
+        // Now we call a function on the object to bring its direct dependencies to life
+        $class->setValue('hello');
+
+        // And the object overall is not lazy
+        $this->assertCount(2, ConstructionNotices::$constructed);
+        $this->assertTrue(ConstructionNotices::$constructed[LazyClassWithLazyDependency::class]);
+        $this->assertFalse((new ReflectionClass($class))->isUninitializedLazyObject($class));
+        // Nor is its non-lazy dependency
+        $this->assertTrue(ConstructionNotices::$constructed[ClassWithLazyDependencies::class]);
+
+        // now we bring to life `$wholeClassIsLazyDependency`
+        $class->bringDependencyToLife('child dependency');
+        $this->assertCount(4, ConstructionNotices::$constructed);
+        $this->assertTrue(ConstructionNotices::$constructed[ProxyDependenciesClass::class]);
+        // which also constructs its Container IContainerImplementationStub dependency
+        $this->assertTrue(ConstructionNotices::$constructed[ContainerImplementationStub::class]);
+
+        $class->lazyAttributeDependency->bringDependencyToLife('grandchild dependency');
+        $this->assertCount(5, ConstructionNotices::$constructed);
+        $this->assertTrue(ConstructionNotices::$constructed[ContainerDependentStub::class]);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
@@ -990,7 +1028,10 @@ interface IContainerContractStub
 
 class ContainerImplementationStub implements IContainerContractStub
 {
-    //
+    public function __construct()
+    {
+        ConstructionNotices::$constructed[self::class] = true;
+    }
 }
 
 class ContainerImplementationStubTwo implements IContainerContractStub
@@ -1000,11 +1041,18 @@ class ContainerImplementationStubTwo implements IContainerContractStub
 
 class ContainerDependentStub
 {
+    public $value;
     public $impl;
 
     public function __construct(IContainerContractStub $impl)
     {
         $this->impl = $impl;
+        ConstructionNotices::$constructed[self::class] = true;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
     }
 }
 
@@ -1250,14 +1298,22 @@ class RequestDtoDependency implements RequestDtoDependencyContract
 #[Lazy]
 class ProxyDependenciesClass
 {
+    public string $value;
+
     public function __construct(
         public IContainerContractStub $stubby
     ) {
+        ConstructionNotices::$constructed[self::class] = true;
     }
 
     public function stubbyIsSet(): bool
     {
         return isset($this->stubby);
+    }
+
+    public function setValue(string $value): void
+    {
+        $this->value = $value;
     }
 }
 
@@ -1267,10 +1323,50 @@ class ClassWithLazyDependencies
         #[Lazy]
         public ContainerDependentStub $stubby
     ) {
+        ConstructionNotices::$constructed[self::class] = true;
     }
 
     public function stubbyIsSet(): bool
     {
         return isset($this->stubby);
+    }
+
+    public function bringDependencyToLife($value): void
+    {
+        $this->stubby->setValue($value);
+    }
+}
+
+#[Lazy]
+class LazyClassWithLazyDependency
+{
+    public string $value;
+
+    public function __construct(
+        public ProxyDependenciesClass $wholeClassIsLazyDependency,
+        public ClassWithLazyDependencies $lazyAttributeDependency
+    ) {
+        ConstructionNotices::$constructed[self::class] = true;
+    }
+
+    public function setValue(string $value): void
+    {
+        $this->value = $value;
+    }
+
+    public function bringDependencyToLife(string $value): void
+    {
+        $this->wholeClassIsLazyDependency->setValue($value);
+    }
+}
+
+class ConstructionNotices
+{
+    /** @var array<class-string, true> */
+    public static array $constructed = [];
+
+    public static function reset(): void
+    {
+        self::$constructed = [];
     }
 }
