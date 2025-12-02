@@ -43,6 +43,13 @@ class Markdown
     protected static $withSecuredEncoding = false;
 
     /**
+     * The extracted head styles (media queries) from the theme.
+     *
+     * @var string
+     */
+    protected static $headStyles = '';
+
+    /**
      * Create a new Markdown renderer instance.
      *
      * @param  \Illuminate\Contracts\View\Factory  $view
@@ -67,6 +74,20 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
+        $this->view->replaceNamespace('mail', $this->htmlComponentPaths());
+
+        if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
+            $theme = $customTheme;
+        } else {
+            $theme = str_contains($this->theme, '::')
+                ? $this->theme
+                : 'mail::themes.'.$this->theme;
+        }
+
+        $themeCss = $this->view->make($theme, $data)->render();
+
+        [$inlineCss, static::$headStyles] = $this->extractMediaQueries($themeCss);
+
         $bladeCompiler = $this->view
             ->getEngineResolver()
             ->resolve('blade')
@@ -88,9 +109,7 @@ class Markdown
                 }
 
                 try {
-                    $contents = $this->view->replaceNamespace(
-                        'mail', $this->htmlComponentPaths()
-                    )->make($view, $data)->render();
+                    $contents = $this->view->make($view, $data)->render();
                 } finally {
                     EncodedHtmlString::flushState();
                 }
@@ -99,16 +118,8 @@ class Markdown
             }
         );
 
-        if ($this->view->exists($customTheme = Str::start($this->theme, 'mail.'))) {
-            $theme = $customTheme;
-        } else {
-            $theme = str_contains($this->theme, '::')
-                ? $this->theme
-                : 'mail::themes.'.$this->theme;
-        }
-
         return new HtmlString(($inliner ?: new CssToInlineStyles)->convert(
-            str_replace('\[', '[', $contents), $this->view->make($theme, $data)->render()
+            str_replace('\[', '[', $contents), $inlineCss
         ));
     }
 
@@ -289,5 +300,59 @@ class Markdown
     public static function flushState()
     {
         static::$withSecuredEncoding = false;
+        static::$headStyles = '';
+    }
+
+    /**
+     * Extract media queries from CSS that cannot be inlined.
+     *
+     * @param  string  $css
+     * @return array{0: string, 1: string}
+     */
+    protected function extractMediaQueries($css)
+    {
+        $mediaBlocks = '';
+        $inlineCss = '';
+        $offset = 0;
+        $length = strlen($css);
+
+        while (($pos = strpos($css, '@media', $offset)) !== false) {
+            $inlineCss .= substr($css, $offset, $pos - $offset);
+
+            $open = strpos($css, '{', $pos);
+
+            if ($open === false) {
+                break;
+            }
+
+            $braceCount = 1;
+            $i = $open + 1;
+
+            while ($i < $length && $braceCount > 0) {
+                if ($css[$i] === '{') {
+                    $braceCount++;
+                } elseif ($css[$i] === '}') {
+                    $braceCount--;
+                }
+                $i++;
+            }
+
+            $mediaBlocks .= substr($css, $pos, $i - $pos)."\n";
+            $offset = $i;
+        }
+
+        $inlineCss .= substr($css, $offset);
+
+        return [$inlineCss, $mediaBlocks];
+    }
+
+    /**
+     * Get the extracted head styles (media queries) from the theme.
+     *
+     * @return string
+     */
+    public static function getHeadStyles()
+    {
+        return static::$headStyles;
     }
 }
