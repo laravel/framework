@@ -333,10 +333,10 @@ class MailManager implements FactoryContract
     {
         return new MailtrapTransport(
             MailtrapClient::initSendingEmails(
-                $config['key'],
-                $config['is_bulk'],
-                $config['is_sandbox'],
-                $config['inbox_id'],
+                $config['key'] ?? $this->app['config']->get('services.mailtrap.key'),
+                (bool) ($config['is_bulk'] ?? $this->app['config']->get('services.mailtrap.is_bulk')),
+                (bool) ($config['is_sandbox'] ?? $this->app['config']->get('services.mailtrap.is_sandbox')),
+                $config['inbox_id'] ?? $this->app['config']->get('services.mailtrap.inbox_id'),
             ),
         );
     }
