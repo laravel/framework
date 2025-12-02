@@ -188,6 +188,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     protected $isRunningInConsole;
 
     /**
+     * Indicates if the application is running in a continuous integration environment.
+     *
+     * @var bool|null
+     */
+    protected $isRunningInContinuousIntegration;
+
+    /**
      * The application namespace.
      *
      * @var string
@@ -832,6 +839,16 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function runningUnitTests()
     {
         return $this->bound('env') && $this['env'] === 'testing';
+    }
+
+    /**
+     * Determine if the application is running in a continuous integration environment.
+     *
+     * @return bool
+     */
+    public function runningInContinuousIntegration()
+    {
+        return $this->isRunningInContinuousIntegration ??= Env::get('CI') === true;
     }
 
     /**
