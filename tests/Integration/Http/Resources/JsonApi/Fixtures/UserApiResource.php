@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 class UserApiResource extends JsonApiResource
 {
     protected array $relationships = [
+        'comments',
         'profile',
         'posts',
         'teams',

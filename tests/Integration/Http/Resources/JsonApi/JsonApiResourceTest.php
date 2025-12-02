@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Team;
@@ -187,5 +188,59 @@ class JsonApiResourceTest extends TestCase
                     ],
                 ],
             ]);
+    }
+
+    public function test_it_can_resolve_relationship_with_custom_name_and_resource_class()
+    {
+        $now = $this->freezeSecond();
+
+        $user = User::factory()->create();
+
+        $profile = Profile::factory()->create([
+            'user_id' => $user->getKey(),
+            'date_of_birth' => '2011-06-09',
+            'timezone' => 'America/Chicago',
+        ]);
+
+        [$post1, $post2] = Post::factory()->times(2)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $comments = Comment::factory()->create([
+            'post_id' => $post1->getKey(),
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/posts/{$post1->getKey()}?".http_build_query(['include' => 'author']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'attributes' => [
+                        'content' => $post1->content,
+                        'title' => $post1->title,
+                    ],
+                    'type' => 'posts',
+                    'id' => (string) $post1->getKey(),
+                    'relationships' => [
+                        'author' => [
+                            'data' => [
+                                'id' => (string) $user->getKey(),
+                                'type' => 'authors',
+                            ],
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'email' => $user->email,
+                            'name' => $user->name,
+                        ],
+                        'id' => (string) $user->getKey(),
+                        'type' => 'authors',
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi']);
     }
 }

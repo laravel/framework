@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -35,6 +36,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $router->get('users/{userId}', function ($userId) {
             return User::find($userId)->toResource();
+        });
+
+        $router->get('posts', function () {
+            return Post::paginate(5)->toResourceCollection();
+        });
+
+        $router->get('posts/{postId}', function ($postId) {
+            return Post::find($postId)->toResource();
         });
     }
 
