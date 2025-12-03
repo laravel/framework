@@ -37,7 +37,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `data` for the resource.
      */
-    public function resolveResourceData(JsonApiRequest $request): array
+    public function resolveJsonApiResourceObject(JsonApiRequest $request): array
     {
         $resourceType = $this->resolveResourceType($request);
 
