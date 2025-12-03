@@ -41,7 +41,7 @@ class RelationResolver
     public function __construct(string $relationName, Closure|string|null $resolver = null)
     {
         if (str_contains($relationName, '.')) {
-            [$this->relationName, $this->relationWith] = explode('.', $relationName, 1);
+            [$this->relationName, $this->relationWith] = explode('.', $relationName, 2);
         } else {
             $this->relationName = $relationName;
             $this->relationWith = null;
@@ -62,10 +62,6 @@ class RelationResolver
      */
     public function handle(mixed $resource): Collection|Model|null
     {
-        if (! empty($this->relationWith)) {
-            $resource->loadMissing($this->relationWith);
-        }
-
         return value($this->relationResolver, $resource);
     }
 
