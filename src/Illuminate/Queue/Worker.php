@@ -116,7 +116,7 @@ class Worker
     /**
      * Indicates if the worker should check for the paused signal in the cache.
      *
-     * @var bool
+     * @var bool|callable(string $connection, string $queue): bool
      */
     public static $pausable = true;
 
@@ -414,7 +414,13 @@ class Worker
      */
     protected function queuePaused($connectionName, $queue)
     {
-        if (! static::$pausable) {
+        $isPausable = static::$pausable;
+
+        if (is_callable($isPausable)) {
+            $isPausable = $isPausable($connectionName, $queue);
+        }
+
+        if (! $isPausable) {
             return false;
         }
 
