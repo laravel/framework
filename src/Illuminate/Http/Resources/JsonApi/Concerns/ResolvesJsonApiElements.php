@@ -28,6 +28,11 @@ trait ResolvesJsonApiElements
     protected bool $usesRequestQueryString = true;
 
     /**
+     * Determine whether included relationship for the resource from eager loaded relationship.
+     */
+    protected bool $usesIncludedFromLoadedRelationships = false;
+
+    /**
      * Cached loaded relationships map.
      *
      * @var \WeakMap|null
@@ -49,6 +54,13 @@ trait ResolvesJsonApiElements
     public function withoutRequestQueryString()
     {
         return $this->withRequestQueryString(false);
+    }
+
+    public function withIncludedFromLoadedRelationship()
+    {
+        $this->usesIncludedFromLoadedRelationships = true;
+
+        return $this;
     }
 
     /**
@@ -172,17 +184,18 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $sparseIncluded = match ($this->usesRequestQueryString) {
-            true => $request->sparseIncluded(),
+        $sparseIncluded = match (true) {
+            $this->usesRequestQueryString === true => $request->sparseIncluded(),
+            $this->usesRequestQueryString === false && $this->usesIncludedFromLoadedRelationships === true => array_keys($this->resource->getRelations()),
             default => [],
         };
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
-            ->mapWithKeys(
-                fn ($value, $key) => is_int($key) ? [$value => new RelationResolver($value)] : [$key => new RelationResolver($key, $value)]
-            )->filter(
-                fn ($value, $key) => in_array($key, $sparseIncluded)
-            );
+            ->mapWithKeys(function ($value, $key) {
+                $relationResolver = is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value);
+
+                return [$relationResolver->relationName => $relationResolver];
+            })->filter(fn ($value, $key) => in_array($key, $sparseIncluded));
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
 
@@ -267,7 +280,7 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resourceInstance->withoutRequestQueryString()->resolve($request);
+            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationship()->resolve($request);
 
             $relations->push(array_filter([
                 'id' => $id,
