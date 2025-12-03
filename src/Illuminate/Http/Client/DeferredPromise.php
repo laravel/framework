@@ -2,8 +2,6 @@
 
 namespace Illuminate\Http\Client;
 
-use GuzzleHttp\Promise\PromiseInterface;
-
 class DeferredPromise
 {
     /**
