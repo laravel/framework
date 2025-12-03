@@ -132,6 +132,10 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toAttributes(Request $request)
     {
+        if (property_exists($this, 'attributes')) {
+            return $this->attributes;
+        }
+
         return $this->toArray($request);
     }
 
