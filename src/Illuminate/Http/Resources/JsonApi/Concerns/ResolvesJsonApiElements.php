@@ -203,8 +203,12 @@ trait ResolvesJsonApiElements
         $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) use ($request) {
-            $relatedModels = $relationResolver->handle($this->resource)->loadMissing($request->sparseIncluded($key));
+            $relatedModels = $relationResolver->handle($this->resource);
             $relatedResourceClass = $relationResolver->resourceClass();
+
+            if (! is_null($relatedModels)) {
+                $relatedModels->loadMissing($request->sparseIncluded($key));
+            }
 
             // Relationship is a collection of models...
             if ($relatedModels instanceof Collection) {
