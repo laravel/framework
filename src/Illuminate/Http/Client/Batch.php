@@ -135,7 +135,7 @@ class Batch
      * Add a request to the batch with a key.
      *
      * @param  string  $key
-     * @return \Illuminate\Http\Client\DeferredRequest
+     * @return \Illuminate\Http\Client\PendingRequest
      *
      * @throws \Illuminate\Http\Client\BatchInProgressException
      */
@@ -147,7 +147,7 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        return new DeferredRequest($this->requests, $key, $this->factory, $this->handler);
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->requests, $key);
     }
 
     /**
@@ -423,7 +423,7 @@ class Batch
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\DeferredRequest
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     public function __call(string $method, array $parameters)
     {
@@ -433,12 +433,10 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        // Get the next numeric index and create a DeferredRequest for method chaining
+        // Get the next numeric index
         $key = count($this->requests);
 
-        $deferred = new DeferredRequest($this->requests, $key, $this->factory, $this->handler);
-
-        // Call the method on the DeferredRequest to start accumulating calls
-        return $deferred->$method(...$parameters);
+        // Create a deferred PendingRequest and call the method to start chaining
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->requests, $key)->$method(...$parameters);
     }
 }

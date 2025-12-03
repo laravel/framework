@@ -45,11 +45,11 @@ class Pool
      * Add a request to the pool with a key.
      *
      * @param  string  $key
-     * @return \Illuminate\Http\Client\DeferredRequest
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     public function as(string $key)
     {
-        return new DeferredRequest($this->pool, $key, $this->factory, $this->handler);
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->pool, $key);
     }
 
     /**
@@ -77,16 +77,14 @@ class Pool
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\DeferredRequest
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     public function __call($method, $parameters)
     {
-        // Get the next numeric index and create a DeferredRequest for method chaining
+        // Get the next numeric index
         $key = count($this->pool);
 
-        $deferred = new DeferredRequest($this->pool, $key, $this->factory, $this->handler);
-
-        // Call the method on the DeferredRequest to start accumulating calls
-        return $deferred->$method(...$parameters);
+        // Create a deferred PendingRequest and call the method to start chaining
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->pool, $key)->$method(...$parameters);
     }
 }
