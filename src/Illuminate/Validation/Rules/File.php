@@ -239,7 +239,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $size = strtolower(trim($size));
 
-        $value = floatval($size);
+        $value = (float) $size;
 
         return round(match (true) {
             Str::endsWith($size, 'kb') => $value * 1,
