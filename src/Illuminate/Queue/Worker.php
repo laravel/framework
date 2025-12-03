@@ -116,7 +116,7 @@ class Worker
     /**
      * Indicates if the worker should check for the paused signal in the cache.
      *
-     * @var bool|callable(string $connection, string $queue): bool
+     * @var bool|callable(string, string): bool
      */
     public static $pausable = true;
 
