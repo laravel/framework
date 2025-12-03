@@ -13,6 +13,13 @@ use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException
 class RelationResolver
 {
     /**
+     * The relation name.
+     */
+    public string $relationName;
+
+    public ?string $relationWith = null;
+
+    /**
      * The relation resolver.
      *
      * @var \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)
@@ -31,10 +38,15 @@ class RelationResolver
      *
      * @param  \Closure(mixed):(\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null)|class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resolver
      */
-    public function __construct(
-        public string $relationName,
-        Closure|string|null $resolver = null
-    ) {
+    public function __construct(string $relationName, Closure|string|null $resolver = null)
+    {
+        if (str_contains($relationName, '.')) {
+            [$this->relationName, $this->relationWith] = explode('.', $relationName, 1);
+        } else {
+            $this->relationName = $relationName;
+            $this->relationWith = null;
+        }
+
         $this->relationResolver = match (true) {
             $resolver instanceof Closure => $resolver,
             default => fn ($resource) => $resource->getRelation($this->relationName),
@@ -50,6 +62,10 @@ class RelationResolver
      */
     public function handle(mixed $resource): Collection|Model|null
     {
+        if (! empty($this->relationWith)) {
+            $resource->loadMissing($this->relationWith);
+        }
+
         return value($this->relationResolver, $resource);
     }
 

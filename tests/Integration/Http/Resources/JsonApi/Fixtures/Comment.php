@@ -3,10 +3,12 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures;
 
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[UseFactory(CommentFactory::class)]
+#[UseResource(CommentApiResource::class)]
 class Comment extends Model
 {
     use HasFactory;

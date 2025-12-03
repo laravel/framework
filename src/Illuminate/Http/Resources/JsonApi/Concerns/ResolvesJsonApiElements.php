@@ -185,9 +185,8 @@ trait ResolvesJsonApiElements
         }
 
         $sparseIncluded = match (true) {
-            $this->usesRequestQueryString === true => $request->sparseIncluded(),
-            $this->usesRequestQueryString === false && $this->usesIncludedFromLoadedRelationships === true => array_keys($this->resource->getRelations()),
-            default => [],
+            $this->usesIncludedFromLoadedRelationships => array_keys($this->resource->getRelations()),
+            default => $request->sparseIncluded(),
         };
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
@@ -199,12 +198,12 @@ trait ResolvesJsonApiElements
 
         $resourceRelationshipKeys = $resourceRelationships->keys();
 
-        $this->resource->loadMissing($resourceRelationshipKeys->all());
+        $this->resource->loadMissing($resourceRelationshipKeys->all() ?? []);
 
         $this->loadedRelationshipsMap = new WeakMap;
 
         $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) use ($request) {
-            $relatedModels = $relationResolver->handle($this->resource);
+            $relatedModels = $relationResolver->handle($this->resource)->loadMissing($request->sparseIncluded($key));
             $relatedResourceClass = $relationResolver->resourceClass();
 
             // Relationship is a collection of models...

@@ -298,6 +298,21 @@ class JsonApiResourceTest extends TestCase
                         'id' => (string) $user->getKey(),
                         'type' => 'authors',
                     ],
+                    [
+                        'attributes' => [
+                            'content' => $comment->content,
+                        ],
+                        'id' => (string) $comment->getKey(),
+                        'type' => 'comments',
+                        'relationships' => [
+                            'commenter' => [
+                                'data' => [
+                                    'id' => (string) $user->getKey(),
+                                    'type' => 'users',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
             ])
             ->assertJsonMissing(['jsonapi']);
