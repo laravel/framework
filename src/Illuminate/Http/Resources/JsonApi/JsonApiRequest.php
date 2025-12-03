@@ -7,8 +7,14 @@ use Illuminate\Support\Collection;
 
 class JsonApiRequest extends Request
 {
+    /**
+     * Cached sparse fieldset.
+     */
     protected ?array $cachedSparseFields = null;
 
+    /**
+     * Cached sparse included.
+     */
     protected ?array $cachedSparseIncluded = null;
 
     /**
