@@ -338,8 +338,16 @@ trait ResolvesJsonApiElements
 
         $morphMap = Relation::getMorphAlias($modelClassName);
 
-        return Str::of(
+        return static::normalizeResourceType(
             $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
-        )->snake()->pluralStudly();
+        );
+    }
+
+    /**
+     * Normalize the resource type.
+     */
+    public static function normalizeResourceType(string $value): string
+    {
+        return Str::of($value)->snake()->pluralStudly();
     }
 }
