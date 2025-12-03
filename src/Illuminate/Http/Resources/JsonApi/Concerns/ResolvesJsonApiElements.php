@@ -23,6 +23,11 @@ use WeakMap;
 trait ResolvesJsonApiElements
 {
     /**
+     * Determine whether resource use included and fields from the request object.
+     */
+    protected bool $usesRequestQueryString = true;
+
+    /**
      * Cached loaded relationships map.
      *
      * @var \WeakMap|null
@@ -34,10 +39,22 @@ trait ResolvesJsonApiElements
      */
     protected array $loadedRelationshipIdentifiers = [];
 
+    public function withRequestQueryString(bool $value = true)
+    {
+        $this->usesRequestQueryString = $value;
+
+        return $this;
+    }
+
+    public function withoutRequestQueryString()
+    {
+        return $this->withRequestQueryString(false);
+    }
+
     /**
      * Resolves `data` for the resource.
      */
-    public function resolveJsonApiResourceObject(JsonApiRequest $request): array
+    protected function resolveResourceObject(JsonApiRequest $request): array
     {
         $resourceType = $this->resolveResourceType($request);
 
@@ -108,7 +125,10 @@ trait ResolvesJsonApiElements
             $data = $data->jsonSerialize();
         }
 
-        $sparseFieldset = $request->sparseFields($resourceType);
+        $sparseFieldset = match ($this->usesRequestQueryString) {
+            true => $request->sparseFields($resourceType),
+            default => [],
+        };
 
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
@@ -152,7 +172,10 @@ trait ResolvesJsonApiElements
             return;
         }
 
-        $sparseIncluded = $request->sparseIncluded();
+        $sparseIncluded = match ($this->usesRequestQueryString) {
+            true => $request->sparseIncluded(),
+            default => [],
+        };
 
         $resourceRelationships = (new Collection($this->toRelationships($request)))
             ->mapWithKeys(
@@ -244,7 +267,7 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resourceInstance->resolve($request);
+            $relationsData = $resourceInstance->withoutRequestQueryString()->resolve($request);
 
             $relations->push(array_filter([
                 'id' => $id,

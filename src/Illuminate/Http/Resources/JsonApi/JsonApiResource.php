@@ -162,7 +162,7 @@ class JsonApiResource extends JsonResource
     #[\Override]
     public function resolveResourceData(Request $request)
     {
-        return $this->resolveJsonApiResourceObject($request);
+        return $this->resolveResourceObject($request);
     }
 
     /**
