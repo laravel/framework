@@ -983,6 +983,31 @@ class ContainerTest extends TestCase
         $this->assertTrue(ConstructionNotices::$constructed[ContainerDependentStub::class]);
     }
 
+    public function testLazyObjectAsSingleton()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped('Lazy objects are only available in 8.4 and later');
+        }
+
+        ConstructionNotices::reset();
+
+        $container = new Container;
+        $container->singleton(LazyClassWithLazyDependency::class);
+        $class = $container->make(LazyClassWithLazyDependency::class);
+
+        $this->assertInstanceOf(LazyClassWithLazyDependency::class, $class);
+        $this->assertCount(0, ConstructionNotices::$constructed);
+        $class2 = $container->make(LazyClassWithLazyDependency::class);
+        $this->assertCount(0, ConstructionNotices::$constructed);
+        $this->assertSame($class, $class2);
+
+        $class->setValue('hello');
+        $this->assertCount(2, ConstructionNotices::$constructed);
+        $this->assertTrue(ConstructionNotices::$constructed[ClassWithLazyDependencies::class]);
+        $this->assertTrue(ConstructionNotices::$constructed[LazyClassWithLazyDependency::class]);
+        $this->assertEquals('hello', $class2->value);
+    }
+
     // public function testContainerCanCatchCircularDependency()
     // {
     //     $this->expectException(\Illuminate\Contracts\Container\CircularDependencyException::class);
