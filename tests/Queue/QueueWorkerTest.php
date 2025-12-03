@@ -405,6 +405,62 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
     }
 
+    public function testQueuePausedReturnsFalseWhenPausableIsFalse()
+    {
+        Worker::$pausable = false;
+
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+
+        Worker::$pausable = true;
+    }
+
+    public function testQueuePausedUsesCallableToEnablePauseChecking()
+    {
+        Worker::$pausable = fn ($connection, $queue) => $connection === 'paused' && $queue === 'blocked';
+
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+
+        Worker::$pausable = true;
+    }
+
+    public function testQueuePausedDoesNotCheckCacheWhenCallableReturnsFalse()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+        $cache->forever('illuminate:queue:paused:default:queue', true);
+
+        Worker::$pausable = fn ($connection, $queue) => false;
+
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertTrue($job->fired);
+
+        Worker::$pausable = true;
+    }
+
+    public function testQueuePausedChecksCacheWhenCallableReturnsTrue()
+    {
+        $cache = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
+        $cache->forever('illuminate:queue:paused:default:queue', true);
+
+        Worker::$pausable = fn ($connection, $queue) => $connection === 'default' && $queue === 'queue';
+
+        $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
+        $worker->setCache($cache);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertFalse($job->fired);
+
+        Worker::$pausable = true;
+    }
+
     /**
      * Helpers...
      */

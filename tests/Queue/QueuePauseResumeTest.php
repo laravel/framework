@@ -6,6 +6,7 @@ use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\Worker;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -108,6 +109,39 @@ class QueuePauseResumeTest extends TestCase
 
         $this->assertFalse($this->manager->isPaused('redis', 'emails'));
         $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+
+    public function testPausableCanBeSetToTrue()
+    {
+        Worker::$pausable = false;
+        $this->manager->pausable(true);
+
+        $this->assertTrue(Worker::$pausable);
+    }
+
+    public function testPausableCanBeSetToFalse()
+    {
+        Worker::$pausable = true;
+        $this->manager->pausable(false);
+
+        $this->assertFalse(Worker::$pausable);
+    }
+
+    public function testPausableCanBeSetToCallable()
+    {
+        Worker::$pausable = true;
+        $callback = fn ($connection, $queue) => $connection === 'redis' && $queue === 'default';
+        $this->manager->pausable($callback);
+
+        $this->assertSame($callback, Worker::$pausable);
+    }
+
+    public function testPausableDefaultsToTrue()
+    {
+        Worker::$pausable = false;
+        $this->manager->pausable();
+
+        $this->assertTrue(Worker::$pausable);
     }
 
     public function testParsingQueueString()
