@@ -65,6 +65,8 @@ class RelationResolver
 
     /**
      * Get the relation resource type.
+     *
+     * @throws \Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException
      */
     public function resourceType(Collection|Model $resources, JsonApiRequest $request): ?string
     {
