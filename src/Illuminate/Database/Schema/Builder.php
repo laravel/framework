@@ -298,15 +298,15 @@ class Builder
      * @param  string  $table
      * @param  string  $column
      * @param  \Closure  $callback
-     * @param  \Closure|null  $fail
+     * @param  \Closure|null  $otherwise
      * @return void
      */
-    public function whenTableHasColumn(string $table, string $column, Closure $callback, ?Closure $fail = null)
+    public function whenTableHasColumn(string $table, string $column, Closure $callback, ?Closure $otherwise = null)
     {
         if ($this->hasColumn($table, $column)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
-        } elseif ($fail) {
-            $this->table($table, fn (Blueprint $table) => $fail($table));
+        } elseif ($otherwise) {
+            $this->table($table, fn (Blueprint $table) => $otherwise($table));
         }
     }
 
@@ -316,15 +316,15 @@ class Builder
      * @param  string  $table
      * @param  string  $column
      * @param  \Closure  $callback
-     * @param  \Closure|null  $fail
+     * @param  \Closure|null  $otherwise
      * @return void
      */
-    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback, ?Closure $fail = null)
+    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback, ?Closure $otherwise = null)
     {
         if (! $this->hasColumn($table, $column)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
-        } elseif ($fail) {
-            $this->table($table, fn (Blueprint $table) => $fail($table));
+        } elseif ($otherwise) {
+            $this->table($table, fn (Blueprint $table) => $otherwise($table));
         }
     }
 
