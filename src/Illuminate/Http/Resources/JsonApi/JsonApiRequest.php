@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class JsonApiRequest extends Request
