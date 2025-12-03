@@ -19,6 +19,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
  * @method static void pauseFor(string $connection, string $queue, \DateTimeInterface|\DateInterval|int $ttl)
  * @method static void resume(string $connection, string $queue)
  * @method static bool isPaused(string $connection, string $queue)
+ * @method static void withoutInterruptionPolling()
  * @method static void extend(string $driver, \Closure $resolver)
  * @method static void addConnector(string $driver, \Closure $resolver)
  * @method static string getDefaultDriver()
