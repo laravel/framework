@@ -569,6 +569,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Find a model once by its primary key.
+     *
+     * @param  mixed  $id
+     * @param  array|string  $columns
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel|null)
+     */
+    public function findOnce($id, $columns = ['*'])
+    {
+        return once(fn () => $this->find($id, $columns));
+    }
+
+    /**
      * Find a sole model by its primary key.
      *
      * @param  mixed  $id
@@ -633,6 +645,20 @@ class Builder implements BuilderContract
         }
 
         return $result;
+    }
+
+    /**
+     * Find a model by its primary key once or throw an exception.
+     *
+     * @param  mixed  $id
+     * @param  array|string  $columns
+     * @return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \Illuminate\Database\Eloquent\Collection<int, TModel> : TModel)
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException<TModel>
+     */
+    public function findOrFailOnce($id, $columns = ['*'])
+    {
+        return once(fn () => $this->findOrFail($id, $columns));
     }
 
     /**
