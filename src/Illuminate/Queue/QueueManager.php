@@ -255,6 +255,19 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Indicate that queue workers should not poll for restart or pause signals.
+     *
+     * This prevents the workers from hitting the application cache to determine if they need to pause or restart.
+     *
+     * @return void
+     */
+    public function withoutInterruptionPolling()
+    {
+        Worker::$restartable = false;
+        Worker::$pausable = false;
+    }
+
+    /**
      * Add a queue connection resolver.
      *
      * @param  string  $driver
