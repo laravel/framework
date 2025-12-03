@@ -214,7 +214,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Indicate whether the queue workers should monitor for pause signals.
      *
-     * @param  bool|callable(string $connection, string $queue): void  $value
+     * @param  bool|callable(string $connection, string $queue): bool  $value
      * @return void
      */
     public function pausable($value = true)
