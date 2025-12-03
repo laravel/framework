@@ -132,7 +132,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toAttributes(Request $request)
     {
-        return $this->resolveResourceData($request);
+        return $this->toArray($request);
     }
 
     /**
@@ -143,7 +143,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function resolveResourceData(Request $request)
     {
-        return $this->toArray($request);
+        if (is_null($this->resource)) {
+            return [];
+        }
+
+        return is_array($this->resource)
+            ? $this->resource
+            : $this->resource->toArray();
     }
 
     /**
@@ -154,13 +160,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray(Request $request)
     {
-        if (is_null($this->resource)) {
-            return [];
-        }
-
-        return is_array($this->resource)
-            ? $this->resource
-            : $this->resource->toArray();
+        return $this->resolveResourceData($request);
     }
 
     /**
