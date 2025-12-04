@@ -20,10 +20,10 @@ class DistinctWithinTest extends TestCase
         ]);
 
         // Step 2: Create a storage array for the session handler
-        $storage = []; // ArraySessionHandler expects a reference to an array
+        $storage = [];
+        $handlerStorage =& $storage;  // create reference
 
-        // Step 3: Create ArraySessionHandler with storage
-        $sessionHandler = new ArraySessionHandler($storage);
+        $sessionHandler = new ArraySessionHandler($handlerStorage);
 
         // Step 4: Create session store with handler
         $session = new Store('test_session', $sessionHandler);

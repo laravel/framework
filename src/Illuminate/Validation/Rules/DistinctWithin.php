@@ -14,7 +14,7 @@ class DistinctWithin implements Rule
     /**
      * Constructor.
      *
-     * @param  int  $seconds
+     * @param  int|\DateInterval|array{int, 'milliseconds'|'seconds'|'minutes'|'hours'}  $seconds
      * @param  Request|null  $request  Optional, inject Request for testability
      */
     public function __construct(int|\DateInterval $seconds = 60, ?Request $request = null)
