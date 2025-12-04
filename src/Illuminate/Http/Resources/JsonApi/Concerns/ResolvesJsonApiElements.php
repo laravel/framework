@@ -364,7 +364,7 @@ trait ResolvesJsonApiElements
             ]));
         }
 
-        return $relations->dump()->uniqueStrict(fn ($relation) => $relation['_uniqueKey'])
+        return $relations->uniqueStrict(fn ($relation) => $relation['_uniqueKey'])
             ->map(fn ($relation) => Arr::except($relation, ['_uniqueKey']))
             ->all();
     }
