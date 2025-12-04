@@ -328,10 +328,10 @@ class Builder
      * @param  string  $table
      * @param  string|array  $index
      * @param  \Closure  $callback
-     * @param string|null $type
+     * @param  string|null  $type
      * @return void
      */
-    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, string|null $type = null)
+    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
     {
         if ($this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
@@ -343,11 +343,11 @@ class Builder
      *
      * @param  string  $table
      * @param  string|array  $index
-     * @param \Closure $callback
-     * @param string|null $type
+     * @param  \Closure  $callback
+     * @param  string|null  $type
      * @return void
      */
-    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, string|null $type = null)
+    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
     {
         if (! $this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
