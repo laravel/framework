@@ -44,6 +44,11 @@ trait ResolvesJsonApiElements
      */
     protected array $loadedRelationshipIdentifiers = [];
 
+    /**
+     * Determine relationships should rely on request's query string.
+     *
+     * @return $this
+     */
     public function withRequestQueryString(bool $value = true)
     {
         $this->usesRequestQueryString = $value;
@@ -51,12 +56,22 @@ trait ResolvesJsonApiElements
         return $this;
     }
 
+    /**
+     * Determine relationships should not be relied on request's query string.
+     *
+     * @return $this
+     */
     public function withoutRequestQueryString()
     {
         return $this->withRequestQueryString(false);
     }
 
-    public function withIncludedFromLoadedRelationship()
+    /**
+     * Determine relationship should include loaded relationships.
+     *
+     * @return $this
+     */
+    public function withIncludedFromLoadedRelationships()
     {
         $this->usesIncludedFromLoadedRelationships = true;
 
@@ -283,7 +298,7 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationship()->resolve($request);
+            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
 
             $relations->push(array_filter([
                 'id' => $id,
