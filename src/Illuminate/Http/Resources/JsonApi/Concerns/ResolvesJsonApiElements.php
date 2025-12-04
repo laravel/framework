@@ -248,6 +248,12 @@ trait ResolvesJsonApiElements
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
 
+        if (is_null($relatedModels)) {
+            yield $relationName => null;
+
+            return;
+        }
+
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
             $relatedModels = $relatedModels->values();
@@ -283,11 +289,7 @@ trait ResolvesJsonApiElements
         // Relationship is a single model...
         $relatedModel = $relatedModels;
 
-        if (is_null($relatedModel)) {
-            yield $relationName => null;
-
-            return;
-        } elseif ($relatedModel instanceof Pivot ||
+        if ($relatedModel instanceof Pivot ||
             in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
             yield $relationName => new MissingValue;
 
