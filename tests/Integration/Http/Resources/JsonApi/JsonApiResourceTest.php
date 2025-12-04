@@ -267,6 +267,7 @@ class JsonApiResourceTest extends TestCase
 
         $this->getJson("/posts/{$post1->getKey()}?".http_build_query(['include' => 'author,comments.commenter']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->dump()
             ->assertExactJson([
                 'data' => [
                     'attributes' => [
