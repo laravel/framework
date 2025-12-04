@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
@@ -106,7 +107,7 @@ trait ResolvesJsonApiElements
      *
      * @throws ResourceIdentificationException
      */
-    protected function resolveResourceIdentifier(JsonApiRequest $request): string
+    public function resolveResourceIdentifier(JsonApiRequest $request): string
     {
         if (! is_null($resourceId = $this->toId($request))) {
             return $resourceId;
@@ -125,7 +126,7 @@ trait ResolvesJsonApiElements
      *
      * @throws ResourceIdentificationException
      */
-    protected function resolveResourceType(JsonApiRequest $request): string
+    public function resolveResourceType(JsonApiRequest $request): string
     {
         if (! is_null($resourceType = $this->toType($request))) {
             return $resourceType;
@@ -235,6 +236,8 @@ trait ResolvesJsonApiElements
                 );
             }
         }))->all();
+
+        dump($this->loadedRelationshipIdentifiers);
     }
 
     /**
@@ -248,15 +251,12 @@ trait ResolvesJsonApiElements
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
 
-        if (is_null($relatedModels)) {
-            yield $relationName => null;
-
-            return;
-        }
-
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
-            $relatedModels = $relatedModels->values();
+            $relatedResources = rescue(
+                fn () => $relatedModels->toResourceCollection($resourceClass),
+                new AnonymousResourceCollection($relatedModels->values(), JsonApiResource::class)
+            );
 
             if ($relatedModels->isEmpty()) {
                 yield $relationName => ['data' => $relatedModels];
@@ -265,15 +265,13 @@ trait ResolvesJsonApiElements
             }
 
             $relationship = $this->resource->{$relationName}();
-            $resourceType = $relationResolver->resourceType($relatedModels, $request);
-
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedModels->map(function ($relation) use ($resourceClass, $isUnique, $resourceType) {
+            yield $relationName => ['data' => $relatedResources->collection->map(function ($resource) use ($request, $isUnique) {
                 return transform(
-                    [$resourceType, static::resourceIdFromModel($relation)],
-                    function ($uniqueKey) use ($relation, $resourceClass, $isUnique) {
-                        $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $resourceClass, $isUnique];
+                    [$resource->resolveResourceType($request), $resource->resolveResourceIdentifier($request)],
+                    function ($uniqueKey) use ($resource, $isUnique) {
+                        $this->loadedRelationshipsMap[$resource] = [...$uniqueKey, $isUnique];
 
                         return [
                             'id' => $uniqueKey[1],
@@ -289,17 +287,23 @@ trait ResolvesJsonApiElements
         // Relationship is a single model...
         $relatedModel = $relatedModels;
 
-        if ($relatedModel instanceof Pivot ||
+        if (is_null($relatedModel)) {
+            yield $relationName => null;
+
+            return;
+        } elseif ($relatedModel instanceof Pivot ||
             in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
             yield $relationName => new MissingValue;
 
             return;
         }
 
+        $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
+
         yield $relationName => ['data' => transform(
-            [$relationResolver->resourceType($relatedModel, $request), static::resourceIdFromModel($relatedModel)],
-            function ($uniqueKey) use ($relatedModel, $resourceClass) {
-                $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $resourceClass, true];
+            [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
+            function ($uniqueKey) use ($relatedResource) {
+                $this->loadedRelationshipsMap[$relatedResource] = [...$uniqueKey, true];
 
                 return [
                     'id' => $uniqueKey[1],
@@ -322,17 +326,15 @@ trait ResolvesJsonApiElements
 
         $relations = new Collection;
 
-        foreach ($this->loadedRelationshipsMap as $relation => $value) {
-            [$type, $id, $relatedResourceClass, $isUnique] = $value;
+        foreach ($this->loadedRelationshipsMap as $resource => $value) {
+            [$type, $id, $isUnique] = $value;
 
-            $resourceInstance = rescue(fn () => $relation->toResource($relatedResourceClass), new JsonApiResource($relation), false);
-
-            if (! $resourceInstance instanceof JsonApiResource &&
-                $resourceInstance instanceof JsonResource) {
-                $resourceInstance = new JsonApiResource($resourceInstance->resource);
+            if (! $resource instanceof JsonApiResource &&
+                $resource instanceof JsonResource) {
+                $resource = new JsonApiResource($resource->resource);
             }
 
-            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
+            $relationsData = $resource->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
 
             $relations->push(array_filter([
                 'id' => $id,
