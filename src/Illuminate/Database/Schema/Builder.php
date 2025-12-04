@@ -332,33 +332,41 @@ class Builder
 
     /**
      * Execute a table builder callback if the given table has a given index.
+     * Optionally execute a separate callback if the column does not exist
      *
      * @param  string  $table
      * @param  string|array  $index
      * @param  \Closure  $callback
      * @param  string|null  $type
+     * @param  \Closure|null  $otherwise
      * @return void
      */
-    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null, ?Closure $otherwise = null)
     {
         if ($this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
+        } elseif ($otherwise) {
+            $this->table($table, fn (Blueprint $table) => $otherwise($table));
         }
     }
 
     /**
      * Execute a table builder callback if the given table doesn't have a given index.
+     * Optionally execute a separate callback if the column exists
      *
      * @param  string  $table
      * @param  string|array  $index
      * @param  \Closure  $callback
      * @param  string|null  $type
+     * @param  \Closure|null  $otherwise
      * @return void
      */
-    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null, ?Closure $otherwise = null)
     {
         if (! $this->hasIndex($table, $index, $type)) {
             $this->table($table, fn (Blueprint $table) => $callback($table));
+        } elseif ($otherwise) {
+            $this->table($table, fn (Blueprint $table) => $otherwise($table));
         }
     }
 
