@@ -9,6 +9,8 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
+use Mockery;
+use Mockery\LegacyMockInterface;
 
 /**
  * @mixin \Illuminate\Cache\Repository
@@ -81,9 +83,17 @@ class CacheManager implements FactoryContract
     {
         $driver = $driver ?: $this->getDefaultDriver();
 
-        $this->app->scopedIf($bindingKey = "cache.__memoized:{$driver}", fn () => $this->repository(
-            new MemoizedStore($driver, $this->store($driver)), ['events' => false]
-        ));
+        $bindingKey = "cache.__memoized:{$driver}";
+
+        $isSpy = isset($this->app['cache']) && $this->app['cache'] instanceof LegacyMockInterface;
+
+        $this->app->scopedIf($bindingKey, function () use ($driver, $isSpy) {
+            $repository = $this->repository(
+                new MemoizedStore($driver, $this->store($driver)), ['events' => false]
+            );
+
+            return $isSpy ? Mockery::spy($repository) : $repository;
+        });
 
         return $this->app->make($bindingKey);
     }

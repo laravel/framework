@@ -8,6 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
 use Illuminate\Foundation\Application as FoundationApplication;
+use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
@@ -241,6 +242,35 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    public function testLoadIgnoresTestFiles()
+    {
+        $dir = __DIR__.'/laravel';
+        @mkdir($dir.'/app/Console/Commands', 0755, true);
+        file_put_contents($dir.'/composer.json', json_encode(['autoload' => ['psr-4' => ['App\\' => 'app/']]]));
+        file_put_contents($dir.'/app/Console/Commands/ExampleCommand.php', '<?php namespace App\Console\Commands; class ExampleCommand extends \Illuminate\Console\Command { protected $signature = "example"; public function handle() {} }');
+        file_put_contents($dir.'/app/Console/Commands/ExampleCommandTest.php', '<?php namespace App\Console\Commands; class ExampleCommandTest extends \Illuminate\Console\Command { protected $signature = "example-test"; public function handle() {} }');
+
+        try {
+            $app = new FoundationApplication($dir);
+            $events = new EventsDispatcher($app);
+            $app->instance('events', $events);
+
+            $kernel = new TestKernel($app, $events);
+            $kernel->loadFrom([$dir.'/app/Console/Commands']);
+
+            $this->assertContains('App\Console\Commands\ExampleCommand', $kernel->loadedCommands);
+            $this->assertNotContains('App\Console\Commands\ExampleCommandTest', $kernel->loadedCommands);
+        } finally {
+            @unlink($dir.'/app/Console/Commands/ExampleCommand.php');
+            @unlink($dir.'/app/Console/Commands/ExampleCommandTest.php');
+            @unlink($dir.'/composer.json');
+            @rmdir($dir.'/app/Console/Commands');
+            @rmdir($dir.'/app/Console');
+            @rmdir($dir.'/app');
+            @rmdir($dir);
+        }
+    }
+
     protected function getMockConsole(array $methods)
     {
         $app = m::mock(ApplicationContract::class, ['version' => '6.0']);
@@ -272,4 +302,19 @@ class CommandWithAliasViaProperty extends Command
 {
     public $name = 'command-name';
     public $aliases = ['command-alias'];
+}
+
+class TestKernel extends Kernel
+{
+    public $loadedCommands = [];
+
+    public function loadFrom($paths)
+    {
+        $this->load($paths);
+    }
+
+    protected function commandClassFromFile(\SplFileInfo $file, string $namespace): string
+    {
+        return tap(parent::commandClassFromFile($file, $namespace), fn ($command) => $this->loadedCommands[] = $command);
+    }
 }

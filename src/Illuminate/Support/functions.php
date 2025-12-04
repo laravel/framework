@@ -70,7 +70,7 @@ if (! function_exists('Illuminate\Support\microseconds')) {
     /**
      * Get the current date / time plus the given number of microseconds.
      */
-    function microseconds(int $microseconds): CarbonInterval
+    function microseconds(int|float $microseconds): CarbonInterval
     {
         return CarbonInterval::microseconds($microseconds);
     }
@@ -80,7 +80,7 @@ if (! function_exists('Illuminate\Support\milliseconds')) {
     /**
      * Get the current date / time plus the given number of milliseconds.
      */
-    function milliseconds(int $milliseconds): CarbonInterval
+    function milliseconds(int|float $milliseconds): CarbonInterval
     {
         return CarbonInterval::milliseconds($milliseconds);
     }
@@ -90,7 +90,7 @@ if (! function_exists('Illuminate\Support\seconds')) {
     /**
      * Get the current date / time plus the given number of seconds.
      */
-    function seconds(int $seconds): CarbonInterval
+    function seconds(int|float $seconds): CarbonInterval
     {
         return CarbonInterval::seconds($seconds);
     }
@@ -100,7 +100,7 @@ if (! function_exists('Illuminate\Support\minutes')) {
     /**
      * Get the current date / time plus the given number of minutes.
      */
-    function minutes(int $minutes): CarbonInterval
+    function minutes(int|float $minutes): CarbonInterval
     {
         return CarbonInterval::minutes($minutes);
     }
@@ -110,7 +110,7 @@ if (! function_exists('Illuminate\Support\hours')) {
     /**
      * Get the current date / time plus the given number of hours.
      */
-    function hours(int $hours): CarbonInterval
+    function hours(int|float $hours): CarbonInterval
     {
         return CarbonInterval::hours($hours);
     }
@@ -120,7 +120,7 @@ if (! function_exists('Illuminate\Support\days')) {
     /**
      * Get the current date / time plus the given number of days.
      */
-    function days(int $days): CarbonInterval
+    function days(int|float $days): CarbonInterval
     {
         return CarbonInterval::days($days);
     }
