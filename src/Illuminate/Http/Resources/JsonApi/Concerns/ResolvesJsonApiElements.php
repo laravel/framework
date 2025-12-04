@@ -253,6 +253,8 @@ trait ResolvesJsonApiElements
 
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
+            $relatedModels = $relatedModels->values();
+
             if ($relatedModels->isEmpty()) {
                 yield $relationName => ['data' => $relatedModels];
 
