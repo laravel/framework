@@ -235,8 +235,6 @@ trait ResolvesJsonApiElements
                 );
             }
         }))->all();
-
-        dump($this->loadedRelationshipIdentifiers);
     }
 
     /**
@@ -268,8 +266,8 @@ trait ResolvesJsonApiElements
 
                 return transform(
                     [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-                    function ($uniqueKey) use ($relatedResource, $isUnique) {
-                        $this->loadedRelationshipsMap[$relatedResource] = [...$uniqueKey, $isUnique];
+                    function ($uniqueKey) use ($relatedModel, $relatedResource, $isUnique) {
+                        $this->loadedRelationshipsMap[$relatedModel] = [$relatedResource, ...$uniqueKey, $isUnique];
 
                         return [
                             'id' => $uniqueKey[1],
@@ -300,8 +298,8 @@ trait ResolvesJsonApiElements
 
         yield $relationName => ['data' => transform(
             [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-            function ($uniqueKey) use ($relatedResource) {
-                $this->loadedRelationshipsMap[$relatedResource] = [...$uniqueKey, true];
+            function ($uniqueKey) use ($relatedModel, $relatedResource) {
+                $this->loadedRelationshipsMap[$relatedModel] = [$relatedResource, ...$uniqueKey, true];
 
                 return [
                     'id' => $uniqueKey[1],
@@ -324,8 +322,8 @@ trait ResolvesJsonApiElements
 
         $relations = new Collection;
 
-        foreach ($this->loadedRelationshipsMap as $resourceInstance => $value) {
-            [$type, $id, $isUnique] = $value;
+        foreach ($this->loadedRelationshipsMap as $relation => $value) {
+            [$resourceInstance, $type, $id, $isUnique] = $value;
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
