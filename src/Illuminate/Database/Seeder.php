@@ -186,8 +186,10 @@ abstract class Seeder
 
         $uses = array_flip(class_uses_recursive(static::class));
 
-        if (isset($uses[WithoutModelEvents::class])) {
-            $callback = $this->withoutModelEvents($callback);
+        foreach ($uses as $trait) {
+            if (method_exists($this, $method = Str::camel(class_basename($trait)))) {
+                $callback = $this->{$method}($callback);
+            }
         }
 
         return $callback();
