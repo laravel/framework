@@ -253,11 +253,6 @@ trait ResolvesJsonApiElements
 
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
-            $relatedResources = rescue(
-                fn () => $relatedModels->toResourceCollection($resourceClass),
-                new AnonymousResourceCollection($relatedModels->values(), JsonApiResource::class)
-            );
-
             if ($relatedModels->isEmpty()) {
                 yield $relationName => ['data' => $relatedModels];
 
@@ -267,11 +262,13 @@ trait ResolvesJsonApiElements
             $relationship = $this->resource->{$relationName}();
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedResources->collection->map(function ($resource) use ($request, $isUnique) {
+            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
+                $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
+
                 return transform(
-                    [$resource->resolveResourceType($request), $resource->resolveResourceIdentifier($request)],
-                    function ($uniqueKey) use ($resource, $isUnique) {
-                        $this->loadedRelationshipsMap[$resource] = [...$uniqueKey, $isUnique];
+                    [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
+                    function ($uniqueKey) use ($relatedResource, $isUnique) {
+                        $this->loadedRelationshipsMap[$relatedResource] = [...$uniqueKey, $isUnique];
 
                         return [
                             'id' => $uniqueKey[1],
@@ -279,7 +276,7 @@ trait ResolvesJsonApiElements
                         ];
                     }
                 );
-            })];
+            })->all()];
 
             return;
         }
