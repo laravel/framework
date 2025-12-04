@@ -265,7 +265,7 @@ trait ResolvesJsonApiElements
 
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedModels->map(function ($relation) use ($relationName, $resourceClass, $isUnique, $resourceType) {
+            yield $relationName => ['data' => $relatedModels->map(function ($relation) use ($resourceClass, $isUnique, $resourceType) {
                 return transform(
                     [$resourceType, static::resourceIdFromModel($relation)],
                     function ($uniqueKey) use ($relation, $resourceClass, $isUnique) {
