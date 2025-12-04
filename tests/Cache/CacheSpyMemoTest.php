@@ -51,7 +51,7 @@ class CacheSpyMemoTest extends TestCase
     {
         $cache = Cache::spy();
 
-        Cache::memo()->remember('key', 60, fn() => 'bar');
+        Cache::memo()->remember('key', 60, fn () => 'bar');
 
         $cache->shouldHaveReceived('memo')->once();
     }
@@ -61,10 +61,10 @@ class CacheSpyMemoTest extends TestCase
         $cache = Cache::spy();
 
         $memoizedCache = Cache::memo();
-        $value = $memoizedCache->remember('key', 60, fn() => 'bar');
-        
+        $value = $memoizedCache->remember('key', 60, fn () => 'bar');
+
         $this->assertSame('bar', $value);
-        
+
         $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Mockery::type(Closure::class));
     }
 
@@ -73,7 +73,7 @@ class CacheSpyMemoTest extends TestCase
         $cache = Cache::spy();
 
         $memoizedCache = Cache::memo();
-        $memoizedCache->remember('key', 60, fn() => 'bar');
+        $memoizedCache->remember('key', 60, fn () => 'bar');
 
         $memoizedCache->shouldHaveReceived('remember')->once()->with('key', 60, Mockery::type(Closure::class));
     }
@@ -86,9 +86,8 @@ class CacheSpyMemoTest extends TestCase
 
         $this->assertInstanceOf(LegacyMockInterface::class, $memoizedCache);
 
-        $memoizedCache->remember('key', 60, fn() => 'bar');
+        $memoizedCache->remember('key', 60, fn () => 'bar');
 
         $memoizedCache->shouldHaveReceived('remember')->once();
     }
 }
-
