@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Cache;
 
 class DistinctWithin implements Rule
 {
-    protected int $seconds;
+    protected int|\DateInterval $seconds;
     protected ?Request $request;
 
     /**
@@ -17,9 +17,9 @@ class DistinctWithin implements Rule
      * @param  int  $seconds
      * @param  Request|null  $request  Optional, inject Request for testability
      */
-    public function __construct(int $seconds = 60, ?Request $request = null)
+    public function __construct(int|\DateInterval $seconds = 60, ?Request $request = null)
     {
-        $this->seconds = $seconds;
+        $this->seconds = $seconds instanceof \DateInterval ? $seconds->s : $seconds;
         $this->request = $request;
     }
 
