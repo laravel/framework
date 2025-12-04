@@ -344,9 +344,7 @@ trait ResolvesJsonApiElements
 
         dump($this->loadedRelationshipsMap);
 
-        foreach ($this->loadedRelationshipsMap as $value) {
-            [$resourceInstance, $type, $id, $isUnique] = $value;
-
+        foreach ($this->loadedRelationshipsMap as [$resourceInstance, $type, $id, $isUnique]) {
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
