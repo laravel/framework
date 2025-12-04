@@ -5,6 +5,7 @@ namespace Illuminate\Console\Concerns;
 use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
@@ -459,5 +460,166 @@ trait InteractsWithIO
     public function outputComponents()
     {
         return $this->components;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function string(string $key, ?string $default = null): string
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_string($value)) {
+            throw new TypeError(sprintf('"%s" is not of type string. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function integer(string $key, ?int $default = null): int
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ??  throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_int($value)) {
+            throw new TypeError(sprintf('"%s" is not of type integer. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function int(string $key, $default): int
+    {
+        return $this->integer($key, $default);
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function float(string $key, ?float $default = null): float
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_float($value)) {
+            throw new TypeError(sprintf('"%s" is not of type float. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function double(string $key, $default): float
+    {
+        return $this->float($key, $default);
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function number(string $key, int|float|null $default = null): int|float
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_int($value) && ! is_float($value)) {
+            throw new TypeError(sprintf('"%s" is neither of type float nor integer. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function boolean(string $key, int|float|null $default = null): bool
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_bool($value)) {
+            throw new TypeError(sprintf('"%s" is not of type boolean. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function bool(string $key, $default): bool
+    {
+        return $this->boolean($key, $default);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function array(string $key, ?array $default = null): array
+    {
+        $value = match (true) {
+            $this->hasArgument($key) => $this->getArgument($key),
+            $this->hasOption($key) => $this->getOption($key),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+        };
+
+        if (! is_array($value)) {
+            throw new TypeError(sprintf('"%s" is not of type array. %s given', $key, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * @throws \InvalidArgumentException when neither an option nor an argument
+     *                                   with give key exists and no default value was given 
+     * @throws \TypeError on type mismatch
+     */
+    public function collection(string $key, $default = null): Collection
+    {
+        return new Collection($this->array($key, $default));
     }
 }
