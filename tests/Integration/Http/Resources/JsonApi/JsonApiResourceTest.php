@@ -300,6 +300,14 @@ class JsonApiResourceTest extends TestCase
                     ],
                     [
                         'attributes' => [
+                            'email' => $user->email,
+                            'name' => $user->name,
+                        ],
+                        'id' => (string) $user->getKey(),
+                        'type' => 'users',
+                    ],
+                    [
+                        'attributes' => [
                             'content' => $comment->content,
                         ],
                         'id' => (string) $comment->getKey(),

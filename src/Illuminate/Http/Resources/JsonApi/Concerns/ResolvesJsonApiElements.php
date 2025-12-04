@@ -16,6 +16,7 @@ use Illuminate\Http\Resources\JsonApi\RelationResolver;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use JsonSerializable;
 use WeakMap;
@@ -217,62 +218,75 @@ trait ResolvesJsonApiElements
 
         $this->loadedRelationshipsMap = new WeakMap;
 
-        $this->loadedRelationshipIdentifiers = $resourceRelationships->mapWithKeys(function (RelationResolver $relationResolver, $key) use ($request) {
-            $relatedModels = $relationResolver->handle($this->resource);
-            $relatedResourceClass = $relationResolver->resourceClass();
+        $this->loadedRelationshipIdentifiers = (new LazyCollection(function () use ($request, $resourceRelationships) {
+            foreach ($resourceRelationships as $key => $relationResolver) {
+                $relatedModels = $relationResolver->handle($this->resource);
+                $relatedResourceClass = $relationResolver->resourceClass();
 
-            if (! is_null($relatedModels)) {
-                $relatedModels->loadMissing($request->sparseIncluded($key));
-            }
-
-            // Relationship is a collection of models...
-            if ($relatedModels instanceof Collection) {
-                $relatedModels = $relatedModels->values();
-
-                if ($relatedModels->isEmpty()) {
-                    return [$key => ['data' => $relatedModels]];
+                if (! is_null($relatedModels)) {
+                    $relatedModels->loadMissing($request->sparseIncluded($key));
                 }
 
-                $relationship = $this->resource->{$key}();
+                // Relationship is a collection of models...
+                if ($relatedModels instanceof Collection) {
+                    $relatedModels = $relatedModels->values();
 
-                $isUnique = ! $relationship instanceof BelongsToMany;
+                    if ($relatedModels->isEmpty()) {
+                        yield $key => ['data' => $relatedModels];
 
-                $key = $relationResolver->resourceType($relatedModels, $request);
+                        continue;
+                    }
 
-                return [$key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
-                    return transform([$key, static::resourceIdFromModel($relation)], function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
-                        $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $relatedResourceClass, $isUnique];
+                    $relationship = $this->resource->{$key}();
+
+                    $isUnique = ! $relationship instanceof BelongsToMany;
+
+                    $key = $relationResolver->resourceType($relatedModels, $request);
+
+                    yield $key => ['data' => $relatedModels->map(function ($relation) use ($key, $relatedResourceClass, $isUnique) {
+                        return transform(
+                            [$key, static::resourceIdFromModel($relation)],
+                            function ($uniqueKey) use ($relation, $relatedResourceClass, $isUnique) {
+                                $this->loadedRelationshipsMap[$relation] = [...$uniqueKey, $relatedResourceClass, $isUnique];
+
+                                return [
+                                    'id' => $uniqueKey[1],
+                                    'type' => $uniqueKey[0],
+                                ];
+                            }
+                        );
+                    })];
+
+                    continue;
+                }
+
+                // Relationship is a single model...
+                $relatedModel = $relatedModels;
+
+                if (is_null($relatedModel)) {
+                    yield $key => null;
+
+                    continue;
+                } elseif ($relatedModel instanceof Pivot ||
+                    in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
+                    yield $key => new MissingValue;
+
+                    continue;
+                }
+
+                yield $key => ['data' => transform(
+                    [$relationResolver->resourceType($relatedModel, $request), static::resourceIdFromModel($relatedModel)],
+                    function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
+                        $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $relatedResourceClass, true];
 
                         return [
                             'id' => $uniqueKey[1],
                             'type' => $uniqueKey[0],
                         ];
-                    });
-                })]];
+                    }
+                )];
             }
-
-            // Relationship is a single model...
-            $relatedModel = $relatedModels;
-
-            if (is_null($relatedModel)) {
-                return [$key => null];
-            } elseif ($relatedModel instanceof Pivot ||
-                in_array(AsPivot::class, class_uses_recursive($relatedModel), true)) {
-                return [$key => new MissingValue];
-            }
-
-            return [$key => ['data' => transform(
-                [$relationResolver->resourceType($relatedModel, $request), static::resourceIdFromModel($relatedModel)],
-                function ($uniqueKey) use ($relatedModel, $relatedResourceClass) {
-                    $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $relatedResourceClass, true];
-
-                    return [
-                        'id' => $uniqueKey[1],
-                        'type' => $uniqueKey[0],
-                    ];
-                }
-            )]];
-        })->all();
+        }))->all();
     }
 
     /**
