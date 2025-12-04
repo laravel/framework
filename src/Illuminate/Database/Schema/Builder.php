@@ -332,7 +332,7 @@ class Builder
 
     /**
      * Execute a table builder callback if the given table has a given index.
-     * Optionally execute a separate callback if the column does not exist.
+     * Optionally execute a separate callback if the index does not exist.
      *
      * @param  string  $table
      * @param  string|array  $index
@@ -352,7 +352,7 @@ class Builder
 
     /**
      * Execute a table builder callback if the given table doesn't have a given index.
-     * Optionally execute a separate callback if the column exists.
+     * Optionally execute a separate callback if the index exists.
      *
      * @param  string  $table
      * @param  string|array  $index
