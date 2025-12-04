@@ -2,9 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
 use Orchestra\Testbench\Attributes\WithConfig;
@@ -15,6 +16,15 @@ use Orchestra\Testbench\Attributes\WithMigration;
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     use LazilyRefreshDatabase;
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function setUp(): void
+    {
+        Model::shouldBeStrict(true);
+
+        parent::setUp();
+    }
 
     /** {@inheritdoc} */
     #[\Override]
