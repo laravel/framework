@@ -229,11 +229,9 @@ trait ResolvesJsonApiElements
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(
-                    $relationName,
+                    $relationResolver,
                     $relatedModels,
-                    $request,
-                    $relatedResourceClass,
-                    $relationResolver->resourceType($relatedModels, $request)
+                    $request
                 );
             }
         }))->all();
@@ -241,16 +239,15 @@ trait ResolvesJsonApiElements
 
     /**
      * Compile resource relations.
-     *
-     * @param  class-string<\Illuminate\Http\Resources\JsonApi\JsonApiResource>|null  $resourceClass
      */
     protected function compileResourceRelationshipUsingResolver(
-        string $relationName,
-        Collection|Model $relatedModels,
-        JsonApiRequest $request,
-        ?string $resourceClass,
-        string $resourceType
+        RelationResolver $relationResolver,
+        Collection|Model|null $relatedModels,
+        JsonApiRequest $request
     ): Generator {
+        $relationName = $relationResolver->relationName;
+        $resourceClass = $relationResolver->resourceClass();
+
         // Relationship is a collection of models...
         if ($relatedModels instanceof Collection) {
             $relatedModels = $relatedModels->values();
@@ -262,6 +259,7 @@ trait ResolvesJsonApiElements
             }
 
             $relationship = $this->resource->{$relationName}();
+            $resourceType = $relationResolver->resourceType($relatedModels, $request);
 
             $isUnique = ! $relationship instanceof BelongsToMany;
 
@@ -297,7 +295,7 @@ trait ResolvesJsonApiElements
         }
 
         yield $relationName => ['data' => transform(
-            [$resourceType, static::resourceIdFromModel($relatedModel)],
+            [$relationResolver->resourceType($relatedModel, $request), static::resourceIdFromModel($relatedModel)],
             function ($uniqueKey) use ($relatedModel, $resourceClass) {
                 $this->loadedRelationshipsMap[$relatedModel] = [...$uniqueKey, $resourceClass, true];
 
