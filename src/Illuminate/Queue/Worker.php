@@ -420,7 +420,7 @@ class Worker
             $isPausable = $isPausable($connectionName, $queue);
         }
 
-        if (! $isPausable) {
+        if ($isPausable === false) {
             return false;
         }
 
