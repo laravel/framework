@@ -96,7 +96,6 @@ class JsonApiResourceTest extends TestCase
 
         $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'profile,posts,teams']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
-            ->dump()
             ->assertExactJson([
                 'data' => [
                     'id' => (string) $user->getKey(),
