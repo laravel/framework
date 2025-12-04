@@ -20,7 +20,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use JsonSerializable;
-use WeakMap;
 
 trait ResolvesJsonApiElements
 {
