@@ -326,15 +326,15 @@ trait ResolvesJsonApiElements
 
         $relations = new Collection;
 
-        foreach ($this->loadedRelationshipsMap as $resource => $value) {
+        foreach ($this->loadedRelationshipsMap as $resourceInstance => $value) {
             [$type, $id, $isUnique] = $value;
 
-            if (! $resource instanceof JsonApiResource &&
-                $resource instanceof JsonResource) {
-                $resource = new JsonApiResource($resource->resource);
+            if (! $resourceInstance instanceof JsonApiResource &&
+                $resourceInstance instanceof JsonResource) {
+                $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resource->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
+            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
 
             $relations->push(array_filter([
                 'id' => $id,
