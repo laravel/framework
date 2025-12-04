@@ -83,10 +83,10 @@ class Cache extends Facade
     {
         if (! static::isMock()) {
             $class = static::getMockableClass();
-            $realInstance = static::getFacadeRoot();
+            $instance = static::getFacadeRoot();
 
-            if ($realInstance && $class) {
-                return tap(Mockery::spy($realInstance)->makePartial(), function ($spy) {
+            if ($class && $instance) {
+                return tap(Mockery::spy($instance)->makePartial(), function ($spy) {
                     static::swap($spy);
                 });
             }
