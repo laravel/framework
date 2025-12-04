@@ -293,7 +293,8 @@ class Builder
     }
 
     /**
-     * Execute a table builder callback if the given table has a given column.
+     * Execute a table builder callback if the given table has a given column
+     * Optionally execute a separate callback if the column does not exist
      *
      * @param  string  $table
      * @param  string  $column
@@ -312,6 +313,7 @@ class Builder
 
     /**
      * Execute a table builder callback if the given table doesn't have a given column.
+     * Optionally execute a separate callback if the column exists
      *
      * @param  string  $table
      * @param  string  $column
