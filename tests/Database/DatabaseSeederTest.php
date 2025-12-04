@@ -26,6 +26,30 @@ class TestDepsSeeder extends Seeder
     }
 }
 
+trait SomeTrait
+{
+    public $someTraitCalled = false;
+
+    public function someTrait(callable $callback): callable
+    {
+        $this->someTraitCalled = true;
+
+        return $callback;
+    }
+}
+
+class TestSeederWithAutoLoadedTraits extends Seeder
+{
+    use SomeTrait;
+
+    public $runCalled = false;
+
+    public function run()
+    {
+        $this->runCalled = true;
+    }
+}
+
 class DatabaseSeederTest extends TestCase
 {
     protected function tearDown(): void
@@ -88,5 +112,14 @@ class DatabaseSeederTest extends TestCase
         $seeder->__invoke(['test1', 'test2']);
 
         $container->shouldHaveReceived('call')->once()->with([$seeder, 'run'], ['test1', 'test2']);
+    }
+
+    public function testAutoLoadedTraitsOnRunMethod()
+    {
+        $seeder = new TestSeederWithAutoLoadedTraits;
+        $seeder->__invoke();
+
+        $this->assertTrue($seeder->someTraitCalled);
+        $this->assertTrue($seeder->runCalled);
     }
 }
