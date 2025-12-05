@@ -612,14 +612,4 @@ trait InteractsWithIO
 
         return $value;
     }
-
-    /**
-     * @throws \InvalidArgumentException when neither an option nor an argument
-     *                                   with give key exists and no default value was given 
-     * @throws \TypeError on type mismatch
-     */
-    public function collection(string $key, $default = null): Collection
-    {
-        return new Collection($this->array($key, $default));
-    }
 }
