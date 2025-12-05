@@ -1505,7 +1505,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function toFloat()
     {
-        return (float) ($this->value);
+        return floatval($this->value);
     }
 
     /**
