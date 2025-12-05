@@ -8,12 +8,14 @@ use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use InvalidArgumentException;
 
 class CommandTest extends TestCase
 {
@@ -218,7 +220,6 @@ class CommandTest extends TestCase
 
     public function testGetStringArgument()
     {
-        
         $command = new class extends Command
         {
             public function handle()
@@ -250,7 +251,6 @@ class CommandTest extends TestCase
 
     public function testGetStringOption()
     {
-        
         $command = new class extends Command
         {
             public function handle()
@@ -278,5 +278,53 @@ class CommandTest extends TestCase
         $value = $command->string('option-one');
         $this->assertSame('test-first-option', $value);
         $this->assertTrue(is_string($value));
+    }
+
+    public function testAttemptToGetNotDefinedInput()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"option-one" is neither an option nor an argument of this command');
+
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 'test-first-option',
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+        $command->string('option-one');
+    }
+
+    public function testAttemptToGetOptionWithWrongType()
+    {
+        $this->expectException(TypeError::class);
+        $this->expectExceptionMessage('"option-one" is not of type string. array given');
+
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => ['foo', 'bar'],
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+        $command->string('option-one');
     }
 }
