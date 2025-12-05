@@ -154,6 +154,18 @@ class JsonApiResource extends JsonResource
     }
 
     /**
+     * Resolve the resource data to an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    #[\Override]
+    public function resolveResourceData(Request $request)
+    {
+        return $this->resolveResourceObject($request);
+    }
+
+    /**
      * Customize the outgoing response for the resource.
      */
     #[\Override]

@@ -107,7 +107,7 @@ class JsonApiCollectionTest extends TestCase
                             'email' => $user->email,
                         ],
                         'relationships' => [
-                            'profile' => ['data' => []],
+                            'profile' => ['data' => null],
                             'posts' => ['data' => []],
                             'teams' => ['data' => []],
                         ],
@@ -122,7 +122,8 @@ class JsonApiCollectionTest extends TestCase
                         'relationships' => [
                             'profile' => [
                                 'data' => [
-                                    ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
+                                    'id' => (string) $profile->getKey(),
+                                    'type' => 'profiles',
                                 ],
                             ],
                             'posts' => [

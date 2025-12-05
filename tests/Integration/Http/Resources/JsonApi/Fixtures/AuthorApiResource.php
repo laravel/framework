@@ -5,13 +5,11 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
-class UserApiResource extends JsonApiResource
+class AuthorApiResource extends JsonApiResource
 {
     protected array $relationships = [
         'comments',
         'profile',
-        'posts',
-        'teams',
     ];
 
     #[\Override]
@@ -26,6 +24,6 @@ class UserApiResource extends JsonApiResource
     #[\Override]
     public function toType(Request $request)
     {
-        return 'users';
+        return 'authors';
     }
 }

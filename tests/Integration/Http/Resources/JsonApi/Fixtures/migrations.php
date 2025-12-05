@@ -34,3 +34,11 @@ Schema::create('team_user', function (Blueprint $table) {
 
     $table->index(['team_id', 'user_id']);
 });
+
+Schema::create('comments', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('post_id')->unique();
+    $table->foreignId('user_id')->index()->nullable();
+    $table->text('content');
+    $table->timestamps();
+});

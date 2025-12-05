@@ -10,4 +10,9 @@ class PostApiResource extends JsonApiResource
         'title',
         'content',
     ];
+
+    protected array $relationships = [
+        'author' => AuthorApiResource::class,
+        'comments',
+    ];
 }
