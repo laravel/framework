@@ -214,6 +214,10 @@ class WorkCommand extends Command
      */
     protected function writeOutput(Job $job, $status, ?Throwable $exception = null)
     {
+        if ($this->output->isQuiet() || $this->output->isSilent()) {
+            return;
+        }
+
         $this->outputUsingJson()
             ? $this->writeOutputAsJson($job, $status, $exception)
             : $this->writeOutputForCli($job, $status);
