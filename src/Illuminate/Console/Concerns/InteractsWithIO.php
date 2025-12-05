@@ -593,6 +593,7 @@ trait InteractsWithIO
 
     /**
      * @return array<array-key, mixed>
+     *
      * @throws \InvalidArgumentException when neither an option nor an argument
      *                                   with give key exists and no default value was given 
      * @throws \TypeError on type mismatch
