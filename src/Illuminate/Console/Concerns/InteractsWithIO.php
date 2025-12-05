@@ -492,7 +492,7 @@ trait InteractsWithIO
         $value = match (true) {
             $this->hasArgument($key) => $this->getArgument($key),
             $this->hasOption($key) => $this->getOption($key),
-            default => $default ??  throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
+            default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
         if (! is_int($value)) {
