@@ -246,7 +246,6 @@ class CommandTest extends TestCase
 
         $value = $command->string('argument-one');
         $this->assertSame('test-first-argument', $value);
-        $this->assertTrue(is_string($value));
     }
 
     public function testGetStringOption()
@@ -277,7 +276,6 @@ class CommandTest extends TestCase
 
         $value = $command->string('option-one');
         $this->assertSame('test-first-option', $value);
-        $this->assertTrue(is_string($value));
     }
 
     public function testAttemptToGetNotDefinedInput()
@@ -326,5 +324,155 @@ class CommandTest extends TestCase
 
         $command->run($input, $output);
         $command->string('option-one');
+    }
+
+    public function testGetIntegerOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 42,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->integer('option-one');
+        $this->assertSame(42, $value);
+    }
+
+    public function testGetFloatOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 0.42,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->float('option-one');
+        $this->assertSame(0.42, $value);
+    }
+
+    public function testGetNumberOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 42,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->number('option-one');
+        $this->assertSame(42, $value);
+    }
+
+    public function testGetBooleanOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => true,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->boolean('option-one');
+        $this->assertSame(true, $value);
+    }
+
+    public function testGetArrayOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => ['foo', 'bar'],
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->array('option-one');
+        $this->assertSame(['foo', 'bar'], $value);
     }
 }
