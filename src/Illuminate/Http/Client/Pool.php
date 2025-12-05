@@ -49,7 +49,7 @@ class Pool
      */
     public function as(string $key)
     {
-        return $this->pool[$key] = $this->asyncRequest();
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->pool, $key);
     }
 
     /**
@@ -77,10 +77,14 @@ class Pool
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     public function __call($method, $parameters)
     {
-        return $this->pool[] = $this->asyncRequest()->$method(...$parameters);
+        // Get the next numeric index
+        $key = count($this->pool);
+
+        // Create a deferred PendingRequest and call the method to start chaining
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->pool, $key)->$method(...$parameters);
     }
 }

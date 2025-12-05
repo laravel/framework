@@ -147,7 +147,7 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        return $this->requests[$key] = $this->asyncRequest();
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->requests, $key);
     }
 
     /**
@@ -252,18 +252,19 @@ class Batch
         }
 
         $results = [];
-        $promises = [];
 
-        foreach ($this->requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
+        if (! empty($this->requests)) {
+            // Create a generator that yields promises on-demand for proper concurrency control
+            $promiseGenerator = function () {
+                foreach ($this->requests as $key => $item) {
+                    yield $key => match (true) {
+                        $item instanceof Closure => $item(),
+                        $item instanceof PendingRequest => $item->getPromise(),
+                        default => $item,
+                    };
+                }
             };
 
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
             $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
@@ -311,7 +312,7 @@ class Batch
                 $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
             }
 
-            (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
+            (new EachPromise($promiseGenerator(), $eachPromiseOptions))->promise()->wait();
         }
 
         // Before returning the results, we must ensure that the results are sorted
@@ -422,7 +423,7 @@ class Batch
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     public function __call(string $method, array $parameters)
     {
@@ -432,6 +433,10 @@ class Batch
 
         $this->incrementPendingRequests();
 
-        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
+        // Get the next numeric index
+        $key = count($this->requests);
+
+        // Create a deferred PendingRequest and call the method to start chaining
+        return $this->factory->setHandler($this->handler)->async()->setDeferred($this->requests, $key)->$method(...$parameters);
     }
 }

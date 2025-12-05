@@ -231,6 +231,20 @@ class PendingRequest
     protected $truncateExceptionsAt = null;
 
     /**
+     * Reference to the pool/batch requests array for deferred execution.
+     *
+     * @var array|null
+     */
+    protected $deferredRequests = null;
+
+    /**
+     * The key for this request in the pool/batch for deferred execution.
+     *
+     * @var string|int|null
+     */
+    protected $deferredKey = null;
+
+    /**
      * Create a new HTTP Client instance.
      *
      * @param  \Illuminate\Http\Client\Factory|null  $factory
@@ -787,16 +801,35 @@ class PendingRequest
     }
 
     /**
+     * Enable deferred execution mode for pool/batch requests.
+     *
+     * @param  array  &$requests  Reference to the pool/batch requests array
+     * @param  string|int  $key  The key for this request
+     * @return $this
+     */
+    public function setDeferred(array &$requests, $key)
+    {
+        $this->deferredRequests = &$requests;
+        $this->deferredKey = $key;
+
+        return $this;
+    }
+
+    /**
      * Issue a GET request to the given URL.
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function get(string $url, $query = null)
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('get', func_get_args());
+        }
+
         return $this->send('GET', $url, func_num_args() === 1 ? [] : [
             'query' => $query,
         ]);
@@ -807,12 +840,16 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function head(string $url, $query = null)
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('head', func_get_args());
+        }
+
         return $this->send('HEAD', $url, func_num_args() === 1 ? [] : [
             'query' => $query,
         ]);
@@ -823,12 +860,16 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function post(string $url, $data = [])
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('post', func_get_args());
+        }
+
         return $this->send('POST', $url, [
             $this->bodyFormat => $data,
         ]);
@@ -839,12 +880,16 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function patch(string $url, $data = [])
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('patch', func_get_args());
+        }
+
         return $this->send('PATCH', $url, [
             $this->bodyFormat => $data,
         ]);
@@ -855,12 +900,16 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function put(string $url, $data = [])
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('put', func_get_args());
+        }
+
         return $this->send('PUT', $url, [
             $this->bodyFormat => $data,
         ]);
@@ -871,12 +920,16 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface|$this
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
     public function delete(string $url, $data = [])
     {
+        if ($this->deferredRequests !== null) {
+            return $this->deferRequest('delete', func_get_args());
+        }
+
         return $this->send('DELETE', $url, empty($data) ? [] : [
             $this->bodyFormat => $data,
         ]);
@@ -896,20 +949,34 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
+            $promises = [];
             foreach ($requests as $key => $item) {
-                $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
+                $promises[$key] = match (true) {
+                    $item instanceof Closure => $item(),
+                    $item instanceof static => $item->getPromise(),
+                    default => $item,
+                };
+            }
+
+            foreach ($promises as $key => $promise) {
+                $results[$key] = $promise->wait();
             }
 
             return $results;
         }
 
-        $promises = [];
+        // Use a generator to create promises on-demand for proper concurrency control
+        $promiseGenerator = function () use ($requests) {
+            foreach ($requests as $key => $item) {
+                yield $key => match (true) {
+                    $item instanceof Closure => $item(),
+                    $item instanceof static => $item->getPromise(),
+                    default => $item,
+                };
+            }
+        };
 
-        foreach ($requests as $key => $item) {
-            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
-        }
-
-        (new EachPromise($promises, [
+        (new EachPromise($promiseGenerator(), [
             'fulfilled' => function ($result, $key) use (&$results) {
                 $results[$key] = $result;
             },
@@ -969,34 +1036,32 @@ class PendingRequest
 
                     $this->dispatchResponseReceivedEvent($response);
 
-                    if ($response->successful()) {
-                        return;
-                    }
+                    if (! $response->successful()) {
+                        try {
+                            $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
+                        } catch (Exception $exception) {
+                            $shouldRetry = false;
 
-                    try {
-                        $shouldRetry = $this->retryWhenCallback ? call_user_func($this->retryWhenCallback, $response->toException(), $this, $this->request->toPsrRequest()->getMethod()) : true;
-                    } catch (Exception $exception) {
-                        $shouldRetry = false;
+                            throw $exception;
+                        }
 
-                        throw $exception;
-                    }
+                        if ($this->throwCallback &&
+                            ($this->throwIfCallback === null ||
+                             call_user_func($this->throwIfCallback, $response))) {
+                            $response->throw($this->throwCallback);
+                        }
 
-                    if ($this->throwCallback &&
-                        ($this->throwIfCallback === null ||
-                         call_user_func($this->throwIfCallback, $response))) {
-                        $response->throw($this->throwCallback);
-                    }
+                        $potentialTries = is_array($this->tries)
+                            ? count($this->tries) + 1
+                            : $this->tries;
 
-                    $potentialTries = is_array($this->tries)
-                        ? count($this->tries) + 1
-                        : $this->tries;
+                        if ($attempt < $potentialTries && $shouldRetry) {
+                            $response->throw();
+                        }
 
-                    if ($attempt < $potentialTries && $shouldRetry) {
-                        $response->throw();
-                    }
-
-                    if ($potentialTries > 1 && $this->retryThrow) {
-                        $response->throw();
+                        if ($potentialTries > 1 && $this->retryThrow) {
+                            $response->throw();
+                        }
                     }
                 });
             } catch (TransferException $e) {
@@ -1757,6 +1822,32 @@ class PendingRequest
         $this->handler = $handler;
 
         return $this;
+    }
+
+    /**
+     * Defer a request execution for pool/batch processing.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return \Illuminate\Http\Client\DeferredPromise
+     */
+    protected function deferRequest(string $method, array $parameters)
+    {
+        // Clone the current request state to capture all configuration
+        $clonedRequest = clone $this;
+
+        // Clear deferred mode on the clone to prevent infinite recursion
+        // We need to break the reference completely
+        unset($clonedRequest->deferredRequests, $clonedRequest->deferredKey);
+        $clonedRequest->deferredRequests = null;
+        $clonedRequest->deferredKey = null;
+
+        // Create a DeferredPromise that wraps the closure
+        return new DeferredPromise(
+            $this->deferredRequests,
+            $this->deferredKey,
+            fn () => $clonedRequest->$method(...$parameters)
+        );
     }
 
     /**
