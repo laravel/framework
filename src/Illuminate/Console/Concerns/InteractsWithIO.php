@@ -469,8 +469,8 @@ trait InteractsWithIO
     public function string(string $key, ?string $default = null): string
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
@@ -489,8 +489,8 @@ trait InteractsWithIO
     public function integer(string $key, ?int $default = null): int
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
@@ -519,8 +519,8 @@ trait InteractsWithIO
     public function float(string $key, ?float $default = null): float
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
@@ -549,8 +549,8 @@ trait InteractsWithIO
     public function number(string $key, int|float|null $default = null): int|float
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
@@ -569,8 +569,8 @@ trait InteractsWithIO
     public function boolean(string $key, int|float|null $default = null): bool
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
@@ -601,8 +601,8 @@ trait InteractsWithIO
     public function array(string $key, ?array $default = null): array
     {
         $value = match (true) {
-            $this->hasArgument($key) => $this->getArgument($key),
-            $this->hasOption($key) => $this->getOption($key),
+            $this->hasArgument($key) => $this->argument($key),
+            $this->hasOption($key) => $this->option($key),
             default => $default ?? throw new InvalidArgumentException(sprintf('"%s" is neither an option nor an argument of this command', $key)),
         };
 
