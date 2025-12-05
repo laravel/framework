@@ -741,6 +741,23 @@ class Str
     }
 
     /**
+     * Limit the number of characters in a string, including the ending.
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $end
+     * @return string
+     */
+    public static function limitExact($value, $limit = 100, $end = '...')
+    {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
+            return $value;
+        }
+
+        return mb_strimwidth($value, 0, $limit, $end, 'UTF-8');
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @param  string  $value

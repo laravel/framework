@@ -478,6 +478,18 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Limit the number of characters in a string, including the ending.
+     *
+     * @param  int  $limit
+     * @param  string  $end
+     * @return static
+     */
+    public function limitExact($limit = 100, $end = '...')
+    {
+        return new static(Str::limitExact($this->value, $limit, $end));
+    }
+
+    /**
      * Convert the given string to lower-case.
      *
      * @return static
@@ -1493,7 +1505,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function toFloat()
     {
-        return floatval($this->value);
+        return (float) ($this->value);
     }
 
     /**
