@@ -1040,6 +1040,17 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
     }
 
     /**
+     * Skip the first or last {$skip} characters.
+     *
+     * @param  int  $skip
+     * @return static
+     */
+    public function skip(int $skip)
+    {
+        return new static(Str::skip($this->value, $skip));
+    }
+
+    /**
      * Take the first or last {$limit} characters.
      *
      * @param  int  $limit
@@ -1052,6 +1063,28 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
         }
 
         return $this->substr(0, $limit);
+    }
+
+    /**
+     * Get the first {$limit} characters.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function first(int $limit = 1)
+    {
+        return new static(Str::first($this->value, $limit));
+    }
+
+    /**
+     * Get the last {$limit} characters.
+     *
+     * @param  int  $limit
+     * @return static
+     */
+    public function last(int $limit = 1)
+    {
+        return new static(Str::last($this->value, $limit));
     }
 
     /**
@@ -1493,7 +1526,7 @@ class Stringable implements JsonSerializable, ArrayAccess, BaseStringable
      */
     public function toFloat()
     {
-        return floatval($this->value);
+        return (float) ($this->value);
     }
 
     /**

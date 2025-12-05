@@ -1802,24 +1802,24 @@ class Str
      * Get the first N characters of a string.
      *
      * @param  string  $string
-     * @param  int  $characters
+     * @param  int  $limit
      * @return string
      */
-    public static function first($string, int $characters = 1): string
+    public static function first($string, int $limit = 1): string
     {
-        return static::take($string, $characters);
+        return static::take($string, $limit);
     }
 
     /**
      * Get the last N characters of a string.
      *
      * @param  string  $string
-     * @param  int  $characters
+     * @param  int  $limit
      * @return string
      */
-    public static function last($string, int $characters = 1): string
+    public static function last($string, int $limit = 1): string
     {
-        return static::take($string, $characters * -1);
+        return static::take($string, $limit * -1);
     }
 
     /**

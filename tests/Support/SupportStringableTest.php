@@ -150,6 +150,24 @@ class SupportStringableTest extends TestCase
         $this->assertSame('ef', (string) $this->stringable('abcdef')->take(-2));
     }
 
+    public function testSkip()
+    {
+        $this->assertSame('cdef', (string) $this->stringable('abcdef')->skip(2));
+        $this->assertSame('abcdef', (string) $this->stringable('abcdef')->skip(-2));
+    }
+
+    public function testFirst()
+    {
+        $this->assertSame('ab', (string) $this->stringable('abcdef')->first(2));
+        $this->assertSame('ef', (string) $this->stringable('abcdef')->first(-2));
+    }
+
+    public function testLast()
+    {
+        $this->assertSame('ef', (string) $this->stringable('abcdef')->last(2));
+        $this->assertSame('ab', (string) $this->stringable('abcdef')->last(-2));
+    }
+
     public function testTest()
     {
         $stringable = $this->stringable('foo bar');
