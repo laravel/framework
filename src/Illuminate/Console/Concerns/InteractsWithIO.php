@@ -5,7 +5,6 @@ namespace Illuminate\Console\Concerns;
 use Closure;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
