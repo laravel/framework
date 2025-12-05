@@ -215,4 +215,68 @@ class CommandTest extends TestCase
 
         $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
     }
+
+    public function testGetStringArgument()
+    {
+        
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getArguments()
+            {
+                return [
+                    new InputArgument('argument-one', InputArgument::REQUIRED, 'first test argument'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            'argument-one' => 'test-first-argument',
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->string('argument-one');
+        $this->assertSame('test-first-argument', $value);
+        $this->assertTrue(is_string($value));
+    }
+
+    public function testGetStringOption()
+    {
+        
+        $command = new class extends Command
+        {
+            public function handle()
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 'test-first-option',
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $value = $command->string('option-one');
+        $this->assertSame('test-first-option', $value);
+        $this->assertTrue(is_string($value));
+    }
 }
