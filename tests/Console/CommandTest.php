@@ -288,12 +288,21 @@ class CommandTest extends TestCase
             public function handle()
             {
             }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-two', 'o', InputOption::VALUE_OPTIONAL, 'second test option'),
+                ];
+            }
         };
 
         $application = app();
         $command->setLaravel($application);
 
-        $input = new ArrayInput();
+        $input = new ArrayInput([
+            '--option-two' => ['foo', 'bar'],
+        ]);
         $output = new NullOutput;
 
         $command->run($input, $output);
