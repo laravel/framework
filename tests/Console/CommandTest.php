@@ -293,9 +293,7 @@ class CommandTest extends TestCase
         $application = app();
         $command->setLaravel($application);
 
-        $input = new ArrayInput([
-            '--option-one' => 'test-first-option',
-        ]);
+        $input = new ArrayInput();
         $output = new NullOutput;
 
         $command->run($input, $output);
@@ -311,6 +309,13 @@ class CommandTest extends TestCase
         {
             public function handle()
             {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
             }
         };
 
