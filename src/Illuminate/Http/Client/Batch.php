@@ -151,6 +151,24 @@ class Batch
     }
 
     /**
+     * Add a request to the batch with a numeric index.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     *
+     * @throws \Illuminate\Http\Client\BatchInProgressException
+     */
+    public function newRequest()
+    {
+        if ($this->inProgress) {
+            throw new BatchInProgressException();
+        }
+
+        $this->incrementPendingRequests();
+
+        return $this->requests[] = $this->asyncRequest();
+    }
+
+    /**
      * Register a callback to run before the first request from the batch runs.
      *
      * @param  (\Closure($this): void)  $callback
@@ -423,15 +441,11 @@ class Batch
      * @param  string  $method
      * @param  array  $parameters
      * @return \Illuminate\Http\Client\PendingRequest|\GuzzleHttp\Promise\Promise
+     *
+     * @throws \Illuminate\Http\Client\BatchInProgressException
      */
     public function __call(string $method, array $parameters)
     {
-        if ($this->inProgress) {
-            throw new BatchInProgressException();
-        }
-
-        $this->incrementPendingRequests();
-
-        return $this->requests[] = $this->asyncRequest()->$method(...$parameters);
+        return $this->newRequest()->{$method}(...$parameters);
     }
 }
