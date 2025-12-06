@@ -151,7 +151,7 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
-            'LARAVEL_LOAD_SSL_CA' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA] ?? '', // @phpstan-ignore class.notFound,
+            'LARAVEL_LOAD_SSL_CA' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA] ?? '', // @phpstan-ignore class.notFound
             'LARAVEL_LOAD_SSL_CERT' => $config['options'][\PDO::MYSQL_ATTR_SSL_CERT] ?? '',
             'LARAVEL_LOAD_SSL_KEY' => $config['options'][\PDO::MYSQL_ATTR_SSL_KEY] ?? '',
         ];
