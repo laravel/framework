@@ -5,6 +5,7 @@ namespace Illuminate\Validation;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Support\Str;
 
 class ValidationException extends Exception
 {
@@ -93,7 +94,7 @@ class ValidationException extends Exception
         $message = array_shift($messages);
 
         if ($count = count($messages)) {
-            $pluralized = $count === 1 ? 'error' : 'errors';
+            $pluralized = Str::plural('error', $count);
 
             $message .= ' '.$validator->getTranslator()->choice("(and :count more $pluralized)", $count, compact('count'));
         }
