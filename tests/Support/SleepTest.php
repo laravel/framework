@@ -258,7 +258,7 @@ class SleepTest extends TestCase
         Sleep::fake();
         Carbon::setTestNow(now()->startOfDay());
 
-        Sleep::until((string) (now()->addMinute()->timestamp));
+        Sleep::until((string) now()->addMinute()->timestamp);
 
         Sleep::assertSequence([
             Sleep::for(60)->seconds(),
