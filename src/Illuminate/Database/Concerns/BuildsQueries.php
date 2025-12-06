@@ -45,7 +45,7 @@ trait BuildsQueries
         $page = 1;
 
         do {
-            $offset = (($page - 1) * $count) + intval($skip);
+            $offset = (($page - 1) * $count) + (int) $skip;
 
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
