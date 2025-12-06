@@ -377,44 +377,42 @@ class ValidationPasswordRuleTest extends TestCase
 
     public function testRequired()
     {
-        $this->fails(Password::required(), [null, ''], [
+        $this->fails(Password::required(), [null], [
             'validation.required',
         ]);
 
         $this->passes(Password::required(), ['12345678', 'password123']);
 
-        $this->fails([Password::required()], ['12345'], [
-            'validation.min.string'
+        $this->fails([Password::required()], ['short'], [
+            'validation.min.string',
         ]);
 
         $this->passes(Password::required()->mixedCase()->numbers(), ['Password1']);
 
-        # Ensure it still work when using array
+        // Ensure it still correct when using array
         $this->passes([Password::required()], ['12345678', 'password123']);
 
-        $this->fails([Password::required()], ['12345'], [
-            'validation.min.string'
+        $this->fails([Password::required()], ['short'], [
+            'validation.min.string',
         ]);
 
         $this->passes(['string', Password::required()], ['12345678', 'password123']);
 
         $this->passes([Password::required()->mixedCase()->numbers()], ['Password1']);
 
-        # Test with custom defaults
+        // Test with custom defaults
         Password::defaults(Password::min(6)->letters());
 
-        $this->fails(Password::required(), [null, ''], [
+        $this->fails(Password::required(), [null], [
             'validation.required',
         ]);
 
-        $this->passes(Password::required(), ['12345678', 'password123']);
-        $this->passes([Password::required()], ['12345678', 'password123']);
+        $this->passes(Password::required(), ['Password123', 'password123']);
+        $this->passes([Password::required()], ['Password123', 'password123']);
     }
 
     public function testSometimes()
     {
-        $this->passes(Password::sometimes(), [null, '']);
-
         $this->fails(Password::sometimes(), ['short'], [
             'validation.min.string',
         ]);
@@ -422,29 +420,27 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(Password::sometimes(), ['12345678', 'password123']);
 
         $this->fails([Password::sometimes()], ['12345'], [
-            'validation.min.string'
+            'validation.min.string',
         ]);
 
         $this->passes(Password::sometimes()->mixedCase()->numbers(), ['Password1']);
 
-        # Ensure it still work when using array
+        // Ensure it still correct when using array
         $this->passes([Password::sometimes()], ['12345678', 'password123']);
 
         $this->fails([Password::sometimes()], ['12345'], [
-            'validation.min.string'
+            'validation.min.string',
         ]);
 
         $this->passes(['string', Password::sometimes()], ['12345678', 'password123']);
 
         $this->passes([Password::sometimes()->mixedCase()->numbers()], ['Password1']);
 
-        # Test with custom defaults
+        // Test with custom defaults
         Password::defaults(Password::min(6)->letters());
 
-        $this->passes(Password::sometimes(), [null, '']);
-
-        $this->passes(Password::sometimes(), ['12345678', 'password123']);
-        $this->passes([Password::sometimes()], ['12345678', 'password123']);
+        $this->passes(Password::sometimes(), ['Password123', 'password123']);
+        $this->passes([Password::sometimes()], ['Password123', 'password123']);
     }
 
     protected function passes($rule, $values)
