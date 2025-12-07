@@ -221,8 +221,11 @@ trait HasAttributes
             $attributes = $this->getArrayableAttributes()
         );
 
+        // Important: derive mutated attributes *only* from the arrayable keys
+        $mutatedAttributes = $this->getArrayableMutatedAttributes($attributes);
+
         $attributes = $this->addMutatedAttributesToArray(
-            $attributes, $mutatedAttributes = $this->getMutatedAttributes()
+            $attributes, $mutatedAttributes
         );
 
         // Next we will handle any casts that have been setup for this model and cast
@@ -679,15 +682,24 @@ trait HasAttributes
      */
     public function hasAttributeGetMutator($key)
     {
-        if (isset(static::$getAttributeMutatorCache[get_class($this)][$key])) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key];
+        $class = get_class($this);
+
+        if (array_key_exists($key, static::$getAttributeMutatorCache[$class] ?? [])) {
+            return static::$getAttributeMutatorCache[$class][$key];
         }
 
+        // First, ensure there's actually an Attribute-returning method
         if (! $this->hasAttributeMutator($key)) {
-            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
+            return static::$getAttributeMutatorCache[$class][$key] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        // Lazy evaluation: only now do we resolve and inspect the Attribute
+        try {
+            $attribute = $this->{Str::camel($key)}();
+            return static::$getAttributeMutatorCache[$class][$key] = is_callable($attribute->get);
+        } catch (\Throwable $e) {
+            return static::$getAttributeMutatorCache[$class][$key] = false;
+        }
     }
 
     /**
@@ -752,14 +764,14 @@ trait HasAttributes
     {
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+        } elseif ($this->hasAttributeGetMutator($key)) {
+            // Attribute::make(get: ...)
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
-            $value = $value instanceof DateTimeInterface
-                ? $this->serializeDate($value)
-                : $value;
-        } else {
+            if ($value instanceof DateTimeInterface) {
+                $value = $this->serializeDate($value);
+            }
+        } elseif ($this->hasGetMutator($key)) {
             $value = $this->mutateAttribute($key, $value);
         }
 
@@ -2437,6 +2449,20 @@ trait HasAttributes
         return static::$mutatorCache[static::class];
     }
 
+    protected function getArrayableMutatedAttributes(array $attributes): array
+    {
+        $keys = array_keys($attributes);
+
+        if ($keys === []) {
+            return [];
+        }
+
+        // Only consider keys that are actually arrayable *and* have a mutator
+        return array_values(array_filter($keys, function ($key) {
+            return $this->hasAnyGetMutator($key);
+        }));
+    }
+
     /**
      * Extract and cache all the mutated attributes of a class.
      *
@@ -2449,8 +2475,17 @@ trait HasAttributes
 
         $class = $reflection->getName();
 
-        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
-            ->mapWithKeys(fn ($match) => [lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true])
+        // Get Attribute return type methods without invoking them (lazy caching)
+        $attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance);
+
+        // Initialize cache with method names but don't set to true yet
+        // This allows us to know which methods might be Attribute mutators
+        // without invoking them. The actual 'get' callable check happens lazily
+        // in hasAttributeGetMutator() when the attribute is actually accessed.
+        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods))
+            ->mapWithKeys(fn ($match) => [
+                lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => null
+            ])
             ->all();
 
         static::$mutatorCache[$class] = (new Collection(static::getMutatorMethods($class)))
@@ -2482,17 +2517,9 @@ trait HasAttributes
     {
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
-            $returnType = $method->getReturnType();
-
-            if ($returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class) {
-                if (is_callable($method->invoke($instance)->get)) {
-                    return true;
-                }
-            }
-
-            return false;
-        })->map->name->values()->all();
+        return (new Collection((new ReflectionClass($instance))->getMethods()))
+            ->filter(fn ($method) => $method->getReturnType() instanceof ReflectionNamedType &&
+                $method->getReturnType()->getName() === Attribute::class)
+            ->map->name->values()->all();
     }
 }

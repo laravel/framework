@@ -3546,6 +3546,115 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertNotInstanceOf(CustomBuilder::class, $eloquentBuilder);
     }
+
+    public function testAccessorsNotCalledForNonVisibleAttributes()
+    {
+        $model = new class extends Model {
+            protected $visible = ['id', 'name'];
+            protected $attributes = ['id' => 1, 'name' => 'Test'];
+            
+            public $locationAccessorCalled = false;
+            public $timezoneAccessorCalled = false;
+            
+            protected function location(): Attribute
+            {
+                $this->locationAccessorCalled = true;
+                return Attribute::make(
+                    get: fn () => 'Paris',
+                );
+            }
+            
+            protected function timezone(): Attribute
+            {
+                $this->timezoneAccessorCalled = true;
+                return Attribute::make(
+                    get: fn () => 'Europe/Paris',
+                );
+            }
+        };
+        
+        $array = $model->toArray();
+        
+        $this->assertFalse($model->locationAccessorCalled, 'Location accessor should not be called for non-visible attributes');
+        $this->assertFalse($model->timezoneAccessorCalled, 'Timezone accessor should not be called for non-visible attributes');
+        $this->assertArrayNotHasKey('location', $array);
+        $this->assertArrayNotHasKey('timezone', $array);
+        $this->assertEquals(['id' => 1, 'name' => 'Test'], $array);
+    }
+
+    public function testAccessorsCalledForVisibleAttributes()
+    {
+        $model = new class extends Model {
+            protected $visible = ['id', 'name', 'location'];
+            protected $attributes = ['id' => 1, 'name' => 'Test', 'location' => 'original'];
+            
+            public $locationAccessorCalled = false;
+            
+            protected function location(): Attribute
+            {
+                $this->locationAccessorCalled = true;
+                return Attribute::make(
+                    get: fn ($value) => 'Paris',
+                );
+            }
+        };
+        
+        $array = $model->toArray();
+        
+        $this->assertTrue($model->locationAccessorCalled, 'Location accessor should be called for visible attributes');
+        $this->assertArrayHasKey('location', $array);
+        $this->assertEquals('Paris', $array['location']);
+        $this->assertEquals(['id' => 1, 'name' => 'Test', 'location' => 'Paris'], $array);
+    }
+
+    public function testAccessorsNotCalledForHiddenAttributes()
+    {
+        $model = new class extends Model {
+            protected $hidden = ['location'];
+            protected $attributes = ['id' => 1, 'name' => 'Test', 'location' => 'original'];
+            
+            public $locationAccessorCalled = false;
+            
+            protected function location(): Attribute
+            {
+                $this->locationAccessorCalled = true;
+                return Attribute::make(
+                    get: fn ($value) => 'Paris',
+                );
+            }
+        };
+        
+        $array = $model->toArray();
+        
+        $this->assertFalse($model->locationAccessorCalled, 'Location accessor should not be called for hidden attributes');
+        $this->assertArrayNotHasKey('location', $array);
+        $this->assertEquals(['id' => 1, 'name' => 'Test'], $array);
+    }
+
+    public function testSetOnlyAttributeMutatorDoesNotBreakSerialization() 
+    {
+        $model = new class extends Model {
+            protected $visible = ['id', 'name', 'foo'];
+            protected $attributes = ['id' => 1, 'name' => 'Test', 'foo' => 'ORIGINAL'];
+
+            protected function foo(): Attribute
+            {
+                return Attribute::make(
+                    set: function ($value) {
+                        return ['foo' => strtolower($value)];
+                    }
+                );
+            }
+        };
+
+        // Set the attribute using the set mutator
+        $model->foo = 'BAR';
+
+        $array = $model->toArray();
+
+        // Should not crash and should still include the "foo" attribute.
+        $this->assertArrayHasKey('foo', $array);
+    }
 }
 
 class CustomBuilder extends Builder
