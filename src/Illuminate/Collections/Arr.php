@@ -794,6 +794,27 @@ class Arr
     }
 
     /**
+     * Map over an array's keys.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function mapKeys(array $array, callable $callback): array
+    {
+        $keys = array_keys($array);
+        $values = array_values($array);
+
+        try {
+            $newKeys = array_map($callback, $keys, $values);
+        } catch (ArgumentCountError) {
+            $newKeys = array_map($callback, $keys);
+        }
+
+        return array_combine($newKeys, $values);
+    }
+
+    /**
      * Run an associative map over each of the items.
      *
      * The callback should return an associative array with a single key/value pair.

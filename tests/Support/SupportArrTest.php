@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
@@ -991,6 +992,37 @@ class SupportArrTest extends TestCase
         });
         $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $mapped);
         $this->assertEquals(['first' => 'taylor', 'last' => 'otwell'], $data);
+    }
+
+    public function testMapKeys()
+    {
+        // Basic transformation
+        $array = ['first_name' => 'Taylor', 'last_name' => 'Otwell'];
+        $result = Arr::mapKeys($array, fn($key) => Str::camel($key));
+        $this->assertEquals(['firstName' => 'Taylor', 'lastName' => 'Otwell'], $result);
+
+        // With value parameter
+        $array = ['name' => 'Taylor', 'age' => 31];
+        $result = Arr::mapKeys($array, fn($key, $value) => is_numeric($value) ? "num_{$key}" : $key);
+        $this->assertEquals(['name' => 'Taylor', 'num_age' => 31], $result);
+
+        // Key collision - last wins
+        $array = ['name' => 'First', 'NAME' => 'Second'];
+        $result = Arr::mapKeys($array, fn($key) => strtolower($key));
+        $this->assertEquals(['name' => 'Second'], $result);
+
+        // Empty array
+        $this->assertEquals([], Arr::mapKeys([], fn($key) => $key));
+
+        // Numeric keys
+        $array = [1, 2, 3];
+        $result = Arr::mapKeys($array, fn($key) => "item_{$key}");
+        $this->assertEquals(['item_0' => 1, 'item_1' => 2, 'item_2' => 3], $result);
+
+        // Prefix example
+        $config = ['host' => 'localhost', 'port' => 3306, 'database' => 'app'];
+        $result = Arr::mapKeys($config, fn($key) => "db_{$key}");
+        $this->assertEquals(['db_host' => 'localhost', 'db_port' => 3306, 'db_database' => 'app'], $result);
     }
 
     public function testMapWithEmptyArray()
