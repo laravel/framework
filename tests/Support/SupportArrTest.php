@@ -1012,7 +1012,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['name' => 'Second'], $result);
 
         // Empty array
-        $this->assertEquals([], Arr::mapKeys([], fn($key) => $key));
+        $this->assertEquals([], Arr::mapKeys([], fn ($key) => $key));
 
         // Numeric keys
         $array = [1, 2, 3];
