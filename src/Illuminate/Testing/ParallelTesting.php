@@ -43,7 +43,7 @@ class ParallelTesting
     protected $setUpTestCaseCallbacks = [];
 
     /**
-     * All of the registered "setUp" test database callbacks prior the migrations.
+     * All of the registered "setUp" test database callbacks prior to the migrations.
      *
      * @var array
      */
