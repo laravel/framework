@@ -696,6 +696,7 @@ trait HasAttributes
         // Lazy evaluation: only now do we resolve and inspect the Attribute
         try {
             $attribute = $this->{Str::camel($key)}();
+
             return static::$getAttributeMutatorCache[$class][$key] = is_callable($attribute->get);
         } catch (\Throwable $e) {
             return static::$getAttributeMutatorCache[$class][$key] = false;
@@ -2484,7 +2485,7 @@ trait HasAttributes
         // in hasAttributeGetMutator() when the attribute is actually accessed.
         static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods))
             ->mapWithKeys(fn ($match) => [
-                lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => null
+                lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => null,
             ])
             ->all();
 

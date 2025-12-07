@@ -3549,7 +3549,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAccessorsNotCalledForNonVisibleAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model 
+        {
             protected $visible = ['id', 'name'];
             protected $attributes = ['id' => 1, 'name' => 'Test'];
             
@@ -3584,7 +3585,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAccessorsCalledForVisibleAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model 
+        {
             protected $visible = ['id', 'name', 'location'];
             protected $attributes = ['id' => 1, 'name' => 'Test', 'location' => 'original'];
             
@@ -3609,7 +3611,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testAccessorsNotCalledForHiddenAttributes()
     {
-        $model = new class extends Model {
+        $model = new class extends Model 
+        {
             protected $hidden = ['location'];
             protected $attributes = ['id' => 1, 'name' => 'Test', 'location' => 'original'];
             
@@ -3633,7 +3636,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testSetOnlyAttributeMutatorDoesNotBreakSerialization() 
     {
-        $model = new class extends Model {
+        $model = new class extends Model 
+        {
             protected $visible = ['id', 'name', 'foo'];
             protected $attributes = ['id' => 1, 'name' => 'Test', 'foo' => 'ORIGINAL'];
 
