@@ -60,7 +60,7 @@ trait TestDatabases
                     $this->switchToDatabase($testDatabase);
 
                     if ($created) {
-                        ParallelTesting::callSetUpTestDatabasePreMigrationCallbacks($testDatabase);
+                        ParallelTesting::callSetUpTestDatabaseBeforeMigratingCallbacks($testDatabase);
                     }
 
                     if (isset($uses[Testing\DatabaseTransactions::class])) {

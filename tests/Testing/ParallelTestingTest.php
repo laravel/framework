@@ -91,7 +91,7 @@ class ParallelTestingTest extends TestCase
             ['setUpProcess'],
             ['setUpTestCase'],
             ['setUpTestDatabase'],
-            ['setUpTestDatabasePreMigration'],
+            ['setUpTestDatabaseBeforeMigrating'],
             ['tearDownTestCase'],
             ['tearDownProcess'],
         ];
