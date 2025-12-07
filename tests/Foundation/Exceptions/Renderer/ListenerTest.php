@@ -45,4 +45,3 @@ class ListenerTest extends TestCase
         $this->assertEquals(['foo'], $query['bindings']);
     }
 }
-
