@@ -1,6 +1,6 @@
 {
-    "name": "illuminate/reflections",
-    "description": "The Illuminate Reflections package.",
+    "name": "illuminate/reflection",
+    "description": "The Illuminate Reflection package.",
     "license": "MIT",
     "homepage": "https://laravel.com",
     "support": {
