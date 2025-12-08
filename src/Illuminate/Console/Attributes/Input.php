@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Attributes;
 
-use Attribute;
 use Illuminate\Console\Command;
 use ReflectionParameter;
 use ReflectionIntersectionType;
@@ -11,7 +10,6 @@ use ReflectionType;
 use ReflectionUnionType;
 use TypeError;
 
-#[Attribute(Attribute::TARGET_PARAMETER)]
 abstract class Input
 {
     public function __construct(public string $parameter)

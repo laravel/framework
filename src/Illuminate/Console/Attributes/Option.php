@@ -2,9 +2,11 @@
 
 namespace Illuminate\Console\Attributes;
 
+use Attribute;
 use InvalidArgumentException;
 use Illuminate\Console\Command;
 
+#[Attribute(Attribute::TARGET_PARAMETER)]
 class Option extends Input
 {
     /**
