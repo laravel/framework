@@ -222,8 +222,11 @@ class CommandTest extends TestCase
     {
         $command = new class extends Command
         {
-            public function handle(#[Argument('argument-one')] public int $argumentOne)
+            public int $argumentOne;
+
+            public function handle(#[Argument('argument-one')] int $argumentOne)
             {
+                $this->argumentOne = $argumentOne;
             }
 
             protected function getArguments()
@@ -251,8 +254,11 @@ class CommandTest extends TestCase
     {
         $command = new class extends Command
         {
-            public function handle(#[Option('option-one')] public int $optionOne)
+            public int $optionOne;
+
+            public function handle(#[Option('option-one')] int $optionOne)
             {
+                $this->optionOne = $optionOne;
             }
 
             protected function getOptions()
