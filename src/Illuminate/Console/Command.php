@@ -206,9 +206,23 @@ class Command extends SymfonyCommand
         }
 
         $method = method_exists($this, 'handle') ? 'handle' : '__invoke';
+        $arguments = array_reduce(
+            (new ReflectionMethod($this, $method))->getParameters(),
+            function (array $carry, ReflectionParameter $parameter) {
+                $attributes = $parameter->getAttributes(Input::class);
+
+                if ($attributes === []) {
+                    return $carry;
+                }
+
+                $instance = $attributes->newInstance();
+                return [ ...$carry, $parameter->getName() => $instance::resolve($instance, $this, $parameter) ];
+            },
+            [],
+        );        
 
         try {
-            return (int) $this->laravel->call([$this, $method]);
+            return (int) $this->laravel->call([$this, $method], $arguments);
         } catch (ManuallyFailedException $e) {
             $this->components->error($e->getMessage());
 
