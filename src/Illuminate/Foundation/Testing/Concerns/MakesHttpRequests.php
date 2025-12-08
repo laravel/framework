@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use BackedEnum;
 use Illuminate\Contracts\Http\Kernel as HttpKernel;
 use Illuminate\Cookie\CookieValuePrefix;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Uri;
@@ -365,7 +366,11 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('GET', $uri, [], $cookies, [], $server);
+        $testResponse = $this->call('GET', $uri, [], $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -378,7 +383,11 @@ trait MakesHttpRequests
      */
     public function getJson($uri, array $headers = [], $options = 0)
     {
-        return $this->json('GET', $uri, [], $headers, $options);
+        $testResponse = $this->json('GET', $uri, [], $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -394,7 +403,11 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('POST', $uri, $data, $cookies, [], $server);
+        $testResponse = $this->call('POST', $uri, $data, $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -408,7 +421,11 @@ trait MakesHttpRequests
      */
     public function postJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('POST', $uri, $data, $headers, $options);
+        $testResponse = $this->json('POST', $uri, $data, $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -424,7 +441,11 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('PUT', $uri, $data, $cookies, [], $server);
+        $testResponse = $this->call('PUT', $uri, $data, $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -438,7 +459,11 @@ trait MakesHttpRequests
      */
     public function putJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('PUT', $uri, $data, $headers, $options);
+        $testResponse = $this->json('PUT', $uri, $data, $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -454,7 +479,11 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('PATCH', $uri, $data, $cookies, [], $server);
+        $testResponse = $this->call('PATCH', $uri, $data, $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -468,7 +497,11 @@ trait MakesHttpRequests
      */
     public function patchJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('PATCH', $uri, $data, $headers, $options);
+        $testResponse = $this->json('PATCH', $uri, $data, $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -484,7 +517,11 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('DELETE', $uri, $data, $cookies, [], $server);
+        $testResponse = $this->call('DELETE', $uri, $data, $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -498,7 +535,11 @@ trait MakesHttpRequests
      */
     public function deleteJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('DELETE', $uri, $data, $headers, $options);
+        $testResponse = $this->json('DELETE', $uri, $data, $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -515,7 +556,11 @@ trait MakesHttpRequests
 
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('OPTIONS', $uri, $data, $cookies, [], $server);
+        $testResponse = $this->call('OPTIONS', $uri, $data, $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -529,7 +574,11 @@ trait MakesHttpRequests
      */
     public function optionsJson($uri, array $data = [], array $headers = [], $options = 0)
     {
-        return $this->json('OPTIONS', $uri, $data, $headers, $options);
+        $testResponse = $this->json('OPTIONS', $uri, $data, $headers, $options);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -545,7 +594,11 @@ trait MakesHttpRequests
 
         $cookies = $this->prepareCookiesForRequest();
 
-        return $this->call('HEAD', $uri, [], $cookies, [], $server);
+        $testResponse = $this->call('HEAD', $uri, [], $cookies, [], $server);
+
+        $this->resetDatabaseTransactionLevelToOne();
+
+        return $testResponse;
     }
 
     /**
@@ -762,5 +815,24 @@ trait MakesHttpRequests
                     : new LoggedExceptionCollection
             );
         });
+    }
+
+    protected function resetDatabaseTransactionLevelToOne()
+    {
+        $uses = $this->traitsUsedByTest ?? array_flip(class_uses_recursive(static::class));
+
+        if (! isset($uses[DatabaseTransactions::class])) {
+            return;
+        }
+
+        $databaseManager = $this->app['db'];
+
+        $connections = $this->connectionsToTransact();
+
+        foreach ($connections as $connectionName) {
+            if ($databaseManager->connection($connectionName)->transactionLevel() > 1) {
+                $databaseManager->connection($connectionName)->rollBack(1);
+            }
+        }
     }
 }
