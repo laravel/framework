@@ -27,6 +27,13 @@ class Request implements ArrayAccess
     protected $data;
 
     /**
+     * The contextual data passed when building the PendingRequest.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $requestContext = [];
+
+    /**
      * Create a new request instance.
      *
      * @param  \Psr\Http\Message\RequestInterface  $request
@@ -242,6 +249,29 @@ class Request implements ArrayAccess
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * Set the request's context data.
+     *
+     * @param  array<array-key, mixed>  $context
+     * @return $this
+     */
+    public function setRequestContext($context)
+    {
+        $this->requestContext = $context;
+
+        return $this;
+    }
+
+    /**
+     * Get the contextual data from the request.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function requestContext()
+    {
+        return $this->requestContext;
     }
 
     /**

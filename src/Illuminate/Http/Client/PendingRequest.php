@@ -210,6 +210,13 @@ class PendingRequest
     protected $request;
 
     /**
+     * The context to track with the request.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $requestContext = [];
+
+    /**
      * The Guzzle request options that are mergeable via array_merge_recursive.
      *
      * @var array
@@ -437,6 +444,19 @@ class PendingRequest
     public function withHeader($name, $value)
     {
         return $this->withHeaders([$name => $value]);
+    }
+
+    /**
+     * Set context to store with the request.
+     *
+     * @param  array<array-key, mixed>  $context
+     * @return $this
+     */
+    public function withRequestContext($context)
+    {
+        $this->requestContext = array_merge_recursive($this->requestContext, $context);
+
+        return $this;
     }
 
     /**
@@ -1123,7 +1143,10 @@ class PendingRequest
                 if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-                    $this->dispatchConnectionFailedEvent(new Request($e->getRequest()), $exception);
+                    $this->dispatchConnectionFailedEvent(
+                        (new Request($e->getRequest()))->setRequestContext($this->requestContext),
+                        $exception
+                    );
 
                     return $exception;
                 }
@@ -1399,7 +1422,9 @@ class PendingRequest
 
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
-                        (new Request($request))->withData($options['laravel_data']),
+                        (new Request($request))
+                            ->withData($options['laravel_data'])
+                            ->setRequestContext($this->requestContext),
                         $this->newResponse($response)
                     );
 
@@ -1420,7 +1445,12 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? new Collection)
                     ->map
-                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->__invoke(
+                        (new Request($request))
+                            ->withData($options['laravel_data'])
+                            ->setRequestContext($this->requestContext),
+                        $options
+                    )
                     ->filter()
                     ->first();
 
@@ -1479,7 +1509,12 @@ class PendingRequest
         return tap($request, function (&$request) use ($options) {
             $this->beforeSendingCallbacks->each(function ($callback) use (&$request, $options) {
                 $callbackResult = call_user_func(
-                    $callback, (new Request($request))->withData($options['laravel_data']), $options, $this
+                    $callback,
+                    (new Request($request))
+                        ->withData($options['laravel_data'])
+                        ->setRequestContext($this->requestContext),
+                    $options,
+                    $this
                 );
 
                 if ($callbackResult instanceof RequestInterface) {
@@ -1683,7 +1718,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = new Request($e->getRequest());
+        $request = (new Request($e->getRequest()))->setRequestContext($this->requestContext);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1704,7 +1739,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = new Request($e->getRequest());
+        $request = (new Request($e->getRequest()))->setRequestContext($this->requestContext);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1726,7 +1761,7 @@ class PendingRequest
         $response = $this->populateResponse($this->newResponse($e->getResponse()));
 
         $this->factory?->recordRequestResponsePair(
-            new Request($e->getRequest()),
+            (new Request($e->getRequest()))->setRequestContext($this->requestContext),
             $response
         );
 
