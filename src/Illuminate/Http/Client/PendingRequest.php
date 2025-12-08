@@ -18,6 +18,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Client\Events\ConnectionFailed;
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Events\ResponseReceived;
+use Illuminate\Http\Client\Promises\FluentPromise;
+use Illuminate\Http\Client\Promises\LazyPromise;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -886,7 +888,7 @@ class PendingRequest
      * Send a pool of asynchronous requests concurrently.
      *
      * @param  (callable(\Illuminate\Http\Client\Pool): mixed)  $callback
-     * @param  int|null  $concurrency
+     * @param  non-negative-int|null  $concurrency
      * @return array<array-key, \Illuminate\Http\Client\Response|\Illuminate\Http\Client\ConnectionException|\Illuminate\Http\Client\RequestException>
      */
     public function pool(callable $callback, ?int $concurrency = null)
@@ -896,6 +898,16 @@ class PendingRequest
         $requests = tap(new Pool($this->factory), $callback)->getRequests();
 
         if ($concurrency === null) {
+            (new Collection($requests))->each(static function ($item) {
+                if ($item instanceof static) {
+                    $item = $item->getPromise();
+                }
+
+                if ($item instanceof LazyPromise) {
+                    $item->buildPromise();
+                }
+            });
+
             foreach ($requests as $key => $item) {
                 $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
             }
@@ -903,13 +915,16 @@ class PendingRequest
             return $results;
         }
 
-        $promises = [];
+        $concurrency = $concurrency === 0 ? count($requests) : $concurrency;
 
-        foreach ($requests as $key => $item) {
-            $promises[$key] = $item instanceof static ? $item->getPromise() : $item;
-        }
+        $promiseGenerator = static function () use ($requests) {
+            foreach ($requests as $key => $item) {
+                $promise = $item instanceof static ? $item->getPromise() : $item;
+                yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+            }
+        };
 
-        (new EachPromise($promises, [
+        (new EachPromise($promiseGenerator(), [
             'fulfilled' => function ($result, $key) use (&$results) {
                 $results[$key] = $result;
             },
@@ -939,7 +954,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Illuminate\Http\Client\Response
+     * @return \Illuminate\Http\Client\Response|\Illuminate\Http\Client\Promises\LazyPromise
      *
      * @throws \Exception
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -957,7 +972,9 @@ class PendingRequest
         [$this->pendingBody, $this->pendingFiles] = [null, []];
 
         if ($this->async) {
-            return $this->makePromise($method, $url, $options);
+            return $this->promise = new LazyPromise(
+                fn () => $this->makePromise($method, $url, $options)
+            );
         }
 
         $shouldRetry = null;
@@ -1198,7 +1215,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Psr\Http\Message\MessageInterface|\Illuminate\Http\Client\FluentPromise
+     * @return \Psr\Http\Message\MessageInterface|\GuzzleHttp\Promise\PromiseInterface
      *
      * @throws \Exception
      */

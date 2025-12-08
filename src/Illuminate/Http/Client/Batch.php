@@ -7,6 +7,8 @@ use Closure;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
+use Illuminate\Http\Client\Promises\LazyPromise;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Defer\DeferredCallback;
 
 use function Illuminate\Support\defer;
@@ -270,18 +272,8 @@ class Batch
         }
 
         $results = [];
-        $promises = [];
 
-        foreach ($this->requests as $key => $item) {
-            $promise = match (true) {
-                $item instanceof PendingRequest => $item->getPromise(),
-                default => $item,
-            };
-
-            $promises[$key] = $promise;
-        }
-
-        if (! empty($promises)) {
+        if (! empty($this->requests)) {
             $eachPromiseOptions = [
                 'fulfilled' => function ($result, $key) use (&$results) {
                     $results[$key] = $result;
@@ -329,7 +321,16 @@ class Batch
                 $eachPromiseOptions['concurrency'] = $this->concurrencyLimit;
             }
 
-            (new EachPromise($promises, $eachPromiseOptions))->promise()->wait();
+            $promiseGenerator = function () {
+                foreach ($this->requests as $key => $item) {
+                    $promise = $item instanceof PendingRequest ? $item->getPromise() : $item;
+                    yield $key => $promise instanceof LazyPromise ? $promise->buildPromise() : $promise;
+                }
+            };
+
+            (new EachPromise($promiseGenerator(), $eachPromiseOptions))
+                ->promise()
+                ->wait();
         }
 
         // Before returning the results, we must ensure that the results are sorted
