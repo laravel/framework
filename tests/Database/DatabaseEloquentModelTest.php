@@ -3560,6 +3560,7 @@ class DatabaseEloquentModelTest extends TestCase
             protected function location(): Attribute
             {
                 $this->locationAccessorCalled = true;
+
                 return Attribute::make(
                     get: fn () => 'Paris',
                 );
@@ -3568,6 +3569,7 @@ class DatabaseEloquentModelTest extends TestCase
             protected function timezone(): Attribute
             {
                 $this->timezoneAccessorCalled = true;
+
                 return Attribute::make(
                     get: fn () => 'Europe/Paris',
                 );
@@ -3595,6 +3597,7 @@ class DatabaseEloquentModelTest extends TestCase
             protected function location(): Attribute
             {
                 $this->locationAccessorCalled = true;
+
                 return Attribute::make(
                     get: fn ($value) => 'Paris',
                 );
@@ -3621,6 +3624,7 @@ class DatabaseEloquentModelTest extends TestCase
             protected function location(): Attribute
             {
                 $this->locationAccessorCalled = true;
+
                 return Attribute::make(
                     get: fn ($value) => 'Paris',
                 );
@@ -3634,7 +3638,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(['id' => 1, 'name' => 'Test'], $array);
     }
 
-    public function testSetOnlyAttributeMutatorDoesNotBreakSerialization() 
+    public function testSetOnlyAttributeMutatorDoesNotBreakSerialization()
     {
         $model = new class extends Model
         {
