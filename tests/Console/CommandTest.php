@@ -232,7 +232,7 @@ class CommandTest extends TestCase
             protected function getArguments()
             {
                 return [
-                    new InputArgument('argument-one', 'o', InputArgument::REQUIRED, 'first test argument'),
+                    new InputArgument('argument-one', InputArgument::REQUIRED, 'first test argument'),
                 ];
             }
         };
