@@ -228,6 +228,20 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
+     * Retrieve a model attribute if it is filled.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenFilled($value, $default = new MissingValue)
+    {
+        $arguments = func_num_args() == 1 ? [$value] : [$value, $default];
+
+        return $this->when(filled($value), ...$arguments);
+    }
+
+    /**
      * Retrieve an accessor when it has been appended.
      *
      * @param  string  $attribute

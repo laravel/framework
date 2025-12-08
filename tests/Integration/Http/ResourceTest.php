@@ -31,6 +31,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithJsonOptionsAndTyp
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAppendedAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalFilledAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalHasAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
@@ -200,6 +201,29 @@ class ResourceTest extends TestCase
         Route::get('/', function () {
             return new PostResourceWithOptionalAttributes(new Post([
                 'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'no title',
+            ],
+        ]);
+    }
+
+    public function testResourcesMayHaveOptionalFilledAttributes()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalFilledAttributes(new Post([
+                'id' => 5,
+                'title' => '',
             ]));
         });
 
