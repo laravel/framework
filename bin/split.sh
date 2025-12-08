@@ -44,6 +44,7 @@ remote pagination git@github.com:illuminate/pagination.git
 remote pipeline git@github.com:illuminate/pipeline.git
 remote process git@github.com:illuminate/process.git
 remote queue git@github.com:illuminate/queue.git
+remote reflections git@github.com:illuminate/reflections.git
 remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
 remote session git@github.com:illuminate/session.git
@@ -79,6 +80,7 @@ split 'src/Illuminate/Pagination' pagination
 split 'src/Illuminate/Pipeline' pipeline
 split 'src/Illuminate/Process' process
 split 'src/Illuminate/Queue' queue
+split 'src/Illuminate/Reflections' reflections
 split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing
 split 'src/Illuminate/Session' session

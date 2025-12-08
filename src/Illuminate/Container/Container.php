@@ -13,18 +13,19 @@ use Illuminate\Contracts\Container\CircularDependencyException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Container\SelfBuilding;
+use Illuminate\Support\Traits\ReflectsClosures;
 use LogicException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
-use ReflectionIntersectionType;
 use ReflectionParameter;
-use ReflectionUnionType;
 use TypeError;
 
 class Container implements ArrayAccess, ContainerContract
 {
+    use ReflectsClosures;
+
     /**
      * The current globally available container (if any).
      *
@@ -561,40 +562,6 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($abstracts as $abstract) {
             $this->bind($abstract, $concrete, $shared);
         }
-    }
-
-    /**
-     * Get the class names / types of the return type of the given Closure.
-     *
-     * @return list<class-string>
-     *
-     * @throws \ReflectionException
-     */
-    protected function closureReturnTypes(Closure $closure)
-    {
-        $reflection = new ReflectionFunction($closure);
-
-        if ($reflection->getReturnType() === null ||
-            $reflection->getReturnType() instanceof ReflectionIntersectionType) {
-            return [];
-        }
-
-        $types = $reflection->getReturnType() instanceof ReflectionUnionType
-            ? $reflection->getReturnType()->getTypes()
-            : [$reflection->getReturnType()];
-
-        $returnTypes = [];
-
-        foreach ($types as $type) {
-            if ($type->isBuiltin() ||
-                in_array($type->getName(), ['static', 'self'])) {
-                continue;
-            }
-
-            $returnTypes[] = $type->getName();
-        }
-
-        return $returnTypes;
     }
 
     /**
