@@ -8,6 +8,7 @@ use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
+use TypeError;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 abstract class Input
