@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Application;
+use Illuminate\Console\Attributes\Argument;
+use Illuminate\Console\Attributes\Option;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
@@ -214,5 +216,63 @@ class CommandTest extends TestCase
         $command->setOutput($output);
 
         $command->choice('Select all that apply.', ['option-1', 'option-2', 'option-3'], null, null, true);
+    }
+
+    public function testGetArgument()
+    {
+        $command = new class extends Command
+        {
+            public function handle(#[Argument('argument-one')] public int $argumentOne)
+            {
+            }
+
+            protected function getArguments()
+            {
+                return [
+                    new InputArgument('argument-one', 'o', InputArgument::REQUIRED, 'first test argument'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            'argument-one' => 42,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $this->assertSame(42, $command->argumentOne);
+    }
+
+    public function testGetOption()
+    {
+        $command = new class extends Command
+        {
+            public function handle(#[Option('option-one')] public int $optionOne)
+            {
+            }
+
+            protected function getOptions()
+            {
+                return [
+                    new InputOption('option-one', 'o', InputOption::VALUE_OPTIONAL, 'first test option'),
+                ];
+            }
+        };
+
+        $application = app();
+        $command->setLaravel($application);
+
+        $input = new ArrayInput([
+            '--option-one' => 42,
+        ]);
+        $output = new NullOutput;
+
+        $command->run($input, $output);
+
+        $this->assertSame(42, $command->optionOne);
     }
 }
