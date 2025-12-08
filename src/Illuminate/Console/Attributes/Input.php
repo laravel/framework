@@ -29,7 +29,7 @@ abstract class Input
         $input = $attribute->getInput($command, $attribute->parameter);
         $type = $parameter->getType();
 
-        if (! $this->checkType($type, $input)) {
+        if (! $attribute->checkType($type, $input)) {
             throw new TypeError(sprintf('"%s" is not of type string. %s given', $attribute->parameter, get_debug_type($input)));
         }
       
