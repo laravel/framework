@@ -28,7 +28,7 @@ abstract class Input
      */
     public static function resolve(self $attribute, Command $command, ReflectionParameter $parameter)
     {
-        $input = $attribute->getInput($command);
+        $input = $attribute->getInput($command, $attribute->parameter);
         $type = $parameter->getType();
 
         if (! $this->checkType($type, $input)) {
@@ -53,5 +53,5 @@ abstract class Input
      * @throws \InvalidArgumentException when neither an option nor an argument
      *                                   with give key exists and no default value was given
      */
-    abstract private function getInput(Command $command);
+    abstract private function getInput(Command $command, string $parameter);
 }
