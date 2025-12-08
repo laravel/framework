@@ -231,7 +231,7 @@ class Command extends SymfonyCommand
                 ];
             },
             [],
-        );        
+        );
 
         try {
             return (int) $this->laravel->call([$this, $method], $arguments);

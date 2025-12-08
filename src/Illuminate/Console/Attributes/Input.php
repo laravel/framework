@@ -3,9 +3,9 @@
 namespace Illuminate\Console\Attributes;
 
 use Illuminate\Console\Command;
-use ReflectionParameter;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
+use ReflectionParameter;
 use ReflectionType;
 use ReflectionUnionType;
 use TypeError;
@@ -32,7 +32,7 @@ abstract class Input
         if (! $attribute->checkType($type, $input)) {
             throw new TypeError(sprintf('"%s" is not of type string. %s given', $attribute->parameter, get_debug_type($input)));
         }
-      
+
         return $input;
     }
 
@@ -46,7 +46,7 @@ abstract class Input
     }
 
     /**
-     * @param \Illuminate\Console\Command $command
+     * @param  \Illuminate\Console\Command  $command
      *
      * @throws \InvalidArgumentException when neither an option nor an argument
      *                                   with give key exists and no default value was given
