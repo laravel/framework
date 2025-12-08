@@ -55,16 +55,6 @@ class LazyPromise implements PromiseInterface
         return $this->guzzlePromise;
     }
 
-    /**
-     * If the promise has been created from the promise builder.
-     *
-     * @return bool
-     */
-    public function promiseNeedsBuilt(): bool
-    {
-        return ! isset($this->guzzlePromise);
-    }
-
     #[\Override]
     public function then(?callable $onFulfilled = null, ?callable $onRejected = null): PromiseInterface
     {
@@ -125,5 +115,15 @@ class LazyPromise implements PromiseInterface
         }
 
         return $this->guzzlePromise->wait($unwrap);
+    }
+
+    /**
+     * Determine if the promise has been created from the promise builder.
+     *
+     * @return bool
+     */
+    public function promiseNeedsBuilt(): bool
+    {
+        return ! isset($this->guzzlePromise);
     }
 }

@@ -902,10 +902,12 @@ class PendingRequest
                 if ($item instanceof static) {
                     $item = $item->getPromise();
                 }
+
                 if ($item instanceof LazyPromise) {
                     $item->buildPromise();
                 }
             });
+
             foreach ($requests as $key => $item) {
                 $results[$key] = $item instanceof static ? $item->getPromise()->wait() : $item->wait();
             }
