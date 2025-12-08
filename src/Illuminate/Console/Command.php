@@ -227,6 +227,7 @@ class Command extends SymfonyCommand
                             ...$carry,
                             $parameter->getName() => ($instance = $attribute->newInstance())::resolve($instance, $this, $parameter),
                         ],
+                        [],
                     ),
                 ];
             },
