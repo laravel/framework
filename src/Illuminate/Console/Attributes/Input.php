@@ -51,5 +51,5 @@ abstract class Input
      * @throws \InvalidArgumentException when neither an option nor an argument
      *                                   with give key exists and no default value was given
      */
-    abstract private function getInput(Command $command, string $parameter);
+    abstract protected function getInput(Command $command, string $parameter);
 }
