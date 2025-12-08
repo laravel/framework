@@ -6,6 +6,7 @@ use Illuminate\Console\Attributes\Input;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionAttribute;
 use ReflectionMethod;
 use ReflectionParameter;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -218,8 +219,16 @@ class Command extends SymfonyCommand
                     return $carry;
                 }
 
-                $instance = $attributes->newInstance();
-                return [ ...$carry, $parameter->getName() => $instance::resolve($instance, $this, $parameter) ];
+                return [
+                    ...$carry,
+                    array_reduce(
+                        $attributes,
+                        fn (array $carry, ReflectionAttribute $attribute) => [
+                            ...$carry,
+                            $parameter->getName() => ($instance = $attribute->newInstance())::resolve($instance, $this, $parameter),
+                        ],
+                    ),
+                ];
             },
             [],
         );        
