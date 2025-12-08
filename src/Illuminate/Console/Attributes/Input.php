@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Attributes;
 
 use Attribute;
+use Illuminate\Console\Command;
 use ReflectionParameter;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
@@ -25,9 +26,9 @@ abstract class Input
      *
      * @throws \TypeError on type mismatch
      */
-    public static function resolve(self $attribute, ReflectionParameter $parameter)
+    public static function resolve(self $attribute, Command $command, ReflectionParameter $parameter)
     {
-        $input = $attribute->getInput();
+        $input = $attribute->getInput($command);
         $type = $parameter->getType();
 
         if (! $this->checkType($type, $input)) {
@@ -47,8 +48,10 @@ abstract class Input
     }
 
     /**
+     * @param \Illuminate\Console\Command $command
+     *
      * @throws \InvalidArgumentException when neither an option nor an argument
-     *                                   with give key exists and no default value was given 
+     *                                   with give key exists and no default value was given
      */
-    abstract private function getInput();
+    abstract private function getInput(Command $command);
 }
