@@ -8,7 +8,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\EachPromise;
 use GuzzleHttp\Utils;
 use Illuminate\Http\Client\Promises\LazyPromise;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Defer\DeferredCallback;
 
 use function Illuminate\Support\defer;
