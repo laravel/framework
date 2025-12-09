@@ -296,7 +296,7 @@ trait ResolvesJsonApiElements
     /**
      * Resolves `included` for the resource.
      */
-    public function resolveIncludedResources(JsonApiRequest $request): array
+    public function resolveIncludedResourceObjects(JsonApiRequest $request): Collection
     {
         if (! $this->resource instanceof Model) {
             return [];
@@ -335,9 +335,7 @@ trait ResolvesJsonApiElements
             $index++;
         }
 
-        return $relations->uniqueStrict(fn ($relation) => $relation['_uniqueKey'])
-            ->map(fn ($relation) => Arr::except($relation, ['_uniqueKey']))
-            ->all();
+        return $relations;
     }
 
     /**

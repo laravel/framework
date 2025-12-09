@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 
 class JsonApiResource extends JsonResource
 {
@@ -132,7 +133,10 @@ class JsonApiResource extends JsonResource
     public function with($request)
     {
         return array_filter([
-            'included' => $this->resolveIncludedResources($request),
+            'included' => $this->resolveIncludedResourceObjects($request)
+                ->uniqueStrict('_uniqueKey')
+                ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
+                ->all(),
             ...($implementation = static::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]
                 : [],
