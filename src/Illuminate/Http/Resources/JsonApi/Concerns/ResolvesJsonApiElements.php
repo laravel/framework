@@ -77,11 +77,11 @@ trait ResolvesJsonApiElements
             return $resourceId;
         }
 
-        if (! $this->resource instanceof Model) {
+        if (! ($this->resource instanceof Model || method_exists($this->resource, 'getKey'))) {
             throw ResourceIdentificationException::attemptingToDetermineIdFor($this);
         }
 
-        return static::resourceIdFromModel($this->resource);
+        return (string) $this->resource->getKey();
     }
 
     /**
@@ -96,11 +96,21 @@ trait ResolvesJsonApiElements
             return $resourceType;
         }
 
+        if (static::class !== JsonApiResource::class) {
+            return Str::of(static::class)->classBasename()->basename('Resource')->snake()->pluralStudly();
+        }
+
         if (! $this->resource instanceof Model) {
             throw ResourceIdentificationException::attemptingToDetermineTypeFor($this);
         }
 
-        return static::resourceTypeFromModel($this->resource);
+        $modelClassName = $this->resource::class;
+
+        $morphMap = Relation::getMorphAlias($modelClassName);
+
+        return Str::of(
+            $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
+        )->snake()->pluralStudly();
     }
 
     /**
@@ -359,28 +369,6 @@ trait ResolvesJsonApiElements
     }
 
     /**
-     * Get the resource ID from the given Eloquent model.
-     */
-    public static function resourceIdFromModel(Model $model): string
-    {
-        return $model->getKey();
-    }
-
-    /**
-     * Get the resource type from the given Eloquent model.
-     */
-    public static function resourceTypeFromModel(Model $model): string
-    {
-        $modelClassName = $model::class;
-
-        $morphMap = Relation::getMorphAlias($modelClassName);
-
-        return static::normalizeResourceType(
-            $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
-        );
-    }
-
-    /**
      * Indicate that relationship loading should respect the request's "includes" query string.
      *
      * @return $this
@@ -412,13 +400,5 @@ trait ResolvesJsonApiElements
         $this->includesPreviouslyLoadedRelationships = true;
 
         return $this;
-    }
-
-    /**
-     * Normalize the resource type.
-     */
-    public static function normalizeResourceType(string $value): string
-    {
-        return Str::of($value)->snake()->pluralStudly();
     }
 }

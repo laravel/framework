@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[UseFactory(CommentFactory::class)]
-#[UseResource(CommentApiResource::class)]
+#[UseResource(CommentResource::class)]
 class Comment extends Model
 {
     use HasFactory;

@@ -26,6 +26,7 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
                 ->flatten(depth: 1)
                 ->uniqueStrict('_uniqueKey')
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
+                ->values()
                 ->all(),
             ...($implementation = JsonApiResource::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures;
 
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
-class CommentApiResource extends JsonApiResource
+class CommentResource extends JsonApiResource
 {
     /**
      * The resource's attributes.

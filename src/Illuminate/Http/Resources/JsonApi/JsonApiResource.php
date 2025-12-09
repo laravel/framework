@@ -136,6 +136,7 @@ class JsonApiResource extends JsonResource
             'included' => $this->resolveIncludedResourceObjects($request)
                 ->uniqueStrict('_uniqueKey')
                 ->map(fn ($included) => Arr::except($included, ['_uniqueKey']))
+                ->values()
                 ->all(),
             ...($implementation = static::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]

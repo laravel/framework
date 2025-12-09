@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Orchestra\Testbench\Factories\UserFactory;
 
-#[UseResource(UserApiResource::class)]
+#[UseResource(UserResource::class)]
 #[UseFactory(UserFactory::class)]
 class User extends Authenticatable
 {

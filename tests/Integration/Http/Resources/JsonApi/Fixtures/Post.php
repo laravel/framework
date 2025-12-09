@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[UseFactory(PostFactory::class)]
-#[UseResource(PostApiResource::class)]
+#[UseResource(PostResource::class)]
 class Post extends Model
 {
     use HasFactory;
