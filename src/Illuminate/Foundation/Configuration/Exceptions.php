@@ -10,13 +10,11 @@ use Illuminate\Support\Arr;
 class Exceptions
 {
     /**
-     * Create a new exception handling configuration instance.
+     * List of configuration callbacks for exception handler.
      *
-     * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
+     * @var array<int, (\Closure(\Illuminate\Foundation\Exceptions\Handler):(mixed))>
      */
-    public function __construct(public Handler $handler)
-    {
-    }
+    protected $bootstrapCallbacks = [];
 
     /**
      * Register a reportable callback.
@@ -130,7 +128,7 @@ class Exceptions
      */
     public function context(Closure $contextCallback)
     {
-        $this->handler->buildContextUsing($contextCallback);
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->buildContextUsing($contextCallback);
 
         return $this;
     }
@@ -143,9 +141,11 @@ class Exceptions
      */
     public function dontReport(array|string $class)
     {
-        foreach (Arr::wrap($class) as $exceptionClass) {
-            $this->handler->dontReport($exceptionClass);
-        }
+        $this->bootstrapCallbacks[] = function ($handler) use ($class) {
+            foreach (Arr::wrap($class) as $exceptionClass) {
+                $handler->dontReport($exceptionClass);
+            }
+        };
 
         return $this;
     }
@@ -158,7 +158,7 @@ class Exceptions
      */
     public function dontReportWhen(Closure $dontReportWhen)
     {
-        $this->handler->dontReportWhen($dontReportWhen);
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->dontReportWhen($dontReportWhen);
 
         return $this;
     }
@@ -170,7 +170,7 @@ class Exceptions
      */
     public function dontReportDuplicates()
     {
-        $this->handler->dontReportDuplicates();
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->dontReportDuplicates();
 
         return $this;
     }
@@ -183,7 +183,7 @@ class Exceptions
      */
     public function dontFlash(array|string $attributes)
     {
-        $this->handler->dontFlash($attributes);
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->dontFlash($attributes);
 
         return $this;
     }
@@ -196,7 +196,7 @@ class Exceptions
      */
     public function shouldRenderJsonWhen(callable $callback)
     {
-        $this->handler->shouldRenderJsonWhen($callback);
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->shouldRenderJsonWhen($callback);
 
         return $this;
     }
@@ -209,7 +209,7 @@ class Exceptions
      */
     public function stopIgnoring(array|string $class)
     {
-        $this->handler->stopIgnoring($class);
+        $this->bootstrapCallbacks[] = fn ($handler) => $handler->stopIgnoring($class);
 
         return $this;
     }
@@ -237,5 +237,18 @@ class Exceptions
         RequestException::dontTruncate();
 
         return $this;
+    }
+
+    /**
+     * Register the callbacks to exception handler.
+     *
+     * @param  \Illuminate\Foundation\Exceptions\Handler  $handler
+     * @return void
+     */
+    public function handle(Handler $handler)
+    {
+        foreach ($this->bootstrapCallbacks as $callback) {
+            value($callback, $handler);
+        }
     }
 }

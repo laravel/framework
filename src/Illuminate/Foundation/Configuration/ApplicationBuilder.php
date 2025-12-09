@@ -373,12 +373,16 @@ class ApplicationBuilder
             \Illuminate\Foundation\Exceptions\Handler::class
         );
 
+        $configureExceptions = new Exceptions;
+
         if ($using !== null) {
-            $this->app->afterResolving(
-                \Illuminate\Foundation\Exceptions\Handler::class,
-                fn ($handler) => $using(new Exceptions($handler)),
-            );
+            $using($configureExceptions);
         }
+
+        $this->app->afterResolving(
+            \Illuminate\Foundation\Exceptions\Handler::class,
+            fn ($handler) => $configureExceptions->handle($handler),
+        );
 
         return $this;
     }

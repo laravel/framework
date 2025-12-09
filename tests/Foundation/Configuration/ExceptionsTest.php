@@ -2,51 +2,89 @@
 
 namespace Illuminate\Tests\Foundation\Configuration;
 
+use Closure;
 use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Http\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ExceptionsTest extends TestCase
 {
-    public function testStopIgnoring()
+    #[TestWith([HttpException::class])]
+    #[TestWith([ModelNotFoundException::class])]
+    public function testStopIgnoring(string $class)
     {
         $container = new Container;
-        $exceptions = new Exceptions($handler = new class($container) extends Handler
+        $exceptions = new Exceptions;
+
+        $handler = new class($container) extends Handler
         {
             public function getDontReport(): array
             {
                 return array_merge($this->dontReport, $this->internalDontReport);
             }
-        });
+        };
 
-        $this->assertContains(HttpException::class, $handler->getDontReport());
-        $exceptions = $exceptions->stopIgnoring(HttpException::class);
+        $this->assertContains($class, $handler->getDontReport());
+
+        $exceptions = $exceptions->stopIgnoring($class);
+
+        $exceptions->handle($handler);
+
         $this->assertInstanceOf(Exceptions::class, $exceptions);
-        $this->assertNotContains(HttpException::class, $handler->getDontReport());
-
-        $this->assertContains(ModelNotFoundException::class, $handler->getDontReport());
-        $exceptions->stopIgnoring([ModelNotFoundException::class]);
-        $this->assertNotContains(ModelNotFoundException::class, $handler->getDontReport());
+        $this->assertNotContains($class, $handler->getDontReport());
     }
 
-    public function testShouldRenderJsonWhen()
+    #[TestWith([HttpException::class])]
+    #[TestWith([ModelNotFoundException::class])]
+    public function testStopIgnoringUsingArray(string $class)
     {
-        $exceptions = new Exceptions(new Handler(new Container));
+        $container = new Container;
+        $exceptions = new Exceptions;
 
-        $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
-        $this->assertFalse($shouldReturnJson);
+        $handler = new class($container) extends Handler
+        {
+            public function getDontReport(): array
+            {
+                return array_merge($this->dontReport, $this->internalDontReport);
+            }
+        };
 
-        $exceptions->shouldRenderJsonWhen(fn () => true);
-        $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
-        $this->assertTrue($shouldReturnJson);
+        $this->assertContains($class, $handler->getDontReport());
 
-        $exceptions->shouldRenderJsonWhen(fn () => false);
-        $shouldReturnJson = (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($exceptions->handler);
-        $this->assertFalse($shouldReturnJson);
+        $exceptions = $exceptions->stopIgnoring([$class]);
+
+        $exceptions->handle($handler);
+
+        $this->assertInstanceOf(Exceptions::class, $exceptions);
+        $this->assertNotContains($class, $handler->getDontReport());
+    }
+
+    public static function shouldRenderJsonDataProvider()
+    {
+        yield [null, false];
+        yield [fn () => true, true];
+        yield [fn () => false, false];
+    }
+
+    #[DataProvider('shouldRenderJsonDataProvider')]
+    public function testShouldRenderJsonWhen(?Closure $given, bool $expects)
+    {
+        $exceptions = new Exceptions;
+        $handler = new Handler(new Container);
+
+        if (! is_null($given)) {
+            $exceptions->shouldRenderJsonWhen($given);
+        }
+
+        $exceptions->handle($handler);
+
+        $this->assertSame($expects, (fn () => $this->shouldReturnJson(new Request, new Exception()))->call($handler));
     }
 }
