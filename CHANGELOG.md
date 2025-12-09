@@ -1,6 +1,31 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.41.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.42.0...12.x)
+
+## [v12.42.0](https://github.com/laravel/framework/compare/v12.41.1...v12.42.0) - 2025-12-09
+
+* [12.x] Improve `Context::scope()` return type by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58012
+* [12.x] Allow float values in duration helpers for CarbonInterval by [@SanderMuller](https://github.com/SanderMuller) in https://github.com/laravel/framework/pull/58006
+* Add whenTableHasIndex and whenTableDoesntHaveIndex to Builder by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58005
+* [12.x] Add commandFileFinder method and exclude test files from command discovery by [@davidhemphill](https://github.com/davidhemphill) in https://github.com/laravel/framework/pull/58017
+* [12.x] Fix Cache spy not working with memoized cache by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/57996
+* Respect --quiet and --silent in queue:work command by [@MatusBoa](https://github.com/MatusBoa) in https://github.com/laravel/framework/pull/58024
+* [12.x] Improve Blueprint docblocks with concrete value ranges for integer and text columns by [@nguyentranchung](https://github.com/nguyentranchung) in https://github.com/laravel/framework/pull/58019
+* [12.x] Modernize typecasting by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58037
+* [12.x] Fix `required` and `sometimes` validation of `Password` rule by [@mrvipchien](https://github.com/mrvipchien) in https://github.com/laravel/framework/pull/58034
+* [12.x] Add support as a depdency for container by [@adrum](https://github.com/adrum) in https://github.com/laravel/framework/pull/58026
+* fix autoloading StringableObjectStub class in tests/Support/SupportStringableTest.php by [@angus-mcritchie](https://github.com/angus-mcritchie) in https://github.com/laravel/framework/pull/58030
+* [12.x] Remove calls to `optional()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58027
+* [12.x] Add `newRequest()` to Pool and Batch by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58038
+* [12.x] Align Listener docblock and add unit test for query shape by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58040
+* [12.x] feat: add pre-migration hook when setting up databases in parallel tests by [@philipheimboeck](https://github.com/philipheimboeck) in https://github.com/laravel/framework/pull/58011
+* [12.x] Supports PHPUnit 12.5 by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58042
+* [12.x] Add support for Enums in Translator replacements by [@hosni](https://github.com/hosni) in https://github.com/laravel/framework/pull/58048
+* [12.x] Fix `PendingRequest@pool()` && `batch()` concurrency by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/57973
+* [12.x] New `illuminate/reflections` component from `illuminate/support` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58052
+* Make queue commands' option descriptions more consistent by [@jasonlbeggs](https://github.com/jasonlbeggs) in https://github.com/laravel/framework/pull/58058
+* [12.x] Add LICENSE, auto close for PRs and `.gitattributes` to `illuminate/reflection` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58055
+* [12.x] `PendingRequest@withRequestContext()` by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58054
 
 ## [v12.41.1](https://github.com/laravel/framework/compare/v12.41.0...v12.41.1) - 2025-12-03
 
