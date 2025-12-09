@@ -65,6 +65,7 @@ use Illuminate\Http\Client\Factory;
  * @method static \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\PendingRequest withRequestMiddleware(callable $middleware)
  * @method static \Illuminate\Http\Client\PendingRequest withResponseMiddleware(callable $middleware)
+ * @method static \Illuminate\Http\Client\PendingRequest withAttributes(array $attributes)
  * @method static \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
  * @method static \Illuminate\Http\Client\PendingRequest throw(callable|null $callback = null)
  * @method static \Illuminate\Http\Client\PendingRequest throwIf(callable|bool $condition)
