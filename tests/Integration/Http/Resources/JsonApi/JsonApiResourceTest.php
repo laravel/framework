@@ -200,7 +200,7 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->getJson("/posts?".http_build_query(['include' => 'author', 'fields' => ['authors' => 'name']]))
+        $this->getJson('/posts?'.http_build_query(['include' => 'author', 'fields' => ['authors' => 'name']]))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [
