@@ -326,7 +326,6 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonMissing(['jsonapi']);
     }
 
-
     public function testItCanResolveRelationshipWithoutRedundantIncludedRelationship()
     {
         $now = $this->freezeSecond();
@@ -337,7 +336,7 @@ class JsonApiResourceTest extends TestCase
             'user_id' => $user->getKey(),
         ]);
 
-        $this->getJson("/posts?".http_build_query(['include' => 'author']))
+        $this->getJson('/posts?'.http_build_query(['include' => 'author']))
             ->assertHeader('Content-type', 'application/vnd.api+json')
             ->assertExactJson([
                 'data' => [
