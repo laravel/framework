@@ -196,6 +196,13 @@ class PendingRequest
     protected $async = false;
 
     /**
+     * The attributes to track with the request.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $attributes = [];
+
+    /**
      * The pending request promise.
      *
      * @var \GuzzleHttp\Promise\PromiseInterface
@@ -208,13 +215,6 @@ class PendingRequest
      * @var \Illuminate\Http\Client\Request|null
      */
     protected $request;
-
-    /**
-     * The context to track with the request.
-     *
-     * @var array<array-key, mixed>
-     */
-    protected $requestContext = [];
 
     /**
      * The Guzzle request options that are mergeable via array_merge_recursive.
@@ -444,19 +444,6 @@ class PendingRequest
     public function withHeader($name, $value)
     {
         return $this->withHeaders([$name => $value]);
-    }
-
-    /**
-     * Set context to store with the request.
-     *
-     * @param  array<array-key, mixed>  $context
-     * @return $this
-     */
-    public function withRequestContext($context)
-    {
-        $this->requestContext = array_merge_recursive($this->requestContext, $context);
-
-        return $this;
     }
 
     /**
@@ -716,6 +703,19 @@ class PendingRequest
     public function withResponseMiddleware(callable $middleware)
     {
         $this->middleware->push(Middleware::mapResponse($middleware));
+
+        return $this;
+    }
+
+    /**
+     * Set arbitrary attributes to store with the request.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
 
         return $this;
     }
@@ -1144,7 +1144,7 @@ class PendingRequest
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
                     $this->dispatchConnectionFailedEvent(
-                        (new Request($e->getRequest()))->setRequestContext($this->requestContext),
+                        (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
                         $exception
                     );
 
@@ -1424,7 +1424,7 @@ class PendingRequest
                     $this->factory?->recordRequestResponsePair(
                         (new Request($request))
                             ->withData($options['laravel_data'])
-                            ->setRequestContext($this->requestContext),
+                            ->setRequestAttributes($this->attributes),
                         $this->newResponse($response)
                     );
 
@@ -1448,7 +1448,7 @@ class PendingRequest
                     ->__invoke(
                         (new Request($request))
                             ->withData($options['laravel_data'])
-                            ->setRequestContext($this->requestContext),
+                            ->setRequestAttributes($this->attributes),
                         $options
                     )
                     ->filter()
@@ -1512,7 +1512,7 @@ class PendingRequest
                     $callback,
                     (new Request($request))
                         ->withData($options['laravel_data'])
-                        ->setRequestContext($this->requestContext),
+                        ->setRequestAttributes($this->attributes),
                     $options,
                     $this
                 );
@@ -1718,7 +1718,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = (new Request($e->getRequest()))->setRequestContext($this->requestContext);
+        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1739,7 +1739,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = (new Request($e->getRequest()))->setRequestContext($this->requestContext);
+        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1761,7 +1761,7 @@ class PendingRequest
         $response = $this->populateResponse($this->newResponse($e->getResponse()));
 
         $this->factory?->recordRequestResponsePair(
-            (new Request($e->getRequest()))->setRequestContext($this->requestContext),
+            (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
             $response
         );
 

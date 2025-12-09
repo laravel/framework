@@ -89,20 +89,20 @@ class HttpClientTest extends TestCase
         $this->assertEquals('stub', $r);
     }
 
-    public function testCanSetRequestContext()
+    public function testCanSetRequestAttributes()
     {
         Http::fake([
-            '*' => fn (Request $request) => match($request->requestContext()['name'] ?? null) {
+            '*' => fn (Request $request) => match($request->attributes()['name'] ?? null) {
                 'first' => Http::response('first response'),
                 'second' => Http::response('second response'),
                 default => Http::response('unnamed')
             }
         ]);
 
-        $response1 = Http::withRequestContext(['name' => 'first'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
-        $response2 = Http::withRequestContext(['name' => 'second'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response1 = Http::withAttributes(['name' => 'first'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response2 = Http::withAttributes(['name' => 'second'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
         $response3 = Http::get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
-        $response4 = Http::withRequestContext(['name' => 'fourth'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response4 = Http::withAttributes(['name' => 'fourth'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
 
         $this->assertEquals('first response', $response1->body());
         $this->assertEquals('second response', $response2->body());

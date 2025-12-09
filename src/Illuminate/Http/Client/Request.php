@@ -27,11 +27,11 @@ class Request implements ArrayAccess
     protected $data;
 
     /**
-     * The contextual data passed when building the PendingRequest.
+     * The attribute data passed when building the PendingRequest.
      *
      * @var array<array-key, mixed>
      */
-    protected $requestContext = [];
+    protected $attributes = [];
 
     /**
      * Create a new request instance.
@@ -252,26 +252,26 @@ class Request implements ArrayAccess
     }
 
     /**
-     * Set the request's context data.
-     *
-     * @param  array<array-key, mixed>  $context
-     * @return $this
-     */
-    public function setRequestContext($context)
-    {
-        $this->requestContext = $context;
-
-        return $this;
-    }
-
-    /**
-     * Get the contextual data from the request.
+     * Get the attribute data from the request.
      *
      * @return array<array-key, mixed>
      */
-    public function requestContext()
+    public function attributes()
     {
-        return $this->requestContext;
+        return $this->attributes;
+    }
+
+    /**
+     * Set the request's attribute data.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function setRequestAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+
+        return $this;
     }
 
     /**
