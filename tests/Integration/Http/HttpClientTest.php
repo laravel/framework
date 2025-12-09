@@ -92,11 +92,11 @@ class HttpClientTest extends TestCase
     public function testCanSetRequestAttributes()
     {
         Http::fake([
-            '*' => fn (Request $request) => match($request->attributes()['name'] ?? null) {
+            '*' => fn (Request $request) => match ($request->attributes()['name'] ?? null) {
                 'first' => Http::response('first response'),
                 'second' => Http::response('second response'),
                 default => Http::response('unnamed')
-            }
+            },
         ]);
 
         $response1 = Http::withAttributes(['name' => 'first'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
