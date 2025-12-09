@@ -23,6 +23,7 @@ class AnonymousResourceCollection extends \Illuminate\Http\Resources\Json\Anonym
             'included' => $this->collection
                 ->map(fn ($resource) => $resource->resolveIncludedResources($request))
                 ->flatten(depth: 1)
+                ->uniqueStrict(fn ($included) => implode(':', [$included['id'], $included['type']]))
                 ->all(),
             ...($implementation = JsonApiResource::$jsonApiInformation)
                 ? ['jsonapi' => $implementation]

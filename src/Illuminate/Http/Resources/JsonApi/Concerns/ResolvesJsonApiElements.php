@@ -326,7 +326,7 @@ trait ResolvesJsonApiElements
             $relations->push(array_filter([
                 'id' => $id,
                 'type' => $type,
-                '_uniqueKey' => $isUnique === true ? [$id, $type] : [$id, $type, (string) Str::random()],
+                '_uniqueKey' => implode(':', $isUnique === true ? [$id, $type] : [$id, $type, (string) Str::random()]),
                 'attributes' => Arr::get($relationsData, 'data.attributes'),
                 'relationships' => Arr::get($relationsData, 'data.relationships'),
                 'links' => Arr::get($relationsData, 'data.links'),
