@@ -1167,7 +1167,7 @@ class Container implements ArrayAccess, ContainerContract
         }
 
         if (! in_array($concrete, $withoutLazyFor) && ! empty($reflector->getAttributes(Lazy::class))) {
-            return proxy($concrete, fn () => $this->build($concrete, array_push($withoutLazyFor, $concrete)));
+            return proxy($concrete, fn () => $this->build($concrete, [...$withoutLazyFor, $concrete]));
         }
 
         $dependencies = $constructor->getParameters();
