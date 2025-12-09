@@ -317,7 +317,6 @@ trait ResolvesJsonApiElements
             }
 
             $relationsData = $resourceInstance
-                ->withoutRequestQueryString()
                 ->includePreviouslyLoadedRelationships()
                 ->resolve($request);
 

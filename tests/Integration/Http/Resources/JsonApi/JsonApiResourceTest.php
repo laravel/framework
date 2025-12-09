@@ -190,6 +190,87 @@ class JsonApiResourceTest extends TestCase
             ]);
     }
 
+    public function testItCanGenerateJsonApiResponseWithRelationshipsUsingSparseIncludedAndSparseFieldsets()
+    {
+        $now = $this->freezeSecond();
+
+        $user = User::factory()->create();
+
+        [$post1, $post2] = Post::factory()->times(2)->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        $this->getJson("/posts?".http_build_query(['include' => 'author', 'fields' => ['authors' => 'name']]))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    [
+                        'attributes' => [
+                            'content' => $post1->content,
+                            'title' => $post1->title,
+                        ],
+                        'type' => 'posts',
+                        'id' => (string) $post1->getKey(),
+                        'relationships' => [
+                            'author' => [
+                                'data' => [
+                                    'id' => (string) $user->getKey(),
+                                    'type' => 'authors',
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        'attributes' => [
+                            'content' => $post2->content,
+                            'title' => $post2->title,
+                        ],
+                        'type' => 'posts',
+                        'id' => (string) $post2->getKey(),
+                        'relationships' => [
+                            'author' => [
+                                'data' => [
+                                    'id' => (string) $user->getKey(),
+                                    'type' => 'authors',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'name' => $user->name,
+                        ],
+                        'id' => (string) $user->getKey(),
+                        'type' => 'authors',
+                    ],
+                ],
+                'links' => [
+                    'first' => url('/posts?page=1'),
+                    'last' => url('/posts?page=1'),
+                    'next' => null,
+                    'prev' => null,
+                ],
+                'meta' => [
+                    'current_page' => 1,
+                    'from' => 1,
+                    'last_page' => 1,
+                    'links' => [
+                        ['active' => false, 'label' => '&laquo; Previous', 'page' => null, 'url' => null],
+                        ['active' => true, 'label' => '1', 'page' => 1, 'url' => url('/posts?page=1')],
+                        ['active' => false, 'label' => 'Next &raquo;', 'page' => null, 'url' => null],
+                    ],
+                    'path' => url('/posts'),
+                    'per_page' => 5,
+                    'to' => 2,
+                    'total' => 2,
+                ],
+            ])
+            ->assertJsonCount(1, 'included')
+            ->assertJsonMissing(['jsonapi']);
+    }
+
     public function testItCanResolveRelationshipWithCustomNameAndResourceClass()
     {
         $now = $this->freezeSecond();
