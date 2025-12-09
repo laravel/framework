@@ -65,6 +65,38 @@ class Date implements Stringable
     }
 
     /**
+     * Ensure the date is before now.
+     */
+    public function beforeNow(): static
+    {
+        return $this->before('now');
+    }
+
+    /**
+     * Ensure the date is after now.
+     */
+    public function afterNow(): static
+    {
+        return $this->after('now');
+    }
+
+    /**
+     * Ensure the date is before or equal to now.
+     */
+    public function nowOrBefore(): static
+    {
+        return $this->beforeOrEqual('now');
+    }
+
+    /**
+     * Ensure the date is after or equal to now.
+     */
+    public function nowOrAfter(): static
+    {
+        return $this->afterOrEqual('now');
+    }
+
+    /**
      * Ensure the date is before the given date or date field.
      */
     public function before(DateTimeInterface|string $date): static
