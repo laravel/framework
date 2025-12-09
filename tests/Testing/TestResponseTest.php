@@ -1087,6 +1087,25 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertFailedDependency(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_FAILED_DEPENDENCY)
+        );
+
+        $response->assertFailedDependency();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [424] but received 200.\nFailed asserting that 200 is identical to 424.");
+
+        $response->assertFailedDependency();
+        $this->fail();
+    }
+
     public function testAssertClientError(): void
     {
         $statusCode = 400;
