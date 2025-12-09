@@ -205,8 +205,8 @@ trait ResolvesJsonApiElements
      * Compile resource relations.
      */
     protected function compileResourceRelationshipUsingResolver(
-        mixed $resource,
         JsonApiRequest $request,
+        mixed $resource,
         RelationResolver $relationResolver,
         Collection|Model|null $relatedModels
     ): Generator {
@@ -289,7 +289,7 @@ trait ResolvesJsonApiElements
             ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
             ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
             ->each(function ($relationResolver, $key) use ($relation, $request) {
-                $this->compileResourceRelationshipUsingResolver($relation, $relationResolver, $relation->getRelation($key), $request);
+                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
             });
     }
 
