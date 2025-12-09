@@ -3,6 +3,7 @@
 namespace Illuminate\Config;
 
 use ArrayAccess;
+use BackedEnum;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -198,6 +199,43 @@ class Repository implements ArrayAccess, ConfigContract
     public function collection(string $key, $default = null): Collection
     {
         return new Collection($this->array($key, $default));
+    }
+
+    /**
+     * Get the specified configuration value as an enum.
+     *
+     * @template TEnum of \BackedEnum
+     *
+     * @param  string  $key
+     * @param  class-string<TEnum>  $enumClass
+     * @param  (\Closure():(TEnum|null))|TEnum|null  $default
+     * @return TEnum
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function enum(string $key, string $enumClass, $default = null): BackedEnum
+    {
+        $value = $this->get($key, $default);
+
+        if ($value instanceof $enumClass) {
+            return $value;
+        }
+
+        if ($value === null || ! enum_exists($enumClass) || ! is_subclass_of($enumClass, BackedEnum::class)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a valid backed enum value, %s given.', $key, gettype($value))
+            );
+        }
+
+        $enumValue = $enumClass::tryFrom($value);
+
+        if ($enumValue === null) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] is not a valid value for enum [%s].', $key, $enumClass)
+            );
+        }
+
+        return $enumValue;
     }
 
     /**

@@ -7,6 +7,18 @@ use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
+enum TestStringBackedEnum: string
+{
+    case Foo = 'foo';
+    case Bar = 'bar';
+}
+
+enum TestIntBackedEnum: int
+{
+    case One = 1;
+    case Two = 2;
+}
+
 class RepositoryTest extends TestCase
 {
     /**
@@ -371,5 +383,61 @@ class RepositoryTest extends TestCase
         $this->expectExceptionMessageMatches('#^Configuration value for key \[a.b\] must be a float, (.*) given.#');
 
         $this->repository->float('a.b');
+    }
+
+    public function testItGetsAsEnumFromStringValue(): void
+    {
+        $this->repository->set('string_enum', 'foo');
+
+        $this->assertSame(
+            TestStringBackedEnum::Foo,
+            $this->repository->enum('string_enum', TestStringBackedEnum::class)
+        );
+    }
+
+    public function testItGetsAsEnumFromIntValue(): void
+    {
+        $this->repository->set('int_enum', 1);
+
+        $this->assertSame(
+            TestIntBackedEnum::One,
+            $this->repository->enum('int_enum', TestIntBackedEnum::class)
+        );
+    }
+
+    public function testItGetsAsEnumWhenValueIsAlreadyEnumInstance(): void
+    {
+        $this->repository->set('enum_instance', TestStringBackedEnum::Bar);
+
+        $this->assertSame(
+            TestStringBackedEnum::Bar,
+            $this->repository->enum('enum_instance', TestStringBackedEnum::class)
+        );
+    }
+
+    public function testItGetsAsEnumWithDefault(): void
+    {
+        $this->assertSame(
+            TestStringBackedEnum::Foo,
+            $this->repository->enum('non_existent_key', TestStringBackedEnum::class, TestStringBackedEnum::Foo)
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenEnumValueIsInvalid(): void
+    {
+        $this->repository->set('invalid_enum', 'invalid');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Configuration value for key [invalid_enum] is not a valid value for enum');
+
+        $this->repository->enum('invalid_enum', TestStringBackedEnum::class);
+    }
+
+    public function testItThrowsAnExceptionWhenEnumValueIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Configuration value for key [non_existent] must be a valid backed enum value');
+
+        $this->repository->enum('non_existent', TestStringBackedEnum::class);
     }
 }
