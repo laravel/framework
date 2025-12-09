@@ -366,7 +366,7 @@ class Kernel implements KernelContract
 
         $namespace = $this->app->getNamespace();
 
-        foreach (Finder::create()->in($paths)->files() as $file) {
+        foreach ($this->findCommands($paths) as $file) {
             $command = $this->commandClassFromFile($file, $namespace);
 
             if (is_subclass_of($command, Command::class) &&
@@ -376,6 +376,17 @@ class Kernel implements KernelContract
                 });
             }
         }
+    }
+
+    /**
+     * Get the Finder instance for discovering command files.
+     *
+     * @param  array  $paths
+     * @return \Symfony\Component\Finder\Finder
+     */
+    protected function findCommands(array $paths)
+    {
+        return Finder::create()->in($paths)->notName('*Test.php')->files();
     }
 
     /**

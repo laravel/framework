@@ -1906,10 +1906,12 @@ class HttpClientTest extends TestCase
                 $pool->as('test200')->get('200.com'),
                 $pool->as('test400')->get('400.com'),
                 $pool->as('test500')->get('500.com'),
+                $pool->newRequest()->get('200.com'),
             ];
         });
 
         $this->assertSame(200, $responses['test200']->status());
+        $this->assertSame(200, $responses[0]->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
     }
@@ -3534,7 +3536,7 @@ class HttpClientTest extends TestCase
             return [
                 $pool->get('https://laravel.com'),
             ];
-        });
+        }, null);
     }
 
     public function testPreventingStrayRequests()

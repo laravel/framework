@@ -90,6 +90,7 @@
         "illuminate/pipeline": "self.version",
         "illuminate/process": "self.version",
         "illuminate/queue": "self.version",
+        "illuminate/reflection": "self.version",
         "illuminate/redis": "self.version",
         "illuminate/routing": "self.version",
         "illuminate/session": "self.version",
@@ -115,7 +116,7 @@
         "league/flysystem-sftp-v3": "^3.25.1",
         "mockery/mockery": "^1.6.10",
         "opis/json-schema": "^2.4.1",
-        "orchestra/testbench-core": "^10.8.0",
+        "orchestra/testbench-core": "^10.8.1",
         "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
@@ -143,6 +144,7 @@
             "src/Illuminate/Filesystem/functions.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Log/functions.php",
+            "src/Illuminate/Reflection/helpers.php",
             "src/Illuminate/Support/functions.php",
             "src/Illuminate/Support/helpers.php"
         ],
@@ -151,7 +153,8 @@
             "Illuminate\\Support\\": [
                 "src/Illuminate/Macroable/",
                 "src/Illuminate/Collections/",
-                "src/Illuminate/Conditionable/"
+                "src/Illuminate/Conditionable/",
+                "src/Illuminate/Reflection/"
             ]
         }
     },

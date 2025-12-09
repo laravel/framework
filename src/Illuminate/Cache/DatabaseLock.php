@@ -137,11 +137,11 @@ class DatabaseLock extends Lock
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return string
+     * @return string|null
      */
     protected function getCurrentOwner()
     {
-        return optional($this->connection->table($this->table)->where('key', $this->name)->first())->owner;
+        return $this->connection->table($this->table)->where('key', $this->name)->first()?->owner;
     }
 
     /**

@@ -323,6 +323,38 @@ class Builder
     }
 
     /**
+     * Execute a table builder callback if the given table has a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  \Closure  $callback
+     * @param  string|null  $type
+     * @return void
+     */
+    public function whenTableHasIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    {
+        if ($this->hasIndex($table, $index, $type)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
+     * Execute a table builder callback if the given table doesn't have a given index.
+     *
+     * @param  string  $table
+     * @param  string|array  $index
+     * @param  \Closure  $callback
+     * @param  string|null  $type
+     * @return void
+     */
+    public function whenTableDoesntHaveIndex(string $table, string|array $index, Closure $callback, ?string $type = null)
+    {
+        if (! $this->hasIndex($table, $index, $type)) {
+            $this->table($table, fn (Blueprint $table) => $callback($table));
+        }
+    }
+
+    /**
      * Get the data type for the given column name.
      *
      * @param  string  $table

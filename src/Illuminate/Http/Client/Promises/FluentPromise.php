@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Http\Client;
+namespace Illuminate\Http\Client\Promises;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Support\Traits\ForwardsCalls;
