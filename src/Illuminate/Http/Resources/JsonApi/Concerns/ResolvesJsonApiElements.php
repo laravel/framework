@@ -24,14 +24,14 @@ use JsonSerializable;
 trait ResolvesJsonApiElements
 {
     /**
-     * Determine whether resource use included and fields from the request object.
+     * Determine whether resources respect inclusions and fields from the request.
      */
     protected bool $usesRequestQueryString = true;
 
     /**
      * Determine whether included relationship for the resource from eager loaded relationship.
      */
-    protected bool $usesIncludedFromLoadedRelationships = false;
+    protected bool $includesPreviouslyLoadedRelationships = false;
 
     /**
      * Cached loaded relationships map.
@@ -44,40 +44,6 @@ trait ResolvesJsonApiElements
      * Cached loaded relationships identifers.
      */
     protected array $loadedRelationshipIdentifiers = [];
-
-    /**
-     * Determine relationships should rely on request's query string.
-     *
-     * @return $this
-     */
-    public function withRequestQueryString(bool $value = true)
-    {
-        $this->usesRequestQueryString = $value;
-
-        return $this;
-    }
-
-    /**
-     * Determine relationships should not be relied on request's query string.
-     *
-     * @return $this
-     */
-    public function withoutRequestQueryString()
-    {
-        return $this->withRequestQueryString(false);
-    }
-
-    /**
-     * Determine relationship should include loaded relationships.
-     *
-     * @return $this
-     */
-    public function withIncludedFromLoadedRelationships()
-    {
-        $this->usesIncludedFromLoadedRelationships = true;
-
-        return $this;
-    }
 
     /**
      * Resolves `data` for the resource.
@@ -201,7 +167,7 @@ trait ResolvesJsonApiElements
         }
 
         $sparseIncluded = match (true) {
-            $this->usesIncludedFromLoadedRelationships => array_keys($this->resource->getRelations()),
+            $this->includesPreviouslyLoadedRelationships => array_keys($this->resource->getRelations()),
             default => $request->sparseIncluded(),
         };
 
@@ -226,10 +192,10 @@ trait ResolvesJsonApiElements
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(
+                    $request,
                     $this->resource,
                     $relationResolver,
                     $relatedModels,
-                    $request
                 );
             }
         }))->all();
@@ -240,9 +206,9 @@ trait ResolvesJsonApiElements
      */
     protected function compileResourceRelationshipUsingResolver(
         mixed $resource,
+        JsonApiRequest $request,
         RelationResolver $relationResolver,
-        Collection|Model|null $relatedModels,
-        JsonApiRequest $request
+        Collection|Model|null $relatedModels
     ): Generator {
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
@@ -258,6 +224,7 @@ trait ResolvesJsonApiElements
             }
 
             $relationship = $resource->{$relationName}();
+
             $isUnique = ! $relationship instanceof BelongsToMany;
 
             yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
@@ -268,7 +235,7 @@ trait ResolvesJsonApiElements
                     function ($uniqueKey) use ($request, $relatedModel, $relatedResource, $isUnique) {
                         $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique];
 
-                        $this->compileIncludedNestedRelationshipsMap($relatedModel, $relatedResource, $request);
+                        $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
 
                         return [
                             'id' => $uniqueKey[1],
@@ -302,7 +269,7 @@ trait ResolvesJsonApiElements
             function ($uniqueKey) use ($relatedModel, $relatedResource, $request) {
                 $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true];
 
-                $this->compileIncludedNestedRelationshipsMap($relatedModel, $relatedResource, $request);
+                $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
 
                 return [
                     'id' => $uniqueKey[1],
@@ -315,7 +282,7 @@ trait ResolvesJsonApiElements
     /**
      * Compile included relationships map.
      */
-    protected function compileIncludedNestedRelationshipsMap(Model $relation, JsonApiResource $resource, JsonApiRequest $request): void
+    protected function compileIncludedNestedRelationshipsMap(JsonApiRequest $request, Model $relation, JsonApiResource $resource): void
     {
         (new Collection($resource->toRelationships($request)))
             ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
@@ -349,7 +316,10 @@ trait ResolvesJsonApiElements
                 $resourceInstance = new JsonApiResource($resourceInstance->resource);
             }
 
-            $relationsData = $resourceInstance->withoutRequestQueryString()->withIncludedFromLoadedRelationships()->resolve($request);
+            $relationsData = $resourceInstance
+                ->withoutRequestQueryString()
+                ->includePreviouslyLoadedRelationships()
+                ->resolve($request);
 
             array_push($this->loadedRelationshipsMap, ...$resourceInstance->loadedRelationshipsMap);
 
@@ -411,6 +381,40 @@ trait ResolvesJsonApiElements
         return static::normalizeResourceType(
             $morphMap !== $modelClassName ? $morphMap : class_basename($modelClassName)
         );
+    }
+
+    /**
+     * Indicate that relationship loading should respect the request's "includes" query string.
+     *
+     * @return $this
+     */
+    public function withRequestQueryString(bool $value = true)
+    {
+        $this->usesRequestQueryString = $value;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that relationship loading should not rely on the request's "includes" query string.
+     *
+     * @return $this
+     */
+    public function withoutRequestQueryString()
+    {
+        return $this->withRequestQueryString(false);
+    }
+
+    /**
+     * Determine relationship should include loaded relationships.
+     *
+     * @return $this
+     */
+    public function includePreviouslyLoadedRelationships()
+    {
+        $this->includesPreviouslyLoadedRelationships = true;
+
+        return $this;
     }
 
     /**

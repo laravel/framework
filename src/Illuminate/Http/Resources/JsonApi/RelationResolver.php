@@ -5,7 +5,6 @@ namespace Illuminate\Http\Resources\JsonApi;
 use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException;
 
 /**
  * @internal
@@ -44,7 +43,7 @@ class RelationResolver
     }
 
     /**
-     * Resolve relation for a resource.
+     * Resolve the relation for a resource.
      */
     public function handle(mixed $resource): Collection|Model|null
     {
@@ -59,28 +58,5 @@ class RelationResolver
     public function resourceClass(): ?string
     {
         return $this->relationResourceClass;
-    }
-
-    /**
-     * Get the relation resource type.
-     *
-     * @throws \Illuminate\Http\Resources\JsonApi\Exceptions\ResourceIdentificationException
-     */
-    public function resourceType(Collection|Model $resources, JsonApiRequest $request): ?string
-    {
-        $resource = $resources instanceof Collection ? $resources->first() : $resources;
-
-        if (is_null($resourceClass = $this->resourceClass())) {
-            return JsonApiResource::resourceTypeFromModel($resource);
-        }
-
-        $relatedResource = new $resourceClass($resource);
-
-        return tap($relatedResource->toType($request), function ($resourceType) use ($relatedResource) {
-            throw_if(
-                is_null($resourceType),
-                ResourceIdentificationException::attemptingToDetermineTypeFor($relatedResource)
-            );
-        });
     }
 }
