@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Http\Client\Events\RequestSending;
 use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Request;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
@@ -86,5 +87,26 @@ class HttpClientTest extends TestCase
 
         $this->assertEquals('faked response', $myFakedResponse);
         $this->assertEquals('stub', $r);
+    }
+
+    public function testCanSetRequestAttributes()
+    {
+        Http::fake([
+            '*' => fn (Request $request) => match($request->attributes()['name'] ?? null) {
+                'first' => Http::response('first response'),
+                'second' => Http::response('second response'),
+                default => Http::response('unnamed')
+            }
+        ]);
+
+        $response1 = Http::withAttributes(['name' => 'first'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response2 = Http::withAttributes(['name' => 'second'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response3 = Http::get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+        $response4 = Http::withAttributes(['name' => 'fourth'])->get('https://some-store.myshopify.com/admin/api/2025-10/graphql.json');
+
+        $this->assertEquals('first response', $response1->body());
+        $this->assertEquals('second response', $response2->body());
+        $this->assertEquals('unnamed', $response3->body());
+        $this->assertEquals('unnamed', $response4->body());
     }
 }

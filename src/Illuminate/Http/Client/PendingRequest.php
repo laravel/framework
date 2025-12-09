@@ -198,6 +198,13 @@ class PendingRequest
     protected $async = false;
 
     /**
+     * The attributes to track with the request.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $attributes = [];
+
+    /**
      * The pending request promise.
      *
      * @var \GuzzleHttp\Promise\PromiseInterface
@@ -703,6 +710,19 @@ class PendingRequest
     }
 
     /**
+     * Set arbitrary attributes to store with the request.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function withAttributes($attributes)
+    {
+        $this->attributes = array_merge_recursive($this->attributes, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Add a new "before sending" callback to the request.
      *
      * @param  callable  $callback
@@ -1140,7 +1160,10 @@ class PendingRequest
                 if ($e instanceof ConnectException || ($e instanceof RequestException && ! $e->hasResponse())) {
                     $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-                    $this->dispatchConnectionFailedEvent(new Request($e->getRequest()), $exception);
+                    $this->dispatchConnectionFailedEvent(
+                        (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
+                        $exception
+                    );
 
                     return $exception;
                 }
@@ -1416,7 +1439,9 @@ class PendingRequest
 
                 return $promise->then(function ($response) use ($request, $options) {
                     $this->factory?->recordRequestResponsePair(
-                        (new Request($request))->withData($options['laravel_data']),
+                        (new Request($request))
+                            ->withData($options['laravel_data'])
+                            ->setRequestAttributes($this->attributes),
                         $this->newResponse($response)
                     );
 
@@ -1437,7 +1462,12 @@ class PendingRequest
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?? new Collection)
                     ->map
-                    ->__invoke((new Request($request))->withData($options['laravel_data']), $options)
+                    ->__invoke(
+                        (new Request($request))
+                            ->withData($options['laravel_data'])
+                            ->setRequestAttributes($this->attributes),
+                        $options
+                    )
                     ->filter()
                     ->first();
 
@@ -1496,7 +1526,12 @@ class PendingRequest
         return tap($request, function (&$request) use ($options) {
             $this->beforeSendingCallbacks->each(function ($callback) use (&$request, $options) {
                 $callbackResult = call_user_func(
-                    $callback, (new Request($request))->withData($options['laravel_data']), $options, $this
+                    $callback,
+                    (new Request($request))
+                        ->withData($options['laravel_data'])
+                        ->setRequestAttributes($this->attributes),
+                    $options,
+                    $this
                 );
 
                 if ($callbackResult instanceof RequestInterface) {
@@ -1700,7 +1735,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = new Request($e->getRequest());
+        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1721,7 +1756,7 @@ class PendingRequest
     {
         $exception = new ConnectionException($e->getMessage(), 0, $e);
 
-        $request = new Request($e->getRequest());
+        $request = (new Request($e->getRequest()))->setRequestAttributes($this->attributes);
 
         $this->factory?->recordRequestResponsePair(
             $request, null
@@ -1743,7 +1778,7 @@ class PendingRequest
         $response = $this->populateResponse($this->newResponse($e->getResponse()));
 
         $this->factory?->recordRequestResponsePair(
-            new Request($e->getRequest()),
+            (new Request($e->getRequest()))->setRequestAttributes($this->attributes),
             $response
         );
 
