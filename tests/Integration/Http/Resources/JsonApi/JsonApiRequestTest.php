@@ -32,10 +32,13 @@ class JsonApiRequestTest extends TestCase
     public function testItCanResolveSparseIncluded()
     {
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([
-            'include' => 'teams,users',
+            'include' => 'teams,posts.author,posts.comments,profile.user.profile',
         ]));
 
-        $this->assertSame(['teams', 'users'], $request->sparseIncluded());
+        $this->assertSame(['teams', 'posts', 'profile'], $request->sparseIncluded());
+        $this->assertSame([], $request->sparseIncluded('teams'));
+        $this->assertSame(['author', 'comments'], $request->sparseIncluded('posts'));
+        $this->assertSame(['user.profile'], $request->sparseIncluded('profile'));
     }
 
     public function testItCanResolveEmptySparseIncluded()
