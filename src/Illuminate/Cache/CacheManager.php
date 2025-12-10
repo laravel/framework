@@ -444,7 +444,7 @@ class CacheManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['cache.default'];
+        return $this->app['config']['cache.default'] ?? 'null';
     }
 
     /**
