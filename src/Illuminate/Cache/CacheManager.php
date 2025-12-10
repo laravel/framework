@@ -57,7 +57,7 @@ class CacheManager implements FactoryContract
      */
     public function store($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = $name ?? $this->getDefaultDriver();
 
         return $this->stores[$name] ??= $this->resolve($name);
     }
@@ -81,7 +81,7 @@ class CacheManager implements FactoryContract
      */
     public function memo($driver = null)
     {
-        $driver = $driver ?: $this->getDefaultDriver();
+        $driver = $driver ?? $this->getDefaultDriver();
 
         $bindingKey = "cache.__memoized:{$driver}";
 
@@ -430,11 +430,9 @@ class CacheManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        if (! is_null($name) && $name !== 'null') {
-            return $this->app['config']["cache.stores.{$name}"];
-        }
-
-        return ['driver' => 'null'];
+        return $name !== 'null'
+            ? $this->app['config']["cache.stores.{$name}"]
+            : ['driver' => 'null'];
     }
 
     /**
@@ -444,7 +442,7 @@ class CacheManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['cache.default'];
+        return $this->app['config']['cache.default'] ?? 'null';
     }
 
     /**
