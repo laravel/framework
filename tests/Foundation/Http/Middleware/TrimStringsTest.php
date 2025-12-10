@@ -22,10 +22,10 @@ class TrimStringsTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertSame('123', $request->get('abc'));
-            $this->assertSame('456', $request->get('xyz'));
-            $this->assertSame('  789  ', $request->get('foo'));
-            $this->assertSame('  010  ', $request->get('bar'));
+            $this->assertSame('123', $request->input('abc'));
+            $this->assertSame('456', $request->input('xyz'));
+            $this->assertSame('  789  ', $request->input('foo'));
+            $this->assertSame('  010  ', $request->input('bar'));
         });
     }
 
@@ -47,13 +47,13 @@ class TrimStringsTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertSame('123', $request->get('abc'));
-            $this->assertSame('ha', $request->get('zwnbsp'));
-            $this->assertSame('だ', $request->get('xyz'));
-            $this->assertSame('ム', $request->get('foo'));
-            $this->assertSame('だ', $request->get('bar'));
-            $this->assertSame('ム', $request->get('baz'));
-            $this->assertSame("\xE9", $request->get('binary'));
+            $this->assertSame('123', $request->input('abc'));
+            $this->assertSame('ha', $request->input('zwnbsp'));
+            $this->assertSame('だ', $request->input('xyz'));
+            $this->assertSame('ム', $request->input('foo'));
+            $this->assertSame('だ', $request->input('bar'));
+            $this->assertSame('ム', $request->input('baz'));
+            $this->assertSame("\xE9", $request->input('binary'));
         });
     }
 }

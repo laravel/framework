@@ -20,8 +20,8 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertSame('12', $request->get('bar'));
-            $this->assertSame('ab', $request->get('baz'));
+            $this->assertSame('12', $request->input('bar'));
+            $this->assertSame('ab', $request->input('baz'));
         });
     }
 
@@ -39,9 +39,9 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertSame('Damian', $request->get('name'));
-            $this->assertEquals(27, $request->get('age'));
-            $this->assertEquals(5, $request->get('beers'));
+            $this->assertSame('Damian', $request->input('name'));
+            $this->assertEquals(27, $request->input('age'));
+            $this->assertEquals(5, $request->input('beers'));
         });
     }
 
@@ -61,9 +61,9 @@ class TransformsRequestTest extends TestCase
         $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
-            $this->assertSame('Damian', $request->get('name'));
-            $this->assertEquals([27, 55, 83], $request->get('age'));
-            $this->assertEquals([5, 9, 13], $request->get('beers'));
+            $this->assertSame('Damian', $request->input('name'));
+            $this->assertEquals([27, 55, 83], $request->input('age'));
+            $this->assertEquals([5, 9, 13], $request->input('beers'));
         });
     }
 
