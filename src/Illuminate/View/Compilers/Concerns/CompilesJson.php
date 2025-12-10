@@ -15,7 +15,6 @@ trait CompilesJson
      * Compile the JSON statement into valid PHP.
      *
      * @param  string  $expression
-     *
      * @return string
      */
     protected function compileJson($expression)
@@ -39,7 +38,6 @@ trait CompilesJson
      * and other nested structures by using PHP's tokenizer.
      *
      * @param  string  $expression
-     *
      * @return array
      */
     protected function parseArguments($expression)
@@ -48,7 +46,7 @@ trait CompilesJson
             return [];
         }
 
-        $tokens = @token_get_all('<?php ' . $expression);
+        $tokens = @token_get_all('<?php '.$expression);
 
         if (false === $tokens) {
             // Fallback to simple explode if tokenization fails
@@ -85,10 +83,10 @@ trait CompilesJson
 
                 // Track nesting depth for parentheses, brackets, and braces
                 if ('(' === $char || '[' === $char || '{' === $char) {
-                    ++$depth;
+                    $depth++;
                     $current .= $char;
                 } elseif (')' === $char || ']' === $char || '}' === $char) {
-                    --$depth;
+                    $depth--;
                     $current .= $char;
                 } elseif (',' === $char && 0 === $depth) {
                     // Only split on commas at the top level
