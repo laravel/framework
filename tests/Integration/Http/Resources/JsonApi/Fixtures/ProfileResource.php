@@ -15,6 +15,10 @@ class ProfileResource extends JsonApiResource
     public function toAttributes(Request $request)
     {
         return [
+            'id' => [
+                'user' => $this->user_id,
+                'profile' => $this->id,
+            ],
             'timezone' => $this->timezone,
             'date_of_birth' => $this->date_of_birth,
         ];
