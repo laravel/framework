@@ -148,8 +148,8 @@ class JsonApiCollectionTest extends TestCase
                         'id' => (string) $profile->getKey(),
                         'type' => 'profiles',
                         'attributes' => [
-                            'date_of_birth' => '2011-06-09',
                             'timezone' => 'America/Chicago',
+                            'date_of_birth' => '2011-06-09',
                         ],
                     ],
                     [
