@@ -6,8 +6,10 @@ use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\InvokableRule;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ScopeAwareRule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
+use Illuminate\Support\Arr;
 use Illuminate\Translation\CreatesPotentiallyTranslatedStrings;
 
 class InvokableValidationRule implements Rule, ValidatorAwareRule
@@ -68,7 +70,8 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
     public static function make($invokable)
     {
         if ($invokable->implicit ?? false) {
-            return new class($invokable) extends InvokableValidationRule implements ImplicitRule {
+            return new class($invokable) extends InvokableValidationRule implements ImplicitRule
+            {
             };
         }
 
@@ -92,6 +95,10 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
 
         if ($this->invokable instanceof ValidatorAwareRule) {
             $this->invokable->setValidator($this->validator);
+        }
+
+        if ($this->invokable instanceof ScopeAwareRule) {
+            $this->invokable->setScope($this->getScopeFromAttribute($attribute));
         }
 
         $method = $this->invokable instanceof ValidationRule
@@ -151,5 +158,26 @@ class InvokableValidationRule implements Rule, ValidatorAwareRule
         $this->validator = $validator;
 
         return $this;
+    }
+
+    protected function getScopeFromAttribute(string $attribute): array
+    {
+        $data = $this->validator->getData();
+        $parts = explode('.', $attribute);
+
+        $indexes = array_keys(
+            array_filter($parts, fn ($part) => ctype_digit((string) $part))
+        );
+
+        if ($indexes === []) {
+            return $data;
+        }
+
+        $scope = Arr::get(
+            $data,
+            implode('.', array_slice($parts, 0, last($indexes) + 1))
+        );
+
+        return is_array($scope) ? $scope : [];
     }
 }
