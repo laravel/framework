@@ -682,25 +682,15 @@ trait HasAttributes
      */
     public function hasAttributeGetMutator($key)
     {
-        $class = get_class($this);
-
-        if (array_key_exists($key, static::$getAttributeMutatorCache[$class] ?? [])) {
-            return static::$getAttributeMutatorCache[$class][$key];
+        if (isset(static::$getAttributeMutatorCache[get_class($this)][$key])) {
+            return static::$getAttributeMutatorCache[get_class($this)][$key];
         }
 
-        // First, ensure there's actually an Attribute-returning method
         if (! $this->hasAttributeMutator($key)) {
-            return static::$getAttributeMutatorCache[$class][$key] = false;
+            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        // Lazy evaluation: only now do we resolve and inspect the Attribute
-        try {
-            $attribute = $this->{Str::camel($key)}();
-
-            return static::$getAttributeMutatorCache[$class][$key] = is_callable($attribute->get);
-        } catch (\Throwable $e) {
-            return static::$getAttributeMutatorCache[$class][$key] = false;
-        }
+        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
     }
 
     /**
@@ -765,14 +755,14 @@ trait HasAttributes
     {
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif ($this->hasAttributeGetMutator($key)) {
-            // Attribute::make(get: ...)
+        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
+                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
-            if ($value instanceof DateTimeInterface) {
-                $value = $this->serializeDate($value);
-            }
-        } elseif ($this->hasGetMutator($key)) {
+            $value = $value instanceof DateTimeInterface
+                ? $this->serializeDate($value)
+                : $value;
+        } else {
             $value = $this->mutateAttribute($key, $value);
         }
 
@@ -2476,16 +2466,9 @@ trait HasAttributes
 
         $class = $reflection->getName();
 
-        // Get Attribute return type methods without invoking them (lazy caching)
-        $attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance);
-
-        // Initialize cache with method names but don't set to true yet
-        // This allows us to know which methods might be Attribute mutators
-        // without invoking them. The actual 'get' callable check happens lazily
-        // in hasAttributeGetMutator() when the attribute is actually accessed.
-        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods))
+        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
             ->mapWithKeys(fn ($match) => [
-                lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => null,
+                lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true,
             ])
             ->all();
 
@@ -2518,9 +2501,19 @@ trait HasAttributes
     {
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getMethods()))
-            ->filter(fn ($method) => $method->getReturnType() instanceof ReflectionNamedType &&
-                $method->getReturnType()->getName() === Attribute::class)
-            ->map->name->values()->all();
+        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
+            $returnType = $method->getReturnType();
+
+            if ($returnType instanceof ReflectionNamedType &&
+                $returnType->getName() === Attribute::class) {
+                if (is_callable($method->invoke($instance)->get)) {
+                    return true;
+                }
+            }
+
+            return false;
+        })->map->name->values()->all();
     }
+
+
 }

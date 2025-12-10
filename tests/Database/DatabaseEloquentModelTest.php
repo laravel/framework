@@ -3663,6 +3663,27 @@ class DatabaseEloquentModelTest extends TestCase
         // Should not crash and should still include the "foo" attribute.
         $this->assertArrayHasKey('foo', $array);
     }
+
+    public function testHiddenAttributeAccessorIsNotInvokedDuringSerialization()
+    {
+        $model = new class extends Model
+        {
+            protected $hidden = ['dangerous'];
+
+            protected function dangerous(): Attribute
+            {
+                return Attribute::make(
+                    get: function () {
+                        throw new \RuntimeException('Hidden attribute accessor should not be invoked');
+                    }
+                );
+            }
+        };
+
+        $array = $model->toArray();
+
+        $this->assertArrayNotHasKey('dangerous', $array);
+    }
 }
 
 class CustomBuilder extends Builder
