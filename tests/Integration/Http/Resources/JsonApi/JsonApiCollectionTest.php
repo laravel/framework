@@ -172,7 +172,6 @@ class JsonApiCollectionTest extends TestCase
                         'id' => (string) $team->getKey(),
                         'type' => 'teams',
                         'attributes' => [
-                            'id' => $team->getKey(),
                             'user_id' => $team->user_id,
                             'name' => 'Laravel Team',
                             'personal_team' => true,
@@ -189,7 +188,6 @@ class JsonApiCollectionTest extends TestCase
                         'id' => (string) $team->getKey(),
                         'type' => 'teams',
                         'attributes' => [
-                            'id' => $team->getKey(),
                             'user_id' => $team->user_id,
                             'name' => 'Laravel Team',
                             'personal_team' => true,

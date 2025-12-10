@@ -154,7 +154,6 @@ class JsonApiResourceTest extends TestCase
                         'id' => (string) $team->getKey(),
                         'type' => 'teams',
                         'attributes' => [
-                            'id' => $team->getKey(),
                             'user_id' => $team->user_id,
                             'name' => 'Laravel Team',
                             'personal_team' => true,
@@ -171,7 +170,6 @@ class JsonApiResourceTest extends TestCase
                         'id' => (string) $team->getKey(),
                         'type' => 'teams',
                         'attributes' => [
-                            'id' => $team->getKey(),
                             'user_id' => $team->user_id,
                             'name' => 'Laravel Team',
                             'personal_team' => true,
