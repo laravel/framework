@@ -64,6 +64,7 @@ class DatabaseLock extends Lock
      * Attempt to acquire the lock.
      *
      * @return bool
+     *
      * @throws Throwable
      */
     public function acquire()

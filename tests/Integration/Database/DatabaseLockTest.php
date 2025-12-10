@@ -8,8 +8,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Orchestra\Testbench\Attributes\WithMigration;
 use Mockery as m;
+use Orchestra\Testbench\Attributes\WithMigration;
 use PDOException;
 use PHPUnit\Framework\Attributes\TestWith;
 
