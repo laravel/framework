@@ -55,8 +55,8 @@ class MiddlewareTest extends TestCase
 
         $request = $middleware->handle($request, fn (Request $request) => $request);
 
-        $this->assertSame('  123  ', $request->get('aaa'));
-        $this->assertNull($request->get('bbb'));
+        $this->assertSame('  123  ', $request->input('aaa'));
+        $this->assertNull($request->input('bbb'));
 
         $symfonyRequest = new SymfonyRequest([
             'aaa' => '  123  ',
@@ -68,8 +68,8 @@ class MiddlewareTest extends TestCase
 
         $request = $middleware->handle($request, fn (Request $request) => $request);
 
-        $this->assertSame('  123  ', $request->get('aaa'));
-        $this->assertSame('', $request->get('bbb'));
+        $this->assertSame('  123  ', $request->input('aaa'));
+        $this->assertSame('', $request->input('bbb'));
 
         $symfonyRequest = new SymfonyRequest([
             'aaa' => '  123  ',
@@ -81,8 +81,8 @@ class MiddlewareTest extends TestCase
 
         $request = $middleware->handle($request, fn (Request $request) => $request);
 
-        $this->assertSame('  123  ', $request->get('aaa'));
-        $this->assertSame('', $request->get('bbb'));
+        $this->assertSame('  123  ', $request->input('aaa'));
+        $this->assertSame('', $request->input('bbb'));
     }
 
     public function testTrimStrings()
@@ -105,9 +105,9 @@ class MiddlewareTest extends TestCase
 
         $request = $middleware->handle($request, fn (Request $request) => $request);
 
-        $this->assertSame('  123  ', $request->get('aaa'));
-        $this->assertSame('456', $request->get('bbb'));
-        $this->assertSame('789', $request->get('ccc'));
+        $this->assertSame('  123  ', $request->input('aaa'));
+        $this->assertSame('456', $request->input('bbb'));
+        $this->assertSame('789', $request->input('ccc'));
 
         $symfonyRequest = new SymfonyRequest([
             'aaa' => '  123  ',
@@ -120,9 +120,9 @@ class MiddlewareTest extends TestCase
 
         $request = $middleware->handle($request, fn (Request $request) => $request);
 
-        $this->assertSame('  123  ', $request->get('aaa'));
-        $this->assertSame('  456  ', $request->get('bbb'));
-        $this->assertSame('  789  ', $request->get('ccc'));
+        $this->assertSame('  123  ', $request->input('aaa'));
+        $this->assertSame('  456  ', $request->input('bbb'));
+        $this->assertSame('  789  ', $request->input('ccc'));
     }
 
     public function testTrustProxies()

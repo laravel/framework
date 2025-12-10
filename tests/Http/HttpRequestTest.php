@@ -1777,10 +1777,10 @@ class HttpRequestTest extends TestCase
         $request = Request::createFromBase($base);
 
         $request->merge([
-            'name' => $request->get('first').' '.$request->get('last'),
+            'name' => $request->input('first').' '.$request->input('last'),
         ]);
 
-        $this->assertSame('Taylor Otwell', $request->get('name'));
+        $this->assertSame('Taylor Otwell', $request->input('name'));
     }
 
     public function testItCanHaveObjectsInJsonPayload()
@@ -1792,9 +1792,9 @@ class HttpRequestTest extends TestCase
         $base = SymfonyRequest::create('/', 'POST', server: ['CONTENT_TYPE' => 'application/json'], content: '{"framework":{"name":"Laravel"}}');
         $request = Request::createFromBase($base);
 
-        $value = $request->get('framework');
+        $value = $request->input('framework');
 
-        $this->assertSame(['name' => 'Laravel'], $request->get('framework'));
+        $this->assertSame(['name' => 'Laravel'], $request->input('framework'));
     }
 
     public function testItDoesNotGenerateJsonErrorsForEmptyContent()
