@@ -2507,6 +2507,4 @@ trait HasAttributes
             ->values()
             ->all();
     }
-
-
 }
