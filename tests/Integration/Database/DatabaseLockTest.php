@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Mockery as m;
+use PDOException;
 use PHPUnit\Framework\Attributes\TestWith;
 
 #[WithMigration('cache')]
@@ -87,11 +88,11 @@ class DatabaseLockTest extends DatabaseTestCase
 
         $deleteBuilder->shouldReceive('where')->with('expiration', '<=', m::any())->once()->andReturnSelf();
         $deleteBuilder->shouldReceive('delete')->once()->andThrow(
-            new \Illuminate\Database\QueryException(
+            new QueryException(
                 'mysql',
                 'delete from cache_locks where expiration <= ?',
                 [],
-                new \PDOException($message, $code)
+                new PDOException($message, $code)
             )
         );
 
