@@ -137,7 +137,6 @@ trait ResolvesJsonApiElements
         $data = (new Collection($data))
             ->mapWithKeys(fn ($value, $key) => is_int($key) ? [$value => $this->resource->{$value}] : [$key => $value])
             ->when(! empty($sparseFieldset), fn ($attributes) => $attributes->only($sparseFieldset))
-            ->reject(fn ($value, $key) => $key === $this->resource->getKey())
             ->transform(fn ($value) => value($value, $request))
             ->all();
 
