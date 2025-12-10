@@ -15,6 +15,7 @@ trait CompilesJson
      * Compile the JSON statement into valid PHP.
      *
      * @param  string  $expression
+     *
      * @return string
      */
     protected function compileJson($expression)
@@ -38,17 +39,18 @@ trait CompilesJson
      * and other nested structures by using PHP's tokenizer.
      *
      * @param  string  $expression
+     *
      * @return array
      */
     protected function parseArguments($expression)
     {
-        if (trim($expression) === '') {
+        if ('' === trim($expression)) {
             return [];
         }
 
-        $tokens = @token_get_all('<?php '.$expression);
+        $tokens = @token_get_all('<?php ' . $expression);
 
-        if ($tokens === false) {
+        if (false === $tokens) {
             // Fallback to simple explode if tokenization fails
             return array_map('trim', explode(',', $expression));
         }
@@ -59,7 +61,7 @@ trait CompilesJson
 
         foreach ($tokens as $index => $token) {
             // Skip the initial <?php token
-            if ($index === 0 && is_array($token) && $token[0] === T_OPEN_TAG) {
+            if (0 === $index && is_array($token) && T_OPEN_TAG === $token[0]) {
                 continue;
             }
 
@@ -73,7 +75,7 @@ trait CompilesJson
                 }
 
                 // Handle whitespace at top level when $current is empty (can be ignored)
-                if ($id === T_WHITESPACE && $depth === 0 && $current === '') {
+                if (T_WHITESPACE === $id && 0 === $depth && '' === $current) {
                     continue;
                 }
 
@@ -82,13 +84,13 @@ trait CompilesJson
                 $char = $token;
 
                 // Track nesting depth for parentheses, brackets, and braces
-                if ($char === '(' || $char === '[' || $char === '{') {
-                    $depth++;
+                if ('(' === $char || '[' === $char || '{' === $char) {
+                    ++$depth;
                     $current .= $char;
-                } elseif ($char === ')' || $char === ']' || $char === '}') {
-                    $depth--;
+                } elseif (')' === $char || ']' === $char || '}' === $char) {
+                    --$depth;
                     $current .= $char;
-                } elseif ($char === ',' && $depth === 0) {
+                } elseif (',' === $char && 0 === $depth) {
                     // Only split on commas at the top level
                     $parts[] = trim($current);
                     $current = '';
@@ -99,7 +101,7 @@ trait CompilesJson
         }
 
         // Add the last part
-        if ($current !== '') {
+        if ('' !== $current) {
             $parts[] = trim($current);
         }
 
