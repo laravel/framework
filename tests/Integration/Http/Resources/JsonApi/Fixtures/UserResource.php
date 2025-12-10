@@ -22,10 +22,4 @@ class UserResource extends JsonApiResource
             'email' => $this->email,
         ];
     }
-
-    #[\Override]
-    public function toType(Request $request)
-    {
-        return 'users';
-    }
 }
