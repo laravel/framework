@@ -19,12 +19,90 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression));
+        $parts = $this->parseArguments($this->stripParentheses($expression));
 
         $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
 
         $depth = isset($parts[2]) ? trim($parts[2]) : 512;
 
-        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
+        // Ensure we have at least one argument, default to null if empty
+        $data = $parts[0] ?? 'null';
+
+        return "<?php echo json_encode($data, $options, $depth) ?>";
+    }
+
+    /**
+     * Parse arguments from an expression, respecting nested structures.
+     *
+     * This method properly handles commas inside arrays, closures, function calls,
+     * and other nested structures by using PHP's tokenizer.
+     *
+     * @param  string  $expression
+     * @return array
+     */
+    protected function parseArguments($expression)
+    {
+        if (trim($expression) === '') {
+            return [];
+        }
+
+        $tokens = @token_get_all('<?php '.$expression);
+
+        if ($tokens === false) {
+            // Fallback to simple explode if tokenization fails
+            return array_map('trim', explode(',', $expression));
+        }
+
+        $parts = [];
+        $current = '';
+        $depth = 0;
+
+        foreach ($tokens as $index => $token) {
+            // Skip the initial <?php token
+            if ($index === 0 && is_array($token) && $token[0] === T_OPEN_TAG) {
+                continue;
+            }
+
+            if (is_array($token)) {
+                [$id, $text] = $token;
+
+                // Handle strings - preserve them completely
+                if (in_array($id, [T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE])) {
+                    $current .= $text;
+                    continue;
+                }
+
+                // Handle whitespace at top level when $current is empty (can be ignored)
+                if ($id === T_WHITESPACE && $depth === 0 && $current === '') {
+                    continue;
+                }
+
+                $current .= $text;
+            } else {
+                $char = $token;
+
+                // Track nesting depth for parentheses, brackets, and braces
+                if ($char === '(' || $char === '[' || $char === '{') {
+                    $depth++;
+                    $current .= $char;
+                } elseif ($char === ')' || $char === ']' || $char === '}') {
+                    $depth--;
+                    $current .= $char;
+                } elseif ($char === ',' && $depth === 0) {
+                    // Only split on commas at the top level
+                    $parts[] = trim($current);
+                    $current = '';
+                } else {
+                    $current .= $char;
+                }
+            }
+        }
+
+        // Add the last part
+        if ($current !== '') {
+            $parts[] = trim($current);
+        }
+
+        return $parts;
     }
 }
