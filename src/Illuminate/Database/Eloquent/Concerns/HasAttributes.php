@@ -42,6 +42,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
 use Stringable;
+use Throwable;
 use ValueError;
 
 use function Illuminate\Support\enum_value;
@@ -221,8 +222,11 @@ trait HasAttributes
             $attributes = $this->getArrayableAttributes()
         );
 
-        // Important: derive mutated attributes *only* from the arrayable keys
-        $mutatedAttributes = $this->getArrayableMutatedAttributes($attributes);
+        $mutatedAttributes = array_values(
+            array_filter(array_keys($attributes), function ($key) {
+                return $this->hasAnyGetMutator($key);
+            })
+        );
 
         $attributes = $this->addMutatedAttributesToArray(
             $attributes, $mutatedAttributes
@@ -690,7 +694,13 @@ trait HasAttributes
             return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
         }
 
-        return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($this->{Str::camel($key)}()->get);
+        try {
+            $attribute = $this->{Str::camel($key)}();
+
+            return static::$getAttributeMutatorCache[get_class($this)][$key] = is_callable($attribute->get);
+        } catch (Throwable $e) {
+            return static::$getAttributeMutatorCache[get_class($this)][$key] = false;
+        }
     }
 
     /**
@@ -755,8 +765,7 @@ trait HasAttributes
     {
         if ($this->isClassCastable($key)) {
             $value = $this->getClassCastableAttributeValue($key, $value);
-        } elseif (isset(static::$getAttributeMutatorCache[get_class($this)][$key]) &&
-                  static::$getAttributeMutatorCache[get_class($this)][$key] === true) {
+        } elseif ($this->hasAttributeGetMutator($key)) {
             $value = $this->mutateAttributeMarkedAttribute($key, $value);
 
             $value = $value instanceof DateTimeInterface
@@ -2440,20 +2449,6 @@ trait HasAttributes
         return static::$mutatorCache[static::class];
     }
 
-    protected function getArrayableMutatedAttributes(array $attributes): array
-    {
-        $keys = array_keys($attributes);
-
-        if ($keys === []) {
-            return [];
-        }
-
-        // Only consider keys that are actually arrayable *and* have a mutator
-        return array_values(array_filter($keys, function ($key) {
-            return $this->hasAnyGetMutator($key);
-        }));
-    }
-
     /**
      * Extract and cache all the mutated attributes of a class.
      *
@@ -2466,7 +2461,9 @@ trait HasAttributes
 
         $class = $reflection->getName();
 
-        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance)))
+        $attributeMutatorMethods = static::getAttributeMarkedMutatorMethods($classOrInstance);
+
+        static::$getAttributeMutatorCache[$class] = (new Collection($attributeMutatorMethods))
             ->mapWithKeys(fn ($match) => [
                 lcfirst(static::$snakeAttributes ? Str::snake($match) : $match) => true,
             ])
@@ -2501,18 +2498,14 @@ trait HasAttributes
     {
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
-            $returnType = $method->getReturnType();
-
-            if ($returnType instanceof ReflectionNamedType &&
-                $returnType->getName() === Attribute::class) {
-                if (is_callable($method->invoke($instance)->get)) {
-                    return true;
-                }
-            }
-
-            return false;
-        })->map->name->values()->all();
+        return (new Collection((new ReflectionClass($instance))->getMethods()))
+            ->filter(
+                fn ($method) => $method->getReturnType() instanceof ReflectionNamedType &&
+                    $method->getReturnType()->getName() === Attribute::class)
+            ->map
+            ->name
+            ->values()
+            ->all();
     }
 
 
