@@ -131,9 +131,7 @@ class JsonApiResourceTest extends TestCase
                         'type' => 'profiles',
                         'attributes' => [
                             'date_of_birth' => '2011-06-09',
-                            'id' => $profile->getKey(),
                             'timezone' => 'America/Chicago',
-                            'user_id' => $user->getKey(),
                         ],
                     ],
                     [
