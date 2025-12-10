@@ -198,7 +198,17 @@ trait ResolvesJsonApiElements
                 $relatedResourceClass = $relationResolver->resourceClass();
 
                 if (! is_null($relatedModels)) {
-                    $relatedModels->loadMissing($request->sparseIncluded($relationName));
+                    if ($this->includesPreviouslyLoadedRelationships === true) {
+                        if ($relatedModels instanceof Collection) {
+                            $relatedModels->each(function ($relatedModel) {
+                                $relatedModel->withoutRelations();
+                            });
+                        } else {
+                            $relatedModels->withoutRelations();
+                        }
+                    } else {
+                        $relatedModels->loadMissing($request->sparseIncluded($relationName));
+                    }
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(
