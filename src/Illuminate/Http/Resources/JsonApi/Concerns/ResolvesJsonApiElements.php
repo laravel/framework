@@ -34,11 +34,6 @@ trait ResolvesJsonApiElements
     protected bool $includesPreviouslyLoadedRelationships = false;
 
     /**
-     * Determine nested relationships depth allowed for each resources.
-     */
-    public static int $nestedRelationshipsDepth = 3;
-
-    /**
      * Cached loaded relationships map.
      *
      * @var array<int, array{0: \Illuminate\Http\Resources\JsonApi\JsonApiResource, 1: string, 2: string, 3: bool}|null
@@ -51,11 +46,16 @@ trait ResolvesJsonApiElements
     protected array $loadedRelationshipIdentifiers = [];
 
     /**
-     * Determine maximum relationship nesting.
+     * The maximum relationship depth.
      */
-    public static function maxRelationshipNesting(int $depth): void
+    public static int $maxRelationshipDepth = 5;
+
+    /**
+     * Specify the maximum relationship depth.
+     */
+    public static function maxRelationshipDepth(int $depth): void
     {
-        static::$nestedRelationshipsDepth = max(0, $depth);
+        static::$maxRelationshipDepth = max(0, $depth);
     }
 
     /**

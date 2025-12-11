@@ -44,7 +44,7 @@ class JsonApiRequestTest extends TestCase
 
     public function testItCanREsolveSparseIncludedWithMaxRelationshipNesting()
     {
-        JsonApiResource::maxRelationshipNesting(2);
+        JsonApiResource::maxRelationshipDepth(2);
 
         $request = JsonApiRequest::create(uri: '/?'.http_build_query([
             'include' => 'teams,posts.author,posts.comments,profile.user.profile',

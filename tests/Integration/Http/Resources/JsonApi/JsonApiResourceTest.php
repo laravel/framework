@@ -468,7 +468,7 @@ class JsonApiResourceTest extends TestCase
 
     public function testItCanResolveRelationshipWithRecursiveNestedRelationshipLimitedToDepthConfiguration()
     {
-        JsonApiResource::maxRelationshipNesting(2);
+        JsonApiResource::maxRelationshipDepth(2);
 
         $now = $this->freezeSecond();
 
