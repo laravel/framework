@@ -216,7 +216,7 @@ trait ResolvesJsonApiElements
                     $request,
                     $this->resource,
                     $relationResolver,
-                    $relatedModels
+                    $relatedModels,
                 );
             }
         }))->all();
@@ -312,8 +312,6 @@ trait ResolvesJsonApiElements
             ->each(function ($relationResolver, $key) use ($relation, $request) {
                 $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
             });
-
-        static::$currentNestedRelationshipDepth++;
     }
 
     /**
