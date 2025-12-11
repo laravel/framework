@@ -791,6 +791,34 @@ class PendingRequest
     }
 
     /**
+     * Dump the execution as a cURL command before sending.
+     *
+     * @return $this
+     */
+    public function dumpCurl()
+    {
+        return $this->beforeSending(function (Request $request) {
+            $body = $request->isJson()
+                ? json_encode($request->data(), JSON_THROW_ON_ERROR)
+                : $request->body();
+
+            $command = sprintf('curl -X %s %s', $request->method(), escapeshellarg($request->url()));
+
+            foreach ($request->headers() as $key => $values) {
+                foreach ($values as $value) {
+                    $command .= sprintf(' -H %s', escapeshellarg("{$key}: {$value}"));
+                }
+            }
+
+            if ($body) {
+                $command .= sprintf(' -d %s', escapeshellarg($body));
+            }
+
+            VarDumper::dump($value);
+        });
+    }
+
+    /**
      * Dump the request before sending and end the script.
      *
      * @return $this
@@ -1819,31 +1847,5 @@ class PendingRequest
     public function getOptions()
     {
         return $this->options;
-    }
-
-    /**
-     * Dump the execution as a cURL command.
-     */
-    public function dumpCurl(): self
-    {
-        return $this->beforeSending(function (Request $request) {
-            $body = $request->isJson()
-                ? json_encode($request->data(), JSON_THROW_ON_ERROR)
-                : $request->body();
-
-            $command = sprintf('curl -X %s %s', $request->method(), escapeshellarg($request->url()));
-
-            foreach ($request->headers() as $key => $values) {
-                foreach ($values as $value) {
-                    $command .= sprintf(' -H %s', escapeshellarg("{$key}: {$value}"));
-                }
-            }
-
-            if ($body) {
-                $command .= sprintf(' -d %s', escapeshellarg($body));
-            }
-
-            dump($command);
-        });
     }
 }
