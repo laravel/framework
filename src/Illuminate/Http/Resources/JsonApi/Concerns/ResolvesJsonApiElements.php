@@ -372,7 +372,7 @@ trait ResolvesJsonApiElements
      *
      * @return $this
      */
-    public function withRequestQueryString(bool $value = true)
+    public function respectFieldsAndIncludesInQueryString(bool $value = true)
     {
         $this->usesRequestQueryString = $value;
 
@@ -384,9 +384,9 @@ trait ResolvesJsonApiElements
      *
      * @return $this
      */
-    public function withoutRequestQueryString()
+    public function ignoreFieldsAndIncludesInQueryString()
     {
-        return $this->withRequestQueryString(false);
+        return $this->respectFieldsAndIncludesFromQueryString(false);
     }
 
     /**
