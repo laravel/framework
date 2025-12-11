@@ -54,7 +54,6 @@ class JsonApiRequestTest extends TestCase
         $this->assertSame([], $request->sparseIncluded('teams'));
         $this->assertSame(['author', 'comments'], $request->sparseIncluded('posts'));
         $this->assertSame(['user'], $request->sparseIncluded('profile'));
-
     }
 
     public function testItCanResolveEmptySparseIncluded()
