@@ -4194,6 +4194,27 @@ class HttpClientTest extends TestCase
             'delete' => ['delete'],
         ];
     }
+
+    public function testDumpCurl(): void
+    {
+        $dumped = null;
+
+        VarDumper::setHandler(function ($value) use (&$dumped) {
+            $dumped = $value;
+        });
+
+        $this->factory->fake()
+            ->dumpCurl()
+            ->withHeaders(['X-Test' => 'foo'])
+            ->post('https://laravel.com/api/test', ['name' => 'Taylor']);
+
+        VarDumper::setHandler(null);
+
+        $this->assertStringContainsString('curl -X POST', $dumped);
+        $this->assertStringContainsString(escapeshellarg('https://laravel.com/api/test'), $dumped);
+        $this->assertStringContainsString('-H '.escapeshellarg('X-Test: foo'), $dumped);
+        $this->assertStringContainsString('-d '.escapeshellarg(json_encode(['name' => 'Taylor'])), $dumped);
+    }
 }
 
 class CustomFactory extends Factory
