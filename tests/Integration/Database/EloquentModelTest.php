@@ -135,6 +135,24 @@ class EloquentModelTest extends DatabaseTestCase
             'analyze' => true,
         ]);
     }
+
+    public function testMacroable()
+    {
+        Model::macro('test', function () {
+            return 'test';
+        });
+
+        $model = new class extends Model
+        {
+            protected $table = 'actions';
+
+            protected $guarded = ['id'];
+
+            public $timestamps = false;
+        };
+
+        $this->assertSame('test', $model->test());
+    }
 }
 
 class TestModel1 extends Model
