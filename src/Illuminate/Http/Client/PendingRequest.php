@@ -166,6 +166,13 @@ class PendingRequest
     protected $beforeSendingCallbacks;
 
     /**
+     * The callbacks that should execute after the Laravel Response is built.
+     * 
+     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response))>
+     */
+    protected $afterResponseCallbacks;
+
+    /**
      * The stub callables that will handle requests.
      *
      * @var \Illuminate\Support\Collection|null
@@ -268,6 +275,8 @@ class PendingRequest
 
             $pendingRequest->dispatchRequestSendingEvent();
         }]);
+
+        $this->afterResponseCallbacks = new Collection();
     }
 
     /**
@@ -739,6 +748,18 @@ class PendingRequest
     }
 
     /**
+     * Add a new callback to execute after the response is built.
+     * @param  callable(\Illuminate\Http\Client\Response)  $callback
+     * @return $this
+     */
+    public function afterResponse(callable $callback)
+    {
+        $this->$afterResponseCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
      * Throw an exception if a server or client error occurs.
      *
      * @param  callable|null  $callback
@@ -1008,6 +1029,7 @@ class PendingRequest
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
+                    $this->runAfterResponseCallbacks($response);
 
                     if ($response->successful()) {
                         return;
@@ -1153,6 +1175,7 @@ class PendingRequest
                 return tap($this->newResponse($message), function ($response) {
                     $this->populateResponse($response);
                     $this->dispatchResponseReceivedEvent($response);
+                    $this->runAfterResponseCallbacks($response);
                 });
             })
             ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
@@ -1577,6 +1600,11 @@ class PendingRequest
                 ? $laravelResponse->dontTruncateExceptions()
                 : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
         });
+    }
+
+    protected function runAfterResponseCallbacks(Response $response)
+    {
+        $this->afterResponseCallbacks->each(static fn (callable $callback) => $callback($response));
     }
 
     /**
