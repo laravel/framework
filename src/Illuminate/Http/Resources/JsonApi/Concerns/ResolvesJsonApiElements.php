@@ -35,8 +35,6 @@ trait ResolvesJsonApiElements
 
     public static int $nestedRelationshipsDepth = 3;
 
-    public static int $currentNestedRelationshipDepth = 0;
-
     /**
      * Cached loaded relationships map.
      *
@@ -307,20 +305,15 @@ trait ResolvesJsonApiElements
     /**
      * Compile included relationships map.
      */
-    protected function compileIncludedNestedRelationshipsMap(
-        JsonApiRequest $request,
-        Model $relation,
-        JsonApiResource $resource
-    ): void {
-        if (static::$currentNestedRelationshipDepth < static::$nestedRelationshipsDepth) {
-            (new Collection($resource->toRelationships($request)))
-                ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
-                ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
-                ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
-                ->each(function ($relationResolver, $key) use ($relation, $request) {
-                    $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
-                });
-        }
+    protected function compileIncludedNestedRelationshipsMap(JsonApiRequest $request, Model $relation, JsonApiResource $resource): void
+    {
+        (new Collection($resource->toRelationships($request)))
+            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
+            ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
+            ->each(function ($relationResolver, $key) use ($relation, $request) {
+                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
+            });
 
         static::$currentNestedRelationshipDepth++;
     }
