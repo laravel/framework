@@ -754,7 +754,7 @@ class PendingRequest
      */
     public function afterResponse(callable $callback)
     {
-        $this->$afterResponseCallbacks[] = $callback;
+        $this->afterResponseCallbacks[] = $callback;
 
         return $this;
     }
