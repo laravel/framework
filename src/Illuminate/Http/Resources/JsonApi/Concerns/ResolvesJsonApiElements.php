@@ -33,6 +33,9 @@ trait ResolvesJsonApiElements
      */
     protected bool $includesPreviouslyLoadedRelationships = false;
 
+    /**
+     * Determine nested relationships depth allowed for each resources.
+     */
     public static int $nestedRelationshipsDepth = 3;
 
     /**
