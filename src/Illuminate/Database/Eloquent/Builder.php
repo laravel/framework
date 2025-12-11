@@ -1363,7 +1363,7 @@ class Builder implements BuilderContract
 
         $column = $this->model->getUpdatedAtColumn();
 
-        if (! array_key_exists($column, $values)) {
+        if (! is_null($column) && ! array_key_exists($column, $values)) {
             $timestamp = $this->model->freshTimestampString();
 
             if (
