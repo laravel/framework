@@ -51,7 +51,6 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         ForwardsCalls;
     /** @use HasCollection<\Illuminate\Database\Eloquent\Collection<array-key, static & self>> */
     use HasCollection;
-    
     use Macroable {
         __call as macroCall;
     }
@@ -2532,7 +2531,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
         }
-        
+
         if (in_array($method, ['increment', 'decrement', 'incrementQuietly', 'decrementQuietly'])) {
             return $this->$method(...$parameters);
         }
