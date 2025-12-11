@@ -46,6 +46,19 @@ trait ResolvesJsonApiElements
     protected array $loadedRelationshipIdentifiers = [];
 
     /**
+     * The maximum relationship depth.
+     */
+    public static int $maxRelationshipDepth = 5;
+
+    /**
+     * Specify the maximum relationship depth.
+     */
+    public static function maxRelationshipDepth(int $depth): void
+    {
+        static::$maxRelationshipDepth = max(0, $depth);
+    }
+
+    /**
      * Resolves `data` for the resource.
      */
     protected function resolveResourceObject(JsonApiRequest $request): array
@@ -197,7 +210,9 @@ trait ResolvesJsonApiElements
                 $relatedResourceClass = $relationResolver->resourceClass();
 
                 if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
-                    $relatedModels->loadMissing($request->sparseIncluded($relationName));
+                    if (! empty($relations = $request->sparseIncluded($relationName))) {
+                        $relatedModels->loadMissing($relations);
+                    }
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(

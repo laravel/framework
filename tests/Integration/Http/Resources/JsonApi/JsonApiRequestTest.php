@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 
 class JsonApiRequestTest extends TestCase
 {
@@ -39,6 +40,20 @@ class JsonApiRequestTest extends TestCase
         $this->assertSame([], $request->sparseIncluded('teams'));
         $this->assertSame(['author', 'comments'], $request->sparseIncluded('posts'));
         $this->assertSame(['user.profile'], $request->sparseIncluded('profile'));
+    }
+
+    public function testItCanREsolveSparseIncludedWithMaxRelationshipNesting()
+    {
+        JsonApiResource::maxRelationshipDepth(2);
+
+        $request = JsonApiRequest::create(uri: '/?'.http_build_query([
+            'include' => 'teams,posts.author,posts.comments,profile.user.profile',
+        ]));
+
+        $this->assertSame(['teams', 'posts', 'profile'], $request->sparseIncluded());
+        $this->assertSame([], $request->sparseIncluded('teams'));
+        $this->assertSame(['author', 'comments'], $request->sparseIncluded('posts'));
+        $this->assertSame(['user'], $request->sparseIncluded('profile'));
     }
 
     public function testItCanResolveEmptySparseIncluded()
