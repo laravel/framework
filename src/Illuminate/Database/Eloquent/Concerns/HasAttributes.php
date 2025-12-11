@@ -222,10 +222,15 @@ trait HasAttributes
             $attributes = $this->getArrayableAttributes()
         );
 
-        // IMPORTANT: only derive mutated attributes from the *arrayable* keys
+        $mutatedAttributes = array_values(
+            array_filter(array_keys($attributes), function ($key) {
+                return $this->hasAnyGetMutator($key);
+            })
+        );
+
         $attributes = $this->addMutatedAttributesToArray(
             $attributes,
-            $mutatedAttributes = $this->getArrayableMutatedAttributes($attributes)
+            $mutatedAttributes,
         );
 
         // Next we will handle any casts that have been setup for this model and cast
@@ -294,29 +299,6 @@ trait HasAttributes
 
         return $attributes;
     }
-
-    /**
-     * Get the mutated attributes that are actually arrayable.
-     *
-     * This ensures that Attribute-based and classic get mutators are only
-     * invoked during serialization for attributes that are visible /
-     * not hidden on the model.
-     *
-     * @param  array  $attributes
-     * @return array
-     */
-    protected function getArrayableMutatedAttributes(array $attributes)
-    {
-        return array_values(
-            array_filter(
-                array_keys($attributes),
-                function ($key) {
-                    return $this->hasAnyGetMutator($key);
-                }
-            )
-        );
-    }
-
 
     /**
      * Add the casted attributes to the attributes array.
