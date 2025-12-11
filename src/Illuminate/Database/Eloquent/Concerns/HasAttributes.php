@@ -222,21 +222,18 @@ trait HasAttributes
             $attributes = $this->getArrayableAttributes()
         );
 
-        $mutatedAttributes = array_values(
-            array_filter(array_keys($attributes), function ($key) {
-                return $this->hasAnyGetMutator($key);
-            })
-        );
-
+        // IMPORTANT: only derive mutated attributes from the *arrayable* keys
         $attributes = $this->addMutatedAttributesToArray(
-            $attributes, $mutatedAttributes
+            $attributes,
+            $mutatedAttributes = $this->getArrayableMutatedAttributes($attributes)
         );
 
         // Next we will handle any casts that have been setup for this model and cast
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
         $attributes = $this->addCastAttributesToArray(
-            $attributes, $mutatedAttributes
+            $attributes,
+            $mutatedAttributes
         );
 
         // Here we will grab all of the appended, calculated attributes to this model
@@ -297,6 +294,29 @@ trait HasAttributes
 
         return $attributes;
     }
+
+    /**
+     * Get the mutated attributes that are actually arrayable.
+     *
+     * This ensures that Attribute-based and classic get mutators are only
+     * invoked during serialization for attributes that are visible /
+     * not hidden on the model.
+     *
+     * @param  array  $attributes
+     * @return array
+     */
+    protected function getArrayableMutatedAttributes(array $attributes)
+    {
+        return array_values(
+            array_filter(
+                array_keys($attributes),
+                function ($key) {
+                    return $this->hasAnyGetMutator($key);
+                }
+            )
+        );
+    }
+
 
     /**
      * Add the casted attributes to the attributes array.
@@ -2498,13 +2518,17 @@ trait HasAttributes
     {
         $instance = is_object($class) ? $class : new $class;
 
-        return (new Collection((new ReflectionClass($instance))->getMethods()))
-            ->filter(
-                fn ($method) => $method->getReturnType() instanceof ReflectionNamedType &&
-                    $method->getReturnType()->getName() === Attribute::class)
-            ->map
-            ->name
-            ->values()
-            ->all();
+        return (new Collection((new ReflectionClass($instance))->getMethods()))->filter(function ($method) use ($instance) {
+            $returnType = $method->getReturnType();
+
+            if ($returnType instanceof ReflectionNamedType &&
+                $returnType->getName() === Attribute::class) {
+                if (is_callable($method->invoke($instance)->get)) {
+                    return true;
+                }
+            }
+
+            return false;
+        })->map->name->values()->all();
     }
 }
