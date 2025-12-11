@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\JsonApi;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class JsonApiRequest extends Request
@@ -59,7 +60,12 @@ class JsonApiRequest extends Request
         }
 
         return transform($this->cachedSparseIncluded[$key] ?? null, function ($value) {
-            return array_filter($value);
+            return (new Collection(Arr::wrap($value)))
+                ->transform(function ($item) {
+                    $item = implode('.', Arr::take(explode('.', $item), (JsonApiResource::$nestedRelationshipsDepth - 1)));
+
+                    return ! empty($item) ? $item : null;
+                })->filter()->all();
         }) ?? [];
     }
 }

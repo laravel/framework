@@ -33,7 +33,9 @@ trait ResolvesJsonApiElements
      */
     protected bool $includesPreviouslyLoadedRelationships = false;
 
-    protected static int $nestedRelationshipsDepth = 3;
+    public static int $nestedRelationshipsDepth = 3;
+
+    public static int $currentNestedRelationshipDepth = 0;
 
     /**
      * Cached loaded relationships map.
@@ -207,15 +209,18 @@ trait ResolvesJsonApiElements
                 $relatedResourceClass = $relationResolver->resourceClass();
 
                 if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
-                    $relatedModels->loadMissing($request->sparseIncluded($relationName));
+                    $relations = $request->sparseIncluded($relationName);
+
+                    if (! empty($relations)) {
+                        $relatedModels->loadMissing($relations);
+                    }
                 }
 
                 yield from $this->compileResourceRelationshipUsingResolver(
                     $request,
                     $this->resource,
                     $relationResolver,
-                    $relatedModels,
-                    depth: 0
+                    $relatedModels
                 );
             }
         }))->all();
@@ -228,8 +233,7 @@ trait ResolvesJsonApiElements
         JsonApiRequest $request,
         mixed $resource,
         RelationResolver $relationResolver,
-        Collection|Model|null $relatedModels,
-        int $depth
+        Collection|Model|null $relatedModels
     ): Generator {
         $relationName = $relationResolver->relationName;
         $resourceClass = $relationResolver->resourceClass();
@@ -248,15 +252,15 @@ trait ResolvesJsonApiElements
 
             $isUnique = ! $relationship instanceof BelongsToMany;
 
-            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique, $depth) {
+            yield $relationName => ['data' => $relatedModels->map(function ($relatedModel) use ($request, $resourceClass, $isUnique) {
                 $relatedResource = rescue(fn () => $relatedModel->toResource($resourceClass), new JsonApiResource($relatedModel));
 
                 return transform(
                     [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-                    function ($uniqueKey) use ($request, $relatedModel, $relatedResource, $isUnique, $depth) {
+                    function ($uniqueKey) use ($request, $relatedModel, $relatedResource, $isUnique) {
                         $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, $isUnique];
 
-                        $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource, depth: $depth);
+                        $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
 
                         return [
                             'id' => $uniqueKey[1],
@@ -287,10 +291,10 @@ trait ResolvesJsonApiElements
 
         yield $relationName => ['data' => transform(
             [$relatedResource->resolveResourceType($request), $relatedResource->resolveResourceIdentifier($request)],
-            function ($uniqueKey) use ($relatedModel, $relatedResource, $request, $depth) {
+            function ($uniqueKey) use ($relatedModel, $relatedResource, $request) {
                 $this->loadedRelationshipsMap[] = [$relatedResource, ...$uniqueKey, true];
 
-                $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource, depth: $depth);
+                $this->compileIncludedNestedRelationshipsMap($request, $relatedModel, $relatedResource);
 
                 return [
                     'id' => $uniqueKey[1],
@@ -306,22 +310,19 @@ trait ResolvesJsonApiElements
     protected function compileIncludedNestedRelationshipsMap(
         JsonApiRequest $request,
         Model $relation,
-        JsonApiResource $resource,
-        int $depth
+        JsonApiResource $resource
     ): void {
-        if ($depth >= static::$nestedRelationshipsDepth) {
-            return;
+        if (static::$currentNestedRelationshipDepth < static::$nestedRelationshipsDepth) {
+            (new Collection($resource->toRelationships($request)))
+                ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
+                ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
+                ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
+                ->each(function ($relationResolver, $key) use ($relation, $request) {
+                    $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key));
+                });
         }
 
-        $depth++;
-
-        (new Collection($resource->toRelationships($request)))
-            ->transform(fn ($value, $key) => is_int($key) ? new RelationResolver($value) : new RelationResolver($key, $value))
-            ->mapWithKeys(fn ($relationResolver) => [$relationResolver->relationName => $relationResolver])
-            ->filter(fn ($value, $key) => in_array($key, array_keys($relation->getRelations())))
-            ->each(function ($relationResolver, $key) use ($relation, $request, $depth) {
-                $this->compileResourceRelationshipUsingResolver($request, $relation, $relationResolver, $relation->getRelation($key), depth: $depth);
-            });
+        static::$currentNestedRelationshipDepth++;
     }
 
     /**
