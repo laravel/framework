@@ -32,6 +32,9 @@ use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * @template TAsync of bool = false
+ */
 class PendingRequest
 {
     use Conditionable, Macroable;
@@ -193,7 +196,7 @@ class PendingRequest
     /**
      * Whether the requests should be asynchronous.
      *
-     * @var bool
+     * @var TAsync
      */
     protected $async = false;
 
@@ -813,7 +816,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -829,7 +832,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|string|null  $query
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -845,7 +848,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -861,7 +864,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -877,7 +880,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -893,7 +896,7 @@ class PendingRequest
      *
      * @param  string  $url
      * @param  array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable  $data
-     * @return \Illuminate\Http\Client\Response|\GuzzleHttp\Promise\PromiseInterface
+     * @return (TAsync is false ?  \Illuminate\Http\Client\Response : \GuzzleHttp\Promise\PromiseInterface)
      *
      * @throws \Illuminate\Http\Client\ConnectionException
      */
@@ -974,7 +977,7 @@ class PendingRequest
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
-     * @return \Illuminate\Http\Client\Response|\Illuminate\Http\Client\Promises\LazyPromise
+     * @return (TAsync is false ? \Illuminate\Http\Client\Response : \Illuminate\Http\Client\Promises\LazyPromise)
      *
      * @throws \Exception
      * @throws \Illuminate\Http\Client\ConnectionException
@@ -1639,8 +1642,12 @@ class PendingRequest
     /**
      * Toggle asynchronicity in requests.
      *
-     * @param  bool  $async
-     * @return $this
+     * @template T of bool = true
+     *
+     * @param  T  $async
+     * @return self<T>
+     *
+     * @phpstan-self-out self<T>
      */
     public function async(bool $async = true)
     {
