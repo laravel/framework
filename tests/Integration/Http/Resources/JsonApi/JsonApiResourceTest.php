@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http\Resources\JsonApi;
 
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Comment;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Profile;
@@ -459,6 +460,63 @@ class JsonApiResourceTest extends TestCase
                                 'data' => ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
                             ],
                         ],
+                    ],
+                ],
+            ])
+            ->assertJsonMissing(['jsonapi']);
+    }
+
+    public function testItCanResolveRelationshipWithRecursiveNestedRelationshipLimitedToDepthConfiguration()
+    {
+        JsonApiResource::maxRelationshipNesting(2);
+
+        $now = $this->freezeSecond();
+
+        $user = User::factory()->create();
+
+        $profile = Profile::factory()->create([
+            'user_id' => $user->getKey(),
+            'date_of_birth' => '2011-06-09',
+            'timezone' => 'America/Chicago',
+        ]);
+
+        $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'profile.user.profile']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertExactJson([
+                'data' => [
+                    'attributes' => [
+                        'email' => $user->email,
+                        'name' => $user->name,
+                    ],
+                    'id' => (string) $user->getKey(),
+                    'type' => 'users',
+                    'relationships' => [
+                        'profile' => [
+                            'data' => ['id' => (string) $profile->getKey(), 'type' => 'profiles'],
+                        ],
+                    ],
+                ],
+                'included' => [
+                    [
+                        'attributes' => [
+                            'date_of_birth' => '2011-06-09',
+                            'timezone' => 'America/Chicago',
+                        ],
+                        'id' => (string) $profile->getKey(),
+                        'type' => 'profiles',
+                        'relationships' => [
+                            'user' => [
+                                'data' => ['id' => (string) $user->getKey(), 'type' => 'users'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'attributes' => [
+                            'email' => $user->email,
+                            'name' => $user->name,
+                        ],
+                        'id' => (string) $user->getKey(),
+                        'type' => 'users',
                     ],
                 ],
             ])
