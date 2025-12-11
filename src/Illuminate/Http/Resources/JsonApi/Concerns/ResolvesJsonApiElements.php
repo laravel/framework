@@ -207,9 +207,7 @@ trait ResolvesJsonApiElements
                 $relatedResourceClass = $relationResolver->resourceClass();
 
                 if (! is_null($relatedModels) && $this->includesPreviouslyLoadedRelationships === false) {
-                    $relations = $request->sparseIncluded($relationName);
-
-                    if (! empty($relations)) {
+                    if (! empty($relations = $request->sparseIncluded($relationName))) {
                         $relatedModels->loadMissing($relations);
                     }
                 }
