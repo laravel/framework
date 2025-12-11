@@ -152,6 +152,7 @@ class EloquentModelTest extends DatabaseTestCase
         };
 
         $this->assertSame('test', $model->test());
+        $this->assertSame('test', $model::test());
     }
 }
 
