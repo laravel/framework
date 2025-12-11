@@ -1643,8 +1643,10 @@ class PendingRequest
      * Toggle asynchronicity in requests.
      *
      * @template T of bool = true
+     *
      * @param  T  $async
      * @return self<T>
+     *
      * @phpstan-self-out self<T>
      */
     public function async(bool $async = true)
