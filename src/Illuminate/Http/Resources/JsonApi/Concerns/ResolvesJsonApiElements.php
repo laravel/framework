@@ -215,7 +215,7 @@ trait ResolvesJsonApiElements
                     $this->resource,
                     $relationResolver,
                     $relatedModels,
-                    depth: 1
+                    depth: 0
                 );
             }
         }))->all();
@@ -309,7 +309,7 @@ trait ResolvesJsonApiElements
         JsonApiResource $resource,
         int $depth
     ): void {
-        if ($depth > static::$nestedRelationshipsDepth) {
+        if ($depth >= static::$nestedRelationshipsDepth) {
             return;
         }
 
