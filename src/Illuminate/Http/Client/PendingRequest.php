@@ -814,7 +814,7 @@ class PendingRequest
                 $command .= sprintf(' -d %s', escapeshellarg($body));
             }
 
-            VarDumper::dump($value);
+            VarDumper::dump($command);
         });
     }
 
