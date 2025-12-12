@@ -5912,7 +5912,7 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new Collection([
             'name' => 'Ali',
-            'age' => 17,
+            'age' => 18,
             'skills' => ['php', 'laravel'],
         ]);
 
