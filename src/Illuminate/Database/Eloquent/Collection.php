@@ -570,17 +570,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Make the given, typically hidden, attributes visible across the entire collection.
-     *
-     * @param  array<array-key, string>|string  $attributes
-     * @return $this
-     */
-    public function makeVisible($attributes)
-    {
-        return $this->each->makeVisible($attributes);
-    }
-
-    /**
      * Merge the given, typically visible, attributes hidden across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -589,6 +578,28 @@ class Collection extends BaseCollection implements QueueableCollection
     public function mergeHidden($attributes)
     {
         return $this->each->mergeHidden($attributes);
+    }
+
+    /**
+     * Set the hidden attributes across the entire collection.
+     *
+     * @param  array<int, string>  $hidden
+     * @return $this
+     */
+    public function setHidden($hidden)
+    {
+        return $this->each->setHidden($hidden);
+    }
+
+    /**
+     * Make the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function makeVisible($attributes)
+    {
+        return $this->each->makeVisible($attributes);
     }
 
     /**
@@ -611,17 +622,6 @@ class Collection extends BaseCollection implements QueueableCollection
     public function setVisible($visible)
     {
         return $this->each->setVisible($visible);
-    }
-
-    /**
-     * Set the hidden attributes across the entire collection.
-     *
-     * @param  array<int, string>  $hidden
-     * @return $this
-     */
-    public function setHidden($hidden)
-    {
-        return $this->each->setHidden($hidden);
     }
 
     /**
