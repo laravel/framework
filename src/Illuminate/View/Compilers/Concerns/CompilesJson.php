@@ -19,14 +19,7 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = $this->parseArguments($this->stripParentheses($expression));
-
-        $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
-
-        $depth = isset($parts[2]) ? trim($parts[2]) : 512;
-
-        // Ensure we have at least one argument, default to null if empty
-        $data = $parts[0] ?? 'null';
+        [$data, $options, $depth] = $this->parseArguments($this->stripParenthesis($expression)) + ['null', $this->encodingOptions, 512];
 
         return "<?php echo json_encode($data, $options, $depth) ?>";
     }
@@ -38,7 +31,7 @@ trait CompilesJson
      * and other nested structures by using PHP's tokenizer.
      *
      * @param  string  $expression
-     * @return array
+     * @return array{0?: string, 1?: string, 2?: string}
      */
     protected function parseArguments($expression)
     {
