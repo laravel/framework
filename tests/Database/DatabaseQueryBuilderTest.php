@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Database;
 use BadMethodCallException;
 use Carbon\Carbon;
 use Closure;
+use DateInterval;
+use DatePeriod;
 use DateTime;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
 use Illuminate\Database\Connection;
@@ -1187,6 +1189,108 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', 2)->orWhereNotBetweenColumns('id', [new Raw(1), new Raw(2)]);
         $this->assertSame('select * from "users" where "id" = ? or "id" not between 1 and 2', $builder->toSql());
         $this->assertEquals([0 => 2], $builder->getBindings());
+    }
+
+    public function testWhereBetweenWithDatePeriodEndDate()
+    {
+        $builder = $this->getBuilder();
+        $start = new DateTime('2024-01-01');
+        $end = new DateTime('2024-01-31');
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod($start, $interval, $end);
+
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(2, $bindings);
+        $this->assertEquals($start, $bindings[0]);
+        $this->assertEquals($end, $bindings[1]);
+    }
+
+    public function testWhereBetweenWithDatePeriodRecurrences()
+    {
+        $builder = $this->getBuilder();
+        $start = new DateTime('2024-01-01');
+        $interval = new DateInterval('P1M');
+        $recurrences = 2;
+        $period = new DatePeriod($start, $interval, $recurrences);
+
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(2, $bindings);
+        $this->assertEquals($start, $bindings[0]);
+        $this->assertEquals(new DateTime('2024-03-01'), $bindings[1]);
+    }
+
+    public function testWhereBetweenWithDatePeriodSingleRecurrence()
+    {
+        $builder = $this->getBuilder();
+        $start = new DateTime('2024-01-01');
+        $interval = new DateInterval('P1D');
+        $recurrences = 1;
+        $period = new DatePeriod($start, $interval, $recurrences);
+
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(2, $bindings);
+        $this->assertEquals($start, $bindings[0]);
+        $this->assertEquals(new DateTime('2024-01-02'), $bindings[1]);
+    }
+
+    public function testWhereNotBetweenWithDatePeriod()
+    {
+        $builder = $this->getBuilder();
+        $start = new DateTime('2024-01-01');
+        $end = new DateTime('2024-01-31');
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod($start, $interval, $end);
+
+        $builder->select('*')->from('users')->whereNotBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "created_at" not between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(2, $bindings);
+        $this->assertEquals($start, $bindings[0]);
+        $this->assertEquals($end, $bindings[1]);
+    }
+
+    public function testOrWhereBetweenWithDatePeriod()
+    {
+        $builder = $this->getBuilder();
+        $start = new DateTime('2024-01-01');
+        $end = new DateTime('2024-01-31');
+        $interval = new DateInterval('P1D');
+        $period = new DatePeriod($start, $interval, $end);
+
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "id" = ? or "created_at" between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(3, $bindings);
+        $this->assertEquals(1, $bindings[0]);
+        $this->assertEquals($start, $bindings[1]);
+        $this->assertEquals($end, $bindings[2]);
+    }
+
+    public function testWhereBetweenWithCarbonPeriod()
+    {
+        $builder = $this->getBuilder();
+        $start = Carbon::parse('2024-01-01');
+        $end = Carbon::parse('2024-01-31');
+        $period = \Carbon\CarbonPeriod::create($start, $end);
+
+        $builder->select('*')->from('users')->whereBetween('created_at', $period);
+
+        $this->assertSame('select * from "users" where "created_at" between ? and ?', $builder->toSql());
+        $bindings = $builder->getBindings();
+        $this->assertCount(2, $bindings);
+        $this->assertEquals($start, $bindings[0]);
+        $this->assertEquals($end, $bindings[1]);
     }
 
     public function testWhereValueBetween()

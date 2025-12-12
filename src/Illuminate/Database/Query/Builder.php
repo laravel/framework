@@ -1385,6 +1385,7 @@ class Builder implements BuilderContract
      * Add a where between statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  iterable  $values
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1393,8 +1394,24 @@ class Builder implements BuilderContract
     {
         $type = 'between';
 
-        if ($values instanceof CarbonPeriod) {
-            $values = [$values->getStartDate(), $values->getEndDate()];
+        if ($values instanceof \DatePeriod || $values instanceof CarbonPeriod) {
+            $period = $values;
+
+            $startDate = $period->getStartDate();
+
+            $endDate = $period->getEndDate();
+
+            if ($endDate === null) {
+                $dates = iterator_to_array($period);
+
+                if (empty($dates)) {
+                    $endDate = $startDate;
+                } else {
+                    $endDate = end($dates);
+                }
+            }
+
+            $values = [$startDate, $endDate];
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
