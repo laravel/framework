@@ -1942,4 +1942,14 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         unset($this->items[$key]);
     }
+
+    /**
+     * Convert the collection into a query string.
+     *
+     * @return static
+     */
+    public function query(): static
+    {
+        return new static(Arr::query($this->all()));
+    }
 }
