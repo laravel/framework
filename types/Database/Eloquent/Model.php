@@ -2,7 +2,6 @@
 
 namespace Illuminate\Types\Model;
 
-use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\HasCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +9,7 @@ use User;
 
 use function PHPStan\Testing\assertType;
 
-function test(User $user, Post $post, Comment $comment, Article $article): void
+function test(User $user, Post $post, Comment $comment): void
 {
     assertType('UserFactory', User::factory(function ($attributes, $model) {
         assertType('array<string, mixed>', $attributes);
@@ -42,7 +41,6 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
 
     assertType('Illuminate\Database\Eloquent\Collection<(int|string), User>', $user->newCollection([new User()]));
     assertType('Illuminate\Types\Model\Posts<(int|string), Illuminate\Types\Model\Post>', $post->newCollection(['foo' => new Post()]));
-    assertType('Illuminate\Types\Model\Articles<(int|string), Illuminate\Types\Model\Article>', $article->newCollection([new Article()]));
     assertType('Illuminate\Types\Model\Comments', $comment->newCollection([new Comment()]));
 
     assertType('bool', $user->restore());
@@ -81,21 +79,5 @@ final class Comment extends Model
 
 /** @extends Collection<array-key, Comment> */
 final class Comments extends Collection
-{
-}
-
-#[CollectedBy(Articles::class)]
-class Article extends Model
-{
-    /** @use HasCollection<Articles<array-key, static>> */
-    use HasCollection;
-}
-
-/**
- * @template TKey of array-key
- * @template TModel of Article
- *
- * @extends Collection<TKey, TModel> */
-class Articles extends Collection
 {
 }

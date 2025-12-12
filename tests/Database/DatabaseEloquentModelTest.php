@@ -14,7 +14,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -3507,14 +3506,6 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame('Anytown', $model->address_line_two);
     }
 
-    public function testCollectedByAttribute()
-    {
-        $model = new EloquentModelWithCollectedByAttribute;
-        $collection = $model->newCollection([$model]);
-
-        $this->assertInstanceOf(CustomEloquentCollection::class, $collection);
-    }
-
     public function testUseFactoryAttribute()
     {
         $model = new EloquentModelWithUseFactoryAttribute;
@@ -4404,15 +4395,6 @@ class EloquentModelWithMutators extends Model
         $this->attributes['address_line_one'] = $addressLineOne;
         $this->attributes['address_line_two'] = $addressLineTwo;
     }
-}
-
-#[CollectedBy(CustomEloquentCollection::class)]
-class EloquentModelWithCollectedByAttribute extends Model
-{
-}
-
-class CustomEloquentCollection extends Collection
-{
 }
 
 class EloquentModelWithUseFactoryAttributeFactory extends Factory
