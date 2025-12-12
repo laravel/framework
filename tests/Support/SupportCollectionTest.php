@@ -9,6 +9,7 @@ use CachingIterator;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\ItemNotFoundException;
@@ -5905,6 +5906,44 @@ class SupportCollectionTest extends TestCase
         $collection = new $collection([]);
 
         $this->assertNull($collection->percentage(fn ($value) => $value === 1));
+    }
+
+    public function testConvertsCollectionToQueryString()
+    {
+        $collection = new Collection([
+            'name' => 'Ali',
+            'age' => 17,
+            'skills' => ['php', 'laravel'],
+        ]);
+
+        $query = $collection->query();
+
+        $this->assertInstanceOf(Collection::class, $query);
+
+        $this->assertEquals(
+            Arr::query($collection->all()),
+            $query->first(),
+        );
+    }
+
+    public function testDoesNotMutateOriginalCollection()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2]);
+
+        $originalArray = $collection->all();
+
+        $collection->query();
+
+        $this->assertEquals($originalArray, $collection->all());
+    }
+
+    public function testReturnsNewInstance()
+    {
+        $collection = new Collection(['foo' => 'bar']);
+
+        $queryCollection = $collection->query();
+
+        $this->assertNotSame($collection, $queryCollection);
     }
 
     /**
