@@ -41,9 +41,9 @@ class FileFailedJobProviderTest extends TestCase
 
     public function testCanRetrieveAllFailedJobs()
     {
-        Carbon::setTestNow(now());
-
         try {
+            Carbon::setTestNow(now());
+
             [$uuidOne, $exceptionOne] = $this->logFailedJob();
             [$uuidTwo, $exceptionTwo] = $this->logFailedJob();
 
