@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Auth\Events\Validated;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
@@ -623,7 +624,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     public function hashPasswordForCookie($passwordHash)
     {
-        return hash_hmac('sha256', $passwordHash, config('app.key'));
+        $container = Container::getInstance();
+
+        if ($container && $container->bound('config')) {
+            $key = $container->make('config')->get('app.key');
+        } else {
+            $key = 'base-key-for-password-hash-mac';
+        }
+
+        return hash_hmac('sha256', $passwordHash, $key);
     }
 
     /**
