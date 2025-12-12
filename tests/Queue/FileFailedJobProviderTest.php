@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Illuminate\Queue\Failed\FileFailedJobProvider;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 
@@ -40,31 +41,37 @@ class FileFailedJobProviderTest extends TestCase
 
     public function testCanRetrieveAllFailedJobs()
     {
-        [$uuidOne, $exceptionOne] = $this->logFailedJob();
-        [$uuidTwo, $exceptionTwo] = $this->logFailedJob();
+        Carbon::setTestNow(now());
 
-        $failedJobs = $this->provider->all();
+        try {
+            [$uuidOne, $exceptionOne] = $this->logFailedJob();
+            [$uuidTwo, $exceptionTwo] = $this->logFailedJob();
 
-        $this->assertEquals([
-            (object) [
-                'id' => $uuidTwo,
-                'connection' => 'connection',
-                'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuidTwo]),
-                'exception' => (string) mb_convert_encoding($exceptionTwo, 'UTF-8'),
-                'failed_at' => $failedJobs[1]->failed_at,
-                'failed_at_timestamp' => $failedJobs[1]->failed_at_timestamp,
-            ],
-            (object) [
-                'id' => $uuidOne,
-                'connection' => 'connection',
-                'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuidOne]),
-                'exception' => (string) mb_convert_encoding($exceptionOne, 'UTF-8'),
-                'failed_at' => $failedJobs[0]->failed_at,
-                'failed_at_timestamp' => $failedJobs[0]->failed_at_timestamp,
-            ],
-        ], $failedJobs);
+            $failedJobs = $this->provider->all();
+
+            $this->assertEquals([
+                (object) [
+                    'id' => $uuidTwo,
+                    'connection' => 'connection',
+                    'queue' => 'queue',
+                    'payload' => json_encode(['uuid' => $uuidTwo]),
+                    'exception' => (string) mb_convert_encoding($exceptionTwo, 'UTF-8'),
+                    'failed_at' => $failedJobs[1]->failed_at,
+                    'failed_at_timestamp' => $failedJobs[1]->failed_at_timestamp,
+                ],
+                (object) [
+                    'id' => $uuidOne,
+                    'connection' => 'connection',
+                    'queue' => 'queue',
+                    'payload' => json_encode(['uuid' => $uuidOne]),
+                    'exception' => (string) mb_convert_encoding($exceptionOne, 'UTF-8'),
+                    'failed_at' => $failedJobs[0]->failed_at,
+                    'failed_at_timestamp' => $failedJobs[0]->failed_at_timestamp,
+                ],
+            ], $failedJobs);
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 
     public function testCanFindFailedJobs()
