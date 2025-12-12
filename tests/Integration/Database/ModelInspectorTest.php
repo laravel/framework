@@ -180,10 +180,11 @@ class ModelInspectorTest extends DatabaseTestCase
 }
 
 #[ObservedBy(ModelInspectorTestModelObserver::class)]
-#[CollectedBy(ModelInspectorTestModelEloquentCollection::class)]
 class ModelInspectorTestModel extends Model
 {
     use HasUuids;
+
+    protected static string $collectionClass = ModelInspectorTestModelEloquentCollection::class;
 
     protected static string $builder = ModelInspectorTestModelBuilder::class;
     public $table = 'model_info_extractor_test_model';
