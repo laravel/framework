@@ -43,4 +43,36 @@ class SqlServerBuilderTest extends TestCase
 
         $builder->dropDatabaseIfExists('my_temporary_database_b');
     }
+
+    public function testItUsesNativeJsonTypeForSqlServer2025Plus()
+    {
+        // Mockery is already aliased as 'm' at the top of the file.
+        $connection = m::mock(Connection::class);
+        $grammar = new SqlServerGrammar($connection);
+
+        // CRITICAL: Mock the internal connection method to return the version supporting the feature.
+        $connection->shouldReceive('getServerVersion')->once()->andReturn('2025.0.0');
+        // Mock table prefix if needed by the Grammar methods you touch.
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+
+        $column = new \Illuminate\Support\Fluent(['name' => 'data', 'type' => 'json']);
+
+        // Assert that the Grammar returns the native JSON type.
+        $this->assertEquals('json', $grammar->typeJson($column));
+    }
+
+    public function testItFallsBackToNvarcharMaxForSqlServerPre2025()
+    {
+        $connection = m::mock(Connection::class);
+        $grammar = new SqlServerGrammar($connection);
+
+        // CRITICAL: Mock the internal connection method to return an older version.
+        $connection->shouldReceive('getServerVersion')->once()->andReturn('2019.0.0');
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+
+        $column = new \Illuminate\Support\Fluent(['name' => 'data', 'type' => 'json']);
+
+        // Assert that the Grammar falls back to the old nvarchar(max) type.
+        $this->assertEquals('nvarchar(max)', $grammar->typeJson($column));
+    }
 }
