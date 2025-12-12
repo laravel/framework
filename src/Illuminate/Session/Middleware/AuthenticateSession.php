@@ -48,9 +48,9 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         if ($this->guard()->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
+            $passwordHashMac = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
-            if (! $passwordHash || ! hash_equals($request->user()->getAuthPassword(), $passwordHash)) {
+            if (! $passwordHashMac || ! hash_equals($this->guard()->hashPasswordForCookie($request->user()->getAuthPassword()), $passwordHashMac)) {
                 $this->logout($request);
             }
         }
@@ -59,7 +59,7 @@ class AuthenticateSession implements AuthenticatesSessions
             $this->storePasswordHashInSession($request);
         }
 
-        if (! hash_equals($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()), $request->user()->getAuthPassword())) {
+        if (! hash_equals($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()), $this->guard()->hashPasswordForCookie($request->user()->getAuthPassword()))) {
             $this->logout($request);
         }
 
@@ -83,7 +83,7 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         $request->session()->put([
-            'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
+            'password_hash_'.$this->auth->getDefaultDriver() => $this->guard()->hashPasswordForCookie($request->user()->getAuthPassword()),
         ]);
     }
 

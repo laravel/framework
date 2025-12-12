@@ -94,11 +94,13 @@ class AuthenticateSessionTest extends TestCase
         $authFactory->shouldReceive('viaRemember')->andReturn(false);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
+        // expected MAC for current password when storing in session:
+        $authFactory->shouldReceive('hashPasswordForCookie')->with('my-pass-(*&^%$#!@')->andReturn('mac:my-pass-(*&^%$#!@');
 
         $middleware = new AuthenticateSession($authFactory);
         $response = $middleware->handle($request, fn () => 'next-4');
 
-        $this->assertEquals('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
         $this->assertEquals('next-4', $response);
     }
 
@@ -112,7 +114,7 @@ class AuthenticateSessionTest extends TestCase
             }
         };
 
-        $request = new Request(cookies: ['recaller-name' => 'a|b|my-pass-dont-match']);
+        $request = new Request(cookies: ['recaller-name' => 'a|b|invalid-mac']);
         $request->setUserResolver(fn () => $user);
 
         $session = new Store('name', new ArraySessionHandler(1));
@@ -127,6 +129,8 @@ class AuthenticateSessionTest extends TestCase
         $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
+        // expected MAC for current password (won't match cookie):
+        $authFactory->shouldReceive('hashPasswordForCookie')->with('my-pass-(*&^%$#!@')->andReturn('mac:my-pass-(*&^%$#!@');
 
         $this->assertNotNull($session->get('a'));
         $this->assertNotNull($session->get('b'));
@@ -159,7 +163,7 @@ class AuthenticateSessionTest extends TestCase
             }
         };
 
-        $request = new Request(cookies: ['recaller-name' => 'a|b|my-pass-dont-match']);
+        $request = new Request(cookies: ['recaller-name' => 'a|b|invalid-mac']);
         $request->setUserResolver(fn () => $user);
 
         $session = new Store('name', new ArraySessionHandler(1));
@@ -174,6 +178,8 @@ class AuthenticateSessionTest extends TestCase
         $authFactory->shouldReceive('logoutCurrentDevice')->once();
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
+        // expected MAC for current password (won't match cookie):
+        $authFactory->shouldReceive('hashPasswordForCookie')->with('my-pass-(*&^%$#!@')->andReturn('mac:my-pass-(*&^%$#!@');
 
         $middleware = new AuthenticateSession($authFactory);
         // act:
@@ -201,7 +207,7 @@ class AuthenticateSessionTest extends TestCase
             }
         };
 
-        $request = new Request(cookies: ['recaller-name' => 'a|b|my-pass-(*&^%$#!@']);
+        $request = new Request(cookies: ['recaller-name' => 'a|b|mac:my-pass-(*&^%$#!@']);
         $request->setUserResolver(fn () => $user);
 
         $session = new Store('name', new ArraySessionHandler(1));
@@ -217,6 +223,8 @@ class AuthenticateSessionTest extends TestCase
         $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
+        // expected MAC for current password (matches cookie but not session):
+        $authFactory->shouldReceive('hashPasswordForCookie')->with('my-pass-(*&^%$#!@')->andReturn('mac:my-pass-(*&^%$#!@');
 
         // act:
         $middleware = new AuthenticateSession($authFactory);
@@ -250,7 +258,7 @@ class AuthenticateSessionTest extends TestCase
         $session = new Store('name', new ArraySessionHandler(1));
         $session->put('a', '1');
         $session->put('b', '2');
-        $session->put('password_hash_web', 'my-pass-(*&^%$#!@');
+        $session->put('password_hash_web', 'mac:my-pass-(*&^%$#!@');
         // set session on the request:
         $request->setLaravelSession($session);
 
@@ -260,6 +268,8 @@ class AuthenticateSessionTest extends TestCase
         $authFactory->shouldReceive('logoutCurrentDevice')->never();
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn($user);
+        // expected MAC for current password:
+        $authFactory->shouldReceive('hashPasswordForCookie')->with('my-pass-(*&^%$#!@')->andReturn('mac:my-pass-(*&^%$#!@');
 
         // act:
         $middleware = new AuthenticateSession($authFactory);
@@ -267,7 +277,7 @@ class AuthenticateSessionTest extends TestCase
 
         $this->assertEquals('next-8', $response);
         // ensure session is flushed:
-        $this->assertEquals('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
         $this->assertEquals('1', $session->get('a'));
         $this->assertEquals('2', $session->get('b'));
     }
