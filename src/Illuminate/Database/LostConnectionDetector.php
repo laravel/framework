@@ -49,6 +49,7 @@ class LostConnectionDetector implements LostConnectionDetectorContract
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo failed: Name or service not known',
             'SQLSTATE[HY000] [2002] php_network_getaddresses: getaddrinfo for',
             'SQLSTATE[HY000]: General error: 7 SSL SYSCALL error: EOF detected',
+            'SSL error: unexpected eof',
             'SQLSTATE[HY000] [2002] Connection timed out',
             'SSL: Connection timed out',
             'SQLSTATE[HY000]: General error: 1105 The last transaction was aborted due to Seamless Scaling. Please retry.',
