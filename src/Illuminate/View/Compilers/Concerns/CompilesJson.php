@@ -19,7 +19,7 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        [$data, $options, $depth] = $this->parseArguments($this->stripParenthesis($expression)) + ['null', $this->encodingOptions, 512];
+        [$data, $options, $depth] = $this->parseArguments($this->stripParentheses($expression)) + ['null', $this->encodingOptions, 512];
 
         return "<?php echo json_encode($data, $options, $depth) ?>";
     }
