@@ -115,18 +115,18 @@ class DynamoDbStore implements LockProvider, Store
         return array_merge(
             array_flip($keys),
             (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
-            if ($this->isExpired($response, $now)) {
-                $value = null;
-            } else {
-                $value = $this->unserialize(
-                    $response[$this->valueAttribute]['S'] ??
-                    $response[$this->valueAttribute]['N'] ??
-                    null
-                );
-            }
+                if ($this->isExpired($response, $now)) {
+                    $value = null;
+                } else {
+                    $value = $this->unserialize(
+                        $response[$this->valueAttribute]['S'] ??
+                        $response[$this->valueAttribute]['N'] ??
+                        null
+                    );
+                }
 
-            return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
-        })->all());
+                return [Str::replaceFirst($this->prefix, '', $response[$this->keyAttribute]['S']) => $value];
+            })->all());
     }
 
     /**
@@ -264,6 +264,7 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $key
      * @param  mixed  $value
      * @return int|false
+     *
      * @throws \Aws\DynamoDb\Exception\DynamoDbException
      */
     public function increment($key, $value = 1)
@@ -310,6 +311,7 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $key
      * @param  mixed  $value
      * @return int|false
+     *
      * @throws \Aws\DynamoDb\Exception\DynamoDbException
      */
     public function decrement($key, $value = 1)
