@@ -17,41 +17,6 @@ class DynamoDbStore implements LockProvider, Store
     use InteractsWithTime;
 
     /**
-     * The DynamoDB client instance.
-     *
-     * @var \Aws\DynamoDb\DynamoDbClient
-     */
-    protected $dynamo;
-
-    /**
-     * The table name.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * The name of the attribute that should hold the key.
-     *
-     * @var string
-     */
-    protected $keyAttribute;
-
-    /**
-     * The name of the attribute that should hold the value.
-     *
-     * @var string
-     */
-    protected $valueAttribute;
-
-    /**
-     * The name of the attribute that should hold the expiration timestamp.
-     *
-     * @var string
-     */
-    protected $expirationAttribute;
-
-    /**
      * A string that should be prepended to keys.
      *
      * @var string
@@ -61,27 +26,21 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Create a new store instance.
      *
-     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo
-     * @param  string  $table
-     * @param  string  $keyAttribute
-     * @param  string  $valueAttribute
-     * @param  string  $expirationAttribute
+     * @param  \Aws\DynamoDb\DynamoDbClient  $dynamo  The DynamoDB client instance.
+     * @param  string  $table  The table name.
+     * @param  string  $keyAttribute  The name of the attribute that should hold the key.
+     * @param  string  $valueAttribute  The name of the attribute that should hold the value.
+     * @param  string  $expirationAttribute  The name of the attribute that should hold the expiration timestamp.
      * @param  string  $prefix
      */
     public function __construct(
-        DynamoDbClient $dynamo,
-        $table,
-        $keyAttribute = 'key',
-        $valueAttribute = 'value',
-        $expirationAttribute = 'expires_at',
+        protected DynamoDbClient $dynamo,
+        protected $table,
+        protected $keyAttribute = 'key',
+        protected $valueAttribute = 'value',
+        protected $expirationAttribute = 'expires_at',
         $prefix = '',
     ) {
-        $this->table = $table;
-        $this->dynamo = $dynamo;
-        $this->keyAttribute = $keyAttribute;
-        $this->valueAttribute = $valueAttribute;
-        $this->expirationAttribute = $expirationAttribute;
-
         $this->setPrefix($prefix);
     }
 
@@ -142,22 +101,20 @@ class DynamoDbStore implements LockProvider, Store
             'RequestItems' => [
                 $this->table => [
                     'ConsistentRead' => false,
-                    'Keys' => (new Collection($prefixedKeys))->map(function ($key) {
-                        return [
-                            $this->keyAttribute => [
-                                'S' => $key,
-                            ],
-                        ];
-                    })->all(),
+                    'Keys' => (new Collection($prefixedKeys))->map(fn ($key) => [
+                        $this->keyAttribute => [
+                            'S' => $key,
+                        ],
+                    ])->all(),
                 ],
             ],
         ]);
 
         $now = Carbon::now();
 
-        return array_merge((new Collection(array_flip($keys)))->map(function () {
-            //
-        })->all(), (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
+        return array_merge(
+            array_flip($keys),
+            (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
             if ($this->isExpired($response, $now)) {
                 $value = null;
             } else {
@@ -307,6 +264,7 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $key
      * @param  mixed  $value
      * @return int|false
+     * @throws \Aws\DynamoDb\Exception\DynamoDbException
      */
     public function increment($key, $value = 1)
     {
@@ -352,6 +310,7 @@ class DynamoDbStore implements LockProvider, Store
      * @param  string  $key
      * @param  mixed  $value
      * @return int|false
+     * @throws \Aws\DynamoDb\Exception\DynamoDbException
      */
     public function decrement($key, $value = 1)
     {
@@ -451,7 +410,7 @@ class DynamoDbStore implements LockProvider, Store
     /**
      * Remove all items from the cache.
      *
-     * @return bool
+     * @return never
      *
      * @throws \RuntimeException
      */
