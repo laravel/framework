@@ -167,7 +167,7 @@ class PendingRequest
 
     /**
      * The callbacks that should execute after the Laravel Response is built.
-     * 
+     *
      * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response))>
      */
     protected $afterResponseCallbacks;
@@ -749,7 +749,8 @@ class PendingRequest
 
     /**
      * Add a new callback to execute after the response is built.
-     * @param  callable(\Illuminate\Http\Client\Response)  $callback
+     *
+     * @param  (callable(\Illuminate\Http\Client\Response): void)  $callback
      * @return $this
      */
     public function afterResponse(callable $callback)
@@ -1602,6 +1603,12 @@ class PendingRequest
         });
     }
 
+    /**
+     * Execute the "after response" callbacks.
+     *
+     * @param  Response  $response
+     * @return void
+     */
     protected function runAfterResponseCallbacks(Response $response)
     {
         $this->afterResponseCallbacks->each(static fn (callable $callback) => $callback($response));
