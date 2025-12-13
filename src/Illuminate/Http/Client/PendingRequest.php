@@ -168,7 +168,7 @@ class PendingRequest
     /**
      * The callbacks that should execute after the Laravel Response is built.
      *
-     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response))>
+     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response): void)>
      */
     protected $afterResponseCallbacks;
 
