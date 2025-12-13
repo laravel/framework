@@ -406,7 +406,7 @@ class HttpClientTest extends TestCase
     {
         Response::macro('movieFields', function () {
             return $this->collect()
-                ->mapWithKeys(fn($field, $key) => [strtolower($key) => $field])
+                ->mapWithKeys(fn ($field, $key) => [strtolower($key) => $field])
                 ->toArray();
         });
 
