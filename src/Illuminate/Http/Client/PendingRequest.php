@@ -168,7 +168,7 @@ class PendingRequest
     /**
      * The callbacks that should execute after the Laravel Response is built.
      *
-     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response): void)>
+     * @var \Illuminate\Support\Collection<int, (callable(\Illuminate\Http\Client\Response): \Illuminate\Http\Client\Response|null)>
      */
     protected $afterResponseCallbacks;
 
@@ -750,7 +750,7 @@ class PendingRequest
     /**
      * Add a new callback to execute after the response is built.
      *
-     * @param  (callable(\Illuminate\Http\Client\Response): void)  $callback
+     * @param  (callable(\Illuminate\Http\Client\Response): \Illuminate\Http\Client\Response|null)  $callback
      * @return $this
      */
     public function afterResponse(callable $callback)
@@ -1026,11 +1026,11 @@ class PendingRequest
 
         return retry($this->tries ?? 1, function ($attempt) use ($method, $url, $options, &$shouldRetry) {
             try {
-                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function ($response) use ($attempt, &$shouldRetry) {
+                return tap($this->newResponse($this->sendRequest($method, $url, $options)), function (&$response) use ($attempt, &$shouldRetry) {
                     $this->populateResponse($response);
 
                     $this->dispatchResponseReceivedEvent($response);
-                    $this->runAfterResponseCallbacks($response);
+                    $response = $this->runAfterResponseCallbacks($response);
 
                     if ($response->successful()) {
                         return;
@@ -1173,11 +1173,11 @@ class PendingRequest
     {
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
-                return tap($this->newResponse($message), function ($response) {
-                    $this->populateResponse($response);
-                    $this->dispatchResponseReceivedEvent($response);
-                    $this->runAfterResponseCallbacks($response);
-                });
+                $response = $this->newResponse($message);
+                $this->populateResponse($response);
+                $this->dispatchResponseReceivedEvent($response);
+
+                return $this->runAfterResponseCallbacks($response);
             })
             ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
                 if ($e instanceof StrayRequestException) {
@@ -1606,12 +1606,19 @@ class PendingRequest
     /**
      * Execute the "after response" callbacks.
      *
-     * @param  Response  $response
-     * @return void
+     * @param  \Illuminate\Http\Client\Response  $response
+     * @return \Illuminate\Http\Client\Response
      */
     protected function runAfterResponseCallbacks(Response $response)
     {
-        $this->afterResponseCallbacks->each(static fn (callable $callback) => $callback($response));
+        foreach ($this->afterResponseCallbacks as $callback) {
+            $returnedResponse = $callback($response);
+            if ($returnedResponse instanceof Response) {
+                $response = $returnedResponse;
+            }
+        }
+
+        return $response;
     }
 
     /**
