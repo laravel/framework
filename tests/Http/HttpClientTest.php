@@ -3567,7 +3567,6 @@ class HttpClientTest extends TestCase
     {
         $this->factory->fake();
 
-        //
         $this->factory->beforeSending(function (Request $request) {
             $requestLine = sprintf(
                 '%s %s HTTP/%s',
