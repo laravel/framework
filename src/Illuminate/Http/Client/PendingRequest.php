@@ -1544,9 +1544,9 @@ class PendingRequest
     /**
      * Execute the "before sending" callbacks.
      *
-     * @param  \GuzzleHttp\Psr7\RequestInterface  $request
+     * @param  \Psr\Http\Message\RequestInterface  $request
      * @param  array  $options
-     * @return \GuzzleHttp\Psr7\RequestInterface
+     * @return \Psr\Http\Message\RequestInterface
      */
     public function runBeforeSendingCallbacks($request, array $options)
     {
