@@ -6,6 +6,7 @@ use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
@@ -113,7 +114,7 @@ class DynamoDbStore implements LockProvider, Store
         $now = Carbon::now();
 
         return array_merge(
-            (new Collection($keys))->mapWithKeys(fn ($key) => [$key => null])->all(),
+            Arr::mapWithKeys($keys, fn ($key) => [$key => null]),
             (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
                 if ($this->isExpired($response, $now)) {
                     $value = null;
