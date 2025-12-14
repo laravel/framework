@@ -113,7 +113,7 @@ class DynamoDbStore implements LockProvider, Store
         $now = Carbon::now();
 
         return array_merge(
-            (new Collection(array_flip($keys)))->all(),
+            (new Collection($keys))->mapWithKeys(fn ($key) => [$key => null])->all(),
             (new Collection($response['Responses'][$this->table]))->mapWithKeys(function ($response) use ($now) {
                 if ($this->isExpired($response, $now)) {
                     $value = null;
