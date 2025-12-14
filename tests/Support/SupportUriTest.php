@@ -254,7 +254,7 @@ class CustomUrlGeneratorResolver implements UrlGenerator
 
     public function previous($fallback = false)
     {
-        // TODO: Implement previous() method.
+        return 'https://laravel.com/previous';
     }
 
     public function to($path, $extra = [], $secure = null)
@@ -264,12 +264,12 @@ class CustomUrlGeneratorResolver implements UrlGenerator
 
     public function secure($path, $parameters = [])
     {
-        // TODO: Implement secure() method.
+        return 'https://laravel.com/secure';
     }
 
     public function asset($path, $secure = null)
     {
-        // TODO: Implement asset() method.
+        return 'https://laravel.com/asset';
     }
 
     public function route($name, $parameters = [], $absolute = true)
@@ -289,7 +289,7 @@ class CustomUrlGeneratorResolver implements UrlGenerator
 
     public function query($path, $query = [], $extra = [], $secure = null)
     {
-        // TODO: Implement query() method.
+        return 'https://laravel.com/query';
     }
 
     public function action($action, $parameters = [], $absolute = true)
@@ -299,11 +299,11 @@ class CustomUrlGeneratorResolver implements UrlGenerator
 
     public function getRootControllerNamespace()
     {
-        // TODO: Implement getRootControllerNamespace() method.
+        return 'App\\Http\\Controllers';
     }
 
     public function setRootControllerNamespace($rootNamespace)
     {
-        // TODO: Implement setRootControllerNamespace() method.
+        return $this;
     }
 }
