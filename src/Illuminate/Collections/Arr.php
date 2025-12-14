@@ -337,6 +337,27 @@ class Arr
     }
 
     /**
+     * Return the key of the last element in an array passing a given truth test.
+     *
+     * @template TKey
+     * @template TValue
+     * @template TLastDefault
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TLastDefault|(\Closure(): TLastDefault)  $default
+     * @return TValue|TLastDefault
+     */
+    public static function lastKey($array, ?callable $callback = null, $default = null)
+    {
+        if (is_null($callback)) {
+            return empty($array) ? value($default) : array_key_last($array);
+        }
+
+        return static::firstKey(array_reverse($array, true), $callback, $default);
+    }
+
+    /**
      * Take the first or last {$limit} items from an array.
      *
      * @param  array  $array

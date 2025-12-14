@@ -457,6 +457,30 @@ class SupportArrTest extends TestCase
         $this->assertEquals(200, $value5);
     }
 
+    public function testLastKey()
+    {
+        $this->assertSame(null, Arr::lastKey([]));
+
+        $array = [
+            'foo_key_1' => 'foo',
+            'foo_key_2' => 'foo',
+            'foo_key_3' => 'foo',
+            'bar_key_1' => 'bar',
+            'bar_key_2' => 'bar',
+            'bar_key_3' => 'bar',
+            'baz_key_1' => 'baz',
+            'baz_key_2' => 'baz',
+            'baz_key_3' => 'baz',
+        ];
+
+        $this->assertSame('baz_key_3', Arr::lastKey($array));
+        $this->assertSame('bar_key_3', Arr::lastKey($array, fn ($item) => $item === 'bar'));
+        $this->assertSame(2, Arr::lastKey(array_values($array), fn ($item) => $item === 'foo'));
+        $this->assertSame(null, Arr::lastKey($array, fn ($item) => $item === 'boo'));
+        $this->assertSame('last_boo_key', Arr::lastKey($array, fn ($item) => $item === 'boo', 'last_boo_key'));
+        $this->assertSame('last_boo_key', Arr::lastKey($array, fn ($item) => $item === 'boo', fn () => 'last_boo_key'));
+    }
+
     public function testFlatten()
     {
         // Flat arrays are unaffected
