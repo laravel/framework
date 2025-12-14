@@ -376,6 +376,24 @@ class SupportArrTest extends TestCase
         $this->assertNull(Arr::first($cursor));
     }
 
+    public function testFirstKey()
+    {
+        $this->assertSame(null, Arr::firstKey([]));
+
+        $array = [
+            'foo_key' => 'foo',
+            'bar_key' => 'bar',
+            'baz_key' => 'baz',
+        ];
+
+        $this->assertSame('foo_key', Arr::firstKey($array));
+        $this->assertSame('baz_key', Arr::firstKey($array, fn ($item) => $item === 'baz'));
+        $this->assertSame(1, Arr::firstKey(array_values($array), fn ($item) => $item === 'bar'));
+        $this->assertSame(null, Arr::firstKey($array, fn ($item) => $item === 'boo'));
+        $this->assertSame('boo_key', Arr::firstKey($array, fn ($item) => $item === 'boo', 'boo_key'));
+        $this->assertSame('boo_key', Arr::firstKey($array, fn ($item) => $item === 'boo', fn () => 'boo_key'));
+    }
+
     public function testFirstWorksWithArrayObject()
     {
         $arrayObject = new ArrayObject([0, 10, 20]);

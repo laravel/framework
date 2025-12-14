@@ -279,6 +279,43 @@ class Arr
     }
 
     /**
+     * Return the key of the first element in an iterable passing a given truth test.
+     *
+     * @template TKey
+     * @template TValue
+     * @template TFirstDefault
+     *
+     * @param  iterable<TKey, TValue>  $array
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @param  TFirstDefault|(\Closure(): TFirstDefault)  $default
+     * @return TValue|TFirstDefault
+     */
+    public static function firstKey($array, ?callable $callback = null, $default = null)
+    {
+        if (is_null($callback)) {
+            if (empty($array)) {
+                return value($default);
+            }
+
+            if (is_array($array)) {
+                return array_key_first($array);
+            }
+
+            foreach ($array as $key => $item) {
+                return $key;
+            }
+
+            return value($default);
+        }
+
+        $array = static::from($array);
+
+        $key = array_find_key($array, $callback);
+
+        return $key !== null ? $key : value($default);
+    }
+
+    /**
      * Return the last element in an array passing a given truth test.
      *
      * @template TKey
