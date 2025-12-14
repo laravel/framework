@@ -6,13 +6,13 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
-use Illuminate\Queue\Concerns\HasDefaultQueues;
+use Illuminate\Queue\Concerns\ResolvesQueueDefaults;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
-    use HasDefaultQueues;
+    use ResolvesQueueDefaults;
 
     /**
      * The default channel used to deliver messages.
@@ -168,7 +168,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      *
      * @return \Illuminate\Queue\QueueDefaults
      */
-    protected function getQueueDefaults()
+    protected function queueDefaults()
     {
         return $this->container['queue.defaults'];
     }

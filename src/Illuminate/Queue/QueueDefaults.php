@@ -7,26 +7,26 @@ class QueueDefaults
     /**
      * The mapping of class names to their default queues.
      *
-     * @var array
+     * @var array<class-string, string>
      */
     protected $defaults = [];
 
     /**
-     * Set the default queues for the given classes.
+     * Register the default queue name for the given class.
      *
      * @param  class-string  $class
-     * @param  string  $queue
+     * @param  string  $queueName
      * @return $this
      */
-    public function set($class, $queue)
+    public function set($class, $queueName)
     {
-        $this->defaults[$class] = $queue;
+        $this->defaults[$class] = $queueName;
 
         return $this;
     }
 
     /**
-     * Set multiple default queues at once.
+     * Register default queue names for the given classes.
      *
      * @param  array<class-string, string>  $defaults
      * @return $this
@@ -39,7 +39,7 @@ class QueueDefaults
     }
 
     /**
-     * Get the default queue for a given queueable instance.
+     * Get the default queue name for a given queueable instance.
      *
      * @param  object  $queueable
      * @return string|null
