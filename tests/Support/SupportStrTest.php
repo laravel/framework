@@ -719,6 +719,34 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isJson([]));
     }
 
+    public function testIsBase64()
+    {
+        $padded = base64_encode('Laravel');
+        $unpadded = rtrim($padded, '=');
+
+        $this->assertTrue(Str::isBase64($padded));
+        $this->assertFalse(Str::isBase64($unpadded));
+        $this->assertTrue(Str::isBase64($unpadded, strict: false));
+
+        $binary = "\x00\x01\x02\xff";
+        $binaryEncoded = base64_encode($binary);
+        $this->assertTrue(Str::isBase64($binaryEncoded));
+
+        $urlsafe = rtrim(strtr($binaryEncoded, '+/', '-_'), '=');
+        $this->assertFalse(Str::isBase64($urlsafe));
+        $this->assertTrue(Str::isBase64($urlsafe, strict: false));
+
+        $this->assertFalse(Str::isBase64(''));
+        $this->assertFalse(Str::isBase64('!!!!'));
+        $this->assertFalse(Str::isBase64('YWJj#A=='));
+        $this->assertFalse(Str::isBase64('TQ==='));
+        $this->assertFalse(Str::isBase64('TQ=', strict: false));
+
+        $this->assertSame(Str::isBase64($padded), Str::of($padded)->isBase64());
+        $this->assertSame(Str::isBase64($unpadded, strict: false), Str::of($unpadded)->isBase64(strict: false));
+        $this->assertSame(Str::isBase64($urlsafe, strict: false), Str::of($urlsafe)->isBase64(strict: false));
+    }
+
     public function testIsMatch()
     {
         $this->assertTrue(Str::isMatch('/.*,.*!/', 'Hello, Laravel!'));
