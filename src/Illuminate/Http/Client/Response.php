@@ -7,6 +7,7 @@ use GuzzleHttp\Psr7\StreamWrapper;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
 use LogicException;
 use Stringable;
 
@@ -15,7 +16,7 @@ use Stringable;
  */
 class Response implements ArrayAccess, Stringable
 {
-    use Concerns\DeterminesStatusCode, Macroable {
+    use Concerns\DeterminesStatusCode, Tappable, Macroable {
         __call as macroCall;
     }
 
