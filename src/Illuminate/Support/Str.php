@@ -565,6 +565,75 @@ class Str
     }
 
     /**
+     * Determine if a given string is valid Base64.
+     *
+     * When strict mode is enabled, the value must be RFC 4648-compliant Base64 using
+     * the standard alphabet and correct padding. When strict mode is disabled, URL-safe
+     * Base64 variants (- and _) and unpadded Base64 values are supported.
+     *
+     * This method exists to provide a safe, predictable way to validate Base64-like
+     * strings without throwing exceptions or decoding values for side effects.
+     *
+     * @param  string  $value
+     * @param  bool  $strict
+     * @return bool
+     */
+    public static function isBase64(string $value, bool $strict = true): bool
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        if ($strict) {
+            if (strlen($value) % 4 !== 0) {
+                return false;
+            }
+
+            if (preg_match('/^[A-Za-z0-9+\/]+={0,2}$/D', $value) !== 1) {
+                return false;
+            }
+
+            $decoded = base64_decode($value, true);
+
+            return $decoded !== false && base64_encode($decoded) === $value;
+        }
+
+        $normalized = strtr($value, '-_', '+/');
+
+        if (preg_match('/[^A-Za-z0-9+\/=]/', $normalized) === 1) {
+            return false;
+        }
+
+        if (($paddingPosition = strpos($normalized, '=')) !== false) {
+            if (strlen($normalized) % 4 !== 0) {
+                return false;
+            }
+
+            if (substr_count($normalized, '=') > 2 || $paddingPosition < strlen($normalized) - 2) {
+                return false;
+            }
+        }
+
+        $unpadded = rtrim($normalized, '=');
+
+        if ($unpadded === '') {
+            return false;
+        }
+
+        $remainder = strlen($unpadded) % 4;
+
+        if ($remainder === 1) {
+            return false;
+        }
+
+        $padded = $remainder === 0 ? $unpadded : $unpadded.str_repeat('=', 4 - $remainder);
+
+        $decoded = base64_decode($padded, true);
+
+        return $decoded !== false && base64_encode($decoded) === $padded;
+    }
+
+    /**
      * Determine if a given value is valid JSON.
      *
      * @param  mixed  $value
