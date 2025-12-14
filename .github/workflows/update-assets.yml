@@ -34,6 +34,6 @@ jobs:
           npm run build --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
 
       - name: Commit Compiled Files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Update Assets
