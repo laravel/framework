@@ -186,6 +186,7 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertSent(MailableStub::class, 2);
+        $this->fake->assertSentTimes(MailableStub::class, 2);
     }
 
     public function testAssertSentCount()
@@ -258,6 +259,7 @@ class SupportTestingMailFakeTest extends TestCase
         }
 
         $this->fake->assertQueued(MailableStub::class, 2);
+        $this->fake->assertQueuedTimes(MailableStub::class, 2);
     }
 
     public function testAssertNotQueuedWithString()
