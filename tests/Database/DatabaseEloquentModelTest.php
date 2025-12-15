@@ -3041,6 +3041,14 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testIsWithStringableKey()
+    {
+        $firstInstance = new EloquentModelStub(['id' => new Stringable('1')]);
+        $secondInstance = new EloquentModelStub(['id' => new Stringable('1')]);
+        $result = $firstInstance->is($secondInstance);
+        $this->assertTrue($result);
+    }
+
     public function testWithoutTouchingCallback()
     {
         new EloquentModelStub(['id' => 1]);

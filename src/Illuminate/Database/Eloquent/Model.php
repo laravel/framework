@@ -1919,8 +1919,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function is($model)
     {
-        return ! is_null($model) &&
-            $this->getKey() === $model->getKey() &&
+        if (is_null($model)) {
+            return false;
+        }
+
+        $modelAKey = $this->getKey();
+        $modelBKey = $model->getKey();
+
+        $normalizedAKey = $modelAKey instanceof Stringable ? (string) $modelAKey : $modelAKey;
+        $normalizedBKey = $modelBKey instanceof Stringable ? (string) $modelBKey : $modelBKey;
+
+        return $normalizedAKey === $normalizedBKey &&
             $this->getTable() === $model->getTable() &&
             $this->getConnectionName() === $model->getConnectionName();
     }
