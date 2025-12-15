@@ -16,26 +16,22 @@ class QueueDefaults
      *
      * @param  class-string  $class
      * @param  string  $queueName
-     * @return $this
+     * @return void
      */
     public function set($class, $queueName)
     {
         $this->defaults[$class] = $queueName;
-
-        return $this;
     }
 
     /**
      * Register default queue names for the given classes.
      *
      * @param  array<class-string, string>  $defaults
-     * @return $this
+     * @return void
      */
     public function setMany(array $defaults)
     {
         $this->defaults = array_merge($this->defaults, $defaults);
-
-        return $this;
     }
 
     /**

@@ -128,26 +128,22 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  class-string  $class
      * @param  string  $queue
-     * @return $this
+     * @return void
      */
     public function defaultQueue($class, $queue)
     {
         $this->queueDefaults()->set($class, $queue);
-
-        return $this;
     }
 
     /**
      * Set the default queues for the given queueable classes.
      *
      * @param  array<class-string, string>  $queues
-     * @return $this
+     * @return void
      */
     public function defaultQueues($queues)
     {
         $this->queueDefaults()->setMany($queues);
-
-        return $this;
     }
 
     /**
