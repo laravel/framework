@@ -443,6 +443,28 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes([Password::sometimes()], ['Password123', 'password123']);
     }
 
+    public function testRequiredWithMissingValue()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [],
+            ['password' => [Password::required()]]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertArrayHasKey('password', $v->messages()->toArray());
+        $this->assertStringContainsString('required', $v->messages()->first('password'));
+
+        $v = \Illuminate\Support\Facades\Validator::make(
+            [],
+            [
+                'password' => [\Illuminate\Validation\Rules\Password::required()],
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);
