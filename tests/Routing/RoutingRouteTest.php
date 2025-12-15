@@ -38,6 +38,7 @@ use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -2272,6 +2273,14 @@ class RoutingRouteTest extends TestCase
         })->name('foo.bar');
         $router->alias('foo/baz', 'foo.bar');
         $this->assertSame('hello', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
+    public function testRouteAliasNameNotFound()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No route found by name to alias, "foo.bar" given.');
+        $router = $this->getRouter();
+        $router->alias('foo/baz', 'foo.bar');
     }
 
     protected function getRouter($container = null)
