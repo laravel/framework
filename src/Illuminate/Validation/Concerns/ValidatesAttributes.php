@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Concerns;
 use Brick\Math\BigDecimal;
 use Brick\Math\BigNumber;
 use Brick\Math\Exception\MathException as BrickMathException;
+use Cron\CronExpression;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
@@ -2915,5 +2916,17 @@ trait ValidatesAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Validate that an attribute is a cron expression.
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateCron($attribute, $value)
+    {
+        return CronExpression::isValidExpression($value);
     }
 }
