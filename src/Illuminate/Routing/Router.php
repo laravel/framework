@@ -285,6 +285,7 @@ class Router implements BindingRegistrar, RegistrarContract
     {
         $canonicalRoute = clone $this->routes->getByName($name);
         $canonicalRoute->uri = $uri;
+
         return $this->routes->add($canonicalRoute);
     }
 
