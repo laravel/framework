@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 
-class Password implements Rule, DataAwareRule, ValidatorAwareRule
+class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
 {
     use Conditionable;
 
@@ -330,6 +331,14 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     public function passes($attribute, $value)
     {
         $this->messages = [];
+
+        if (! $this->required && ! $this->sometimes && ($this->data === null || ! Arr::has($this->data, $attribute))) {
+            return true;
+        }
+
+        if ($value === null && ! $this->required && $this->validator && $this->validator->hasRule($attribute, ['Nullable'])) {
+            return true;
+        }
 
         $validator = Validator::make(
             $this->data,
