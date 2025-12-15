@@ -1923,13 +1923,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
             return false;
         }
 
-        $modelAKey = $this->getKey();
-        $modelBKey = $model->getKey();
+        $firstModelKey = $this->getKey();
+        $secondModelKey = $model->getKey();
 
-        $normalizedAKey = $modelAKey instanceof Stringable ? (string) $modelAKey : $modelAKey;
-        $normalizedBKey = $modelBKey instanceof Stringable ? (string) $modelBKey : $modelBKey;
+        $firstModelKey = $firstModelKey instanceof Stringable ? (string) $firstModelKey : $firstModelKey;
+        $secondModelKey = $secondModelKey instanceof Stringable ? (string) $secondModelKey : $secondModelKey;
 
-        return $normalizedAKey === $normalizedBKey &&
+        return $firstModelKey === $secondModelKey &&
             $this->getTable() === $model->getTable() &&
             $this->getConnectionName() === $model->getConnectionName();
     }
