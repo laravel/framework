@@ -635,9 +635,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $closing = 0;
 
         foreach ($tokens as $token) {
-            if ($token === ')') {
+            if ($token == ')') {
                 $closing++;
-            } elseif ($token === '(') {
+            } elseif ($token == '(') {
                 $opening++;
             }
         }
