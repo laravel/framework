@@ -2264,6 +2264,16 @@ class RoutingRouteTest extends TestCase
         $this->assertSame($response, $prepared[1]->response);
     }
 
+    public function testRouteAlias()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return 'hello';
+        })->name('foo.bar');
+        $router->alias('foo/bar', 'foo.bar');
+        $this->assertSame('hello', $router->dispatch(Request::create('foo/baz', 'GET'))->getContent());
+    }
+
     protected function getRouter($container = null)
     {
         $container ??= new Container;
