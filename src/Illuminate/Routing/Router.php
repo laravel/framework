@@ -275,6 +275,20 @@ class Router implements BindingRegistrar, RegistrarContract
     }
 
     /**
+     * Register a new route alias.
+     *
+     * @param  string  $uri
+     * @param  string  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function alias(string $uri, string $name)
+    {
+        $canonicalRoute = (clone) $this->routes->getByName($name);
+        $canonicalRoute->uri = $uri;
+        return $this->routes->add($canonicalRoute);
+    }
+
+    /**
      * Register a new route that returns a view.
      *
      * @param  string  $uri
