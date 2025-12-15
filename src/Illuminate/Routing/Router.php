@@ -286,9 +286,9 @@ class Router implements BindingRegistrar, RegistrarContract
         $canonicalRoute = $this->routes->getByName($name);
 
         if ($canonicalRoute === null) {
-            throw new InvalidArgumentException('No route found by name to alias, "' . $name . '" given.');
+            throw new InvalidArgumentException('No route found by name to alias, "'.$name.'" given.');
         }
-        
+
         $newRoute = clone $canonicalRoute;
         $canonicalRoute->uri = $uri;
 
