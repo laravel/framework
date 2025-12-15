@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Bootstrap;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
+use Uri\Rfc3986\Uri;
 
 class SetRequestForConsole
 {
@@ -17,14 +18,14 @@ class SetRequestForConsole
     {
         $uri = $app->make('config')->get('app.url', 'http://localhost');
 
-        $components = parse_url($uri);
+        $components = new Uri($uri);
 
         $server = $_SERVER;
 
-        if (isset($components['path'])) {
+        if ($path = $components->getPath()) {
             $server = array_merge($server, [
-                'SCRIPT_FILENAME' => $components['path'],
-                'SCRIPT_NAME' => $components['path'],
+                'SCRIPT_FILENAME' => $path,
+                'SCRIPT_NAME' => $path,
             ]);
         }
 

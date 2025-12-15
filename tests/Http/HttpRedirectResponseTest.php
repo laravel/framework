@@ -12,6 +12,7 @@ use Illuminate\Support\ViewErrorBag;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
+use Uri\Rfc3986\Uri;
 
 class HttpRedirectResponseTest extends TestCase
 {
@@ -57,13 +58,13 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
 
         $response->withFragment('foo');
-        $this->assertSame('foo', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+        $this->assertSame('foo', (new Uri($response->getTargetUrl()))->getFragment());
 
         $response->withFragment('#bar');
-        $this->assertSame('bar', parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+        $this->assertSame('bar', (new Uri($response->getTargetUrl()))->getFragment());
 
         $response->withoutFragment();
-        $this->assertNull(parse_url($response->getTargetUrl(), PHP_URL_FRAGMENT));
+        $this->assertNull((new Uri($response->getTargetUrl()))->getFragment());
     }
 
     public function testInputOnRedirect()
