@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.43.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.43.1...12.x)
+
+## [v12.43.1](https://github.com/laravel/framework/compare/v12.43.0...v12.43.1) - 2025-12-16
+
+* [12.x] Only exclude Command ending with `Test` isn't an instance of `Command` by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58147
 
 ## [v12.43.0](https://github.com/laravel/framework/compare/v12.42.0...v12.43.0) - 2025-12-16
 
