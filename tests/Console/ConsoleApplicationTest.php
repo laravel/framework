@@ -337,8 +337,6 @@ class TestKernel extends Kernel
     public function loadFrom($paths)
     {
         $this->load($paths);
-
-        $this->bootstrap();
     }
 
     #[\Override]
