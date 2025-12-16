@@ -12,8 +12,8 @@ class HigherOrderProxyTest extends TestCase
     public function test_get_proxies_property_access_to_items()
     {
         $items = new Collection([
-            (object)['name' => 'Alice'],
-            (object)['name' => 'Bob'],
+            (object) ['name' => 'Alice'],
+            (object) ['name' => 'Bob'],
         ]);
 
         $proxy = new HigherOrderCollectionProxy($items, 'pluck');
@@ -26,16 +26,18 @@ class HigherOrderProxyTest extends TestCase
     public function test_call_proxies_method_call_to_items()
     {
         $items = new Collection([
-            new class {
+            new class
+            {
                 public function shout($s)
                 {
                     return strtoupper($s);
                 }
             },
-            new class {
+            new class
+            {
                 public function shout($s)
                 {
-                    return strtoupper($s) . '!';
+                    return strtoupper($s).'!';
                 }
             },
         ]);
@@ -49,7 +51,8 @@ class HigherOrderProxyTest extends TestCase
 
     public function test_call_forwards_and_returns_target()
     {
-        $target = new class {
+        $target = new class
+        {
             public $count = 0;
 
             public function increment($by = 1)
