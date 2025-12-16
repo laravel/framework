@@ -43,7 +43,7 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
      *
      * @var int
      */
-    protected $max;
+    protected $max = 72;
 
     /**
      * If the password is required.
