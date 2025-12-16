@@ -1,6 +1,34 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.42.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.43.0...12.x)
+
+## [v12.43.0](https://github.com/laravel/framework/compare/v12.42.0...v12.43.0) - 2025-12-16
+
+* [12.x] Add PHPDoc callable types for BusFake methods by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/58070
+* Improve type annotations of `$batchId` in `Batchable` trait by [@markieo1](https://github.com/markieo1) in https://github.com/laravel/framework/pull/58069
+* [12.x] Fix deadlock in cache_locks on cleanup by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58071
+* feat: implement 'assertFailedDependency' response assertion by [@artengin](https://github.com/artengin) in https://github.com/laravel/framework/pull/58061
+* [12.x] Fix using `null` cache store triggering PHP 8.5 deprecation by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58074
+* [12.x] Fix deprecated usage of passing `null` to `array_key_exists` in `AsPivot` class by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58073
+* [12.x] Simplify clearing resolved instances for `Facade` classes by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58072
+* [12.x] Add PHP 8.5 with Herd to passthrough variables in ServeCommand by [@bashgeek](https://github.com/bashgeek) in https://github.com/laravel/framework/pull/58080
+* [12.x] Update actions/checkout v4 to v6 by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58078
+* [12.x] Let Storage::fake() accept enum as disk name by [@bbredewold](https://github.com/bbredewold) in https://github.com/laravel/framework/pull/58076
+* Improve PHPDoc return type for synchronous HTTP Client methods by [@khaled-sadek](https://github.com/khaled-sadek) in https://github.com/laravel/framework/pull/58090
+* [12.x] Adjust testCanRetrieveAllFailedJobs by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58096
+* [12.x] Allow Factory connection method to accept null by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58108
+* [12.x] Make PendingDispatch::afterResponse conditional by [@kenneth-saey](https://github.com/kenneth-saey) in https://github.com/laravel/framework/pull/58099
+* [12.x] Add `mergeHidden` and `mergeVisible` methods to Collection class by [@mahmoudmohamedramadan](https://github.com/mahmoudmohamedramadan) in https://github.com/laravel/framework/pull/58110
+* Added "SSL error: unexpected eof" message to LostConnectionDetector by [@GuidoHendriks](https://github.com/GuidoHendriks) in https://github.com/laravel/framework/pull/58113
+* [12.x] Update git-auto-commit action by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58118
+* [12.x] Add tests for Support Uri class by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58114
+* [12.x] Make the Client Response class tappable by [@kevinb1989](https://github.com/kevinb1989) in https://github.com/laravel/framework/pull/58115
+* [12.x] Add missing docblock param in FailedOver event docblocks by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58123
+* [12.x] Clean up DynamoDbStore by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58116
+* [12.x] Fix: Handle `ParseError` in `hasEvenNumberOfParentheses` when Xdebug is active by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58128
+* [12.x] Fix Password::required() to fail when value is missing by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/58125
+* [12.x] Add HigherOrderProxy tests (Collection & Tap) by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58138
+* [12.x] Run `ConnectionEstablished` event on database reconnection by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58136
 
 ## [v12.42.0](https://github.com/laravel/framework/compare/v12.41.1...v12.42.0) - 2025-12-09
 
