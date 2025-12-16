@@ -216,10 +216,10 @@ class Collection extends BaseCollection implements QueueableCollection
      * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string  $relations
      * @return $this
      */
-    public function loadMissing(array|string $relations): static
+    public function loadMissing(array|string ...$relations): static
     {
-        if (is_string($relations)) {
-            $relations = func_get_args();
+        if (isset($relations[0]) && is_array($relations[0])) {
+            $relations = $relations[0];
         }
 
         if ($this->isNotEmpty()) {
