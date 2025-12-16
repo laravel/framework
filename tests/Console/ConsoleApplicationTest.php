@@ -16,6 +16,7 @@ use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
 use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use Orchestra\Testbench\Foundation\Application as Testbench;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -251,6 +252,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    #[RunInSeparateProcess]
     public function testLoadIgnoresTestFiles()
     {
         $files = new Filesystem;
@@ -283,7 +285,7 @@ class ConsoleApplicationTest extends TestCase
 
             $kernel = new TestKernel($app, $events);
 
-            $commands = collect($kernel->getResolvedArtisan()->all())->values()->transform(fn ($command) => $command::class);
+            $commands = $kernel->getRegisteredCommands();
 
             $this->assertContains('App\Console\Commands\ExampleCommand', $commands);
             $this->assertContains('App\Console\Commands\ExampleCommandTest', $commands);
@@ -339,13 +341,14 @@ class TestKernel extends Kernel
         $this->bootstrap();
     }
 
+    #[\Override]
     protected function commandClassFromFile(\SplFileInfo $file, string $namespace): string
     {
         return tap(parent::commandClassFromFile($file, $namespace), fn ($command) => $this->loadedCommands[] = $command);
     }
 
-    public function getResolvedArtisan()
+    public function getRegisteredCommands(): array
     {
-        return $this->getArtisan();
+        return collect($this->getArtisan()->all())->values()->transform(fn ($command) => $command::class)->all();
     }
 }
