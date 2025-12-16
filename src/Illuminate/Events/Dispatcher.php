@@ -4,6 +4,7 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -601,6 +602,8 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Create a callable for dispatching a listener after database transactions.
+     * If triggered from a -ed event, generate a snapshot of the model state at time of event to capture
+     * original values
      *
      * @param  mixed  $listener
      * @param  string  $method
@@ -611,12 +614,60 @@ class Dispatcher implements DispatcherContract
         return function () use ($method, $listener) {
             $payload = func_get_args();
 
+            // If called from a -ed event, snapshot the model to ensure we have access to
+            // the changed values
+            if (!in_array($method, [
+                'creating',
+                'updating',
+                'saving',
+                'restoring',
+                'replicating',
+                'deleting',
+                'forceDeleting'
+            ])) {
+                $payload = array_map(function ($arg) {
+                    return $arg instanceof Model
+                        ? $this->snapshotModelForAfterCommit($arg)
+                        : $arg;
+                }, $payload);
+            }
+
             $this->resolveTransactionManager()->addCallback(
                 function () use ($listener, $method, $payload) {
                     $listener->$method(...$payload);
                 }
             );
         };
+    }
+
+    /**
+     * Create a snapshot of the model's state at time of the event, allowing for changes to be viewed
+     * despite model reference being already synced
+     *
+     * @param  mixed  $listener
+     * @param  string  $method
+     * @return \Closure
+     */
+    protected function snapshotModelForAfterCommit(Model $model): Model
+    {
+        $clone = clone $model;
+
+        // Preserve "new" state at time of event
+        $clone->setRawAttributes($model->getAttributes(), false);
+
+        // Preserve "before" state at time of event (getOriginal())
+        $clone->setOriginalAttributes($model->getOriginal());
+
+        // Preserve changes at event time (getChanges())
+        $clone->setChanges($model->getChanges());
+
+        // Preserve any already-loaded relations
+        $relations = $model->getRelations();
+        if (!empty($relations)) {
+            $clone->setRelations($relations);
+        }
+
+        return $clone;
     }
 
     /**

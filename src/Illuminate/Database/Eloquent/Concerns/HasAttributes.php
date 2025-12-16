@@ -2032,6 +2032,24 @@ trait HasAttributes
     }
 
     /**
+     * Set the array of model original attributes. No checking is done.
+     *
+     * @param  array  $original
+     * @return $this
+     */
+    public function setOriginalAttributes(array $original)
+    {
+        $this->original = $original;
+
+        // Original values influence cast resolution and attribute access,
+        // so clear caches to avoid stale casted values lingering.
+        $this->classCastCache = [];
+        $this->attributeCastCache = [];
+
+        return $this;
+    }
+
+    /**
      * Get the model's raw original attribute values.
      *
      * @param  string|null  $key
@@ -2252,6 +2270,19 @@ trait HasAttributes
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    /**
+     * Set the changes to append to model's array.
+     *
+     * @param  array  $appends
+     * @return $this
+     */
+    public function setChanges(array $changes)
+    {
+        $this->changes = $changes;
+
+        return $this;
     }
 
     /**
