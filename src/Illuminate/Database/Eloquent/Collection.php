@@ -222,28 +222,30 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = $relations[0];
         }
 
-        if ($this->isNotEmpty()) {
-            $query = $this->first()->newQueryWithoutRelationships()->with($relations);
+        if ($this->isEmpty()) {
+            return $this;
+        }
 
-            foreach ($query->getEagerLoads() as $key => $value) {
-                $segments = explode('.', explode(':', $key)[0]);
+        $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
-                if (str_contains($key, ':')) {
-                    $segments[count($segments) - 1] .= ':' . explode(':', $key)[1];
-                }
+        foreach ($query->getEagerLoads() as $key => $value) {
+            $segments = explode('.', explode(':', $key)[0]);
 
-                $path = [];
-
-                foreach ($segments as $segment) {
-                    $path[] = [$segment => $segment];
-                }
-
-                if (is_callable($value)) {
-                    $path[count($segments) - 1][array_last($segments)] = $value;
-                }
-
-                $this->loadMissingRelation($this, $path);
+            if (str_contains($key, ':')) {
+                $segments[count($segments) - 1] .= ':' . explode(':', $key)[1];
             }
+
+            $path = [];
+
+            foreach ($segments as $segment) {
+                $path[] = [$segment => $segment];
+            }
+
+            if (is_callable($value)) {
+                $path[count($segments) - 1][array_last($segments)] = $value;
+            }
+
+            $this->loadMissingRelation($this, $path);
         }
 
         return $this;
