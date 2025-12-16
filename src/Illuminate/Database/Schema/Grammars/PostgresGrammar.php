@@ -571,6 +571,20 @@ class PostgresGrammar extends Grammar
         return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
     }
 
+     /**
+     * Compile a drop column command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropColumnIfExists(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = $this->prefixArray('drop column if exists ', $this->wrapArray($command->columns));
+
+        return 'alter table '.$this->wrapTable($blueprint).' '.implode(', ', $columns);
+    }
+
     /**
      * Compile a drop primary key command.
      *

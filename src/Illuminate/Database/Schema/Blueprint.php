@@ -418,6 +418,20 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given columns should be dropped if they exist.
+     *
+     * @param  mixed  $columns
+     * @return \Illuminate\Support\Fluent
+     */
+
+    public function dropColumnIfExists($columns)
+    {
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        return $this->addCommand('dropColumnIfExists', compact('columns'));
+    }
+
+    /**
      * Indicate that the given columns should be renamed.
      *
      * @param  string  $from

@@ -201,6 +201,13 @@ class BlueprintState
 
                 break;
 
+            case 'dropColumnIfExists':
+                $this->columns = array_values(
+                    array_filter($this->columns, fn ($column) => ! in_array($column->name, $command->columns))
+                );
+
+                break;
+
             case 'primary':
                 $this->primaryKey = $command;
                 break;

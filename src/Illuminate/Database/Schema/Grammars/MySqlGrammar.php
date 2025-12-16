@@ -535,6 +535,20 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a drop column command if exists.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function compileDropColumnIfExists(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support drop column if exists.');
+    }
+
+    /**
      * Compile a drop primary key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

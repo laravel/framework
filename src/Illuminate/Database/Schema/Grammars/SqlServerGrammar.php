@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
+use RuntimeException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -383,6 +384,21 @@ class SqlServerGrammar extends Grammar
 
         return $dropExistingConstraintsSql.'alter table '.$this->wrapTable($blueprint).' drop column '.implode(', ', $columns);
     }
+
+    /**
+     * Compile a drop column command if exists.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public function compileDropColumnIfExists(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('This database driver does not support drop column if exists.');
+    }
+
 
     /**
      * Compile a drop default constraint command.
