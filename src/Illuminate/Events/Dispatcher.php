@@ -4,7 +4,6 @@ namespace Illuminate\Events;
 
 use Closure;
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -15,6 +14,7 @@ use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -603,7 +603,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Create a callable for dispatching a listener after database transactions.
      * If triggered from a -ed event, generate a snapshot of the model state at time of event to capture
-     * original values
+     * original values.
      *
      * @param  mixed  $listener
      * @param  string  $method
@@ -616,14 +616,14 @@ class Dispatcher implements DispatcherContract
 
             // If called from a -ed event, snapshot the model to ensure we have access to
             // the changed values
-            if (!in_array($method, [
+            if (! in_array($method, [
                 'creating',
                 'updating',
                 'saving',
                 'restoring',
                 'replicating',
                 'deleting',
-                'forceDeleting'
+                'forceDeleting',
             ])) {
                 $payload = array_map(function ($arg) {
                     return $arg instanceof Model
@@ -642,7 +642,7 @@ class Dispatcher implements DispatcherContract
 
     /**
      * Create a snapshot of the model's state at time of the event, allowing for changes to be viewed
-     * despite model reference being already synced
+     * despite model reference being already synced.
      *
      * @param  mixed  $listener
      * @param  string  $method
@@ -663,7 +663,7 @@ class Dispatcher implements DispatcherContract
 
         // Preserve any already-loaded relations
         $relations = $model->getRelations();
-        if (!empty($relations)) {
+        if (! empty($relations)) {
             $clone->setRelations($relations);
         }
 
