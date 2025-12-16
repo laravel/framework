@@ -16,7 +16,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         foreach (ClassLoader::getRegisteredLoaders() as $loader) {
             $loader->addPsr4('App\\', [default_skeleton_path('app')]);
         }
-        
         parent::setUp();
     }
 }
