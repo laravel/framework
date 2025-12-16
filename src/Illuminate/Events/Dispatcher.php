@@ -644,9 +644,8 @@ class Dispatcher implements DispatcherContract
      * Create a snapshot of the model's state at time of the event, allowing for changes to be viewed
      * despite model reference being already synced.
      *
-     * @param  mixed  $listener
-     * @param  string  $method
-     * @return \Closure
+     * @param  Model  $model
+     * @return Model
      */
     protected function snapshotModelForAfterCommit(Model $model): Model
     {
