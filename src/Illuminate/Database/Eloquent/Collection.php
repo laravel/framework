@@ -226,13 +226,13 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this;
         }
 
-        $query = $this->first()->newQueryWithoutRelationships()->with($relations);
+        $eagerLoads = $this->first()->newQueryWithoutRelationships()->with($relations)->getEagerLoads();
+        foreach ($eagerLoads as $key => $value) {
+            $parts = explode(':', $key, 2);
+            $segments = explode('.', $parts[0]);
 
-        foreach ($query->getEagerLoads() as $key => $value) {
-            $segments = explode('.', explode(':', $key)[0]);
-
-            if (str_contains($key, ':')) {
-                $segments[count($segments) - 1] .= ':' . explode(':', $key)[1];
+            if (isset($parts[1])) {
+                $segments[count($segments) - 1] .= ':' . $parts[1];
             }
 
             $path = [];
@@ -242,7 +242,8 @@ class Collection extends BaseCollection implements QueueableCollection
             }
 
             if (is_callable($value)) {
-                $path[count($segments) - 1][array_last($segments)] = $value;
+                $lastIndex = count($path) - 1;
+                $path[$lastIndex][end($segments)] = $value;
             }
 
             $this->loadMissingRelation($this, $path);
