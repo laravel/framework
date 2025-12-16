@@ -2,27 +2,37 @@
 
 namespace Illuminate\Tests\Console;
 
+use Composer\Autoload\ClassLoader;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Events\Dispatcher as EventsDispatcher;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application as FoundationApplication;
 use Illuminate\Foundation\Console\Kernel;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithArrayInputPrompting;
 use Illuminate\Tests\Console\Fixtures\FakeCommandWithInputPrompting;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\InteractsWithMockery;
+use Orchestra\Testbench\Foundation\Application as Testbench;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Throwable;
 
+use function Illuminate\Filesystem\join_paths;
+use function Orchestra\Testbench\default_skeleton_path;
+
 class ConsoleApplicationTest extends TestCase
 {
+    use InteractsWithMockery;
+
     protected function tearDown(): void
     {
-        m::close();
+        $this->tearDownTheTestEnvironmentUsingMockery();
     }
 
     public function testAddSetsLaravelInstance()
@@ -150,7 +160,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputPromptsWhenRequiredArgumentIsMissing()
     {
         $artisan = new Application(
-            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $laravel = new FoundationApplication(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null]),
             'testing'
         );
@@ -169,7 +179,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputDoesntPromptWhenRequiredArgumentIsPassed()
     {
         $artisan = new Application(
-            new \Illuminate\Foundation\Application(__DIR__),
+            new FoundationApplication(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null]),
             'testing'
         );
@@ -188,7 +198,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputPromptsWhenRequiredArgumentsAreMissing()
     {
         $artisan = new Application(
-            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $laravel = new FoundationApplication(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null]),
             'testing'
         );
@@ -207,7 +217,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCommandInputDoesntPromptWhenRequiredArgumentsArePassed()
     {
         $artisan = new Application(
-            new \Illuminate\Foundation\Application(__DIR__),
+            new FoundationApplication(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null]),
             'testing'
         );
@@ -226,7 +236,7 @@ class ConsoleApplicationTest extends TestCase
     public function testCallMethodCanCallArtisanCommandUsingCommandClassObject()
     {
         $artisan = new Application(
-            $laravel = new \Illuminate\Foundation\Application(__DIR__),
+            $laravel = new FoundationApplication(__DIR__),
             m::mock(Dispatcher::class, ['dispatch' => null]),
             'testing'
         );
@@ -242,32 +252,48 @@ class ConsoleApplicationTest extends TestCase
         $this->assertSame(0, $exitCode);
     }
 
+    #[RunInSeparateProcess]
     public function testLoadIgnoresTestFiles()
     {
-        $dir = __DIR__.'/laravel';
-        @mkdir($dir.'/app/Console/Commands', 0755, true);
-        file_put_contents($dir.'/composer.json', json_encode(['autoload' => ['psr-4' => ['App\\' => 'app/']]]));
-        file_put_contents($dir.'/app/Console/Commands/ExampleCommand.php', '<?php namespace App\Console\Commands; class ExampleCommand extends \Illuminate\Console\Command { protected $signature = "example"; public function handle() {} }');
-        file_put_contents($dir.'/app/Console/Commands/ExampleCommandTest.php', '<?php namespace App\Console\Commands; class ExampleCommandTest extends \Illuminate\Console\Command { protected $signature = "example-test"; public function handle() {} }');
+        $files = new Filesystem;
+
+        $files->ensureDirectoryExists(join_paths(default_skeleton_path(), 'app', 'Console', 'Commands'), 0755, true);
 
         try {
-            $app = new FoundationApplication($dir);
+            $files->put(
+                join_paths(default_skeleton_path(), 'app', 'Console', 'Commands', 'ExampleCommand.php'),
+                '<?php namespace App\Console\Commands; class ExampleCommand extends \Illuminate\Console\Command { protected $signature = "example"; public function handle() {} }'
+            );
+
+            $files->put(
+                join_paths(default_skeleton_path(), 'app', 'Console', 'Commands', 'ExampleCommandTest.php'),
+                '<?php namespace App\Console\Commands; class ExampleCommandTest extends \Illuminate\Console\Command { protected $signature = "example-test"; public function handle() {} }'
+            );
+
+            $files->put(
+                join_paths(default_skeleton_path(), 'app', 'Console', 'Commands', 'ExampleCommandUnitTest.php'),
+                '<?php namespace App\Console\Commands; class ExampleCommandUnitTest extends \PHPUnit\Framework\TestCase { public function test_command() { $this->assertTrue(true); } }'
+            );
+
+            foreach (ClassLoader::getRegisteredLoaders() as $loader) {
+                $loader->addPsr4('App\\', [default_skeleton_path('app')]);
+            }
+
+            $app = Testbench::create(default_skeleton_path());
             $events = new EventsDispatcher($app);
             $app->instance('events', $events);
 
             $kernel = new TestKernel($app, $events);
-            $kernel->loadFrom([$dir.'/app/Console/Commands']);
 
-            $this->assertContains('App\Console\Commands\ExampleCommand', $kernel->loadedCommands);
-            $this->assertNotContains('App\Console\Commands\ExampleCommandTest', $kernel->loadedCommands);
+            $commands = $kernel->getRegisteredCommands();
+
+            $this->assertContains('App\Console\Commands\ExampleCommand', $commands);
+            $this->assertContains('App\Console\Commands\ExampleCommandTest', $commands);
+            $this->assertNotContains('App\Console\Commands\ExampleCommandUnitTest', $commands);
+
+            Testbench::flushState($this);
         } finally {
-            @unlink($dir.'/app/Console/Commands/ExampleCommand.php');
-            @unlink($dir.'/app/Console/Commands/ExampleCommandTest.php');
-            @unlink($dir.'/composer.json');
-            @rmdir($dir.'/app/Console/Commands');
-            @rmdir($dir.'/app/Console');
-            @rmdir($dir.'/app');
-            @rmdir($dir);
+            $files->cleanDirectory(default_skeleton_path('app', 'Console', 'Commands'));
         }
     }
 
@@ -313,8 +339,14 @@ class TestKernel extends Kernel
         $this->load($paths);
     }
 
+    #[\Override]
     protected function commandClassFromFile(\SplFileInfo $file, string $namespace): string
     {
         return tap(parent::commandClassFromFile($file, $namespace), fn ($command) => $this->loadedCommands[] = $command);
+    }
+
+    public function getRegisteredCommands(): array
+    {
+        return collect($this->getArtisan()->all())->values()->transform(fn ($command) => $command::class)->all();
     }
 }
