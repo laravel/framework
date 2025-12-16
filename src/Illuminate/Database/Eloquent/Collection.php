@@ -48,7 +48,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return $this->whereIn($this->first()->getKeyName(), $key);
         }
 
-        return Arr::first($this->items, fn ($model) => $model->getKey() == $key, $default);
+        return Arr::first($this->items, fn($model) => $model->getKey() == $key, $default);
     }
 
     /**
@@ -222,28 +222,30 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        if ($this->isNotEmpty()) {
-            $query = $this->first()->newQueryWithoutRelationships()->with($relations);
+        if ($this->isEmpty()) {
+            return $this;
+        }
 
-            foreach ($query->getEagerLoads() as $key => $value) {
-                $segments = explode('.', explode(':', $key)[0]);
+        $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
-                if (str_contains($key, ':')) {
-                    $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
-                }
+        foreach ($query->getEagerLoads() as $key => $value) {
+            $segments = explode('.', explode(':', $key)[0]);
 
-                $path = [];
-
-                foreach ($segments as $segment) {
-                    $path[] = [$segment => $segment];
-                }
-
-                if (is_callable($value)) {
-                    $path[count($segments) - 1][array_last($segments)] = $value;
-                }
-
-                $this->loadMissingRelation($this, $path);
+            if (str_contains($key, ':')) {
+                $segments[count($segments) - 1] .= ':' . explode(':', $key)[1];
             }
+
+            $path = [];
+
+            foreach ($segments as $segment) {
+                $path[] = [$segment => $segment];
+            }
+
+            if (is_callable($value)) {
+                $path[count($segments) - 1][array_last($segments)] = $value;
+            }
+
+            $this->loadMissingRelation($this, $path);
         }
 
         return $this;
@@ -295,7 +297,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $relation = reset($relation);
         }
 
-        $models->filter(fn ($model) => ! is_null($model) && ! $model->relationLoaded($name))->load($relation);
+        $models->filter(fn($model) => ! is_null($model) && ! $model->relationLoaded($name))->load($relation);
 
         if (empty($path)) {
             return;
@@ -321,8 +323,8 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $this->pluck($relation)
             ->filter()
-            ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->load($relations[$className] ?? []));
+            ->groupBy(fn($model) => get_class($model))
+            ->each(fn($models, $className) => static::make($models)->load($relations[$className] ?? []));
 
         return $this;
     }
@@ -338,8 +340,8 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $this->pluck($relation)
             ->filter()
-            ->groupBy(fn ($model) => get_class($model))
-            ->each(fn ($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
+            ->groupBy(fn($model) => get_class($model))
+            ->each(fn($models, $className) => static::make($models)->loadCount($relations[$className] ?? []));
 
         return $this;
     }
@@ -359,10 +361,10 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         if ($key instanceof Model) {
-            return parent::contains(fn ($model) => $model->is($key));
+            return parent::contains(fn($model) => $model->is($key));
         }
 
-        return parent::contains(fn ($model) => $model->getKey() == $key);
+        return parent::contains(fn($model) => $model->getKey() == $key);
     }
 
     /**
@@ -385,7 +387,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function modelKeys()
     {
-        return array_map(fn ($model) => $model->getKey(), $this->items);
+        return array_map(fn($model) => $model->getKey(), $this->items);
     }
 
     /**
@@ -417,7 +419,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::map($callback);
 
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+        return $result->contains(fn($item) => ! $item instanceof Model) ? $result->toBase() : $result;
     }
 
     /**
@@ -435,7 +437,7 @@ class Collection extends BaseCollection implements QueueableCollection
     {
         $result = parent::mapWithKeys($callback);
 
-        return $result->contains(fn ($item) => ! $item instanceof Model) ? $result->toBase() : $result;
+        return $result->contains(fn($item) => ! $item instanceof Model) ? $result->toBase() : $result;
     }
 
     /**
@@ -458,8 +460,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->get()
             ->getDictionary();
 
-        return $this->filter(fn ($model) => $model->exists && isset($freshModels[$model->getKey()]))
-            ->map(fn ($model) => $freshModels[$model->getKey()]);
+        return $this->filter(fn($model) => $model->exists && isset($freshModels[$model->getKey()]))
+            ->map(fn($model) => $freshModels[$model->getKey()]);
     }
 
     /**
@@ -791,7 +793,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function duplicateComparator($strict)
     {
-        return fn ($a, $b) => $a->is($b);
+        return fn($a, $b) => $a->is($b);
     }
 
     /**
@@ -801,7 +803,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function withRelationshipAutoloading()
     {
-        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples);
+        $callback = fn($tuples) => $this->loadMissingRelationshipChain($tuples);
 
         foreach ($this as $model) {
             if (! $model->hasRelationAutoloadCallback()) {
@@ -928,7 +930,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
+        if ($this->reject(fn($model) => $model instanceof $class)->isNotEmpty()) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 
