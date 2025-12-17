@@ -65,7 +65,7 @@ class DatabaseLock extends Lock
      *
      * @return bool
      *
-     * @throws Throwable
+     * @throws \Throwable
      */
     public function acquire()
     {
@@ -91,15 +91,7 @@ class DatabaseLock extends Lock
         }
 
         if (count($this->lottery ?? []) === 2 && random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
-            try {
-                $this->connection->table($this->table)
-                    ->where('expiration', '<=', $this->currentTime())
-                    ->delete();
-            } catch (Throwable $e) {
-                if (! $this->causedByConcurrencyError($e)) {
-                    throw $e;
-                }
-            }
+            $this->pruneExpiredLocks();
         }
 
         return $acquired;
@@ -146,6 +138,26 @@ class DatabaseLock extends Lock
         $this->connection->table($this->table)
             ->where('key', $this->name)
             ->delete();
+    }
+
+    /**
+     * Deletes locks that are past expiration.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function pruneExpiredLocks()
+    {
+        try {
+            $this->connection->table($this->table)
+                ->where('expiration', '<=', $this->currentTime())
+                ->delete();
+        } catch (Throwable $e) {
+            if (! $this->causedByConcurrencyError($e)) {
+                throw $e;
+            }
+        }
     }
 
     /**
