@@ -364,7 +364,7 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->assertSame($password->appliedRules(), [
             'min' => 2,
-            'max' => null,
+            'max' => 72,
             'mixedCase' => false,
             'letters' => false,
             'numbers' => false,
