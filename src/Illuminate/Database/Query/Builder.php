@@ -34,7 +34,7 @@ use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
 {
-    /** @use \Illuminate\Database\Concerns\BuildsQueries<object> */
+    /** @use \Illuminate\Database\Concerns\BuildsQueries<\stdClass> */
     use BuildsWhereDateClauses, BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
@@ -3088,7 +3088,7 @@ class Builder implements BuilderContract
      *
      * @param  int|string  $id
      * @param  string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
-     * @return object|null
+     * @return \stdClass|null
      */
     public function find($id, $columns = ['*'])
     {
@@ -3103,7 +3103,7 @@ class Builder implements BuilderContract
      * @param  mixed  $id
      * @param  (\Closure(): TValue)|string|\Illuminate\Contracts\Database\Query\Expression|array<string|\Illuminate\Contracts\Database\Query\Expression>  $columns
      * @param  (\Closure(): TValue)|null  $callback
-     * @return object|TValue
+     * @return \stdClass|TValue
      */
     public function findOr($id, $columns = ['*'], ?Closure $callback = null)
     {
