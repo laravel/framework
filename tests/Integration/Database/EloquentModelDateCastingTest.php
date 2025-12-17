@@ -11,6 +11,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 class EloquentModelDateCastingTest extends DatabaseTestCase
 {
+    /** {@inheritdoc} */
     protected function afterRefreshingDatabase()
     {
         Schema::create('test_model1', function (Blueprint $table) {
@@ -19,6 +20,15 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $table->datetime('datetime_field')->nullable();
             $table->date('immutable_date_field')->nullable();
             $table->datetime('immutable_datetime_field')->nullable();
+        });
+
+        Schema::create('test_model2', function (Blueprint $table) {
+            $table->increments('id');
+            $table->date('date_field')->nullable();
+            $table->datetime('datetime_field')->nullable();
+            $table->date('immutable_date_field')->nullable();
+            $table->datetime('immutable_datetime_field')->nullable();
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -113,12 +123,51 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         $this->assertArrayNotHasKey('immutable_date_field', $user->getDirty());
         $this->assertArrayNotHasKey('immutable_datetime_field', $user->getDirty());
     }
+
+    public function testDatesCanBeSerializedToArray()
+    {
+        $this->freezeSecond(function ($now) {
+            $user = TestModel2::create([
+                'date_field' => '2019-10-01',
+                'datetime_field' => '2019-10-01 10:15:20',
+                'immutable_date_field' => '2019-10-01',
+                'immutable_datetime_field' => '2019-10-01 10:15:20',
+            ]);
+
+            $this->assertSame(['created_at', null], $user->getDates());
+
+            $user->refresh();
+
+            $this->assertSame([
+                'id' => $user->getKey(),
+                'date_field' => '2019-10',
+                'datetime_field' => '2019-10 10:15',
+                'immutable_date_field' => '2019-10',
+                'immutable_datetime_field' => '2019-10 10:15',
+                'created_at' => $now->toISOString(),
+            ], $user->attributesToArray());
+        });
+    }
 }
 
 class TestModel1 extends Model
 {
     public $table = 'test_model1';
     public $timestamps = false;
+    protected $guarded = [];
+
+    public $casts = [
+        'date_field' => 'date:Y-m',
+        'datetime_field' => 'datetime:Y-m H:i',
+        'immutable_date_field' => 'date:Y-m',
+        'immutable_datetime_field' => 'datetime:Y-m H:i',
+    ];
+}
+
+class TestModel2 extends Model
+{
+    public $table = 'test_model2';
+    const UPDATED_AT = null;
     protected $guarded = [];
 
     public $casts = [

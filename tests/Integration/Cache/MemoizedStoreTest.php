@@ -18,28 +18,32 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Redis;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use Throwable;
 
+#[WithConfig('cache.default', 'redis')]
+#[WithConfig('cache.prefix', 'laravel-cache-')]
 class MemoizedStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
+    /** {@inheritdoc} */
+    #[\Override]
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            $this->setUpRedis();
+
+            Redis::connection(Config::get('cache.stores.redis.connection'))->flushDb();
+            Redis::connection(Config::get('cache.stores.redis.lock_connection'))->flushDb();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->tearDownRedis();
+        });
+
         parent::setUp();
-
-        $this->setUpRedis();
-
-        Config::set('cache.default', 'redis');
-        Redis::flushAll();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->tearDownRedis();
     }
 
     public function test_it_can_memoize_when_retrieving_single_value()
@@ -118,6 +122,21 @@ class MemoizedStoreTest extends TestCase
         $memoValue = Cache::memo()->many(['a', '1.1', '1', 2]);
 
         $this->assertSame($cacheValue, $memoValue);
+    }
+
+    public function test_it_uses_correct_keys_for_getMultiple_with_empty_prefix()
+    {
+        Cache::setPrefix(null);
+
+        $data = [
+            '1' => 'one',
+            0 => 'zero',
+        ];
+        Cache::putMany($data);
+
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
+        // ensure correct on the second memoized retrieval
+        $this->assertSame($data, Cache::memo()->many(array_keys($data)));
     }
 
     public function test_null_values_are_memoized_when_retrieving_multiple_values()
@@ -277,7 +296,7 @@ class MemoizedStoreTest extends TestCase
 
     public function test_memoized_driver_uses_underlying_drivers_prefix()
     {
-        $this->assertSame('laravel_cache_', Cache::memo()->getPrefix());
+        $this->assertSame('laravel-cache-', Cache::memo()->getPrefix());
 
         Cache::driver('redis')->setPrefix('foo');
 

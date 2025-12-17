@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Prohibitable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'schema:dump')]
 class DumpCommand extends Command
 {
+    use Prohibitable;
+
     /**
      * The console command name.
      *
@@ -41,6 +44,10 @@ class DumpCommand extends Command
      */
     public function handle(ConnectionResolverInterface $connections, Dispatcher $dispatcher)
     {
+        if ($this->isProhibited()) {
+            return Command::FAILURE;
+        }
+
         $connection = $connections->connection($database = $this->input->getOption('database'));
 
         $this->schemaState($connection)->dump(

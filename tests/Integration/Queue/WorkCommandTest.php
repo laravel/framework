@@ -220,6 +220,65 @@ class WorkCommandTest extends QueueTestCase
         Worker::$cacheFailedExitCode = null;
     }
 
+    public function testDisableLastRestartCheck()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Worker::$restartable = false;
+
+        $cache = m::mock(Repository::class);
+        $cache->shouldNotReceive('get')->with('illuminate:queue:restart');
+        $cache->shouldReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
+
+        $cacheManager = m::mock(CacheManager::class);
+        $cacheManager->shouldReceive('driver')->andReturn($cache);
+        $cacheManager->shouldReceive('store')->andReturn($cache);
+
+        $this->app->instance('cache', $cacheManager);
+
+        Queue::push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            '--max-jobs' => 1,
+            '--stop-when-empty' => true,
+        ]);
+
+        $this->assertSame(0, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
+
+        Worker::$restartable = true;
+    }
+
+    public function testDisablePauseQueueCheck()
+    {
+        $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);
+
+        Worker::$pausable = false;
+
+        $cache = m::mock(Repository::class);
+
+        $cache->shouldReceive('get')->with('illuminate:queue:restart')->andReturn(null);
+        $cache->shouldNotReceive('get')->with(m::pattern('/^illuminate:queue:paused:/'), false);
+
+        $cacheManager = m::mock(CacheManager::class);
+        $cacheManager->shouldReceive('driver')->andReturn($cache);
+        $cacheManager->shouldReceive('store')->andReturn($cache);
+
+        $this->app->instance('cache', $cacheManager);
+
+        Queue::push(new FirstJob);
+
+        $this->artisan('queue:work', [
+            '--max-jobs' => 1,
+            '--stop-when-empty' => true,
+        ]);
+
+        $this->assertSame(0, Queue::size());
+        $this->assertTrue(FirstJob::$ran);
+
+        Worker::$pausable = true;
+    }
+
     public function testFailedJobListenerOnlyRunsOnce()
     {
         $this->markTestSkippedWhenUsingQueueDrivers(['redis', 'beanstalkd']);

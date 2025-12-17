@@ -16,6 +16,7 @@
     "require": {
         "php": "^8.3",
         "illuminate/contracts": "^13.0",
+        "illuminate/reflection": "^13.0",
         "psr/container": "^1.1.1|^2.0.1",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33"

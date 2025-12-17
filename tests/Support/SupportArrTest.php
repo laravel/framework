@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\MultipleItemsFoundException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use WeakMap;
@@ -164,6 +165,7 @@ class SupportArrTest extends TestCase
         $this->assertSame([[]], Arr::crossJoin());
     }
 
+    #[IgnoreDeprecations]
     public function testDivide(): void
     {
         // Test dividing an empty array
@@ -197,6 +199,11 @@ class SupportArrTest extends TestCase
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
 
         // Test dividing an array where the values are arrays
+        [$keys, $values] = Arr::divide(['' => ['one' => 1, 2 => 'second'], 1 => 'one']);
+        $this->assertEquals([null, 1], $keys);
+        $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
+
+        // Test dividing an array where the values are arrays (with null key)
         [$keys, $values] = Arr::divide([null => ['one' => 1, 2 => 'second'], 1 => 'one']);
         $this->assertEquals([null, 1], $keys);
         $this->assertEquals([['one' => 1, 2 => 'second'], 'one'], $values);
@@ -367,6 +374,15 @@ class SupportArrTest extends TestCase
             }
         })();
         $this->assertNull(Arr::first($cursor));
+    }
+
+    public function testFirstWorksWithArrayObject()
+    {
+        $arrayObject = new ArrayObject([0, 10, 20]);
+
+        $result = Arr::first($arrayObject, fn ($value) => $value === 0);
+
+        $this->assertSame(0, $result);
     }
 
     public function testJoin()
@@ -1036,6 +1052,7 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['1-a-0', '2-b-1'], $result);
     }
 
+    #[IgnoreDeprecations]
     public function testPrepend()
     {
         $array = Arr::prepend(['one', 'two', 'three', 'four'], 'zero');
@@ -1043,6 +1060,9 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, 'zero');
         $this->assertEquals(['zero' => 0, 'one' => 1, 'two' => 2], $array);
+
+        $array = Arr::prepend(['one' => 1, 'two' => 2], 0, '');
+        $this->assertEquals(['' => 0, 'one' => 1, 'two' => 2], $array);
 
         $array = Arr::prepend(['one' => 1, 'two' => 2], 0, null);
         $this->assertEquals([null => 0, 'one' => 1, 'two' => 2], $array);
@@ -1061,6 +1081,18 @@ class SupportArrTest extends TestCase
 
         $array = Arr::prepend(['one', 'two'], ['zero'], 'key');
         $this->assertEquals(['key' => ['zero'], 'one', 'two'], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], '');
+        $this->assertEquals(['one', 'two', '' => ['zero']], $array);
+
+        $array = Arr::prepend(['one', 'two', '' => 'three'], ['zero'], '');
+        $this->assertEquals(['one', 'two', '' => ['zero']], $array);
+
+        $array = Arr::prepend(['one', 'two'], ['zero'], null);
+        $this->assertEquals(['one', 'two', null => ['zero']], $array);
+
+        $array = Arr::prepend(['one', 'two', '' => 'three'], ['zero'], null);
+        $this->assertEquals(['one', 'two', null => ['zero']], $array);
     }
 
     public function testPull()
@@ -1547,9 +1579,9 @@ class SupportArrTest extends TestCase
         Arr::forget($array, 'products.desk.final.taxes');
         $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
 
-        $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
+        $array = ['products' => ['desk' => ['price' => 50], '' => 'something']];
         Arr::forget($array, ['products.amount.all', 'products.desk.price']);
-        $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+        $this->assertEquals(['products' => ['desk' => [], '' => 'something']], $array);
 
         // Only works on first level keys
         $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];

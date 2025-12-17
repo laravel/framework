@@ -545,6 +545,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testMergeHiddenAddsHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->mergeHidden(['merged']);
+
+        $this->assertEquals(['hidden', 'merged'], $c[0]->getHidden());
+    }
+
+    public function testMergeVisibleRemovesHiddenFromEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->mergeVisible(['merged']);
+
+        $this->assertEquals(['visible', 'merged'], $c[0]->getVisible());
+    }
+
     public function testSetVisibleReplacesVisibleOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -568,6 +584,27 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = $c->append('test');
 
         $this->assertEquals(['test' => 'test'], $c[0]->toArray());
+    }
+
+    public function testSetAppendsSetsAppendedPropertiesOnEntireCollection()
+    {
+        $c = new Collection([new EloquentAppendingTestUserModel]);
+        $c->setAppends(['other_appended_field']);
+
+        $this->assertEquals(
+            [['other_appended_field' => 'bye']],
+            $c->toArray()
+        );
+    }
+
+    public function testWithoutAppendsRemovesAppendsOnEntireCollection()
+    {
+        $this->seedData();
+        $c = EloquentAppendingTestUserModel::query()->get();
+        $this->assertEquals('hello', $c->toArray()[0]['appended_field']);
+
+        $c = $c->withoutAppends();
+        $this->assertArrayNotHasKey('appended_field', $c->toArray()[0]);
     }
 
     public function testNonModelRelatedMethods()
@@ -843,5 +880,28 @@ class EloquentTestKey
     public function __toString()
     {
         return $this->key;
+    }
+}
+
+class EloquentAppendingTestUserModel extends Model
+{
+    protected $table = 'users';
+    protected $guarded = [];
+    public $timestamps = false;
+    protected $appends = ['appended_field'];
+
+    public function getAppendedFieldAttribute()
+    {
+        return 'hello';
+    }
+
+    public function getOtherAppendedFieldAttribute()
+    {
+        return 'bye';
+    }
+
+    public function articles()
+    {
+        return $this->hasMany(EloquentTestArticleModel::class, 'user_id');
     }
 }

@@ -148,6 +148,12 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
+    public function testCustomDriverClosureBoundObjectIsAuthManager()
+    {
+        $this->auth->extend(__CLASS__, fn () => $this);
+        $this->assertSame($this->auth, $this->auth->guard(__CLASS__));
+    }
+
     /**
      * Create a new config repository instance.
      *
@@ -161,6 +167,7 @@ class AuthenticateMiddlewareTest extends TestCase
                 'guards' => [
                     'default' => ['driver' => 'default'],
                     'secondary' => ['driver' => 'secondary'],
+                    __CLASS__ => ['driver' => __CLASS__],
                 ],
             ],
         ]);

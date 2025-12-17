@@ -78,7 +78,7 @@ class QueueSyncQueueTest extends TestCase
 
         try {
             $sync->push(new FailingSyncQueueJob());
-        } catch (LogicException $e) {
+        } catch (LogicException) {
             $this->assertSame('extraValue', $_SERVER['__sync.failed']);
         }
     }

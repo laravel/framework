@@ -7,9 +7,11 @@ use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\BatchFactory;
 use Illuminate\Bus\DatabaseBatchRepository;
+use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Bus\Queueable;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher as BusDispatcher;
 use Illuminate\Contracts\Queue\Factory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -17,7 +19,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Queue;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +43,35 @@ class BusBatchTest extends TestCase
 
         $db->bootEloquent();
         $db->setAsGlobal();
+
+        if (! Facade::getFacadeApplication()) {
+            $container = new Container;
+            Facade::setFacadeApplication($container);
+
+            $queue = m::mock(Factory::class);
+            $container->instance(Factory::class, $queue);
+            $container->alias(Factory::class, 'queue');
+
+            $dispatcher = m::mock(Dispatcher::class, [$container]);
+
+            $dispatcher->shouldReceive('batch')->zeroOrMoreTimes()->andReturnUsing(function ($jobs) {
+                $pendingBatch = m::mock(PendingBatch::class);
+                $pendingBatch->shouldReceive('name')->andReturnSelf();
+                $pendingBatch->shouldReceive('dispatch')->zeroOrMoreTimes()->andReturn(m::mock(Batch::class));
+
+                return $pendingBatch;
+            })->byDefault();
+
+            $dispatcher->shouldReceive('chain')->zeroOrMoreTimes()->andReturnUsing(function ($jobs) {
+                $pendingChain = m::mock(PendingChain::class, [$jobs, \stdClass::class]);
+                $pendingChain->shouldReceive('dispatch')->zeroOrMoreTimes()->andReturn(m::mock(Batch::class));
+
+                return $pendingChain;
+            })->byDefault();
+
+            $container->instance(BusDispatcher::class, $dispatcher);
+            $container->alias(BusDispatcher::class, 'bus');
+        }
 
         $this->createSchema();
 
@@ -74,6 +109,10 @@ class BusBatchTest extends TestCase
      */
     protected function tearDown(): void
     {
+        if (Facade::getFacadeApplication()) {
+            Facade::setFacadeApplication(null);
+        }
+
         unset($_SERVER['__finally.batch'], $_SERVER['__progress.batch'], $_SERVER['__then.batch'], $_SERVER['__catch.batch'], $_SERVER['__catch.exception']);
 
         $this->schema()->drop('job_batches');
@@ -454,6 +493,29 @@ class BusBatchTest extends TestCase
         $this->assertIsString($secondJob->batchId);
         $this->assertIsString($thirdJob->batchId);
         $this->assertInstanceOf(CarbonImmutable::class, $batch->createdAt);
+    }
+
+    public function test_chained_closure_after_multiple_batches_is_properly_dispatched()
+    {
+        Queue::fake();
+
+        $TestBatchJob = new class
+        {
+            use Batchable;
+
+            public function handle()
+            {
+            }
+        };
+
+        Bus::chain([
+            Bus::batch([$TestBatchJob])->name('Batch 1'),
+            Bus::batch([$TestBatchJob])->name('Batch 2'),
+            function () {
+            },
+        ])->dispatch();
+
+        $this->assertTrue(true);
     }
 
     public function test_options_serialization_on_postgres()

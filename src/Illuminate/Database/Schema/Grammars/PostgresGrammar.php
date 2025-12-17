@@ -1257,7 +1257,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->virtualAs)) {
-            return " generated always as ({$this->getValue($column->virtualAs)})";
+            return " generated always as ({$this->getValue($column->virtualAs)}) virtual";
         }
     }
 

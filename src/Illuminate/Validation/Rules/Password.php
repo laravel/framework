@@ -4,6 +4,7 @@ namespace Illuminate\Validation\Rules;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
+use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
 
-class Password implements Rule, DataAwareRule, ValidatorAwareRule
+class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
 {
     use Conditionable;
 
@@ -43,6 +44,20 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
      * @var int
      */
     protected $max;
+
+    /**
+     * If the password is required.
+     *
+     * @var bool
+     */
+    protected $required = false;
+
+    /**
+     * If the password should only be validated when present.
+     *
+     * @var bool
+     */
+    protected $sometimes = false;
 
     /**
      * If the password requires at least one uppercase and one lowercase letter.
@@ -155,21 +170,29 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     /**
      * Get the default configuration of the password rule and mark the field as required.
      *
-     * @return array
+     * @return static
      */
     public static function required()
     {
-        return ['required', static::default()];
+        $password = static::default();
+
+        $password->required = true;
+
+        return $password;
     }
 
     /**
      * Get the default configuration of the password rule and mark the field as sometimes being required.
      *
-     * @return array
+     * @return static
      */
     public static function sometimes()
     {
-        return ['sometimes', static::default()];
+        $password = static::default();
+
+        $password->sometimes = true;
+
+        return $password;
     }
 
     /**
@@ -309,9 +332,19 @@ class Password implements Rule, DataAwareRule, ValidatorAwareRule
     {
         $this->messages = [];
 
+        if (! $this->required && ! $this->sometimes && ($this->data === null || ! Arr::has($this->data, $attribute))) {
+            return true;
+        }
+
+        if ($value === null && ! $this->required && $this->validator && $this->validator->hasRule($attribute, ['Nullable'])) {
+            return true;
+        }
+
         $validator = Validator::make(
             $this->data,
             [$attribute => [
+                ...($this->required ? ['required'] : []),
+                ...($this->sometimes ? ['sometimes'] : []),
                 'string',
                 'min:'.$this->min,
                 ...($this->max ? ['max:'.$this->max] : []),

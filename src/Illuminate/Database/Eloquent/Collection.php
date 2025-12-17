@@ -570,25 +570,14 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Make the given, typically hidden, attributes visible across the entire collection.
+     * Merge the given, typically visible, attributes hidden across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
      * @return $this
      */
-    public function makeVisible($attributes)
+    public function mergeHidden($attributes)
     {
-        return $this->each->makeVisible($attributes);
-    }
-
-    /**
-     * Set the visible attributes across the entire collection.
-     *
-     * @param  array<int, string>  $visible
-     * @return $this
-     */
-    public function setVisible($visible)
-    {
-        return $this->each->setVisible($visible);
+        return $this->each->mergeHidden($attributes);
     }
 
     /**
@@ -603,6 +592,39 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Make the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function makeVisible($attributes)
+    {
+        return $this->each->makeVisible($attributes);
+    }
+
+    /**
+     * Merge the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function mergeVisible($attributes)
+    {
+        return $this->each->mergeVisible($attributes);
+    }
+
+    /**
+     * Set the visible attributes across the entire collection.
+     *
+     * @param  array<int, string>  $visible
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        return $this->each->setVisible($visible);
+    }
+
+    /**
      * Append an attribute across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -611,6 +633,27 @@ class Collection extends BaseCollection implements QueueableCollection
     public function append($attributes)
     {
         return $this->each->append($attributes);
+    }
+
+    /**
+     * Sets the appends on every element of the collection, overwriting the existing appends for each.
+     *
+     * @param  array<array-key, mixed>  $appends
+     * @return $this
+     */
+    public function setAppends(array $appends)
+    {
+        return $this->each->setAppends($appends);
+    }
+
+    /**
+     * Remove appended properties from every element in the collection.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
     }
 
     /**

@@ -966,7 +966,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(2, $statements);
         $this->assertSame([
             'alter table "users" add column "foo" integer null',
-            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) virtual',
         ], $statements);
 
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -976,7 +976,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(2, $statements);
         $this->assertSame([
             'alter table "users" add column "foo" integer null',
-            'alter table "users" add column "bar" boolean not null generated always as (foo is not null)',
+            'alter table "users" add column "bar" boolean not null generated always as (foo is not null) virtual',
         ], $statements);
     }
 

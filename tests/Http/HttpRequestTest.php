@@ -591,6 +591,20 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
     }
 
+    public function testFluentMethod()
+    {
+        $request = Request::create('/', 'GET', [
+            'user' => [
+                'name' => 'Michael',
+                'role' => 'admin',
+            ],
+            'users' => null,
+        ]);
+        $this->assertSame(['name' => 'Michael', 'role' => 'admin'], $request->fluent('user')->toArray());
+        $this->assertSame([], $request->fluent('users')->toArray());
+        $this->assertSame([], $request->fluent('not_found')->toArray());
+    }
+
     public function testStringMethod()
     {
         $request = Request::create('/', 'GET', [
@@ -1409,6 +1423,79 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->accepts('text/foo'));
         $this->assertTrue($request->accepts('application/json'));
         $this->assertTrue($request->accepts('application/baz+json'));
+    }
+
+    public function testWantsJsonRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertFalse($request->wantsJson());
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true after Accept header is changed to application/json');
+    }
+
+    public function testAcceptsJsonRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->acceptsJson(), 'acceptsJson() should return true after Accept header is changed to application/json');
+    }
+
+    public function testPrefersRespectsHeaderChanges()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+
+        $this->assertTrue($request->acceptsAnyContentType());
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertSame('json', $request->prefers(['html', 'json']), 'prefers() should return json after Accept header is changed to application/json');
+    }
+
+    public function testWantsJsonWorksWhenHeaderSetBeforeFirstCall()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true when Accept header is set to application/json');
+    }
+
+    public function testCacheClearedWhenTransitioningFromUnsetToSetHeader()
+    {
+        $request = Request::create('/', 'GET', [], [], [], []);
+
+        $request->getAcceptableContentTypes();
+
+        $request->headers->set('Accept', 'application/json');
+
+        $this->assertTrue($request->wantsJson(), 'wantsJson() should return true after Accept header is set from null to application/json');
+
+        $this->assertTrue($request->acceptsJson(), 'acceptsJson() should return true after Accept header is set from null to application/json');
+    }
+
+    public function testAcceptsJsonWorksWhenHeaderChangedMultipleTimes()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+
+        $this->assertFalse($request->acceptsJson());
+
+        $request->headers->set('Accept', 'application/json');
+        $this->assertTrue($request->acceptsJson());
+
+        $request->headers->set('Accept', 'text/html');
+        $this->assertFalse($request->acceptsJson());
+
+        $request->headers->set('Accept', 'application/json');
+        $this->assertTrue($request->acceptsJson());
     }
 
     public function testBadAcceptHeader()

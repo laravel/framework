@@ -161,6 +161,8 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \BadMethodCallException
      */
     public function registerBag(SessionBagInterface $bag): void
     {
@@ -169,6 +171,8 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \BadMethodCallException
      */
     public function getBag(string $name): SessionBagInterface
     {
@@ -177,6 +181,8 @@ class SymfonySessionDecorator implements SessionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \BadMethodCallException
      */
     public function getMetadataBag(): MetadataBag
     {

@@ -215,8 +215,7 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
             ['name' => 'C (user)'],
         ]);
 
-        TestPost::create(['title' => 'B (post)']);
-        TestPost::create(['title' => 'D (post)']);
+        TestPost::fillAndInsert([['title' => 'B (post)'], ['title' => 'D (post)']]);
 
         $table1 = TestPost::select(['title as alias']);
         $table2 = TestUser::select(['name as alias']);
@@ -272,8 +271,10 @@ class EloquentCursorPaginateTest extends DatabaseTestCase
 
     public function testPaginationWithDistinctColumnsAndSelectAndJoin()
     {
+        TestUser::fillAndInsert([[], [], [], [], []]);
+        $users = TestUser::query()->get();
         for ($i = 1; $i <= 5; $i++) {
-            $user = TestUser::create();
+            $user = $users[$i - 1];
 
             for ($j = 1; $j <= 10; $j++) {
                 $posts[] = [

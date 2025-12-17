@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -558,6 +559,17 @@ class SupportStrTest extends TestCase
     {
         $this->assertEquals('"value"', Str::wrap('value', '"'));
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
+    }
+
+    public function testWrapEdgeCases()
+    {
+        $this->assertSame('[]mid[]', Str::wrap('mid', '[]'));
+        $this->assertSame('(mid', Str::wrap('mid', '(', ''));
+        $this->assertSame('<mid<', Str::wrap('mid', '<'));
+        $this->assertSame('value', Str::wrap('value', ''));
+        $this->assertSame('[][]', Str::wrap('', '[]'));
+        $this->assertSame('«値»', Str::wrap('値', '«', '»'));
+        $this->assertSame('🧪X🧪', Str::wrap('X', '🧪'));
     }
 
     public function testUnwrap()
@@ -1264,6 +1276,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testSubstrReplaceWithMultibyte()
+    {
+        $this->assertSame('kengä', Str::substrReplace('kenkä', 'ng', -3, 2));
+        $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
@@ -1289,6 +1307,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertSame('Мама', Str::ucfirst('мама'));
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', Str::ucwords('laravel'));
+        $this->assertSame('Laravel Framework', Str::ucwords('laravel framework'));
+        $this->assertSame('Laravel-Framework', Str::ucwords('laravel-framework', '-'));
+        $this->assertSame('Мама', Str::ucwords('мама'));
+        $this->assertSame('Мама Мыла Раму', Str::ucwords('мама мыла раму'));
+        $this->assertSame('JJ Watt', Str::ucwords('JJ watt'));
     }
 
     public function testUcsplit()
@@ -1870,8 +1898,16 @@ class SupportStrTest extends TestCase
     public function testPlural(): void
     {
         $this->assertSame('Laracon', Str::plural('Laracon', 1));
+        $this->assertSame('Laracon', Str::plural('Laracon', [2025]));
+
         $this->assertSame('Laracons', Str::plural('Laracon', 3));
+        $this->assertSame('Laracons', Str::plural('Laracon', [2024, 2025]));
+
+        $this->assertSame('1 Laracon', Str::plural('Laracon', 1, prependCount: true));
+        $this->assertSame('1 Laracon', Str::plural('Laracon', [2025], prependCount: true));
+
         $this->assertSame('1,000 Laracons', Str::plural('Laracon', 1000, prependCount: true));
+        $this->assertSame('2 Laracons', Str::plural('Laracon', [2024, 2025], prependCount: true));
     }
 
     public function testPluralPascal(): void
@@ -1896,20 +1932,5 @@ class SupportStrTest extends TestCase
         };
 
         $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
-    }
-}
-
-class StringableObjectStub
-{
-    private $value;
-
-    public function __construct($value)
-    {
-        $this->value = $value;
-    }
-
-    public function __toString()
-    {
-        return $this->value;
     }
 }

@@ -715,6 +715,21 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
+    public function testUsesRightSeperatorForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+            'root' => 'something',
+            'directory_separator' => '\\',
+        ]);
+
+        $path = $filesystemAdapter->path('different');
+        $this->assertStringContainsString('/', $path);
+        $this->assertStringNotContainsString('\\', $path);
+    }
+
     public function testProvidesTemporaryUrlsForAdapterWithoutTemporaryUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -736,5 +751,20 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertEquals('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
         $this->assertEquals('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
+    }
+
+    public function testUsesRightSeperatorForS3AdapterWithoutDoublePrefixing()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+            'root' => 'my-root',
+            'prefix' => 'someprefix',
+            'directory_separator' => '\\',
+        ]);
+
+        $path = $filesystemAdapter->path('different');
+        $this->assertEquals('my-root/someprefix/different', $path);
     }
 }

@@ -79,7 +79,7 @@ class MySqlConnection extends Connection
      */
     protected function isUniqueConstraintError(Exception $exception)
     {
-        return boolval(preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage()));
+        return (bool) preg_match('#Integrity constraint violation: 1062#i', $exception->getMessage());
     }
 
     /**

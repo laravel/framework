@@ -3,10 +3,15 @@ name: 'update assets'
 on:
   push:
     branches:
-      - '12.x'
+      - master
+      - '*.x'
     paths:
-      - '/src/Illuminate/Foundation/resources/exceptions/renderer/package-lock.json'
-  workflow_dispatch:
+      - 'src/Illuminate/Foundation/resources/exceptions/renderer/**'
+      - '!src/Illuminate/Foundation/resources/exceptions/renderer/dist/**'
+  pull_request:
+    paths:
+      - 'src/Illuminate/Foundation/resources/exceptions/renderer/**'
+      - '!src/Illuminate/Foundation/resources/exceptions/renderer/dist/**'
 
 permissions:
   contents: write
@@ -17,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - uses: actions/setup-node@v4
         with:
@@ -29,6 +34,6 @@ jobs:
           npm run build --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
 
       - name: Commit Compiled Files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: Update Assets

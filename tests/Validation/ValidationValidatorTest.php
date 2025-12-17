@@ -622,6 +622,157 @@ class ValidationValidatorTest extends TestCase
         $this->assertSame('empty is not a valid email', $v->messages()->first('email'));
     }
 
+    public function testCapitalizedDisplayableValuesAreReplaced()
+    {
+        // accepted_if
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :Other is :Value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when Bar is Aaa.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :OTHER is :VALUE.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aaa'], ['foo' => 'accepted_if:bar,aaa']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertSame('The foo field must be accepted when BAR is AAA.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.accepted_if' => 'The :attribute field must be accepted when :other is :value.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'aAa'], ['foo' => 'accepted_if:bar,aAa']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be accepted when bar is aAa.', $v->messages()->first('foo'));
+
+        // in_array
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :Other.'], 'en');
+        $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
+        $this->assertSame('The value of foo.2 does not exist in Bar.*.', $v->messages()->first('foo.2'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :OTHER.'], 'en');
+        $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
+        $this->assertSame('The value of foo.2 does not exist in BAR.*.', $v->messages()->first('foo.2'));
+
+        // missing_with
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_with' => 'The :attribute field must be missing when :Values is present.'], 'en');
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when Baz / Bar is present.', $v->errors()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.missing_with' => 'The :attribute field must be missing when :VALUES is present.'], 'en');
+        $v = new Validator($trans, ['foo' => [], 'bar' => '2'], ['foo' => 'missing_with:baz,bar']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be missing when BAZ / BAR is present.', $v->errors()->first('foo'));
+
+        // present_with
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_with' => 'The :attribute field must be present when :Values is present.'], 'en');
+        $v = new Validator($trans, ['bar' => 2, 'baz' => 2], ['foo' => 'present_with:bar,baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present when Bar / Baz is present.', $v->errors()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.present_with' => 'The :attribute field must be present when :VALUES is present.'], 'en');
+        $v = new Validator($trans, ['bar' => 2, 'baz' => 2], ['foo' => 'present_with:bar,baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must be present when BAR / BAZ is present.', $v->errors()->first('foo'));
+
+        // prohibits
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibits' => 'The :attribute field prohibits :Other being present.'], 'en');
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The email field prohibits Emails / Email address being present.', $v->messages()->first('email'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.prohibits' => 'The :attribute field prohibits :OTHER being present.'], 'en');
+        $v = new Validator($trans, ['email' => 'foo', 'emails' => 'bar', 'email_address' => 'baz'], ['email' => 'prohibits:emails,email_address']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The email field prohibits EMAILS / EMAIL ADDRESS being present.', $v->messages()->first('email'));
+
+        // required_if_accepted
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_if_accepted' => 'The :attribute field is required when :Other is accepted.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The bar field is required when Foo is accepted.', $v->messages()->first('bar'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_if_accepted' => 'The :attribute field is required when :OTHER is accepted.'], 'en');
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The bar field is required when FOO is accepted.', $v->messages()->first('bar'));
+
+        // required_unless
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :Other is in :Values.'], 'en');
+        $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredUnless:first,taylor,sven']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is required unless First is in Taylor, Sven.', $v->messages()->first('last'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :OTHER is in :VALUES.'], 'en');
+        $v = new Validator($trans, ['first' => 'dayle', 'last' => ''], ['last' => 'RequiredUnless:first,taylor,sven']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is required unless FIRST is in TAYLOR, SVEN.', $v->messages()->first('last'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_unless' => 'The :attribute field is required unless :other is in :values.'], 'en');
+        $v = new Validator($trans, ['firstName' => 'dAyle', 'lastName' => ''], ['lastName' => 'RequiredUnless:firstName,tAylor,sVen']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last name field is required unless first name is in tAylor, sVen.', $v->messages()->first('lastName'));
+
+        // required_with
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_with' => 'The :attribute field is required when :Values is present.'], 'en');
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => ''], ['last' => 'required_with:first']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is required when First is present.', $v->messages()->first('last'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_with' => 'The :attribute field is required when :VALUES is present.'], 'en');
+        $v = new Validator($trans, ['first' => 'Taylor', 'last' => ''], ['last' => 'required_with:first']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The last field is required when FIRST is present.', $v->messages()->first('last'));
+
+        // same
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.same' => 'The :attribute field must match :Other.'], 'en');
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must match Baz.', $v->messages()->first('foo'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.same' => 'The :attribute field must match :OTHER.'], 'en');
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Same:baz']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The foo field must match BAZ.', $v->messages()->first('foo'));
+
+        // starts_with
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :Values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The url must start with one of the following values Http, Https', $v->messages()->first('url'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :VALUES'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:http,https']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The url must start with one of the following values HTTP, HTTPS', $v->messages()->first('url'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.starts_with' => 'The :attribute must start with one of the following values :values'], 'en');
+        $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:hTtp,hTtps']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The url must start with one of the following values hTtp, hTtps', $v->messages()->first('url'));
+    }
+
     public function testInputIsReplacedByItsDisplayableValue()
     {
         $frameworks = [

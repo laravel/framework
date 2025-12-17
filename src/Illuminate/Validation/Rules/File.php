@@ -46,6 +46,13 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     protected $maximumFileSize = null;
 
     /**
+     * The required file encoding.
+     *
+     * @var string|null
+     */
+    protected $encoding = null;
+
+    /**
      * An array of custom rules that will be merged into the validation rules.
      *
      * @var array
@@ -206,6 +213,19 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
     }
 
     /**
+     * Indicate that the uploaded file should be in the given encoding.
+     *
+     * @param  string  $encoding
+     * @return $this
+     */
+    public function encoding($encoding)
+    {
+        $this->encoding = $encoding;
+
+        return $this;
+    }
+
+    /**
      * Convert a potentially human-friendly file size to kilobytes.
      *
      * @param  string|int  $size
@@ -219,7 +239,7 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
 
         $size = strtolower(trim($size));
 
-        $value = floatval($size);
+        $value = (float) $size;
 
         return round(match (true) {
             Str::endsWith($size, 'kb') => $value * 1,
@@ -291,11 +311,15 @@ class File implements Rule, DataAwareRule, ValidatorAwareRule
             default => "size:{$this->minimumFileSize}",
         };
 
+        if ($this->encoding) {
+            $rules[] = 'encoding:'.$this->encoding;
+        }
+
         return array_merge(array_filter($rules), $this->customRules);
     }
 
     /**
-     * Separate the given mimetypes from extensions and return an array of correct rules to validate against.
+     * Separate the given MIME types from extensions and return an array of correct rules to validate against.
      *
      * @return array
      */
