@@ -75,6 +75,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\RouteConflictsCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\ScopeMakeCommand;
@@ -165,6 +166,7 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'RouteCache' => RouteCacheCommand::class,
         'RouteClear' => RouteClearCommand::class,
         'RouteList' => RouteListCommand::class,
+        'RouteConflict' => RouteConflictsCommand::class,
         'SchemaDump' => DumpCommand::class,
         'Seed' => SeedCommand::class,
         'ScheduleFinish' => ScheduleFinishCommand::class,
