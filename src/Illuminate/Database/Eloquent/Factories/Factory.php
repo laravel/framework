@@ -842,10 +842,10 @@ abstract class Factory
     /**
      * Specify the database connection that should be used to generate models.
      *
-     * @param  \UnitEnum|string  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return static
      */
-    public function connection(UnitEnum|string $connection)
+    public function connection(UnitEnum|string|null $connection)
     {
         return $this->newInstance(['connection' => $connection]);
     }

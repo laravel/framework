@@ -387,6 +387,51 @@ class HttpClientTest extends TestCase
         $this->assertSame('bar', $response->object()->result->foo);
     }
 
+    public function testResponseObjectIsTappable()
+    {
+        $bar = null;
+        $this->factory->fake([
+            '*' => ['result' => ['foo' => 'bar']],
+        ]);
+
+        $this->factory->get('http://foo.com/api')
+            ->tap(function (Response $response) use (&$bar) {
+                $bar = $response['result']['foo'];
+            });
+
+        $this->assertSame('bar', $bar);
+    }
+
+    public function testResponseObjectIsMacroable()
+    {
+        Response::macro('movieFields', function () {
+            return $this->collect()
+                ->mapWithKeys(fn ($field, $key) => [strtolower($key) => $field])
+                ->toArray();
+        });
+
+        $response = $this->factory->fake([
+            '*' => [
+                'Title' => 'The Godfather',
+                'Year' => 1972,
+                'Rated' => 'R',
+                'Runtime' => '175 min',
+                'Director' => 'Francis Ford Coppola',
+            ],
+        ]);
+
+        $response = $this->factory->get('http://www.omdbapi.com/?apikey=test_api_key&i=test_imdb_id');
+
+        $this->assertIsArray($response->movieFields());
+        $this->assertSame([
+            'title' => 'The Godfather',
+            'year' => 1972,
+            'rated' => 'R',
+            'runtime' => '175 min',
+            'director' => 'Francis Ford Coppola',
+        ], $response->movieFields());
+    }
+
     public function testResponseCanBeReturnedAsResource()
     {
         $this->factory->fake([
@@ -1906,10 +1951,12 @@ class HttpClientTest extends TestCase
                 $pool->as('test200')->get('200.com'),
                 $pool->as('test400')->get('400.com'),
                 $pool->as('test500')->get('500.com'),
+                $pool->newRequest()->get('200.com'),
             ];
         });
 
         $this->assertSame(200, $responses['test200']->status());
+        $this->assertSame(200, $responses[0]->status());
         $this->assertSame(400, $responses['test400']->status());
         $this->assertSame(500, $responses['test500']->status());
     }

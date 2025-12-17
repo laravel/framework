@@ -3,10 +3,14 @@
 namespace Illuminate\Cache;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\DetectsConcurrencyErrors;
 use Illuminate\Database\QueryException;
+use Throwable;
 
 class DatabaseLock extends Lock
 {
+    use DetectsConcurrencyErrors;
+
     /**
      * The database connection instance.
      *
@@ -60,6 +64,8 @@ class DatabaseLock extends Lock
      * Attempt to acquire the lock.
      *
      * @return bool
+     *
+     * @throws Throwable
      */
     public function acquire()
     {
@@ -85,7 +91,15 @@ class DatabaseLock extends Lock
         }
 
         if (random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
-            $this->connection->table($this->table)->where('expiration', '<=', $this->currentTime())->delete();
+            try {
+                $this->connection->table($this->table)
+                    ->where('expiration', '<=', $this->currentTime())
+                    ->delete();
+            } catch (Throwable $e) {
+                if (! $this->causedByConcurrencyError($e)) {
+                    throw $e;
+                }
+            }
         }
 
         return $acquired;
@@ -137,11 +151,11 @@ class DatabaseLock extends Lock
     /**
      * Returns the owner value written into the driver for this lock.
      *
-     * @return string
+     * @return string|null
      */
     protected function getCurrentOwner()
     {
-        return optional($this->connection->table($this->table)->where('key', $this->name)->first())->owner;
+        return $this->connection->table($this->table)->where('key', $this->name)->first()?->owner;
     }
 
     /**

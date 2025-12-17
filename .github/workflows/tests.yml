@@ -39,8 +39,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4]
-        phpunit: ['11.5.3', '12.0.0', '12.4.0']
+        php: [8.3, 8.4, 8.5]
+        phpunit: ['11.5.3', '12.0.0', '12.5.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: 8.5
@@ -55,22 +55,13 @@ jobs:
           - php: 8.5
             phpunit: '12.4.0'
             stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.1.0'
-            stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.2.0'
-            stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.3.0'
-            stability: prefer-stable
 
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -118,8 +109,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4]
-        phpunit: ['11.5.3', '12.0.0', '12.4.0']
+        php: [8.3, 8.4, 8.5]
+        phpunit: ['11.5.3', '12.0.0', '12.5.0']
         stability: [prefer-lowest, prefer-stable]
         include:
           - php: 8.5
@@ -134,15 +125,6 @@ jobs:
           - php: 8.5
             phpunit: '12.4.0'
             stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.1.0'
-            stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.2.0'
-            stability: prefer-stable
-          - php: 8.3
-            phpunit: '12.3.0'
-            stability: prefer-stable
 
     name: PHP ${{ matrix.php }} - PHPUnit ${{ matrix.phpunit }} - ${{ matrix.stability }} - Windows
 
@@ -153,7 +135,7 @@ jobs:
           git config --global core.eol lf
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

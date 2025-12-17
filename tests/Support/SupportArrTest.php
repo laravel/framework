@@ -376,6 +376,15 @@ class SupportArrTest extends TestCase
         $this->assertNull(Arr::first($cursor));
     }
 
+    public function testFirstWorksWithArrayObject()
+    {
+        $arrayObject = new ArrayObject([0, 10, 20]);
+
+        $result = Arr::first($arrayObject, fn ($value) => $value === 0);
+
+        $this->assertSame(0, $result);
+    }
+
     public function testJoin()
     {
         $this->assertSame('a, b, c', Arr::join(['a', 'b', 'c'], ', '));

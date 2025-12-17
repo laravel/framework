@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Foundation\Mix;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
-use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Vite as ViteFacade;
 use Illuminate\Support\HtmlString;
 use Mockery;
 
@@ -123,7 +123,7 @@ trait InteractsWithContainer
             $this->originalVite = app(Vite::class);
         }
 
-        Facade::clearResolvedInstance(Vite::class);
+        ViteFacade::clearResolvedInstance();
 
         $this->swap(Vite::class, new class extends Vite
         {

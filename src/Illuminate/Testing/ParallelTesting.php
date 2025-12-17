@@ -43,6 +43,13 @@ class ParallelTesting
     protected $setUpTestCaseCallbacks = [];
 
     /**
+     * All of the registered "setUp" test database callbacks prior to the migrations.
+     *
+     * @var array
+     */
+    protected $setUpTestDatabaseBeforeMigratingCallbacks = [];
+
+    /**
      * All of the registered "setUp" test database callbacks.
      *
      * @var array
@@ -118,6 +125,17 @@ class ParallelTesting
     }
 
     /**
+     * Register a "setUp" test database callback that runs prior to the migrations.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public function setUpTestDatabaseBeforeMigrating($callback)
+    {
+        $this->setUpTestDatabaseBeforeMigratingCallbacks[] = $callback;
+    }
+
+    /**
      * Register a "setUp" test database callback.
      *
      * @param  callable  $callback
@@ -178,6 +196,24 @@ class ParallelTesting
             foreach ($this->setUpTestCaseCallbacks as $callback) {
                 $this->container->call($callback, [
                     'testCase' => $testCase,
+                    'token' => $this->token(),
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Call all of the "setUp" test database callbacks that run prior to migrations.
+     *
+     * @param  string  $database
+     * @return void
+     */
+    public function callSetUpTestDatabaseBeforeMigratingCallbacks($database)
+    {
+        $this->whenRunningInParallel(function () use ($database) {
+            foreach ($this->setUpTestDatabaseBeforeMigratingCallbacks as $callback) {
+                $this->container->call($callback, [
+                    'database' => $database,
                     'token' => $this->token(),
                 ]);
             }

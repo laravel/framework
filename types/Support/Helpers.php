@@ -90,3 +90,18 @@ assertType('10', with(new User(), function ($user) {
 
     return 10;
 }));
+
+assertType('SupportLazyClass', lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+    return [];
+}));
+assertType('SupportLazyClass', proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
+    return new SupportLazyClass();
+}));
+assertType('SupportLazyClass', lazy(fn (SupportLazyClass $instance) => []));
+assertType('SupportLazyClass', proxy(fn (SupportLazyClass $proxy) => new SupportLazyClass));
+assertType('SupportLazyClass', proxy(fn (): SupportLazyClass => new SupportLazyClass));
+
+class SupportLazyClass
+{
+    //
+}

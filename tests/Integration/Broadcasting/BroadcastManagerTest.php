@@ -75,7 +75,35 @@ class BroadcastManagerTest extends TestCase
         Bus::assertNotDispatched(UniqueBroadcastEvent::class);
         Queue::assertPushed(UniqueBroadcastEvent::class);
 
-        $lockKey = 'laravel_unique_job:'.UniqueBroadcastEvent::class.':'.TestEventUnique::class;
+        $lockKey = 'laravel_unique_job:'.TestEventUnique::class.':';
+        $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testUniqueEventsCanBeBroadcastWithUniqueIdFromProperty()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Broadcast::queue(new TestEventUniqueWithIdProperty);
+
+        Bus::assertNotDispatched(UniqueBroadcastEvent::class);
+        Queue::assertPushed(UniqueBroadcastEvent::class);
+
+        $lockKey = 'laravel_unique_job:'.TestEventUniqueWithIdProperty::class.':unique-id-property';
+        $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
+    }
+
+    public function testUniqueEventsCanBeBroadcastWithUniqueIdFromMethod()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Broadcast::queue(new TestEventUniqueWithIdMethod);
+
+        Bus::assertNotDispatched(UniqueBroadcastEvent::class);
+        Queue::assertPushed(UniqueBroadcastEvent::class);
+
+        $lockKey = 'laravel_unique_job:'.TestEventUniqueWithIdMethod::class.':unique-id-method';
         $this->assertFalse($this->app->get(Cache::class)->lock($lockKey, 10)->get());
     }
 
@@ -191,6 +219,16 @@ class TestEventUnique implements ShouldBroadcast, ShouldBeUnique
     {
         //
     }
+}
+
+class TestEventUniqueWithIdProperty extends TestEventUnique
+{
+    public string $uniqueId = 'unique-id-property';
+}
+
+class TestEventUniqueWithIdMethod extends TestEventUnique
+{
+    public string $uniqueId = 'unique-id-method';
 }
 
 class TestEventRescue implements ShouldBroadcast, ShouldRescue
