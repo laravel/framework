@@ -80,6 +80,29 @@ class JobSchedulingTest extends TestCase
             return $job->connection === 'bar';
         })->count());
     }
+
+    public function testJobQueuingRespectsQueueDefaults(): void
+    {
+        Queue::fake();
+
+        Queue::defaultQueue(JobWithDefaultQueue::class, 'default-queue');
+        Queue::defaultQueue(JobWithoutDefaultQueue::class, 'fallback-queue');
+
+        /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
+        $scheduler = $this->app->make(Schedule::class);
+
+        $scheduler->job(JobWithDefaultQueue::class)->name('')->everyMinute();
+        $scheduler->job(JobWithoutDefaultQueue::class)->name('')->everyMinute();
+
+        $events = $scheduler->events();
+        foreach ($events as $event) {
+            $event->run($this->app);
+        }
+
+        // Own queue takes precedence over default
+        Queue::assertPushedOn('test-queue', JobWithDefaultQueue::class);
+        Queue::assertPushedOn('fallback-queue', JobWithoutDefaultQueue::class);
+    }
 }
 
 class JobWithDefaultQueue implements ShouldQueue

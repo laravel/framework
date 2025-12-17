@@ -41,6 +41,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->registerManager();
         $this->registerConnection();
         $this->registerWorker();
+        $this->registerDefaults();
         $this->registerListener();
         $this->registerFailedJobServices();
     }
@@ -109,6 +110,18 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         foreach (['Null', 'Sync', 'Deferred', 'Background', 'Failover', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
+    }
+
+    /**
+     * Register the default queues.
+     *
+     * @return void
+     */
+    protected function registerDefaults()
+    {
+        $this->app->singleton('queue.defaults', function () {
+            return new QueueDefaults;
+        });
     }
 
     /**
@@ -386,6 +399,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         return [
             'queue',
             'queue.connection',
+            'queue.defaults',
             'queue.failer',
             'queue.listener',
             'queue.worker',

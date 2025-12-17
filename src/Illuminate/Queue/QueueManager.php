@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Queue\Concerns\ResolvesQueueDefaults;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +13,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use ResolvesQueueDefaults;
+
     /**
      * The application instance.
      *
@@ -118,6 +121,29 @@ class QueueManager implements FactoryContract, MonitorContract
     public function stopping($callback)
     {
         $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+    }
+
+    /**
+     * Set the default queue for the given queueable class.
+     *
+     * @param  class-string  $class
+     * @param  string  $queue
+     * @return void
+     */
+    public function defaultQueue($class, $queue)
+    {
+        $this->queueDefaults()->set($class, $queue);
+    }
+
+    /**
+     * Set the default queues for the given queueable classes.
+     *
+     * @param  array<class-string, string>  $queues
+     * @return void
+     */
+    public function defaultQueues($queues)
+    {
+        $this->queueDefaults()->setMany($queues);
     }
 
     /**
@@ -336,6 +362,16 @@ class QueueManager implements FactoryContract, MonitorContract
     public function getName($connection = null)
     {
         return $connection ?: $this->getDefaultDriver();
+    }
+
+    /**
+     * Get the queue defaults instance.
+     *
+     * @return \Illuminate\Queue\QueueDefaults
+     */
+    protected function queueDefaults()
+    {
+        return $this->app['queue.defaults'];
     }
 
     /**
