@@ -65,33 +65,33 @@ class Date implements Stringable
     }
 
     /**
-     * Ensure the date is before now.
+     * Ensure the date is in the past.
      */
-    public function beforeNow(): static
+    public function past(): static
     {
         return $this->before('now');
     }
 
     /**
-     * Ensure the date is after now.
+     * Ensure the date is in the future.
      */
-    public function afterNow(): static
+    public function future(): static
     {
         return $this->after('now');
     }
 
     /**
-     * Ensure the date is before or equal to now.
+     * Ensure the date is now or in the past.
      */
-    public function nowOrBefore(): static
+    public function nowOrPast(): static
     {
         return $this->beforeOrEqual('now');
     }
 
     /**
-     * Ensure the date is after or equal to now.
+     * Ensure the date is now or in the future.
      */
-    public function nowOrAfter(): static
+    public function nowOrFuture(): static
     {
         return $this->afterOrEqual('now');
     }
