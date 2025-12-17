@@ -28,7 +28,7 @@ class DatabaseLock extends Lock
     /**
      * The prune probability odds.
      *
-     * @var array
+     * @var array{int, int}|null
      */
     protected $lottery;
 
@@ -47,7 +47,7 @@ class DatabaseLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @param  array  $lottery
+     * @param  array{int, int}|null  $lottery
      * @param  int  $defaultTimeoutInSeconds
      */
     public function __construct(Connection $connection, $table, $name, $seconds, $owner = null, $lottery = [2, 100], $defaultTimeoutInSeconds = 86400)
@@ -90,7 +90,7 @@ class DatabaseLock extends Lock
             $acquired = $updated >= 1;
         }
 
-        if (random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
+        if (count($this->lottery ?? []) === 2 && random_int(1, $this->lottery[1]) <= $this->lottery[0]) {
             try {
                 $this->connection->table($this->table)
                     ->where('expiration', '<=', $this->currentTime())
