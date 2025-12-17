@@ -1174,6 +1174,7 @@ class PendingRequest
         return $this->promise = $this->sendRequest($method, $url, $options)
             ->then(function (MessageInterface $message) {
                 $response = $this->newResponse($message);
+
                 $this->populateResponse($response);
                 $this->dispatchResponseReceivedEvent($response);
 
@@ -1613,6 +1614,7 @@ class PendingRequest
     {
         foreach ($this->afterResponseCallbacks as $callback) {
             $returnedResponse = $callback($response);
+
             if ($returnedResponse instanceof Response) {
                 $response = $returnedResponse;
             }
