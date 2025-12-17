@@ -78,7 +78,7 @@ use Illuminate\Http\Client\Factory;
  * @method static void patch(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static void put(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
  * @method static void delete(string $url, array|\JsonSerializable|\Illuminate\Contracts\Support\Arrayable $data = [])
- * @method static array pool(callable $callback, int|null $concurrency = null)
+ * @method static array pool(callable $callback, int|null $concurrency = 0)
  * @method static \Illuminate\Http\Client\Batch batch(callable $callback)
  * @method static void send(string $method, string $url, array $options = [])
  * @method static \GuzzleHttp\Client buildClient()
