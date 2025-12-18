@@ -204,6 +204,13 @@ class Connection implements ConnectionInterface
     protected static $resolvers = [];
 
     /**
+     * The last used PDO read / write type.
+     *
+     * @var null|'read'|'write'
+     */
+    protected $latestPdoTypeUsed;
+
+    /**
      * Create a new database connection instance.
      *
      * @param  \PDO|(\Closure(): \PDO)  $pdo
@@ -819,12 +826,12 @@ class Connection implements ConnectionInterface
         catch (Exception $e) {
             if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e
+                    $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestPdoTypeUsed()
                 );
             }
 
             throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e
+                $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestPdoTypeUsed()
             );
         }
     }
@@ -851,15 +858,16 @@ class Connection implements ConnectionInterface
     public function logQuery($query, $bindings, $time = null)
     {
         $this->totalQueryDuration += $time ?? 0.0;
+        $latestPdoTypeUsed = $this->latestPdoTypeUsed();
 
-        $this->event(new QueryExecuted($query, $bindings, $time, $this));
+        $this->event(new QueryExecuted($query, $bindings, $time, $this, $latestPdoTypeUsed));
 
         $query = $this->pretending === true
             ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
             : $query;
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = compact('query', 'bindings', 'time');
+            $this->queryLog[] = compact('query', 'bindings', 'time', 'latestPdoTypeUsed');
         }
     }
 
@@ -1232,6 +1240,8 @@ class Connection implements ConnectionInterface
      */
     public function getPdo()
     {
+        $this->retrievingPdoType('write');
+
         if ($this->pdo instanceof Closure) {
             return $this->pdo = call_user_func($this->pdo);
         }
@@ -1264,6 +1274,8 @@ class Connection implements ConnectionInterface
             ($this->recordsModified && $this->getConfig('sticky'))) {
             return $this->getPdo();
         }
+
+        $this->retrievingPdoType('read');
 
         if ($this->readPdo instanceof Closure) {
             return $this->readPdo = call_user_func($this->readPdo);
@@ -1619,6 +1631,29 @@ class Connection implements ConnectionInterface
         $this->readWriteType = $readWriteType;
 
         return $this;
+    }
+
+    /**
+     * Handle retrieving PDO read / write type.
+     *
+     * @param  'read'|'write'  $type
+     * @return $this
+     */
+    protected function retrievingPdoType($type)
+    {
+        $this->latestPdoTypeUsed = $type;
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the latest pdo read / write type.
+     *
+     * @return 'read'|'write'
+     */
+    protected function latestPdoTypeUsed()
+    {
+        return $this->readWriteType ?? $this->latestPdoTypeUsed;
     }
 
     /**
