@@ -278,6 +278,10 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
             return false;
         }
 
+        if ($value instanceof AppendableAttributeValue) {
+            return $this->shouldEscapeAttributeValue($escape, $value->value);
+        }
+        
         return ! is_object($value) &&
                ! is_null($value) &&
                ! is_bool($value);

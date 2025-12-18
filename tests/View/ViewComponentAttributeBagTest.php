@@ -65,6 +65,19 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $bag = (new ComponentAttributeBag)
             ->merge([
+                'data-bs-tooltip' => new AppendableAttributeValue('<strong>Sample Title</strong>'),
+            ]);
+
+        $this->assertSame('data-bs-tooltip="&lt;strong&gt;Sample Title&lt;/strong&gt;"', (string) $bag);
+
+        $bag->merge([
+            'data-bs-tooltip' => new AppendableAttributeValue('<em>First Text</em>'),
+        ]);
+
+        $this->assertSame('data-bs-tooltip="&lt;em&gt;First Text&lt;/em&gt; &lt;strong&gt;Sample Title&lt;/strong&gt;"', (string) $bag);
+
+        $bag = (new ComponentAttributeBag)
+            ->merge([
                 'test-string' => 'ok',
                 'test-null' => null,
                 'test-false' => false,
