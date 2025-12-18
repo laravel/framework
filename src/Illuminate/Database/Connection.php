@@ -867,8 +867,10 @@ class Connection implements ConnectionInterface
 
         if ($this->loggingQueries) {
             $this->queryLog[] = [
-                $query, $bindings, $time,
-                $this->latestPdoTypeUsed(),
+                'query' => $query,
+                'bindings' => $bindings,
+                'time' => $time,
+                'readWriteType' => $this->latestPdoTypeUsed(),
             ];
         }
     }
