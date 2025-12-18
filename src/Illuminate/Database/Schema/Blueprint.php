@@ -117,8 +117,34 @@ class Blueprint
      */
     public function build()
     {
-        foreach ($this->toSql() as $statement) {
-            $this->connection->statement($statement);
+        $statements = $this->toSql();
+
+        if (count($statements) === 0) {
+            return;
+        }
+
+        $isCreating = $this->creating();
+        $tableCreated = false;
+
+        try {
+            foreach ($statements as $index => $statement) {
+                $this->connection->statement($statement);
+
+                // Track if the CREATE TABLE statement succeeded
+                if ($index === 0 && $isCreating) {
+                    $tableCreated = true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // If we were creating a table and it was created before the error,
+            // drop it to maintain atomicity (all-or-nothing behavior)
+            if ($tableCreated) {
+                $this->connection->statement(
+                    $this->grammar->compileDropIfExists($this, new Fluent)
+                );
+            }
+
+            throw $e;
         }
     }
 
