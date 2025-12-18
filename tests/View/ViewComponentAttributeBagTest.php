@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\View;
 
-use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\AppendableAttributeValue;
+use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
 
 class ViewComponentAttributeBagTest extends TestCase
