@@ -71,7 +71,7 @@ class ViewComponentAttributeBagTest extends TestCase
 
         $this->assertSame('data-bs-tooltip="&lt;strong&gt;Sample Title&lt;/strong&gt;"', (string) $bag);
 
-        $bag->merge([
+        $bag = $bag->merge([
             'data-bs-tooltip' => new AppendableAttributeValue('<em>First Text</em>'),
         ]);
 
