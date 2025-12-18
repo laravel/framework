@@ -113,6 +113,11 @@ class Blueprint
     /**
      * Execute the blueprint against the database.
      *
+     * This method implements atomic table creation for databases that don't support
+     * transactional DDL (like MySQL/MariaDB). If the CREATE TABLE succeeds but a
+     * subsequent statement fails (e.g., adding indexes or foreign keys), the table
+     * is automatically dropped to maintain a clean database state.
+     *
      * @return void
      */
     public function build()
@@ -130,18 +135,26 @@ class Blueprint
             foreach ($statements as $index => $statement) {
                 $this->connection->statement($statement);
 
-                // Track if the CREATE TABLE statement succeeded
+                // Track if the CREATE TABLE statement succeeded. This flag is necessary
+                // because MySQL/MariaDB don't support transactional DDL, so we can't
+                // rely on database transactions to rollback the table creation.
                 if ($index === 0 && $isCreating) {
                     $tableCreated = true;
                 }
             }
         } catch (\Throwable $e) {
             // If we were creating a table and it was created before the error,
-            // drop it to maintain atomicity (all-or-nothing behavior)
+            // drop it to maintain atomicity (all-or-nothing behavior).
+            // We wrap this in a try-catch to ensure the original exception is
+            // always thrown, even if the cleanup itself fails.
             if ($tableCreated) {
-                $this->connection->statement(
-                    $this->grammar->compileDropIfExists($this, new Fluent)
-                );
+                try {
+                    $this->connection->statement(
+                        $this->grammar->compileDropIfExists($this, new Fluent)
+                    );
+                } catch (\Throwable) {
+                    // Ignore cleanup failures - the original exception is more important
+                }
             }
 
             throw $e;

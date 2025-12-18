@@ -261,6 +261,7 @@ class DatabaseBlueprintAtomicTest extends TestCase
     public function testDropFailureDoesNotSuppressOriginalException()
     {
         $connection = $this->getConnection();
+        $originalException = new RuntimeException('Index creation failed');
 
         $connection->shouldReceive('statement')
             ->once()
@@ -270,9 +271,9 @@ class DatabaseBlueprintAtomicTest extends TestCase
         $connection->shouldReceive('statement')
             ->once()
             ->with(m::pattern('/^alter table.*add index/'))
-            ->andThrow(new RuntimeException('Index creation failed'));
+            ->andThrow($originalException);
 
-        // Even if DROP TABLE also fails, an exception will be thrown
+        // Even if DROP TABLE also fails, the ORIGINAL exception should be thrown
         $connection->shouldReceive('statement')
             ->once()
             ->with(m::pattern('/^drop table/'))
@@ -284,10 +285,14 @@ class DatabaseBlueprintAtomicTest extends TestCase
             $table->index('name');
         });
 
-        // An exception should be thrown (either original or drop failure)
-        $this->expectException(RuntimeException::class);
-
-        $blueprint->build();
+        try {
+            $blueprint->build();
+            $this->fail('Expected exception was not thrown');
+        } catch (RuntimeException $e) {
+            // The ORIGINAL exception should be thrown, not the drop failure
+            $this->assertSame($originalException, $e);
+            $this->assertEquals('Index creation failed', $e->getMessage());
+        }
     }
 
     protected function getConnection(): Connection
