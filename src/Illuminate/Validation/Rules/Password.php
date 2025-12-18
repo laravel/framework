@@ -332,14 +332,12 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
     {
         $this->messages = [];
 
-        if (! $this->required && ! $this->sometimes && ($this->data === null || ! Arr::has($this->data, $attribute))) {
+        if (! $this->required && ! $this->sometimes && ! Arr::has($this->data ?? [], $attribute)) {
             return true;
         }
 
-        if ($this->validator && $this->validator->hasRule($attribute, ['Nullable'])) {
-            if ($value === null || (is_string($value) && trim($value) === '')) {
-                return true;
-            }
+        if (blank($value) && ! $this->required && $this->validator?->hasRule($attribute, ['Nullable'])) {
+            return true;
         }
 
         $validator = Validator::make(
