@@ -858,20 +858,16 @@ class Connection implements ConnectionInterface
     public function logQuery($query, $bindings, $time = null)
     {
         $this->totalQueryDuration += $time ?? 0.0;
+        $readWriteType = $this->latestPdoTypeUsed();
 
-        $this->event(new QueryExecuted($query, $bindings, $time, $this, $this->latestPdoTypeUsed()));
+        $this->event(new QueryExecuted($query, $bindings, $time, $this, $readWriteType));
 
         $query = $this->pretending === true
             ? $this->queryGrammar?->substituteBindingsIntoRawSql($query, $bindings) ?? $query
             : $query;
 
         if ($this->loggingQueries) {
-            $this->queryLog[] = [
-                'query' => $query,
-                'bindings' => $bindings,
-                'time' => $time,
-                'readWriteType' => $this->latestPdoTypeUsed(),
-            ];
+            $this->queryLog[] = compact('query', 'bindings', 'time', 'readWriteType');
         }
     }
 

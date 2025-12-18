@@ -9,6 +9,7 @@ use Illuminate\Database\Events\ConnectionEstablished;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -177,7 +178,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
     }
 
     #[DataProvider('readWriteExpectations')]
-    public function testItCanAccessLastReadWriteConnectionTypeRetrieved(string $connectionName, array $expectedTypes)
+    public function testItCanAccessLastReadWriteConnectionTypeRetrieved(string $connectionName, array $expectedTypes, ?string $loggedType)
     {
         $readPath = __DIR__.'/read.sqlite';
         $writePath = __DIR__.'/write.sqlite';
@@ -198,6 +199,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             touch($writePath);
 
             $connection = DB::connection($connectionName);
+            $connection->enableQueryLog();
 
             $connection->statement('select 1');
             $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
@@ -210,6 +212,15 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
             $connection->select('select 1');
             $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
+
+            $this->assertSame([
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'write'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'write'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'read'],
+            ], Arr::select($connection->getQueryLog(), [
+                'query', 'readWriteType',
+            ]));
         } finally {
             @unlink($readPath);
             @unlink($writePath);
@@ -218,9 +229,9 @@ class DatabaseConnectionsTest extends DatabaseTestCase
 
     public static function readWriteExpectations(): iterable
     {
-        yield 'sqlite' => ['sqlite', ['write', 'read', 'write', 'read']];
-        yield 'sqlite::read' => ['sqlite::read', ['read', 'read', 'read', 'read']];
-        yield 'sqlite::write' => ['sqlite::write', ['write', 'write', 'write', 'write']];
+        yield 'sqlite' => ['sqlite', ['write', 'read', 'write', 'read'], null];
+        yield 'sqlite::read' => ['sqlite::read', ['read', 'read', 'read', 'read'], 'read'];
+        yield 'sqlite::write' => ['sqlite::write', ['write', 'write', 'write', 'write'], 'write'];
     }
 
     public function testNonReadWriteConnectionsAlwaysUseWrite()
@@ -288,6 +299,70 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         } finally {
             @unlink($writePath);
             @unlink($readPath);
+        }
+    }
+
+    #[DataProvider('readWriteExpectations')]
+    public function testQueryInEventListenerCannotInterfereWithReadWriteType(string $connectionName, array $expectedTypes, ?string $loggedType)
+    {
+        $readPath = __DIR__.'/read.sqlite';
+        $writePath = __DIR__.'/write.sqlite';
+        Config::set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'read' => [
+                'database' => $readPath,
+            ],
+            'write' => [
+                'database' => $writePath,
+            ],
+        ]);
+        $events = collect();
+        DB::listen($events->push(...));
+
+        try {
+            touch($readPath);
+            touch($writePath);
+
+            $connection = DB::connection($connectionName);
+            $connection->enableQueryLog();
+
+            $connection->listen(function ($query) use ($connection) {
+                if ($query->sql === 'select 1') {
+                    $connection->select('select 2');
+                }
+            });
+
+            $connection->statement('select 1');
+            $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
+            $this->assertSame($loggedType ?? 'read', $events->shift()->readWriteType);
+
+            $connection->select('select 1');
+            $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
+            $this->assertSame($loggedType ?? 'read', $events->shift()->readWriteType);
+
+            $connection->statement('select 1');
+            $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
+            $this->assertSame($loggedType ?? 'read', $events->shift()->readWriteType);
+
+            $connection->select('select 1');
+            $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
+            $this->assertSame($loggedType ?? 'read', $events->shift()->readWriteType);
+
+            $this->assertSame([
+                ['query' => 'select 2', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'write'],
+                ['query' => 'select 2', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 2', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'write'],
+                ['query' => 'select 2', 'readWriteType' => $loggedType ?? 'read'],
+                ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'read'],
+            ], Arr::select($connection->getQueryLog(), [
+                'query', 'readWriteType',
+            ]));
+        } finally {
+            @unlink($readPath);
+            @unlink($writePath);
         }
     }
 }
