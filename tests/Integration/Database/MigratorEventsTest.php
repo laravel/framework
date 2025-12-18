@@ -7,6 +7,7 @@ use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
+use Illuminate\Database\Events\MigrationSkipped;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
@@ -32,6 +33,7 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationsEnded::class, 2);
         Event::assertDispatched(MigrationStarted::class, 2);
         Event::assertDispatched(MigrationEnded::class, 2);
+        Event::assertDispatched(MigrationSkipped::class, 1);
     }
 
     public function testMigrationEventsContainTheOptionsAndPretendFalse()
