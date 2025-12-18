@@ -193,7 +193,23 @@ class Batch implements Arrayable, JsonSerializable
             );
         });
 
-        return $this->fresh();
+        $batch = $this->fresh();
+
+        if ($count === 0 && $batch->pendingJobs === 0 && ! $batch->finished()) {
+            $this->repository->markAsFinished($this->id);
+
+            if ($this->hasThenCallbacks()) {
+                $this->invokeCallbacks('then');
+            }
+
+            if ($this->hasFinallyCallbacks()) {
+                $this->invokeCallbacks('finally');
+            }
+
+            $batch = $this->fresh();
+        }
+
+        return $batch;
     }
 
     /**

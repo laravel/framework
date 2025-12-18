@@ -393,6 +393,29 @@ class BusBatchTest extends TestCase
         $this->assertEquals(2, $_SERVER['__failure3.param_count']);
     }
 
+    public function test_empty_batch_executes_callbacks()
+    {
+        $queue = m::mock(Factory::class);
+
+        $batch = $this->createTestBatch($queue);
+
+        $queue->shouldReceive('connection')->once()
+            ->with('test-connection')
+            ->andReturn($connection = m::mock(stdClass::class));
+
+        $connection->shouldReceive('bulk')->once()->with([], '', 'test-queue');
+
+        $batch = $batch->add([]);
+
+        $this->assertEquals(0, $batch->totalJobs);
+        $this->assertEquals(0, $batch->pendingJobs);
+        $this->assertTrue($batch->finished());
+        $this->assertInstanceOf(Batch::class, $_SERVER['__then.batch']);
+        $this->assertInstanceOf(Batch::class, $_SERVER['__finally.batch']);
+        $this->assertEquals(1, $_SERVER['__then.count']);
+        $this->assertEquals(1, $_SERVER['__finally.count']);
+    }
+
     public function test_batch_can_be_cancelled()
     {
         $queue = m::mock(Factory::class);
