@@ -237,7 +237,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
     public function merge(array $attributeDefaults = [], $escape = true)
     {
         $attributeDefaults = array_map(function ($value) use ($escape) {
-            if($value instanceof AppendableAttributeValue) {
+            if ($value instanceof AppendableAttributeValue) {
                 return new AppendableAttributeValue(
                     $this->resolveAppendableAttributeDefault([$value], 0, $escape)
                 );
@@ -256,7 +256,7 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
                 );
             });
 
-        $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
+        $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults) {
             $defaultsValue = $attributeDefaults[$key] ?? '';
 
             if ($key === 'style') {
