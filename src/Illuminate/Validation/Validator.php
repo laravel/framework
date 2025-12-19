@@ -257,6 +257,7 @@ class Validator implements ValidatorContract
         'RequiredIfAccepted',
         'RequiredIfDeclined',
         'RequiredUnless',
+        'RequiredUnlessAccepted',
         'RequiredWith',
         'RequiredWithAll',
         'RequiredWithout',
