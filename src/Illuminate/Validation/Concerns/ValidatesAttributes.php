@@ -2370,6 +2370,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute exists when another attribute was not "accepted".
+     *
+     * @param  string  $attribute
+     * @param  mixed  $value
+     * @param  mixed  $parameters
+     * @return bool
+     */
+    public function validateRequiredUnlessAccepted($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'required_unless_accepted');
+
+        if (! $this->validateAccepted($parameters[0], $this->getValue($parameters[0]))) {
+            return $this->validateRequired($attribute, $value);
+        }
+
+        return true;
+    }
+
+    /**
      * Indicate that an attribute should be excluded when another attribute presents.
      *
      * @param  string  $attribute
