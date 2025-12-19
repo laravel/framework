@@ -653,6 +653,20 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the required_unless_accepted rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array<int,string>  $parameters
+     * @return string
+     */
+    protected function replaceRequiredUnlessAccepted($message, $attribute, $rule, $parameters)
+    {
+        return $this->replaceRequiredIfAccepted($message, $attribute, $rule, $parameters);
+    }
+
+    /**
      * Replace all place-holders for the required_unless rule.
      *
      * @param  string  $message
