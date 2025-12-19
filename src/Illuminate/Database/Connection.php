@@ -204,11 +204,11 @@ class Connection implements ConnectionInterface
     protected static $resolvers = [];
 
     /**
-     * The last used PDO read / write type.
+     * The last retrieved PDO read / write type.
      *
      * @var null|'read'|'write'
      */
-    protected $latestPdoTypeUsed;
+    protected $latestPdoTypeRetrieved = null;
 
     /**
      * Create a new database connection instance.
@@ -1240,7 +1240,7 @@ class Connection implements ConnectionInterface
      */
     public function getPdo()
     {
-        $this->retrievingPdoType('write');
+        $this->latestPdoTypeRetrieved = 'write';
 
         if ($this->pdo instanceof Closure) {
             return $this->pdo = call_user_func($this->pdo);
@@ -1275,7 +1275,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        $this->retrievingPdoType('read');
+        $this->latestPdoTypeRetrieved = 'read';
 
         if ($this->readPdo instanceof Closure) {
             return $this->readPdo = call_user_func($this->readPdo);
@@ -1634,26 +1634,13 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Handle retrieving PDO read / write type.
-     *
-     * @param  'read'|'write'  $type
-     * @return $this
-     */
-    protected function retrievingPdoType($type)
-    {
-        $this->latestPdoTypeUsed = $type;
-
-        return $this;
-    }
-
-    /**
      * Retrieve the latest read / write type used.
      *
      * @return 'read'|'write'
      */
     protected function latestReadWriteTypeUsed()
     {
-        return $this->readWriteType ?? $this->latestPdoTypeUsed;
+        return $this->readWriteType ?? $this->latestPdoTypeRetrieved;
     }
 
     /**
