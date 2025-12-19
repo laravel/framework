@@ -6,6 +6,7 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
@@ -26,6 +27,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected $locale;
 
     /**
+     * Boolean or closure to determine if notification sending should be ignored.
+     *
+     * @var bool|\Closure
+     */
+    protected static $ignoreWhen = false;
+
+    /**
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
@@ -34,6 +42,10 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function send($notifiables, $notification)
     {
+        if (empty($notifiables = $this->filterNotifiables($notifiables, $notification))) {
+            return;
+        }
+
         (new NotificationSender(
             $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
         )->send($notifiables, $notification);
@@ -48,7 +60,11 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
-    {
+    {   
+        if (empty($notifiables = $this->filterNotifiables($notifiables, $notification))) {
+            return;
+        }
+
         (new NotificationSender(
             $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
         )->sendNow($notifiables, $notification, $channels);
@@ -158,5 +174,52 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         $this->locale = $locale;
 
         return $this;
+    }
+
+    /**
+     * Execute a callback without sending notifications.
+     * 
+     * @param \Closure  $callback
+     * @param bool|\Closure
+     * @return mixed
+     */
+    public static function withoutNotifications($callback, $when = true)
+    {
+        static::$ignoreWhen = $when;
+
+        try {
+            return $callback();
+        } finally {
+            static::$ignoreWhen = false;
+        }
+    }
+
+    /**
+     * Filter notifiables before they are sent a notification.
+     * 
+     * @param  \Illuminate\Support\Collection|mixed  $notifiables
+     * @param  mixed  $notification
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    protected function filterNotifiables($notifiables, $notification): mixed
+    {
+        $when = static::$ignoreWhen;
+
+        if ($when === false) {
+            return $notifiables;
+        
+        } else if ($when === true) {
+            return [];
+        }
+
+        if ($notifiables instanceof Collection) {
+            return $notifiables->filter(fn($notifiable) => ! $when($notification, $notifiable));
+        
+        } elseif (is_array($notifiables)) {
+
+            return array_filter($notifiables, fn($notifiable) => ! $when($notification, $notifiable));
+        }
+
+        return $when($notification, $notifiables) ? $notifiables : null;
     }
 }
