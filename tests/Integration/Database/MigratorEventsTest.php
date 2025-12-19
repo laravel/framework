@@ -139,4 +139,18 @@ class MigratorEventsTest extends TestCase
             return $event->method === 'down';
         });
     }
+
+    public function testMigrationSkippedEventIsFired()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', [
+            '--path' => realpath(__DIR__.'/stubs/2014_10_13_000000_skipped_migration.php'),
+            '--realpath' => true,
+        ]);
+
+        Event::assertDispatched(MigrationSkipped::class, function ($event) {
+            return $event->migrationName === '2014_10_13_000000_skipped_migration';
+        });
+    }
 }
