@@ -217,6 +217,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
             return array_filter($notifiables, fn ($notifiable) => ! $when($notification, $notifiable));
         }
 
-        return $when($notification, $notifiables) ? $notifiables : null;
+        return $when($notification, $notifiables) ? null : $notifiables;
     }
 }

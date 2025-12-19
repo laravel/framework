@@ -389,6 +389,25 @@ class NotificationChannelManagerTest extends TestCase
 
     public function testWithoutNotificationsConditionallyPreventsSending()
     {
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $events->shouldReceive('listen')->never();
+        $events->shouldReceive('until')->never();
+        $driver->shouldReceive('send')->never();
+        $events->shouldReceive('dispatch')->never();
+
+        ChannelManager::withoutNotifications(function () use ($manager) {
+            $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
+        }, when: fn() => true);
+    }
+
+    public function testWithoutNotificationsConditionallyPreventsSendingToMultipleNotifiables()
+    {
         $notifiables = collect([
             new NotificationChannelManagerTestNotifiable,
             new NotificationChannelManagerTestNotifiable,
