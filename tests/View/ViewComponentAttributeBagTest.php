@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\AppendableAttributeValue;
 use Illuminate\View\ComponentAttributeBag;
 use PHPUnit\Framework\TestCase;
 
@@ -62,6 +63,19 @@ class ViewComponentAttributeBagTest extends TestCase
             ]);
 
         $this->assertSame('test-escaped="&lt;tag attr=&quot;attr&quot;&gt;"', (string) $bag);
+
+        $bag = (new ComponentAttributeBag)
+            ->merge([
+                'test-escaped' => new AppendableAttributeValue('<tag attr="attr">'),
+            ]);
+
+        $this->assertSame('test-escaped="&lt;tag attr=&quot;attr&quot;&gt;"', (string) $bag);
+
+        $bag = $bag->merge([
+            'test-escaped' => $bag->prepends('<prefix>'),
+        ]);
+
+        $this->assertSame('test-escaped="&lt;prefix&gt; &lt;tag attr=&quot;attr&quot;&gt;"', (string) $bag);
 
         $bag = (new ComponentAttributeBag)
             ->merge([
