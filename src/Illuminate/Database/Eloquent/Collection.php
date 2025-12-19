@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
@@ -680,104 +679,103 @@ class Collection extends BaseCollection implements QueueableCollection
      */
 
     /**
-     * Count the number of items in the collection by a field or using a callback.
+     * {@inheritDoc}
      *
-     * @param  (callable(TModel, TKey): array-key)|string|null  $countBy
      * @return \Illuminate\Support\Collection<array-key, int>
      */
+    #[\Override]
     public function countBy($countBy = null)
     {
         return $this->toBase()->countBy($countBy);
     }
 
     /**
-     * Collapse the collection of items into a single array.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function collapse()
     {
         return $this->toBase()->collapse();
     }
 
     /**
-     * Get a flattened array of the items in the collection.
+     * {@inheritDoc}
      *
-     * @param  int  $depth
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function flatten($depth = INF)
     {
         return $this->toBase()->flatten($depth);
     }
 
     /**
-     * Flip the items in the collection.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<TModel, TKey>
      */
+    #[\Override]
     public function flip()
     {
         return $this->toBase()->flip();
     }
 
     /**
-     * Get the keys of the collection items.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<int, TKey>
      */
+    #[\Override]
     public function keys()
     {
         return $this->toBase()->keys();
     }
 
     /**
-     * Pad collection to the specified length with a value.
+     * {@inheritDoc}
      *
      * @template TPadValue
      *
-     * @param  int  $size
-     * @param  TPadValue  $value
      * @return \Illuminate\Support\Collection<int, TModel|TPadValue>
      */
+    #[\Override]
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
     }
 
     /**
-     * Partition the collection into two arrays using the given callback or key.
+     * {@inheritDoc}
      *
-     * @param  (callable(TModel, TKey): bool)|TModel|string  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
      * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
      */
+    #[\Override]
     public function partition($key, $operator = null, $value = null)
     {
         return parent::partition(...func_get_args())->toBase();
     }
 
     /**
-     * Get an array with the values of a given key.
+     * {@inheritDoc}
      *
-     * @param  string|array<array-key, string>|Closure|null  $value
-     * @param  string|Closure|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
+    #[\Override]
     public function pluck($value, $key = null)
     {
         return $this->toBase()->pluck($value, $key);
     }
 
     /**
-     * Zip the collection together with one or more arrays.
+     * {@inheritDoc}
      *
      * @template TZipValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
      * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
      */
+    #[\Override]
     public function zip($items)
     {
         return $this->toBase()->zip(...func_get_args());
@@ -786,7 +784,6 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the comparison function to detect duplicates.
      *
-     * @param  bool  $strict
      * @return callable(TModel, TModel): bool
      */
     protected function duplicateComparator($strict)
