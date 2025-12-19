@@ -826,12 +826,12 @@ class Connection implements ConnectionInterface
         catch (Exception $e) {
             if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestPdoTypeUsed()
+                    $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestReadWriteTypeUsed()
                 );
             }
 
             throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestPdoTypeUsed()
+                $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestReadWriteTypeUsed()
             );
         }
     }
@@ -858,7 +858,7 @@ class Connection implements ConnectionInterface
     public function logQuery($query, $bindings, $time = null)
     {
         $this->totalQueryDuration += $time ?? 0.0;
-        $readWriteType = $this->latestPdoTypeUsed();
+        $readWriteType = $this->latestReadWriteTypeUsed();
 
         $this->event(new QueryExecuted($query, $bindings, $time, $this, $readWriteType));
 
@@ -1647,11 +1647,11 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Retrieve the latest pdo read / write type.
+     * Retrieve the latest read / write type used.
      *
      * @return 'read'|'write'
      */
-    protected function latestPdoTypeUsed()
+    protected function latestReadWriteTypeUsed()
     {
         return $this->readWriteType ?? $this->latestPdoTypeUsed;
     }
