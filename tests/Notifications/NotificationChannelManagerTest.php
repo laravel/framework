@@ -405,9 +405,11 @@ class NotificationChannelManagerTest extends TestCase
         $manager->shouldReceive('driver')->andReturn($driver = m::mock());
         $events->shouldReceive('listen')->once();
         $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
-        $driver->shouldReceive('send')->once()->withArgs(function($recipient, $notif) use ($notifiables) {
-            return $recipient === $notifiables->first()
-                && $notif instanceof NotificationChannelManagerTestNotification;
+        $driver->shouldReceive('send')->once()->withArgs(function ($recipient, $notification) use ($notifiables) {
+            $this->assertEquals($recipient, $notifiables->first());
+            $this->assertInstanceOf(NotificationChannelManagerTestNotification::class, $notification);
+
+            return true;
         });
         $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
 
