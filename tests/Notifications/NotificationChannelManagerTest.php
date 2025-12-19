@@ -403,7 +403,7 @@ class NotificationChannelManagerTest extends TestCase
 
         ChannelManager::withoutNotifications(function () use ($manager) {
             $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
-        }, when: fn() => true);
+        }, when: fn () => true);
     }
 
     public function testWithoutNotificationsConditionallyPreventsSendingToMultipleNotifiables()
