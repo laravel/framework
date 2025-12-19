@@ -415,7 +415,6 @@ class NotificationChannelManagerTest extends TestCase
 
         ChannelManager::withoutNotifications(function () use ($manager, $notification, $notifiables) {
             $manager->send($notifiables, $notification);
-
         }, when: function ($notification, $notifiable) use ($notifiables) {
             return $notifiable === $notifiables->last();
         });
