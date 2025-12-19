@@ -1636,7 +1636,7 @@ class Connection implements ConnectionInterface
     /**
      * Retrieve the latest read / write type used.
      *
-     * @return 'read'|'write'
+     * @return 'read'|'write'|null
      */
     protected function latestReadWriteTypeUsed()
     {
