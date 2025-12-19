@@ -9,7 +9,7 @@ class MigrationSkipped implements MigrationEvent
     /**
      * Create a new event instance.
      *
-     * @param  string  $migrationName  The migration name that was skipped.
+     * @param  string  $migrationName  The name of the migration that was skipped.
      */
     public function __construct(
         public $migrationName,
