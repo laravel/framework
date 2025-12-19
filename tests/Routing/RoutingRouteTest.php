@@ -2230,6 +2230,34 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
+    public function testRouteCanBeDisabled()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->disabled();
+
+        $this->assertTrue($route->getAction('disabled'));
+        $this->assertContains(\Illuminate\Routing\Middleware\DisabledRoute::class, $route->middleware());
+    }
+
+    public function testRouteCanBeDisabledWithCustomMessage()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->disabled('Custom message');
+
+        $this->assertEquals('Custom message', $route->getAction('disabled'));
+        $this->assertContains(\Illuminate\Routing\Middleware\DisabledRoute::class, $route->middleware());
+    }
+
+    public function testRouteCanBeDisabledWithCallback()
+    {
+        $callback = fn ($request) => response('Disabled', 503);
+        $route = new Route(['GET'], '/', []);
+        $route->disabled($callback);
+
+        $this->assertSame($callback, $route->getAction('disabled'));
+        $this->assertContains(\Illuminate\Routing\Middleware\DisabledRoute::class, $route->middleware());
+    }
+
     public function testItDispatchesEventsWhilePreparingRequest()
     {
         $events = new Dispatcher;

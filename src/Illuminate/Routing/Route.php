@@ -1165,6 +1165,19 @@ class Route
     }
 
     /**
+     * Mark this route as temporarily disabled.
+     *
+     * @param  \Closure|string|bool  $messageOrCallback
+     * @return $this
+     */
+    public function disabled($messageOrCallback = true)
+    {
+        $this->action['disabled'] = $messageOrCallback;
+
+        return $this->middleware(\Illuminate\Routing\Middleware\DisabledRoute::class);
+    }
+
+    /**
      * Specify middleware that should be removed from the given route.
      *
      * @param  array|string  $middleware
