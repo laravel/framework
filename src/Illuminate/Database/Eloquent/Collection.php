@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
