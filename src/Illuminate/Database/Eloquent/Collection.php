@@ -684,6 +684,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<array-key, int>
      */
+    #[\Override]
     public function countBy($countBy = null)
     {
         return $this->toBase()->countBy($countBy);
@@ -694,6 +695,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function collapse()
     {
         return $this->toBase()->collapse();
@@ -704,6 +706,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function flatten($depth = INF)
     {
         return $this->toBase()->flatten($depth);
@@ -714,6 +717,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<TModel, TKey>
      */
+    #[\Override]
     public function flip()
     {
         return $this->toBase()->flip();
@@ -724,6 +728,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int, TKey>
      */
+    #[\Override]
     public function keys()
     {
         return $this->toBase()->keys();
@@ -736,6 +741,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int, TModel|TPadValue>
      */
+    #[\Override]
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
@@ -746,6 +752,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
      */
+    #[\Override]
     public function partition($key, $operator = null, $value = null)
     {
         return parent::partition(...func_get_args())->toBase();
@@ -756,6 +763,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
+    #[\Override]
     public function pluck($value, $key = null)
     {
         return $this->toBase()->pluck($value, $key);
@@ -768,6 +776,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
      */
+    #[\Override]
     public function zip($items)
     {
         return $this->toBase()->zip(...func_get_args());
