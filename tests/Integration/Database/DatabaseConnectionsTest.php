@@ -178,7 +178,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
     }
 
     #[DataProvider('readWriteExpectations')]
-    public function testItCanAccessLastReadWriteConnectionTypeRetrieved(string $connectionName, array $expectedTypes, ?string $loggedType)
+    public function testReadWriteTypeIsProvidedInQueryExecutedEventAndQueryLog(string $connectionName, array $expectedTypes, ?string $loggedType)
     {
         $readPath = __DIR__.'/read.sqlite';
         $writePath = __DIR__.'/write.sqlite';
@@ -213,6 +213,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             $connection->select('select 1');
             $this->assertSame(array_shift($expectedTypes), $events->shift()->readWriteType);
 
+            $this->assertEmpty($events);
             $this->assertSame([
                 ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'write'],
                 ['query' => 'select 1', 'readWriteType' => $loggedType ?? 'read'],
@@ -234,7 +235,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         yield 'sqlite::write' => ['sqlite::write', ['write', 'write', 'write', 'write'], 'write'];
     }
 
-    public function testNonReadWriteConnectionsAlwaysUseWrite()
+    public function testConnectionsWithoutReadWriteConfigurationAlwaysShowAsWrite()
     {
         $writePath = __DIR__.'/write.sqlite';
         Config::set('database.connections.sqlite', [
@@ -265,7 +266,7 @@ class DatabaseConnectionsTest extends DatabaseTestCase
         }
     }
 
-    public function testQueryExceptionsCaptureReadWriteType()
+    public function testQueryExceptionsProviderReadWriteType()
     {
         $readPath = __DIR__.'/read.sqlite';
         $writePath = __DIR__.'/write.sqlite';
