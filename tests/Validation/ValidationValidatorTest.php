@@ -771,6 +771,21 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['url' => 'laravel.com'], ['url' => 'starts_with:hTtp,hTtps']);
         $this->assertFalse($v->passes());
         $this->assertSame('The url must start with one of the following values hTtp, hTtps', $v->messages()->first('url'));
+
+        // required_unless_accepted
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.required_unless_accepted' => 'The :attribute field is required unless :other is accepted.'], 'en');
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertFalse($v->passes());
+        $this->assertSame('The bar field is required unless foo is accepted.', $v->messages()->first('bar'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'something'], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertTrue($v->passes());
     }
 
     public function testInputIsReplacedByItsDisplayableValue()
@@ -2716,6 +2731,19 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_if_accepted:foo']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testValidateRequiredUnlessAccepted()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => ''], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'yes', 'bar' => ''], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'no', 'bar' => 'baz'], ['bar' => 'required_unless_accepted:foo']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateAcceptedIf()
