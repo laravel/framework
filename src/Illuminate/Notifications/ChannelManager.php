@@ -41,7 +41,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @return void
      */
     public function send($notifiables, $notification)
-    {
+    {   
         if (empty($notifiables = $this->filterNotifiables($notifiables, $notification))) {
             return;
         }
@@ -178,9 +178,9 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
     /**
      * Execute a callback without sending notifications.
-     * 
-     * @param \Closure  $callback
-     * @param bool|\Closure
+     *
+     * @param  \Closure  $callback
+     * @param  bool|\Closure  $when
      * @return mixed
      */
     public static function withoutNotifications($callback, $when = true)
@@ -196,7 +196,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
     /**
      * Filter notifiables before they are sent a notification.
-     * 
+     *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
      * @param  mixed  $notification
      * @return \Illuminate\Support\Collection|mixed
@@ -207,17 +207,17 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
         if ($when === false) {
             return $notifiables;
-        
-        } else if ($when === true) {
+
+        } elseif ($when === true) {
             return [];
         }
 
         if ($notifiables instanceof Collection) {
-            return $notifiables->filter(fn($notifiable) => ! $when($notification, $notifiable));
+            return $notifiables->filter(fn ($notifiable) => ! $when($notification, $notifiable));
         
         } elseif (is_array($notifiables)) {
 
-            return array_filter($notifiables, fn($notifiable) => ! $when($notification, $notifiable));
+            return array_filter($notifiables, fn ($notifiable) => ! $when($notification, $notifiable));
         }
 
         return $when($notification, $notifiables) ? $notifiables : null;

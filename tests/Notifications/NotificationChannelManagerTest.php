@@ -18,6 +18,7 @@ use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -366,6 +367,58 @@ class NotificationChannelManagerTest extends TestCase
 
         $notification = (new NotificationChannelManagerTestQueuedNotificationWithDeduplicationId);
         $manager->send([new NotificationChannelManagerTestNotifiable], $notification);
+    }
+
+    public function testWithoutNotificationsPreventsSending()
+    {
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $events->shouldReceive('listen')->never();
+        $events->shouldReceive('until')->never();
+        $driver->shouldReceive('send')->never();
+        $events->shouldReceive('dispatch')->never();
+
+        ChannelManager::withoutNotifications(function() use ($manager) {
+            $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
+        });
+    }
+
+    public function testWithoutNotificationsConditionallyPreventsSending()
+    {
+        $notifiables = collect([
+            new NotificationChannelManagerTestNotifiable,
+            new NotificationChannelManagerTestNotifiable
+        ]);
+
+        $notification = new NotificationChannelManagerTestNotification;
+
+        $container = new Container;
+        $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
+        $container->instance(Bus::class, $bus = m::mock());
+        $container->instance(Dispatcher::class, $events = m::mock());
+        Container::setInstance($container);
+        $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $events->shouldReceive('listen')->once();
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $driver->shouldReceive('send')->once()->withArgs(function($recipient, $notif) use ($notifiables) {
+            return $recipient === $notifiables->first()
+                && $notif instanceof NotificationChannelManagerTestNotification;
+        });
+        $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
+
+        ChannelManager::withoutNotifications(function() use ($manager, $notification, $notifiables) {
+            $manager->send($notifiables, $notification);
+
+        }, when: function($notification, $notifiable) use ($notifiables) {
+            return $notifiable === $notifiables->last();
+        });
     }
 }
 
