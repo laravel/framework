@@ -41,7 +41,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @return void
      */
     public function send($notifiables, $notification)
-    {   
+    {
         if (empty($notifiables = $this->filterNotifiables($notifiables, $notification))) {
             return;
         }
@@ -60,7 +60,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @return void
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
-    {   
+    {
         if (empty($notifiables = $this->filterNotifiables($notifiables, $notification))) {
             return;
         }
@@ -207,16 +207,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
         if ($when === false) {
             return $notifiables;
-
         } elseif ($when === true) {
             return [];
         }
 
         if ($notifiables instanceof Collection) {
             return $notifiables->filter(fn ($notifiable) => ! $when($notification, $notifiable));
-        
         } elseif (is_array($notifiables)) {
-
             return array_filter($notifiables, fn ($notifiable) => ! $when($notification, $notifiable));
         }
 

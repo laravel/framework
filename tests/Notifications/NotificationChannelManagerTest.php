@@ -18,7 +18,6 @@ use Illuminate\Notifications\SendQueuedNotifications;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -371,7 +370,6 @@ class NotificationChannelManagerTest extends TestCase
 
     public function testWithoutNotificationsPreventsSending()
     {
-
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
         $container->instance(Bus::class, $bus = m::mock());
@@ -384,7 +382,7 @@ class NotificationChannelManagerTest extends TestCase
         $driver->shouldReceive('send')->never();
         $events->shouldReceive('dispatch')->never();
 
-        ChannelManager::withoutNotifications(function() use ($manager) {
+        ChannelManager::withoutNotifications(function () use ($manager) {
             $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
         });
     }
@@ -393,7 +391,7 @@ class NotificationChannelManagerTest extends TestCase
     {
         $notifiables = collect([
             new NotificationChannelManagerTestNotifiable,
-            new NotificationChannelManagerTestNotifiable
+            new NotificationChannelManagerTestNotifiable,
         ]);
 
         $notification = new NotificationChannelManagerTestNotification;
@@ -413,10 +411,10 @@ class NotificationChannelManagerTest extends TestCase
         });
         $events->shouldReceive('dispatch')->with(m::type(NotificationSent::class));
 
-        ChannelManager::withoutNotifications(function() use ($manager, $notification, $notifiables) {
+        ChannelManager::withoutNotifications(function () use ($manager, $notification, $notifiables) {
             $manager->send($notifiables, $notification);
 
-        }, when: function($notification, $notifiable) use ($notifiables) {
+        }, when: function ($notification, $notifiable) use ($notifiables) {
             return $notifiable === $notifiables->last();
         });
     }
