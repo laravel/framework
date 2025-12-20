@@ -12,12 +12,21 @@ class LocaleUpdated
     public $locale;
 
     /**
+     * The previous locale.
+     *
+     * @var ?string
+     */
+    public $previous;
+
+    /**
      * Create a new event instance.
      *
      * @param  string  $locale
      */
-    public function __construct($locale)
+    public function __construct($locale, $previous = null)
     {
         $this->locale = $locale;
+
+        $this->previous = $previous;
     }
 }
