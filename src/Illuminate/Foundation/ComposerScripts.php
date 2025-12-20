@@ -4,9 +4,11 @@ namespace Illuminate\Foundation;
 
 use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
+use Illuminate\Concurrency\ProcessDriver;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Facades\Concurrency;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 
 class ComposerScripts
 {
@@ -57,32 +59,18 @@ class ComposerScripts
      */
     public static function prePackageUninstall(PackageEvent $event)
     {
-        $bootstrapFile = dirname($vendorDir = $event->getComposer()->getConfig()->get('vendor-dir')).'/bootstrap/app.php';
-
-        if (! file_exists($bootstrapFile)) {
-            return;
-        }
-
-        require_once $vendorDir.'/autoload.php';
-
-        if (! defined('LARAVEL_START')) {
-            define('LARAVEL_START', microtime(true));
-        }
-
-        require_once $bootstrapFile;
-
-        /** @var Application $app */
-        $app = Container::getInstance();
-        $app->make(Kernel::class)->bootstrap();
-
+        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
+        $laravel = new Application(getcwd());
+        $laravel->bootstrapWith([
+            LoadEnvironmentVariables::class,
+            LoadConfiguration::class,
+        ]);
+        Container::setInstance($laravel);
+        (new EncryptionServiceProvider($laravel))->register();
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
         $uninstallOperation = $event->getOperation()->getPackage();
-
-        Concurrency::createProcessDriver([])->run(
-            fn () => Container::getInstance()['events']->dispatch(
-                'composer_package.'.$uninstallOperation->getName().':pre_uninstall'
-            )
-        );
+        $name = $uninstallOperation->getName();
+        $laravel->make(ProcessDriver::class)->run(static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall"));
     }
 
     /**
