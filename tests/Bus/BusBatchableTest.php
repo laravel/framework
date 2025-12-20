@@ -53,7 +53,7 @@ class BusBatchableTest extends TestCase
         $this->assertSame('test-batch-name', $job->batch()->name);
         $this->assertSame(3, $job->batch()->totalJobs);
     }
-    
+
     public function test_batching_reflects_cancelled_state()
     {
         $job = new class
