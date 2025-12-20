@@ -1595,7 +1595,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      */
     public function setLocale($locale)
     {
-        $previous = $this->getLocale();
+        $previous = $this['config']->get('app.locale');
 
         $this['config']->set('app.locale', $locale);
 
