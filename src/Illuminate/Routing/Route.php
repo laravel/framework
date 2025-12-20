@@ -1165,6 +1165,26 @@ class Route
     }
 
     /**
+     * Get the disabled status or callback for the route.
+     *
+     * @return \Closure|string|bool|null
+     */
+    public function getDisabled()
+    {
+        $disabled = $this->action['disabled'] ?? null;
+
+        if (is_string($disabled) &&
+            Str::startsWith($disabled, [
+                'O:47:"Laravel\\SerializableClosure\\SerializableClosure',
+                'O:55:"Laravel\\SerializableClosure\\UnsignedSerializableClosure',
+            ])) {
+            return unserialize($disabled)->getClosure();
+        }
+
+        return $disabled;
+    }
+
+    /**
      * Mark this route as temporarily disabled.
      *
      * @param  \Closure|string|bool  $messageOrCallback
@@ -1407,6 +1427,12 @@ class Route
         if (isset($this->action['missing']) && $this->action['missing'] instanceof Closure) {
             $this->action['missing'] = serialize(
                 SerializableClosure::unsigned($this->action['missing'])
+            );
+        }
+
+        if (isset($this->action['disabled']) && $this->action['disabled'] instanceof Closure) {
+            $this->action['disabled'] = serialize(
+                SerializableClosure::unsigned($this->action['disabled'])
             );
         }
 

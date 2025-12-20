@@ -107,4 +107,109 @@ class DisabledRouteTest extends TestCase
         $enabledResponse->assertStatus(200);
         $this->assertSame('Post list', $enabledResponse->content());
     }
+
+    public function testDisabledClosureCanBeSerializedForRouteCaching()
+    {
+        Route::get('/serialized-closure', function () {
+            return 'This should not be returned';
+        })->disabled(function ($request) {
+            return response()->json([
+                'message' => 'Serialized closure works',
+                'method' => $request->method(),
+            ], 503);
+        });
+
+        $routes = Route::getRoutes();
+        $route = $routes->getByAction('GET', '/serialized-closure');
+
+        if (! $route) {
+            foreach ($routes as $r) {
+                if ($r->uri() === 'serialized-closure' && in_array('GET', $r->methods())) {
+                    $route = $r;
+                    break;
+                }
+            }
+        }
+
+        $this->assertNotNull($route, 'Route not found');
+
+        $route->prepareForSerialization();
+
+        // Verify the closure was serialized
+        $this->assertIsString($route->getAction('disabled'));
+        $this->assertStringStartsWith('O:', $route->getAction('disabled'));
+
+        // Verify the getDisabled() method deserializes it correctly
+        $disabled = $route->getDisabled();
+        $this->assertInstanceOf(\Closure::class, $disabled);
+
+        // Verify the deserialized closure works
+        $mockRequest = $this->app->make('request');
+        $response = $disabled($mockRequest);
+        $this->assertEquals(503, $response->getStatusCode());
+        $this->assertJson($response->getContent());
+    }
+
+    public function testDisabledStringMessageSerializationDoesNotAffectNormalStrings()
+    {
+        Route::get('/normal-string', function () {
+            return 'This should not be returned';
+        })->disabled('Normal string message');
+
+        $routes = Route::getRoutes();
+        $route = null;
+        foreach ($routes as $r) {
+            if ($r->uri() === 'normal-string' && in_array('GET', $r->methods())) {
+                $route = $r;
+                break;
+            }
+        }
+
+        $this->assertNotNull($route, 'Route not found');
+
+        $route->prepareForSerialization();
+
+        // Verify normal strings are not affected
+        $this->assertSame('Normal string message', $route->getAction('disabled'));
+        $this->assertSame('Normal string message', $route->getDisabled());
+    }
+
+    public function testDisabledBooleanValueSerializationDoesNotAffectBooleans()
+    {
+        Route::get('/boolean-true', function () {
+            return 'This should not be returned';
+        })->disabled(true);
+
+        $routes = Route::getRoutes();
+        $route = null;
+        foreach ($routes as $r) {
+            if ($r->uri() === 'boolean-true' && in_array('GET', $r->methods())) {
+                $route = $r;
+                break;
+            }
+        }
+
+        $this->assertNotNull($route, 'Route not found');
+
+        $route->prepareForSerialization();
+
+        // Verify booleans are not affected
+        $this->assertTrue($route->getAction('disabled'));
+        $this->assertTrue($route->getDisabled());
+    }
+
+    public function testDisabledCallbackReturningNullAllowsRouteToExecute()
+    {
+        Route::get('/conditional-disabled', function () {
+            return 'Route executed';
+        })->disabled(function ($request) {
+            // Return null to allow route execution
+            return null;
+        });
+
+        $response = $this->get('/conditional-disabled');
+
+        $response->assertStatus(200);
+        $this->assertSame('Route executed', $response->content());
+    }
 }
