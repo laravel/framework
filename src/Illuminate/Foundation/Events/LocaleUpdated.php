@@ -16,18 +16,18 @@ class LocaleUpdated
      *
      * @var ?string
      */
-    public $previous;
+    public $previousLocale;
 
     /**
      * Create a new event instance.
      *
      * @param  string  $locale
-     * @param  ?string  $previous
+     * @param  ?string  $previousLocale
      */
-    public function __construct($locale, $previous = null)
+    public function __construct($locale, $previousLocale = null)
     {
         $this->locale = $locale;
 
-        $this->previous = $previous;
+        $this->previousLocale = $previousLocale;
     }
 }

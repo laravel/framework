@@ -32,7 +32,7 @@ class FoundationApplicationTest extends TestCase
         $trans->shouldReceive('setLocale')->once()->with('foo');
         $app['events'] = $events = m::mock(stdClass::class);
         $events->shouldReceive('dispatch')->once()->with(m::on(function (LocaleUpdated $event) {
-            return $event->locale === 'foo' && $event->previous === 'bar';
+            return $event->locale === 'foo' && $event->previousLocale === 'bar';
         }));
 
         $app->setLocale('foo');
