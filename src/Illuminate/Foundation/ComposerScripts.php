@@ -6,6 +6,7 @@ use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Facades\Concurrency;
 
 class ComposerScripts
 {
@@ -77,7 +78,12 @@ class ComposerScripts
         /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
         $uninstallOperation = $event->getOperation()->getPackage();
 
-        $app['events']->dispatch('composer_package.'.$uninstallOperation->getName().':pre_uninstall');
+        Concurrency::createProcessDriver([])->run(
+            fn () => Container::getInstance()['events']->dispatch(
+                'composer_package.'.$uninstallOperation->getName().':pre_uninstall'
+            )
+        );
+
     }
 
     /**
