@@ -83,7 +83,6 @@ class ComposerScripts
                 'composer_package.'.$uninstallOperation->getName().':pre_uninstall'
             )
         );
-
     }
 
     /**
