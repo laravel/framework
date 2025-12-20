@@ -270,7 +270,7 @@ class Mailer implements MailerContract, MailQueueContract
         if (preg_match_all('/<img.+?src=[\'"]cid:([^\'"]+)[\'"].*?>/is', $renderedView, $matches)) {
             foreach (array_unique($matches[1]) as $image) {
                 foreach ($attachments as $attachment) {
-                    if ($attachment->getFilename() === $image) {
+                    if ($attachment->getContentId() === $image || $attachment->getFilename() === $image) {
                         $renderedView = str_replace(
                             'cid:'.$image,
                             'data:'.$attachment->getContentType().';base64,'.$attachment->bodyToString(),
