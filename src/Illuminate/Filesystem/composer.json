@@ -19,6 +19,7 @@
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
+        "league/uri-polyfill": "^7.7.0",
         "symfony/finder": "^7.4.0|^8.0.0"
     },
     "autoload": {

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Foundation\CachesRoutes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Uri\Rfc3986\Uri;
 
 class FilesystemServiceProvider extends ServiceProvider
 {
@@ -90,7 +91,7 @@ class FilesystemServiceProvider extends ServiceProvider
 
             $this->app->booted(function ($app) use ($disk, $config) {
                 $uri = isset($config['url'])
-                    ? rtrim(parse_url($config['url'])['path'], '/')
+                    ? rtrim((new Uri($config['url']))->getPath(), '/')
                     : '/storage';
 
                 $isProduction = $app->isProduction();

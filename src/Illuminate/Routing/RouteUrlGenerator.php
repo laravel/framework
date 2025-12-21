@@ -7,6 +7,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Exceptions\UrlGenerationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Uri\Rfc3986\Uri;
 
 class RouteUrlGenerator
 {
@@ -381,7 +382,7 @@ class RouteUrlGenerator
         // If the URI has a fragment we will move it to the end of this URI since it will
         // need to come after any query string that may be added to the URL else it is
         // not going to be available. We will remove it then append it back on here.
-        if (! is_null($fragment = parse_url($uri, PHP_URL_FRAGMENT))) {
+        if (! is_null($fragment = Uri::parse($uri)?->getFragment())) {
             $uri = preg_replace('/#.*/', '', $uri);
         }
 
