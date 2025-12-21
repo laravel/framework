@@ -17,7 +17,9 @@ class PauseCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'queue:pause {queue : The name of the queue to pause}';
+    protected $signature = 'queue:pause
+                {queue : The name of the queue to pause}
+                {--for= : Pause the queue for the given number of seconds}';
 
     /**
      * The console command description.
@@ -34,6 +36,24 @@ class PauseCommand extends Command
     public function handle(QueueManager $manager)
     {
         [$connection, $queue] = $this->parseQueue($this->argument('queue'));
+
+        $seconds = $this->option('for');
+
+        if ($seconds !== null) {
+            $seconds = filter_var($seconds, FILTER_VALIDATE_INT);
+
+            if (! is_int($seconds) || $seconds <= 0) {
+                $this->components->error('The --for option must be a positive integer.');
+
+                return 1;
+            }
+
+            $manager->pauseFor($connection, $queue, $seconds);
+
+            $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused for {$seconds} seconds.");
+
+            return 0;
+        }
 
         $manager->pause($connection, $queue);
 
