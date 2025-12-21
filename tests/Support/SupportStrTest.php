@@ -1704,8 +1704,21 @@ class SupportStrTest extends TestCase
             'http://laravel.com' => [['https://', 'http://'], 'laravel.com'],
             'http://www.laravel.com' => [['http://', 'www.'], 'www.laravel.com'],
             'http://http-is-fun.test' => ['http://', 'http-is-fun.test'],
+            // Multibyte emoji tests
             '🌊✋' => ['🌊', '✋'],
             '🌊✋' => ['✋', '🌊✋'],
+            '🚀🌟💫' => ['🚀', '🌟💫'],
+            '🚀🌟💫' => ['🚀🌟', '💫'],
+            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
+            'こんにちは世界' => ['こんにちは', '世界'],
+            '你好世界' => ['你好', '世界'],
+            'مرحبا بك' => ['مرحبا ', 'بك'],
+            // Mixed multibyte and ASCII
+            '🎉Laravel' => ['🎉', 'Laravel'],
+            'Hello🌍World' => ['Hello🌍', 'World'],
+            // Multiple needle array with multibyte
+            '🌊✋🎉' => [['🚀', '🌊'], '✋🎉'],
+            'こんにちは世界' => [['Hello', 'こんにちは'], '世界'],
         ] as $subject => $value) {
             [$needle, $expected] = $value;
 
@@ -1724,8 +1737,21 @@ class SupportStrTest extends TestCase
             'path/to/file.php' => [['.html', '.php'], 'path/to/file'],
             'path/to/file.php' => [['.php', 'file'], 'path/to/file'],
             'path/to/php.php' => ['.php', 'path/to/php'],
+            // Multibyte emoji tests
             '✋🌊' => ['🌊', '✋'],
             '✋🌊' => ['✋', '✋🌊'],
+            '🌟💫🚀' => ['🚀', '🌟💫'],
+            '🌟💫🚀' => ['💫🚀', '🌟'],
+            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
+            '世界こんにちは' => ['こんにちは', '世界'],
+            '世界你好' => ['你好', '世界'],
+            'بك مرحبا' => [' مرحبا', 'بك'],
+            // Mixed multibyte and ASCII
+            'Laravel🎉' => ['🎉', 'Laravel'],
+            'Hello🌍World' => ['World', 'Hello🌍'],
+            // Multiple needle array with multibyte
+            '🎉✋🌊' => [['🚀', '🌊'], '🎉✋'],
+            '世界こんにちは' => [['Hello', 'こんにちは'], '世界'],
         ] as $subject => $value) {
             [$needle, $expected] = $value;
 
