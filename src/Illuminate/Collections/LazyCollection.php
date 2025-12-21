@@ -729,19 +729,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function lastOrfail(?callable $callback = null)
     {
-        $needle = $placeholder = new stdClass;
+        $placeholder = new stdClass();
 
-        foreach ($this as $key => $value) {
-            if (is_null($callback) || $callback($value, $key)) {
-                $needle = $value;
-            }
+        $item = $this->last($callback, $placeholder);
+
+        if ($item === $placeholder) {
+            throw new ItemNotFoundException;
         }
 
-        if ($needle === $placeholder) {
-            throw new ItemNotFoundException();
-        }
-
-        return $needle;
+        return $item;
     }
 
     /**
