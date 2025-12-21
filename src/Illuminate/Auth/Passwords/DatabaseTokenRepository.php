@@ -11,72 +11,19 @@ use Illuminate\Support\Str;
 class DatabaseTokenRepository implements TokenRepositoryInterface
 {
     /**
-     * The database connection instance.
-     *
-     * @var \Illuminate\Database\ConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * The Hasher implementation.
-     *
-     * @var \Illuminate\Contracts\Hashing\Hasher
-     */
-    protected $hasher;
-
-    /**
-     * The token database table.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * The hashing key.
-     *
-     * @var string
-     */
-    protected $hashKey;
-
-    /**
-     * The number of seconds a token should last.
-     *
-     * @var int
-     */
-    protected $expires;
-
-    /**
-     * Minimum number of seconds before re-redefining the token.
-     *
-     * @var int
-     */
-    protected $throttle;
-
-    /**
      * Create a new token repository instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  \Illuminate\Contracts\Hashing\Hasher  $hasher
-     * @param  string  $table
-     * @param  string  $hashKey
-     * @param  int  $expires
-     * @param  int  $throttle
-     * @return void
+     * @param  int  $expires  The number of seconds a token should remain valid.
+     * @param  int  $throttle  Minimum number of seconds before the user can generate new password reset tokens.
      */
     public function __construct(
-        ConnectionInterface $connection,
-        HasherContract $hasher,
-        $table,
-        $hashKey,
-        $expires = 60,
-        $throttle = 60,
+        protected ConnectionInterface $connection,
+        protected HasherContract $hasher,
+        protected string $table,
+        protected string $hashKey,
+        protected int $expires = 3600,
+        protected int $throttle = 60,
     ) {
-        $this->table = $table;
-        $this->hasher = $hasher;
-        $this->hashKey = $hashKey;
-        $this->expires = $expires * 60;
-        $this->connection = $connection;
-        $this->throttle = $throttle;
     }
 
     /**

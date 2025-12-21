@@ -9,6 +9,8 @@ use Mockery as m;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
+use function Illuminate\Support\php_binary;
+
 class EventTest extends TestCase
 {
     protected function tearDown(): void
@@ -42,7 +44,7 @@ class EventTest extends TestCase
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
 
-        $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".PHP_BINARY."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
+        $this->assertSame("(php -i > '/dev/null' 2>&1 ; '".php_binary()."' 'artisan' schedule:finish {$scheduleId} \"$?\") > '/dev/null' 2>&1 &", $event->buildCommand());
     }
 
     #[RequiresOperatingSystem('Windows')]
@@ -53,7 +55,7 @@ class EventTest extends TestCase
 
         $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
 
-        $this->assertSame('start /b cmd /v:on /c "(php -i & "'.PHP_BINARY.'" artisan schedule:finish '.$scheduleId.' ^!ERRORLEVEL^!) > "NUL" 2>&1"', $event->buildCommand());
+        $this->assertSame('start /b cmd /v:on /c "(php -i & '.php_binary().' artisan schedule:finish '.$scheduleId.' ^!ERRORLEVEL^!) > "NUL" 2>&1"', $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()
@@ -101,5 +103,17 @@ class EventTest extends TestCase
         });
 
         $this->assertSame('fancy-command-description', $event->mutexName());
+    }
+
+    public function testDaysOfMonthMethod()
+    {
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+
+        $event->daysOfMonth(1, 15);
+        $this->assertSame('0 0 1,15 * *', $event->getExpression());
+
+        $event = new Event(m::mock(EventMutex::class), 'php -i');
+        $event->daysOfMonth([1, 10, 20, 30]);
+        $this->assertSame('0 0 1,10,20,30 * *', $event->getExpression());
     }
 }

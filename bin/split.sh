@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CURRENT_BRANCH="master"
+CURRENT_BRANCH="12.x"
 
 function split()
 {
@@ -35,6 +35,7 @@ remote events git@github.com:illuminate/events.git
 remote filesystem git@github.com:illuminate/filesystem.git
 remote hashing git@github.com:illuminate/hashing.git
 remote http git@github.com:illuminate/http.git
+remote json-schema git@github.com:illuminate/json-schema.git
 remote log git@github.com:illuminate/log.git
 remote macroable git@github.com:illuminate/macroable.git
 remote mail git@github.com:illuminate/mail.git
@@ -43,6 +44,7 @@ remote pagination git@github.com:illuminate/pagination.git
 remote pipeline git@github.com:illuminate/pipeline.git
 remote process git@github.com:illuminate/process.git
 remote queue git@github.com:illuminate/queue.git
+remote reflection git@github.com:illuminate/reflection.git
 remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
 remote session git@github.com:illuminate/session.git
@@ -69,6 +71,7 @@ split 'src/Illuminate/Events' events
 split 'src/Illuminate/Filesystem' filesystem
 split 'src/Illuminate/Hashing' hashing
 split 'src/Illuminate/Http' http
+split 'src/Illuminate/JsonSchema' json-schema
 split 'src/Illuminate/Log' log
 split 'src/Illuminate/Macroable' macroable
 split 'src/Illuminate/Mail' mail
@@ -77,6 +80,7 @@ split 'src/Illuminate/Pagination' pagination
 split 'src/Illuminate/Pipeline' pipeline
 split 'src/Illuminate/Process' process
 split 'src/Illuminate/Queue' queue
+split 'src/Illuminate/Reflection' reflection
 split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing
 split 'src/Illuminate/Session' session

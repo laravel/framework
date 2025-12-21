@@ -184,7 +184,7 @@ class DatabaseEloquentModelAttributeCastingTest extends DatabaseTestCase
         $this->assertSame('117 Spencer St.', $model->address->lineOne);
     }
 
-    public function testCastsThatOnlyHaveGetterDoNotPeristAnythingToModelOnSave()
+    public function testCastsThatOnlyHaveGetterDoNotPersistAnythingToModelOnSave()
     {
         $model = new TestEloquentModelWithAttributeCast;
 

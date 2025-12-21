@@ -19,7 +19,6 @@ class DatabaseJobRecord
      * Create a new job record instance.
      *
      * @param  \stdClass  $record
-     * @return void
      */
     public function __construct($record)
     {

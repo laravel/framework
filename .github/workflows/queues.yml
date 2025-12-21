@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -82,56 +82,23 @@ jobs:
           DB_CONNECTION: sqlite
           QUEUE_CONNECTION: database
 
-  redis:
-    runs-on: ubuntu-24.04
-
-    services:
-      redis:
-        image: redis:7.0
-        ports:
-          - 6379:6379
-        options: --entrypoint redis-server
-
-    strategy:
-      fail-fast: true
-
-    name: Redis Driver
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
-          tools: composer:v2
-          coverage: none
-
-      - name: Set Framework version
-        run: composer config version "12.x-dev"
-
-      - name: Install dependencies
-        uses: nick-fields/retry@v3
-        with:
-          timeout_minutes: 5
-          max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-      - name: Execute tests
-        run: vendor/bin/phpunit tests/Integration/Queue
-        env:
-          QUEUE_CONNECTION: redis
-
   beanstalkd:
     runs-on: ubuntu-24.04
 
-    name: Beanstalkd Driver
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - php: 8.2
+            pheanstalk: 5
+          - php: 8.3
+            pheanstalk: 7
+
+    name: Beanstalkd Driver (pda/pheanstalk:^${{ matrix.pheanstalk }})
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Download & Extract beanstalkd
         run: curl -L https://github.com/beanstalkd/beanstalkd/archive/refs/tags/v1.13.tar.gz | tar xz
@@ -143,7 +110,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pdo_mysql, :php-psr
           tools: composer:v2
           coverage: none
@@ -156,7 +123,7 @@ jobs:
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+          command: composer update --prefer-stable --prefer-dist --no-interaction --no-progress --with="pda/pheanstalk:^${{ matrix.pheanstalk }}"
 
       - name: Daemonize beanstalkd
         run: ./beanstalkd-1.13/beanstalkd &

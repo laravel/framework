@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\UuidInterface;
@@ -12,6 +13,13 @@ use ValueError;
 
 class SupportStrTest extends TestCase
 {
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Str::createRandomStringsNormally();
+    }
+
     public function testStringCanBeLimitedByWords(): void
     {
         $this->assertSame('Taylor...', Str::words('Taylor Otwell', 1));
@@ -175,6 +183,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7'));
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
+        $this->assertFalse(Str::startsWith(null, 'Marc'));
         // Test for multibyte string support
         $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
         $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
@@ -183,6 +192,41 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith('你好', '你'));
         $this->assertFalse(Str::startsWith('你好', '好'));
         $this->assertFalse(Str::startsWith('你好', 'a'));
+    }
+
+    public function testDoesntStartWith()
+    {
+        $this->assertFalse(Str::doesntStartWith('jason', 'jas'));
+        $this->assertFalse(Str::doesntStartWith('jason', 'jason'));
+        $this->assertFalse(Str::doesntStartWith('jason', ['jas']));
+        $this->assertFalse(Str::doesntStartWith('jason', ['day', 'jas']));
+        $this->assertFalse(Str::doesntStartWith('jason', collect(['day', 'jas'])));
+        $this->assertTrue(Str::doesntStartWith('jason', 'day'));
+        $this->assertTrue(Str::doesntStartWith('jason', ['day']));
+        $this->assertTrue(Str::doesntStartWith('jason', null));
+        $this->assertTrue(Str::doesntStartWith('jason', [null]));
+        $this->assertTrue(Str::doesntStartWith('0123', [null]));
+        $this->assertFalse(Str::doesntStartWith('0123', 0));
+        $this->assertTrue(Str::doesntStartWith('jason', 'J'));
+        $this->assertTrue(Str::doesntStartWith('jason', ''));
+        $this->assertTrue(Str::doesntStartWith('', ''));
+        $this->assertTrue(Str::doesntStartWith('7', ' 7'));
+        $this->assertFalse(Str::doesntStartWith('7a', '7'));
+        $this->assertFalse(Str::doesntStartWith('7a', 7));
+        $this->assertFalse(Str::doesntStartWith('7.12a', 7.12));
+        $this->assertTrue(Str::doesntStartWith('7.12a', 7.13));
+        $this->assertFalse(Str::doesntStartWith(7.123, '7'));
+        $this->assertFalse(Str::doesntStartWith(7.123, '7.12'));
+        $this->assertTrue(Str::doesntStartWith(7.123, '7.13'));
+        $this->assertTrue(Str::doesntStartWith(null, 'Marc'));
+        // Test for multibyte string support
+        $this->assertFalse(Str::doesntStartWith('Jönköping', 'Jö'));
+        $this->assertFalse(Str::doesntStartWith('Malmö', 'Malmö'));
+        $this->assertTrue(Str::doesntStartWith('Jönköping', 'Jonko'));
+        $this->assertTrue(Str::doesntStartWith('Malmö', 'Malmo'));
+        $this->assertFalse(Str::doesntStartWith('你好', '你'));
+        $this->assertTrue(Str::doesntStartWith('你好', '好'));
+        $this->assertTrue(Str::doesntStartWith('你好', 'a'));
     }
 
     public function testEndsWith()
@@ -207,6 +251,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '7'));
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
+        $this->assertFalse(Str::endsWith(null, 'Marc'));
         // Test for multibyte string support
         $this->assertTrue(Str::endsWith('Jönköping', 'öping'));
         $this->assertTrue(Str::endsWith('Malmö', 'mö'));
@@ -215,6 +260,39 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith('你好', '好'));
         $this->assertFalse(Str::endsWith('你好', '你'));
         $this->assertFalse(Str::endsWith('你好', 'a'));
+    }
+
+    public function testDoesntEndWith()
+    {
+        $this->assertFalse(Str::doesntEndWith('jason', 'on'));
+        $this->assertFalse(Str::doesntEndWith('jason', 'jason'));
+        $this->assertFalse(Str::doesntEndWith('jason', ['on']));
+        $this->assertFalse(Str::doesntEndWith('jason', ['no', 'on']));
+        $this->assertFalse(Str::doesntEndWith('jason', collect(['no', 'on'])));
+        $this->assertTrue(Str::doesntEndWith('jason', 'no'));
+        $this->assertTrue(Str::doesntEndWith('jason', ['no']));
+        $this->assertTrue(Str::doesntEndWith('jason', ''));
+        $this->assertTrue(Str::doesntEndWith('', ''));
+        $this->assertTrue(Str::doesntEndWith('jason', [null]));
+        $this->assertTrue(Str::doesntEndWith('jason', null));
+        $this->assertTrue(Str::doesntEndWith('jason', 'N'));
+        $this->assertTrue(Str::doesntEndWith('7', ' 7'));
+        $this->assertFalse(Str::doesntEndWith('a7', '7'));
+        $this->assertFalse(Str::doesntEndWith('a7', 7));
+        $this->assertFalse(Str::doesntEndWith('a7.12', 7.12));
+        $this->assertTrue(Str::doesntEndWith('a7.12', 7.13));
+        $this->assertFalse(Str::doesntEndWith(0.27, '7'));
+        $this->assertFalse(Str::doesntEndWith(0.27, '0.27'));
+        $this->assertTrue(Str::doesntEndWith(0.27, '8'));
+        $this->assertTrue(Str::doesntEndWith(null, 'Marc'));
+        // Test for multibyte string support
+        $this->assertFalse(Str::doesntEndWith('Jönköping', 'öping'));
+        $this->assertFalse(Str::doesntEndWith('Malmö', 'mö'));
+        $this->assertTrue(Str::doesntEndWith('Jönköping', 'oping'));
+        $this->assertTrue(Str::doesntEndWith('Malmö', 'mo'));
+        $this->assertFalse(Str::doesntEndWith('你好', '好'));
+        $this->assertTrue(Str::doesntEndWith('你好', '你'));
+        $this->assertTrue(Str::doesntEndWith('你好', 'a'));
     }
 
     public function testStrExcerpt()
@@ -412,6 +490,7 @@ class SupportStrTest extends TestCase
         $this->assertSame('what', Str::deduplicate('whaaat', 'a'));
         $this->assertSame('/some/odd/path/', Str::deduplicate('/some//odd//path/', '/'));
         $this->assertSame('ムだム', Str::deduplicate('ムだだム', 'だ'));
+        $this->assertSame(' laravel forever ', Str::deduplicate(' laravell    foreverrr  ', [' ', 'l', 'r']));
     }
 
     public function testParseCallback()
@@ -482,6 +561,17 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo-bar-baz', Str::wrap('-bar-', 'foo', 'baz'));
     }
 
+    public function testWrapEdgeCases()
+    {
+        $this->assertSame('[]mid[]', Str::wrap('mid', '[]'));
+        $this->assertSame('(mid', Str::wrap('mid', '(', ''));
+        $this->assertSame('<mid<', Str::wrap('mid', '<'));
+        $this->assertSame('value', Str::wrap('value', ''));
+        $this->assertSame('[][]', Str::wrap('', '[]'));
+        $this->assertSame('«値»', Str::wrap('値', '«', '»'));
+        $this->assertSame('🧪X🧪', Str::wrap('X', '🧪'));
+    }
+
     public function testUnwrap()
     {
         $this->assertEquals('value', Str::unwrap('"value"', '"'));
@@ -506,6 +596,15 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::is('*BAZ*', 'foo/bar/baz'));
         $this->assertFalse(Str::is('*FOO*', 'foo/bar/baz'));
         $this->assertFalse(Str::is('A', 'a'));
+
+        // is not case sensitive
+        $this->assertTrue(Str::is('A', 'a', true));
+        $this->assertTrue(Str::is('*BAZ*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is(['A*', 'B*'], 'a/', true));
+        $this->assertFalse(Str::is(['A*', 'B*'], 'f/', true));
+        $this->assertTrue(Str::is('FOO', 'foo', true));
+        $this->assertTrue(Str::is('*FOO*', 'foo/bar/baz', true));
+        $this->assertTrue(Str::is('foo/*', 'FOO/bar', true));
 
         // Accepts array of patterns
         $this->assertTrue(Str::is(['a*', 'b*'], 'a/'));
@@ -1028,6 +1127,21 @@ class SupportStrTest extends TestCase
         $this->assertSame('ÖffentlicheÜberraschungen', Str::studly('öffentliche-überraschungen'));
     }
 
+    public function testPascal()
+    {
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel_php_framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel-php-framework'));
+        $this->assertSame('LaravelPhpFramework', Str::pascal('laravel  -_-  php   -_-   framework   '));
+
+        $this->assertSame('FooBar', Str::pascal('fooBar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar'));
+        $this->assertSame('FooBar', Str::pascal('foo_bar')); // test cache
+        $this->assertSame('FooBarBaz', Str::pascal('foo-barBaz'));
+        $this->assertSame('FooBarBaz', Str::pascal('foo-bar_baz'));
+
+        $this->assertSame('ÖffentlicheÜberraschungen', Str::pascal('öffentliche-überraschungen'));
+    }
+
     public function testMask()
     {
         $this->assertSame('tay*************', Str::mask('taylor@email.com', '*', 3));
@@ -1162,6 +1276,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel – The PHP Framework for Web Artisans', Str::substrReplace('Laravel Framework', '– The PHP Framework for Web Artisans', 8));
     }
 
+    public function testSubstrReplaceWithMultibyte()
+    {
+        $this->assertSame('kengä', Str::substrReplace('kenkä', 'ng', -3, 2));
+        $this->assertSame('kenga', Str::substrReplace('kenka', 'ng', -3, 2));
+    }
+
     public function testTake()
     {
         $this->assertSame('ab', Str::take('abcdef', 2));
@@ -1187,6 +1307,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('Laravel framework', Str::ucfirst('laravel framework'));
         $this->assertSame('Мама', Str::ucfirst('мама'));
         $this->assertSame('Мама мыла раму', Str::ucfirst('мама мыла раму'));
+    }
+
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', Str::ucwords('laravel'));
+        $this->assertSame('Laravel Framework', Str::ucwords('laravel framework'));
+        $this->assertSame('Laravel-Framework', Str::ucwords('laravel-framework', '-'));
+        $this->assertSame('Мама', Str::ucwords('мама'));
+        $this->assertSame('Мама Мыла Раму', Str::ucwords('мама мыла раму'));
+        $this->assertSame('JJ Watt', Str::ucwords('JJ watt'));
     }
 
     public function testUcsplit()
@@ -1758,19 +1888,75 @@ class SupportStrTest extends TestCase
             $this->assertSame($expected, Str::chopEnd($subject, $needle));
         }
     }
-}
 
-class StringableObjectStub
-{
-    private $value;
-
-    public function __construct($value)
+    public function testReplaceMatches()
     {
-        $this->value = $value;
+        // Test basic string replacement
+        $this->assertSame('foo bar bar', Str::replaceMatches('/baz/', 'bar', 'foo baz bar'));
+        $this->assertSame('foo baz baz', Str::replaceMatches('/404/', 'found', 'foo baz baz'));
+
+        // Test with array of patterns
+        $this->assertSame('foo XXX YYY', Str::replaceMatches(['/bar/', '/baz/'], ['XXX', 'YYY'], 'foo bar baz'));
+
+        // Test with callback
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz bar');
+
+        $this->assertSame('foo baZ baR', $result);
+
+        $result = Str::replaceMatches('/(\d+)/', function ($match) {
+            return $match[1] * 2;
+        }, 'foo 123 bar 456');
+
+        $this->assertSame('foo 246 bar 912', $result);
+
+        // Test with limit parameter
+        $this->assertSame('foo baz baz', Str::replaceMatches('/ba(.)/', 'ba$1', 'foo baz baz', 1));
+
+        $result = Str::replaceMatches('/ba(.)/', function ($match) {
+            return 'ba'.strtoupper($match[1]);
+        }, 'foo baz baz bar', 1);
+
+        $this->assertSame('foo baZ baz bar', $result);
     }
 
-    public function __toString()
+    public function testPlural(): void
     {
-        return $this->value;
+        $this->assertSame('Laracon', Str::plural('Laracon', 1));
+        $this->assertSame('Laracon', Str::plural('Laracon', [2025]));
+
+        $this->assertSame('Laracons', Str::plural('Laracon', 3));
+        $this->assertSame('Laracons', Str::plural('Laracon', [2024, 2025]));
+
+        $this->assertSame('1 Laracon', Str::plural('Laracon', 1, prependCount: true));
+        $this->assertSame('1 Laracon', Str::plural('Laracon', [2025], prependCount: true));
+
+        $this->assertSame('1,000 Laracons', Str::plural('Laracon', 1000, prependCount: true));
+        $this->assertSame('2 Laracons', Str::plural('Laracon', [2024, 2025], prependCount: true));
+    }
+
+    public function testPluralPascal(): void
+    {
+        // Test basic functionality with default count
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup'));
+        $this->assertSame('ProductCategories', Str::pluralPascal('ProductCategory'));
+
+        // Test with different count values and array
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 0)); // plural
+        $this->assertSame('UserGroup', Str::pluralPascal('UserGroup', 1));  // singular
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', 2)); // plural
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', []));   // plural (empty array count is 0)
+
+        // Test with Countable
+        $countable = new class implements \Countable
+        {
+            public function count(): int
+            {
+                return 3;
+            }
+        };
+
+        $this->assertSame('UserGroups', Str::pluralPascal('UserGroup', $countable));
     }
 }

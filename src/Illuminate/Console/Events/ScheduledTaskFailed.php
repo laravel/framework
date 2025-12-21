@@ -8,29 +8,14 @@ use Throwable;
 class ScheduledTaskFailed
 {
     /**
-     * The scheduled event that failed.
-     *
-     * @var \Illuminate\Console\Scheduling\Event
-     */
-    public $task;
-
-    /**
-     * The exception that was thrown.
-     *
-     * @var \Throwable
-     */
-    public $exception;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $task
-     * @param  \Throwable  $exception
-     * @return void
+     * @param  \Illuminate\Console\Scheduling\Event  $task  The scheduled event that failed.
+     * @param  \Throwable  $exception  The exception that was thrown.
      */
-    public function __construct(Event $task, Throwable $exception)
-    {
-        $this->task = $task;
-        $this->exception = $exception;
+    public function __construct(
+        public Event $task,
+        public Throwable $exception,
+    ) {
     }
 }

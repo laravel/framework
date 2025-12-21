@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use ReflectionClass;
@@ -46,7 +46,6 @@ class ModelInspector
      * Create a new model inspector instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct(Application $app)
     {
@@ -60,7 +59,7 @@ class ModelInspector
      * @param  string|null  $connection
      * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function inspect($model, $connection = null)
     {
@@ -101,7 +100,7 @@ class ModelInspector
         $columns = $schema->getColumns($table);
         $indexes = $schema->getIndexes($table);
 
-        return collect($columns)
+        return (new BaseCollection($columns))
             ->map(fn ($column) => [
                 'name' => $column['name'],
                 'type' => $column['type'],
@@ -128,7 +127,7 @@ class ModelInspector
     {
         $class = new ReflectionClass($model);
 
-        return collect($class->getMethods())
+        return (new BaseCollection($class->getMethods()))
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
                     || $method->isAbstract()
@@ -143,7 +142,7 @@ class ModelInspector
                     return [];
                 }
             })
-            ->reject(fn ($cast, $name) => collect($columns)->contains('name', $name))
+            ->reject(fn ($cast, $name) => (new BaseCollection($columns))->contains('name', $name))
             ->map(fn ($cast, $name) => [
                 'name' => $name,
                 'type' => null,
@@ -167,7 +166,7 @@ class ModelInspector
      */
     protected function getRelations($model)
     {
-        return collect(get_class_methods($model))
+        return (new BaseCollection(get_class_methods($model)))
             ->map(fn ($method) => new ReflectionMethod($model, $method))
             ->reject(
                 fn (ReflectionMethod $method) => $method->isStatic()
@@ -189,7 +188,7 @@ class ModelInspector
                     $file->next();
                 }
 
-                return collect($this->relationMethods)
+                return (new BaseCollection($this->relationMethods))
                     ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
             })
             ->map(function (ReflectionMethod $method) use ($model) {
@@ -230,7 +229,7 @@ class ModelInspector
      */
     protected function getEvents($model)
     {
-        return collect($model->dispatchesEvents())
+        return (new BaseCollection($model->dispatchesEvents()))
             ->map(fn (string $class, string $event) => [
                 'event' => $event,
                 'class' => $class,
@@ -243,7 +242,7 @@ class ModelInspector
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return \Illuminate\Support\Collection
      *
-     * @throws BindingResolutionException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function getObservers($model)
     {
@@ -270,7 +269,7 @@ class ModelInspector
             ];
         }
 
-        return collect($formatted);
+        return new BaseCollection($formatted);
     }
 
     /**
@@ -354,7 +353,7 @@ class ModelInspector
      */
     protected function getCastsWithDates($model)
     {
-        return collect($model->getDates())
+        return (new BaseCollection($model->getDates()))
             ->filter()
             ->flip()
             ->map(fn () => 'datetime')
@@ -386,13 +385,13 @@ class ModelInspector
      *
      * @param  array<string, mixed>  $column
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return mixed|null
+     * @return mixed
      */
     protected function getColumnDefault($column, $model)
     {
         $attributeDefault = $model->getAttributes()[$column['name']] ?? null;
 
-        return enum_value($attributeDefault, $column['default']);
+        return enum_value($attributeDefault) ?? $column['default'];
     }
 
     /**
@@ -404,7 +403,7 @@ class ModelInspector
      */
     protected function columnIsUnique($column, $indexes)
     {
-        return collect($indexes)->contains(
+        return (new BaseCollection($indexes))->contains(
             fn ($index) => count($index['columns']) === 1 && $index['columns'][0] === $column && $index['unique']
         );
     }

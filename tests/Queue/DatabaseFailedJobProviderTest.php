@@ -18,7 +18,7 @@ class DatabaseFailedJobProviderTest extends TestCase
 
     protected $provider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->createDatabaseWithFailedJobTable()
@@ -79,6 +79,20 @@ class DatabaseFailedJobProviderTest extends TestCase
         $this->assertSame(1, $this->failedJobsTable()->count());
 
         $this->provider->prune(Carbon::createFromDate(2024, 4, 30));
+        $this->assertSame(0, $this->failedJobsTable()->count());
+    }
+
+    public function testCanPruneFailedJobsWithRelativeHoursAndMinutes()
+    {
+        Carbon::setTestNow(Carbon::create(2025, 8, 24, 12, 0, 0));
+
+        $this->createFailedJobsRecord(['failed_at' => Carbon::create(2025, 8, 24, 11, 45, 0)]);
+        $this->createFailedJobsRecord(['failed_at' => Carbon::create(2025, 8, 24, 13, 0, 0)]);
+
+        $this->provider->prune(Carbon::create(2025, 8, 24, 11, 45, 0));
+        $this->assertSame(2, $this->failedJobsTable()->count());
+
+        $this->provider->prune(Carbon::create(2025, 8, 24, 14, 0, 0));
         $this->assertSame(0, $this->failedJobsTable()->count());
     }
 

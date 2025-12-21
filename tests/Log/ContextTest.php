@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Log;
 
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Log\ContextLogProcessor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Log\Context\Events\ContextDehydrating as Dehydrating;
@@ -13,12 +14,20 @@ use Illuminate\Support\Facades\Context;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Monolog\LogRecord;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
 
 class ContextTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    #[\Override]
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        MyAddContextProcessor::$wasConstructed = false;
+    }
 
     public function test_it_can_set_values()
     {
@@ -263,6 +272,14 @@ class ContextTest extends TestCase
         $this->assertFalse(Context::has('unset'));
     }
 
+    public function test_it_can_check_if_context_is_missing()
+    {
+        Context::add('foo', 'bar');
+
+        $this->assertTrue(Context::missing('lorem'));
+        $this->assertFalse(Context::missing('foo'));
+    }
+
     public function test_it_can_check_if_value_is_in_context_stack()
     {
         Context::push('foo', 'bar', 'lorem');
@@ -342,6 +359,34 @@ class ContextTest extends TestCase
             'parent.child.1' => 5,
             'parent.child.2' => 6,
         ], Context::only([
+            'parent.child.1',
+            'parent.child.2',
+        ]));
+    }
+
+    public function test_it_can_exclude_subset_of_context()
+    {
+        Context::add('parent.child.1', 5);
+        Context::add('parent.child.2', 6);
+        Context::add('another', 7);
+
+        $this->assertSame([
+            'another' => 7,
+        ], Context::except([
+            'parent.child.1',
+            'parent.child.2',
+        ]));
+    }
+
+    public function test_it_can_exclude_subset_of_hidden_context()
+    {
+        Context::addHidden('parent.child.1', 5);
+        Context::addHidden('parent.child.2', 6);
+        Context::addHidden('another', 7);
+
+        $this->assertSame([
+            'another' => 7,
+        ], Context::exceptHidden([
             'parent.child.1',
             'parent.child.2',
         ]));
@@ -486,6 +531,173 @@ class ContextTest extends TestCase
         file_put_contents($path, '');
         Str::createUuidsNormally();
     }
+
+    public function test_scope_sets_keys_and_restores()
+    {
+        $contextInClosure = [];
+        $callback = function () use (&$contextInClosure) {
+            $contextInClosure = ['data' => Context::all(), 'hidden' => Context::allHidden()];
+
+            throw new Exception('test_with_sets_keys_and_restores');
+        };
+
+        Context::add('key1', 'value1');
+        Context::add('key2', 123);
+        Context::addHidden([
+            'hiddenKey1' => 'hello',
+            'hiddenKey2' => 'world',
+        ]);
+
+        try {
+            Context::scope(
+                $callback,
+                ['key1' => 'with', 'key3' => 'also-with'],
+                ['hiddenKey3' => 'foobar'],
+            );
+
+            $this->fail('No exception was thrown.');
+        } catch (Exception) {
+        }
+
+        $this->assertEqualsCanonicalizing([
+            'data' => [
+                'key1' => 'with',
+                'key2' => 123,
+                'key3' => 'also-with',
+            ],
+            'hidden' => [
+                'hiddenKey1' => 'hello',
+                'hiddenKey2' => 'world',
+                'hiddenKey3' => 'foobar',
+            ],
+        ], $contextInClosure);
+
+        $this->assertEqualsCanonicalizing([
+            'key1' => 'value1',
+            'key2' => 123,
+        ], Context::all());
+        $this->assertEqualsCanonicalizing([
+            'hiddenKey1' => 'hello',
+            'hiddenKey2' => 'world',
+        ], Context::allHidden());
+    }
+
+    public function test_uses_closure_for_context_processor()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        $this->app->bind(
+            ContextLogProcessor::class,
+            fn () => function (LogRecord $record): LogRecord {
+                $logChannel = Context::getHidden('log_channel_name');
+
+                return $record->with(
+                    // allow overriding the context from what's been set on the log
+                    context: array_merge(Context::all(), $record->context),
+                    // use the log channel we've set in context, or fallback to the current channel
+                    channel: $logChannel ?? $record->channel,
+                );
+            }
+        );
+
+        Context::addHidden('log_channel_name', 'closure-test');
+        Context::add(['value_from_context' => 'hello']);
+
+        Log::info('This is an info log.', ['value_from_log_info_context' => 'foo']);
+
+        $log = Str::after(file_get_contents($path), '] ');
+        $this->assertSame('closure-test.INFO: This is an info log. {"value_from_context":"hello","value_from_log_info_context":"foo"}', Str::trim($log));
+        file_put_contents($path, '');
+    }
+
+    public function test_can_rebind_to_separate_class()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+
+        $this->app->bind(ContextLogProcessor::class, MyAddContextProcessor::class);
+
+        Context::add(['this-will-be-included' => false]);
+
+        Log::info('This is an info log.', ['value_from_log_info_context' => 'foo']);
+        $log = Str::after(file_get_contents($path), '] ');
+        $this->assertSame(
+            'testing.INFO: This is an info log. {"value_from_log_info_context":"foo","inside of MyAddContextProcessor":true}',
+            Str::trim($log)
+        );
+        $this->assertTrue(MyAddContextProcessor::$wasConstructed);
+
+        file_put_contents($path, '');
+    }
+
+    public function test_it_increments_a_counter()
+    {
+        Context::increment('foo');
+        $this->assertSame(1, Context::get('foo'));
+
+        Context::increment('foo');
+        $this->assertSame(2, Context::get('foo'));
+    }
+
+    public function test_it_custom_increments_a_counter()
+    {
+        Context::increment('foo', 2);
+        $this->assertSame(2, Context::get('foo'));
+
+        Context::increment('foo', 3);
+        $this->assertSame(5, Context::get('foo'));
+    }
+
+    public function test_it_decrements_a_counter()
+    {
+        Context::increment('foo');
+        Context::decrement('foo');
+        $this->assertSame(0, Context::get('foo'));
+    }
+
+    public function test_it_custom_decrements_a_counter()
+    {
+        Context::increment('foo', 2);
+        Context::decrement('foo', 2);
+        $this->assertSame(0, Context::get('foo'));
+    }
+
+    public function test_it_remembers_a_value()
+    {
+        $this->assertSame(1, Context::remember('int', 1));
+
+        $closureRunCount = 0;
+        $closure = function () use (&$closureRunCount) {
+            $closureRunCount++;
+
+            return 'bar';
+        };
+
+        $this->assertSame('bar', Context::remember('foo', $closure));
+        $this->assertSame('bar', Context::get('foo'));
+
+        Context::remember('foo', $closure);
+        $this->assertSame(1, $closureRunCount);
+    }
+
+    public function test_it_remembers_a_hidden_value()
+    {
+        $this->assertSame(1, Context::rememberHidden('int', 1));
+
+        $closureRunCount = 0;
+        $closure = function () use (&$closureRunCount) {
+            $closureRunCount++;
+
+            return 'bar';
+        };
+
+        $this->assertSame('bar', Context::rememberHidden('foo', $closure));
+        $this->assertSame('bar', Context::getHidden('foo'));
+
+        Context::rememberHidden('foo', $closure);
+        $this->assertSame(1, $closureRunCount);
+    }
 }
 
 enum Suit
@@ -507,4 +719,20 @@ enum StringBackedSuit: string
 class ContextModel extends Model
 {
     //
+}
+
+class MyAddContextProcessor implements ContextLogProcessor
+{
+    public static bool $wasConstructed = false;
+
+    public function __construct()
+    {
+        self::$wasConstructed = true;
+    }
+
+    #[\Override]
+    public function __invoke(LogRecord $record): LogRecord
+    {
+        return $record->with(context: array_merge($record->context, ['inside of MyAddContextProcessor' => true]));
+    }
 }

@@ -7,6 +7,8 @@ use ArrayIterator;
 use Countable;
 use Error;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Sleep;
@@ -25,9 +27,20 @@ use Traversable;
 
 class SupportHelpersTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        mkdir(__DIR__.'/tmp');
+
+        parent::setUp();
+    }
+
     protected function tearDown(): void
     {
         m::close();
+
+        if (is_dir(__DIR__.'/tmp')) {
+            (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
+        }
 
         parent::tearDown();
     }
@@ -75,6 +88,19 @@ class SupportHelpersTest extends TestCase
         $this->assertTrue(blank($object));
     }
 
+    public function testBlankDoesntJsonSerializeModels()
+    {
+        $model = new class extends Model
+        {
+            public function jsonSerialize(): mixed
+            {
+                throw new RuntimeException('Model should not be serialized');
+            }
+        };
+
+        $this->assertFalse(blank($model));
+    }
+
     public function testClassBasename()
     {
         $this->assertSame('Baz', class_basename('Foo\Bar\Baz'));
@@ -120,6 +146,8 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('False', when([], 'True', 'False'));  // Empty Array = Falsy
         $this->assertTrue(when(true, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
         $this->assertTrue(when(false, fn ($value) => $value, fn ($value) => ! $value)); // lazy evaluation
+        $this->assertEquals('Hello', when(fn () => true, 'Hello')); // lazy evaluation condition
+        $this->assertEquals('World', when(fn () => false, 'Hello', 'World')); // lazy evaluation condition
     }
 
     public function testFilled()
@@ -188,6 +216,42 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($object, object_get($object, false));
         $this->assertEquals($object, object_get($object, ''));
         $this->assertEquals($object, object_get($object, '  '));
+    }
+
+    public function testDataHas()
+    {
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
+        $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
+        $dottedArray = ['users' => ['first.name' => 'Taylor', 'middle.name' => null]];
+        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
+        $sameKeyMultiLevel = (object) ['name' => 'Taylor', 'company' => ['name' => 'Laravel']];
+        $plainArray = [1, 2, 3];
+
+        $this->assertTrue(data_has($object, 'users.name.0'));
+        $this->assertTrue(data_has($array, '0.users.0.name'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertFalse(data_has($array, '0.users.3'));
+        $this->assertTrue(data_has($dottedArray, ['users', 'first.name']));
+        $this->assertTrue(data_has($dottedArray, ['users', 'middle.name']));
+        $this->assertFalse(data_has($dottedArray, ['users', 'last.name']));
+        $this->assertTrue(data_has($arrayAccess, 'price'));
+        $this->assertTrue(data_has($arrayAccess, 'user.name'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertFalse(data_has($arrayAccess, 'foo'));
+        $this->assertFalse(data_has($arrayAccess, 'user.foo'));
+        $this->assertTrue(data_has($arrayAccess, 'email'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'name'));
+        $this->assertTrue(data_has($sameKeyMultiLevel, 'company.name'));
+        $this->assertFalse(data_has($sameKeyMultiLevel, 'foo.name'));
+        $this->assertTrue(data_has($plainArray, 0));
+        $this->assertTrue(data_has($plainArray, '0'));
+        $this->assertFalse(data_has($plainArray, 4));
+        $this->assertFalse(data_has($plainArray, '4'));
+        $this->assertFalse(data_has($plainArray, ''));
+        $this->assertFalse(data_has($plainArray, []));
+        $this->assertFalse(data_has($plainArray, null));
     }
 
     public function testDataGet()
@@ -395,6 +459,27 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['dollar', 'asterisk', 'caret'], data_get($array, 'symbols.*.description'));
         $this->assertEquals('dollar', data_get($array, 'symbols.\{last}.description'));
         $this->assertEquals('caret', data_get($array, 'symbols.{last}.description'));
+    }
+
+    public function testDataGetStar()
+    {
+        $data = ['foo' => 'bar'];
+        $this->assertEquals(['bar'], data_get($data, '*'));
+
+        $data = collect(['foo' => 'bar']);
+        $this->assertEquals(['bar'], data_get($data, '*'));
+    }
+
+    public function testDataGetNullKey()
+    {
+        $data = ['foo' => 'bar'];
+
+        $this->assertEquals(['foo' => 'bar'], data_get($data, null));
+        $this->assertEquals(['foo' => 'bar'], data_get($data, null, '42'));
+        $this->assertEquals(['foo' => 'bar'], data_get($data, [null]));
+
+        $data = ['foo' => 'bar', 'baz' => 42];
+        $this->assertEquals(['foo' => 'bar', 'baz' => 42], data_get($data, [null, 'foo']));
     }
 
     public function testDataFill()
@@ -710,11 +795,13 @@ class SupportHelpersTest extends TestCase
 
     public function testTraitUsesRecursive()
     {
-        $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-        ],
-            trait_uses_recursive(SupportTestClassOne::class));
+        $this->assertSame(
+            [
+                'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+                'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            ],
+            trait_uses_recursive(SupportTestClassOne::class)
+        );
 
         $this->assertSame([], trait_uses_recursive(SupportTestClassTwo::class));
     }
@@ -779,6 +866,30 @@ class SupportHelpersTest extends TestCase
         $this->expectExceptionMessage('test');
 
         throw_if(true, LogicException::class, 'test');
+    }
+
+    public function testThrowClosureException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => new \Exception('test'));
+    }
+
+    public function testThrowClosureWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn (string $message) => new \Exception($message), 'test');
+    }
+
+    public function testThrowClosureStringWithParamsException()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('test');
+
+        throw_if(true, fn () => \Exception::class, 'test');
     }
 
     public function testThrowUnless()
@@ -1175,6 +1286,232 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('x"null"x', env('foo'));
     }
 
+    public function testWriteArrayOfEnvVariablesToFile()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+            'DB_PORT' => 3306,
+            'BRAND_NEW_PREFIX' => 'fresh value',
+        ], $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+                'DB_PORT=3306',
+                '',
+                'BRAND_NEW_PREFIX="fresh value"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteArrayOfEnvVariablesToFileAndOverwrite()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+            'DB_CONNECTION' => 'sqlite',
+        ], $path, true);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=sqlite',
+                'DB_HOST="127:0:0:1"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillNotOverwriteArrayOfVariables()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+        ], $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST="127:0:0:1"',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteVariableToFile()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillNotOverwriteVariable()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=odd',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWriteVariableToFileAndOverwrite()
+    {
+        $filesystem = new Filesystem;
+        $path = __DIR__.'/tmp/env-test-file';
+        $filesystem->put($path, implode(PHP_EOL, [
+            'APP_NAME=Laravel',
+            'APP_ENV=local',
+            'APP_KEY=base64:randomkey',
+            'APP_DEBUG=true',
+            'APP_URL=http://localhost',
+            'APP_VIBE=odd',
+            '',
+            'DB_CONNECTION=mysql',
+            'DB_HOST=',
+        ]));
+
+        Env::writeVariable('APP_VIBE', 'chill', $path, true);
+
+        $this->assertSame(
+            implode(PHP_EOL, [
+                'APP_NAME=Laravel',
+                'APP_ENV=local',
+                'APP_KEY=base64:randomkey',
+                'APP_DEBUG=true',
+                'APP_URL=http://localhost',
+                'APP_VIBE=chill',
+                '',
+                'DB_CONNECTION=mysql',
+                'DB_HOST=',
+            ]),
+            $filesystem->get($path)
+        );
+    }
+
+    public function testWillThrowAnExceptionIfFileIsMissingWhenTryingToWriteVariables(): void
+    {
+        $this->expectExceptionObject(new RuntimeException('The file [missing-file] does not exist.'));
+
+        Env::writeVariables([
+            'APP_VIBE' => 'chill',
+            'DB_HOST' => '127:0:0:1',
+        ], 'missing-file');
+    }
+
     public function testGetFromSERVERFirst()
     {
         $_ENV['foo'] = 'From $_ENV';
@@ -1216,6 +1553,12 @@ class SupportHelpersTest extends TestCase
             ['/%s/', ['a', 'b', 'c'], 'Hi', 'Hi'],
             ['//', [], '', ''],
             ['/%s/', ['a'], '', ''],
+            // non-sequential numeric keys → should still consume in natural order
+            ['/%s/', [2 => 'A', 10 => 'B'], '%s %s', 'A B'],
+            // associative keys → order should be insertion order, not keys/pointer
+            ['/%s/', ['first' => 'A', 'second' => 'B'], '%s %s', 'A B'],
+            // values that are "falsy" but must not be treated as empty by mistake, false->'' , null->''
+            ['/%s/', ['0', 0, false, null], '%s|%s|%s|%s', '0|0||'],
             // The internal pointer of this array is not at the beginning
             ['/%s/', $pointerArray, 'Hi, %s %s', 'Hi, Taylor Otwell'],
         ];
@@ -1228,6 +1571,655 @@ class SupportHelpersTest extends TestCase
             $expectedOutput,
             preg_replace_array($pattern, $replacements, $subject)
         );
+    }
+
+    public function testLazy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            $instance->__construct('foo', 'bar');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyCanAcceptShortClosure(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyThrowsExceptionWhenConstructorIsNotCalled()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    public function testLazyCanAcceptHashForProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => [
+            'second' => 'bar',
+            'first' => 'foo',
+        ]);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyCanAcceptListForProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyCanAcceptSingleValueForConstructor(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClassWithArrayParameter::class, fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
+
+        $this->assertFalse(SupportLazyClassWithArrayParameter::$constructorCalled);
+        $this->assertSame(['foo'], $instance->first);
+        $this->assertTrue(SupportLazyClassWithArrayParameter::$constructorCalled);
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+    }
+
+    public function testLazySupportsPositionAndNamedArguments(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Cannot use positional argument after named argument during unpacking');
+
+        $instance->first;
+    }
+
+    public function testLazyCanReturnInitializedObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            $instance->__construct('foo');
+
+            return $instance;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertNull($instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testLazyMustInitilizeObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, function (SupportLazyClass $instance) {
+            return new SupportLazyClass('foo');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    public function testLazyCanEagerlySetProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(SupportLazyClass::class, fn () => ['foo', 'bar'], eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            $instance->__construct('foo', 'bar');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazyCanAcceptShortClosure(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => $instance->__construct('foo', 'bar'));
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazyThrowsExceptionWhenConstructorIsNotCalled()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    public function testClosureOnlyLazyThrowsWhenNotClassSpecifiedInClosure()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
+
+        lazy(function ($instance) {
+            //
+        });
+    }
+
+    public function testClosureOnlyLazyCanAcceptHashForProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => [
+            'second' => 'bar',
+            'first' => 'foo',
+        ]);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazyCanAcceptListForProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClousureOnlyLazyCanAcceptSingleValueForConstructor(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClassWithArrayParameter $instance) => [['foo']]);
+
+        $this->assertFalse(SupportLazyClassWithArrayParameter::$constructorCalled);
+        $this->assertSame(['foo'], $instance->first);
+        $this->assertTrue(SupportLazyClassWithArrayParameter::$constructorCalled);
+
+        SupportLazyClassWithArrayParameter::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazySupportsPositionAndNamedArguments(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['foo', 'second' => 'bar']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazyThrowsWhenPositionalArgumentsComeAfterNamedArguments(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(fn (SupportLazyClass $instance) => ['second' => 'bar', 'foo']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Cannot use positional argument after named argument during unpacking');
+
+        $instance->first;
+    }
+
+    public function testClosureOnlyLazyCanReturnInitializedObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            $instance->__construct('foo');
+
+            return $instance;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertNull($instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyLazyMustInitilizeObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = lazy(function (SupportLazyClass $instance) {
+            return new SupportLazyClass('foo');
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Typed property Illuminate\Tests\Support\SupportLazyClass::$first must not be accessed before initialization');
+
+        $instance->first;
+    }
+
+    public function testProxy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testProxyCanEagerlySetProperties(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn () => $factory(), eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertFalse(isset($instance->eager));
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testProxyCanEagerlySetPropertiesAndThenAlsoSetThemOnActualObject(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, function ($proxy, $eager) use ($factory) {
+            $instance = $factory();
+
+            foreach ($eager as $prop => $value) {
+                $instance->{$prop} = $value;
+            }
+
+            return $instance;
+        }, eager: ['eager' => 'baz']);
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('baz', $instance->eager);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testProxyCanAcceptShortClosure(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(SupportLazyClass::class, fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testProxyThrowsExceptionWhenObjectIsNotReturned()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return an instance of a class compatible with Illuminate\Tests\Support\SupportLazyClass, null returned');
+
+        $instance->first;
+    }
+
+    public function testProxyMustNotInitilizeProxy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = proxy(SupportLazyClass::class, function (SupportLazyClass $proxy) {
+            $proxy->__construct('foo');
+
+            return $proxy;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return a non-lazy object');
+
+        $instance->first;
+    }
+
+    public function testClosureOnlyProxy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(function (SupportLazyClass $proxy) use ($factory) {
+            return $factory();
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyProxyCanAcceptShortClosure(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(fn (SupportLazyClass $proxy) => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
+    }
+
+    public function testClosureOnlyProxyThrowsExceptionWhenObjectIsNotReturned()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $instance = proxy(function (SupportLazyClass $proxy) {
+            //
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return an instance of a class compatible with Illuminate\Tests\Support\SupportLazyClass, null returned');
+
+        $instance->first;
+    }
+
+    public function testClosureOnlyProxyThrowsWhenNotClassSpecifiedInClosure()
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The first parameter of the given Closure is missing a type hint.');
+
+        proxy(function ($proxy) {
+            //
+        });
+    }
+
+    public function testClosureOnlyProxyMustNotInitilizeProxy(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+
+        $instance = proxy(function (SupportLazyClass $proxy) {
+            $proxy->__construct('foo');
+
+            return $proxy;
+        });
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->expectException(Error::class);
+        $this->expectExceptionMessage('Lazy proxy factory must return a non-lazy object');
+
+        $instance->first;
+    }
+
+    public function testProxyCanUseClosureReturnTypeForClassDetection(): void
+    {
+        if (version_compare(phpversion(), '8.4.0', '<')) {
+            $this->markTestSkipped();
+        }
+
+        SupportLazyClass::$constructorCalled = false;
+        $factory = fn () => new SupportLazyClass('foo', 'bar');
+
+        $instance = proxy(fn (): SupportLazyClass => $factory());
+
+        $this->assertFalse(SupportLazyClass::$constructorCalled);
+        $this->assertSame('foo', $instance->first);
+        $this->assertTrue(SupportLazyClass::$constructorCalled);
+        $this->assertSame('bar', $instance->second);
+
+        SupportLazyClass::$constructorCalled = false;
     }
 }
 
@@ -1269,7 +2261,7 @@ trait SupportTestTraitArrayAccess
 
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->items);
+        return array_key_exists($offset ?? '', $this->items);
     }
 
     public function offsetGet($offset): mixed
@@ -1322,5 +2314,30 @@ class SupportTestCountable implements Countable
     public function count(): int
     {
         return 0;
+    }
+}
+
+class SupportLazyClass
+{
+    public static bool $constructorCalled = false;
+
+    public string $eager;
+
+    public function __construct(
+        public string $first,
+        public ?string $second = null,
+    ) {
+        self::$constructorCalled = true;
+    }
+}
+
+class SupportLazyClassWithArrayParameter
+{
+    public static bool $constructorCalled = false;
+
+    public function __construct(
+        public array $first,
+    ) {
+        self::$constructorCalled = true;
     }
 }

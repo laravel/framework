@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Database\Eloquent\Attributes\Boot;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -18,7 +20,7 @@ class ModelSerializationTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('database.connections.custom', [
             'driver' => 'sqlite',
@@ -30,6 +32,8 @@ class ModelSerializationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Model::preventLazyLoading(false);
 
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -161,6 +165,28 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItReloadsRelationshipsOnlyOnce()
+    {
+        $order = tap(ModelSerializationTestCustomOrder::create(), function (ModelSerializationTestCustomOrder $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+
+        $order->load('line', 'lines', 'products');
+
+        $this->expectsDatabaseQueryCount(4);
+
+        $serialized = serialize(new ModelRelationSerializationTestClass($order));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
+    }
+
     public function testItReloadsNestedRelationships()
     {
         $order = tap(Order::create(), function (Order $order) {
@@ -186,16 +212,26 @@ class ModelSerializationTest extends TestCase
         $model = new ModelBootTestWithTraitInitialization();
 
         $this->assertTrue($model->fooBar);
+        $this->assertTrue($model->initializedViaAttributeInClass);
+        $this->assertTrue($model->initializedViaAttributeInTrait);
         $this->assertTrue($model::hasGlobalScope('foo_bar'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_trait'));
 
         $model::clearBootedModels();
 
         $this->assertFalse($model::hasGlobalScope('foo_bar'));
+        $this->assertFalse($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertFalse($model::hasGlobalScope('booted_attr_in_trait'));
 
         $unSerializedModel = unserialize(serialize($model));
 
         $this->assertFalse($unSerializedModel->fooBar);
+        $this->assertFalse($unSerializedModel->initializedViaAttributeInClass);
+        $this->assertFalse($unSerializedModel->initializedViaAttributeInTrait);
         $this->assertTrue($model::hasGlobalScope('foo_bar'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_class'));
+        $this->assertTrue($model::hasGlobalScope('booted_attr_in_trait'));
     }
 
     /**
@@ -378,6 +414,8 @@ class ModelSerializationTest extends TestCase
 
 trait TraitBootsAndInitializersTest
 {
+    public bool $initializedViaAttributeInTrait = false;
+
     public $fooBar = false;
 
     public function initializeTraitBootsAndInitializersTest()
@@ -390,11 +428,41 @@ trait TraitBootsAndInitializersTest
         static::addGlobalScope('foo_bar', function () {
         });
     }
+
+    #[Boot]
+    public static function nonConventionalBootFunctionInTrait()
+    {
+        static::addGlobalScope('booted_attr_in_trait', function () {
+        });
+    }
+
+    #[Initialize]
+    public function nonConventionalInitFunctionInTrait()
+    {
+        $this->initializedViaAttributeInTrait = ! $this->initializedViaAttributeInTrait;
+    }
 }
 
 class ModelBootTestWithTraitInitialization extends Model
 {
     use TraitBootsAndInitializersTest;
+
+    public static bool $bootedViaAttributeInClass = false;
+
+    public bool $initializedViaAttributeInClass = false;
+
+    #[Boot]
+    public static function nonConventionalBootFunctionInClass()
+    {
+        static::addGlobalScope('booted_attr_in_class', function () {
+        });
+    }
+
+    #[Initialize]
+    public function nonConventionalInitFunctionInClass()
+    {
+        $this->initializedViaAttributeInClass = ! $this->initializedViaAttributeInClass;
+    }
 }
 
 class ModelSerializationTestUser extends Model
@@ -430,6 +498,29 @@ class ModelSerializationTestCustomUser extends Model
     public function newCollection(array $models = [])
     {
         return new ModelSerializationTestCustomUserCollection($models);
+    }
+}
+
+class ModelSerializationTestCustomOrder extends Model
+{
+    public $table = 'orders';
+    public $guarded = [];
+    public $timestamps = false;
+    public $with = ['line', 'lines', 'products'];
+
+    public function line()
+    {
+        return $this->hasOne(Line::class, 'order_id');
+    }
+
+    public function lines()
+    {
+        return $this->hasMany(Line::class, 'order_id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'lines', 'order_id');
     }
 }
 

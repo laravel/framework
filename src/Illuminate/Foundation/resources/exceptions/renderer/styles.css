@@ -1,83 +1,28 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
 @import 'tippy.js/dist/tippy.css';
-@import 'tippy.js/themes/material.css';
-@import 'tippy.js/animations/scale.css';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tippy.js/animations/shift-away.css';
 
 [x-cloak] {
-    display: none;
+    display: none !important;
 }
 
-html {
-    tab-size: 4;
+.tippy-box[data-theme~='laravel'] {
+    @apply max-w-7xl! rounded-md border text-xs shadow-md backdrop-blur-md overflow-x-auto;
+    @apply border-neutral-800 bg-neutral-900 text-white;
+    @apply dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100;
 }
 
-table.hljs-ln {
-    color: inherit;
-    font-size: inherit;
-    border-spacing: 2px;
+.tippy-content[data-theme~='laravel'] {
+    @apply px-2 py-1;
 }
 
-pre code.hljs {
-    background: none;
-    padding: 0em;
-    padding-top: 0.5em;
-    width: 100%;
-}
-
-.hljs-ln-line {
-    white-space-collapse: preserve;
-    text-wrap: nowrap;
-}
-
-.trace {
-    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 4rem), transparent);
-}
-
-.scrollbar-hidden {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    overflow-x: scroll;
-}
-
-.scrollbar-hidden::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 0;
-    height: 0;
-}
-
-.hljs-ln .hljs-ln-numbers {
-    padding: 5px;
-    border-right-color: transparent;
-    margin-right: 5px;
-}
-
-.hljs-ln-n {
-    width: 50px;
-}
-
-.hljs-ln-numbers {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
-    text-align: center;
-    border-right: 1px solid #ccc;
-    vertical-align: top;
-    padding-right: 5px;
-}
-
-.hljs-ln-code {
-    width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.hljs-ln-code:hover {
-    background-color: rgba(239, 68, 68, 0.2);
+@media (prefers-color-scheme: dark) {
+    .shiki,
+    .shiki span {
+        color: var(--shiki-dark) !important;
+        font-style: var(--shiki-dark-font-style) !important;
+        font-weight: var(--shiki-dark-font-weight) !important;
+        text-decoration: var(--shiki-dark-text-decoration) !important;
+    }
 }

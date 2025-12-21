@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 
 class RouteCollection extends AbstractRouteCollection
 {
@@ -77,10 +76,10 @@ class RouteCollection extends AbstractRouteCollection
      */
     protected function addLookups($route)
     {
-        // If the route has a name, we will add it to the name look-up table so that we
-        // will quickly be able to find any route associate with a name and not have
-        // to iterate through every route every time we need to perform a look-up.
-        if ($name = $route->getName()) {
+        // If the route has a name, we will add it to the name look-up table, so that we
+        // will quickly be able to find the route associated with a name and not have
+        // to iterate through every route every time we need to find a named route.
+        if (($name = $route->getName()) && ! $this->inNameLookup($name)) {
             $this->nameList[$name] = $route;
         }
 
@@ -89,7 +88,7 @@ class RouteCollection extends AbstractRouteCollection
         // processing a request and easily generate URLs to the given controllers.
         $action = $route->getAction();
 
-        if (isset($action['controller'])) {
+        if (($controller = $action['controller'] ?? null) && ! $this->inActionLookup($controller)) {
             $this->addToActionList($action, $route);
         }
     }
@@ -107,6 +106,28 @@ class RouteCollection extends AbstractRouteCollection
     }
 
     /**
+     * Determine if the given controller is in the action lookup table.
+     *
+     * @param  string  $controller
+     * @return bool
+     */
+    protected function inActionLookup($controller)
+    {
+        return array_key_exists($controller, $this->actionList);
+    }
+
+    /**
+     * Determine if the given name is in the name lookup table.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function inNameLookup($name)
+    {
+        return array_key_exists($name, $this->nameList);
+    }
+
+    /**
      * Refresh the name look-up table.
      *
      * This is done in case any names are fluently defined or if routes are overwritten.
@@ -118,8 +139,8 @@ class RouteCollection extends AbstractRouteCollection
         $this->nameList = [];
 
         foreach ($this->allRoutes as $route) {
-            if ($route->getName()) {
-                $this->nameList[$route->getName()] = $route;
+            if (($name = $route->getName()) && ! $this->inNameLookup($name)) {
+                $this->nameList[$name] = $route;
             }
         }
     }
@@ -136,7 +157,7 @@ class RouteCollection extends AbstractRouteCollection
         $this->actionList = [];
 
         foreach ($this->allRoutes as $route) {
-            if (isset($route->getAction()['controller'])) {
+            if (($controller = $route->getAction()['controller'] ?? null) && ! $this->inActionLookup($controller)) {
                 $this->addToActionList($route->getAction(), $route);
             }
         }
@@ -171,7 +192,7 @@ class RouteCollection extends AbstractRouteCollection
      */
     public function get($method = null)
     {
-        return is_null($method) ? $this->getRoutes() : Arr::get($this->routes, $method, []);
+        return is_null($method) ? $this->getRoutes() : ($this->routes[$method] ?? []);
     }
 
     /**

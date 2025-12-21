@@ -31,7 +31,6 @@ class Sequence implements Countable
      * Create a new sequence instance.
      *
      * @param  mixed  ...$sequence
-     * @return void
      */
     public function __construct(...$sequence)
     {
@@ -52,11 +51,13 @@ class Sequence implements Countable
     /**
      * Get the next value in the sequence.
      *
+     * @param  array<string, mixed>  $attributes
+     * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return mixed
      */
-    public function __invoke()
+    public function __invoke($attributes = [], $parent = null)
     {
-        return tap(value($this->sequence[$this->index % $this->count], $this), function () {
+        return tap(value($this->sequence[$this->index % $this->count], $this, $attributes, $parent), function () {
             $this->index = $this->index + 1;
         });
     }

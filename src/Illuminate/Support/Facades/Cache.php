@@ -2,9 +2,12 @@
 
 namespace Illuminate\Support\Facades;
 
+use Mockery;
+
 /**
  * @method static \Illuminate\Contracts\Cache\Repository store(string|null $name = null)
  * @method static \Illuminate\Contracts\Cache\Repository driver(string|null $driver = null)
+ * @method static \Illuminate\Contracts\Cache\Repository memo(string|null $driver = null)
  * @method static \Illuminate\Contracts\Cache\Repository resolve(string $name)
  * @method static \Illuminate\Cache\Repository build(array $config)
  * @method static \Illuminate\Cache\Repository repository(\Illuminate\Contracts\Cache\Store $store, array $config = [])
@@ -32,12 +35,13 @@ namespace Illuminate\Support\Facades;
  * @method static mixed remember(string $key, \Closure|\DateTimeInterface|\DateInterval|int|null $ttl, \Closure $callback)
  * @method static mixed sear(string $key, \Closure $callback)
  * @method static mixed rememberForever(string $key, \Closure $callback)
- * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null)
+ * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
  * @method static bool forget(string $key)
  * @method static bool delete(string $key)
  * @method static bool deleteMultiple(iterable $keys)
  * @method static bool clear()
- * @method static \Illuminate\Cache\TaggedCache tags(array|mixed $names)
+ * @method static \Illuminate\Cache\TaggedCache tags(mixed $names)
+ * @method static string|null getName()
  * @method static bool supportsTags()
  * @method static int|null getDefaultCacheTime()
  * @method static \Illuminate\Cache\Repository setDefaultCacheTime(int|null $seconds)
@@ -68,5 +72,28 @@ class Cache extends Facade
     protected static function getFacadeAccessor()
     {
         return 'cache';
+    }
+
+    /**
+     * Convert the facade into a Mockery spy.
+     *
+     * @return \Mockery\MockInterface
+     */
+    public static function spy()
+    {
+        if (! static::isMock()) {
+            $class = static::getMockableClass();
+            $instance = static::getFacadeRoot();
+
+            if ($class && $instance) {
+                return tap(Mockery::spy($instance)->makePartial(), function ($spy) {
+                    static::swap($spy);
+                });
+            }
+
+            return tap($class ? Mockery::spy($class) : Mockery::spy(), function ($spy) {
+                static::swap($spy);
+            });
+        }
     }
 }

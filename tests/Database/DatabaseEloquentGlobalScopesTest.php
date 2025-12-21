@@ -60,6 +60,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
+    public function testGlobalScopeInInheritedAttributeIsApplied()
+    {
+        $model = new EloquentGlobalScopeInInheritedAttributeTestModel;
+        $query = $model->newQuery();
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+    }
+
     public function testClosureGlobalScopeIsApplied()
     {
         $model = new EloquentClosureGlobalScopesTestModel;
@@ -106,6 +114,18 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes();
         $this->assertSame('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
+    }
+
+    public function testAllGlobalScopesCanBeRemovedExceptSpecified()
+    {
+        $model = new EloquentClosureGlobalScopesTestModel;
+        $query = $model->newQuery()->withoutGlobalScopesExcept(['active_scope']);
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
+
+        $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopesExcept(['active_scope']);
+        $this->assertSame('select * from "table" where "active" = ?', $query->toSql());
+        $this->assertEquals([1], $query->getBindings());
     }
 
     public function testGlobalScopesWithOrWhereConditionsAreNested()
@@ -254,4 +274,17 @@ class ActiveScope implements Scope
     {
         return $builder->where('active', 1);
     }
+}
+
+#[ScopedBy(ActiveScope::class)]
+trait EloquentGlobalScopeInInheritedAttributeTestTrait
+{
+    //
+}
+
+class EloquentGlobalScopeInInheritedAttributeTestModel extends Model
+{
+    use EloquentGlobalScopeInInheritedAttributeTestTrait;
+
+    protected $table = 'table';
 }

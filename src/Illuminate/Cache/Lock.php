@@ -46,7 +46,6 @@ abstract class Lock implements LockContract
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @return void
      */
     public function __construct($name, $seconds, $owner = null)
     {

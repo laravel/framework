@@ -2,7 +2,10 @@
 
 namespace Illuminate\Foundation;
 
+use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Console\Kernel;
 
 class ComposerScripts
 {
@@ -43,6 +46,38 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         static::clearCompiled();
+    }
+
+    /**
+     * Handle the pre-package-uninstall Composer event.
+     *
+     * @param  \Composer\Installer\PackageEvent  $event
+     * @return void
+     */
+    public static function prePackageUninstall(PackageEvent $event)
+    {
+        $bootstrapFile = dirname($vendorDir = $event->getComposer()->getConfig()->get('vendor-dir')).'/bootstrap/app.php';
+
+        if (! file_exists($bootstrapFile)) {
+            return;
+        }
+
+        require_once $vendorDir.'/autoload.php';
+
+        if (! defined('LARAVEL_START')) {
+            define('LARAVEL_START', microtime(true));
+        }
+
+        require_once $bootstrapFile;
+
+        /** @var Application $app */
+        $app = Container::getInstance();
+        $app->make(Kernel::class)->bootstrap();
+
+        /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
+        $uninstallOperation = $event->getOperation()->getPackage();
+
+        $app['events']->dispatch('composer_package.'.$uninstallOperation->getName().':pre_uninstall');
     }
 
     /**

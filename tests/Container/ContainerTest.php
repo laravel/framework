@@ -2,9 +2,15 @@
 
 namespace Illuminate\Tests\Container;
 
+use Attribute;
+use Illuminate\Container\Attributes\Bind;
+use Illuminate\Container\Attributes\Scoped;
+use Illuminate\Container\Attributes\Singleton;
 use Illuminate\Container\Container;
 use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Container\ContextualAttribute;
+use Illuminate\Contracts\Container\SelfBuilding;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use stdClass;
@@ -38,6 +44,24 @@ class ContainerTest extends TestCase
             return 'Taylor';
         });
         $this->assertSame('Taylor', $container->make('name'));
+    }
+
+    public function testAbstractCanBeBoundFromConcreteReturnType()
+    {
+        $container = new Container;
+        $container->bind(function (): IContainerContractStub|ContainerImplementationStub {
+            return new ContainerImplementationStub;
+        });
+        $container->singleton(function (): ContainerConcreteStub {
+            return new ContainerConcreteStub;
+        });
+
+        $this->assertInstanceOf(
+            IContainerContractStub::class,
+            $container->make(IContainerContractStub::class)
+        );
+
+        $this->assertTrue($container->isShared(ContainerConcreteStub::class));
     }
 
     public function testBindIfDoesntRegisterIfServiceAlreadyRegistered()
@@ -289,6 +313,29 @@ class ContainerTest extends TestCase
         $this->assertSame('taylor', $instance->default);
     }
 
+    public function testResolutionOfClassWithDefaultParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->noDefault);
+        $this->assertSame(null, $instance->default);
+
+        $container->bind(ContainerConcreteStub::class, fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
+    public function testResolutionOfClassWithDefaultParametersAndContextualBindings()
+    {
+        $container = new Container;
+
+        $container->when(ContainerClassWithDefaultValueStub::class)
+            ->needs(ContainerConcreteStub::class)
+            ->give(fn () => new ContainerConcreteStub);
+        $instance = $container->make(ContainerClassWithDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->default);
+    }
+
     public function testBound()
     {
         $container = new Container;
@@ -481,6 +528,23 @@ class ContainerTest extends TestCase
         $this->assertSame('ConcreteStub', $container->getAlias('foo'));
     }
 
+    public function testCurrentlyResolving()
+    {
+        $container = new Container;
+
+        $container->afterResolvingAttribute(ContainerCurrentResolvingAttribute::class, function ($attr, $instance, $container) {
+            $this->assertEquals(ContainerCurrentResolvingConcrete::class, $container->currentlyResolving());
+        });
+
+        $container->when(ContainerCurrentResolvingConcrete::class)
+            ->needs('$currentlyResolving')
+            ->give(fn ($container) => $container->currentlyResolving());
+
+        $resolved = $container->make(ContainerCurrentResolvingConcrete::class);
+
+        $this->assertEquals(ContainerCurrentResolvingConcrete::class, $resolved->currentlyResolving);
+    }
+
     public function testGetAliasRecursive()
     {
         $container = new Container;
@@ -516,13 +580,13 @@ class ContainerTest extends TestCase
     public function testMakeWithMethodIsAnAliasForMakeMethod()
     {
         $mock = $this->getMockBuilder(Container::class)
-                     ->onlyMethods(['make'])
-                     ->getMock();
+            ->onlyMethods(['make'])
+            ->getMock();
 
         $mock->expects($this->once())
-             ->method('make')
-             ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
-             ->willReturn(new stdClass);
+            ->method('make')
+            ->with(ContainerDefaultValueStub::class, ['default' => 'laurence'])
+            ->willReturn(new stdClass);
 
         $result = $mock->makeWith(ContainerDefaultValueStub::class, ['default' => 'laurence']);
 
@@ -672,12 +736,182 @@ class ContainerTest extends TestCase
         $container->bind(IContainerContractStub::class, ContainerImplementationStubTwo::class);
 
         $container->when(ContainerContextualBindingCallTarget::class)
-                ->needs(IContainerContractStub::class)
-                ->give(ContainerImplementationStub::class);
+            ->needs(IContainerContractStub::class)
+            ->give(ContainerImplementationStub::class);
 
         $result = $container->call([new ContainerContextualBindingCallTarget, 'work']);
 
         $this->assertInstanceOf(ContainerImplementationStub::class, $result);
+    }
+
+    public function testContainerSingletonAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $secondInstantiation = $container->get(ContainerSingletonAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testContainerScopedAttribute()
+    {
+        $container = new Container;
+        $firstInstantiation = $container->get(ContainerScopedAttribute::class);
+        $secondInstantiation = $container->get(ContainerScopedAttribute::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerScopedAttribute::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
+    public function testBindInterfaceToSingleton()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => true);
+        $firstInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindSingletonTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testBindInterfaceToScoped()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test']);
+        $firstInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $secondInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+
+        $this->assertSame($firstInstantiation, $secondInstantiation);
+
+        // With a different environment
+        $container->resolveEnvironmentUsing(fn ($arr) => $arr === ['test2']);
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertSame($firstInstantiation, $thirdInstantiation);
+
+        $container->forgetScopedInstances();
+
+        $thirdInstantiation = $container->get(ContainerBindScopedTestInterface::class);
+        $this->assertNotSame($firstInstantiation, $thirdInstantiation);
+    }
+
+    public function testWildcardBindingButNoEnvironmentResolveSetThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+        $container = new Container;
+
+        $instance = $container->make(WildcardOnlyInterface::class);
+
+        $this->assertInstanceOf(WildcardConcrete::class, $instance);
+    }
+
+    public function testChecksForMoreSpecificEnvironmentBeforeFallingBackToDefault(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('prod', $env));
+
+        $instance = $container->make(WildcardAndProdInterface::class);
+
+        $this->assertInstanceOf(ProdConcrete::class, $instance);
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('some_string', $env));
+        $instance = $container->make(WildcardAndProdInterface::class);
+        $this->assertInstanceOf(FallbackConcrete::class, $instance);
+    }
+
+    public function testCanPassAStringForEnvironmentEnvironment(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($env) => in_array('cli', $env));
+
+        $instance = $container->make(CliOnlyInterface::class);
+
+        $this->assertInstanceOf(CliConcrete::class, $instance);
+    }
+
+    public function testAnEmptyEnvironmentListThrowsAnException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => true);
+        $container->make(EmptyEnvInterface::class);
+    }
+
+    public function testContainerBindingsTakePrecedence(): void
+    {
+        $container = new Container;
+        $container->bind(OverrideInterface::class, AltConcrete::class);
+
+        $instance = $container->make(OverrideInterface::class);
+
+        $this->assertInstanceOf(AltConcrete::class, $instance);
+    }
+
+    public function testFlushResetsEnvironmentResolverAndCheckedBindings(): void
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => in_array('prod', $environments));
+
+        $first = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(ProdConcrete::class, $first);
+
+        $container->flush();
+        $container->resolveEnvironmentUsing(fn (array $environments) => in_array('dev', $environments));
+
+        $second = $container->make(MultiEnvInterface::class);
+        $this->assertInstanceOf(DevConcrete::class, $second);
+    }
+
+    public function testNoMatchingEnvironmentAndNoWildcardThrowsBindingResolutionException(): void
+    {
+        $this->expectException(BindingResolutionException::class);
+
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn () => false);
+
+        $container->make(ProdEnvOnlyInterface::class);
+    }
+
+    public function testScopedSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsScoped::class);
+        $new = $container->make(IsScoped::class);
+
+        $this->assertSame($original, $new);
+        $container->forgetScopedInstances();
+        $this->assertNotSame($original, $container->make(IsScoped::class));
+    }
+
+    public function testSingletonWithBind()
+    {
+        $container = new Container;
+        $container->resolveEnvironmentUsing(fn ($environments) => true);
+
+        $original = $container->make(IsSingleton::class);
+        $new = $container->make(IsSingleton::class);
+
+        $this->assertSame($original, $new);
+    }
+
+    public function testWithFactoryHasDependency()
+    {
+        $container = new Container;
+        $_SERVER['__withFactory.email'] = 'taylor@laravel.com';
+        $_SERVER['__withFactory.userId'] = 999;
+
+        $container->bind(RequestDtoDependencyContract::class, RequestDtoDependency::class);
+        $r = $container->make(RequestDto::class);
+
+        $this->assertInstanceOf(RequestDto::class, $r);
+        $this->assertEquals(999, $r->userId);
+        $this->assertEquals('taylor@laravel.com', $r->email);
     }
 
     // public function testContainerCanCatchCircularDependency()
@@ -765,6 +999,15 @@ class ContainerDefaultValueStub
     }
 }
 
+class ContainerClassWithDefaultValueStub
+{
+    public function __construct(
+        public ?ContainerConcreteStub $noDefault,
+        public ?ContainerConcreteStub $default = null,
+    ) {
+    }
+}
+
 class ContainerMixedPrimitiveStub
 {
     public $first;
@@ -808,5 +1051,169 @@ class ContainerContextualBindingCallTarget
     public function work(IContainerContractStub $stub)
     {
         return $stub;
+    }
+}
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
+class ContainerCurrentResolvingAttribute implements ContextualAttribute
+{
+    public function resolve()
+    {
+    }
+}
+
+class ContainerCurrentResolvingConcrete
+{
+    public $currentlyResolving;
+
+    public function __construct(
+        #[ContainerCurrentResolvingAttribute]
+        string $currentlyResolving
+    ) {
+        $this->currentlyResolving = $currentlyResolving;
+    }
+}
+
+#[Singleton]
+class ContainerSingletonAttribute
+{
+}
+
+#[Scoped]
+class ContainerScopedAttribute
+{
+}
+
+#[Bind(ContainerSingletonAttribute::class, environments: ['foo', ContainerTestEnvironments::Bar])]
+interface ContainerBindSingletonTestInterface
+{
+}
+
+enum ContainerTestEnvironments: string
+{
+    case Bar = 'bar';
+}
+
+#[Bind(ContainerScopedAttribute::class, environments: ['test'])]
+#[Bind(ContainerScopedAttribute::class, environments: ['test2'])]
+interface ContainerBindScopedTestInterface
+{
+}
+
+#[Bind(WildcardConcrete::class)]
+interface WildcardOnlyInterface
+{
+}
+
+class WildcardConcrete implements WildcardOnlyInterface
+{
+}
+
+/*
+ * The order of these attributes matters because we want to ensure we only fallback to '*' when there's no more specific environment.
+ */
+#[Bind(FallbackConcrete::class)]
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface WildcardAndProdInterface
+{
+}
+
+class FallbackConcrete implements WildcardAndProdInterface
+{
+}
+class ProdConcrete implements WildcardAndProdInterface
+{
+}
+
+#[Bind(CliConcrete::class, environments: 'cli')]
+interface CliOnlyInterface
+{
+}
+
+class CliConcrete implements CliOnlyInterface
+{
+}
+
+#[Bind(BadConcrete::class, environments: [])]
+interface EmptyEnvInterface
+{
+}
+
+class BadConcrete implements EmptyEnvInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+interface ProdEnvOnlyInterface
+{
+}
+
+#[Bind(ProdConcrete::class, environments: 'prod')]
+#[Bind(DevConcrete::class, environments: 'dev')]
+interface MultiEnvInterface
+{
+}
+
+class DevConcrete implements MultiEnvInterface
+{
+}
+
+#[Bind(OriginalConcrete::class)]
+interface OverrideInterface
+{
+}
+
+class OriginalConcrete implements OverrideInterface
+{
+}
+
+class AltConcrete implements OverrideInterface
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Scoped]
+interface IsScoped
+{
+}
+
+class IsScopedConcrete implements IsScoped
+{
+}
+
+#[Bind(IsScopedConcrete::class)]
+#[Singleton]
+interface IsSingleton
+{
+}
+
+class RequestDto implements SelfBuilding
+{
+    public function __construct(
+        public readonly int $userId,
+        public readonly string $email,
+    ) {
+    }
+
+    public static function newInstance(RequestDtoDependencyContract $dependency): self
+    {
+        return new self(
+            $dependency->userId,
+            $_SERVER['__withFactory.email'],
+        );
+    }
+}
+
+interface RequestDtoDependencyContract
+{
+}
+
+class RequestDtoDependency implements RequestDtoDependencyContract
+{
+    public int $userId;
+
+    public function __construct()
+    {
+        $this->userId = $_SERVER['__withFactory.userId'];
     }
 }

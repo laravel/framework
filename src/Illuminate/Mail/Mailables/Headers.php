@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Mailables;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
 
@@ -36,7 +37,6 @@ class Headers
      * @param  string|null  $messageId
      * @param  array  $references
      * @param  array  $text
-     * @return void
      *
      * @named-arguments-supported
      */
@@ -93,8 +93,8 @@ class Headers
      */
     public function referencesString(): string
     {
-        return collect($this->references)->map(function ($messageId) {
-            return Str::finish(Str::start($messageId, '<'), '>');
-        })->implode(' ');
+        return (new Collection($this->references))
+            ->map(fn ($messageId) => Str::of($messageId)->start('<')->finish('>')->value())
+            ->implode(' ');
     }
 }

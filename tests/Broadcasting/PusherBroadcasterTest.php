@@ -32,7 +32,7 @@ class PusherBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('private-test')
@@ -73,7 +73,7 @@ class PusherBroadcasterTest extends TestCase
         });
 
         $this->broadcaster->shouldReceive('validAuthenticationResponse')
-                          ->once();
+            ->once();
 
         $this->broadcaster->auth(
             $this->getMockRequestWithUserForChannel('presence-test')
@@ -115,8 +115,8 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->shouldReceive('socket_auth')
-                     ->once()
-                     ->andReturn(json_encode($data));
+            ->once()
+            ->andReturn(json_encode($data));
 
         $this->assertEquals(
             $data,
@@ -137,8 +137,8 @@ class PusherBroadcasterTest extends TestCase
         ];
 
         $this->pusher->shouldReceive('presence_auth')
-                     ->once()
-                     ->andReturn(json_encode($data));
+            ->once()
+            ->andReturn(json_encode($data));
 
         $this->assertEquals(
             $data,
@@ -181,17 +181,17 @@ class PusherBroadcasterTest extends TestCase
         $request->shouldReceive('all')->andReturn(['channel_name' => $channel, 'socket_id' => 'abcd.1234']);
 
         $request->shouldReceive('input')
-                ->with('callback', false)
-                ->andReturn(false);
+            ->with('callback', false)
+            ->andReturn(false);
 
         $user = m::mock('User');
         $user->shouldReceive('getAuthIdentifierForBroadcasting')
-             ->andReturn(42);
+            ->andReturn(42);
         $user->shouldReceive('getAuthIdentifier')
-             ->andReturn(42);
+            ->andReturn(42);
 
         $request->shouldReceive('user')
-                ->andReturn($user);
+            ->andReturn($user);
 
         return $request;
     }
@@ -206,7 +206,7 @@ class PusherBroadcasterTest extends TestCase
         $request->shouldReceive('all')->andReturn(['channel_name' => $channel]);
 
         $request->shouldReceive('user')
-                ->andReturn(null);
+            ->andReturn(null);
 
         return $request;
     }

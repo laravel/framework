@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Queue\Listener;
 use Illuminate\Queue\ListenerOptions;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:listen')]
@@ -23,10 +24,10 @@ class ListenCommand extends Command
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--queue= : The queue to listen on}
-                            {--sleep=3 : Number of seconds to sleep when no job is available}
-                            {--rest=0 : Number of seconds to rest between jobs}
+                            {--sleep=3 : The number of seconds to sleep when no job is available}
+                            {--rest=0 : The number of seconds to rest between jobs}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=1 : Number of times to attempt a job before logging it failed}';
+                            {--tries=1 : The number of times to attempt a job before logging it failed}';
 
     /**
      * The console command description.
@@ -46,7 +47,6 @@ class ListenCommand extends Command
      * Create a new queue listen command.
      *
      * @param  \Illuminate\Queue\Listener  $listener
-     * @return void
      */
     public function __construct(Listener $listener)
     {
@@ -69,7 +69,7 @@ class ListenCommand extends Command
             $connection = $this->input->getArgument('connection')
         );
 
-        $this->components->info(sprintf('Processing jobs from the [%s] %s.', $queue, str('queue')->plural(explode(',', $queue))));
+        $this->components->info(sprintf('Processing jobs from the [%s] %s.', $queue, (new Stringable('queue'))->plural(explode(',', $queue))));
 
         $this->listener->listen(
             $connection, $queue, $this->gatherOptions()
@@ -99,8 +99,8 @@ class ListenCommand extends Command
     protected function gatherOptions()
     {
         $backoff = $this->hasOption('backoff')
-                ? $this->option('backoff')
-                : $this->option('delay');
+            ? $this->option('backoff')
+            : $this->option('delay');
 
         return new ListenerOptions(
             name: $this->option('name'),

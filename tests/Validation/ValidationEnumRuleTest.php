@@ -249,6 +249,22 @@ class ValidationEnumRuleTest extends TestCase
         $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
     }
 
+    public function testValidationFailsWhenUsingDifferentCase()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'DONE',
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals(['The selected status is invalid.'], $v->messages()->get('status'));
+    }
+
     public static function conditionalCasesDataProvider(): array
     {
         return [
@@ -259,6 +275,32 @@ class ValidationEnumRuleTest extends TestCase
             [IntegerStatus::pending->value, [IntegerStatus::done, IntegerStatus::pending], true],
             [IntegerStatus::done->value, IntegerStatus::pending, false],
         ];
+    }
+
+    public function testCustomMessageUsingDotNotationAndFqcnWorks()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            [
+                'status' => 'invalid_value',
+                'status_fqcn' => 'another_invalid',
+            ],
+            [
+                'status' => new Enum(StringStatus::class),
+                'status_fqcn' => new Enum(StringStatus::class),
+            ],
+            [
+                'status.enum' => 'Please choose a valid status (dot notation)',
+                'status_fqcn.Illuminate\Validation\Rules\Enum' => 'Please choose a valid status (fqcn)',
+            ]
+        );
+
+        $this->assertTrue($v->fails());
+
+        $this->assertSame([
+            'Please choose a valid status (dot notation)',
+            'Please choose a valid status (fqcn)',
+        ], $v->messages()->all());
     }
 
     protected function setUp(): void

@@ -11,8 +11,6 @@ use Illuminate\Support\Collection as BaseCollection;
  * @method static \Illuminate\Database\Eloquent\Builder<static> withoutTrashed()
  * @method static static restoreOrCreate(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
  * @method static static createOrRestore(array<string, mixed> $attributes = [], array<string, mixed> $values = [])
- *
- * @mixin \Illuminate\Database\Eloquent\Model
  */
 trait SoftDeletes
 {
@@ -210,7 +208,7 @@ trait SoftDeletes
     /**
      * Register a "softDeleted" model event callback with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
      * @return void
      */
     public static function softDeleted($callback)
@@ -221,7 +219,7 @@ trait SoftDeletes
     /**
      * Register a "restoring" model event callback with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
      * @return void
      */
     public static function restoring($callback)
@@ -232,7 +230,7 @@ trait SoftDeletes
     /**
      * Register a "restored" model event callback with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
      * @return void
      */
     public static function restored($callback)
@@ -243,7 +241,7 @@ trait SoftDeletes
     /**
      * Register a "forceDeleting" model event callback with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
      * @return void
      */
     public static function forceDeleting($callback)
@@ -254,7 +252,7 @@ trait SoftDeletes
     /**
      * Register a "forceDeleted" model event callback with the dispatcher.
      *
-     * @param  \Illuminate\Events\QueuedClosure|\Closure|string  $callback
+     * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
      * @return void
      */
     public static function forceDeleted($callback)

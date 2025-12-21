@@ -117,6 +117,69 @@ class HttpRedirectResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
+    public function testCanEnforceSameOriginWhenSameOrigin()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('https://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('https://example.com/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenSameOriginAndCustomPort()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:1/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('https://example.com:1/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameScheme()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('http://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameHostname()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('https://example2.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSamePort()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:2/baz/buzz'));
+        $response->enforceSameOrigin('fallback');
+
+        $this->assertSame('fallback', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSameSchemeAndSchemeValidationIsDisabled()
+    {
+        $response = new RedirectResponse('https://example.com/foo/bar');
+        $response->setRequest(Request::create('http://example.com/baz/buzz'));
+        $response->enforceSameOrigin('fallback', validateScheme: false);
+
+        $this->assertSame('https://example.com/foo/bar', $response->getTargetUrl());
+    }
+
+    public function testCanEnforceSameOriginWhenNotSamePortAndPortValidationIsDisabled()
+    {
+        $response = new RedirectResponse('https://example.com:1/foo/bar');
+        $response->setRequest(Request::create('https://example.com:2/baz/buzz'));
+        $response->enforceSameOrigin('fallback', validatePort: false);
+
+        $this->assertSame('https://example.com:1/foo/bar', $response->getTargetUrl());
+    }
+
     public function testSettersGettersOnRequest()
     {
         $response = new RedirectResponse('foo.bar');

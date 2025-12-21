@@ -37,7 +37,6 @@ class MemcachedStore extends TaggableStore implements LockProvider
      *
      * @param  \Memcached  $memcached
      * @param  string  $prefix
-     * @return void
      */
     public function __construct($memcached, $prefix = '')
     {
@@ -45,7 +44,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
         $this->memcached = $memcached;
 
         $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
-                            ->getNumberOfParameters() == 2;
+            ->getNumberOfParameters() == 2;
     }
 
     /**

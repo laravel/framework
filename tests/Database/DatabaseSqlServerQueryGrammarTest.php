@@ -18,8 +18,7 @@ class DatabaseSqlServerQueryGrammarTest extends TestCase
     {
         $connection = m::mock(Connection::class);
         $connection->shouldReceive('escape')->with('foo', false)->andReturn("'foo'");
-        $grammar = new SqlServerGrammar;
-        $grammar->setConnection($connection);
+        $grammar = new SqlServerGrammar($connection);
 
         $query = $grammar->substituteBindingsIntoRawSql(
             "select * from [users] where 'Hello''World?' IS NOT NULL AND [email] = ?",

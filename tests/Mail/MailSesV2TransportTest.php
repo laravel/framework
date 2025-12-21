@@ -26,7 +26,7 @@ class MailSesV2TransportTest extends TestCase
         parent::tearDown();
     }
 
-    public function testGetTransport()
+    public function testGetTransport(): void
     {
         $container = new Container;
 
@@ -52,7 +52,7 @@ class MailSesV2TransportTest extends TestCase
         $this->assertSame('ses-v2', (string) $transport);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $message = new Email();
         $message->subject('Foo subject');
@@ -76,14 +76,14 @@ class MailSesV2TransportTest extends TestCase
                     $arg['Destination']['ToAddresses'] === ['me@example.com', 'you@example.com'] &&
                     $arg['ListManagementOptions'] === ['ContactListName' => 'TestList', 'TopicName' => 'TestTopic'] &&
                     $arg['EmailTags'] === [['Name' => 'FooTag', 'Value' => 'TagValue']] &&
-                    strpos($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>') !== false;
+                    str_contains($arg['Content']['Raw']['Data'], 'Reply-To: Taylor Otwell <taylor@example.com>');
             }))
             ->andReturn($sesResult);
 
         (new SesV2Transport($client))->send($message);
     }
 
-    public function testSendError()
+    public function testSendError(): void
     {
         $message = new Email();
         $message->subject('Foo subject');
@@ -100,7 +100,7 @@ class MailSesV2TransportTest extends TestCase
         (new SesV2Transport($client))->send($message);
     }
 
-    public function testSesV2LocalConfiguration()
+    public function testSesV2LocalConfiguration(): void
     {
         $container = new Container;
 

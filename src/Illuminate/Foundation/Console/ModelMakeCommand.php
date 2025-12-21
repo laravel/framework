@@ -4,12 +4,14 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\multiselect;
 
 #[AsCommand(name: 'make:model')]
@@ -46,7 +48,15 @@ class ModelMakeCommand extends GeneratorCommand
     public function handle()
     {
         if (parent::handle() === false && ! $this->option('force')) {
-            return false;
+            if (! $this->alreadyExists($this->getNameInput())) {
+                return false;
+            }
+
+            if (! confirm('Do you want to generate additional components for the model?')) {
+                return false;
+            } else {
+                $this->afterPromptingForMissingArguments($this->input, $this->output);
+            }
         }
 
         if ($this->option('all')) {
@@ -210,8 +220,8 @@ class ModelMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
@@ -252,7 +262,7 @@ class ModelMakeCommand extends GeneratorCommand
         $replacements = [];
 
         if ($this->option('factory') || $this->option('all')) {
-            $modelPath = str($this->argument('name'))->studly()->replace('/', '\\')->toString();
+            $modelPath = Str::of($this->argument('name'))->studly()->replace('/', '\\')->toString();
 
             $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
 
@@ -308,13 +318,13 @@ class ModelMakeCommand extends GeneratorCommand
             return;
         }
 
-        collect(multiselect('Would you like any of the following?', [
+        (new Collection(multiselect('Would you like any of the following?', [
             'seed' => 'Database Seeder',
             'factory' => 'Factory',
             'requests' => 'Form Requests',
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-        ]))->each(fn ($option) => $input->setOption($option, true));
+        ])))->each(fn ($option) => $input->setOption($option, true));
     }
 }

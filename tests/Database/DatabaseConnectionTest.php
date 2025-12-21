@@ -567,7 +567,6 @@ class DatabaseConnectionTestMockPDOException extends PDOException
      *
      * @param  string|null  $message
      * @param  string|null  $code
-     * @return void
      */
     public function __construct($message = null, $code = null)
     {

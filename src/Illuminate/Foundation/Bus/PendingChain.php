@@ -3,8 +3,10 @@
 namespace Illuminate\Foundation\Bus;
 
 use Closure;
+use Illuminate\Bus\ChainedBatch;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Queue\CallQueuedClosure;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 
@@ -61,7 +63,6 @@ class PendingChain
      *
      * @param  mixed  $job
      * @param  array  $chain
-     * @return void
      */
     public function __construct($job, $chain)
     {
@@ -72,12 +73,12 @@ class PendingChain
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param  \UnitEnum|string|null  $connection
      * @return $this
      */
     public function onConnection($connection)
     {
-        $this->connection = $connection;
+        $this->connection = enum_value($connection);
 
         return $this;
     }
@@ -85,12 +86,56 @@ class PendingChain
     /**
      * Set the desired queue for the job.
      *
-     * @param  \BackedEnum|string|null  $queue
+     * @param  \UnitEnum|string|null  $queue
      * @return $this
      */
     public function onQueue($queue)
     {
         $this->queue = enum_value($queue);
+
+        return $this;
+    }
+
+    /**
+     * Prepend a job to the chain.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function prepend($job)
+    {
+        $jobs = ChainedBatch::prepareNestedBatches(
+            Collection::wrap($job)
+        );
+
+        if ($this->job) {
+            array_unshift($this->chain, $this->job);
+        }
+
+        $this->job = $jobs->shift();
+
+        array_unshift($this->chain, ...$jobs->toArray());
+
+        return $this;
+    }
+
+    /**
+     * Append a job to the chain.
+     *
+     * @param  mixed  $job
+     * @return $this
+     */
+    public function append($job)
+    {
+        $jobs = ChainedBatch::prepareNestedBatches(
+            Collection::wrap($job)
+        );
+
+        if (! $this->job) {
+            $this->job = $jobs->shift();
+        }
+
+        array_push($this->chain, ...$jobs->toArray());
 
         return $this;
     }
@@ -117,8 +162,8 @@ class PendingChain
     public function catch($callback)
     {
         $this->catchCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }

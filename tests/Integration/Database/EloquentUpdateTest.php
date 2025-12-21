@@ -136,6 +136,50 @@ class EloquentUpdateTest extends DatabaseTestCase
         $deletedModel->decrement('counter');
         $this->assertEquals(0, $deletedModel->fresh()->counter);
     }
+
+    public function testUpdateSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->update(['title' => 'Dr.']);
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
+    }
+
+    public function testSaveSyncsPrevious()
+    {
+        $model = TestUpdateModel1::create([
+            'name' => Str::random(),
+            'title' => 'Ms.',
+        ]);
+
+        $model->title = 'Dr.';
+        $model->save();
+
+        $this->assertSame('Dr.', $model->title);
+        $this->assertSame('Dr.', $model->getOriginal('title'));
+        $this->assertSame(['title' => 'Dr.'], $model->getChanges());
+        $this->assertSame(['title' => 'Ms.'], $model->getPrevious());
+    }
+
+    public function testIncrementSyncsPrevious()
+    {
+        $model = TestUpdateModel3::create([
+            'counter' => 0,
+        ]);
+
+        $model->increment('counter');
+
+        $this->assertEquals(1, $model->counter);
+        $this->assertSame(['counter' => 1], $model->getChanges());
+        $this->assertSame(['counter' => 0], $model->getPrevious());
+    }
 }
 
 class TestUpdateModel1 extends Model

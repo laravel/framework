@@ -22,7 +22,6 @@ class QueuedCommand implements ShouldQueue
      * Create a new job instance.
      *
      * @param  array  $data
-     * @return void
      */
     public function __construct($data)
     {

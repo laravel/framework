@@ -15,6 +15,6 @@ class Info extends Component
      */
     public function render($string, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        with(new Line($this->output))->render('info', $string, $verbosity);
+        (new Line($this->output))->render('info', $string, $verbosity);
     }
 }

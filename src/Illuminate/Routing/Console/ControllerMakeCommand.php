@@ -53,8 +53,8 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = "/stubs/controller.{$type}.stub";
         } elseif ($this->option('parent')) {
             $stub = $this->option('singleton')
-                        ? '/stubs/controller.nested.singleton.stub'
-                        : '/stubs/controller.nested.stub';
+                ? '/stubs/controller.nested.singleton.stub'
+                : '/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             $stub = '/stubs/controller.model.stub';
         } elseif ($this->option('invokable')) {
@@ -85,8 +85,8 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function resolveStubPath($stub)
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
-                        ? $customPath
-                        : __DIR__.$stub;
+            ? $customPath
+            : __DIR__.$stub;
     }
 
     /**
@@ -136,11 +136,9 @@ class ControllerMakeCommand extends GeneratorCommand
             $replace["use {$rootNamespace}Http\Controllers\Controller;\n"] = '';
         }
 
-        $class = str_replace(
+        return str_replace(
             array_keys($replace), array_values($replace), parent::buildClass($name)
         );
-
-        return $class;
     }
 
     /**
@@ -330,8 +328,8 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (in_array($type, ['api', 'resource', 'singleton'])) {
             $model = suggest(
-                "What model should this $type controller be for? (Optional)",
-                $this->possibleModels()
+                "What model is this $type controller for? (Optional)",
+                $this->findAvailableModels()
             );
 
             if ($model) {

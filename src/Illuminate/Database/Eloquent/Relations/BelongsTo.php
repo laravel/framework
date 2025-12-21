@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\ComparesRelatedModels;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
@@ -59,7 +59,6 @@ class BelongsTo extends Relation
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relationName
-     * @return void
      */
     public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName)
     {
@@ -150,7 +149,7 @@ class BelongsTo extends Relation
     }
 
     /** @inheritDoc */
-    public function match(array $models, Collection $results, $relation)
+    public function match(array $models, EloquentCollection $results, $relation)
     {
         // First we will get to build a dictionary of the child models by their primary
         // key of the relationship, then we can easily match the children back onto
@@ -169,8 +168,8 @@ class BelongsTo extends Relation
         foreach ($models as $model) {
             $attribute = $this->getDictionaryKey($this->getForeignKeyFrom($model));
 
-            if (isset($dictionary[$attribute])) {
-                $model->setRelation($relation, $dictionary[$attribute]);
+            if (isset($dictionary[$attribute ?? ''])) {
+                $model->setRelation($relation, $dictionary[$attribute ?? '']);
             }
         }
 
@@ -249,7 +248,7 @@ class BelongsTo extends Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder<TRelatedModel>  $query
      * @param  \Illuminate\Database\Eloquent\Builder<TDeclaringModel>  $parentQuery
-     * @param  array|mixed  $columns
+     * @param  mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder<TRelatedModel>
      */
     public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
@@ -344,10 +343,6 @@ class BelongsTo extends Relation
      */
     public function getQualifiedOwnerKeyName()
     {
-        if (is_null($this->ownerKey)) {
-            return '';
-        }
-
         return $this->related->qualifyColumn($this->ownerKey);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Console\Scheduling;
 
+use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\ScheduleListCommand;
@@ -29,6 +30,15 @@ class ScheduleListCommandTest extends TestCase
         $this->artisan(ScheduleListCommand::class)
             ->assertSuccessful()
             ->expectsOutputToContain('No scheduled tasks have been defined.');
+    }
+
+    public function testDisplayEmptyScheduleAsJson()
+    {
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $this->assertJsonStringEqualsJsonString('[]', $output);
     }
 
     public function testDisplaySchedule()
@@ -63,6 +73,148 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * *     * *      *  Illuminate\Tests\Integration\Console\Scheduling\FooCall  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Closure at: Illuminate\Tests\Integration\Console\Scheduling\FooCall::fooFunction  Next Due: 1 minute from now')
             ->expectsOutput('  * *     * *      *  Closure at: '.$closureFilePath.':'.$closureLineNumber.'  Next Due: 1 minute from now');
+    }
+
+    public function testDisplayScheduleAsJson()
+    {
+        $this->schedule->command(FooCommand::class)->quarterly();
+        $this->schedule->command('inspire')->twiceDaily(14, 18);
+        $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
+        $this->schedule->job(FooJob::class)->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->everyMinute();
+        $this->schedule->job(FooJob::class)->name('foo-named-job')->everyMinute();
+        $this->schedule->job(new FooParamJob('test'))->name('foo-named-param-job')->everyMinute();
+        $this->schedule->command('inspire')->cron('0 9,17 * * *');
+        $this->schedule->call(fn () => '')->everyMinute();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(9, $data);
+
+        $this->assertSame('0 0 1 1-12/3 *', $data[0]['expression']);
+        $this->assertNull($data[0]['repeat_seconds']);
+        $this->assertSame('php artisan foo:command', $data[0]['command']);
+        $this->assertSame('This is the description of the command.', $data[0]['description']);
+        $this->assertStringContainsString('2023-04-01 00:00:00', $data[0]['next_due_date']);
+        $this->assertSame('3 months from now', $data[0]['next_due_date_human']);
+        $this->assertFalse($data[0]['has_mutex']);
+        $this->assertIsArray($data[0]['environments']);
+        $this->assertEmpty($data[0]['environments']);
+
+        $this->assertSame('* * * * *', $data[2]['expression']);
+        $this->assertSame('php artisan foobar a='.ProcessUtils::escapeArgument('b'), $data[2]['command']);
+        $this->assertNull($data[2]['description']);
+        $this->assertSame('1 minute from now', $data[2]['next_due_date_human']);
+
+        $this->assertSame('Illuminate\Tests\Integration\Console\Scheduling\FooJob', $data[3]['command']);
+
+        $this->assertSame('foo-named-job', $data[5]['command']);
+
+        $this->assertStringContainsString('Closure at:', $data[8]['command']);
+        $this->assertStringContainsString('ScheduleListCommandTest.php', $data[8]['command']);
+    }
+
+    public function testDisplayScheduleAsJsonWithSpecificEnvironment()
+    {
+        $environment = 'production';
+        $this->schedule->command(FooCommand::class)->quarterly()->environments($environment);
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, ['--json' => true]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+
+        $this->assertIsArray($data[0]['environments']);
+        $this->assertNotEmpty($data[0]['environments']);
+        $this->assertContains($environment, $data[0]['environments']);
+    }
+
+    public function testDisplayScheduleWithSortAsJson()
+    {
+        $this->schedule->command(FooCommand::class)->quarterly();
+        $this->schedule->command('inspire')->twiceDaily(14, 18);
+        $this->schedule->command('foobar', ['a' => 'b'])->everyMinute();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--next' => true,
+            '--json' => true,
+        ]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(3, $data);
+
+        $this->assertSame('* * * * *', $data[0]['expression']);
+        $this->assertSame('1 minute from now', $data[0]['next_due_date_human']);
+        $this->assertSame('php artisan foobar a='.ProcessUtils::escapeArgument('b'), $data[0]['command']);
+
+        $this->assertSame('0 14,18 * * *', $data[1]['expression']);
+        $this->assertSame('14 hours from now', $data[1]['next_due_date_human']);
+        $this->assertSame('php artisan inspire', $data[1]['command']);
+
+        $this->assertSame('0 0 1 1-12/3 *', $data[2]['expression']);
+        $this->assertSame('3 months from now', $data[2]['next_due_date_human']);
+        $this->assertSame('php artisan foo:command', $data[2]['command']);
+    }
+
+    public function testDisplayScheduleAsJsonWithTimezone()
+    {
+        $this->schedule->command('inspire')->daily();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--timezone' => 'America/Chicago',
+            '--json' => true,
+        ]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(1, $data);
+        $this->assertSame('America/Chicago', $data[0]['timezone']);
+        $this->assertStringContainsString('-06:00', $data[0]['next_due_date']);
+        $this->assertSame('php artisan inspire', $data[0]['command']);
+    }
+
+    public function testDisplayScheduleAsJsonInVerboseMode()
+    {
+        $this->schedule->command(FooCommand::class)->quarterly();
+        $this->schedule->command('inspire')->everyMinute();
+        $this->schedule->call(fn () => '')->everyMinute();
+
+        $this->withoutMockingConsoleOutput()->artisan(ScheduleListCommand::class, [
+            '--json' => true,
+            '-v' => true,
+        ]);
+        $output = Artisan::output();
+
+        $this->assertJson($output);
+        $data = json_decode($output, true);
+
+        $this->assertIsArray($data);
+        $this->assertCount(3, $data);
+
+        $this->assertSame('0 0 1 1-12/3 *', $data[0]['expression']);
+        $this->assertSame(Application::phpBinary().' '.Application::artisanBinary().' foo:command', $data[0]['command']);
+        $this->assertSame('This is the description of the command.', $data[0]['description']);
+
+        $this->assertSame('* * * * *', $data[1]['expression']);
+        $this->assertSame(Application::phpBinary().' '.Application::artisanBinary().' inspire', $data[1]['command']);
+
+        $this->assertStringContainsString('Closure at:', $data[2]['command']);
+        $this->assertStringContainsString('ScheduleListCommandTest.php', $data[2]['command']);
     }
 
     public function testDisplayScheduleWithSort()
@@ -156,11 +308,9 @@ class ScheduleListCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         putenv('SHELL_VERBOSITY');
 
-        ScheduleListCommand::resolveTerminalWidthUsing(null);
+        parent::tearDown();
     }
 }
 

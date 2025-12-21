@@ -18,7 +18,6 @@ class AddQueuedCookiesToResponse
      * Create a new CookieQueue instance.
      *
      * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookies
-     * @return void
      */
     public function __construct(CookieJar $cookies)
     {

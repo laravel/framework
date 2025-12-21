@@ -118,7 +118,7 @@ class SendingBroadcastsViaAnonymousEventTest extends TestCase
             ->send();
 
         EventFacade::assertDispatched(AnonymousEvent::class, function ($event) {
-            return $event->socket = '12345';
+            return $event->socket === '12345';
         });
     }
 

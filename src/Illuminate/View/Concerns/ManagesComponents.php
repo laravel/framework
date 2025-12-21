@@ -133,7 +133,7 @@ trait ManagesComponents
      *
      * @param  string  $key
      * @param  mixed  $default
-     * @return mixed|null
+     * @return mixed
      */
     public function getConsumableComponentData($key, $default = null)
     {

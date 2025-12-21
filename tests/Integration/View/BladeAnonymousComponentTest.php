@@ -41,7 +41,7 @@ class BladeAnonymousComponentTest extends TestCase
         $view = View::make('panel')->render();
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
         $app['config']->set('view.paths', [__DIR__.'/anonymous-components-templates']);
     }

@@ -14,13 +14,6 @@ use Orchestra\Testbench\TestCase;
 
 class UrlSigningTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     protected function defineEnvironment($app): void
     {
         $app['config']->set(['app.key' => 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF']);
@@ -149,7 +142,7 @@ class UrlSigningTest extends TestCase
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
             return $request->hasValidSignature()
-                && intval($id) === 1
+                && (int) $id === 1
                 && $request->has('paramEmpty')
                 && $request->has('paramEmptyString')
                 && $request->query('paramWithValue') === 'value'

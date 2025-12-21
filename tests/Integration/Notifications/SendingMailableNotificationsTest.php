@@ -9,6 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Stringable;
 use Orchestra\Testbench\TestCase;
 
 class SendingMailableNotificationsTest extends TestCase
@@ -48,16 +49,24 @@ class SendingMailableNotificationsTest extends TestCase
 
         $user->notify(new MarkdownNotification());
 
-        $email = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->toString();
+        $message = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage();
+        $email = $message->toString();
+        $textBody = $message->getTextBody();
 
-        $cid = explode(' cid:', str($email)->explode("\r\n")
+        $cid = explode(' cid:', (new Stringable($textBody))->explode("\n")
             ->filter(fn ($line) => str_contains($line, 'Embed content: cid:'))
             ->first())[1];
 
+        $filename = explode(' file: ', (new Stringable($textBody))->explode("\n")
+            ->filter(fn ($line) => str_contains($line, 'Embed file: '))
+            ->first())[1];
+
         $this->assertStringContainsString(<<<EOT
-        Content-Type: application/x-php; name=$cid\r
+        Content-Type: application/x-php; name=$filename\r
         Content-Transfer-Encoding: base64\r
-        Content-Disposition: inline; name=$cid; filename=$cid\r
+        Content-Disposition: inline; name=$filename;\r
+         filename=$filename\r
+        Content-ID: <$cid>\r
         EOT, $email);
     }
 

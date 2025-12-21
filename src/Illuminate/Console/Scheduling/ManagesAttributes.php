@@ -91,6 +91,13 @@ trait ManagesAttributes
     protected $rejects = [];
 
     /**
+     * The human readable description of the event.
+     *
+     * @var string|null
+     */
+    public $description;
+
+    /**
      * Set which user the command should run as.
      *
      * @param  string  $user
@@ -106,7 +113,7 @@ trait ManagesAttributes
     /**
      * Limit the environments the command should run in.
      *
-     * @param  array|mixed  $environments
+     * @param  mixed  $environments
      * @return $this
      */
     public function environments($environments)
@@ -196,6 +203,30 @@ trait ManagesAttributes
         $this->rejects[] = Reflector::isCallable($callback) ? $callback : function () use ($callback) {
             return $callback;
         };
+
+        return $this;
+    }
+
+    /**
+     * Set the human-friendly description of the event.
+     *
+     * @param  string  $description
+     * @return $this
+     */
+    public function name($description)
+    {
+        return $this->description($description);
+    }
+
+    /**
+     * Set the human-friendly description of the event.
+     *
+     * @param  string  $description
+     * @return $this
+     */
+    public function description($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -10,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FrequencyTest extends TestCase
 {
-    /*
-     * @var \Illuminate\Console\Scheduling\Event
-     */
+    /** @var \Illuminate\Console\Scheduling\Event */
     protected $event;
 
     protected function setUp(): void
@@ -48,6 +46,11 @@ class FrequencyTest extends TestCase
     public function testDailyAt()
     {
         $this->assertSame('8 13 * * *', $this->event->dailyAt('13:08')->getExpression());
+    }
+
+    public function testDailyAtParsesMinutesAndIgnoresSecondsWhenSecondsAreDefined()
+    {
+        $this->assertSame('8 13 * * *', $this->event->dailyAt('13:08:10')->getExpression());
     }
 
     public function testTwiceDaily()

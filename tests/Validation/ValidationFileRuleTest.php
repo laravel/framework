@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Validation\Validator;
@@ -194,6 +195,39 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testImageFailsOnSvgByDefault()
+    {
+        $maliciousSvgFileWithXSS = UploadedFile::fake()->createWithContent(
+            name: 'foo.svg',
+            content: <<<'XML'
+                    <svg xmlns="http://www.w3.org/2000/svg" width="383" height="97" viewBox="0 0 383 97">
+                        <text x="10" y="50" font-size="30" fill="black">XSS Logo</text>
+                        <script>alert('XSS');</script>
+                    </svg>
+                    XML
+        );
+
+        $this->fails(
+            File::image(),
+            $maliciousSvgFileWithXSS,
+            ['validation.image']
+        );
+        $this->fails(
+            Rule::imageFile(),
+            $maliciousSvgFileWithXSS,
+            ['validation.image']
+        );
+
+        $this->passes(
+            File::image(allowSvg: true),
+            $maliciousSvgFileWithXSS
+        );
+        $this->passes(
+            Rule::imageFile(allowSvg: true),
+            $maliciousSvgFileWithXSS
+        );
+    }
+
     public function testSize()
     {
         $this->fails(
@@ -323,6 +357,49 @@ class ValidationFileRuleTest extends TestCase
         );
     }
 
+    public function testEncoding()
+    {
+        // ASCII file containing UTF-8.
+        $this->fails(
+            File::default()->encoding('ascii'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+            ['validation.encoding'],
+        );
+
+        // UTF-8 file containing invalid UTF-8 byte sequence.
+        $this->fails(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', "\xf0\x28\x8c\x28"),
+            ['validation.encoding'],
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            UploadedFile::fake()->createWithContent('foo.txt', '✌️'),
+        );
+
+        $this->passes(
+            File::default()->encoding('utf-8'),
+            [
+                UploadedFile::fake()->createWithContent('foo-1.txt', '✌️'),
+                UploadedFile::fake()->createWithContent('foo-2.txt', '👍'),
+            ]
+        );
+    }
+
+    public function testEncodingWithInvalidParameter()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Validation rule encoding parameter [FOOBAR] is not a valid encoding.');
+
+        // Invalid encoding.
+        $this->fails(
+            File::default()->encoding('FOOBAR'),
+            UploadedFile::fake()->createWithContent('foo.txt', ''),
+            ['validation.encoding'],
+        );
+    }
+
     public function testMacro()
     {
         File::macro('toDocument', function () {
@@ -382,6 +459,27 @@ class ValidationFileRuleTest extends TestCase
             File::default(),
             UploadedFile::fake()->create('foo.png', 1.5 * 1024),
         );
+    }
+
+    public function testFileSizeConversionWithDifferentUnits()
+    {
+        $this->passes(
+            File::image()->size('5MB'),
+            UploadedFile::fake()->create('foo.png', 5000)
+        );
+
+        $this->passes(
+            File::image()->size(' 2gb '),
+            UploadedFile::fake()->create('foo.png', 2 * 1000000)
+        );
+
+        $this->passes(
+            File::image()->size('1Tb'),
+            UploadedFile::fake()->create('foo.png', 1000000000)
+        );
+
+        $this->expectException(\InvalidArgumentException::class);
+        File::image()->size('10xyz');
     }
 
     protected function setUp(): void

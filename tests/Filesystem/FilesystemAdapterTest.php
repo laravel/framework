@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Filesystem;
 
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Stream;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
@@ -545,6 +547,126 @@ class FilesystemAdapterTest extends TestCase
         $this->fail('Exception was not thrown.');
     }
 
+    public function testReportExceptionsForGet()
+    {
+        $container = Container::getInstance();
+
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+
+        $exceptionHandler->shouldReceive('report')
+            ->once()
+            ->andReturnUsing(function (UnableToReadFile $e) {
+                self::assertStringContainsString(
+                    'Unable to read file from location: foo.txt.',
+                    $e->getMessage(),
+                );
+            });
+
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true]);
+
+        try {
+            $adapter->get('/foo.txt');
+        } catch (UnableToReadFile) {
+            $this->fail('Exception was thrown.');
+        }
+    }
+
+    public function testReportExceptionsForReadStream()
+    {
+        $container = Container::getInstance();
+
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+
+        $exceptionHandler->shouldReceive('report')
+            ->once()
+            ->andReturnUsing(function (UnableToReadFile $e) {
+                self::assertStringContainsString(
+                    'Unable to read file from location: foo.txt.',
+                    $e->getMessage(),
+                );
+            });
+
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
+
+        try {
+            $adapter->readStream('/foo.txt');
+        } catch (UnableToReadFile) {
+            $this->fail('Exception was thrown.');
+        }
+    }
+
+    public function testReportExceptionsForPut()
+    {
+        $container = Container::getInstance();
+
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+
+        $exceptionHandler->shouldReceive('report')
+            ->once()
+            ->andReturnUsing(function (UnableToWriteFile $e) {
+                self::assertStringContainsString(
+                    'Unable to write file at location: foo.txt.',
+                    $e->getMessage(),
+                );
+            });
+
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
+
+        $this->filesystem->write('foo.txt', 'Hello World');
+
+        chmod(__DIR__.'/tmp/foo.txt', 0400);
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
+
+        try {
+            $adapter->put('/foo.txt', 'Hello World!');
+        } catch (UnableToWriteFile) {
+            $this->fail('Exception was thrown.');
+        } finally {
+            chmod(__DIR__.'/tmp/foo.txt', 0600);
+        }
+    }
+
+    public function testReportExceptionsForMimeType()
+    {
+        $container = Container::getInstance();
+
+        $exceptionHandler = m::mock(ExceptionHandler::class);
+
+        $exceptionHandler->shouldReceive('report')
+            ->once()
+            ->andReturnUsing(function (UnableToRetrieveMetadata $e) {
+                self::assertStringContainsString(
+                    'Unable to retrieve the mime_type for file at location: unknown.mime-type.',
+                    $e->getMessage(),
+                );
+            });
+
+        $container->bind(ExceptionHandler::class, function () use ($exceptionHandler) {
+            return $exceptionHandler;
+        });
+
+        $this->filesystem->write('unknown.mime-type', '');
+
+        $adapter = new FilesystemAdapter($this->filesystem, $this->adapter, ['report' => true], $exceptionHandler);
+
+        try {
+            $adapter->mimeType('unknown.mime-type');
+        } catch (UnableToRetrieveMetadata) {
+            $this->fail('Exception was thrown.');
+        }
+    }
+
     public function testGetAllFiles()
     {
         $this->filesystem->write('body.txt', 'Hello World');
@@ -593,6 +715,21 @@ class FilesystemAdapterTest extends TestCase
         $this->assertTrue($filesystemAdapter->providesTemporaryUrls());
     }
 
+    public function testUsesRightSeperatorForS3Adapter()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+            'root' => 'something',
+            'directory_separator' => '\\',
+        ]);
+
+        $path = $filesystemAdapter->path('different');
+        $this->assertStringContainsString('/', $path);
+        $this->assertStringNotContainsString('\\', $path);
+    }
+
     public function testProvidesTemporaryUrlsForAdapterWithoutTemporaryUrlSupport()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
@@ -614,5 +751,20 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertEquals('730bed78bccf58c2cfe44c29b71e5e6b', $filesystemAdapter->checksum('path.txt'));
         $this->assertEquals('a5c3556d', $filesystemAdapter->checksum('path.txt', ['checksum_algo' => 'crc32']));
+    }
+
+    public function testUsesRightSeperatorForS3AdapterWithoutDoublePrefixing()
+    {
+        $filesystem = new FilesystemManager(new Application);
+        $filesystemAdapter = $filesystem->createS3Driver([
+            'region' => 'us-west-1',
+            'bucket' => 'laravel',
+            'root' => 'my-root',
+            'prefix' => 'someprefix',
+            'directory_separator' => '\\',
+        ]);
+
+        $path = $filesystemAdapter->path('different');
+        $this->assertEquals('my-root/someprefix/different', $path);
     }
 }

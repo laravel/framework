@@ -342,8 +342,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
             'cat *' => 'cat command',
         ]);
 
@@ -363,9 +363,9 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2')
-                        ->dontFailWhenEmpty(),
+                ->push('ls command 1')
+                ->push('ls command 2')
+                ->dontFailWhenEmpty(),
         ]);
 
         $result = $factory->run('ls -la');
@@ -386,8 +386,8 @@ class ProcessTest extends TestCase
 
         $factory->fake([
             'ls *' => $factory->sequence()
-                        ->push('ls command 1')
-                        ->push('ls command 2'),
+                ->push('ls command 1')
+                ->push('ls command 2'),
         ]);
 
         $result = $factory->run('ls -la');
@@ -739,10 +739,10 @@ class ProcessTest extends TestCase
 
         $factory->fake(function () use ($factory) {
             return $factory->describe()
-                    ->output('ONE')
-                    ->output('TWO')
-                    ->output('THREE')
-                    ->runsFor(iterations: 3);
+                ->output('ONE')
+                ->output('TWO')
+                ->output('THREE')
+                ->runsFor(iterations: 3);
         });
 
         $process = $factory->start('echo "ONE"; sleep 1; echo "TWO"; sleep 1; echo "THREE"; sleep 1;');
@@ -763,6 +763,261 @@ class ProcessTest extends TestCase
 
         $this->assertEquals('', $latestOutput[2]);
         $this->assertEquals("ONE\nTWO\nTHREE\n", $output[2]);
+    }
+
+    public function testFakeInvokedProcessWaitUntil()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('WAITING')
+                ->output('READY')
+                ->output('DONE')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "WAITING"; sleep 1; echo "READY"; sleep 1; echo "DONE";');
+
+        $callbackInvoked = [];
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'READY');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertContains("WAITING\n", $callbackInvoked);
+        $this->assertContains("READY\n", $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilWithNoCallback()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('OUTPUT');
+        });
+
+        $process = $factory->start('echo "OUTPUT"');
+
+        $result = $process->waitUntil();
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertEquals("OUTPUT\n", $result->output());
+    }
+
+    public function testFakeInvokedProcessWaitUntilWithErrorOutput()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('STDOUT')
+                ->errorOutput('ERROR1')
+                ->errorOutput('TARGET_ERROR')
+                ->output('MORE_STDOUT')
+                ->runsFor(iterations: 4);
+        });
+
+        $process = $factory->start('echo "STDOUT"; echo "ERROR1" >&2; echo "TARGET_ERROR" >&2; echo "MORE_STDOUT";');
+
+        $callbackInvoked = [];
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = [$type, $buffer];
+
+            return str_contains($buffer, 'TARGET_ERROR');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertContains(['out', "STDOUT\n"], $callbackInvoked);
+        $this->assertContains(['err', "ERROR1\n"], $callbackInvoked);
+        $this->assertContains(['err', "TARGET_ERROR\n"], $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilCalledTwice()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->output('FOURTH')
+                ->runsFor(iterations: 4);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD"; echo "FOURTH";');
+
+        $firstCallbackInvoked = [];
+        $secondCallbackInvoked = [];
+
+        $firstResult = $process->waitUntil(function ($type, $buffer) use (&$firstCallbackInvoked) {
+            $firstCallbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'SECOND');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $firstResult);
+        $this->assertTrue($firstResult->successful());
+        $this->assertContains("FIRST\n", $firstCallbackInvoked);
+        $this->assertContains("SECOND\n", $firstCallbackInvoked);
+        $this->assertCount(2, $firstCallbackInvoked);
+
+        $secondResult = $process->waitUntil(function ($type, $buffer) use (&$secondCallbackInvoked) {
+            $secondCallbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'FOURTH');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $secondResult);
+        $this->assertTrue($secondResult->successful());
+        $this->assertContains("THIRD\n", $secondCallbackInvoked);
+        $this->assertContains("FOURTH\n", $secondCallbackInvoked);
+        $this->assertCount(2, $secondCallbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilThatNeverMatches()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('LINE1')
+                ->output('LINE2')
+                ->output('LINE3')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "LINE1"; echo "LINE2"; echo "LINE3";');
+
+        $callbackInvoked = [];
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$callbackInvoked) {
+            $callbackInvoked[] = $buffer;
+
+            return str_contains($buffer, 'NEVER_MATCHES');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(3, $callbackInvoked);
+        $this->assertContains("LINE1\n", $callbackInvoked);
+        $this->assertContains("LINE2\n", $callbackInvoked);
+        $this->assertContains("LINE3\n", $callbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitUntilFollowedByWait()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $waitUntilCallbacks = [];
+        $waitCallbacks = [];
+
+        $process->waitUntil(function ($type, $buffer) use (&$waitUntilCallbacks) {
+            $waitUntilCallbacks[] = $buffer;
+
+            return str_contains($buffer, 'FIRST');
+        });
+
+        $result = $process->wait(function ($type, $buffer) use (&$waitCallbacks) {
+            $waitCallbacks[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(1, $waitUntilCallbacks);
+        $this->assertEquals("FIRST\n", $waitUntilCallbacks[0]);
+        $this->assertCount(2, $waitCallbacks);
+        $this->assertContains("SECOND\n", $waitCallbacks);
+        $this->assertContains("THIRD\n", $waitCallbacks);
+    }
+
+    public function testFakeInvokedProcessWaitCalledTwice()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $firstCallbackInvoked = [];
+        $secondCallbackInvoked = [];
+
+        $firstResult = $process->wait(function ($type, $buffer) use (&$firstCallbackInvoked) {
+            $firstCallbackInvoked[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $firstResult);
+        $this->assertTrue($firstResult->successful());
+        $this->assertCount(3, $firstCallbackInvoked);
+        $this->assertContains("FIRST\n", $firstCallbackInvoked);
+        $this->assertContains("SECOND\n", $firstCallbackInvoked);
+        $this->assertContains("THIRD\n", $firstCallbackInvoked);
+
+        $secondResult = $process->wait(function ($type, $buffer) use (&$secondCallbackInvoked) {
+            $secondCallbackInvoked[] = $buffer;
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $secondResult);
+        $this->assertTrue($secondResult->successful());
+        $this->assertEmpty($secondCallbackInvoked);
+    }
+
+    public function testFakeInvokedProcessWaitFollowedByWaitUntil()
+    {
+        $factory = new Factory;
+
+        $factory->fake(function () use ($factory) {
+            return $factory->describe()
+                ->output('FIRST')
+                ->output('SECOND')
+                ->output('THIRD')
+                ->runsFor(iterations: 3);
+        });
+
+        $process = $factory->start('echo "FIRST"; echo "SECOND"; echo "THIRD";');
+
+        $waitCallbacks = [];
+        $waitUntilCallbacks = [];
+
+        $process->wait(function ($type, $buffer) use (&$waitCallbacks) {
+            $waitCallbacks[] = $buffer;
+        });
+
+        $result = $process->waitUntil(function ($type, $buffer) use (&$waitUntilCallbacks) {
+            $waitUntilCallbacks[] = $buffer;
+
+            return str_contains($buffer, 'THIRD');
+        });
+
+        $this->assertInstanceOf(ProcessResult::class, $result);
+        $this->assertTrue($result->successful());
+        $this->assertCount(3, $waitCallbacks);
+        $this->assertEmpty($waitUntilCallbacks);
     }
 
     public function testBasicFakeAssertions()
@@ -793,6 +1048,37 @@ class ProcessTest extends TestCase
         $factory->fake();
 
         $factory->assertNothingRan();
+    }
+
+    public function testProcessWithMultipleEnvironmentVariablesAndSequences()
+    {
+        $factory = new Factory;
+
+        $factory->fake([
+            'printenv TEST_VAR OTHER_VAR' => $factory->sequence()
+                ->push("test_value\nother_value")
+                ->push("new_test_value\nnew_other_value"),
+        ]);
+
+        $result = $factory->env([
+            'TEST_VAR' => 'test_value',
+            'OTHER_VAR' => 'other_value',
+        ])->run('printenv TEST_VAR OTHER_VAR');
+
+        $this->assertTrue($result->successful());
+        $this->assertEquals("test_value\nother_value\n", $result->output());
+
+        $result = $factory->env([
+            'TEST_VAR' => 'new_test_value',
+            'OTHER_VAR' => 'new_other_value',
+        ])->run('printenv TEST_VAR OTHER_VAR');
+
+        $this->assertTrue($result->successful());
+        $this->assertEquals("new_test_value\nnew_other_value\n", $result->output());
+
+        $factory->assertRanTimes(function ($process) {
+            return str_contains($process->command, 'printenv TEST_VAR OTHER_VAR');
+        }, 2);
     }
 
     protected function ls()

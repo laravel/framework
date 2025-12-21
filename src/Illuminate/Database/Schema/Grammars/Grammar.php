@@ -2,15 +2,15 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use BackedEnum;
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Concerns\CompilesJsonPaths;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar as BaseGrammar;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
-use LogicException;
 use RuntimeException;
+use UnitEnum;
+
+use function Illuminate\Support\enum_value;
 
 abstract class Grammar extends BaseGrammar
 {
@@ -41,27 +41,129 @@ abstract class Grammar extends BaseGrammar
      * Compile a create database command.
      *
      * @param  string  $name
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return void
-     *
-     * @throws \LogicException
+     * @return string
      */
-    public function compileCreateDatabase($name, $connection)
+    public function compileCreateDatabase($name)
     {
-        throw new LogicException('This database driver does not support creating databases.');
+        return sprintf('create database %s',
+            $this->wrapValue($name),
+        );
     }
 
     /**
      * Compile a drop database if exists command.
      *
      * @param  string  $name
-     * @return void
-     *
-     * @throws \LogicException
+     * @return string
      */
     public function compileDropDatabaseIfExists($name)
     {
-        throw new LogicException('This database driver does not support dropping databases.');
+        return sprintf('drop database if exists %s',
+            $this->wrapValue($name)
+        );
+    }
+
+    /**
+     * Compile the query to determine the schemas.
+     *
+     * @return string
+     */
+    public function compileSchemas()
+    {
+        throw new RuntimeException('This database driver does not support retrieving schemas.');
+    }
+
+    /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string|null
+     */
+    public function compileTableExists($schema, $table)
+    {
+        //
+    }
+
+    /**
+     * Compile the query to determine the tables.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileTables($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving tables.');
+    }
+
+    /**
+     * Compile the query to determine the views.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileViews($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving views.');
+    }
+
+    /**
+     * Compile the query to determine the user-defined types.
+     *
+     * @param  string|string[]|null  $schema
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileTypes($schema)
+    {
+        throw new RuntimeException('This database driver does not support retrieving user-defined types.');
+    }
+
+    /**
+     * Compile the query to determine the columns.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileColumns($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving columns.');
+    }
+
+    /**
+     * Compile the query to determine the indexes.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileIndexes($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving indexes.');
+    }
+
+    /**
+     * Compile the query to determine the foreign keys.
+     *
+     * @param  string|null  $schema
+     * @param  string  $table
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function compileForeignKeys($schema, $table)
+    {
+        throw new RuntimeException('This database driver does not support retrieving foreign keys.');
     }
 
     /**
@@ -69,10 +171,9 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return array|string
+     * @return list<string>|string
      */
-    public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileRenameColumn(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('alter table %s rename column %s to %s',
             $this->wrapTable($blueprint),
@@ -86,14 +187,13 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection  $connection
-     * @return array|string
+     * @return list<string>|string
      *
      * @throws \RuntimeException
      */
-    public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
+    public function compileChange(Blueprint $blueprint, Fluent $command)
     {
-        throw new LogicException('This database driver does not support modifying columns.');
+        throw new RuntimeException('This database driver does not support modifying columns.');
     }
 
     /**
@@ -289,7 +389,7 @@ abstract class Grammar extends BaseGrammar
         $commands = $this->getCommandsByName($blueprint, $name);
 
         if (count($commands) > 0) {
-            return reset($commands);
+            return array_first($commands);
         }
     }
 
@@ -329,8 +429,8 @@ abstract class Grammar extends BaseGrammar
      * Add a prefix to an array of values.
      *
      * @param  string  $prefix
-     * @param  array  $values
-     * @return array
+     * @param  array<string>  $values
+     * @return array<string>
      */
     public function prefixArray($prefix, array $values)
     {
@@ -343,12 +443,14 @@ abstract class Grammar extends BaseGrammar
      * Wrap a table in keyword identifiers.
      *
      * @param  mixed  $table
+     * @param  string|null  $prefix
      * @return string
      */
-    public function wrapTable($table)
+    public function wrapTable($table, $prefix = null)
     {
         return parent::wrapTable(
-            $table instanceof Blueprint ? $table->getTable() : $table
+            $table instanceof Blueprint ? $table->getTable() : $table,
+            $prefix
         );
     }
 
@@ -377,13 +479,13 @@ abstract class Grammar extends BaseGrammar
             return $this->getValue($value);
         }
 
-        if ($value instanceof BackedEnum) {
-            return "'{$value->value}'";
+        if ($value instanceof UnitEnum) {
+            return "'".str_replace("'", "''", enum_value($value))."'";
         }
 
         return is_bool($value)
-                    ? "'".(int) $value."'"
-                    : "'".(string) $value."'";
+            ? "'".(int) $value."'"
+            : "'".str_replace("'", "''", $value)."'";
     }
 
     /**

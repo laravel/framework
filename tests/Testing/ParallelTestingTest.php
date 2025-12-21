@@ -19,7 +19,7 @@ class ParallelTestingTest extends TestCase
     }
 
     #[DataProvider('callbacks')]
-    public function testCallbacks($callback)
+    public function testCallbacks($callback): void
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
         $caller = 'call'.ucfirst($callback).'Callbacks';
@@ -50,7 +50,7 @@ class ParallelTestingTest extends TestCase
         $this->assertTrue($state);
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
 
@@ -72,7 +72,7 @@ class ParallelTestingTest extends TestCase
         $this->assertTrue($parallelTesting->option('without_databases'));
     }
 
-    public function testToken()
+    public function testToken(): void
     {
         $parallelTesting = new ParallelTesting(Container::getInstance());
 
@@ -91,6 +91,7 @@ class ParallelTestingTest extends TestCase
             ['setUpProcess'],
             ['setUpTestCase'],
             ['setUpTestDatabase'],
+            ['setUpTestDatabaseBeforeMigrating'],
             ['tearDownTestCase'],
             ['tearDownProcess'],
         ];

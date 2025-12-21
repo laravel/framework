@@ -245,6 +245,24 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertSame('exists:table,NULL,softdeleted_at,"NOT_NULL"', (string) $rule);
     }
 
+    public function testItIsAPartOfListRules()
+    {
+        $rule = new Exists('users', 'id');
+
+        User::create(['id' => '1', 'type' => 'foo']);
+        User::create(['id' => '2', 'type' => 'bar']);
+        User::create(['id' => '3', 'type' => 'baz']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => ['required', $rule]]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertTrue($v->passes());
+    }
+
     protected function createSchema()
     {
         $this->schema('default')->create('users', function ($table) {

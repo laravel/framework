@@ -152,7 +152,7 @@ class SleepTest extends TestCase
         Sleep::fake();
 
         $sleep = Sleep::for(1)->second()
-                      ->and(500)->microseconds();
+            ->and(500)->microseconds();
 
         $this->assertSame((float) $sleep->duration->totalMicroseconds, 1000500.0);
     }
@@ -258,7 +258,7 @@ class SleepTest extends TestCase
         Sleep::fake();
         Carbon::setTestNow(now()->startOfDay());
 
-        Sleep::until(strval(now()->addMinute()->timestamp));
+        Sleep::until((string) now()->addMinute()->timestamp);
 
         Sleep::assertSequence([
             Sleep::for(60)->seconds(),

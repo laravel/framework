@@ -50,10 +50,8 @@ abstract class Seeder
             $name = get_class($seeder);
 
             if ($silent === false && isset($this->command)) {
-                with(new TwoColumnDetail($this->command->getOutput()))->render(
-                    $name,
-                    '<fg=yellow;options=bold>RUNNING</>'
-                );
+                (new TwoColumnDetail($this->command->getOutput()))
+                    ->render($name, '<fg=yellow;options=bold>RUNNING</>');
             }
 
             $startTime = microtime(true);
@@ -63,10 +61,8 @@ abstract class Seeder
             if ($silent === false && isset($this->command)) {
                 $runTime = number_format((microtime(true) - $startTime) * 1000);
 
-                with(new TwoColumnDetail($this->command->getOutput()))->render(
-                    $name,
-                    "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>"
-                );
+                (new TwoColumnDetail($this->command->getOutput()))
+                    ->render($name, "<fg=gray>$runTime ms</> <fg=green;options=bold>DONE</>");
 
                 $this->command->getOutput()->writeln('');
             }
@@ -110,11 +106,15 @@ abstract class Seeder
      */
     public function callOnce($class, $silent = false, array $parameters = [])
     {
-        if (in_array($class, static::$called)) {
-            return;
-        }
+        $classes = Arr::wrap($class);
 
-        $this->call($class, $silent, $parameters);
+        foreach ($classes as $class) {
+            if (in_array($class, static::$called)) {
+                continue;
+            }
+
+            $this->call($class, $silent, $parameters);
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ use Illuminate\Events\CallQueuedListener;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Laravel\SerializableClosure\SerializableClosure;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -179,6 +180,100 @@ class QueuedEventsTest extends TestCase
         });
     }
 
+    public function testQueuePropagateTries()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherOptions::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->tries === 5;
+        });
+    }
+
+    public function testQueuePropagateMessageGroupProperty()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithMessageGroupProperty::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->messageGroup === 'group-property';
+        });
+    }
+
+    public function testQueuePropagateMessageGroupMethodOverProperty()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithMessageGroupMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            return $job->messageGroup === 'group-method';
+        });
+    }
+
+    public function testQueuePropagateDeduplicationIdMethod()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithDeduplicationIdMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplication-id-method';
+        });
+    }
+
+    public function testQueuePropagateDeduplicatorMethodOverDeduplicationIdMethod()
+    {
+        $d = new Dispatcher;
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherWithDeduplicatorMethod::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushed(CallQueuedListener::class, function ($job) {
+            $this->assertInstanceOf(SerializableClosure::class, $job->deduplicator);
+
+            return is_callable($job->deduplicator) && call_user_func($job->deduplicator, '', null) === 'deduplicator-method';
+        });
+    }
+
     public function testQueuePropagateMiddleware()
     {
         $d = new Dispatcher;
@@ -198,6 +293,23 @@ class QueuedEventsTest extends TestCase
                 && $job->middleware[0]->a === 'foo'
                 && $job->middleware[0]->b === 'bar';
         });
+    }
+
+    public function testDispatchesOnQueueDefinedWithEnum()
+    {
+        $d = new Dispatcher;
+        $queue = m::mock(Queue::class);
+
+        $fakeQueue = new QueueFake(new Container);
+
+        $d->setQueueResolver(function () use ($fakeQueue) {
+            return $fakeQueue;
+        });
+
+        $d->listen('some.event', TestDispatcherViaQueueSupportsEnum::class.'@handle');
+        $d->dispatch('some.event', ['foo', 'bar']);
+
+        $fakeQueue->assertPushedOn('enumerated-queue', CallQueuedListener::class);
     }
 }
 
@@ -277,9 +389,70 @@ class TestDispatcherOptions implements ShouldQueue
         return now()->addHour(1);
     }
 
+    public function tries()
+    {
+        return 5;
+    }
+
     public function handle()
     {
         //
+    }
+}
+
+class TestDispatcherWithMessageGroupProperty implements ShouldQueue
+{
+    public $messageGroup = 'group-property';
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class TestDispatcherWithMessageGroupMethod implements ShouldQueue
+{
+    public $messageGroup = 'group-property';
+
+    public function handle()
+    {
+        //
+    }
+
+    public function messageGroup($event)
+    {
+        return 'group-method';
+    }
+}
+
+class TestDispatcherWithDeduplicationIdMethod implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function deduplicationId($payload, $queue)
+    {
+        return 'deduplication-id-method';
+    }
+}
+
+class TestDispatcherWithDeduplicatorMethod implements ShouldQueue
+{
+    public function handle()
+    {
+        //
+    }
+
+    public function deduplicationId($payload, $queue)
+    {
+        return 'deduplication-id-method';
+    }
+
+    public function deduplicator($event)
+    {
+        return fn ($payload, $queue) => 'deduplicator-method';
     }
 }
 
@@ -365,5 +538,18 @@ class TestDispatcherGetDelayDynamically implements ShouldQueue
         }
 
         return 20;
+    }
+}
+
+enum TestQueueType: string
+{
+    case EnumeratedQueue = 'enumerated-queue';
+}
+
+class TestDispatcherViaQueueSupportsEnum implements ShouldQueue
+{
+    public function viaQueue()
+    {
+        return TestQueueType::EnumeratedQueue;
     }
 }

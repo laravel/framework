@@ -3,8 +3,11 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Tests\Validation\fixtures\Values;
+use Illuminate\Translation\ArrayLoader;
+use Illuminate\Translation\Translator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\NotIn;
+use Illuminate\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 include_once 'Enums.php';
@@ -64,5 +67,22 @@ class ValidationNotInRuleTest extends TestCase
         $rule = Rule::notIn([PureEnum::one]);
 
         $this->assertSame('not_in:"one"', (string) $rule);
+    }
+
+    public function testNotInRuleValidation()
+    {
+        $trans = new Translator(new ArrayLoader, 'en');
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => Rule::notIn('bar', 'baz')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => (string) Rule::notIn('bar', 'baz')]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => [Rule::notIn('foo', 'bar')]]);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo'], ['x' => ['required', Rule::notIn('bar', 'baz')]]);
+        $this->assertTrue($v->passes());
     }
 }

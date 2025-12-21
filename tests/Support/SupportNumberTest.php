@@ -107,6 +107,14 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testSpellOrdinal()
+    {
+        $this->assertSame('first', Number::spellOrdinal(1));
+        $this->assertSame('second', Number::spellOrdinal(2));
+        $this->assertSame('third', Number::spellOrdinal(3));
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testToPercent()
     {
         $this->assertSame('0%', Number::percentage(0, precision: 0));
@@ -143,6 +151,10 @@ class SupportNumberTest extends TestCase
         $this->assertSame('-$5.00', Number::currency(-5));
         $this->assertSame('$5.00', Number::currency(5.00));
         $this->assertSame('$5.32', Number::currency(5.325));
+
+        $this->assertSame('$0', Number::currency(0, precision: 0));
+        $this->assertSame('$5', Number::currency(5.00, precision: 0));
+        $this->assertSame('$10', Number::currency(10.252, precision: 0));
     }
 
     #[RequiresPhpExtension('intl')]
@@ -322,5 +334,40 @@ class SupportNumberTest extends TestCase
         $this->assertSame(12.3, Number::trim(12.30));
         $this->assertSame(12.3456789, Number::trim(12.3456789));
         $this->assertSame(12.3456789, Number::trim(12.34567890000));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParse()
+    {
+        $this->assertSame(1234.0, Number::parse('1,234'));
+        $this->assertSame(1234.5, Number::parse('1,234.5'));
+        $this->assertSame(1234.56, Number::parse('1,234.56'));
+        $this->assertSame(-1234.56, Number::parse('-1,234.56'));
+
+        $this->assertSame(1234.56, Number::parse('1.234,56', locale: 'de'));
+        $this->assertSame(1234.56, Number::parse('1 234,56', locale: 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParseInt()
+    {
+        $this->assertSame(1234, Number::parseInt('1,234'));
+        $this->assertSame(1234, Number::parseInt('1,234.5'));
+        $this->assertSame(-1234, Number::parseInt('-1,234.56'));
+
+        $this->assertSame(1234, Number::parseInt('1.234', locale: 'de'));
+        $this->assertSame(1234, Number::parseInt('1 234', locale: 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testParseFloat()
+    {
+        $this->assertSame(1234.0, Number::parseFloat('1,234'));
+        $this->assertSame(1234.5, Number::parseFloat('1,234.5'));
+        $this->assertSame(1234.56, Number::parseFloat('1,234.56'));
+        $this->assertSame(-1234.56, Number::parseFloat('-1,234.56'));
+
+        $this->assertSame(1234.56, Number::parseFloat('1.234,56', locale: 'de'));
+        $this->assertSame(1234.56, Number::parseFloat('1 234,56', locale: 'fr'));
     }
 }

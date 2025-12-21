@@ -15,7 +15,6 @@ class DatabaseTransactionsManager extends BaseManager
      * Create a new database transaction manager instance.
      *
      * @param  array  $connectionsTransacting
-     * @return void
      */
     public function __construct(array $connectionsTransacting)
     {

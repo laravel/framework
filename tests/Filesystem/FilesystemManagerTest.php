@@ -6,6 +6,8 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Foundation\Application;
 use InvalidArgumentException;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
+use League\Flysystem\UnableToReadFile;
 use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
@@ -99,6 +101,38 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    public function testCanBuildScopedDiskFromScopedDisk()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'root-to-be-scoped',
+                    ],
+                    'filesystems.disks.scoped-from-root' => [
+                        'driver' => 'scoped',
+                        'disk' => 'local',
+                        'prefix' => 'scoped-from-root-prefix',
+                    ],
+                ];
+            }));
+
+            $root = $filesystem->disk('local');
+            $nestedScoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'scoped-from-root',
+                'prefix' => 'nested-scoped-prefix',
+            ]);
+
+            $nestedScoped->put('dirname/filename.txt', 'file content');
+            $this->assertEquals('file content', $root->get('scoped-from-root-prefix/nested-scoped-prefix/dirname/filename.txt'));
+            $root->deleteDirectory('scoped-from-root-prefix');
+        } finally {
+            rmdir(__DIR__.'/../../root-to-be-scoped');
+        }
+    }
+
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testCanBuildScopedDisksWithVisibility()
     {
@@ -131,6 +165,33 @@ class FilesystemManagerTest extends TestCase
         }
     }
 
+    public function testCanBuildScopedDisksWithThrow()
+    {
+        try {
+            $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+                $app['config'] = [
+                    'filesystems.disks.local' => [
+                        'driver' => 'local',
+                        'root' => 'to-be-scoped',
+                        'throw' => false,
+                    ],
+                ];
+            }));
+
+            $scoped = $filesystem->build([
+                'driver' => 'scoped',
+                'disk' => 'local',
+                'prefix' => 'path-prefix',
+                'throw' => true,
+            ]);
+
+            $this->expectException(UnableToReadFile::class);
+            $scoped->get('dirname/filename.txt');
+        } finally {
+            rmdir(__DIR__.'/../../to-be-scoped');
+        }
+    }
+
     public function testCanBuildInlineScopedDisks()
     {
         try {
@@ -155,4 +216,28 @@ class FilesystemManagerTest extends TestCase
             rmdir(__DIR__.'/../../to-be-scoped');
         }
     }
+
+    // public function testKeepTrackOfAdapterDecoration()
+    // {
+    //     try {
+    //         $filesystem = new FilesystemManager(tap(new Application, function ($app) {
+    //             $app['config'] = [
+    //                 'filesystems.disks.local' => [
+    //                     'driver' => 'local',
+    //                     'root' => 'to-be-scoped',
+    //                 ],
+    //             ];
+    //         }));
+
+    //         $scoped = $filesystem->build([
+    //             'driver' => 'scoped',
+    //             'disk' => 'local',
+    //             'prefix' => 'path-prefix',
+    //         ]);
+
+    //         $this->assertInstanceOf(PathPrefixedAdapter::class, $scoped->getAdapter());
+    //     } finally {
+    //         rmdir(__DIR__.'/../../to-be-scoped');
+    //     }
+    // }
 }

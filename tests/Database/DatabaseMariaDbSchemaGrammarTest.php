@@ -1,6 +1,6 @@
 <?php
 
-namespace Database;
+namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
@@ -53,6 +53,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
 
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
@@ -165,10 +166,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testBasicCreateTableWithPrefix()
     {
-        $grammar = $this->getGrammar();
-        $grammar->setTablePrefix('prefix_');
-
-        $conn = $this->getConnection($grammar);
+        $conn = $this->getConnection(prefix: 'prefix_');
         $conn->shouldReceive('getConfig')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
@@ -837,10 +835,12 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->enum('role', ['member', 'admin']);
+        $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertSame('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
+        $this->assertSame('alter table `users` add `status` enum(\'bar\') not null', $statements[1]);
     }
 
     public function testAddingSet()
@@ -875,7 +875,11 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingDate()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
         $statements = $blueprint->toSql();
 
@@ -883,13 +887,45 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` date not null default (CURDATE())', $statements[0]);
+    }
+
     public function testAddingYear()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `birth_year` year not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(true);
+        $conn->shouldReceive('getServerVersion')->andReturn('10.3.0');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))', $statements[0]);
     }
 
     public function testAddingDateTime()
@@ -1121,7 +1157,10 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingUuid()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid('foo');
         $statements = $blueprint->toSql();
 
@@ -1129,9 +1168,25 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $this->assertSame('alter table `users` add `foo` uuid not null', $statements[0]);
     }
 
+    public function testAddingUuidOn106()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.6.21');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->uuid('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` char(36) not null', $statements[0]);
+    }
+
     public function testAddingUuidDefaultsColumnName()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->uuid();
         $statements = $blueprint->toSql();
 
@@ -1141,7 +1196,10 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testAddingForeignUuid()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getServerVersion')->andReturn('10.7.0');
+
+        $blueprint = new Blueprint($conn, 'users');
         $foreignUuid = $blueprint->foreignUuid('foo');
         $blueprint->foreignUuid('company_id')->constrained();
         $blueprint->foreignUuid('laravel_idea_id')->constrained();
@@ -1330,7 +1388,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
@@ -1341,7 +1399,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
@@ -1377,7 +1435,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\"')))", $statements[0]);
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1390,7 +1448,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\".\"nested\"')))", $statements[0]);
     }
 
     public function testCreateTableWithVirtualAsColumnWhenJsonColumnHasArrayKey()
@@ -1405,7 +1463,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"foo\"[0][1]'))))", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) as (json_value(`my_json_column`, '$.\"foo\"[0][1]')))", $statements[0]);
     }
 
     public function testCreateTableWithStoredAsColumn()
@@ -1436,7 +1494,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\"'))) stored)", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\"')) stored)", $statements[0]);
 
         $conn = $this->getConnection();
         $conn->shouldReceive('getConfig')->andReturn(null);
@@ -1449,7 +1507,7 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
-        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_unquote(json_extract(`my_json_column`, '$.\"some_attribute\".\"nested\"'))) stored)", $statements[0]);
+        $this->assertSame("create table `users` (`my_json_column` varchar(255) not null, `my_other_column` varchar(255) as (json_value(`my_json_column`, '$.\"some_attribute\".\"nested\"')) stored)", $statements[0]);
     }
 
     public function testDropDatabaseIfExists()
@@ -1471,16 +1529,17 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
 
     public function testDropAllTables()
     {
-        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+        $connection = $this->getConnection();
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop table `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testDropAllViews()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop view `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testGrammarsAreMacroable()
@@ -1498,19 +1557,25 @@ class DatabaseMariaDbSchemaGrammarTest extends TestCase
     protected function getConnection(
         ?MariaDbGrammar $grammar = null,
         ?MariaDbBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(?Connection $connection = null)
     {
-        return new MariaDbGrammar;
+        return new MariaDbGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

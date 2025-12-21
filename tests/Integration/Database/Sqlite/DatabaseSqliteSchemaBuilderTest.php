@@ -80,4 +80,17 @@ SQL);
 
         $this->assertEmpty(Schema::getViews());
     }
+
+    public function testGetRawIndex()
+    {
+        Schema::create('table', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->rawIndex('(strftime("%Y", created_at))', 'table_raw_index');
+        });
+
+        $indexes = Schema::getIndexes('table');
+
+        $this->assertSame([], collect($indexes)->firstWhere('name', 'table_raw_index')['columns']);
+    }
 }

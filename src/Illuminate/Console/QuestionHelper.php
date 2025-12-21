@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\View\Components\TwoColumnDetail;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -61,7 +62,7 @@ class QuestionHelper extends SymfonyQuestionHelper
 
         if ($question instanceof ChoiceQuestion) {
             foreach ($question->getChoices() as $key => $value) {
-                with(new TwoColumnDetail($output))->render($value, $key);
+                (new TwoColumnDetail($output))->render($value, $key);
             }
         }
 
@@ -76,7 +77,7 @@ class QuestionHelper extends SymfonyQuestionHelper
      */
     protected function ensureEndsWithPunctuation($string)
     {
-        if (! str($string)->endsWith(['?', ':', '!', '.'])) {
+        if (! (new Stringable($string))->endsWith(['?', ':', '!', '.'])) {
             return "$string:";
         }
 

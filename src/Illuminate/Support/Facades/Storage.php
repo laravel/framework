@@ -4,9 +4,11 @@ namespace Illuminate\Support\Facades;
 
 use Illuminate\Filesystem\Filesystem;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
- * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(string|null $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Cloud cloud()
  * @method static \Illuminate\Contracts\Filesystem\Filesystem build(string|array $config)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem createLocalDriver(array $config, string $name = 'local')
@@ -45,6 +47,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertExists(string|array $path, string|null $content = null)
+ * @method static \Illuminate\Filesystem\FilesystemAdapter assertCount(string $path, int $count, bool $recursive = false)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertMissing(string|array $path)
  * @method static \Illuminate\Filesystem\FilesystemAdapter assertDirectoryEmpty(string $path)
  * @method static bool missing(string $path)
@@ -95,9 +98,7 @@ class Storage extends Facade
      */
     public static function fake($disk = null, array $config = [])
     {
-        $disk = $disk ?: static::$app['config']->get('filesystems.default');
-
-        $root = storage_path('framework/testing/disks/'.$disk);
+        $root = self::getRootPath($disk = enum_value($disk) ?: static::$app['config']->get('filesystems.default'));
 
         if ($token = ParallelTesting::token()) {
             $root = "{$root}_test_{$token}";
@@ -105,9 +106,9 @@ class Storage extends Facade
 
         (new Filesystem)->cleanDirectory($root);
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => $root,
-        ])));
+        static::set($disk, $fake = static::createLocalDriver(
+            self::buildDiskConfiguration($disk, $config, root: $root)
+        ));
 
         return tap($fake)->buildTemporaryUrlsUsing(function ($path, $expiration) {
             return URL::to($path.'?expiration='.$expiration->getTimestamp());
@@ -125,11 +126,41 @@ class Storage extends Facade
     {
         $disk = $disk ?: static::$app['config']->get('filesystems.default');
 
-        static::set($disk, $fake = static::createLocalDriver(array_merge($config, [
-            'root' => storage_path('framework/testing/disks/'.$disk),
-        ])));
+        static::set($disk, $fake = static::createLocalDriver(
+            self::buildDiskConfiguration($disk, $config, root: self::getRootPath($disk))
+        ));
 
         return $fake;
+    }
+
+    /**
+     * Get the root path of the given disk.
+     *
+     * @param  string  $disk
+     * @return string
+     */
+    protected static function getRootPath(string $disk): string
+    {
+        return storage_path('framework/testing/disks/'.$disk);
+    }
+
+    /**
+     * Assemble the configuration of the given disk.
+     *
+     * @param  string  $disk
+     * @param  array  $config
+     * @param  string  $root
+     * @return array
+     */
+    protected static function buildDiskConfiguration(string $disk, array $config, string $root): array
+    {
+        $originalConfig = static::$app['config']["filesystems.disks.{$disk}"] ?? [];
+
+        return array_merge([
+            'throw' => $originalConfig['throw'] ?? false],
+            $config,
+            ['root' => $root]
+        );
     }
 
     /**

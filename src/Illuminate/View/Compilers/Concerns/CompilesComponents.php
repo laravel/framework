@@ -25,8 +25,8 @@ trait CompilesComponents
     protected function compileComponent($expression)
     {
         [$component, $alias, $data] = str_contains($expression, ',')
-                    ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', '']
-                    : [trim($expression, '()'), '', ''];
+            ? array_map(trim(...), explode(',', trim($expression, '()'), 3)) + ['', '', '']
+            : [trim($expression, '()'), '', ''];
 
         $component = trim($component, '\'"');
 
@@ -185,7 +185,7 @@ foreach (\$attributes->all() as \$__key => \$__value) {
     if (array_key_exists(\$__key, \$__defined_vars)) unset(\$\$__key);
 }
 
-unset(\$__defined_vars); ?>";
+unset(\$__defined_vars, \$__key, \$__value); ?>";
     }
 
     /**
@@ -215,8 +215,8 @@ unset(\$__defined_vars); ?>";
         }
 
         return is_string($value) ||
-               (is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
-                        ? e($value)
-                        : $value;
+            (is_object($value) && ! $value instanceof ComponentAttributeBag && method_exists($value, '__toString'))
+                ? e($value)
+                : $value;
     }
 }

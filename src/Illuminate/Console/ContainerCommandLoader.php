@@ -28,7 +28,6 @@ class ContainerCommandLoader implements CommandLoaderInterface
      *
      * @param  \Psr\Container\ContainerInterface  $container
      * @param  array  $commandMap
-     * @return void
      */
     public function __construct(ContainerInterface $container, array $commandMap)
     {

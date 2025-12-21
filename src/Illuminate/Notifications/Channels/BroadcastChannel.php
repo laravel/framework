@@ -21,7 +21,6 @@ class BroadcastChannel
      * Create a new broadcast channel.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
      */
     public function __construct(Dispatcher $events)
     {
@@ -45,7 +44,7 @@ class BroadcastChannel
 
         if ($message instanceof BroadcastMessage) {
             $event->onConnection($message->connection)
-                  ->onQueue($message->queue);
+                ->onQueue($message->queue);
         }
 
         return $this->events->dispatch($event);

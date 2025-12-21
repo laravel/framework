@@ -3,7 +3,7 @@
 namespace Illuminate\Console\Concerns;
 
 use Illuminate\Console\Signals;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 trait InteractsWithSignals
 {
@@ -30,7 +30,7 @@ trait InteractsWithSignals
                 $this->getApplication()->getSignalRegistry(),
             );
 
-            collect(Arr::wrap(value($signals)))
+            Collection::wrap(value($signals))
                 ->each(fn ($signal) => $this->signals->register($signal, $callback));
         });
     }

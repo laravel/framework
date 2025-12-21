@@ -44,7 +44,7 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheRatioMethod()
+    public function testDimensionWithTheRatioMethod()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->ratio(1)),
@@ -58,7 +58,7 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheMinRatioMethod()
+    public function testDimensionWithTheMinRatioMethod()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->minRatio(1 / 2)),
@@ -72,7 +72,7 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheMaxRatioMethod()
+    public function testDimensionWithTheMaxRatioMethod()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->maxRatio(1 / 2)),
@@ -86,7 +86,7 @@ class ValidationImageFileRuleTest extends TestCase
         );
     }
 
-    public function testDimentionWithTheRatioBetweenMethod()
+    public function testDimensionWithTheRatioBetweenMethod()
     {
         $this->fails(
             File::image()->dimensions(Rule::dimensions()->ratioBetween(1 / 2, 1 / 3)),

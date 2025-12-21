@@ -48,7 +48,6 @@ class FileStore implements Store, LockProvider
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
      * @param  int|null  $filePermission
-     * @return void
      */
     public function __construct(Filesystem $files, $directory, $filePermission = null)
     {
@@ -221,7 +220,7 @@ class FileStore implements Store, LockProvider
 
         return new FileLock(
             new static($this->files, $this->lockDirectory ?? $this->directory, $this->filePermission),
-            $name,
+            "file-store-lock:{$name}",
             $seconds,
             $owner
         );

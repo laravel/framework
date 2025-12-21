@@ -5,6 +5,7 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\Facades\Date;
 
 class RequirePassword
 {
@@ -35,7 +36,6 @@ class RequirePassword
      * @param  \Illuminate\Contracts\Routing\ResponseFactory  $responseFactory
      * @param  \Illuminate\Contracts\Routing\UrlGenerator  $urlGenerator
      * @param  int|null  $passwordTimeout
-     * @return void
      */
     public function __construct(ResponseFactory $responseFactory, UrlGenerator $urlGenerator, $passwordTimeout = null)
     {
@@ -93,7 +93,7 @@ class RequirePassword
      */
     protected function shouldConfirmPassword($request, $passwordTimeoutSeconds = null)
     {
-        $confirmedAt = time() - $request->session()->get('auth.password_confirmed_at', 0);
+        $confirmedAt = Date::now()->unix() - $request->session()->get('auth.password_confirmed_at', 0);
 
         return $confirmedAt > ($passwordTimeoutSeconds ?? $this->passwordTimeout);
     }

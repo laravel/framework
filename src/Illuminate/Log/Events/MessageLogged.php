@@ -5,38 +5,16 @@ namespace Illuminate\Log\Events;
 class MessageLogged
 {
     /**
-     * The log "level".
-     *
-     * @var string
-     */
-    public $level;
-
-    /**
-     * The log message.
-     *
-     * @var string
-     */
-    public $message;
-
-    /**
-     * The log context.
-     *
-     * @var array
-     */
-    public $context;
-
-    /**
      * Create a new event instance.
      *
-     * @param  string  $level
-     * @param  string  $message
-     * @param  array  $context
-     * @return void
+     * @param  "emergency"|"alert"|"critical"|"error"|"warning"|"notice"|"info"|"debug"  $level  The log "level".
+     * @param  string  $message  The log message.
+     * @param  array  $context  The log context.
      */
-    public function __construct($level, $message, array $context = [])
-    {
-        $this->level = $level;
-        $this->message = $message;
-        $this->context = $context;
+    public function __construct(
+        public $level,
+        public $message,
+        public array $context = [],
+    ) {
     }
 }

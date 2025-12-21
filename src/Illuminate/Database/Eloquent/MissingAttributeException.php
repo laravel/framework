@@ -11,7 +11,6 @@ class MissingAttributeException extends OutOfBoundsException
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @param  string  $key
-     * @return void
      */
     public function __construct($model, $key)
     {

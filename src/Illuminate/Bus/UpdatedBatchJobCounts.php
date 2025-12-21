@@ -23,7 +23,6 @@ class UpdatedBatchJobCounts
      *
      * @param  int  $pendingJobs
      * @param  int  $failedJobs
-     * @return void
      */
     public function __construct(int $pendingJobs = 0, int $failedJobs = 0)
     {

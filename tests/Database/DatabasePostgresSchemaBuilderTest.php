@@ -21,8 +21,6 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
         $connection = m::mock(Connection::class);
         $grammar = m::mock(PostgresGrammar::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
-        $connection->shouldReceive('getConfig')->with('schema')->andReturn('schema');
-        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
         $builder = new PostgresBuilder($connection);
         $grammar->shouldReceive('compileTableExists')->twice()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->twice()->andReturn('prefix_');
@@ -39,10 +37,7 @@ class DatabasePostgresSchemaBuilderTest extends TestCase
         $processor = m::mock(PostgresProcessor::class);
         $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
         $connection->shouldReceive('getPostProcessor')->andReturn($processor);
-        $connection->shouldReceive('getConfig')->with('database')->andReturn('db');
-        $connection->shouldReceive('getConfig')->with('schema')->andReturn('schema');
-        $connection->shouldReceive('getConfig')->with('search_path')->andReturn('public');
-        $grammar->shouldReceive('compileColumns')->with('public', 'prefix_table')->once()->andReturn('sql');
+        $grammar->shouldReceive('compileColumns')->with(null, 'prefix_table')->once()->andReturn('sql');
         $processor->shouldReceive('processColumns')->once()->andReturn([['name' => 'column']]);
         $builder = new PostgresBuilder($connection);
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');

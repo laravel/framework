@@ -23,7 +23,6 @@ class Address
      *
      * @param  string  $address
      * @param  string|null  $name
-     * @return void
      */
     public function __construct(string $address, ?string $name = null)
     {

@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Mail\Markdown;
+use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -14,9 +16,17 @@ class MailMarkdownTest extends TestCase
         m::close();
     }
 
-    public function testRenderFunctionReturnsHtml()
+    public function testRenderFunctionReturnsHtml(): void
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $viewFactory->shouldReceive('flushFinderCache')->once();
         $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
@@ -30,9 +40,17 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderFunctionReturnsHtmlWithCustomTheme()
+    public function testRenderFunctionReturnsHtmlWithCustomTheme(): void
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $markdown->theme('yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
@@ -47,9 +65,17 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix()
+    public function testRenderFunctionReturnsHtmlWithCustomThemeWithMailPrefix(): void
     {
         $viewFactory = m::mock(Factory::class);
+        $engineResolver = m::mock(EngineResolver::class);
+        $bladeCompiler = m::mock(BladeCompiler::class);
+        $viewFactory->shouldReceive('getEngineResolver')->andReturn($engineResolver);
+        $engineResolver->shouldReceive('resolve->getCompiler')->andReturn($bladeCompiler);
+        $bladeCompiler->shouldReceive('usingEchoFormat')
+            ->with('new \Illuminate\Support\EncodedHtmlString(%s)', m::type('Closure'))
+            ->andReturnUsing(fn ($echoFormat, $callback) => $callback());
+
         $markdown = new Markdown($viewFactory);
         $markdown->theme('mail.yaz');
         $viewFactory->shouldReceive('flushFinderCache')->once();
@@ -64,7 +90,7 @@ class MailMarkdownTest extends TestCase
         $this->assertStringContainsString('<html></html>', $result);
     }
 
-    public function testRenderTextReturnsText()
+    public function testRenderTextReturnsText(): void
     {
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);
@@ -78,7 +104,7 @@ class MailMarkdownTest extends TestCase
         $this->assertSame('text', $result);
     }
 
-    public function testParseReturnsParsedMarkdown()
+    public function testParseReturnsParsedMarkdown(): void
     {
         $viewFactory = m::mock(Factory::class);
         $markdown = new Markdown($viewFactory);

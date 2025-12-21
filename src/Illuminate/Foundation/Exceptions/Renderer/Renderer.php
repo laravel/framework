@@ -60,7 +60,6 @@ class Renderer
      * @param  \Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer  $htmlErrorRenderer
      * @param  \Illuminate\Foundation\Exceptions\Renderer\Mappers\BladeMapper  $bladeMapper
      * @param  string  $basePath
-     * @return void
      */
     public function __construct(
         Factory $viewFactory,
@@ -89,8 +88,15 @@ class Renderer
             $this->htmlErrorRenderer->render($throwable),
         );
 
+        $exception = new Exception($flattenException, $request, $this->listener, $this->basePath);
+
+        $exceptionAsMarkdown = $this->viewFactory->make('laravel-exceptions-renderer::markdown', [
+            'exception' => $exception,
+        ])->render();
+
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
-            'exception' => new Exception($flattenException, $request, $this->listener, $this->basePath),
+            'exception' => $exception,
+            'exceptionAsMarkdown' => $exceptionAsMarkdown,
         ])->render();
     }
 
@@ -101,19 +107,7 @@ class Renderer
      */
     public static function css()
     {
-        return collect([
-            ['styles.css', []],
-            ['light-mode.css', ['data-theme' => 'light']],
-            ['dark-mode.css', ['data-theme' => 'dark']],
-        ])->map(function ($fileAndAttributes) {
-            [$filename, $attributes] = $fileAndAttributes;
-
-            return '<style '.collect($attributes)->map(function ($value, $attribute) {
-                return $attribute.'="'.$value.'"';
-            })->implode(' ').'>'
-                .file_get_contents(static::DIST.$filename)
-                .'</style>';
-        })->implode('');
+        return '<style>'.file_get_contents(static::DIST.'styles.css').'</style>';
     }
 
     /**

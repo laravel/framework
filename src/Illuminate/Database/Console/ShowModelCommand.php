@@ -2,14 +2,21 @@
 
 namespace Illuminate\Database\Console;
 
+use Illuminate\Console\Concerns\FindsAvailableModels;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\ModelInspector;
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function Laravel\Prompts\suggest;
+
 #[AsCommand(name: 'model:show')]
-class ShowModelCommand extends DatabaseInspectionCommand
+class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMissingInput
 {
+    use FindsAvailableModels;
+
     /**
      * The console command name.
      *
@@ -101,7 +108,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
     protected function displayJson($class, $database, $table, $policy, $attributes, $relations, $events, $observers)
     {
         $this->output->writeln(
-            collect([
+            (new Collection([
                 'class' => $class,
                 'database' => $database,
                 'table' => $table,
@@ -110,7 +117,7 @@ class ShowModelCommand extends DatabaseInspectionCommand
                 'relations' => $relations,
                 'events' => $events,
                 'observers' => $observers,
-            ])->toJson()
+            ]))->toJson()
         );
     }
 
@@ -150,16 +157,16 @@ class ShowModelCommand extends DatabaseInspectionCommand
             $first = trim(sprintf(
                 '%s %s',
                 $attribute['name'],
-                collect(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended'])
+                (new Collection(['increments', 'unique', 'nullable', 'fillable', 'hidden', 'appended']))
                     ->filter(fn ($property) => $attribute[$property])
                     ->map(fn ($property) => sprintf('<fg=gray>%s</>', $property))
                     ->implode('<fg=gray>,</> ')
             ));
 
-            $second = collect([
+            $second = (new Collection([
                 $attribute['type'],
                 $attribute['cast'] ? '<fg=yellow;options=bold>'.$attribute['cast'].'</>' : null,
-            ])->filter()->implode(' <fg=gray>/</> ');
+            ]))->filter()->implode(' <fg=gray>/</> ');
 
             $this->components->twoColumnDetail($first, $second);
 
@@ -209,5 +216,17 @@ class ShowModelCommand extends DatabaseInspectionCommand
         }
 
         $this->newLine();
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array<string, \Closure(): string>
+     */
+    protected function promptForMissingArgumentsUsing(): array
+    {
+        return [
+            'model' => fn (): string => suggest('Which model would you like to show?', $this->findAvailableModels()),
+        ];
     }
 }

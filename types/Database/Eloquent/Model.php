@@ -25,6 +25,12 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
         return ['string' => 'string'];
     }));
 
+    User::addGlobalScope('ancient', function ($builder) {
+        assertType('Illuminate\Database\Eloquent\Builder<User>', $builder);
+
+        $builder->where('created_at', '<', now()->subYears(2000));
+    });
+
     assertType('Illuminate\Database\Eloquent\Builder<User>', User::query());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->newQuery());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->withTrashed());
@@ -32,6 +38,7 @@ function test(User $user, Post $post, Comment $comment, Article $article): void
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->withoutTrashed());
     assertType('Illuminate\Database\Eloquent\Builder<User>', $user->prunable());
     assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Notifications\DatabaseNotification, User>', $user->notifications());
+    assertType('Illuminate\Database\Eloquent\Relations\MorphMany<Illuminate\Notifications\DatabaseNotification, User>', $user->unreadNotifications());
 
     assertType('Illuminate\Database\Eloquent\Collection<(int|string), User>', $user->newCollection([new User()]));
     assertType('Illuminate\Types\Model\Posts<(int|string), Illuminate\Types\Model\Post>', $post->newCollection(['foo' => new Post()]));

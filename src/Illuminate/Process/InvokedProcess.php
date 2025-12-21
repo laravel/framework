@@ -20,7 +20,6 @@ class InvokedProcess implements InvokedProcessContract
      * Create a new invoked process instance.
      *
      * @param  \Symfony\Component\Process\Process  $process
-     * @return void
      */
     public function __construct(Process $process)
     {
@@ -35,6 +34,16 @@ class InvokedProcess implements InvokedProcessContract
     public function id()
     {
         return $this->process->getPid();
+    }
+
+    /**
+     * Get the command line for the process.
+     *
+     * @return string
+     */
+    public function command()
+    {
+        return $this->process->getCommandLine();
     }
 
     /**
@@ -110,6 +119,22 @@ class InvokedProcess implements InvokedProcessContract
     public function latestErrorOutput()
     {
         return $this->process->getIncrementalErrorOutput();
+    }
+
+    /**
+     * Ensure that the process has not timed out.
+     *
+     * @return void
+     *
+     * @throws \Illuminate\Process\Exceptions\ProcessTimedOutException
+     */
+    public function ensureNotTimedOut()
+    {
+        try {
+            $this->process->checkTimeout();
+        } catch (SymfonyTimeoutException $e) {
+            throw new ProcessTimedOutException($e, new ProcessResult($this->process));
+        }
     }
 
     /**

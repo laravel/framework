@@ -22,7 +22,6 @@ use RuntimeException;
 /**
  * @template TValue
  *
- * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Database\Query\Builder
  */
 trait BuildsQueries
@@ -46,7 +45,7 @@ trait BuildsQueries
         $page = 1;
 
         do {
-            $offset = (($page - 1) * $count) + intval($skip);
+            $offset = (($page - 1) * $count) + (int) $skip;
 
             $limit = is_null($remaining) ? $count : min($count, $remaining);
 
@@ -89,7 +88,7 @@ trait BuildsQueries
      */
     public function chunkMap(callable $callback, $count = 1000)
     {
-        $collection = Collection::make();
+        $collection = new Collection;
 
         $this->chunk($count, function ($items) use ($collection, $callback) {
             $items->each(function ($item) use ($collection, $callback) {
@@ -247,7 +246,7 @@ trait BuildsQueries
      * Query lazily, by chunks of the given size.
      *
      * @param  int  $chunkSize
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
@@ -259,7 +258,7 @@ trait BuildsQueries
 
         $this->enforceOrderBy();
 
-        return LazyCollection::make(function () use ($chunkSize) {
+        return new LazyCollection(function () use ($chunkSize) {
             $page = 1;
 
             while (true) {
@@ -282,7 +281,7 @@ trait BuildsQueries
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
@@ -297,7 +296,7 @@ trait BuildsQueries
      * @param  int  $chunkSize
      * @param  string|null  $column
      * @param  string|null  $alias
-     * @return \Illuminate\Support\LazyCollection
+     * @return \Illuminate\Support\LazyCollection<int, TValue>
      *
      * @throws \InvalidArgumentException
      */
@@ -327,7 +326,7 @@ trait BuildsQueries
 
         $alias ??= $column;
 
-        return LazyCollection::make(function () use ($chunkSize, $column, $alias, $descending) {
+        return new LazyCollection(function () use ($chunkSize, $column, $alias, $descending) {
             $lastId = null;
 
             while (true) {
@@ -364,7 +363,7 @@ trait BuildsQueries
      */
     public function first($columns = ['*'])
     {
-        return $this->take(1)->get($columns)->first();
+        return $this->limit(1)->get($columns)->first();
     }
 
     /**
@@ -396,7 +395,7 @@ trait BuildsQueries
      */
     public function sole($columns = ['*'])
     {
-        $result = $this->take(2)->get($columns);
+        $result = $this->limit(2)->get($columns);
 
         $count = $result->count();
 
@@ -588,7 +587,7 @@ trait BuildsQueries
     }
 
     /**
-     * Pass the query to a given callback.
+     * Pass the query to a given callback and then return it.
      *
      * @param  callable($this): mixed  $callback
      * @return $this
@@ -598,5 +597,18 @@ trait BuildsQueries
         $callback($this);
 
         return $this;
+    }
+
+    /**
+     * Pass the query to a given callback and return the result.
+     *
+     * @template TReturn
+     *
+     * @param  (callable($this): TReturn)  $callback
+     * @return (TReturn is null|void ? $this : TReturn)
+     */
+    public function pipe($callback)
+    {
+        return $callback($this) ?? $this;
     }
 }

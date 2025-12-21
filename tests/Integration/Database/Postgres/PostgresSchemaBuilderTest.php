@@ -13,9 +13,9 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 #[RequiresPhpExtension('pdo_pgsql')]
 class PostgresSchemaBuilderTest extends PostgresTestCase
 {
-    protected function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        parent::getEnvironmentSetUp($app);
+        parent::defineEnvironment($app);
 
         $app['config']->set('database.connections.pgsql.search_path', 'public,private');
     }
@@ -102,10 +102,13 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         DB::statement('create view public.foo (id) as select 1');
         DB::statement('create view private.foo (id) as select 1');
 
+        $this->assertTrue(Schema::hasView('public.foo'));
+        $this->assertTrue(Schema::hasView('private.foo'));
+
         Schema::dropAllViews();
 
-        $this->assertFalse($this->hasView('public', 'foo'));
-        $this->assertFalse($this->hasView('private', 'foo'));
+        $this->assertFalse(Schema::hasView('public.foo'));
+        $this->assertFalse(Schema::hasView('private.foo'));
     }
 
     public function testAddTableCommentOnNewTable()
@@ -190,12 +193,39 @@ class PostgresSchemaBuilderTest extends PostgresTestCase
         $this->assertNotContains('groups_2', $tables);
     }
 
-    protected function hasView($schema, $table)
+    public function testGetRawIndex()
     {
-        return DB::table('information_schema.views')
-            ->where('table_catalog', $this->app['config']->get('database.connections.pgsql.database'))
-            ->where('table_schema', $schema)
-            ->where('table_name', $table)
-            ->exists();
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->rawIndex("DATE_TRUNC('year'::text,created_at)", 'table_raw_index');
+        });
+
+        $indexes = Schema::getIndexes('public.table');
+
+        $this->assertSame([], collect($indexes)->firstWhere('name', 'table_raw_index')['columns']);
+    }
+
+    public function testCreateIndexesOnline()
+    {
+        Schema::create('public.table', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('title', 200);
+            $table->text('body');
+
+            $table->unique('title')->online();
+            $table->index(['created_at'])->online();
+            $table->fullText(['body'])->online();
+            $table->rawIndex("DATE_TRUNC('year'::text,created_at)", 'table_raw_index')->online();
+        });
+
+        $indexes = Schema::getIndexes('public.table');
+        $indexNames = collect($indexes)->pluck('name');
+
+        $this->assertContains('public_table_title_unique', $indexNames);
+        $this->assertContains('public_table_created_at_index', $indexNames);
+        $this->assertContains('public_table_body_fulltext', $indexNames);
+        $this->assertContains('table_raw_index', $indexNames);
     }
 }

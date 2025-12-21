@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Carbon\Carbon;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
@@ -69,6 +70,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $queue = $this->getMockBuilder(DatabaseQueue::class)
             ->onlyMethods(['currentTime'])
             ->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])
@@ -76,9 +80,9 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->expects($this->any())->method('currentTime')->willReturn('time');
         $queue->setContainer($container = m::spy(Container::class));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid) {
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($uuid, $time) {
             $this->assertSame('default', $array['queue']);
-            $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]), $array['payload']);
+            $this->assertSame(json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => 10]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertIsInt($array['available_at']);
@@ -88,6 +92,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 
@@ -130,22 +135,25 @@ class QueueDatabaseQueueUnitTest extends TestCase
             return $uuid;
         });
 
+        $time = Carbon::now();
+        Carbon::setTestNow($time);
+
         $database = m::mock(Connection::class);
         $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->willReturn('created');
         $queue->expects($this->any())->method('availableAt')->willReturn('available');
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
-        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) use ($uuid) {
+        $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) use ($uuid, $time) {
             $this->assertEquals([[
                 'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
                 'created_at' => 'created',
             ], [
                 'queue' => 'queue',
-                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data']]),
+                'payload' => json_encode(['uuid' => $uuid, 'displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'delay' => null]),
                 'attempts' => 0,
                 'reserved_at' => null,
                 'available_at' => 'available',
@@ -155,6 +163,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
 
+        Carbon::setTestNow();
         Str::createUuidsNormally();
     }
 

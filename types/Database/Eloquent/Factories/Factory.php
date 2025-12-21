@@ -16,6 +16,18 @@ class UserFactory extends Factory
     }
 }
 
+/** @extends Illuminate\Database\Eloquent\Factories\Factory<Post> */
+class PostFactory extends Factory
+{
+    protected $model = Post::class;
+
+    /** @return array<string, mixed> */
+    public function definition(): array
+    {
+        return [];
+    }
+}
+
 assertType('UserFactory', $factory = UserFactory::new());
 assertType('UserFactory', UserFactory::new(['string' => 'string']));
 assertType('UserFactory', UserFactory::new(function ($attributes) {
@@ -105,7 +117,7 @@ assertType('UserFactory', $factory->state(function ($attributes) {
 }));
 assertType('UserFactory', $factory->state(function ($attributes, $model) {
     assertType('array<string, mixed>', $attributes);
-    assertType('User|null', $model);
+    assertType('Illuminate\Database\Eloquent\Model|null', $model);
 
     return ['string' => 'string'];
 }));
@@ -164,3 +176,19 @@ Factory::guessFactoryNamesUsing(function (string $modelName) {
         default => throw new LogicException('Unknown factory'),
     };
 });
+
+UserFactory::new()->has(
+    PostFactory::new()
+        ->state(function ($attributes, $user) {
+            assertType('array<string, mixed>', $attributes);
+            assertType('Illuminate\Database\Eloquent\Model|null', $user);
+
+            return ['user_id' => $user?->getKey()];
+        })
+        ->prependState(function ($attributes, $user) {
+            assertType('array<string, mixed>', $attributes);
+            assertType('Illuminate\Database\Eloquent\Model|null', $user);
+
+            return ['user_id' => $user?->getKey()];
+        }),
+);

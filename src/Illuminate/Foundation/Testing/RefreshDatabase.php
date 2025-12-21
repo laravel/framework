@@ -85,10 +85,28 @@ trait RefreshDatabase
 
             $this->app[Kernel::class]->setArtisan(null);
 
+            $this->updateLocalCacheOfInMemoryDatabases();
+
             RefreshDatabaseState::$migrated = true;
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * Update locally cached in-memory PDO connections after migration.
+     *
+     * @return void
+     */
+    protected function updateLocalCacheOfInMemoryDatabases()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            if ($this->usingInMemoryDatabase($name)) {
+                RefreshDatabaseState::$inMemoryConnections[$name] = $database->connection($name)->getPdo();
+            }
+        }
     }
 
     /**
@@ -136,6 +154,11 @@ trait RefreshDatabase
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
+
+                if ($connection->getPdo() && ! $connection->getPdo()->inTransaction()) {
+                    RefreshDatabaseState::$migrated = false;
+                }
+
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
                 $connection->disconnect();
@@ -151,7 +174,8 @@ trait RefreshDatabase
     protected function connectionsToTransact()
     {
         return property_exists($this, 'connectionsToTransact')
-                            ? $this->connectionsToTransact : [config('database.default')];
+            ? $this->connectionsToTransact
+            : [config('database.default')];
     }
 
     /**

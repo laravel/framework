@@ -30,7 +30,6 @@ abstract class Component
      * Creates a new component instance.
      *
      * @param  \Illuminate\Console\OutputStyle  $output
-     * @return void
      */
     public function __construct($output)
     {
@@ -57,7 +56,7 @@ abstract class Component
      *
      * @param  string  $view
      * @param  array  $data
-     * @return void
+     * @return string
      */
     protected function compile($view, $data)
     {
@@ -104,7 +103,7 @@ abstract class Component
      */
     protected function usingQuestionHelper($callable)
     {
-        $property = with(new ReflectionClass(OutputStyle::class))
+        $property = (new ReflectionClass(OutputStyle::class))
             ->getParentClass()
             ->getProperty('questionHelper');
 

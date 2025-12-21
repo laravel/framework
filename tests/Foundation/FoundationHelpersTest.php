@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Broadcasting\FakePendingBroadcast;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Mix;
@@ -46,6 +48,15 @@ class FoundationHelpersTest extends TestCase
         // 5. cache('baz', 'default');
         $cache->shouldReceive('get')->once()->with('baz', 'default')->andReturn('default');
         $this->assertSame('default', cache('baz', 'default'));
+    }
+
+    public function testEvents()
+    {
+        $app = new Application;
+        $app['events'] = $dispatcher = m::mock(Dispatcher::class);
+
+        $dispatcher->shouldReceive('dispatch')->once()->with('a', 'b', 'c')->andReturn('foo');
+        $this->assertSame('foo', event('a', 'b', 'c'));
     }
 
     public function testMixDoesNotIncludeHost()
@@ -279,7 +290,7 @@ class FoundationHelpersTest extends TestCase
             $this->fail(
                 sprintf('abort function must throw %s when receiving code as Responable implementation.', HttpResponseException::class)
             );
-        } catch (HttpResponseException $ex) {
+        } catch (HttpResponseException) {
             $this->assertSame($request, $code->request);
         }
     }
@@ -294,5 +305,10 @@ class FoundationHelpersTest extends TestCase
         Container::setInstance($app);
 
         abort($code, $message, $headers);
+    }
+
+    public function testBroadcastIfReturnsFakeOnFalse()
+    {
+        $this->assertInstanceOf(FakePendingBroadcast::class, broadcast_if(false, 'foo'));
     }
 }

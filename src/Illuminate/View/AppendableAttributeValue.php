@@ -17,7 +17,6 @@ class AppendableAttributeValue implements Stringable
      * Create a new appendable attribute value.
      *
      * @param  mixed  $value
-     * @return void
      */
     public function __construct($value)
     {

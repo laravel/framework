@@ -272,7 +272,7 @@ class FoundationFormRequestTest extends TestCase
         $request = $class::create('/', 'GET', $payload);
 
         return $request->setRedirector($this->createMockRedirector($request))
-                       ->setContainer($container);
+            ->setContainer($container);
     }
 
     /**
@@ -284,7 +284,7 @@ class FoundationFormRequestTest extends TestCase
     protected function createValidationFactory($container)
     {
         $translator = m::mock(Translator::class)->shouldReceive('get')
-                       ->zeroOrMoreTimes()->andReturn('error')->getMock();
+            ->zeroOrMoreTimes()->andReturn('error')->getMock();
 
         return new ValidationFactory($translator, $container);
     }
@@ -300,13 +300,13 @@ class FoundationFormRequestTest extends TestCase
         $redirector = $this->mocks['redirector'] = m::mock(Redirector::class);
 
         $redirector->shouldReceive('getUrlGenerator')->zeroOrMoreTimes()
-                   ->andReturn($generator = $this->createMockUrlGenerator());
+            ->andReturn($generator = $this->createMockUrlGenerator());
 
         $redirector->shouldReceive('to')->zeroOrMoreTimes()
-                   ->andReturn($this->createMockRedirectResponse());
+            ->andReturn($this->createMockRedirectResponse());
 
         $generator->shouldReceive('previous')->zeroOrMoreTimes()
-                  ->andReturn('previous');
+            ->andReturn('previous');
 
         return $redirector;
     }

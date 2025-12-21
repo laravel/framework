@@ -16,7 +16,7 @@ class JoinClause extends Builder
     /**
      * The table the join clause is joining to.
      *
-     * @var string
+     * @var \Illuminate\Contracts\Database\Query\Expression|string
      */
     public $table;
 
@@ -54,7 +54,6 @@ class JoinClause extends Builder
      * @param  \Illuminate\Database\Query\Builder  $parentQuery
      * @param  string  $type
      * @param  string  $table
-     * @return void
      */
     public function __construct(Builder $parentQuery, $type, $table)
     {

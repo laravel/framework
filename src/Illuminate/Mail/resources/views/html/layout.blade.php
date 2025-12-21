@@ -23,7 +23,7 @@ width: 100% !important;
 }
 }
 </style>
-{{ $head ?? '' }}
+{!! $head ?? '' !!}
 </head>
 <body>
 
@@ -31,7 +31,7 @@ width: 100% !important;
 <tr>
 <td align="center">
 <table class="content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-{{ $header ?? '' }}
+{!! $header ?? '' !!}
 
 <!-- Email Body -->
 <tr>
@@ -40,16 +40,16 @@ width: 100% !important;
 <!-- Body content -->
 <tr>
 <td class="content-cell">
-{{ Illuminate\Mail\Markdown::parse($slot) }}
+{!! Illuminate\Mail\Markdown::parse($slot) !!}
 
-{{ $subcopy ?? '' }}
+{!! $subcopy ?? '' !!}
 </td>
 </tr>
 </table>
 </td>
 </tr>
 
-{{ $footer ?? '' }}
+{!! $footer ?? '' !!}
 </table>
 </td>
 </tr>

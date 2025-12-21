@@ -18,7 +18,6 @@ class RedisLock extends Lock
      * @param  string  $name
      * @param  int  $seconds
      * @param  string|null  $owner
-     * @return void
      */
     public function __construct($redis, $name, $seconds, $owner = null)
     {

@@ -221,31 +221,60 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        foreach ($relations as $key => $value) {
-            if (is_numeric($key)) {
-                $key = $value;
+        if ($this->isNotEmpty()) {
+            $query = $this->first()->newQueryWithoutRelationships()->with($relations);
+
+            foreach ($query->getEagerLoads() as $key => $value) {
+                $segments = explode('.', explode(':', $key)[0]);
+
+                if (str_contains($key, ':')) {
+                    $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
+                }
+
+                $path = [];
+
+                foreach ($segments as $segment) {
+                    $path[] = [$segment => $segment];
+                }
+
+                if (is_callable($value)) {
+                    $path[count($segments) - 1][array_last($segments)] = $value;
+                }
+
+                $this->loadMissingRelation($this, $path);
             }
-
-            $segments = explode('.', explode(':', $key)[0]);
-
-            if (str_contains($key, ':')) {
-                $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
-            }
-
-            $path = [];
-
-            foreach ($segments as $segment) {
-                $path[] = [$segment => $segment];
-            }
-
-            if (is_callable($value)) {
-                $path[count($segments) - 1][end($segments)] = $value;
-            }
-
-            $this->loadMissingRelation($this, $path);
         }
 
         return $this;
+    }
+
+    /**
+     * Load a relationship path for models of the given type if it is not already eager loaded.
+     *
+     * @param  array<int, <string, class-string>>  $tuples
+     * @return void
+     */
+    public function loadMissingRelationshipChain(array $tuples)
+    {
+        [$relation, $class] = array_shift($tuples);
+
+        $this->filter(function ($model) use ($relation, $class) {
+            return ! is_null($model) &&
+                ! $model->relationLoaded($relation) &&
+                $model::class === $class;
+        })->load($relation);
+
+        if (empty($tuples)) {
+            return;
+        }
+
+        $models = $this->pluck($relation)->whereNotNull();
+
+        if ($models->first() instanceof BaseCollection) {
+            $models = $models->collapse();
+        }
+
+        (new static($models))->loadMissingRelationshipChain($tuples);
     }
 
     /**
@@ -271,7 +300,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return;
         }
 
-        $models = $models->pluck($name)->whereNotNull();
+        $models = $models->pluck($name)->filter();
 
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
@@ -333,6 +362,19 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return parent::contains(fn ($model) => $model->getKey() == $key);
+    }
+
+    /**
+     * Determine if a key does not exist in the collection.
+     *
+     * @param  (callable(TModel, TKey): bool)|TModel|string|int  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function doesntContain($key, $operator = null, $value = null)
+    {
+        return ! $this->contains(...func_get_args());
     }
 
     /**
@@ -527,25 +569,14 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Make the given, typically hidden, attributes visible across the entire collection.
+     * Merge the given, typically visible, attributes hidden across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
      * @return $this
      */
-    public function makeVisible($attributes)
+    public function mergeHidden($attributes)
     {
-        return $this->each->makeVisible($attributes);
-    }
-
-    /**
-     * Set the visible attributes across the entire collection.
-     *
-     * @param  array<int, string>  $visible
-     * @return $this
-     */
-    public function setVisible($visible)
-    {
-        return $this->each->setVisible($visible);
+        return $this->each->mergeHidden($attributes);
     }
 
     /**
@@ -560,6 +591,39 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Make the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function makeVisible($attributes)
+    {
+        return $this->each->makeVisible($attributes);
+    }
+
+    /**
+     * Merge the given, typically hidden, attributes visible across the entire collection.
+     *
+     * @param  array<array-key, string>|string  $attributes
+     * @return $this
+     */
+    public function mergeVisible($attributes)
+    {
+        return $this->each->mergeVisible($attributes);
+    }
+
+    /**
+     * Set the visible attributes across the entire collection.
+     *
+     * @param  array<int, string>  $visible
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        return $this->each->setVisible($visible);
+    }
+
+    /**
      * Append an attribute across the entire collection.
      *
      * @param  array<array-key, string>|string  $attributes
@@ -568,6 +632,27 @@ class Collection extends BaseCollection implements QueueableCollection
     public function append($attributes)
     {
         return $this->each->append($attributes);
+    }
+
+    /**
+     * Sets the appends on every element of the collection, overwriting the existing appends for each.
+     *
+     * @param  array<array-key, mixed>  $appends
+     * @return $this
+     */
+    public function setAppends(array $appends)
+    {
+        return $this->each->setAppends($appends);
+    }
+
+    /**
+     * Remove appended properties from every element in the collection.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
     }
 
     /**
@@ -594,104 +679,103 @@ class Collection extends BaseCollection implements QueueableCollection
      */
 
     /**
-     * Count the number of items in the collection by a field or using a callback.
+     * {@inheritDoc}
      *
-     * @param  (callable(TModel, TKey): array-key)|string|null  $countBy
      * @return \Illuminate\Support\Collection<array-key, int>
      */
+    #[\Override]
     public function countBy($countBy = null)
     {
         return $this->toBase()->countBy($countBy);
     }
 
     /**
-     * Collapse the collection of items into a single array.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function collapse()
     {
         return $this->toBase()->collapse();
     }
 
     /**
-     * Get a flattened array of the items in the collection.
+     * {@inheritDoc}
      *
-     * @param  int  $depth
      * @return \Illuminate\Support\Collection<int, mixed>
      */
+    #[\Override]
     public function flatten($depth = INF)
     {
         return $this->toBase()->flatten($depth);
     }
 
     /**
-     * Flip the items in the collection.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<TModel, TKey>
      */
+    #[\Override]
     public function flip()
     {
         return $this->toBase()->flip();
     }
 
     /**
-     * Get the keys of the collection items.
+     * {@inheritDoc}
      *
      * @return \Illuminate\Support\Collection<int, TKey>
      */
+    #[\Override]
     public function keys()
     {
         return $this->toBase()->keys();
     }
 
     /**
-     * Pad collection to the specified length with a value.
+     * {@inheritDoc}
      *
      * @template TPadValue
      *
-     * @param  int  $size
-     * @param  TPadValue  $value
      * @return \Illuminate\Support\Collection<int, TModel|TPadValue>
      */
+    #[\Override]
     public function pad($size, $value)
     {
         return $this->toBase()->pad($size, $value);
     }
 
     /**
-     * Partition the collection into two arrays using the given callback or key.
+     * {@inheritDoc}
      *
-     * @param  (callable(TModel, TKey): bool)|TModel|string  $key
-     * @param  TModel|string|null  $operator
-     * @param  TModel|null  $value
      * @return \Illuminate\Support\Collection<int<0, 1>, static<TKey, TModel>>
      */
+    #[\Override]
     public function partition($key, $operator = null, $value = null)
     {
-        return parent::partition($key, $operator, $value)->toBase();
+        return parent::partition(...func_get_args())->toBase();
     }
 
     /**
-     * Get an array with the values of a given key.
+     * {@inheritDoc}
      *
-     * @param  string|array<array-key, string>|null  $value
-     * @param  string|null  $key
      * @return \Illuminate\Support\Collection<array-key, mixed>
      */
+    #[\Override]
     public function pluck($value, $key = null)
     {
         return $this->toBase()->pluck($value, $key);
     }
 
     /**
-     * Zip the collection together with one or more arrays.
+     * {@inheritDoc}
      *
      * @template TZipValue
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<array-key, TZipValue>|iterable<array-key, TZipValue>  ...$items
      * @return \Illuminate\Support\Collection<int, \Illuminate\Support\Collection<int, TModel|TZipValue>>
      */
+    #[\Override]
     public function zip($items)
     {
         return $this->toBase()->zip(...func_get_args());
@@ -700,12 +784,29 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the comparison function to detect duplicates.
      *
-     * @param  bool  $strict
      * @return callable(TModel, TModel): bool
      */
     protected function duplicateComparator($strict)
     {
         return fn ($a, $b) => $a->is($b);
+    }
+
+    /**
+     * Enable relationship autoloading for all models in this collection.
+     *
+     * @return $this
+     */
+    public function withRelationshipAutoloading()
+    {
+        $callback = fn ($tuples) => $this->loadMissingRelationshipChain($tuples);
+
+        foreach ($this as $model) {
+            if (! $model->hasRelationAutoloadCallback()) {
+                $model->autoloadRelationsUsing($callback, $this);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -741,8 +842,8 @@ class Collection extends BaseCollection implements QueueableCollection
     protected function getQueueableModelClass($model)
     {
         return method_exists($model, 'getQueueableClassName')
-                ? $model->getQueueableClassName()
-                : get_class($model);
+            ? $model->getQueueableClassName()
+            : get_class($model);
     }
 
     /**
@@ -757,8 +858,8 @@ class Collection extends BaseCollection implements QueueableCollection
         }
 
         return $this->first() instanceof QueueableEntity
-                    ? $this->map->getQueueableId()->all()
-                    : $this->modelKeys();
+            ? $this->map->getQueueableId()->all()
+            : $this->modelKeys();
     }
 
     /**
@@ -824,7 +925,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $class = get_class($model);
 
-        if ($this->filter(fn ($model) => ! $model instanceof $class)->isNotEmpty()) {
+        if ($this->reject(fn ($model) => $model instanceof $class)->isNotEmpty()) {
             throw new LogicException('Unable to create query for collection with mixed types.');
         }
 

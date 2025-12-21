@@ -125,11 +125,11 @@ class DocsCommand extends Command
      */
     protected function openUrl()
     {
-        with($this->url(), function ($url) {
-            $this->components->info("Opening the docs to: <fg=yellow>{$url}</>");
+        $url = $this->url();
 
-            $this->open($url);
-        });
+        $this->components->info("Opening the docs to: <fg=yellow>{$url}</>");
+
+        $this->open($url);
     }
 
     /**
@@ -145,9 +145,9 @@ class DocsCommand extends Command
             ]);
         }
 
-        return with($this->page(), function ($page) {
-            return trim("https://laravel.com/docs/{$this->version()}/{$page}#{$this->section($page)}", '#/');
-        });
+        $page = $this->page();
+
+        return trim("https://laravel.com/docs/{$this->version()}/{$page}#{$this->section($page)}", '#/');
     }
 
     /**
@@ -157,15 +157,15 @@ class DocsCommand extends Command
      */
     protected function page()
     {
-        return with($this->resolvePage(), function ($page) {
-            if ($page === null) {
-                $this->components->warn('Unable to determine the page you are trying to visit.');
+        $page = $this->resolvePage();
 
-                return '/';
-            }
+        if ($page === null) {
+            $this->components->warn('Unable to determine the page you are trying to visit.');
 
-            return $page;
-        });
+            return '/';
+        }
+
+        return $page;
     }
 
     /**
@@ -381,10 +381,10 @@ class DocsCommand extends Command
             return;
         }
 
-        $binary = Collection::make(match ($this->systemOsFamily) {
+        $binary = (new Collection(match ($this->systemOsFamily) {
             'Darwin' => ['open'],
             'Linux' => ['xdg-open', 'wslview'],
-        })->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
+        }))->first(fn ($binary) => (new ExecutableFinder)->find($binary) !== null);
 
         if ($binary === null) {
             $this->components->warn('Unable to open the URL on your system. You will need to open it yourself or create a custom opener for your system.');
@@ -441,11 +441,11 @@ class DocsCommand extends Command
      */
     protected function refreshDocs()
     {
-        with($this->fetchDocs(), function ($response) {
-            if ($response->successful()) {
-                $this->cache->put("artisan.docs.{{$this->version()}}.index", $response->collect(), CarbonInterval::months(2));
-            }
-        });
+        $response = $this->fetchDocs();
+
+        if ($response->successful()) {
+            $this->cache->put("artisan.docs.{{$this->version()}}.index", $response->collect(), CarbonInterval::months(2));
+        }
     }
 
     /**
@@ -475,7 +475,7 @@ class DocsCommand extends Command
      */
     protected function searchQuery()
     {
-        return Collection::make($_SERVER['argv'])->skip(3)->implode(' ');
+        return (new Collection($_SERVER['argv']))->skip(3)->implode(' ');
     }
 
     /**

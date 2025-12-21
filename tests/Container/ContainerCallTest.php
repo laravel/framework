@@ -146,9 +146,7 @@ class ContainerCallTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertSame($stub, $result[1]);
 
-        /*
-         * Wrap a function...
-         */
+        // Wrap a function...
         $result = $container->wrap(function (stdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);

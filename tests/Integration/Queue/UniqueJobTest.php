@@ -4,14 +4,20 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Bus;
 use Orchestra\Testbench\Attributes\WithMigration;
+use Orchestra\Testbench\Factories\UserFactory;
 
 #[WithMigration]
 #[WithMigration('cache')]
@@ -45,6 +51,14 @@ class UniqueJobTest extends QueueTestCase
         $this->assertFalse(
             $this->app->get(Cache::class)->lock($this->getLockKey(UniqueTestJob::class), 10)->get()
         );
+    }
+
+    public function testUniqueJobWithViaDispatched()
+    {
+        Bus::fake();
+
+        UniqueViaJob::dispatch();
+        Bus::assertDispatched(UniqueViaJob::class);
     }
 
     public function testLockIsReleasedForSuccessfulJobs()
@@ -130,9 +144,87 @@ class UniqueJobTest extends QueueTestCase
         $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
     }
 
+    public function testLockIsReleasedOnModelNotFoundException()
+    {
+        UniqueTestSerializesModelsJob::$handled = false;
+
+        /** @var \Illuminate\Foundation\Auth\User */
+        $user = UserFactory::new()->create();
+        $job = new UniqueTestSerializesModelsJob($user);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        try {
+            $user->delete();
+            dispatch($job);
+            $this->runQueueWorkerCommand(['--once' => true]);
+            unserialize(serialize($job));
+        } finally {
+            $this->assertFalse($job::$handled);
+            $this->assertModelMissing($user);
+            $this->assertTrue($this->app->get(Cache::class)->lock($this->getLockKey($job), 10)->get());
+        }
+    }
+
     protected function getLockKey($job)
     {
         return 'laravel_unique_job:'.(is_string($job) ? $job : get_class($job)).':';
+    }
+
+    public function testLockUsesDisplayNameWhenAvailable()
+    {
+        Bus::fake();
+
+        $lockKey = 'laravel_unique_job:App\\Actions\\UniqueTestAction:';
+
+        dispatch(new UniqueTestJobWithDisplayName);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        Bus::assertDispatched(UniqueTestJobWithDisplayName::class);
+
+        $this->assertFalse(
+            $this->app->get(Cache::class)->lock($lockKey, 10)->get()
+        );
+
+        Bus::assertDispatchedTimes(UniqueTestJobWithDisplayName::class);
+        dispatch(new UniqueTestJobWithDisplayName);
+        $this->runQueueWorkerCommand(['--once' => true]);
+        Bus::assertDispatchedTimes(UniqueTestJobWithDisplayName::class);
+
+        $this->assertFalse(
+            $this->app->get(Cache::class)->lock($lockKey, 10)->get()
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithClassName()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:'.UniqueTestJob::class.':',
+            UniqueLock::getKey(new UniqueTestJob)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithIdAndClassName()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:'.UniqueIdTestJob::class.':unique-id-1',
+            UniqueLock::getKey(new UniqueIdTestJob)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithDisplayNameWhenAvailable()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
+        );
+    }
+
+    public function testUniqueLockCreatesKeyWithIdAndDisplayNameWhenAvailable()
+    {
+        $this->assertEquals(
+            'laravel_unique_job:App\\Actions\\UniqueTestAction:unique-id-2',
+            UniqueLock::getKey(new UniqueIdTestJobWithDisplayName)
+        );
     }
 }
 
@@ -184,4 +276,52 @@ class UniqueTestRetryJob extends UniqueTestFailJob
 class UniqueUntilStartTestJob extends UniqueTestJob implements ShouldBeUniqueUntilProcessing
 {
     public $tries = 2;
+}
+
+class UniqueTestSerializesModelsJob extends UniqueTestJob
+{
+    use SerializesModels;
+
+    public $deleteWhenMissingModels = true;
+
+    public function __construct(public User $user)
+    {
+    }
+}
+
+class UniqueViaJob extends UniqueTestJob
+{
+    public function uniqueVia(): Cache
+    {
+        return Container::getInstance()->make(Cache::class);
+    }
+}
+
+class UniqueIdTestJob extends UniqueTestJob
+{
+    public function uniqueId(): string
+    {
+        return 'unique-id-1';
+    }
+}
+
+class UniqueTestJobWithDisplayName extends UniqueTestJob
+{
+    public function displayName(): string
+    {
+        return 'App\\Actions\\UniqueTestAction';
+    }
+}
+
+class UniqueIdTestJobWithDisplayName extends UniqueTestJob
+{
+    public function uniqueId(): string
+    {
+        return 'unique-id-2';
+    }
+
+    public function displayName(): string
+    {
+        return 'App\\Actions\\UniqueTestAction';
+    }
 }

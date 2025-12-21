@@ -22,6 +22,15 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         });
     }
 
+    protected function tearDown(): void
+    {
+        $this->deprecationsFound = false;
+
+        HandleExceptions::flushHandlersState($this);
+
+        parent::tearDown();
+    }
+
     public function testWithDeprecationHandling()
     {
         $this->withDeprecationHandling();
@@ -39,14 +48,5 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         $this->expectExceptionMessage('Something is deprecated');
 
         trigger_error('Something is deprecated', E_USER_DEPRECATED);
-    }
-
-    protected function tearDown(): void
-    {
-        $this->deprecationsFound = false;
-
-        HandleExceptions::flushHandlersState();
-
-        parent::tearDown();
     }
 }

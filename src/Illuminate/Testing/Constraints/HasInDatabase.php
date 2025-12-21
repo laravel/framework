@@ -25,7 +25,7 @@ class HasInDatabase extends Constraint
     /**
      * The data that will be used to narrow the search in the database table.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     protected $data;
 
@@ -33,8 +33,7 @@ class HasInDatabase extends Constraint
      * Create a new constraint instance.
      *
      * @param  \Illuminate\Database\Connection  $database
-     * @param  array  $data
-     * @return void
+     * @param  array<string, mixed>  $data
      */
     public function __construct(Connection $database, array $data)
     {
@@ -82,7 +81,7 @@ class HasInDatabase extends Constraint
 
         $similarResults = $query->where(
             array_key_first($this->data),
-            $this->data[array_key_first($this->data)]
+            array_first($this->data),
         )->select(array_keys($this->data))->limit($this->show)->get();
 
         if ($similarResults->isNotEmpty()) {

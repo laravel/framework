@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Redis\Connections\Connection connection(string|null $name = null)
+ * @method static \Illuminate\Redis\Connections\Connection connection(\UnitEnum|string|null $name = null)
  * @method static \Illuminate\Redis\Connections\Connection resolve(string|null $name = null)
  * @method static array connections()
  * @method static void enableEvents()

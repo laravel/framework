@@ -47,7 +47,6 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @param  int  $perPage
      * @param  int|null  $currentPage
      * @param  array  $options  (path, query, fragment, pageName)
-     * @return void
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = [])
     {
@@ -62,7 +61,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
-        $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->items = $items instanceof Collection ? $items : new Collection($items);
     }
 
     /**
@@ -113,25 +112,28 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     public function linkCollection()
     {
-        return collect($this->elements())->flatMap(function ($item) {
+        return (new Collection($this->elements()))->flatMap(function ($item) {
             if (! is_array($item)) {
                 return [['url' => null, 'label' => '...', 'active' => false]];
             }
 
-            return collect($item)->map(function ($url, $page) {
+            return (new Collection($item))->map(function ($url, $page) {
                 return [
                     'url' => $url,
                     'label' => (string) $page,
+                    'page' => $page,
                     'active' => $this->currentPage() === $page,
                 ];
             });
         })->prepend([
             'url' => $this->previousPageUrl(),
             'label' => function_exists('__') ? __('pagination.previous') : 'Previous',
+            'page' => $this->currentPage() > 1 ? $this->currentPage() - 1 : null,
             'active' => false,
         ])->push([
             'url' => $this->nextPageUrl(),
             'label' => function_exists('__') ? __('pagination.next') : 'Next',
+            'page' => $this->hasMorePages() ? $this->currentPage() + 1 : null,
             'active' => false,
         ]);
     }
@@ -239,5 +241,17 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * Convert the object to pretty print formatted JSON.
+     *
+     * @params int $options
+     *
+     * @return string
+     */
+    public function toPrettyJson(int $options = 0)
+    {
+        return $this->toJson(JSON_PRETTY_PRINT | $options);
     }
 }

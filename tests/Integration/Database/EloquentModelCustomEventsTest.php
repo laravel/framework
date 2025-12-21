@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelCustomEventsTest;
 
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Event;
@@ -24,6 +25,11 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
         Schema::create('test_model1', function (Blueprint $table) {
             $table->increments('id');
         });
+
+        Schema::create('eloquent_model_stub_with_custom_event_from_traits', function (Blueprint $table) {
+            $table->boolean('custom_attribute');
+            $table->boolean('observer_attribute');
+        });
     }
 
     public function testFlushListenersClearsCustomEvents()
@@ -45,6 +51,19 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
 
         $this->assertTrue($_SERVER['fired_event']);
     }
+
+    public function testAddObservableEventFromTrait()
+    {
+        $model = new EloquentModelStubWithCustomEventFromTrait();
+
+        $this->assertNull($model->custom_attribute);
+        $this->assertNull($model->observer_attribute);
+
+        $model->completeCustomAction();
+
+        $this->assertTrue($model->custom_attribute);
+        $this->assertTrue($model->observer_attribute);
+    }
 }
 
 class TestModel1 extends Model
@@ -58,4 +77,37 @@ class TestModel1 extends Model
 class CustomEvent
 {
     //
+}
+
+trait CustomEventTrait
+{
+    public function completeCustomAction()
+    {
+        $this->custom_attribute = true;
+
+        $this->fireModelEvent('customEvent');
+    }
+
+    public function initializeCustomEventTrait()
+    {
+        $this->addObservableEvents([
+            'customEvent',
+        ]);
+    }
+}
+
+class CustomObserver
+{
+    public function customEvent(EloquentModelStubWithCustomEventFromTrait $model)
+    {
+        $model->observer_attribute = true;
+    }
+}
+
+#[ObservedBy(CustomObserver::class)]
+class EloquentModelStubWithCustomEventFromTrait extends Model
+{
+    use CustomEventTrait;
+
+    public $timestamps = false;
 }

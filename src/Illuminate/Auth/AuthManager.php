@@ -48,7 +48,6 @@ class AuthManager implements FactoryContract
      * Create a new Auth manager instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return void
      */
     public function __construct($app)
     {
@@ -67,7 +66,7 @@ class AuthManager implements FactoryContract
     {
         $name = $name ?: $this->getDefaultDriver();
 
-        return $this->guards[$name] ?? $this->guards[$name] = $this->resolve($name);
+        return $this->guards[$name] ??= $this->resolve($name);
     }
 
     /**
@@ -122,29 +121,22 @@ class AuthManager implements FactoryContract
      */
     public function createSessionDriver($name, $config)
     {
-        $provider = $this->createUserProvider($config['provider'] ?? null);
-
         $guard = new SessionGuard(
             $name,
-            $provider,
+            $this->createUserProvider($config['provider'] ?? null),
             $this->app['session.store'],
             rehashOnLogin: $this->app['config']->get('hashing.rehash_on_login', true),
+            timeboxDuration: $this->app['config']->get('auth.timebox_duration', 200000),
         );
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
         // secure, encrypted cookie values to get generated for those cookies.
-        if (method_exists($guard, 'setCookieJar')) {
-            $guard->setCookieJar($this->app['cookie']);
-        }
+        $guard->setCookieJar($this->app['cookie']);
 
-        if (method_exists($guard, 'setDispatcher')) {
-            $guard->setDispatcher($this->app['events']);
-        }
+        $guard->setDispatcher($this->app['events']);
 
-        if (method_exists($guard, 'setRequest')) {
-            $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
-        }
+        $guard->setRequest($this->app->refresh('request', $guard, 'setRequest'));
 
         if (isset($config['remember'])) {
             $guard->setRememberDuration($config['remember']);

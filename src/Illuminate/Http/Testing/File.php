@@ -39,7 +39,6 @@ class File extends UploadedFile
      *
      * @param  string  $name
      * @param  resource  $tempFile
-     * @return void
      */
     public function __construct($name, $tempFile)
     {
@@ -113,7 +112,7 @@ class File extends UploadedFile
     }
 
     /**
-     * Set the "MIME type" for the file.
+     * Set the MIME type for the file.
      *
      * @param  string  $mimeType
      * @return $this

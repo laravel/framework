@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Compilers\ComponentTagCompiler;
 use Illuminate\View\Component;
@@ -21,7 +22,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testInlineSlotsCanBeCompiled()
@@ -30,7 +34,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot:foo>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testDynamicSlotsCanBeCompiled()
@@ -39,7 +46,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo">
 </x-slot>');
 
-        $this->assertSame("@slot(\$foo, null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot(\$foo, null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testDynamicSlotsCanBeCompiledWithKeyOfObjects()
@@ -48,7 +58,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot :name="$foo->name">
 </x-slot>');
 
-        $this->assertSame("@slot(\$foo->name, null, []) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot(\$foo->name, null, []) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithAttributesCanBeCompiled()
@@ -57,7 +70,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" class="font-bold">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testInlineSlotsWithAttributesCanBeCompiled()
@@ -66,7 +82,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot:foo class="font-bold">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => 'font-bold']) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithDynamicAttributesCanBeCompiled()
@@ -75,7 +94,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" :class="$classes">
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\$classes)]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithClassDirectiveCanBeCompiled()
@@ -84,7 +106,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" @class($classes)>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['class' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssClasses(\$classes))]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testSlotsWithStyleDirectiveCanBeCompiled()
@@ -93,7 +118,10 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $result = $this->compiler()->compileSlots('<x-slot name="foo" @style($styles)>
 </x-slot>');
 
-        $this->assertSame("@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot', trim($result));
+        $this->assertSame(
+            "@slot('foo', null, ['style' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(\Illuminate\Support\Arr::toCssStyles(\$styles))]) \n".' @endslot',
+            str_replace("\r\n", "\n", trim($result))
+        );
     }
 
     public function testBasicComponentParsing()
@@ -128,6 +156,19 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
         $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('App\View\Components\Card\Card', 'card', [])
 <?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
 <?php \$attributes = \$attributes->except(\App\View\Components\Card\Card::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php \$component->withAttributes([]); ?>\n".
+            '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
+    public function testCustomNamespaceNestedDefaultComponentParsing()
+    {
+        $this->mockViewFactory();
+        $result = $this->compiler(namespaces: ['nightshade' => 'Nightshade\\View\\Components'])->compileTags('<div><x-nightshade::accordion /></div>');
+
+        $this->assertSame("<div>##BEGIN-COMPONENT-CLASS##@component('Nightshade\View\Components\Accordion\Accordion', 'nightshade::accordion', [])
+<?php if (isset(\$attributes) && \$attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php \$attributes = \$attributes->except(\Nightshade\View\Components\Accordion\Accordion::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
             '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
@@ -345,6 +386,18 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
 <?php endif; ?>
 <?php \$component->withAttributes([]); ?>\n".
 '@endComponentClass##END-COMPONENT-CLASS##</div>', trim($result));
+    }
+
+    public function testClassesCanBeFoundByComponents()
+    {
+        $this->mockViewFactory();
+        $compiler = $this->compiler(namespaces: ['nightshade' => 'Nightshade\\View\\Components']);
+
+        $result = $compiler->findClassByComponent('nightshade::calendar');
+        $this->assertSame('Nightshade\\View\\Components\\Calendar', trim($result));
+
+        $result = $compiler->findClassByComponent('nightshade::accordion');
+        $this->assertSame('Nightshade\\View\\Components\\Accordion\\Accordion', trim($result));
     }
 
     public function testClassNamesCanBeGuessed()
@@ -769,13 +822,18 @@ class BladeComponentTagCompilerTest extends AbstractBladeTestCase
             }
         };
 
-        $model = new class extends Model {};
+        $model = new class extends Model {
+        };
+
+        $paginator = new class extends AbstractPaginator {
+        };
 
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute('<hi>'));
         $this->assertEquals(e('1'), BladeCompiler::sanitizeComponentAttribute('1'));
         $this->assertEquals(1, BladeCompiler::sanitizeComponentAttribute(1));
         $this->assertEquals(e('<hi>'), BladeCompiler::sanitizeComponentAttribute($class));
         $this->assertSame($model, BladeCompiler::sanitizeComponentAttribute($model));
+        $this->assertSame($paginator, BladeCompiler::sanitizeComponentAttribute($paginator));
     }
 
     public function testItThrowsAnExceptionForNonExistingAliases()
@@ -969,5 +1027,29 @@ class Card extends Component
     public function render()
     {
         return 'card';
+    }
+}
+
+namespace Nightshade\View\Components;
+
+use Illuminate\View\Component;
+
+class Calendar extends Component
+{
+    public function render()
+    {
+        return 'calendar';
+    }
+}
+
+namespace Nightshade\View\Components\Accordion;
+
+use Illuminate\View\Component;
+
+class Accordion extends Component
+{
+    public function render()
+    {
+        return 'accordion';
     }
 }

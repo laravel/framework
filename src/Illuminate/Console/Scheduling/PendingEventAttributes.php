@@ -42,6 +42,10 @@ class PendingEventAttributes
         $event->expression = $this->expression;
         $event->repeatSeconds = $this->repeatSeconds;
 
+        if ($this->description !== null) {
+            $event->name($this->description);
+        }
+
         if ($this->timezone !== null) {
             $event->timezone($this->timezone);
         }

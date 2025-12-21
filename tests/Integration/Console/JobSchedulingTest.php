@@ -11,7 +11,7 @@ use Orchestra\Testbench\TestCase;
 
 class JobSchedulingTest extends TestCase
 {
-    public function testJobQueuingRespectsJobQueue()
+    public function testJobQueuingRespectsJobQueue(): void
     {
         Queue::fake();
 
@@ -39,7 +39,7 @@ class JobSchedulingTest extends TestCase
         })->isEmpty());
     }
 
-    public function testJobQueuingRespectsJobConnection()
+    public function testJobQueuingRespectsJobConnection(): void
     {
         Queue::fake();
 

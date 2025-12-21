@@ -71,7 +71,6 @@ class SendQueuedNotifications implements ShouldQueue
      * @param  \Illuminate\Notifications\Notifiable|\Illuminate\Support\Collection  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  array|null  $channels
-     * @return void
      */
     public function __construct($notifiables, $notification, ?array $channels = null)
     {

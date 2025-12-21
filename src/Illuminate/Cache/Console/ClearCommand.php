@@ -45,7 +45,6 @@ class ClearCommand extends Command
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
      */
     public function __construct(CacheManager $cache, Filesystem $files)
     {
@@ -58,7 +57,7 @@ class ClearCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
     public function handle()
     {
@@ -71,7 +70,9 @@ class ClearCommand extends Command
         $this->flushFacades();
 
         if (! $successful) {
-            return $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+            $this->components->error('Failed to clear cache. Make sure you have the appropriate permissions.');
+
+            return self::FAILURE;
         }
 
         $this->laravel['events']->dispatch(
@@ -79,6 +80,8 @@ class ClearCommand extends Command
         );
 
         $this->components->info('Application cache cleared successfully.');
+
+        return self::SUCCESS;
     }
 
     /**

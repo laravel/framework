@@ -90,7 +90,7 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new CallQueuedHandler(new Dispatcher($this->app), $this->app);
 
         $job = m::mock(Job::class);
-        $job->shouldReceive('resolveName')->andReturn(__CLASS__);
+        $job->shouldReceive('resolveQueuedJobClass')->andReturn(__CLASS__);
         $job->shouldReceive('fail')->once();
 
         $instance->call($job, [
@@ -106,7 +106,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
-        $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerExceptionThrower::class);
+        $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('delete')->once();
@@ -127,7 +127,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $job = m::mock(Job::class);
         $job->shouldReceive('getConnectionName')->andReturn('connection');
-        $job->shouldReceive('resolveName')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
+        $job->shouldReceive('resolveQueuedJobClass')->andReturn(CallQueuedHandlerAttributeExceptionThrower::class);
         $job->shouldReceive('markAsFailed')->never();
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('delete')->once();

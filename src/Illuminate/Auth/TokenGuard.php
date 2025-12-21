@@ -47,7 +47,6 @@ class TokenGuard implements Guard
      * @param  string  $inputKey
      * @param  string  $storageKey
      * @param  bool  $hash
-     * @return void
      */
     public function __construct(
         UserProvider $provider,

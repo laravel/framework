@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Exception;
 use Illuminate\Console\Application;
 use Illuminate\Console\Command;
 use Illuminate\Console\Events\ScheduledTaskFailed;
@@ -21,11 +22,11 @@ use Throwable;
 class ScheduleRunCommand extends Command
 {
     /**
-     * The console command name.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'schedule:run';
+    protected $signature = 'schedule:run {--whisper : Do not output message indicating that no jobs were ready to run}';
 
     /**
      * The console command description.
@@ -85,8 +86,6 @@ class ScheduleRunCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -112,17 +111,21 @@ class ScheduleRunCommand extends Command
         $this->handler = $handler;
         $this->phpBinary = Application::phpBinary();
 
-        $this->clearInterruptSignal();
-
-        $this->newLine();
-
         $events = $this->schedule->dueEvents($this->laravel);
+
+        if ($events->contains->isRepeatable()) {
+            $this->clearInterruptSignal();
+        }
 
         foreach ($events as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 $this->dispatcher->dispatch(new ScheduledTaskSkipped($event));
 
                 continue;
+            }
+
+            if (! $this->eventsRan) {
+                $this->newLine();
             }
 
             if ($event->onOneServer) {
@@ -139,7 +142,9 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->components->info('No scheduled commands are ready to run.');
+            if (! $this->option('whisper')) {
+                $this->components->info('No scheduled commands are ready to run.');
+            }
         } else {
             $this->newLine();
         }
@@ -157,7 +162,7 @@ class ScheduleRunCommand extends Command
             $this->runEvent($event);
         } else {
             $this->components->info(sprintf(
-                'Skipping [%s], as command already run on another server.', $event->getSummaryForDisplay()
+                'Skipping [%s] because the command already ran on another server.', $event->getSummaryForDisplay()
             ));
         }
     }
@@ -197,6 +202,10 @@ class ScheduleRunCommand extends Command
                 ));
 
                 $this->eventsRan = true;
+
+                if ($event->exitCode != 0 && ! $event->runInBackground) {
+                    throw new Exception("Scheduled command [{$event->command}] failed with exit code [{$event->exitCode}].");
+                }
             } catch (Throwable $e) {
                 $this->dispatcher->dispatch(new ScheduledTaskFailed($event, $e));
 

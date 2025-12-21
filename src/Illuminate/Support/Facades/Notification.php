@@ -7,8 +7,8 @@ use Illuminate\Notifications\ChannelManager;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
- * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, mixed $notification)
- * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, mixed $notification, array|null $channels = null)
+ * @method static void send(\Illuminate\Support\Collection|mixed $notifiables, mixed $notification)
+ * @method static void sendNow(\Illuminate\Support\Collection|mixed $notifiables, mixed $notification, array|null $channels = null)
  * @method static mixed channel(string|null $name = null)
  * @method static string getDefaultDriver()
  * @method static string deliversVia()

@@ -23,8 +23,8 @@ trait ManagesLoops
     public function addLoop($data)
     {
         $length = is_countable($data) && ! $data instanceof LazyCollection
-                            ? count($data)
-                            : null;
+            ? count($data)
+            : null;
 
         $parent = Arr::last($this->loopsStack);
 

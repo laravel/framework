@@ -11,6 +11,7 @@ namespace Illuminate\Support\Facades;
  * @method static void load(string $namespace, string $group, string $locale)
  * @method static \Illuminate\Translation\Translator handleMissingKeysUsing(callable|null $callback)
  * @method static void addNamespace(string $namespace, string $hint)
+ * @method static void addPath(string $path)
  * @method static void addJsonPath(string $path)
  * @method static array parseKey(string $key)
  * @method static void determineLocalesUsing(callable $callback)

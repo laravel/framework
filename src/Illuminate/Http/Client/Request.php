@@ -4,6 +4,7 @@ namespace Illuminate\Http\Client;
 
 use ArrayAccess;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use LogicException;
 
@@ -26,10 +27,16 @@ class Request implements ArrayAccess
     protected $data;
 
     /**
+     * The attribute data passed when building the PendingRequest.
+     *
+     * @var array<array-key, mixed>
+     */
+    protected $attributes = [];
+
+    /**
      * Create a new request instance.
      *
      * @param  \Psr\Http\Message\RequestInterface  $request
-     * @return void
      */
     public function __construct($request)
     {
@@ -146,7 +153,7 @@ class Request implements ArrayAccess
             return false;
         }
 
-        return collect($this->data)->reject(function ($file) use ($name, $value, $filename) {
+        return (new Collection($this->data))->reject(function ($file) use ($name, $value, $filename) {
             return $file['name'] != $name ||
                 ($value && $file['contents'] != $value) ||
                 ($filename && $file['filename'] != $filename);
@@ -240,6 +247,29 @@ class Request implements ArrayAccess
     public function withData(array $data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * Get the attribute data from the request.
+     *
+     * @return array<array-key, mixed>
+     */
+    public function attributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Set the request's attribute data.
+     *
+     * @param  array<array-key, mixed>  $attributes
+     * @return $this
+     */
+    public function setRequestAttributes($attributes)
+    {
+        $this->attributes = $attributes;
 
         return $this;
     }

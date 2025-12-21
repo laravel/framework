@@ -3,13 +3,14 @@
 namespace Illuminate\Tests\Mail;
 
 use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Http\Testing\File;
 use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 
 class AttachableTest extends TestCase
 {
-    public function testItCanHaveMacroConstructors()
+    public function testItCanHaveMacroConstructors(): void
     {
         Attachment::macro('fromInvoice', function ($name) {
             return Attachment::fromData(fn () => 'pdf content', $name);
@@ -35,7 +36,7 @@ class AttachableTest extends TestCase
         ], $mailable->rawAttachments[0]);
     }
 
-    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithPath()
+    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithPath(): void
     {
         Attachment::macro('size', function () {
             return 99;
@@ -72,7 +73,7 @@ class AttachableTest extends TestCase
         ], $notification->pathArgs);
     }
 
-    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithArgs()
+    public function testItCanUtiliseExistingApisOnNonMailBasedResourcesWithArgs(): void
     {
         Attachment::macro('size', function () {
             return 99;
@@ -110,7 +111,7 @@ class AttachableTest extends TestCase
         ], $notification->dataArgs);
     }
 
-    public function testFromUrlMethod()
+    public function testFromUrlMethod(): void
     {
         $mailable = new class extends Mailable
         {
@@ -137,5 +138,35 @@ class AttachableTest extends TestCase
                 'mime' => 'application/pdf',
             ],
         ], $mailable->attachments[0]);
+    }
+
+    public function testFromUploadedFileMethod(): void
+    {
+        $mailable = new class extends Mailable
+        {
+            public function build()
+            {
+                $this->attach(new class implements Attachable
+                {
+                    public function toMailAttachment()
+                    {
+                        return Attachment::fromUploadedFile(
+                            File::createWithContent('example.pdf', 'content')
+                                ->mimeType('application/pdf')
+                        );
+                    }
+                });
+            }
+        };
+
+        $mailable->build();
+
+        $this->assertSame([
+            'data' => 'content',
+            'name' => 'example.pdf',
+            'options' => [
+                'mime' => 'application/pdf',
+            ],
+        ], $mailable->rawAttachments[0]);
     }
 }

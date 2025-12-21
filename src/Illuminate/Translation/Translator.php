@@ -12,6 +12,8 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
     use Macroable, ReflectsClosures;
@@ -84,7 +86,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
      * @param  string  $locale
-     * @return void
      */
     public function __construct(Loader $loader, $locale)
     {
@@ -286,8 +287,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                 continue;
             }
 
-            if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
-                $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
+            if (is_object($value)) {
+                $value = isset($this->stringableHandlers[get_class($value)])
+                    ? call_user_func($this->stringableHandlers[get_class($value)], $value)
+                    : enum_value($value);
             }
 
             $shouldReplace[':'.Str::ucfirst($key)] = Str::ucfirst($value ?? '');
@@ -402,6 +405,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function addNamespace($namespace, $hint)
     {
         $this->loader->addNamespace($namespace, $hint);
+    }
+
+    /**
+     * Add a new path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addPath($path)
+    {
+        $this->loader->addPath($path);
     }
 
     /**

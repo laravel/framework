@@ -94,6 +94,38 @@ class CompiledRouteCollectionTest extends TestCase
         $this->assertSame($action, Arr::except($route->getAction(), 'as'));
     }
 
+    public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForActions()
+    {
+        @unlink(__DIR__.'/Fixtures/cache/routes-v7.php');
+        $this->app->useBootstrapPath(__DIR__.'/Fixtures');
+        $app = (static function () {
+            $refresh = true;
+
+            return require __DIR__.'/Fixtures/app.php';
+        })();
+        $app['router']->get('/foo/{bar}', ['FooController', 'show']);
+        $app['router']->get('/foo/{bar}/{baz}', ['FooController', 'show']);
+        $app['router']->getRoutes()->refreshActionLookups();
+
+        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
+
+        $this->artisan('route:cache')->assertExitCode(0);
+        require __DIR__.'/Fixtures/cache/routes-v7.php';
+
+        $this->assertSame('foo/{bar}', $app['router']->getRoutes()->getByAction('FooController@show')->uri);
+
+        unlink(__DIR__.'/Fixtures/cache/routes-v7.php');
+    }
+
+    public function testCompiledAndNonCompiledUrlResolutionHasSamePrecedenceForNames()
+    {
+        $this->router->get('/foo/{bar}', ['FooController', 'show'])->name('foo.show');
+        $this->router->get('/foo/{bar}/{baz}', ['FooController', 'show'])->name('foo.show');
+        $this->router->getRoutes()->refreshNameLookups();
+
+        $this->assertSame('foo/{bar}', $this->router->getRoutes()->getByName('foo.show')->uri);
+    }
+
     public function testRouteCollectionCanGetIterator()
     {
         $this->routeCollection->add($this->newRoute('GET', 'foo/index', [

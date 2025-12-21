@@ -26,7 +26,6 @@ abstract class MigrationEvent implements MigrationEventContract
      *
      * @param  \Illuminate\Database\Migrations\Migration  $migration
      * @param  string  $method
-     * @return void
      */
     public function __construct(Migration $migration, $method)
     {

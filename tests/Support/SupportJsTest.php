@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Js;
 use Illuminate\Tests\Support\Fixtures\IntBackedEnum;
@@ -117,6 +118,73 @@ class SupportJsTest extends TestCase
             public $bar = 'not world';
 
             public function toArray()
+            {
+                return ['foo' => 'hello', 'bar' => 'world'];
+            }
+        };
+
+        $this->assertEquals(
+            "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
+            (string) Js::from($data)
+        );
+    }
+
+    public function testHtmlable()
+    {
+        $data = new class implements Htmlable
+        {
+            public function toHtml()
+            {
+                return '<p>Hello, World!</p>';
+            }
+        };
+
+        $this->assertEquals("'\u003Cp\u003EHello, World!\u003C\/p\u003E'", (string) Js::from($data));
+
+        $data = new class implements Htmlable, Arrayable
+        {
+            public function toHtml()
+            {
+                return '<p>Hello, World!</p>';
+            }
+
+            public function toArray()
+            {
+                return ['foo' => 'hello', 'bar' => 'world'];
+            }
+        };
+
+        $this->assertEquals(
+            "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
+            (string) Js::from($data)
+        );
+
+        $data = new class implements Htmlable, Jsonable
+        {
+            public function toHtml()
+            {
+                return '<p>Hello, World!</p>';
+            }
+
+            public function toJson($options = 0)
+            {
+                return json_encode(['foo' => 'hello', 'bar' => 'world'], $options);
+            }
+        };
+
+        $this->assertEquals(
+            "JSON.parse('{\\u0022foo\\u0022:\\u0022hello\\u0022,\\u0022bar\\u0022:\\u0022world\\u0022}')",
+            (string) Js::from($data)
+        );
+
+        $data = new class implements Htmlable, JsonSerializable
+        {
+            public function toHtml()
+            {
+                return '<p>Hello, World!</p>';
+            }
+
+            public function jsonSerialize(): mixed
             {
                 return ['foo' => 'hello', 'bar' => 'world'];
             }

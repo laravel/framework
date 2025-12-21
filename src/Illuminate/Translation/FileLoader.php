@@ -4,6 +4,7 @@ namespace Illuminate\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use RuntimeException;
 
 class FileLoader implements Loader
@@ -41,7 +42,6 @@ class FileLoader implements Loader
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  array|string  $path
-     * @return void
      */
     public function __construct(Filesystem $files, array|string $path)
     {
@@ -101,16 +101,16 @@ class FileLoader implements Loader
      */
     protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace)
     {
-        return collect($this->paths)
-            ->reduce(function ($output, $path) use ($lines, $locale, $group, $namespace) {
+        return (new Collection($this->paths))
+            ->reduce(function ($output, $path) use ($locale, $group, $namespace) {
                 $file = "{$path}/vendor/{$namespace}/{$locale}/{$group}.php";
 
                 if ($this->files->exists($file)) {
-                    $lines = array_replace_recursive($lines, $this->files->getRequire($file));
+                    $output = array_replace_recursive($output, $this->files->getRequire($file));
                 }
 
-                return $lines;
-            }, []);
+                return $output;
+            }, $lines);
     }
 
     /**
@@ -123,7 +123,7 @@ class FileLoader implements Loader
      */
     protected function loadPaths(array $paths, $locale, $group)
     {
-        return collect($paths)
+        return (new Collection($paths))
             ->reduce(function ($output, $path) use ($locale, $group) {
                 if ($this->files->exists($full = "{$path}/{$locale}/{$group}.php")) {
                     $output = array_replace_recursive($output, $this->files->getRequire($full));
@@ -143,7 +143,7 @@ class FileLoader implements Loader
      */
     protected function loadJsonPaths($locale)
     {
-        return collect(array_merge($this->jsonPaths, $this->paths))
+        return (new Collection(array_merge($this->jsonPaths, $this->paths)))
             ->reduce(function ($output, $path) use ($locale) {
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
                     $decoded = json_decode($this->files->get($full), true);
@@ -182,6 +182,17 @@ class FileLoader implements Loader
     }
 
     /**
+     * Add a new path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addPath($path)
+    {
+        $this->paths[] = $path;
+    }
+
+    /**
      * Add a new JSON path to the loader.
      *
      * @param  string  $path
@@ -190,6 +201,16 @@ class FileLoader implements Loader
     public function addJsonPath($path)
     {
         $this->jsonPaths[] = $path;
+    }
+
+    /**
+     * Get an array of all the registered paths to translation files.
+     *
+     * @return array
+     */
+    public function paths()
+    {
+        return $this->paths;
     }
 
     /**

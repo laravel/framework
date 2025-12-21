@@ -41,7 +41,6 @@ class Response implements Arrayable, Stringable
      * @param  bool  $allowed
      * @param  string|null  $message
      * @param  mixed  $code
-     * @return void
      */
     public function __construct($allowed, $message = '', $code = null)
     {

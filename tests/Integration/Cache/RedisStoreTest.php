@@ -3,28 +3,32 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use DateTime;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Sleep;
+use Mockery as m;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class RedisStoreTest extends TestCase
 {
     use InteractsWithRedis;
 
+    /** {@inheritdoc} */
+    #[\Override]
     protected function setUp(): void
     {
+        $this->afterApplicationCreated(function () {
+            $this->setUpRedis();
+        });
+
+        $this->beforeApplicationDestroyed(function () {
+            $this->tearDownRedis();
+        });
+
         parent::setUp();
-
-        $this->setUpRedis();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->tearDownRedis();
     }
 
     public function testCacheTtl(): void
@@ -90,8 +94,12 @@ class RedisStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testTagsCanBeAccessed()
+    #[TestWith(['laravel_cache_'])]
+    #[TestWith(['laravel-cache-'])]
+    public function testTagsCanBeAccessed(string $cachePrefix)
     {
+        config(['cache.prefix' => $cachePrefix]);
+
         Cache::store('redis')->clear();
 
         Cache::store('redis')->tags(['people', 'author'])->put('name', 'Sally', 5);
@@ -230,5 +238,61 @@ class RedisStoreTest extends TestCase
         ], $store->many(['foo', 'fizz', 'quz', 'norf']));
 
         $this->assertEquals([], $store->many([]));
+    }
+
+    public function testPutManyCallsPutWhenClustered()
+    {
+        $store = m::mock(RedisStore::class)->makePartial();
+        $store->expects('connection')->andReturn(m::mock(PhpRedisClusterConnection::class));
+        $store->expects('put')
+            ->twice()
+            ->andReturn(true);
+
+        $store->putMany([
+            'foo' => 'bar',
+            'fizz' => 'buz',
+        ], 10);
+    }
+
+    public function testIncrementWithSerializationEnabled()
+    {
+        $this->markTestSkipped('Test makes no sense anymore. Application must explicitly wrap such code in runClean() when used with serialization/compression enabled.');
+
+        /** @var \Illuminate\Cache\RedisStore $store */
+        $store = Cache::store('redis');
+        /** @var \Redis $client */
+        $client = $store->connection()->client();
+        $client->setOption(\Redis::OPT_SERIALIZER, \Redis::SERIALIZER_PHP);
+
+        $store->flush();
+        $store->add('foo', 1, 10);
+        $this->assertEquals(1, $store->get('foo'));
+
+        $store->increment('foo');
+        $this->assertEquals(2, $store->get('foo'));
+    }
+
+    public function testTagsCanBeFlushedWithLargeNumberOfKeys()
+    {
+        Cache::store('redis')->clear();
+
+        $tags = ['large-test-'.time()];
+
+        for ($i = 1; $i <= 5000; $i++) {
+            Cache::store('redis')->tags($tags)->put("key:{$i}", "value:{$i}", 300);
+        }
+
+        $this->assertEquals('value:1', Cache::store('redis')->tags($tags)->get('key:1'));
+        $this->assertEquals('value:2500', Cache::store('redis')->tags($tags)->get('key:2500'));
+        $this->assertEquals('value:5000', Cache::store('redis')->tags($tags)->get('key:5000'));
+
+        Cache::store('redis')->tags($tags)->flush();
+
+        $this->assertNull(Cache::store('redis')->tags($tags)->get('key:1'));
+        $this->assertNull(Cache::store('redis')->tags($tags)->get('key:2500'));
+        $this->assertNull(Cache::store('redis')->tags($tags)->get('key:5000'));
+
+        $keyCount = Cache::store('redis')->connection()->keys('*');
+        $this->assertCount(0, $keyCount);
     }
 }

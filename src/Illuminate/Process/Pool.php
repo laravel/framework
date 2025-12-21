@@ -2,6 +2,7 @@
 
 namespace Illuminate\Process;
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 /**
@@ -36,7 +37,6 @@ class Pool
      *
      * @param  \Illuminate\Process\Factory  $factory
      * @param  callable  $callback
-     * @return void
      */
     public function __construct(Factory $factory, callable $callback)
     {
@@ -68,17 +68,18 @@ class Pool
         call_user_func($this->callback, $this);
 
         return new InvokedProcessPool(
-            collect($this->pendingProcesses)
+            (new Collection($this->pendingProcesses))
                 ->each(function ($pendingProcess) {
                     if (! $pendingProcess instanceof PendingProcess) {
                         throw new InvalidArgumentException('Process pool must only contain pending processes.');
                     }
-                })->mapWithKeys(function ($pendingProcess, $key) use ($output) {
+                })
+                ->mapWithKeys(function ($pendingProcess, $key) use ($output) {
                     return [$key => $pendingProcess->start(output: $output ? function ($type, $buffer) use ($key, $output) {
                         $output($type, $buffer, $key);
                     } : null)];
                 })
-            ->all()
+                ->all()
         );
     }
 

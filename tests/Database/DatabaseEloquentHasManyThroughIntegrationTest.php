@@ -136,11 +136,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFindMethod()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->createMany([
-                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-                                 ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
 
         $country = HasManyThroughTestCountry::first();
         $post = $country->posts()->find(1);
@@ -155,11 +155,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFindManyMethod()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->createMany([
-                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-                                 ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
 
         $country = HasManyThroughTestCountry::first();
 
@@ -184,7 +184,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1');
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(1);
     }
@@ -195,8 +195,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail([1, 2]);
     }
@@ -207,8 +207,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->expectExceptionMessage('No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost] 1, 2');
 
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         HasManyThroughTestCountry::first()->posts()->findOrFail(new Collection([1, 2]));
     }
@@ -216,8 +216,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFindOrMethod()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->create(['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com']);
 
         $result = HasManyThroughTestCountry::first()->posts()->findOr(1, fn () => 'callback result');
         $this->assertInstanceOf(HasManyThroughTestPost::class, $result);
@@ -236,11 +236,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFindOrMethodWithMany()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->createMany([
-                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-                                 ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
 
         $result = HasManyThroughTestCountry::first()->posts()->findOr([1, 2], fn () => 'callback result');
         $this->assertInstanceOf(Collection::class, $result);
@@ -263,11 +263,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     public function testFindOrMethodWithManyUsingCollection()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->createMany([
-                                     ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                                     ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-                                 ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['id' => 1, 'title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['id' => 2, 'title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
 
         $result = HasManyThroughTestCountry::first()->posts()->findOr(new Collection([1, 2]), fn () => 'callback result');
         $this->assertInstanceOf(Collection::class, $result);
@@ -500,11 +500,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     protected function seedData()
     {
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
-                                 ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
-                                 ->posts()->createMany([
-                                     ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
-                                     ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
-                                 ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us'])
+            ->posts()->createMany([
+                ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
+                ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
     }
 
     protected function seedDataExtended()
@@ -533,11 +533,11 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     protected function seedDefaultData()
     {
         HasManyThroughDefaultTestCountry::create(['id' => 1, 'name' => 'United States of America'])
-                                        ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
-                                        ->posts()->createMany([
-                                            ['title' => 'A title', 'body' => 'A body'],
-                                            ['title' => 'Another title', 'body' => 'Another body'],
-                                        ]);
+            ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com'])
+            ->posts()->createMany([
+                ['title' => 'A title', 'body' => 'A body'],
+                ['title' => 'Another title', 'body' => 'Another body'],
+            ]);
     }
 
     /**

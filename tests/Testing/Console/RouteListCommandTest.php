@@ -8,9 +8,10 @@ use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDeprecationHandling;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Facade;
+use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 
+#[WithConfig('filesystems.disks.local.serve', false)]
 class RouteListCommandTest extends TestCase
 {
     use InteractsWithDeprecationHandling;
@@ -119,6 +120,31 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('');
     }
 
+    public function testRouteCanBeFilteredByAction()
+    {
+        $this->withoutDeprecationHandling();
+
+        RouteListCommand::resolveTerminalWidthUsing(function () {
+            return 82;
+        });
+
+        $this->router->get('/', function () {
+            //
+        });
+        $this->router->get('foo/{user}', [FooController::class, 'show']);
+
+        $this->artisan(RouteListCommand::class, ['--action' => 'FooController'])
+            ->assertSuccessful()
+            ->expectsOutput('')
+            ->expectsOutput(
+                '  GET|HEAD       foo/{user} Illuminate\Tests\Testing\Console\FooController@show'
+            )->expectsOutput('')
+            ->expectsOutput(
+                '                                                              Showing [1] routes'
+            )
+            ->expectsOutput('');
+    }
+
     public function testDisplayRoutesExceptVendor()
     {
         $this->router->get('foo/{user}', [FooController::class, 'show']);
@@ -134,15 +160,6 @@ class RouteListCommandTest extends TestCase
             ->expectsOutput('')
             ->expectsOutput('                                                  Showing [3] routes')
             ->expectsOutput('');
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Facade::setFacadeApplication(null);
-
-        RouteListCommand::resolveTerminalWidthUsing(null);
     }
 }
 

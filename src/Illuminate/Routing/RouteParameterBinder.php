@@ -17,7 +17,6 @@ class RouteParameterBinder
      * Create a new Route parameter binder instance.
      *
      * @param  \Illuminate\Routing\Route  $route
-     * @return void
      */
     public function __construct($route)
     {

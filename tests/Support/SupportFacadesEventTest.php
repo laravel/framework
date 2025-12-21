@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Events\CacheFlushed;
+use Illuminate\Cache\Events\CacheFlushing;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Cache\Events\RetrievingKey;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -38,8 +40,8 @@ class SupportFacadesEventTest extends TestCase
 
     protected function tearDown(): void
     {
-        Event::clearResolvedInstances();
-        Event::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
 
         m::close();
     }
@@ -85,6 +87,17 @@ class SupportFacadesEventTest extends TestCase
 
         Event::assertDispatched(RetrievingKey::class);
         Event::assertDispatched(CacheMissed::class);
+    }
+
+    public function testCacheFlushDispatchesEvent()
+    {
+        $arrayRepository = Cache::store('array');
+        Event::fake();
+
+        $arrayRepository->clear();
+
+        Event::assertDispatched(CacheFlushing::class);
+        Event::assertDispatched(CacheFlushed::class);
     }
 
     protected function getCacheConfig()

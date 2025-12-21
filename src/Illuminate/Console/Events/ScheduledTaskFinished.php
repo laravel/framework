@@ -7,29 +7,14 @@ use Illuminate\Console\Scheduling\Event;
 class ScheduledTaskFinished
 {
     /**
-     * The scheduled event that ran.
-     *
-     * @var \Illuminate\Console\Scheduling\Event
-     */
-    public $task;
-
-    /**
-     * The runtime of the scheduled event.
-     *
-     * @var float
-     */
-    public $runtime;
-
-    /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $task
-     * @param  float  $runtime
-     * @return void
+     * @param  \Illuminate\Console\Scheduling\Event  $task  The scheduled event that ran.
+     * @param  float  $runtime  The runtime of the scheduled event.
      */
-    public function __construct(Event $task, $runtime)
-    {
-        $this->task = $task;
-        $this->runtime = $runtime;
+    public function __construct(
+        public Event $task,
+        public float $runtime,
+    ) {
     }
 }

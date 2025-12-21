@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Pagination\Cursor;
@@ -23,6 +25,7 @@ use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\Tests\Integration\Database\Fixtures\Post;
 use Illuminate\Tests\Integration\Database\Fixtures\User;
 use PHPUnit\Framework\TestCase;
@@ -78,6 +81,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $table->string('name')->nullable();
             $table->string('email address');
             $table->timestamps();
+        });
+
+        $this->schema()->create('users_having_uuids', function (Blueprint $table) {
+            $table->id();
+            $table->uuid();
+            $table->string('name');
+            $table->tinyInteger('role');
+            $table->string('role_string');
         });
 
         foreach (['default', 'second_connection'] as $connection) {
@@ -159,6 +170,16 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->integer('parent_id')->nullable();
                 $table->timestamps();
             });
+
+            $this->schema($connection)->create('achievements', function ($table) {
+                $table->increments('id');
+                $table->integer('status')->nullable();
+            });
+
+            $this->schema($connection)->create('eloquent_test_achievement_eloquent_test_user', function ($table) {
+                $table->integer('eloquent_test_achievement_id');
+                $table->integer('eloquent_test_user_id');
+            });
         }
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
@@ -187,6 +208,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Eloquent::unsetConnectionResolver();
 
         Carbon::setTestNow(null);
+        Str::createUuidsNormally();
+        DB::flushQueryLog();
     }
 
     /**
@@ -194,8 +217,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     public function testBasicModelRetrieval()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([['id' => 1, 'email' => 'taylorotwell@gmail.com'], ['id' => 2, 'email' => 'abigailotwell@gmail.com']]);
 
         $this->assertEquals(2, EloquentTestUser::count());
 
@@ -245,8 +267,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testBasicModelCollectionRetrieval()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([['id' => 1, 'email' => 'taylorotwell@gmail.com'], ['id' => 2, 'email' => 'abigailotwell@gmail.com']]);
 
         $models = EloquentTestUser::oldest('id')->get();
 
@@ -260,9 +281,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPaginatedModelCollectionRetrieval()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
 
         Paginator::currentPageResolver(function () {
             return 1;
@@ -289,9 +312,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPaginatedModelCollectionRetrievalUsingCallablePerPage()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
 
         Paginator::currentPageResolver(function () {
             return 1;
@@ -378,10 +403,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testCountForPaginationWithGrouping()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
-        EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+            ['id' => 4, 'email' => 'foo@gmail.com'],
+        ]);
 
         $query = EloquentTestUser::groupBy('email')->getQuery();
 
@@ -390,11 +417,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testCountForPaginationWithGroupingAndSubSelects()
     {
-        $user1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
-        EloquentTestUser::create(['id' => 4, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+            ['id' => 4, 'email' => 'foo@gmail.com'],
+        ]);
+        $user1 = EloquentTestUser::find(1);
 
         $user1->friends()->create(['id' => 5, 'email' => 'friend@gmail.com']);
 
@@ -408,9 +437,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testCursorPaginatedModelCollectionRetrieval()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create($secondParams = ['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            $secondParams = ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
 
         CursorPaginator::currentCursorResolver(function () {
             return null;
@@ -441,9 +472,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPreviousCursorPaginatedModelCollectionRetrieval()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
-        EloquentTestUser::create($thirdParams = ['id' => 3, 'email' => 'foo@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+            $thirdParams = ['id' => 3, 'email' => 'foo@gmail.com'],
+        ]);
 
         CursorPaginator::currentCursorResolver(function () use ($thirdParams) {
             return new Cursor($thirdParams, false);
@@ -678,9 +711,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunk()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -702,9 +737,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunksWithLimitsWhereLimitIsLessThanTotal()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -725,9 +762,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunksWithLimitsWhereLimitIsMoreThanTotal()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -751,9 +790,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunksWithOffset()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -774,9 +815,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunksWithOffsetWhereMoreThanTotal()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -789,13 +832,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunksWithLimitsAndOffsets()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
-        EloquentTestUser::create(['name' => 'Fourth', 'email' => 'fourth@example.com']);
-        EloquentTestUser::create(['name' => 'Fifth', 'email' => 'fifth@example.com']);
-        EloquentTestUser::create(['name' => 'Sixth', 'email' => 'sixth@example.com']);
-        EloquentTestUser::create(['name' => 'Seventh', 'email' => 'seventh@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -819,9 +864,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunkByIdWithLimits()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -842,9 +889,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunkByIdWithOffsets()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -865,13 +914,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunkByIdWithLimitsAndOffsets()
     {
-        EloquentTestUser::create(['name' => 'First', 'email' => 'first@example.com']);
-        EloquentTestUser::create(['name' => 'Second', 'email' => 'second@example.com']);
-        EloquentTestUser::create(['name' => 'Third', 'email' => 'third@example.com']);
-        EloquentTestUser::create(['name' => 'Fourth', 'email' => 'fourth@example.com']);
-        EloquentTestUser::create(['name' => 'Fifth', 'email' => 'fifth@example.com']);
-        EloquentTestUser::create(['name' => 'Sixth', 'email' => 'sixth@example.com']);
-        EloquentTestUser::create(['name' => 'Seventh', 'email' => 'seventh@example.com']);
+        EloquentTestUser::insert([
+            ['name' => 'First', 'email' => 'first@example.com'],
+            ['name' => 'Second', 'email' => 'second@example.com'],
+            ['name' => 'Third', 'email' => 'third@example.com'],
+            ['name' => 'Fourth', 'email' => 'fourth@example.com'],
+            ['name' => 'Fifth', 'email' => 'fifth@example.com'],
+            ['name' => 'Sixth', 'email' => 'sixth@example.com'],
+            ['name' => 'Seventh', 'email' => 'seventh@example.com'],
+        ]);
 
         $chunks = 0;
 
@@ -895,9 +946,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testChunkByIdWithNonIncrementingKey()
     {
-        EloquentTestNonIncrementingSecond::create(['name' => ' First']);
-        EloquentTestNonIncrementingSecond::create(['name' => ' Second']);
-        EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
+        EloquentTestNonIncrementingSecond::insert([
+            ['name' => ' First'],
+            ['name' => ' Second'],
+            ['name' => ' Third'],
+        ]);
 
         $i = 0;
         EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
@@ -914,9 +967,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testEachByIdWithNonIncrementingKey()
     {
-        EloquentTestNonIncrementingSecond::create(['name' => ' First']);
-        EloquentTestNonIncrementingSecond::create(['name' => ' Second']);
-        EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
+        EloquentTestNonIncrementingSecond::insert([
+            ['name' => ' First'],
+            ['name' => ' Second'],
+            ['name' => ' Third'],
+        ]);
 
         $users = [];
         EloquentTestNonIncrementingSecond::query()->eachById(
@@ -928,8 +983,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPluck()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
 
         $simple = EloquentTestUser::oldest('id')->pluck('users.email')->all();
         $keyed = EloquentTestUser::oldest('id')->pluck('users.email', 'users.id')->all();
@@ -955,8 +1012,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testPluckWithColumnNameContainingASpace()
     {
-        EloquentTestUserWithSpaceInColumnName::create(['id' => 1, 'email address' => 'taylorotwell@gmail.com']);
-        EloquentTestUserWithSpaceInColumnName::create(['id' => 2, 'email address' => 'abigailotwell@gmail.com']);
+        EloquentTestUserWithSpaceInColumnName::insert([
+            ['id' => 1, 'email address' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email address' => 'abigailotwell@gmail.com'],
+        ]);
 
         $simple = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('users_with_space_in_column_name.email address')->all();
         $keyed = EloquentTestUserWithSpaceInColumnName::oldest('id')->pluck('email address', 'id')->all();
@@ -967,8 +1026,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFindOrFail()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
 
         $single = EloquentTestUser::findOrFail(1);
         $multiple = EloquentTestUser::findOrFail([1, 2]);
@@ -1226,8 +1287,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testAggregatedValuesOfDatetimeField()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => Carbon::now()]);
-        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => Carbon::now()]);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => Carbon::now()],
+            ['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => Carbon::now()],
+        ]);
 
         $this->assertSame('2016-08-10 09:21:00', EloquentTestUser::max('created_at'));
         $this->assertSame('2016-08-01 12:00:00', EloquentTestUser::min('created_at'));
@@ -1392,7 +1455,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 
         $user->posts()->create(['name' => 'Post 2'])
-             ->photos()->create(['name' => 'photo.jpg']);
+            ->photos()->create(['name' => 'photo.jpg']);
 
         $query = EloquentTestUser::has('postWithPhotos');
 
@@ -1468,6 +1531,38 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $this->assertEquals($user->id, $result->pivot->user_id);
             $this->assertEquals($friend->id, $result->pivot->friend_id);
         }
+    }
+
+    public function testWhereAttachedTo()
+    {
+        EloquentTestUser::insert([
+            ['email' => 'user1@gmail.com'],
+            ['email' => 'user2@gmail.com'],
+            ['email' => 'user3@gmail.com'],
+        ]);
+
+        [$user1, $user2, $user3] = EloquentTestUser::get();
+
+        EloquentTestAchievement::fillAndInsert([['status' => 3], [], []]);
+        [$achievement1, $achievement2, $achievement3] = EloquentTestAchievement::get();
+
+        $user1->eloquentTestAchievements()->attach([$achievement1]);
+        $user2->eloquentTestAchievements()->attach([$achievement1, $achievement3]);
+        $user3->eloquentTestAchievements()->attach([$achievement2, $achievement3]);
+
+        $achievedAchievement1 = EloquentTestUser::whereAttachedTo($achievement1)->get();
+
+        $this->assertSame(2, $achievedAchievement1->count());
+        $this->assertTrue($achievedAchievement1->contains($user1));
+        $this->assertTrue($achievedAchievement1->contains($user2));
+
+        $achievedByUser1or2 = EloquentTestAchievement::whereAttachedTo(
+            new Collection([$user1, $user2])
+        )->get();
+
+        $this->assertSame(2, $achievedByUser1or2->count());
+        $this->assertTrue($achievedByUser1or2->contains($achievement1));
+        $this->assertTrue($achievedByUser1or2->contains($achievement3));
     }
 
     public function testBasicHasManyEagerLoading()
@@ -1809,8 +1904,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testForPageBeforeIdCorrectlyPaginates()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
 
         $results = EloquentTestUser::forPageBeforeId(15, 2);
         $this->assertInstanceOf(Builder::class, $results);
@@ -1823,8 +1920,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testForPageAfterIdCorrectlyPaginates()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        EloquentTestUser::insert([
+            ['id' => 1, 'email' => 'taylorotwell@gmail.com'],
+            ['id' => 2, 'email' => 'abigailotwell@gmail.com'],
+        ]);
 
         $results = EloquentTestUser::forPageAfterId(15, 1);
         $this->assertInstanceOf(Builder::class, $results);
@@ -1874,9 +1973,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $jack = EloquentTestUserWithCustomFriendPivot::create(['id' => 3, 'name' => 'Jack Doe', 'email' => 'jackdoe@example.com']);
         $jule = EloquentTestUserWithCustomFriendPivot::create(['id' => 4, 'name' => 'Jule Doe', 'email' => 'juledoe@example.com']);
 
-        EloquentTestFriendLevel::create(['id' => 1, 'level' => 'acquaintance']);
-        EloquentTestFriendLevel::create(['id' => 2, 'level' => 'friend']);
-        EloquentTestFriendLevel::create(['id' => 3, 'level' => 'bff']);
+        EloquentTestFriendLevel::insert([
+            ['id' => 1, 'level' => 'acquaintance'],
+            ['id' => 2, 'level' => 'friend'],
+            ['id' => 3, 'level' => 'bff'],
+        ]);
 
         $john->friends()->attach($jane, ['friend_level_id' => 1]);
         $john->friends()->attach($jack, ['friend_level_id' => 2]);
@@ -1974,8 +2075,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnCollection()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::insert([['id' => 1, 'email' => 'taylorotwell@gmail.com'], ['id' => 2, 'email' => 'taylorotwell@gmail.com']]);
 
         $users = EloquentTestUser::all()
             ->add(new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']));
@@ -2461,6 +2561,147 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
+    public function testCanFillAndInsert()
+    {
+        DB::enableQueryLog();
+        Carbon::setTestNow('2025-03-15T07:32:00Z');
+
+        $this->assertTrue(EloquentTestUser::fillAndInsert([
+            ['email' => 'taylor@laravel.com', 'birthday' => null],
+            ['email' => 'nuno@laravel.com', 'birthday' => new Carbon('1980-01-01')],
+            ['email' => 'tim@laravel.com', 'birthday' => '1987-11-01', 'created_at' => '2025-01-02T02:00:55', 'updated_at' => Carbon::parse('2025-02-19T11:41:13')],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(3, $users = EloquentTestUser::get());
+
+        $users->take(2)->each(function (EloquentTestUser $user) {
+            $this->assertEquals(Carbon::parse('2025-03-15T07:32:00Z'), $user->created_at);
+            $this->assertEquals(Carbon::parse('2025-03-15T07:32:00Z'), $user->updated_at);
+        });
+
+        $tim = $users->firstWhere('email', 'tim@laravel.com');
+        $this->assertEquals(Carbon::parse('2025-01-02T02:00:55'), $tim->created_at);
+        $this->assertEquals(Carbon::parse('2025-02-19T11:41:13'), $tim->updated_at);
+
+        $this->assertNull($users[0]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[1]->birthday);
+        $this->assertInstanceOf(\DateTime::class, $users[2]->birthday);
+        $this->assertEquals('1987-11-01', $users[2]->birthday->format('Y-m-d'));
+
+        DB::flushQueryLog();
+
+        $this->assertTrue(EloquentTestWithJSON::fillAndInsert([
+            ['id' => 1, 'json' => ['album' => 'Keep It Like a Secret', 'release_date' => '1999-02-02']],
+            ['id' => 2, 'json' => (object) ['album' => 'You In Reverse', 'release_date' => '2006-04-11']],
+        ]));
+
+        $this->assertCount(1, DB::getQueryLog());
+
+        $this->assertCount(2, $testsWithJson = EloquentTestWithJSON::get());
+
+        $testsWithJson->each(function (EloquentTestWithJSON $testWithJson) {
+            $this->assertIsArray($testWithJson->json);
+            $this->assertArrayHasKey('album', $testWithJson->json);
+        });
+    }
+
+    public function testCanFillAndInsertWithUniqueStringIds()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000',
+            '11111111-0000-7000-0000-000000000000',
+            '22222222-0000-7000-0000-000000000000',
+        ]);
+
+        $this->assertTrue(ModelWithUniqueStringIds::fillAndInsert([
+            [
+                'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
+            ],
+            [
+                'name' => 'Nuno', 'role' => 3, 'role_string' => 'admin',
+            ],
+            [
+                'name' => 'Dries', 'uuid' => 'bbbb0000-0000-7000-0000-000000000000',
+            ],
+            [
+                'name' => 'Chris',
+            ],
+        ]));
+
+        $models = ModelWithUniqueStringIds::get();
+
+        $taylor = $models->firstWhere('name', 'Taylor');
+        $nuno = $models->firstWhere('name', 'Nuno');
+        $dries = $models->firstWhere('name', 'Dries');
+        $chris = $models->firstWhere('name', 'Chris');
+
+        $this->assertEquals(IntBackedRole::Admin, $taylor->role);
+        $this->assertEquals(StringBackedRole::Admin, $taylor->role_string);
+        $this->assertSame('00000000-0000-7000-0000-000000000000', $taylor->uuid);
+
+        $this->assertEquals(IntBackedRole::Admin, $nuno->role);
+        $this->assertEquals(StringBackedRole::Admin, $nuno->role_string);
+        $this->assertSame('11111111-0000-7000-0000-000000000000', $nuno->uuid);
+
+        $this->assertEquals(IntBackedRole::User, $dries->role);
+        $this->assertEquals(StringBackedRole::User, $dries->role_string);
+        $this->assertSame('bbbb0000-0000-7000-0000-000000000000', $dries->uuid);
+
+        $this->assertEquals(IntBackedRole::User, $chris->role);
+        $this->assertEquals(StringBackedRole::User, $chris->role_string);
+        $this->assertSame('22222222-0000-7000-0000-000000000000', $chris->uuid);
+    }
+
+    public function testFillAndInsertOrIgnore()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000',
+            '11111111-0000-7000-0000-000000000000',
+            '22222222-0000-7000-0000-000000000000',
+        ]);
+
+        $this->assertEquals(1, ModelWithUniqueStringIds::fillAndInsertOrIgnore([
+            [
+                'id' => 1, 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
+            ],
+        ]));
+
+        $this->assertSame(1, ModelWithUniqueStringIds::fillAndInsertOrIgnore([
+            [
+                'id' => 1, 'name' => 'Taylor', 'role' => IntBackedRole::Admin, 'role_string' => StringBackedRole::Admin,
+            ],
+            [
+                'id' => 2, 'name' => 'Nuno',
+            ],
+        ]));
+
+        $models = ModelWithUniqueStringIds::get();
+        $this->assertSame('00000000-0000-7000-0000-000000000000', $models->firstWhere('name', 'Taylor')->uuid);
+        $this->assertSame(
+            ['uuid' => '22222222-0000-7000-0000-000000000000', 'role' => IntBackedRole::User],
+            $models->firstWhere('name', 'Nuno')->only('uuid', 'role')
+        );
+    }
+
+    public function testFillAndInsertGetId()
+    {
+        Str::createUuidsUsingSequence([
+            '00000000-0000-7000-0000-000000000000',
+        ]);
+
+        DB::enableQueryLog();
+
+        $this->assertIsInt($newId = ModelWithUniqueStringIds::fillAndInsertGetId([
+            'name' => 'Taylor',
+            'role' => IntBackedRole::Admin,
+            'role_string' => StringBackedRole::Admin,
+        ]));
+        $this->assertCount(1, DB::getRawQueryLog());
+        $this->assertSame($newId, ModelWithUniqueStringIds::sole()->id);
+    }
+
     /**
      * Helpers...
      */
@@ -2532,6 +2773,11 @@ class EloquentTestUser extends Eloquent
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
     }
+
+    public function eloquentTestAchievements()
+    {
+        return $this->belongsToMany(EloquentTestAchievement::class);
+    }
 }
 
 class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
@@ -2539,7 +2785,7 @@ class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
     public function friends()
     {
         return $this->belongsToMany(EloquentTestUser::class, 'friends', 'user_id', 'friend_id')
-                        ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
+            ->using(EloquentTestFriendPivot::class)->withPivot('user_id', 'friend_id', 'friend_level_id');
     }
 }
 
@@ -2785,4 +3031,57 @@ class EloquentTouchingCategory extends Eloquent
     {
         return $this->hasMany(EloquentTouchingCategory::class, 'parent_id')->chaperone();
     }
+}
+
+class EloquentTestAchievement extends Eloquent
+{
+    public $timestamps = false;
+
+    protected $table = 'achievements';
+    protected $guarded = [];
+    protected $attributes = ['status' => null];
+
+    public function eloquentTestUsers()
+    {
+        return $this->belongsToMany(EloquentTestUser::class);
+    }
+}
+
+class ModelWithUniqueStringIds extends Eloquent
+{
+    use HasUuids;
+
+    public $timestamps = false;
+
+    protected $table = 'users_having_uuids';
+
+    protected function casts()
+    {
+        return [
+            'role' => IntBackedRole::class,
+            'role_string' => StringBackedRole::class,
+        ];
+    }
+
+    protected $attributes = [
+        'role' => IntBackedRole::User,
+        'role_string' => StringBackedRole::User,
+    ];
+
+    public function uniqueIds()
+    {
+        return ['uuid'];
+    }
+}
+
+enum IntBackedRole: int
+{
+    case User = 1;
+    case Admin = 3;
+}
+
+enum StringBackedRole: string
+{
+    case User = 'user';
+    case Admin = 'admin';
 }

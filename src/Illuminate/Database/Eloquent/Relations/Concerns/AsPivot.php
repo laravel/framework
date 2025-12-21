@@ -15,6 +15,13 @@ trait AsPivot
     public $pivotParent;
 
     /**
+     * The related model of the relationship.
+     *
+     * @var \Illuminate\Database\Eloquent\Model
+     */
+    public $pivotRelated;
+
+    /**
      * The name of the foreign key column.
      *
      * @var string
@@ -215,6 +222,19 @@ trait AsPivot
     }
 
     /**
+     * Set the related model of the relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $related
+     * @return $this
+     */
+    public function setRelatedModel(?Model $related = null)
+    {
+        $this->pivotRelated = $related;
+
+        return $this;
+    }
+
+    /**
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
      * @param  array|null  $attributes
@@ -222,7 +242,8 @@ trait AsPivot
      */
     public function hasTimestampAttributes($attributes = null)
     {
-        return array_key_exists($this->getCreatedAtColumn(), $attributes ?? $this->attributes);
+        return ($createdAt = $this->getCreatedAtColumn()) !== null
+            && array_key_exists($createdAt, $attributes ?? $this->attributes);
     }
 
     /**
@@ -326,6 +347,7 @@ trait AsPivot
     public function unsetRelations()
     {
         $this->pivotParent = null;
+        $this->pivotRelated = null;
         $this->relations = [];
 
         return $this;

@@ -23,9 +23,7 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
 
-        /*
-         * Test With Closures
-         */
+        // Test With Closures
         $container = new Container;
 
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
@@ -41,9 +39,7 @@ class ContextualBindingTest extends TestCase
         $this->assertInstanceOf(ContainerContextImplementationStub::class, $one->impl);
         $this->assertInstanceOf(ContainerContextImplementationStubTwo::class, $two->impl);
 
-        /*
-         * Test nesting to make the same 'abstract' in different context
-         */
+        // Test nesting to make the same 'abstract' in different context
         $container = new Container;
 
         $container->bind(IContainerContextContractStub::class, ContainerContextImplementationStub::class);
@@ -120,6 +116,23 @@ class ContextualBindingTest extends TestCase
 
         $container->bind('stub', ContainerContextImplementationStub::class);
         $container->alias('stub', IContainerContextContractStub::class);
+
+        $this->assertInstanceOf(
+            ContainerContextImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
+        );
+    }
+
+    public function testContextualBindingDoesNotFollowStaleAliases()
+    {
+        $container = new Container;
+
+        $container->when(ContainerTestContextInjectOne::class)->needs('stale')->give(ContainerContextImplementationStub::class);
+        $container->when(ContainerTestContextInjectOne::class)->needs('live')->give(ContainerContextImplementationStubTwo::class);
+
+        $container->alias(IContainerContextContractStub::class, 'stale');
+        $container->alias('unrelated', 'stale');
+        $container->alias(IContainerContextContractStub::class, 'live');
 
         $this->assertInstanceOf(
             ContainerContextImplementationStubTwo::class,

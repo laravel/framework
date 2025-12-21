@@ -17,21 +17,21 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * The array of active view paths.
      *
-     * @var array
+     * @var string[]
      */
     protected $paths;
 
     /**
      * The array of views that have been located.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $views = [];
 
     /**
      * The namespace to file path hints.
      *
-     * @var array
+     * @var array<string, array>
      */
     protected $hints = [];
 
@@ -46,14 +46,13 @@ class FileViewFinder implements ViewFinderInterface
      * Create a new file view loader instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  array  $paths
-     * @param  array|null  $extensions
-     * @return void
+     * @param  string[]  $paths
+     * @param  string[]|null  $extensions
      */
     public function __construct(Filesystem $files, array $paths, ?array $extensions = null)
     {
         $this->files = $files;
-        $this->paths = array_map([$this, 'resolvePath'], $paths);
+        $this->paths = array_map($this->resolvePath(...), $paths);
 
         if (isset($extensions)) {
             $this->extensions = $extensions;
@@ -96,7 +95,7 @@ class FileViewFinder implements ViewFinderInterface
      * Get the segments of a template with a named path.
      *
      * @param  string  $name
-     * @return array
+     * @return string[]
      *
      * @throws \InvalidArgumentException
      */
@@ -119,7 +118,7 @@ class FileViewFinder implements ViewFinderInterface
      * Find the given view in the list of paths.
      *
      * @param  string  $name
-     * @param  array  $paths
+     * @param  string|string[]  $paths
      * @return string
      *
      * @throws \InvalidArgumentException
@@ -143,7 +142,7 @@ class FileViewFinder implements ViewFinderInterface
      * Get an array of possible view files.
      *
      * @param  string  $name
-     * @return array
+     * @return string[]
      */
     protected function getPossibleViewFiles($name)
     {
@@ -187,7 +186,7 @@ class FileViewFinder implements ViewFinderInterface
      * Add a namespace hint to the finder.
      *
      * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string|string[]  $hints
      * @return void
      */
     public function addNamespace($namespace, $hints)
@@ -205,7 +204,7 @@ class FileViewFinder implements ViewFinderInterface
      * Prepend a namespace hint to the finder.
      *
      * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string|string[]  $hints
      * @return void
      */
     public function prependNamespace($namespace, $hints)
@@ -223,7 +222,7 @@ class FileViewFinder implements ViewFinderInterface
      * Replace the namespace hints for the given namespace.
      *
      * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string|string[]  $hints
      * @return void
      */
     public function replaceNamespace($namespace, $hints)
@@ -280,7 +279,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Set the active view paths.
      *
-     * @param  array  $paths
+     * @param  string[]  $paths
      * @return $this
      */
     public function setPaths($paths)
@@ -293,7 +292,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get the active view paths.
      *
-     * @return array
+     * @return string[]
      */
     public function getPaths()
     {
@@ -303,7 +302,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get the views that have been located.
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getViews()
     {
@@ -313,7 +312,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get the namespace to file path hints.
      *
-     * @return array
+     * @return array<string, array>
      */
     public function getHints()
     {
@@ -323,7 +322,7 @@ class FileViewFinder implements ViewFinderInterface
     /**
      * Get registered extensions.
      *
-     * @return array
+     * @return string[]
      */
     public function getExtensions()
     {

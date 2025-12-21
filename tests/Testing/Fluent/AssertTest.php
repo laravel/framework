@@ -580,6 +580,72 @@ class AssertTest extends TestCase
         $assert->where('bar', BackedEnum::test_empty);
     }
 
+    public function testAssertWhereNullMatchesValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => null,
+        ]);
+
+        $assert->whereNull('bar');
+    }
+
+    public function testAssertWhereNullFailsWhenNotNull()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] should be null.');
+
+        $assert->whereNull('bar');
+    }
+
+    public function testAssertWhereNullFailsWhenMissing()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] does not exist.');
+
+        $assert->whereNull('baz');
+    }
+
+    public function testAssertWhereNotNullMatchesValue()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $assert->whereNotNull('bar');
+    }
+
+    public function testAssertWhereNotNullFailsWhenNull()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => null,
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [bar] should not be null.');
+
+        $assert->whereNotNull('bar');
+    }
+
+    public function testAssertWhereNotNullFailsWhenMissing()
+    {
+        $assert = AssertableJson::fromArray([
+            'bar' => 'value',
+        ]);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Property [baz] does not exist.');
+
+        $assert->whereNotNull('baz');
+    }
+
     public function testAssertWhereContainsFailsWithEmptyValue()
     {
         $assert = AssertableJson::fromArray([]);

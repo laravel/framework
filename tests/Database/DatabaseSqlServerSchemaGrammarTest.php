@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Tests\Database\Fixtures\Enums\Foo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -40,7 +41,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
             'alter table "users" add "email" nvarchar(255) not null',
         ], $statements);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->create();
         $blueprint->increments('id');
@@ -53,7 +54,9 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testCreateTemporaryTable()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $connection = $this->getConnection();
+        $connection->shouldReceive('getTablePrefix')->andReturn('');
+        $blueprint = new Blueprint($connection, 'users');
         $blueprint->create();
         $blueprint->temporary();
         $blueprint->increments('id');
@@ -62,6 +65,20 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create table "#users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
+    }
+
+    public function testCreateTemporaryTableWithPrefix()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $blueprint = new Blueprint($connection, 'users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create table "#prefix_users" ("id" int not null identity primary key, "email" nvarchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -73,7 +90,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('drop table "users"', $statements[0]);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->drop();
         $statements = $blueprint->toSql();
@@ -91,7 +108,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertSame('if object_id(N\'"users"\', \'U\') is not null drop table "users"', $statements[0]);
 
-        $conn = $this->getConnection($this->getGrammar()->setTablePrefix('prefix_'));
+        $conn = $this->getConnection(prefix: 'prefix_');
         $blueprint = new Blueprint($conn, 'users');
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql();
@@ -266,6 +283,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
+    public function testAddingUniqueKeyOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->unique('foo', 'bar')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create unique index "bar" on "users" ("foo") with (online = on)', $statements[0]);
+    }
+
     public function testAddingIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -274,6 +301,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->index(['foo', 'bar'], 'baz')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "baz" on "users" ("foo", "bar") with (online = on)', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
@@ -562,10 +599,12 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->enum('role', ['member', 'admin']);
+        $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertSame('alter table "users" add "role" nvarchar(255) check ("role" in (N\'member\', N\'admin\')) not null', $statements[0]);
+        $this->assertSame('alter table "users" add "status" nvarchar(255) check ("status" in (N\'bar\')) not null', $statements[1]);
     }
 
     public function testAddingJson()
@@ -598,6 +637,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertSame('alter table "users" add "foo" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "foo" date not null default CAST(GETDATE() AS DATE)', $statements[0]);
+    }
+
     public function testAddingYear()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
@@ -605,6 +654,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql();
         $this->assertCount(1, $statements);
         $this->assertSame('alter table "users" add "birth_year" int not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table "users" add "birth_year" int not null default CAST(YEAR(GETDATE()) AS INTEGER)', $statements[0]);
     }
 
     public function testAddingDateTime()
@@ -915,16 +973,14 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     public function testCreateDatabase()
     {
-        $connection = $this->getConnection();
-
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database "my_database_a"',
             $statement
         );
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database "my_database_b"',
@@ -951,20 +1007,26 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
 
     protected function getConnection(
         ?SqlServerGrammar $grammar = null,
-        ?SqlServerBuilder $builder = null
+        ?SqlServerBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function getGrammar(?Connection $connection = null)
     {
-        return new SqlServerGrammar;
+        return new SqlServerGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

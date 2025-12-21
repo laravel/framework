@@ -5,6 +5,7 @@ namespace Illuminate\Mail;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -20,7 +21,7 @@ class Attachment
     public $as;
 
     /**
-     * The attached file's mime type.
+     * The attached file's MIME type.
      *
      * @var string|null
      */
@@ -37,7 +38,6 @@ class Attachment
      * Create a mail attachment.
      *
      * @param  \Closure  $resolver
-     * @return void
      */
     private function __construct(Closure $resolver)
     {
@@ -78,6 +78,23 @@ class Attachment
         return (new static(
             fn ($attachment, $pathStrategy, $dataStrategy) => $dataStrategy($data, $attachment)
         ))->as($name);
+    }
+
+    /**
+     * Create a mail attachment from an UploadedFile instance.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @return static
+     */
+    public static function fromUploadedFile(UploadedFile $file)
+    {
+        return new static(function ($attachment, $pathStrategy, $dataStrategy) use ($file) {
+            $attachment
+                ->as($file->getClientOriginalName())
+                ->withMime($file->getMimeType() ?? $file->getClientMimeType());
+
+            return $dataStrategy(fn () => $file->get(), $attachment);
+        });
     }
 
     /**
@@ -127,7 +144,7 @@ class Attachment
     }
 
     /**
-     * Set the attached file's mime type.
+     * Set the attached file's MIME type.
      *
      * @param  string  $mime
      * @return $this
@@ -189,15 +206,17 @@ class Attachment
      */
     public function isEquivalent(Attachment $attachment, $options = [])
     {
-        return with([
+        $newOptions = [
             'as' => $options['as'] ?? $attachment->as,
             'mime' => $options['mime'] ?? $attachment->mime,
-        ], fn ($options) => $this->attachWith(
+        ];
+
+        return $this->attachWith(
             fn ($path) => [$path, ['as' => $this->as, 'mime' => $this->mime]],
             fn ($data) => [$data(), ['as' => $this->as, 'mime' => $this->mime]],
         ) === $attachment->attachWith(
-            fn ($path) => [$path, $options],
-            fn ($data) => [$data(), $options],
-        ));
+            fn ($path) => [$path, $newOptions],
+            fn ($data) => [$data(), $newOptions],
+        );
     }
 }

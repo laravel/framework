@@ -14,6 +14,8 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use SplFileInfo;
 
+use function Orchestra\Testbench\terminate;
+
 class FilesystemTest extends TestCase
 {
     private static $tempDir;
@@ -523,6 +525,21 @@ class FilesystemTest extends TestCase
         $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
     }
 
+    public function testAllDirectoriesFindsDirectories()
+    {
+        mkdir(self::$tempDir.'/film');
+        mkdir(self::$tempDir.'/music');
+        mkdir(self::$tempDir.'/music/rock');
+        mkdir(self::$tempDir.'/music/blues');
+
+        $directories = (new Filesystem)->allDirectories(self::$tempDir);
+
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'film', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'rock', $directories);
+        $this->assertContains(self::$tempDir.DIRECTORY_SEPARATOR.'music'.DIRECTORY_SEPARATOR.'blues', $directories);
+    }
+
     public function testMakeDirectory()
     {
         $files = new Filesystem;
@@ -547,7 +564,7 @@ class FilesystemTest extends TestCase
                 $files->put(self::$tempDir.'/file.txt', $content, true);
                 $read = $files->get(self::$tempDir.'/file.txt', true);
 
-                exit(strlen($read) === strlen($content) ? 1 : 0);
+                terminate($this, strlen($read) === strlen($content) ? 1 : 0);
             }
         }
 
@@ -648,6 +665,19 @@ class FilesystemTest extends TestCase
         $this->assertSame('76d3bc41c9f588f7fcd0d5bf4718f8f84b1c41b20882703100b9eb9413807c01', $filesystem->hash(self::$tempDir.'/foo.txt', 'sha3-256'));
     }
 
+    public function testLastModifiedReturnsTimestamp()
+    {
+        $path = self::$tempDir.'/timestamp.txt';
+        file_put_contents($path, 'test content');
+
+        $filesystem = new Filesystem;
+        $timestamp = $filesystem->lastModified($path);
+
+        $this->assertIsInt($timestamp);
+        $this->assertGreaterThan(0, $timestamp);
+        $this->assertEquals(filemtime($path), $timestamp);
+    }
+
     /**
      * @param  string  $file
      * @return int
@@ -658,5 +688,43 @@ class FilesystemTest extends TestCase
         $filePerms = substr(sprintf('%o', $filePerms), -3);
 
         return (int) base_convert($filePerms, 8, 10);
+    }
+
+    public function testFileCreationAndContentVerification()
+    {
+        $files = new Filesystem;
+
+        $testContent = 'This is a test file content';
+        $filePath = self::$tempDir.'/test.txt';
+
+        $files->put($filePath, $testContent);
+
+        $this->assertTrue($files->exists($filePath));
+        $this->assertSame($testContent, $files->get($filePath));
+        $this->assertEquals(strlen($testContent), $files->size($filePath));
+    }
+
+    public function testDirectoryOperationsWithSubdirectories()
+    {
+        $files = new Filesystem;
+
+        $dirPath = self::$tempDir.'/test_dir';
+        $subDirPath = $dirPath.'/sub_dir';
+
+        $this->assertTrue($files->makeDirectory($dirPath));
+        $this->assertTrue($files->isDirectory($dirPath));
+
+        $this->assertTrue($files->makeDirectory($subDirPath));
+        $this->assertTrue($files->isDirectory($subDirPath));
+
+        $filePath = $subDirPath.'/test.txt';
+        $files->put($filePath, 'test content');
+
+        $this->assertTrue($files->exists($filePath));
+
+        $allFiles = $files->allFiles($dirPath);
+
+        $this->assertCount(1, $allFiles);
+        $this->assertEquals('test.txt', $allFiles[0]->getFilename());
     }
 }

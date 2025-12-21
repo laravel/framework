@@ -50,7 +50,7 @@ class CommandEventsTest extends TestCase
     }
 
     #[DataProvider('foregroundCommandEventsProvider')]
-    public function testCommandEventsReceiveParsedInput($callback)
+    public function testCommandEventsReceiveParsedInput($callback): void
     {
         $this->app[ConsoleKernel::class]->registerCommand(new CommandEventsTestCommand);
         $this->app[Dispatcher::class]->listen(function (CommandStarting $event) {
@@ -94,7 +94,7 @@ class CommandEventsTest extends TestCase
         }];
     }
 
-    public function testCommandEventsReceiveParsedInputFromBackground()
+    public function testCommandEventsReceiveParsedInputFromBackground(): void
     {
         $laravel = Testbench::create(
             basePath: static::applicationBasePath(),

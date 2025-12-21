@@ -6,8 +6,10 @@ use Brick\Math\BigNumber;
 use GMP;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Contracts\Database\Eloquent\ComparesCastableAttributes;
 use Illuminate\Contracts\Database\Eloquent\SerializesCastableAttributes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Schema\Blueprint;
@@ -53,6 +55,17 @@ class EloquentModelCustomCastingTest extends TestCase
             $table->increments('id');
             $table->decimal('amount', 4, 2);
         });
+
+        $this->schema()->create('documents', function (Blueprint $table) {
+            $table->increments('id');
+            $table->json('document');
+        });
+
+        $this->schema()->create('people', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('address_line_one');
+            $table->string('address_line_two');
+        });
     }
 
     /**
@@ -64,6 +77,7 @@ class EloquentModelCustomCastingTest extends TestCase
     {
         $this->schema()->drop('casting_table');
         $this->schema()->drop('members');
+        $this->schema()->drop('documents');
     }
 
     #[RequiresPhpExtension('gmp')]
@@ -174,6 +188,44 @@ class EloquentModelCustomCastingTest extends TestCase
 
         $model->increment('amount', new Euro('1'));
         $this->assertEquals('3.00', $model->amount->value);
+    }
+
+    public function testModelWithCustomCastsCompareFunction()
+    {
+        // Set raw attribute, this is an example of how we would receive JSON string from the database.
+        // Note the spaces after the colon.
+        $model = new Document();
+        $model->setRawAttributes(['document' => '{"content": "content", "title": "hello world"}']);
+        $model->save();
+
+        // Inverse title and content this would result in a different JSON string when json_encode is used
+        $document = new \stdClass();
+        $document->title = 'hello world';
+        $document->content = 'content';
+        $model->document = $document;
+
+        $this->assertFalse($model->isDirty('document'));
+        $document->title = 'hello world 2';
+        $this->assertTrue($model->isDirty('document'));
+    }
+
+    public function testModelWithCustomCastsUnguardedCanBeMassAssigned()
+    {
+        Person::preventSilentlyDiscardingAttributes();
+
+        $model = Person::create(['address' => new AddressDto('123 Main St.', 'Anytown, USA')]);
+        $this->assertSame('123 Main St.', $model->address->lineOne);
+        $this->assertSame('Anytown, USA', $model->address->lineTwo);
+    }
+
+    public function testModelWithCustomCastsCanBeGuardedAgainstMassAssigned()
+    {
+        Person::preventSilentlyDiscardingAttributes();
+        $this->expectException(MassAssignmentException::class);
+
+        $model = new Person();
+        $model->guard(['address']);
+        $model->create(['id' => 1, 'address' => new AddressDto('123 Main St.', 'Anytown, USA')]);
     }
 
     /**
@@ -409,4 +461,61 @@ class Member extends Model
     protected $casts = [
         'amount' => Euro::class,
     ];
+}
+
+class Document extends Model
+{
+    public $timestamps = false;
+
+    protected $casts = [
+        'document' => StructuredDocumentCaster::class,
+    ];
+}
+
+class Person extends Model
+{
+    protected $guarded = ['id'];
+    public $timestamps = false;
+    protected $casts = [
+        'address' => AsAddress::class,
+    ];
+}
+
+class StructuredDocumentCaster implements CastsAttributes, ComparesCastableAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return json_decode($value);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return json_encode($value);
+    }
+
+    public function compare($model, $key, $value1, $value2)
+    {
+        return json_decode($value1) == json_decode($value2);
+    }
+}
+
+class AddressDto
+{
+    public function __construct(public string $lineOne, public string $lineTwo)
+    {
+        //
+    }
+}
+
+class AsAddress implements CastsAttributes
+{
+    public function get($model, $key, $value, $attributes)
+    {
+        return new AddressDto($attributes['address_line_one'], $attributes['address_line_two']);
+    }
+
+    public function set($model, $key, $value, $attributes)
+    {
+        return ['address_line_one' => $value->lineOne, 'address_line_two' => $value->lineTwo];
+    }
 }

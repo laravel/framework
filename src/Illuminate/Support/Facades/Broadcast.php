@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static \Illuminate\Broadcasting\AnonymousEvent on(\Illuminate\Broadcasting\Channel|array|string $channels)
  * @method static \Illuminate\Broadcasting\AnonymousEvent private(string $channel)
  * @method static \Illuminate\Broadcasting\AnonymousEvent presence(string $channel)
- * @method static \Illuminate\Broadcasting\PendingBroadcast event(mixed|null $event = null)
+ * @method static \Illuminate\Broadcasting\PendingBroadcast event(mixed $event = null)
  * @method static void queue(mixed $event)
  * @method static mixed connection(string|null $driver = null)
  * @method static mixed driver(string|null $name = null)

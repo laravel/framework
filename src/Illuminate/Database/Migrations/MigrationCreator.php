@@ -35,7 +35,6 @@ class MigrationCreator
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $customStubPath
-     * @return void
      */
     public function __construct(Filesystem $files, $customStubPath)
     {
@@ -83,7 +82,7 @@ class MigrationCreator
      * Ensure that a migration with the given name doesn't already exist.
      *
      * @param  string  $name
-     * @param  string  $migrationPath
+     * @param  string|null  $migrationPath
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -114,16 +113,16 @@ class MigrationCreator
     {
         if (is_null($table)) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.stub';
         } elseif ($create) {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.create.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.create.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.create.stub';
         } else {
             $stub = $this->files->exists($customPath = $this->customStubPath.'/migration.update.stub')
-                            ? $customPath
-                            : $this->stubPath().'/migration.update.stub';
+                ? $customPath
+                : $this->stubPath().'/migration.update.stub';
         }
 
         return $this->files->get($stub);

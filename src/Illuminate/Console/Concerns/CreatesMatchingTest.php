@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Concerns;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Symfony\Component\Console\Input\InputOption;
 
 trait CreatesMatchingTest
@@ -37,9 +37,10 @@ trait CreatesMatchingTest
         }
 
         return $this->call('make:test', [
-            'name' => Str::of($path)->after($this->laravel['path'])->beforeLast('.php')->append('Test')->replace('\\', '/'),
+            'name' => (new Stringable($path))->after($this->laravel['path'])->beforeLast('.php')->append('Test')->replace('\\', '/'),
             '--pest' => $this->option('pest'),
             '--phpunit' => $this->option('phpunit'),
+            '--force' => $this->hasOption('force') && $this->option('force'),
         ]) == 0;
     }
 }

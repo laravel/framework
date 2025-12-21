@@ -2,13 +2,8 @@
 
 namespace Illuminate\Tests\Testing\Concerns;
 
-use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Database\Query\Grammars\MariaDbGrammar;
-use Illuminate\Database\Query\Grammars\MySqlGrammar;
-use Illuminate\Database\Query\Grammars\PostgresGrammar;
-use Illuminate\Database\Query\Grammars\SQLiteGrammar;
-use Illuminate\Database\Query\Grammars\SqlServerGrammar;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Facade;
@@ -30,7 +25,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     public function testCastToJsonSqlite()
     {
-        $grammar = new SQLiteGrammar();
+        $grammar = 'SQLite';
 
         $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
@@ -53,7 +48,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     public function testCastToJsonPostgres()
     {
-        $grammar = new PostgresGrammar();
+        $grammar = 'Postgres';
 
         $this->assertEquals(<<<'TEXT'
         '["foo","bar"]'
@@ -76,7 +71,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     public function testCastToJsonSqlServer()
     {
-        $grammar = new SqlServerGrammar();
+        $grammar = 'SqlServer';
 
         $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]')
@@ -99,7 +94,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     public function testCastToJsonMySql()
     {
-        $grammar = new MySqlGrammar();
+        $grammar = 'MySql';
 
         $this->assertEquals(<<<'TEXT'
         cast('["foo","bar"]' as json)
@@ -122,7 +117,7 @@ class InteractsWithDatabaseTest extends TestCase
 
     public function testCastToJsonMariaDb()
     {
-        $grammar = new MariaDbGrammar();
+        $grammar = 'MariaDb';
 
         $this->assertEquals(<<<'TEXT'
         json_query('["foo","bar"]', '$')
@@ -145,7 +140,9 @@ class InteractsWithDatabaseTest extends TestCase
 
     protected function castAsJson($value, $grammar)
     {
-        $connection = m::mock(ConnectionInterface::class);
+        $connection = m::mock(Connection::class);
+        $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$grammar.'Grammar';
+        $grammar = new $grammarClass($connection);
 
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
 

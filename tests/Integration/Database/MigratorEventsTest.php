@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Events\MigrationEnded;
 use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Events\MigrationSkipped;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Events\MigrationStarted;
 use Illuminate\Database\Events\NoPendingMigrations;
@@ -32,6 +33,62 @@ class MigratorEventsTest extends TestCase
         Event::assertDispatched(MigrationsEnded::class, 2);
         Event::assertDispatched(MigrationStarted::class, 2);
         Event::assertDispatched(MigrationEnded::class, 2);
+        Event::assertDispatched(MigrationSkipped::class, 1);
+    }
+
+    public function testMigrationEventsContainTheOptionsAndPretendFalse()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', $this->migrateOptions());
+        $this->artisan('migrate:rollback', $this->migrateOptions());
+
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'down'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'down'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === false;
+        });
+    }
+
+    public function testMigrationEventsContainTheOptionsAndPretendTrue()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', $this->migrateOptions() + ['--pretend' => true]);
+        $this->artisan('migrate:rollback', $this->migrateOptions()); // doesn't support pretend
+
+        Event::assertDispatched(MigrationsStarted::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === true;
+        });
+
+        Event::assertDispatched(MigrationsEnded::class, function ($event) {
+            return $event->method === 'up'
+                && is_array($event->options)
+                && isset($event->options['pretend'])
+                && $event->options['pretend'] === true;
+        });
     }
 
     public function testMigrationEventsContainTheMigrationAndMethod()
@@ -80,6 +137,20 @@ class MigratorEventsTest extends TestCase
         });
         Event::assertDispatched(NoPendingMigrations::class, function ($event) {
             return $event->method === 'down';
+        });
+    }
+
+    public function testMigrationSkippedEventIsFired()
+    {
+        Event::fake();
+
+        $this->artisan('migrate', [
+            '--path' => realpath(__DIR__.'/stubs/2014_10_13_000000_skipped_migration.php'),
+            '--realpath' => true,
+        ]);
+
+        Event::assertDispatched(MigrationSkipped::class, function ($event) {
+            return $event->migrationName === '2014_10_13_000000_skipped_migration';
         });
     }
 }

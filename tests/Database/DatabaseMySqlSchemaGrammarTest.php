@@ -165,10 +165,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function testBasicCreateTableWithPrefix()
     {
-        $grammar = $this->getGrammar();
-        $grammar->setTablePrefix('prefix_');
-
-        $conn = $this->getConnection($grammar);
+        $conn = $this->getConnection(prefix: 'prefix_');
         $conn->shouldReceive('getConfig')->andReturn(null);
 
         $blueprint = new Blueprint($conn, 'users');
@@ -837,10 +834,12 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');
         $blueprint->enum('role', ['member', 'admin']);
+        $blueprint->enum('status', Foo::cases());
         $statements = $blueprint->toSql();
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertSame('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
+        $this->assertSame('alter table `users` add `status` enum(\'bar\') not null', $statements[1]);
     }
 
     public function testAddingSet()
@@ -875,8 +874,40 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function testAddingDate()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->date('foo');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` date not null', $statements[0]);
+    }
+
+    public function testAddingDateWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->date('foo')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `foo` date not null default (CURDATE())', $statements[0]);
+    }
+
+    public function testAddingDateWithDefaultCurrentOn57()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('5.7');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->date('foo')->useCurrent();
         $statements = $blueprint->toSql();
 
         $this->assertCount(1, $statements);
@@ -885,9 +916,41 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function testAddingYear()
     {
-        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+
+        $blueprint = new Blueprint($conn, 'users');
         $blueprint->year('birth_year');
         $statements = $blueprint->toSql();
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `birth_year` year not null', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrent()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('8.0.13');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `birth_year` year not null default (YEAR(CURDATE()))', $statements[0]);
+    }
+
+    public function testAddingYearWithDefaultCurrentOn57()
+    {
+        $conn = $this->getConnection();
+        $conn->shouldReceive('isMaria')->andReturn(false);
+        $conn->shouldReceive('getServerVersion')->andReturn('5.7');
+
+        $blueprint = new Blueprint($conn, 'users');
+        $blueprint->year('birth_year')->useCurrent();
+        $statements = $blueprint->toSql();
+
         $this->assertCount(1, $statements);
         $this->assertSame('alter table `users` add `birth_year` year not null', $statements[0]);
     }
@@ -1340,7 +1403,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_foo');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_foo');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_a', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_a');
 
         $this->assertSame(
             'create database `my_database_a` default character set `utf8mb4_foo` default collate `utf8mb4_unicode_ci_foo`',
@@ -1351,7 +1414,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $connection->shouldReceive('getConfig')->once()->once()->with('charset')->andReturn('utf8mb4_bar');
         $connection->shouldReceive('getConfig')->once()->once()->with('collation')->andReturn('utf8mb4_unicode_ci_bar');
 
-        $statement = $this->getGrammar()->compileCreateDatabase('my_database_b', $connection);
+        $statement = $this->getGrammar($connection)->compileCreateDatabase('my_database_b');
 
         $this->assertSame(
             'create database `my_database_b` default character set `utf8mb4_bar` default collate `utf8mb4_unicode_ci_bar`',
@@ -1483,14 +1546,30 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     {
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop table `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop table `alpha`, `beta`, `gamma`', $statement);
     }
 
     public function testDropAllViews()
     {
         $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
 
-        $this->assertSame('drop view `alpha`,`beta`,`gamma`', $statement);
+        $this->assertSame('drop view `alpha`, `beta`, `gamma`', $statement);
+    }
+
+    public function testDropAllTablesWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllTables(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop table `schema`.`alpha`, `schema`.`beta`, `schema`.`gamma`', $statement);
+    }
+
+    public function testDropAllViewsWithPrefixAndSchema()
+    {
+        $connection = $this->getConnection(prefix: 'prefix_');
+        $statement = $this->getGrammar($connection)->compileDropAllViews(['schema.alpha', 'schema.beta', 'schema.gamma']);
+
+        $this->assertSame('drop view `schema`.`alpha`, `schema`.`beta`, `schema`.`gamma`', $statement);
     }
 
     public function testGrammarsAreMacroable()
@@ -1508,19 +1587,56 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     protected function getConnection(
         ?MySqlGrammar $grammar = null,
         ?MySqlBuilder $builder = null,
+        string $prefix = ''
     ) {
-        $grammar ??= $this->getGrammar();
+        $connection = m::mock(Connection::class)
+            ->shouldReceive('getTablePrefix')->andReturn($prefix)
+            ->shouldReceive('getConfig')->with('prefix_indexes')->andReturn(null)
+            ->shouldReceive('isMaria')->andReturn(false)
+            ->getMock();
+
+        $grammar ??= $this->getGrammar($connection);
         $builder ??= $this->getBuilder();
 
-        return m::mock(Connection::class)
+        return $connection
             ->shouldReceive('getSchemaGrammar')->andReturn($grammar)
             ->shouldReceive('getSchemaBuilder')->andReturn($builder)
             ->getMock();
     }
 
-    public function getGrammar()
+    public function testAddingColumnWithAlgorithm()
     {
-        return new MySqlGrammar;
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name')->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` add `name` varchar(255) not null, algorithm=instant', $statements[0]);
+    }
+
+    public function testChangingColumnWithAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->string('name', 100)->change()->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` modify `name` varchar(100) not null, algorithm=instant', $statements[0]);
+    }
+
+    public function testDroppingColumnWithAlgorithm()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'users');
+        $blueprint->dropColumn('name')->instant();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('alter table `users` drop `name`, algorithm=instant', $statements[0]);
+    }
+
+    public function getGrammar(?Connection $connection = null)
+    {
+        return new MySqlGrammar($connection ?? $this->getConnection());
     }
 
     public function getBuilder()

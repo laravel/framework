@@ -1,11 +1,11 @@
+.DS_Store
+.phpunit.result.cache
+/.fleet
+/.idea
 /.phpunit.cache
+/phpunit.xml
+/.vscode
 /vendor
 composer.phar
 composer.lock
-.DS_Store
 Thumbs.db
-/phpunit.xml
-/.idea
-/.fleet
-/.vscode
-.phpunit.result.cache

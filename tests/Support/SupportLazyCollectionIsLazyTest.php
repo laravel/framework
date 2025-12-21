@@ -1583,7 +1583,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $data = $this->make(['a' => 0])->concat(
             $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]])
-                 ->mapInto(stdClass::class)
+                ->mapInto(stdClass::class)
         );
 
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {
@@ -1703,6 +1703,21 @@ class SupportLazyCollectionIsLazyTest extends TestCase
 
         $this->assertEnumeratesCollection($data, 2, function ($collection) {
             $collection->whereStrict('a', 2)->take(1)->all();
+        });
+    }
+
+    public function testWithHeartbeatIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->withHeartbeat(1, function () {
+                // Heartbeat callback
+            });
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->withHeartbeat(1, function () {
+                // Heartbeat callback
+            })->all();
         });
     }
 

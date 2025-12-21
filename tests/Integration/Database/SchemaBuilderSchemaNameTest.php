@@ -8,17 +8,42 @@ use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\Attributes\RequiresDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-#[RequiresDatabase(['pgsql', 'sqlsrv'])]
 class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if ($this->usesSqliteInMemoryDatabaseConnection()) {
+            $this->markTestSkipped('Test cannot be run using :memory: database connection, SQLite test file is here: \Illuminate\Tests\Integration\Database\Sqlite\SchemaBuilderSchemaNameTest');
+        }
+    }
+
     protected function defineDatabaseMigrations()
     {
-        if ($this->driver === 'pgsql') {
-            DB::connection('without-prefix')->statement('create schema if not exists my_schema');
-            DB::connection('with-prefix')->statement('create schema if not exists my_schema');
+        if (in_array($this->driver, ['mariadb', 'mysql'])) {
+            Schema::createDatabase('my_schema');
+        } elseif ($this->driver === 'sqlite') {
+            DB::connection('without-prefix')->statement("attach database ':memory:' as my_schema");
+            DB::connection('with-prefix')->statement("attach database ':memory:' as my_schema");
+        } elseif ($this->driver === 'pgsql') {
+            DB::statement('create schema if not exists my_schema');
         } elseif ($this->driver === 'sqlsrv') {
-            DB::connection('without-prefix')->statement("if schema_id('my_schema') is null begin exec('create schema my_schema') end");
-            DB::connection('with-prefix')->statement("if schema_id('my_schema') is null begin exec('create schema my_schema') end");
+            DB::statement("if schema_id('my_schema') is null begin exec('create schema my_schema') end");
+        }
+    }
+
+    protected function destroyDatabaseMigrations()
+    {
+        if (in_array($this->driver, ['mariadb', 'mysql'])) {
+            Schema::dropDatabaseIfExists('my_schema');
+        } elseif ($this->driver === 'sqlite') {
+            DB::connection('without-prefix')->statement('detach database my_schema');
+            DB::connection('with-prefix')->statement('detach database my_schema');
+        } elseif ($this->driver === 'pgsql') {
+            DB::statement('drop schema if exists my_schema cascade');
+        } elseif ($this->driver === 'sqlsrv') {
+            // DB::statement("if schema_id('my_schema') is not null begin exec('drop schema my_schema') end");
         }
     }
 
@@ -26,10 +51,32 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     {
         parent::defineEnvironment($app);
 
+        $connection = $app['config']->get('database.default');
+
+        $app['config']->set("database.connections.$connection.prefix_indexes", true);
         $app['config']->set('database.connections.pgsql.search_path', 'public,my_schema');
-        $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$this->driver));
+        $app['config']->set('database.connections.without-prefix', $app['config']->get('database.connections.'.$connection));
         $app['config']->set('database.connections.with-prefix', $app['config']->get('database.connections.without-prefix'));
         $app['config']->set('database.connections.with-prefix.prefix', 'example_');
+    }
+
+    #[DataProvider('connectionProvider')]
+    public function testSchemas($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schemas = $schema->getSchemas();
+
+        $this->assertSame($schema->getCurrentSchemaName(), collect($schemas)->firstWhere('default')['name']);
+        $this->assertEqualsCanonicalizing(
+            match ($this->driver) {
+                'mysql', 'mariadb' => ['laravel', 'my_schema'],
+                'pgsql' => ['public', 'my_schema'],
+                'sqlite' => ['main', 'my_schema'],
+                'sqlsrv' => ['dbo', 'guest', 'my_schema'],
+            },
+            array_column($schemas, 'name'),
+        );
     }
 
     #[DataProvider('connectionProvider')]
@@ -43,6 +90,14 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $this->assertTrue($schema->hasTable('my_schema.table'));
         $this->assertFalse($schema->hasTable('table'));
+
+        $currentSchema = $schema->getCurrentSchemaName();
+        $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
+
+        $this->assertEqualsCanonicalizing(
+            [$currentSchema.'.migrations', 'my_schema.'.$tableName],
+            $schema->getTableListing([$currentSchema, 'my_schema'])
+        );
     }
 
     #[DataProvider('connectionProvider')]
@@ -62,7 +117,11 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasTable('table'));
         $this->assertFalse($schema->hasTable('my_table'));
 
-        $schema->rename('my_schema.table', 'new_table');
+        if (in_array($this->driver, ['mariadb', 'mysql'])) {
+            $schema->rename('my_schema.table', 'my_schema.new_table');
+        } else {
+            $schema->rename('my_schema.table', 'new_table');
+        }
         $schema->rename('table', 'my_table');
 
         $this->assertTrue($schema->hasTable('my_schema.new_table'));
@@ -86,10 +145,23 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertTrue($schema->hasTable('my_schema.table'));
         $this->assertTrue($schema->hasTable('table'));
 
+        $currentSchema = $schema->getCurrentSchemaName();
+        $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
+
+        $this->assertEqualsCanonicalizing(
+            [$currentSchema.'.migrations', $currentSchema.'.'.$tableName, 'my_schema.'.$tableName],
+            $schema->getTableListing([$currentSchema, 'my_schema'])
+        );
+
         $schema->drop('my_schema.table');
 
         $this->assertFalse($schema->hasTable('my_schema.table'));
         $this->assertTrue($schema->hasTable('table'));
+
+        $this->assertEqualsCanonicalizing(
+            [$currentSchema.'.migrations', $currentSchema.'.'.$tableName],
+            $schema->getTableListing([$currentSchema, 'my_schema'])
+        );
     }
 
     #[DataProvider('connectionProvider')]
@@ -210,8 +282,16 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         $this->assertStringContainsString('default title', collect($schema->getColumns('my_table'))->firstWhere('name', 'title')['default']);
         $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_schema.table', 'name'));
         $this->assertEquals($this->driver === 'sqlsrv' ? 'nvarchar' : 'varchar', $schema->getColumnType('my_table', 'title'));
-        $this->assertEquals($this->driver === 'pgsql' ? 'int8' : 'bigint', $schema->getColumnType('my_schema.table', 'count'));
-        $this->assertEquals($this->driver === 'pgsql' ? 'int8' : 'bigint', $schema->getColumnType('my_table', 'count'));
+        $this->assertEquals(match ($this->driver) {
+            'pgsql' => 'int8',
+            'sqlite' => 'integer',
+            default => 'bigint',
+        }, $schema->getColumnType('my_schema.table', 'count'));
+        $this->assertEquals(match ($this->driver) {
+            'pgsql' => 'int8',
+            'sqlite' => 'integer',
+            default => 'bigint',
+        }, $schema->getColumnType('my_table', 'count'));
     }
 
     #[DataProvider('connectionProvider')]
@@ -306,6 +386,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase(['mariadb', 'mysql', 'pgsql', 'sqlsrv'])]
     public function testForeignKeys($connection)
     {
         $schema = Schema::connection($connection);
@@ -315,7 +396,8 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         });
         $schema->create('my_schema.table', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('my_table_id')->constrained();
+            $table->foreignId('my_table_id')
+                ->constrained(table: in_array($this->driver, ['mariadb', 'mysql']) ? 'laravel.my_tables' : null);
         });
         $schema->create('table', function (Blueprint $table) {
             $table->unsignedBigInteger('table_id');
@@ -324,10 +406,15 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $schemaTableName = $connection === 'with-prefix' ? 'example_table' : 'table';
         $tableName = $connection === 'with-prefix' ? 'example_my_tables' : 'my_tables';
+        $defaultSchemaName = match ($this->driver) {
+            'pgsql' => 'public',
+            'sqlsrv' => 'dbo',
+            default => 'laravel',
+        };
 
         $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
             fn ($foreign) => $foreign['columns'] === ['my_table_id']
-                && $foreign['foreign_table'] === $tableName && in_array($foreign['foreign_schema'], ['public', 'dbo'])
+                && $foreign['foreign_table'] === $tableName && $foreign['foreign_schema'] === $defaultSchemaName
                 && $foreign['foreign_columns'] === ['id']
         ));
 
@@ -349,28 +436,79 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
+    #[RequiresDatabase('sqlite')]
+    public function testForeignKeysOnSameSchema($connection)
+    {
+        $schema = Schema::connection($connection);
+
+        $schema->create('my_schema.my_tables', function (Blueprint $table) {
+            $table->id();
+        });
+        $schema->create('my_schema.table', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('my_table_id')->constrained();
+        });
+        $schema->create('my_schema.second_table', function (Blueprint $table) {
+            $table->unsignedBigInteger('table_id');
+            $table->foreign('table_id')->references('id')->on('table');
+        });
+
+        $myTableName = $connection === 'with-prefix' ? 'example_my_tables' : 'my_tables';
+        $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
+
+        $this->assertTrue(collect($schema->getForeignKeys('my_schema.table'))->contains(
+            fn ($foreign) => $foreign['columns'] === ['my_table_id']
+                && $foreign['foreign_table'] === $myTableName && $foreign['foreign_schema'] === 'my_schema'
+                && $foreign['foreign_columns'] === ['id']
+        ));
+
+        $this->assertTrue(collect($schema->getForeignKeys('my_schema.second_table'))->contains(
+            fn ($foreign) => $foreign['columns'] === ['table_id']
+                && $foreign['foreign_table'] === $tableName && $foreign['foreign_schema'] === 'my_schema'
+                && $foreign['foreign_columns'] === ['id']
+        ));
+
+        $schema->table('my_schema.table', function (Blueprint $table) {
+            $table->dropForeign(['my_table_id']);
+        });
+
+        $this->assertEmpty($schema->getForeignKeys('my_schema.table'));
+    }
+
+    #[DataProvider('connectionProvider')]
     public function testHasView($connection)
     {
-        $connection = DB::connection($connection);
-        $schema = $connection->getSchemaBuilder();
+        $db = DB::connection($connection);
+        $schema = $db->getSchemaBuilder();
 
-        $connection->statement('create view '.$connection->getSchemaGrammar()->wrapTable('my_schema.view').' (name) as select 1');
-        $connection->statement('create view '.$connection->getSchemaGrammar()->wrapTable('my_view').' (name) as select 1');
+        $db->statement('create view '.$db->getSchemaGrammar()->wrapTable('my_schema.view').' (name) as select 1');
+        $db->statement('create view '.$db->getSchemaGrammar()->wrapTable('my_view').' (name) as select 1');
 
         $this->assertTrue($schema->hasView('my_schema.view'));
         $this->assertTrue($schema->hasView('my_view'));
         $this->assertTrue($schema->hasColumn('my_schema.view', 'name'));
         $this->assertTrue($schema->hasColumn('my_view', 'name'));
 
-        $connection->statement('drop view '.$connection->getSchemaGrammar()->wrapTable('my_schema.view'));
-        $connection->statement('drop view '.$connection->getSchemaGrammar()->wrapTable('my_view'));
+        $currentSchema = $schema->getCurrentSchemaName();
+        $viewName = $connection === 'with-prefix' ? 'example_view' : 'view';
+        $myViewName = $connection === 'with-prefix' ? 'example_my_view' : 'my_view';
+
+        $this->assertEqualsCanonicalizing(
+            [$currentSchema.'.'.$myViewName, 'my_schema.'.$viewName],
+            array_column($schema->getViews([$currentSchema, 'my_schema']), 'schema_qualified_name')
+        );
+
+        $db->statement('drop view '.$db->getSchemaGrammar()->wrapTable('my_schema.view'));
+        $db->statement('drop view '.$db->getSchemaGrammar()->wrapTable('my_view'));
 
         $this->assertFalse($schema->hasView('my_schema.view'));
         $this->assertFalse($schema->hasView('my_view'));
+
+        $this->assertEmpty($schema->getViews([$currentSchema, 'my_schema']));
     }
 
     #[DataProvider('connectionProvider')]
-    #[RequiresDatabase('pgsql')]
+    #[RequiresDatabase(['mariadb', 'mysql', 'pgsql'])]
     public function testComment($connection)
     {
         $schema = Schema::connection($connection);
@@ -386,12 +524,13 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
 
         $tables = collect($schema->getTables());
         $tableName = $connection === 'with-prefix' ? 'example_table' : 'table';
+        $defaultSchema = $this->driver === 'pgsql' ? 'public' : 'laravel';
 
         $this->assertEquals('comment on schema table',
             $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'my_schema')['comment']
         );
         $this->assertEquals('comment on table',
-            $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === 'public')['comment']
+            $tables->first(fn ($table) => $table['name'] === $tableName && $table['schema'] === $defaultSchema)['comment']
         );
         $this->assertEquals('comment on schema column',
             collect($schema->getColumns('my_schema.table'))->firstWhere('name', 'name')['comment']
@@ -402,7 +541,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
     }
 
     #[DataProvider('connectionProvider')]
-    #[RequiresDatabase('pgsql')]
+    #[RequiresDatabase(['mariadb', 'mysql', 'pgsql'])]
     public function testAutoIncrementStartingValue($connection)
     {
         $this->expectNotToPerformAssertions();
@@ -427,7 +566,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
         try {
             $db->statement("create login my_user with password = 'Passw0rd'");
             $db->statement('create user my_user for login my_user');
-        } catch(\Illuminate\Database\QueryException $e) {
+        } catch(\Illuminate\Database\QueryException) {
             //
         }
 
@@ -440,7 +579,7 @@ class SchemaBuilderSchemaNameTest extends DatabaseTestCase
             'database.connections.'.$connection.'.password' => 'Passw0rd',
         ]);
 
-        $this->assertEquals('my_schema', $db->scalar('select schema_name()'));
+        $this->assertEquals('my_schema', $schema->getCurrentSchemaName());
 
         $schema->create('table', function (Blueprint $table) {
             $table->id();

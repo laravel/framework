@@ -23,6 +23,13 @@ class CallQueuedClosure implements ShouldQueue
     public $closure;
 
     /**
+     * The name assigned to the job.
+     *
+     * @var string|null
+     */
+    public $name = null;
+
+    /**
      * The callbacks that should be executed on failure.
      *
      * @var array
@@ -40,7 +47,6 @@ class CallQueuedClosure implements ShouldQueue
      * Create a new job instance.
      *
      * @param  \Laravel\SerializableClosure\SerializableClosure  $closure
-     * @return void
      */
     public function __construct($closure)
     {
@@ -78,8 +84,8 @@ class CallQueuedClosure implements ShouldQueue
     public function onFailure($callback)
     {
         $this->failureCallbacks[] = $callback instanceof Closure
-                        ? new SerializableClosure($callback)
-                        : $callback;
+            ? new SerializableClosure($callback)
+            : $callback;
 
         return $this;
     }
@@ -104,8 +110,27 @@ class CallQueuedClosure implements ShouldQueue
      */
     public function displayName()
     {
-        $reflection = new ReflectionFunction($this->closure->getClosure());
+        $closure = $this->closure instanceof SerializableClosure
+                    ? $this->closure->getClosure()
+                    : $this->closure;
 
-        return 'Closure ('.basename($reflection->getFileName()).':'.$reflection->getStartLine().')';
+        $reflection = new ReflectionFunction($closure);
+
+        $prefix = is_null($this->name) ? '' : "{$this->name} - ";
+
+        return $prefix.'Closure ('.basename($reflection->getFileName()).':'.$reflection->getStartLine().')';
+    }
+
+    /**
+     * Assign a name to the job.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function name($name)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 }

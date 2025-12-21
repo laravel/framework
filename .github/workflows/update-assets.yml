@@ -1,0 +1,39 @@
+name: 'update assets'
+
+on:
+  push:
+    branches:
+      - master
+      - '*.x'
+    paths:
+      - 'src/Illuminate/Foundation/resources/exceptions/renderer/**'
+      - '!src/Illuminate/Foundation/resources/exceptions/renderer/dist/**'
+  pull_request:
+    paths:
+      - 'src/Illuminate/Foundation/resources/exceptions/renderer/**'
+      - '!src/Illuminate/Foundation/resources/exceptions/renderer/dist/**'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Update Exception Renderer Assets
+        run: |
+          npm ci --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
+          npm run build --prefix "./src/Illuminate/Foundation/resources/exceptions/renderer"
+
+      - name: Commit Compiled Files
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: Update Assets

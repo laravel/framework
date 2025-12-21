@@ -7,12 +7,15 @@ use Illuminate\Console\CommandMutex;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Foundation\Application;
 use Mockery as m;
+use Orchestra\Testbench\Concerns\InteractsWithMockery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 class CommandMutexTest extends TestCase
 {
+    use InteractsWithMockery;
+
     /**
      * @var Command
      */
@@ -23,6 +26,8 @@ class CommandMutexTest extends TestCase
      */
     protected $commandMutex;
 
+    /** {@inheritdoc} */
+    #[\Override]
     protected function setUp(): void
     {
         $this->command = new class extends Command implements Isolatable
@@ -40,6 +45,13 @@ class CommandMutexTest extends TestCase
         $app = new Application;
         $app->instance(CommandMutex::class, $this->commandMutex);
         $this->command->setLaravel($app);
+    }
+
+    /** {@inheritdoc} */
+    #[\Override]
+    protected function tearDown(): void
+    {
+        $this->tearDownTheTestEnvironmentUsingMockery();
     }
 
     public function testCanRunIsolatedCommandIfNotBlocked()

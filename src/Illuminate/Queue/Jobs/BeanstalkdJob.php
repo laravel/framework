@@ -31,7 +31,6 @@ class BeanstalkdJob extends Job implements JobContract
      * @param  \Pheanstalk\Contract\JobIdInterface  $job
      * @param  string  $connectionName
      * @param  string  $queue
-     * @return void
      */
     public function __construct(Container $container, $pheanstalk, JobIdInterface $job, $connectionName, $queue)
     {

@@ -29,7 +29,6 @@ class Composer
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string|null  $workingPath
-     * @return void
      */
     public function __construct(Filesystem $files, $workingPath = null)
     {
@@ -43,7 +42,7 @@ class Composer
      * @param  string  $package
      * @return bool
      *
-     * @throw \RuntimeException
+     * @throws \RuntimeException
      */
     public function hasPackage($package)
     {
@@ -64,14 +63,14 @@ class Composer
      */
     public function requirePackages(array $packages, bool $dev = false, Closure|OutputInterface|null $output = null, $composerBinary = null)
     {
-        $command = collect([
+        $command = (new Collection([
             ...$this->findComposer($composerBinary),
             'require',
             ...$packages,
-        ])
-        ->when($dev, function ($command) {
-            $command->push('--dev');
-        })->all();
+        ]))
+            ->when($dev, function ($command) {
+                $command->push('--dev');
+            })->all();
 
         return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
@@ -93,14 +92,14 @@ class Composer
      */
     public function removePackages(array $packages, bool $dev = false, Closure|OutputInterface|null $output = null, $composerBinary = null)
     {
-        $command = collect([
+        $command = (new Collection([
             ...$this->findComposer($composerBinary),
             'remove',
             ...$packages,
-        ])
-        ->when($dev, function ($command) {
-            $command->push('--dev');
-        })->all();
+        ]))
+            ->when($dev, function ($command) {
+                $command->push('--dev');
+            })->all();
 
         return 0 === $this->getProcess($command, ['COMPOSER_MEMORY_LIMIT' => '-1'])
             ->run(
@@ -117,7 +116,7 @@ class Composer
      * @param  callable(array):array  $callback
      * @return void
      *
-     * @throw \RuntimeException
+     * @throws \RuntimeException
      */
     public function modify(callable $callback)
     {
@@ -183,7 +182,7 @@ class Composer
      *
      * @return string
      *
-     * @throw \RuntimeException
+     * @throws \RuntimeException
      */
     protected function findComposerFile()
     {

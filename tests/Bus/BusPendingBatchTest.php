@@ -71,7 +71,8 @@ class BusPendingBatchTest extends TestCase
 
         $container = new Container;
 
-        $job = new class {};
+        $job = new class {
+        };
 
         $pendingBatch = new PendingBatch($container, new Collection([$job]));
 
@@ -222,4 +223,183 @@ class BusPendingBatchTest extends TestCase
 
         $this->assertTrue($beforeCalled);
     }
+
+    public function test_it_throws_exception_if_batched_job_is_not_batchable(): void
+    {
+        $nonBatchableJob = new class {
+        };
+
+        $this->expectException(RuntimeException::class);
+
+        new PendingBatch(new Container, new Collection([$nonBatchableJob]));
+    }
+
+    public function test_it_throws_an_exception_if_batched_job_contains_batch_with_nonbatchable_job(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $container = new Container;
+        new PendingBatch(
+            $container,
+            new Collection(
+                [new PendingBatch($container, new Collection([new BatchableJob, new class {
+                }]))]
+            )
+        );
+    }
+
+    public function test_it_can_batch_a_closure(): void
+    {
+        new PendingBatch(
+            new Container,
+            new Collection([
+                function () {
+                },
+            ])
+        );
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function test_allow_failures_with_boolean_true_enables_failure_tolerance(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures(true);
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertEmpty($batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_with_boolean_false_disables_failure_tolerance(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures(false);
+
+        $this->assertSame($batch, $result);
+        $this->assertFalse($batch->options['allowFailures']);
+        $this->assertEmpty($batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_with_single_closure_registers_callback(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures(static fn (): true => true);
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertCount(1, $batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_with_single_callable_registers_callback(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures('strlen');
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertCount(1, $batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_with_array_of_callables_registers_multiple_callbacks(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures([
+            static fn (): true => true,
+            'strlen',
+            [$batch, 'failureCallbacks'],
+            strlen(...),
+        ]);
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertCount(4, $batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_registers_only_valid_callbacks(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures([
+            // 3 valid
+            static fn (): true => true,
+            'strlen',
+            [$batch, 'failureCallbacks'],
+            // 5 invalid
+            'invalid_function_name',
+            123,
+            null,
+            [],
+            new stdClass,
+        ]);
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertCount(3, $batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_with_empty_array_enables_tolerance_without_callbacks(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $result = $batch->allowFailures([]);
+
+        $this->assertSame($batch, $result);
+        $this->assertTrue($batch->options['allowFailures']);
+        $this->assertEmpty($batch->failureCallbacks());
+    }
+
+    public function test_allow_failures_is_chainable(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $this->assertSame($batch, $batch->allowFailures(true));
+        $this->assertSame($batch, $batch->allowFailures(false));
+        $this->assertSame($batch, $batch->allowFailures(static fn (): true => true));
+        $this->assertSame($batch, $batch->allowFailures('strlen'));
+        $this->assertSame($batch, $batch->allowFailures([static fn (): true => true, 'strlen']));
+        $this->assertSame($batch, $batch->allowFailures([]));
+    }
+
+    public function test_failure_callbacks_accessor_returns_registered_callbacks(): void
+    {
+        $batch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $this->assertEmpty($batch->failureCallbacks());
+
+        $batch->allowFailures(
+            static fn (): true => true
+        );
+
+        $this->assertCount(1, $batch->failureCallbacks());
+
+        $freshBatch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $freshBatch->allowFailures([
+            'strlen',
+            [$freshBatch, 'failureCallbacks'],
+        ]);
+
+        $this->assertCount(2, $freshBatch->failureCallbacks());
+
+        $anotherBatch = new PendingBatch(new Container, new Collection([new BatchableJob]));
+
+        $anotherBatch->allowFailures([
+            static fn (): false => false,
+            'trim',
+            123,
+            'invalid_function',
+        ]);
+
+        $this->assertCount(2, $anotherBatch->failureCallbacks());
+    }
+}
+
+class BatchableJob
+{
+    use Batchable;
 }

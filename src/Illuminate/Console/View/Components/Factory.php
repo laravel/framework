@@ -33,7 +33,6 @@ class Factory
      * Creates a new factory instance.
      *
      * @param  \Illuminate\Console\OutputStyle  $output
-     * @return void
      */
     public function __construct($output)
     {
@@ -57,6 +56,6 @@ class Factory
             'Console component [%s] not found.', $method
         )));
 
-        return with(new $component($this->output))->render(...$parameters);
+        return (new $component($this->output))->render(...$parameters);
     }
 }
