@@ -302,7 +302,7 @@ class SupportCollectionTest extends TestCase
             ['name' => 'bar'],
         ]);
 
-        $this->assertSame(['name' => 'foo'], $collection->lastOrfail());
+        $this->assertSame(['name' => 'bar'], $collection->lastOrfail());
     }
 
     #[DataProvider('collectionClassProvider')]
