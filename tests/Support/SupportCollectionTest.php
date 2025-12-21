@@ -298,7 +298,7 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new $collection([
             ['name' => 'foo'],
-            ['name' => 'foo'],
+            ['name' => 'bar'],
             ['name' => 'bar'],
         ]);
 
