@@ -273,6 +273,68 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailReturnsLastItemInCollection($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'bar'], $collection->lastOrFail());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailThrowsExceptionOnEmptyCollection($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $collection = new $collection();
+
+        $collection->lastOrFail();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailDoesntThrowExceptionIfMoreThanOneItemExists($collection)
+    {
+        $collection = new $collection([
+            ['name' => 'foo'],
+            ['name' => 'foo'],
+            ['name' => 'bar'],
+        ]);
+
+        $this->assertSame(['name' => 'foo'], $collection->lastOrfail());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailReturnsLastItemInCollectionIfOnlyOneExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'baz']);
+        $result = $data->lastOrFail(static fn (string $value) => $value === 'bar');
+        $this->assertSame('bar', $result);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailThrowsExceptionIfNoItemsExistWithCallback($collection)
+    {
+        $this->expectException(ItemNotFoundException::class);
+
+        $data = new $collection(['foo', 'bar', 'baz']);
+
+        $data->lastOrFail(static fn (string $value) => $value === 'invalid');
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testLastOrFailDoesntThrowExceptionIfMoreThanOneItemExistsWithCallback($collection)
+    {
+        $data = new $collection(['foo', 'bar', 'bar']);
+
+        $this->assertSame(
+            'bar',
+            $data->lastOrFail(static fn (string $value) => $value === 'bar')
+        );
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testLastReturnsLastItemInCollection($collection)
     {
         $c = new $collection(['foo', 'bar']);

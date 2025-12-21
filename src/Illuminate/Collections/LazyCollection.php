@@ -722,6 +722,31 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     /**
      * Get the last item from the collection.
      *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function lastOrfail(?callable $callback = null)
+    {
+        $needle = $placeholder = new stdClass;
+
+        foreach ($this as $key => $value) {
+            if (is_null($callback) || $callback($value, $key)) {
+                $needle = $value;
+            }
+        }
+
+        if ($needle === $placeholder) {
+            throw new ItemNotFoundException();
+        }
+
+        return $needle;
+    }
+
+    /**
+     * Get the last item from the collection.
+     *
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback

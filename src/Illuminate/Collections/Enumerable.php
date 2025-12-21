@@ -644,6 +644,16 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     /**
      * Get the last item from the collection.
      *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function lastOrfail(?callable $callback = null);
+
+    /**
+     * Get the last item from the collection.
+     *
      * @template TLastDefault
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback

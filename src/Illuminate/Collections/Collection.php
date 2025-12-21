@@ -781,6 +781,27 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Get the last item from the collection but throw exception if no matching item exists.
+     *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @return TValue
+     *
+     * @throws \Illuminate\Support\ItemNotFoundException
+     */
+    public function lastOrFail(?callable $callback = null)
+    {
+        $placeholder = new stdClass();
+
+        $item = $this->last($callback, $placeholder);
+
+        if ($item === $placeholder) {
+            throw new ItemNotFoundException;
+        }
+
+        return $item;
+    }
+
+    /**
      * Get the last item from the collection.
      *
      * @template TLastDefault
