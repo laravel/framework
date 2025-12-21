@@ -642,7 +642,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
     public function keys();
 
     /**
-     * Get the last item from the collection.
+     * Get the last item from the collection but throw exception if no matching item exists.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
      * @return TValue
