@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -27,7 +28,7 @@ use function Illuminate\Support\enum_value;
  */
 class Schedule
 {
-    use Macroable {
+    use Conditionable, Macroable {
         __call as macroCall;
     }
 
