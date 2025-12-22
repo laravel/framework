@@ -1277,10 +1277,10 @@ class Str
             return $subject;
         }
 
-        $position = strpos($subject, $search);
+        $position = mb_strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;
@@ -1325,10 +1325,10 @@ class Str
             return $subject;
         }
 
-        $position = strrpos($subject, $search);
+        $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;

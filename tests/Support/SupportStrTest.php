@@ -856,6 +856,12 @@ class SupportStrTest extends TestCase
         $this->assertSame('foo/bar/baz', Str::replace(' ', '/', 'foo bar baz'));
         $this->assertSame('foo bar baz', Str::replace(['?1', '?2', '?3'], ['foo', 'bar', 'baz'], '?1 ?2 ?3'));
         $this->assertSame(['foo', 'bar', 'baz'], Str::replace(collect(['?1', '?2', '?3']), collect(['foo', 'bar', 'baz']), collect(['?1', '?2', '?3'])));
+
+        // Test for multibyte string support
+        $this->assertSame('Jxnkxping Malmx', Str::replace('ö', 'x', 'Jönköping Malmö'));
+        $this->assertSame('こんにちは 世界', Str::replace('Hello', 'こんにちは', 'Hello 世界'));
+        $this->assertSame('🎉 celebration 🎉', Str::replace('party', 'celebration', '🎉 party 🎉'));
+        $this->assertSame('আমার দেশ', Str::replace('বাংলাদেশ', 'দেশ', 'আমার বাংলাদেশ'));
     }
 
     public function testReplaceArray()
@@ -881,9 +887,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
         $this->assertSame('foobar foobar', Str::replaceFirst('', 'yyy', 'foobar foobar'));
         $this->assertSame('1', Str::replaceFirst(0, '1', '0'));
+
         // Test for multibyte string support
         $this->assertSame('Jxxxnköping Malmö', Str::replaceFirst('ö', 'xxx', 'Jönköping Malmö'));
         $this->assertSame('Jönköping Malmö', Str::replaceFirst('', 'yyy', 'Jönköping Malmö'));
+        $this->assertSame('xxxにちは こんにちは', Str::replaceFirst('こん', 'xxx', 'こんにちは こんにちは'));
+        $this->assertSame('Hello 世界 Hello 世界', Str::replaceFirst('世', '', 'Hello 世界 Hello 世界'));
+        $this->assertSame('🎉🎊 party 🎉', Str::replaceFirst('🎉', '🎉🎊', '🎉 party 🎉'));
+        $this->assertSame('Ä test Ä', Str::replaceFirst('Ä', 'Ä test', 'Ä Ä'));
+        $this->assertSame('Привет мир Привет', Str::replaceFirst('Привет', 'Привет мир', 'Привет Привет'));
+        $this->assertSame('আমার বাংলাদেশ', Str::replaceFirst('তোমার', 'আমার', 'তোমার বাংলাদেশ'));
     }
 
     public function testReplaceStart()
@@ -894,9 +907,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('qux? foo/bar?', Str::replaceStart('foo/bar?', 'qux?', 'foo/bar? foo/bar?'));
         $this->assertSame('bar foobar', Str::replaceStart('foo', '', 'foobar foobar'));
         $this->assertSame('1', Str::replaceStart(0, '1', '0'));
+
         // Test for multibyte string support
         $this->assertSame('xxxnköping Malmö', Str::replaceStart('Jö', 'xxx', 'Jönköping Malmö'));
         $this->assertSame('Jönköping Malmö', Str::replaceStart('', 'yyy', 'Jönköping Malmö'));
+        $this->assertSame('xxxにちは', Str::replaceStart('こん', 'xxx', 'こんにちは'));
+        $this->assertSame('мир Привет', Str::replaceStart('Привет', 'мир', 'Привет Привет'));
+        $this->assertSame('🎊 party', Str::replaceStart('🎉', '🎊', '🎉 party'));
+        $this->assertSame('ভাষা দেশ', Str::replaceStart('বাংলা', 'ভাষা', 'বাংলা দেশ'));
     }
 
     public function testReplaceLast()
@@ -906,9 +924,16 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
         $this->assertSame('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
         $this->assertSame('foobar foobar', Str::replaceLast('', 'yyy', 'foobar foobar'));
+
         // Test for multibyte string support
         $this->assertSame('Malmö Jönkxxxping', Str::replaceLast('ö', 'xxx', 'Malmö Jönköping'));
         $this->assertSame('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
+        $this->assertSame('こんにちは xxxにちは', Str::replaceLast('こん', 'xxx', 'こんにちは こんにちは'));
+        $this->assertSame('Hello 世界 Hello 界', Str::replaceLast('世', '', 'Hello 世界 Hello 世界'));
+        $this->assertSame('🎉 party 🎉🎊', Str::replaceLast('🎉', '🎉🎊', '🎉 party 🎉'));
+        $this->assertSame('Ä Ä test', Str::replaceLast('Ä', 'Ä test', 'Ä Ä'));
+        $this->assertSame('Привет Привет мир', Str::replaceLast('Привет', 'Привет мир', 'Привет Привет'));
+        $this->assertSame('বাংলা দেশ বাংলা ভাষা', Str::replaceLast('দেশ', 'ভাষা', 'বাংলা দেশ বাংলা দেশ'));
     }
 
     public function testReplaceEnd()
@@ -920,9 +945,13 @@ class SupportStrTest extends TestCase
         $this->assertSame('foobar foobar', Str::replaceEnd('', 'yyy', 'foobar foobar'));
         $this->assertSame('fooxxx foobar', Str::replaceEnd('xxx', 'yyy', 'fooxxx foobar'));
 
-        // // Test for multibyte string support
+        // Test for multibyte string support
         $this->assertSame('Malmö Jönköping', Str::replaceEnd('ö', 'xxx', 'Malmö Jönköping'));
         $this->assertSame('Malmö Jönkyyy', Str::replaceEnd('öping', 'yyy', 'Malmö Jönköping'));
+        $this->assertSame('こんにちxxx', Str::replaceEnd('は', 'xxx', 'こんにちは'));
+        $this->assertSame('Привет мир', Str::replaceEnd('Привет', 'мир', 'Привет Привет'));
+        $this->assertSame('party 🎊', Str::replaceEnd('🎉', '🎊', 'party 🎉'));
+        $this->assertSame('বাংলা ভাষা', Str::replaceEnd('দেশ', 'ভাষা', 'বাংলা দেশ'));
     }
 
     public function testRemove()
@@ -937,6 +966,14 @@ class SupportStrTest extends TestCase
         $this->assertSame('Fooar', Str::remove(['f', 'b'], 'Foobar'));
         $this->assertSame('ooar', Str::remove(['f', 'b'], 'Foobar', false));
         $this->assertSame('Foobar', Str::remove(['f', '|'], 'Foo|bar'));
+
+        // Test for multibyte string support
+        $this->assertSame('Jnkping Malm', Str::remove('ö', 'Jönköping Malmö'));
+        $this->assertSame('にちは', Str::remove('こん', 'こんにちは'));
+        $this->assertSame('Hello  Hello ', Str::remove('世界', 'Hello 世界 Hello 世界'));
+        $this->assertSame(' party ', Str::remove('🎉', '🎉 party 🎉'));
+        $this->assertSame('Prvt', Str::remove(['и', 'е'], 'Привет'));
+        $this->assertSame('বাংলা ', Str::remove('দেশ', 'বাংলা দেশ'));
     }
 
     public function testReverse()
