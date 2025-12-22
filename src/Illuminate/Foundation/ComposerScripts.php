@@ -4,8 +4,10 @@ namespace Illuminate\Foundation;
 
 use Composer\Installer\PackageEvent;
 use Composer\Script\Event;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Concurrency\ProcessDriver;
+use Illuminate\Encryption\EncryptionServiceProvider;
+use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 
 class ComposerScripts
 {
@@ -56,28 +58,23 @@ class ComposerScripts
      */
     public static function prePackageUninstall(PackageEvent $event)
     {
-        $bootstrapFile = dirname($vendorDir = $event->getComposer()->getConfig()->get('vendor-dir')).'/bootstrap/app.php';
+        require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
-        if (! file_exists($bootstrapFile)) {
-            return;
-        }
+        $laravel = new Application(getcwd());
 
-        require_once $vendorDir.'/autoload.php';
+        $laravel->bootstrapWith([
+            LoadEnvironmentVariables::class,
+            LoadConfiguration::class,
+        ]);
 
-        if (! defined('LARAVEL_START')) {
-            define('LARAVEL_START', microtime(true));
-        }
+        // Ensure we can encrypt our serializable closure...
+        (new EncryptionServiceProvider($laravel))->register();
 
-        require_once $bootstrapFile;
+        $name = $event->getOperation()->getPackage()->getName();
 
-        /** @var Application $app */
-        $app = Container::getInstance();
-        $app->make(Kernel::class)->bootstrap();
-
-        /** @var \Composer\DependencyResolver\Operation\UninstallOperation $uninstallOperation */
-        $uninstallOperation = $event->getOperation()->getPackage();
-
-        $app['events']->dispatch('composer_package.'.$uninstallOperation->getName().':pre_uninstall');
+        $laravel->make(ProcessDriver::class)->run(
+            static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall")
+        );
     }
 
     /**
