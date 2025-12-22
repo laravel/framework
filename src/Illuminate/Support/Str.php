@@ -314,7 +314,7 @@ class Str
                 $needle = mb_strtolower($needle);
             }
 
-            if ($needle !== '' && str_contains($haystack, $needle)) {
+            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }
         }

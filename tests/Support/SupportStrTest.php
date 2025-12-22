@@ -1476,6 +1476,39 @@ class SupportStrTest extends TestCase
             ['Taylor', ['xxx'], false],
             ['Taylor', '', false],
             ['', '', false],
+            // Multibyte emoji tests
+            ['Hello 🌊 World', '🌊', true],
+            ['🚀🌟💫', '🌟', true],
+            ['🚀🌟💫', '💫', true],
+            ['🚀🌟💫', '🚀', true],
+            ['🚀🌟💫', '🎉', false],
+            ['Hello 🌊 World', ['🌊', '🎉'], true],
+            ['Hello 🌊 World', ['🎉', '🔥'], false],
+            // Multibyte character tests (Japanese, Chinese, Arabic, etc.)
+            ['こんにちは世界', 'にちは', true],
+            ['こんにちは世界', '世界', true],
+            ['こんにちは世界', 'こん', true],
+            ['こんにちは世界', 'さようなら', false],
+            ['你好世界', '世界', true],
+            ['你好世界', '你好', true],
+            ['你好世界', '再见', false],
+            ['مرحبا بك في العالم', 'بك', true],
+            ['مرحبا بك في العالم', 'العالم', true],
+            ['مرحبا بك في العالم', 'وداعا', false],
+            // Mixed multibyte and ASCII
+            ['Laravel 🎉 Framework', 'Laravel', true],
+            ['Laravel 🎉 Framework', '🎉', true],
+            ['Laravel 🎉 Framework', 'Framework', true],
+            ['Hello こんにちは World', 'こんにちは', true],
+            ['Hello こんにちは World', 'Goodbye', false],
+            // Case insensitive multibyte tests
+            ['こんにちは', 'こんにちは', true, true],
+            ['こんにちは', 'コンニチハ', false, true],
+            // Multiple needles with multibyte
+            ['🌊✋🎉', ['🌊', '🚀'], true],
+            ['🌊✋🎉', ['🚀', '🔥'], false],
+            ['こんにちは世界', ['世界', 'さようなら'], true],
+            ['こんにちは世界', ['さようなら', '再见'], false],
         ];
     }
 
@@ -1488,6 +1521,25 @@ class SupportStrTest extends TestCase
             ['Taylor Otwell', ['taylor'], true, true],
             ['Taylor Otwell', ['taylor', 'xxx'], false, false],
             ['Taylor Otwell', ['taylor', 'xxx'], false, true],
+            // Multibyte emoji tests
+            ['🚀🌟💫', ['🚀', '🌟'], true],
+            ['🚀🌟💫', ['🚀', '🌟', '💫'], true],
+            ['🚀🌟💫', ['🚀', '🎉'], false],
+            ['Hello 🌊 World 🎉', ['🌊', '🎉'], true],
+            ['Hello 🌊 World 🎉', ['🌊', '🔥'], false],
+            // Multibyte character tests
+            ['こんにちは世界', ['こん', '世界'], true],
+            ['こんにちは世界', ['こん', 'にちは', '世界'], true],
+            ['こんにちは世界', ['こん', 'さようなら'], false],
+            ['你好世界', ['你好', '世界'], true],
+            ['你好世界', ['你好', '再见'], false],
+            ['مرحبا بك في العالم', ['مرحبا', 'العالم'], true],
+            ['مرحبا بك في العالم', ['مرحبا', 'وداعا'], false],
+            // Mixed multibyte and ASCII
+            ['Laravel 🎉 Framework', ['Laravel', '🎉', 'Framework'], true],
+            ['Laravel 🎉 Framework', ['Laravel', '🔥'], false],
+            ['Hello こんにちは World', ['Hello', 'こんにちは', 'World'], true],
+            ['Hello こんにちは World', ['Hello', 'さようなら'], false],
         ];
     }
 
@@ -1495,6 +1547,29 @@ class SupportStrTest extends TestCase
     {
         return [
             ['Tar', 'ylo', true, true],
+            // Multibyte emoji tests
+            ['🚀🌟💫', '🎉', true],
+            ['🚀🌟💫', ['🎉', '🔥'], true],
+            ['🚀🌟💫', ['🚀', '🎉'], false],
+            ['Hello 🌊 World', '🔥', true],
+            ['Hello 🌊 World', '🌊', false],
+            // Multibyte character tests
+            ['こんにちは世界', 'さようなら', true],
+            ['こんにちは世界', ['さようなら', '再见'], true],
+            ['こんにちは世界', ['こん', 'さようなら'], false],
+            ['你好世界', '再见', true],
+            ['你好世界', ['再见', 'goodbye'], true],
+            ['你好世界', ['你好', '再见'], false],
+            ['مرحبا بك في العالم', 'وداعا', true],
+            ['مرحبا بك في العالم', ['وداعا', 'goodbye'], true],
+            ['مرحبا بك في العالم', ['مرحبا', 'وداعا'], false],
+            // Mixed multibyte and ASCII
+            ['Laravel 🎉 Framework', '🔥', true],
+            ['Laravel 🎉 Framework', ['🔥', 'Symfony'], true],
+            ['Laravel 🎉 Framework', ['Laravel', '🔥'], false],
+            ['Hello こんにちは World', 'さようなら', true],
+            ['Hello こんにちは World', ['さようなら', 'Goodbye'], true],
+            ['Hello こんにちは World', ['Hello', 'Goodbye'], false],
         ];
     }
 
