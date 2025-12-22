@@ -3,19 +3,11 @@ updates:
   - package-ecosystem: "npm"
     directory: "/src/Illuminate/Foundation/resources/exceptions/renderer"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 2
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-minor"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-    interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 2
-    ignore:
-      - dependency-name: "*"
-        update-types:
-          - "version-update:semver-minor"
