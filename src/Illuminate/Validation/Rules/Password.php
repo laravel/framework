@@ -16,7 +16,7 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use Traversable;
 
-class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule, IteratorAggregate
+class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, ValidatorAwareRule
 {
     use Conditionable;
 
