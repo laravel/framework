@@ -157,6 +157,7 @@ abstract class HasOneOrMany extends Relation
 
             if ($key !== null && isset($dictionary[$key])) {
                 $related = $this->getRelationValue($dictionary, $key, $type);
+
                 $model->setRelation($relation, $related);
 
                 // Apply the inverse relation if we have one...

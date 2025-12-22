@@ -56,6 +56,7 @@ class HasOneThrough extends HasOneOrManyThrough implements SupportsPartialRelati
 
             if ($key !== null && isset($dictionary[$key])) {
                 $value = $dictionary[$key];
+
                 $model->setRelation(
                     $relation, reset($value)
                 );
