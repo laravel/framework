@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use ArrayIterator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
@@ -12,8 +13,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
+use IteratorAggregate;
+use Traversable;
 
-class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
+class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule, IteratorAggregate
 {
     use Conditionable;
 
@@ -342,14 +345,7 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
 
         $validator = Validator::make(
             $this->data,
-            [$attribute => [
-                ...($this->required ? ['required'] : []),
-                ...($this->sometimes ? ['sometimes'] : []),
-                'string',
-                'min:'.$this->min,
-                ...($this->max ? ['max:'.$this->max] : []),
-                ...$this->customRules,
-            ]],
+            [$attribute => [...$this]],
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
@@ -431,5 +427,17 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
             'compromisedThreshold' => $this->compromisedThreshold,
             'customRules' => $this->customRules,
         ];
+    }
+
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator([
+            ...($this->required ? ['required'] : []),
+            ...($this->sometimes ? ['sometimes'] : []),
+            'string',
+            'min:'.$this->min,
+            ...($this->max ? ['max:'.$this->max] : []),
+            ...$this->customRules,
+        ]);
     }
 }
