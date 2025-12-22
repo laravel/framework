@@ -61,15 +61,17 @@ class ComposerScripts
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         $laravel = new Application(getcwd());
+
         $laravel->bootstrapWith([
             LoadEnvironmentVariables::class,
             LoadConfiguration::class,
         ]);
 
-        // To ensure we can encrypt our serializable closure
+        // Ensure we can encrypt our serializable closure...
         (new EncryptionServiceProvider($laravel))->register();
 
         $name = $event->getOperation()->getPackage()->getName();
+
         $laravel->make(ProcessDriver::class)->run(
             static fn () => app()['events']->dispatch("composer_package.{$name}:pre_uninstall")
         );
