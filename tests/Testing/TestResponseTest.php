@@ -2675,6 +2675,31 @@ class TestResponseTest extends TestCase
         $response->assertRedirectContains('url.net');
     }
 
+    public function testAssertHeaderContainsSuccess(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'prefix-value-suffix');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
+    public function testAssertHeaderContainsFailure(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'unrelated');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Header [X-Custom-Header] was found, but [unrelated] does not contain [value].");
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
     public function testAssertRedirect(): void
     {
         $response = TestResponse::fromBaseResponse(
