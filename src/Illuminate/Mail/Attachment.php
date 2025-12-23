@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -138,7 +139,7 @@ class Attachment
      */
     public static function fromCloudStorage($path)
     {
-        return self::fromStorageDisk(config('filesystems.cloud'), $path);
+        return self::fromStorageDisk(Storage::getDefaultCloudDriver(), $path);
     }
 
     /**
