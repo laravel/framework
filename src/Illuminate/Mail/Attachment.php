@@ -131,6 +131,17 @@ class Attachment
     }
 
     /**
+     * Create a mail attachment from a file in the cloud storage disk.
+     *
+     * @param  string  $path
+     * @return static
+     */
+    public static function fromCloudStorage($path)
+    {
+        return self::fromStorageDisk(config('filesystems.cloud'), $path);
+    }
+
+    /**
      * Set the attached file's filename.
      *
      * @param  string|null  $name
