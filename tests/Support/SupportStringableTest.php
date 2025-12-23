@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Stringable;
 use Illuminate\Support\Uri;
+use Illuminate\Tests\Support\Fixtures\StringableObjectStub;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 use PHPUnit\Framework\TestCase;
@@ -178,6 +179,16 @@ class SupportStringableTest extends TestCase
         $this->assertSame('Taylor...', (string) $this->stringable('Taylor Otwell')->words(1));
         $this->assertSame('Taylor___', (string) $this->stringable('Taylor Otwell')->words(1, '___'));
         $this->assertSame('Taylor Otwell', (string) $this->stringable('Taylor Otwell')->words(3));
+    }
+
+    public function testUcwords()
+    {
+        $this->assertSame('Laravel', (string) $this->stringable('laravel')->ucwords());
+        $this->assertSame('Laravel Framework', (string) $this->stringable('laravel framework')->ucwords());
+        $this->assertSame('Laravel-Framework', (string) $this->stringable('laravel-framework')->ucwords('-'));
+        $this->assertSame('Мама', (string) $this->stringable('мама')->ucwords());
+        $this->assertSame('Мама Мыла Раму', (string) $this->stringable('мама мыла раму')->ucwords());
+        $this->assertSame('JJ Watt', (string) $this->stringable('JJ watt')->ucwords());
     }
 
     public function testUnless()

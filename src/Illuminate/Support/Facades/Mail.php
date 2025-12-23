@@ -43,6 +43,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  * @method static void assertSent(string|\Closure $mailable, callable|array|string|int|null $callback = null)
+ * @method static void assertSentTimes(string $mailable, int $times = 1)
  * @method static void assertNotOutgoing(string|\Closure $mailable, callable|null $callback = null)
  * @method static void assertNotSent(string|\Closure $mailable, callable|array|string|null $callback = null)
  * @method static void assertNothingOutgoing()

@@ -107,6 +107,20 @@ class Worker
     public static $memoryExceededExitCode;
 
     /**
+     * Indicates if the worker should check for the restart signal in the cache.
+     *
+     * @var bool
+     */
+    public static $restartable = true;
+
+    /**
+     * Indicates if the worker should check for the paused signal in the cache.
+     *
+     * @var bool
+     */
+    public static $pausable = true;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $manager
@@ -372,6 +386,10 @@ class Worker
             }
 
             foreach (explode(',', $queue) as $index => $queue) {
+                if ($this->queuePaused($connection->getConnectionName(), $queue)) {
+                    continue;
+                }
+
                 if (! is_null($job = $popJobCallback($queue, $index))) {
                     $this->raiseAfterJobPopEvent($connection->getConnectionName(), $job);
 
@@ -385,6 +403,24 @@ class Worker
 
             $this->sleep(1);
         }
+    }
+
+    /**
+     * Determine if a given connection and queue is paused.
+     *
+     * @param  string  $connectionName
+     * @param  string  $queue
+     * @return bool
+     */
+    protected function queuePaused($connectionName, $queue)
+    {
+        if (! static::$pausable) {
+            return false;
+        }
+
+        return $this->cache && (bool) $this->cache->get(
+            "illuminate:queue:paused:{$connectionName}:{$queue}", false
+        );
     }
 
     /**
@@ -722,6 +758,10 @@ class Worker
      */
     protected function queueShouldRestart($lastRestart)
     {
+        if (! static::$restartable) {
+            return false;
+        }
+
         return $this->getTimestampOfLastQueueRestart() != $lastRestart;
     }
 
@@ -732,6 +772,10 @@ class Worker
      */
     protected function getTimestampOfLastQueueRestart()
     {
+        if (! static::$restartable) {
+            return null;
+        }
+
         if ($this->cache) {
             return $this->cache->get('illuminate:queue:restart');
         }

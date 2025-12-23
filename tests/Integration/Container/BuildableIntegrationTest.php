@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Container;
+namespace Illuminate\Tests\Integration\Container;
 
 use Illuminate\Container\Attributes\Config;
 use Illuminate\Contracts\Container\SelfBuilding;

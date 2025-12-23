@@ -4,6 +4,8 @@ namespace Illuminate\Support\Facades;
 
 use Illuminate\Filesystem\Filesystem;
 
+use function Illuminate\Support\enum_value;
+
 /**
  * @method static \Illuminate\Contracts\Filesystem\Filesystem drive(string|null $name = null)
  * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(\UnitEnum|string|null $name = null)
@@ -96,7 +98,7 @@ class Storage extends Facade
      */
     public static function fake($disk = null, array $config = [])
     {
-        $root = self::getRootPath($disk = $disk ?: static::$app['config']->get('filesystems.default'));
+        $root = self::getRootPath($disk = enum_value($disk) ?: static::$app['config']->get('filesystems.default'));
 
         if ($token = ParallelTesting::token()) {
             $root = "{$root}_test_{$token}";

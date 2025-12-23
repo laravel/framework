@@ -511,11 +511,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Group an associative array by a field or using a callback.
      *
-     * @template TGroupKey of array-key
+     * @template TGroupKey of array-key|\UnitEnum|\Stringable
      *
      * @param  (callable(TValue, TKey): TGroupKey)|array|string  $groupBy
      * @param  bool  $preserveKeys
-     * @return static<($groupBy is string ? array-key : ($groupBy is array ? array-key : TGroupKey)), static<($preserveKeys is true ? TKey : int), ($groupBy is array ? mixed : TValue)>>
+     * @return static<
+     *  ($groupBy is (array|string)
+     *      ? array-key
+     *      : (TGroupKey is \UnitEnum ? array-key : (TGroupKey is \Stringable ? string : TGroupKey))),
+     *  static<($preserveKeys is true ? TKey : int), ($groupBy is array ? mixed : TValue)>
+     * >
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
@@ -565,10 +570,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @template TNewKey of array-key
+     * @template TNewKey of array-key|\UnitEnum
      *
      * @param  (callable(TValue, TKey): TNewKey)|array|string  $keyBy
-     * @return static<($keyBy is string ? array-key : ($keyBy is array ? array-key : TNewKey)), TValue>
+     * @return static<($keyBy is (array|string) ? array-key : (TNewKey is \UnitEnum ? array-key : TNewKey)), TValue>
      */
     public function keyBy($keyBy)
     {
@@ -1033,7 +1038,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function prepend($value, $key = null)
     {
-        $this->items = Arr::prepend($this->items, ...func_get_args());
+        $this->items = Arr::prepend($this->items, ...(func_num_args() > 1 ? func_get_args() : [$value]));
 
         return $this;
     }
@@ -1282,12 +1287,20 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Create chunks representing a "sliding window" view of the items in the collection.
      *
-     * @param  int  $size
-     * @param  int  $step
+     * @param  positive-int  $size
+     * @param  positive-int  $step
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function sliding($size = 2, $step = 1)
     {
+        if ($size < 1) {
+            throw new InvalidArgumentException('Size value must be at least 1.');
+        } elseif ($step < 1) {
+            throw new InvalidArgumentException('Step value must be at least 1.');
+        }
+
         $chunks = floor(($this->count() - $size) / $step) + 1;
 
         return static::times($chunks, fn ($number) => $this->slice(($number - 1) * $step, $size));
@@ -1587,7 +1600,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                         }
                     } else {
                         $result = match ($options) {
-                            SORT_NUMERIC => intval($values[0]) <=> intval($values[1]),
+                            SORT_NUMERIC => (int) $values[0] <=> (int) $values[1],
                             SORT_STRING => strcmp($values[0], $values[1]),
                             SORT_NATURAL => strnatcmp((string) $values[0], (string) $values[1]),
                             SORT_LOCALE_STRING => strcoll($values[0], $values[1]),
@@ -1855,7 +1868,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Count the number of items in the collection by a field or using a callback.
      *
-     * @param  (callable(TValue, TKey): array-key|\UnitEnum)|string|null  $countBy
+     * @param  (callable(TValue, TKey): (array-key|\UnitEnum))|string|null  $countBy
      * @return static<array-key, int>
      */
     public function countBy($countBy = null)

@@ -465,7 +465,7 @@ class BroadcastManager implements FactoryContract
     }
 
     /**
-     * Disconnect the given disk and remove from local cache.
+     * Disconnect the given driver / connection and remove it from local cache.
      *
      * @param  string|null  $name
      * @return void

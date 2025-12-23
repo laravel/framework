@@ -14,20 +14,37 @@ class RequestException extends HttpClientException
     public $response;
 
     /**
-     * The truncation length for the exception message.
+     * The current truncation length for the exception message.
+     *
+     * @var int|false|null
+     */
+    public $truncateExceptionsAt;
+
+    /**
+     * The global truncation length for the exception message.
      *
      * @var int|false
      */
     public static $truncateAt = 120;
 
     /**
+     * Whether the response has been summarized in the message.
+     *
+     * @var bool
+     */
+    public $hasBeenSummarized = false;
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Http\Client\Response  $response
+     * @param  int|false|null  $truncateExceptionsAt
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, $truncateExceptionsAt = null)
     {
         parent::__construct($this->prepareMessage($response), $response->status());
+
+        $this->truncateExceptionsAt = $truncateExceptionsAt;
 
         $this->response = $response;
     }
@@ -66,6 +83,22 @@ class RequestException extends HttpClientException
     /**
      * Prepare the exception message.
      *
+     * @return bool
+     */
+    public function report()
+    {
+        if (! $this->hasBeenSummarized) {
+            $this->message = $this->prepareMessage($this->response);
+
+            $this->hasBeenSummarized = true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Prepare the exception message.
+     *
      * @param  \Illuminate\Http\Client\Response  $response
      * @return string
      */
@@ -73,10 +106,12 @@ class RequestException extends HttpClientException
     {
         $message = "HTTP request returned status code {$response->status()}";
 
-        $summary = static::$truncateAt
-            ? Message::bodySummary($response->toPsrResponse(), static::$truncateAt)
+        $truncateExceptionsAt = $this->truncateExceptionsAt ?? static::$truncateAt;
+
+        $summary = is_int($truncateExceptionsAt)
+            ? Message::bodySummary($response->toPsrResponse(), $truncateExceptionsAt)
             : Message::toString($response->toPsrResponse());
 
-        return is_null($summary) ? $message : $message .= ":\n{$summary}\n";
+        return is_null($summary) ? $message : $message.":\n{$summary}\n";
     }
 }

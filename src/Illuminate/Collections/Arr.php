@@ -242,7 +242,7 @@ class Arr
     }
 
     /**
-     * Return the first element in an array passing a given truth test.
+     * Return the first element in an iterable passing a given truth test.
      *
      * @template TKey
      * @template TValue
@@ -270,6 +270,8 @@ class Arr
 
             return value($default);
         }
+
+        $array = static::from($array);
 
         $key = array_find_key($array, $callback);
 

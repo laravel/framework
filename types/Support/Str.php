@@ -33,3 +33,11 @@ if (Str::isUuid($uuid)) {
 } else {
     assertType('mixed', $uuid);
 }
+
+/**
+ * @var string $search
+ * @var string $replace
+ * @var string $subject
+ */
+assertType('string', Str::replace($search, $replace, $subject));
+assertType('array<string>', Str::replace($search, $replace, [$subject]));

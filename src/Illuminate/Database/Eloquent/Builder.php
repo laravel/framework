@@ -26,9 +26,9 @@ use ReflectionMethod;
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
- * @property-read HigherOrderBuilderProxy $orWhere
- * @property-read HigherOrderBuilderProxy $whereNot
- * @property-read HigherOrderBuilderProxy $orWhereNot
+ * @property-read HigherOrderBuilderProxy|$this $orWhere
+ * @property-read HigherOrderBuilderProxy|$this $whereNot
+ * @property-read HigherOrderBuilderProxy|$this $orWhereNot
  *
  * @mixin \Illuminate\Database\Query\Builder
  */

@@ -1087,6 +1087,25 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertFailedDependency(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_FAILED_DEPENDENCY)
+        );
+
+        $response->assertFailedDependency();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [424] but received 200.\nFailed asserting that 200 is identical to 424.");
+
+        $response->assertFailedDependency();
+        $this->fail();
+    }
+
     public function testAssertClientError(): void
     {
         $statusCode = 400;
@@ -2654,6 +2673,31 @@ class TestResponseTest extends TestCase
         $this->expectException(ExpectationFailedException::class);
 
         $response->assertRedirectContains('url.net');
+    }
+
+    public function testAssertHeaderContainsSuccess(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'prefix-value-suffix');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
+    public function testAssertHeaderContainsFailure(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'unrelated');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
     }
 
     public function testAssertRedirect(): void

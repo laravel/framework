@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Queue;
 use Exception;
 use Illuminate\Bus\Dispatcher;
 use Illuminate\Bus\Queueable;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\CallQueuedHandler;
@@ -344,6 +345,85 @@ class ThrottlesExceptionsTest extends TestCase
 
         $middleware->report(fn () => false);
         $middleware->handle($job, $next);
+    }
+
+    public function testUsesJobClassNameForCacheKey()
+    {
+        $rateLimiter = $this->mock(RateLimiter::class);
+
+        $job = new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+
+                return $this;
+            }
+        };
+
+        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', get_class($job));
+
+        $rateLimiter->shouldReceive('tooManyAttempts')
+            ->once()
+            ->with($expectedKey, 10)
+            ->andReturn(false);
+
+        $rateLimiter->shouldReceive('hit')
+            ->once()
+            ->with($expectedKey, 600);
+
+        $next = function ($job) {
+            throw new RuntimeException('Whoops!');
+        };
+
+        $middleware = new ThrottlesExceptions();
+        $middleware->handle($job, $next);
+
+        $this->assertTrue($job->released);
+    }
+
+    public function testUsesDisplayNameForCacheKeyWhenAvailable()
+    {
+        $rateLimiter = $this->mock(RateLimiter::class);
+
+        $job = new class
+        {
+            public $released = false;
+
+            public function release()
+            {
+                $this->released = true;
+
+                return $this;
+            }
+
+            public function displayName(): string
+            {
+                return 'App\\Actions\\ThrottlesExceptionsTestAction';
+            }
+        };
+
+        $expectedKey = 'laravel_throttles_exceptions:'.hash('xxh128', 'App\\Actions\\ThrottlesExceptionsTestAction');
+
+        $rateLimiter->shouldReceive('tooManyAttempts')
+            ->once()
+            ->with($expectedKey, 10)
+            ->andReturn(false);
+
+        $rateLimiter->shouldReceive('hit')
+            ->once()
+            ->with($expectedKey, 600);
+
+        $next = function ($job) {
+            throw new RuntimeException('Whoops!');
+        };
+
+        $middleware = new ThrottlesExceptions();
+        $middleware->handle($job, $next);
+
+        $this->assertTrue($job->released);
     }
 }
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 class RedisStore extends TaggableStore implements LockProvider
 {
     use RetrievesMultipleKeys {
+        many as private manyAlias;
         putMany as private putManyAlias;
     }
 
@@ -91,6 +92,11 @@ class RedisStore extends TaggableStore implements LockProvider
         $results = [];
 
         $connection = $this->connection();
+
+        // PredisClusterConnection does not support reading multiple values if the keys hash differently...
+        if ($connection instanceof PredisClusterConnection) {
+            return $this->manyAlias($keys);
+        }
 
         $values = $connection->mget(array_map(function ($key) {
             return $this->prefix.$key;
@@ -324,10 +330,16 @@ class RedisStore extends TaggableStore implements LockProvider
             $cursor = $defaultCursorValue;
 
             do {
-                [$cursor, $tagsChunk] = $connection->scan(
+                $scanResult = $connection->scan(
                     $cursor,
                     ['match' => $prefix.'tag:*:entries', 'count' => $chunkSize]
                 );
+
+                if (! is_array($scanResult)) {
+                    break;
+                }
+
+                [$cursor, $tagsChunk] = $scanResult;
 
                 if (! is_array($tagsChunk)) {
                     break;
