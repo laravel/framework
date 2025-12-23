@@ -1,6 +1,30 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.43.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.44.0...12.x)
+
+## [v12.44.0](https://github.com/laravel/framework/compare/v12.43.1...v12.44.0) - 2025-12-23
+
+* [12.x] Allow easier opting out of `DatabaseLock` prune lottery by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58152
+* [12.x] Specify that the query builder returns instances of `stdClass` by [@axlon](https://github.com/axlon) in https://github.com/laravel/framework/pull/58150
+* [12.x] feat: add now methods to Date rule by [@calebdw](https://github.com/calebdw) in https://github.com/laravel/framework/pull/58059
+* [12.x] Add ability to run callbacks after building an Http response by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58088
+* Fix docblocks by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/framework/pull/58157
+* [12.x] Fix Password::required() missing value validation and nullable empty … by [@faisuc](https://github.com/faisuc) in https://github.com/laravel/framework/pull/58158
+* [12.x] Fixup Eloquent `Collection` (param) docblocks by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58170
+* [12.x] add MigrationSkipped event by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58167
+* [12.x] Simplify `LazyCollection` `passthru` calls and docblocks by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58180
+* [12.x] Add BusBatchable tests by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58175
+* Add previous locale to LocaleUpdated event by [@OutlawPlz](https://github.com/OutlawPlz) in https://github.com/laravel/framework/pull/58179
+* [12.x] Fix inline mail embed replacement by Content-ID by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58173
+* [12.x] Fix multibyte string handling in chopStart and chopEnd by [@mdariftiens](https://github.com/mdariftiens) in https://github.com/laravel/framework/pull/58183
+* [12.x] Improve `Collection` docblock types by [@jnoordsij](https://github.com/jnoordsij) in https://github.com/laravel/framework/pull/58176
+* [12.x] Fix unable to disable `created_at` or `updated_at` column when attaching models by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58164
+* Remove unused variables from destructured arrays by [@rolfvandekrol](https://github.com/rolfvandekrol) in https://github.com/laravel/framework/pull/58187
+* [12.x] use process to trigger package uninstall event by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58177
+* [12.x] Fix null array key deprecation in HasOneOrMany relation matching by [@serhiilabs](https://github.com/serhiilabs) in https://github.com/laravel/framework/pull/58191
+* [12.x] Fix `Password::required()` and `Password::sometimes()` usage as array by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58188
+* [12.x] Add TestResponse::assertHeaderContains assertion and tests by [@miladev95](https://github.com/miladev95) in https://github.com/laravel/framework/pull/58200
+* [12.x] Update setup-node action to v6 by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58196
 
 ## [v12.43.1](https://github.com/laravel/framework/compare/v12.43.0...v12.43.1) - 2025-12-16
 
