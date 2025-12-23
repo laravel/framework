@@ -1066,7 +1066,7 @@ class Route
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null  $middleware
+     * @param  array|string|MiddlewareDefinition|null  $middleware
      * @return $this|array
      */
     public function middleware($middleware = null)
@@ -1088,6 +1088,20 @@ class Route
         );
 
         return $this;
+    }
+
+    /**
+     * Add a middleware with explicit parameters to the route.
+     *
+     * @param  class-string  $middleware
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function middlewareWith(string $middleware, array $parameters = [])
+    {
+        return $this->middleware(
+            new MiddlewareDefinition($middleware, $parameters)
+        );
     }
 
     /**

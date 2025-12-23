@@ -2230,6 +2230,57 @@ class RoutingRouteTest extends TestCase
         ], $route->middleware());
     }
 
+    public function testMiddlewareWithAddsMiddlewareWithPositionalParameters()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middlewareWith('App\Http\Middleware\Role', ['admin', 'editor']);
+
+        $this->assertEquals([
+            'App\Http\Middleware\Role:admin,editor',
+        ], $route->middleware());
+    }
+
+    public function testMiddlewareWithAddsMiddlewareWithNamedParameters()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middlewareWith('App\Http\Middleware\Role', ['role' => 'admin', 'level' => '5']);
+
+        $this->assertEquals([
+            'App\Http\Middleware\Role:admin,5',
+        ], $route->middleware());
+    }
+
+    public function testMiddlewareWithWorksAlongsideExistingMiddleware()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middleware('auth')
+            ->middlewareWith('App\Http\Middleware\Role', ['admin'])
+            ->middleware('verified');
+
+        $this->assertEquals([
+            'auth',
+            'App\Http\Middleware\Role:admin',
+            'verified',
+        ], $route->middleware());
+    }
+
+    public function testMiddlewareWithNoParametersAddsClassOnly()
+    {
+        $route = new Route(['GET'], '/', []);
+        $route->middlewareWith('App\Http\Middleware\Auth');
+
+        $this->assertEquals([
+            'App\Http\Middleware\Auth',
+        ], $route->middleware());
+    }
+
+    public function testMiddlewareWithReturnsSelfForChaining()
+    {
+        $route = new Route(['GET'], '/', []);
+
+        $this->assertSame($route, $route->middlewareWith('App\Http\Middleware\Auth'));
+    }
+
     public function testItDispatchesEventsWhilePreparingRequest()
     {
         $events = new Dispatcher;
