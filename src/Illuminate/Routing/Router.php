@@ -1520,6 +1520,10 @@ class Router implements BindingRegistrar, RegistrarContract
             return (new RouteRegistrar($this))->attribute($method, [$parameters]);
         }
 
+        if ($method === 'middlewareWith') {
+            return (new RouteRegistrar($this))->middlewareWith(...$parameters);
+        }
+
         if ($method !== 'where' && Str::startsWith($method, 'where')) {
             return (new RouteRegistrar($this))->{$method}(...$parameters);
         }

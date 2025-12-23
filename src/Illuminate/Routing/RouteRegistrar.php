@@ -23,6 +23,7 @@ use InvalidArgumentException;
  * @method \Illuminate\Routing\RouteRegistrar controller(string $controller)
  * @method \Illuminate\Routing\RouteRegistrar domain(\BackedEnum|string $value)
  * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
+ * @method \Illuminate\Routing\RouteRegistrar middlewareWith(string $middleware, array $parameters = [])
  * @method \Illuminate\Routing\RouteRegistrar missing(\Closure $missing)
  * @method \Illuminate\Routing\RouteRegistrar name(\BackedEnum|string $value)
  * @method \Illuminate\Routing\RouteRegistrar namespace(string|null $value)
@@ -73,6 +74,7 @@ class RouteRegistrar
         'controller',
         'domain',
         'middleware',
+        'middlewareWith',
         'missing',
         'name',
         'namespace',
@@ -297,6 +299,13 @@ class RouteRegistrar
         if (in_array($method, $this->allowedAttributes)) {
             if ($method === 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            }
+
+            if ($method === 'middlewareWith') {
+                return $this->attribute('middleware', array_merge(
+                    $this->attributes['middleware'] ?? [],
+                    [new MiddlewareDefinition($parameters[0], $parameters[1] ?? [])],
+                ));
             }
 
             if ($method === 'can') {

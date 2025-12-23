@@ -144,6 +144,33 @@ class RouteRegistrarTest extends TestCase
         $this->assertSame([], $this->getRoute()->middleware());
     }
 
+    public function testMiddlewareWithFluentRegistration()
+    {
+        $this->router->middlewareWith('App\Http\Middleware\Role', ['admin'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertEquals(['App\Http\Middleware\Role:admin'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareWithMultipleParameters()
+    {
+        $this->router->middlewareWith('App\Http\Middleware\Throttle', [60, 1])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertEquals(['App\Http\Middleware\Throttle:60,1'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareWithCombinedWithRegularMiddleware()
+    {
+        $this->router->middleware('auth')->middlewareWith('App\Http\Middleware\Role', ['admin'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->assertEquals(['auth', 'App\Http\Middleware\Role:admin'], $this->getRoute()->middleware());
+    }
+
     public function testWithoutMiddlewareRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {
