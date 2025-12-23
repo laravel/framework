@@ -2695,7 +2695,7 @@ class TestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage("Header [X-Custom-Header] was found, but [unrelated] does not contain [value].");
+        $this->expectExceptionMessage('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
 
         $response->assertHeaderContains('X-Custom-Header', 'value');
     }
