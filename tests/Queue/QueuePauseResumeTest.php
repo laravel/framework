@@ -113,6 +113,7 @@ class QueuePauseResumeTest extends TestCase
         $this->assertFalse($this->manager->isPaused('redis', 'emails'));
         $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
     }
+
     public function testPauseDispatchesQueuePausedEvent()
     {
         $dispatchedEvent = null;
