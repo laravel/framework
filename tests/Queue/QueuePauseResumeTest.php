@@ -4,7 +4,10 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\Repository;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
+use Illuminate\Queue\Events\QueuePaused;
+use Illuminate\Queue\Events\QueueResumed;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Carbon;
 use Mockery as m;
@@ -32,6 +35,7 @@ class QueuePauseResumeTest extends TestCase
                 'queue.connections.database' => ['driver' => 'database'],
             ],
             'cache' => $cacheMock,
+            'events' => new Dispatcher(),
         ];
 
         $this->manager = new QueueManager($app);
@@ -108,6 +112,58 @@ class QueuePauseResumeTest extends TestCase
 
         $this->assertFalse($this->manager->isPaused('redis', 'emails'));
         $this->assertTrue($this->manager->isPaused('redis', 'notifications'));
+    }
+    public function testPauseDispatchesQueuePausedEvent()
+    {
+        $dispatchedEvent = null;
+
+        $dispatcher = $this->manager->getApplication()['events'];
+
+        $dispatcher->listen(QueuePaused::class, function ($event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $this->manager->pause('redis', 'default');
+
+        $this->assertInstanceOf(QueuePaused::class, $dispatchedEvent);
+        $this->assertSame('redis', $dispatchedEvent->connection);
+        $this->assertSame('default', $dispatchedEvent->queue);
+        $this->assertNull($dispatchedEvent->ttl);
+    }
+
+    public function testPauseForDispatchesQueuePausedEventWithTTL()
+    {
+        $dispatchedEvent = null;
+
+        $dispatcher = $this->manager->getApplication()['events'];
+
+        $dispatcher->listen(QueuePaused::class, function ($event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $this->manager->pauseFor('redis', 'emails', 60);
+
+        $this->assertInstanceOf(QueuePaused::class, $dispatchedEvent);
+        $this->assertSame('redis', $dispatchedEvent->connection);
+        $this->assertSame('emails', $dispatchedEvent->queue);
+        $this->assertSame(60, $dispatchedEvent->ttl);
+    }
+
+    public function testResumeDispatchesQueueResumedEvent()
+    {
+        $dispatchedEvent = null;
+
+        $dispatcher = $this->manager->getApplication()['events'];
+
+        $dispatcher->listen(QueueResumed::class, function ($event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $this->manager->resume('database', 'notifications');
+
+        $this->assertInstanceOf(QueueResumed::class, $dispatchedEvent);
+        $this->assertSame('database', $dispatchedEvent->connection);
+        $this->assertSame('notifications', $dispatchedEvent->queue);
     }
 
     public function testParsingQueueString()
