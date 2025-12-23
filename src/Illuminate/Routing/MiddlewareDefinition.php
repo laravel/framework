@@ -10,14 +10,14 @@ final readonly class MiddlewareDefinition implements Stringable
     /**
      * Create a new middleware definition instance.
      *
-     * @param  class-string  $class
+     * @param  string  $class
      * @param  array  $parameters
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        public readonly string $class,
-        public readonly array $parameters = [],
+        public string $class,
+        public array $parameters = [],
     ) {
         if (empty($class)) {
             throw new InvalidArgumentException('Middleware class cannot be empty.');
@@ -25,19 +25,7 @@ final readonly class MiddlewareDefinition implements Stringable
     }
 
     /**
-     * Determine if the parameters are named (associative array).
-     */
-    public function hasNamedParameters(): bool
-    {
-        if (empty($this->parameters)) {
-            return false;
-        }
-
-        return array_keys($this->parameters) !== range(0, count($this->parameters) - 1);
-    }
-
-    /**
-     * Convert the middleware definition to the legacy string format.
+     * Convert the middleware definition to its string representation.
      */
     public function __toString(): string
     {
@@ -45,11 +33,7 @@ final readonly class MiddlewareDefinition implements Stringable
             return $this->class;
         }
 
-        $params = $this->hasNamedParameters()
-            ? array_values($this->parameters)
-            : $this->parameters;
-
-        $params = array_map(fn ($p) => (string) $p, $params);
+        $params = array_map(fn ($p) => (string) $p, array_values($this->parameters));
 
         return $this->class.':'.implode(',', $params);
     }
