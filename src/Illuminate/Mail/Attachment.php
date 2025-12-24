@@ -99,7 +99,7 @@ class Attachment
     }
 
     /**
-     * Create a mail attachment from a file in the default storage disk.
+     * Create a mail attachment from a file on the default storage disk.
      *
      * @param  string  $path
      * @return static
@@ -110,7 +110,7 @@ class Attachment
     }
 
     /**
-     * Create a mail attachment from a file in the specified storage disk.
+     * Create a mail attachment from a file on the specified storage disk.
      *
      * @param  string|null  $disk
      * @param  string  $path
@@ -132,7 +132,7 @@ class Attachment
     }
 
     /**
-     * Create a mail attachment from a file in the cloud storage disk.
+     * Create a mail attachment from a file on the cloud storage disk.
      *
      * @param  string  $path
      * @return static
