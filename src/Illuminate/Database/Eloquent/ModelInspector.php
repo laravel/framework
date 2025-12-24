@@ -19,7 +19,7 @@ class ModelInspector
     /**
      * The methods that can be called in a model to indicate a relation.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $relationMethods = [
         'hasMany',
