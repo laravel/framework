@@ -15,7 +15,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
-use Resend\Resource;
 
 class ModelInspectorTest extends DatabaseTestCase
 {
