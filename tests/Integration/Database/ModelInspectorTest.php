@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\UseResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -11,8 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Resend\Resource;
 
 class ModelInspectorTest extends DatabaseTestCase
 {
@@ -39,6 +42,7 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
         $this->assertSame(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
         $this->assertSame(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
+        $this->assertSame(ModelInspectorTestModelResource::class, $modelInfo['resource']);
     }
 
     public function test_command_returns_json()
@@ -181,6 +185,7 @@ class ModelInspectorTest extends DatabaseTestCase
 
 #[ObservedBy(ModelInspectorTestModelObserver::class)]
 #[CollectedBy(ModelInspectorTestModelEloquentCollection::class)]
+#[UseResource(ModelInspectorTestModelResource::class)]
 class ModelInspectorTestModel extends Model
 {
     use HasUuids;
@@ -214,5 +219,9 @@ class ModelInspectorTestModelEloquentCollection extends Collection
 }
 
 class ModelInspectorTestModelBuilder extends Builder
+{
+}
+
+class ModelInspectorTestModelResource extends JsonResource
 {
 }
