@@ -8,7 +8,6 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cookie\Factory as CookieFactory;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -28,11 +27,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Log\LogManager;
-use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Defer\DeferredCallback;
 use Illuminate\Support\Defer\DeferredCallbackCollection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\HtmlString;
@@ -456,9 +455,7 @@ if (! function_exists('dispatch')) {
      */
     function dispatch($job): PendingDispatch|PendingClosureDispatch
     {
-        return $job instanceof Closure
-            ? new PendingClosureDispatch(CallQueuedClosure::create($job))
-            : new PendingDispatch($job);
+        return Bus::dispatchPending($job);
     }
 }
 
@@ -474,7 +471,7 @@ if (! function_exists('dispatch_sync')) {
      */
     function dispatch_sync($job, $handler = null)
     {
-        return app(Dispatcher::class)->dispatchSync($job, $handler);
+        return Bus::dispatchSync($job, $handler);
     }
 }
 

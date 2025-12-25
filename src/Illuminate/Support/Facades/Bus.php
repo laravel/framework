@@ -2,9 +2,13 @@
 
 namespace Illuminate\Support\Facades;
 
+use Closure;
 use Illuminate\Bus\BatchRepository;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Foundation\Bus\PendingChain;
+use Illuminate\Foundation\Bus\PendingClosureDispatch;
+use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
@@ -89,6 +93,19 @@ class Bus extends Facade
 
         return (new PendingChain(array_shift($jobs), $jobs))
             ->dispatch();
+    }
+
+    /**
+     * Dispatch a job to its appropriate handler.
+     *
+     * @param  mixed  $job
+     * @return ($job is \Closure ? \Illuminate\Foundation\Bus\PendingClosureDispatch : \Illuminate\Foundation\Bus\PendingDispatch)
+     */
+    public static function dispatchPending($job): PendingDispatch|PendingClosureDispatch
+    {
+        return $job instanceof Closure
+            ? new PendingClosureDispatch(CallQueuedClosure::create($job))
+            : new PendingDispatch($job);
     }
 
     /**
