@@ -31,20 +31,29 @@ class QueryException extends PDOException
     protected $bindings;
 
     /**
+     * The PDO read / write type for the executed query.
+     *
+     * @var null|'read'|'write'
+     */
+    public $readWriteType;
+
+    /**
      * Create a new query exception instance.
      *
      * @param  string  $connectionName
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
+     * @param  null|'read'|'write'  $readWriteType
      */
-    public function __construct($connectionName, $sql, array $bindings, Throwable $previous)
+    public function __construct($connectionName, $sql, array $bindings, Throwable $previous, $readWriteType = null)
     {
         parent::__construct('', 0, $previous);
 
         $this->connectionName = $connectionName;
         $this->sql = $sql;
         $this->bindings = $bindings;
+        $this->readWriteType = $readWriteType;
         $this->code = $previous->getCode();
         $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
 
