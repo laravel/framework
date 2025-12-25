@@ -1223,6 +1223,7 @@ class Validator implements ValidatorContract
             ->mapWithKeys(function ($value, $key) {
                 return [str_replace('\.', '__dot__'.static::$placeholderHash, $key) => $value];
             })
+            ->dot()
             ->toArray();
 
         $this->initialRules = $rules;
