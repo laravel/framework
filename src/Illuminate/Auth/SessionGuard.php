@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Auth\Events\Validated;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
@@ -600,7 +601,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function queueRecallerCookie(AuthenticatableContract $user)
     {
         $this->getCookieJar()->queue($this->createRecaller(
-            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
+            $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$this->hashPasswordForCookie($user->getAuthPassword())
         ));
     }
 
@@ -613,6 +614,25 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function createRecaller($value)
     {
         return $this->getCookieJar()->make($this->getRecallerName(), $value, $this->getRememberDuration());
+    }
+
+    /**
+     * Create a HMAC of the password hash for storage in cookies.
+     *
+     * @param  string  $passwordHash
+     * @return string
+     */
+    public function hashPasswordForCookie($passwordHash)
+    {
+        $container = Container::getInstance();
+
+        if ($container && $container->bound('config')) {
+            $key = $container->make('config')->get('app.key');
+        } else {
+            $key = 'base-key-for-password-hash-mac';
+        }
+
+        return hash_hmac('sha256', $passwordHash, $key);
     }
 
     /**
