@@ -60,7 +60,8 @@ class ExceptionMakeCommand extends GeneratorCommand
      */
     protected function alreadyExists($rawName)
     {
-        return class_exists($this->rootNamespace().'Exceptions\\'.$rawName);
+        return class_exists($rawName) ||
+            $this->files->exists($this->getPath($this->qualifyClass($rawName)));
     }
 
     /**
