@@ -232,7 +232,9 @@ class RateLimiter
 
         $attempts = $this->attempts($key);
 
-        return max(0, $maxAttempts - $attempts);
+        return $maxAttempts >= 0
+            ? max(0, $maxAttempts - $attempts)
+            : -1;
     }
 
     /**
