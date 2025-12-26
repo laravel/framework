@@ -427,16 +427,27 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
      *
-     * Instead, you may use the "input" method.
+     * @deprecated since version 12.45. Use properties ->attributes, query or request directly instead.
      *
      * @param  string  $key
      * @param  mixed  $default
      * @return mixed
      */
-    #[\Override]
     public function get(string $key, mixed $default = null): mixed
     {
-        return parent::get($key, $default);
+        if ($this !== $result = $this->attributes->get($key, $this)) {
+            return $result;
+        }
+
+        if ($this->query->has($key)) {
+            return $this->query->all()[$key];
+        }
+
+        if ($this->request->has($key)) {
+            return $this->request->all()[$key];
+        }
+
+        return $default;
     }
 
     /**
