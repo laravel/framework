@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory;
+use Illuminate\Queue\Console\Concerns\ParsesQueue;
 use Illuminate\Queue\Events\QueueBusy;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -12,6 +13,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 #[AsCommand(name: 'queue:monitor')]
 class MonitorCommand extends Command
 {
+    use ParsesQueue;
+
     /**
      * The console command name.
      *
@@ -88,12 +91,7 @@ class MonitorCommand extends Command
     protected function parseQueues($queues)
     {
         return (new Collection(explode(',', $queues)))->map(function ($queue) {
-            [$connection, $queue] = array_pad(explode(':', $queue, 2), 2, null);
-
-            if (! isset($queue)) {
-                $queue = $connection;
-                $connection = $this->laravel['config']['queue.default'];
-            }
+            [$connection, $queue] = $this->parseQueue($queue);
 
             return [
                 'connection' => $connection,
