@@ -102,7 +102,6 @@ abstract class MigrationGeneratorCommand extends Command
         $this->files->put($path, $stub);
     }
 
-
     /**
      * Determine whether a migration for the table already exists.
      *
