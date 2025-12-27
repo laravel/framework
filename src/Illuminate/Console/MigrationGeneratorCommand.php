@@ -84,15 +84,24 @@ abstract class MigrationGeneratorCommand extends Command
      * @param  string  $path
      * @param  string  $table
      * @return void
+     *
+     * @throws \RuntimeException if the stub file does not exist
      */
     protected function replaceMigrationPlaceholders($path, $table)
     {
+        $stubPath = $this->migrationStubFile();
+
+        if (! $this->files->exists($stubPath)) {
+            throw new \RuntimeException("Migration stub file does not exist: {$stubPath}");
+        }
+
         $stub = str_replace(
-            '{{table}}', $table, $this->files->get($this->migrationStubFile())
+            '{{table}}', $table, $this->files->get($stubPath)
         );
 
         $this->files->put($path, $stub);
     }
+
 
     /**
      * Determine whether a migration for the table already exists.
