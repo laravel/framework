@@ -48,6 +48,107 @@ class DatabaseQueryExceptionTest extends TestCase
         $this->assertSame($expectedSql, $result);
     }
 
+    public function testMessageIncludesConnectionInfo()
+    {
+        $pdoException = new PDOException('SQLSTATE[HY000] [2002] No such file or directory');
+        $exception = new QueryException('mysql::read', 'SELECT * FROM users', [], $pdoException, [
+            'driver' => 'mysql',
+            'name' => 'mysql::read',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'laravel_db',
+            'unix_socket' => null,
+        ]);
+
+        $this->assertStringContainsString('Host: 192.168.1.10', $exception->getMessage());
+        $this->assertStringContainsString('Port: 3306', $exception->getMessage());
+        $this->assertStringContainsString('Database: laravel_db', $exception->getMessage());
+        $this->assertStringContainsString('Connection: mysql::read', $exception->getMessage());
+    }
+
+    public function testMessageIncludesUnixSocket()
+    {
+        $pdoException = new PDOException('SQLSTATE[HY000] [2002] No such file or directory');
+        $exception = new QueryException('mysql', 'SELECT * FROM users', [], $pdoException, [
+            'driver' => 'mysql',
+            'unix_socket' => '/tmp/mysql.sock',
+            'database' => 'laravel_db',
+        ]);
+
+        $this->assertStringContainsString('Socket: /tmp/mysql.sock', $exception->getMessage());
+        $this->assertStringContainsString('Database: laravel_db', $exception->getMessage());
+        $this->assertStringNotContainsString('Host:', $exception->getMessage());
+    }
+
+    public function testMessageHandlesArrayHosts()
+    {
+        $pdoException = new PDOException('SQLSTATE[HY000] [2002] No such file or directory');
+        $exception = new QueryException('mysql::read', 'SELECT * FROM users', [], $pdoException, [
+            'driver' => 'mysql',
+            'host' => ['192.168.1.10', '192.168.1.11'],
+            'port' => '3306',
+            'database' => 'laravel_db',
+        ]);
+
+        $this->assertStringContainsString('Host: 192.168.1.10, 192.168.1.11', $exception->getMessage());
+    }
+
+    public function testMessageHandlesEmptyConnectionInfo()
+    {
+        $pdoException = new PDOException('SQLSTATE[HY000] [2002] No such file or directory');
+        $exception = new QueryException('mysql', 'SELECT * FROM users', [], $pdoException, [
+            'driver' => 'mysql',
+            'host' => '',
+            'port' => '',
+            'database' => '',
+        ]);
+
+        $this->assertStringContainsString('Host: ,', $exception->getMessage());
+        $this->assertStringContainsString('Database: ', $exception->getMessage());
+    }
+
+    public function testMessageForSqliteOnlyShowsDatabase()
+    {
+        $pdoException = new PDOException('SQLSTATE[HY000]: General error: 1 no such table');
+        $exception = new QueryException('sqlite', 'SELECT * FROM users', [], $pdoException, [
+            'driver' => 'sqlite',
+            'name' => 'sqlite',
+            'host' => null,
+            'port' => null,
+            'database' => '/path/to/database.sqlite',
+            'unix_socket' => null,
+        ]);
+
+        $this->assertStringContainsString('Database: /path/to/database.sqlite', $exception->getMessage());
+        $this->assertStringNotContainsString('Host:', $exception->getMessage());
+        $this->assertStringNotContainsString('Port:', $exception->getMessage());
+    }
+
+    public function testGetConnectionInfoReturnsConnectionInfo()
+    {
+        $pdoException = new PDOException('Mock error');
+        $connectionInfo = [
+            'driver' => 'mysql',
+            'name' => 'mysql::read',
+            'host' => '192.168.1.10',
+            'port' => '3306',
+            'database' => 'laravel_db',
+            'unix_socket' => null,
+        ];
+        $exception = new QueryException('mysql::read', 'SELECT * FROM users', [], $pdoException, $connectionInfo);
+
+        $this->assertSame($connectionInfo, $exception->getConnectionInfo());
+    }
+
+    public function testBackwardCompatibilityWithoutConnectionInfo()
+    {
+        $pdoException = new PDOException('Mock SQL error');
+        $exception = new QueryException('mysql', 'SELECT * FROM users WHERE id = ?', [1], $pdoException);
+
+        $this->assertSame('Mock SQL error (Connection: mysql, SQL: SELECT * FROM users WHERE id = 1)', $exception->getMessage());
+        $this->assertSame([], $exception->getConnectionInfo());
+    }
+
     protected function getConnection()
     {
         $connection = m::mock(Connection::class);

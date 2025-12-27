@@ -819,12 +819,12 @@ class Connection implements ConnectionInterface
         catch (Exception $e) {
             if ($this->isUniqueConstraintError($e)) {
                 throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e
+                    $this->getNameWithReadWriteType(), $query, $this->prepareBindings($bindings), $e, $this->getConnectionInfo()
                 );
             }
 
             throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e
+                $this->getNameWithReadWriteType(), $query, $this->prepareBindings($bindings), $e, $this->getConnectionInfo()
             );
         }
     }
@@ -1352,6 +1352,23 @@ class Connection implements ConnectionInterface
     public function getConfig($option = null)
     {
         return Arr::get($this->config, $option);
+    }
+
+    /**
+     * Get the connection info as an array.
+     *
+     * @return array
+     */
+    protected function getConnectionInfo()
+    {
+        return [
+            'driver' => $this->getDriverName(),
+            'name' => $this->getNameWithReadWriteType(),
+            'host' => $this->getConfig('host'),
+            'port' => $this->getConfig('port'),
+            'database' => $this->getConfig('database'),
+            'unix_socket' => $this->getConfig('unix_socket'),
+        ];
     }
 
     /**
