@@ -29,7 +29,7 @@ class SendingQueuedMailTest extends TestCase
         });
     }
 
-    public function testMailIsSentWhenDefaultingQueue()
+    public function testMailIsSentWhenRoutingQueue()
     {
         Queue::fake();
 

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\QueueRoutes;
-use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class QueueRoutesTest extends TestCase
 {
