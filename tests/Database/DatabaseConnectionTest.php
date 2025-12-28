@@ -373,7 +373,7 @@ class DatabaseConnectionTest extends TestCase
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('server has gone away (Connection: , SQL: foo)');
+        $this->expectExceptionMessage('server has gone away (Connection: , Host: , Port: , Database: , SQL: foo)');
 
         $pdo = m::mock(PDO::class);
         $pdo->shouldReceive('beginTransaction')->once();
@@ -425,7 +425,7 @@ class DatabaseConnectionTest extends TestCase
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {
         $this->expectException(QueryException::class);
-        $this->expectExceptionMessage('(Connection: conn, SQL: ) (Connection: , SQL: )');
+        $this->expectExceptionMessage('(Connection: conn, SQL: ) (Connection: , Host: , Port: , Database: , SQL: )');
 
         $method = (new ReflectionClass(Connection::class))->getMethod('run');
 
