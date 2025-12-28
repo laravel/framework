@@ -10,7 +10,6 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Auth\Events\Validated;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
