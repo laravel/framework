@@ -31,9 +31,18 @@ class SyncDriverTest extends TestCase
         $driver = new SyncDriver();
 
         [$first, $second, $third] = $driver->run([
-            function () { usleep(100000); return 'first'; },
-            function () { usleep(50000); return 'second'; },
-            function () { usleep(20000); return 'third'; },
+            function () {
+                usleep(100000);
+                return 'first';
+            },
+            function () {
+                usleep(50000);
+                return 'second';
+            },
+            function () {
+                usleep(20000);
+                return 'third';
+            },
         ]);
 
         $this->assertEquals('first', $first);
@@ -48,8 +57,12 @@ class SyncDriverTest extends TestCase
         $called = [];
 
         $deferred = $driver->defer([
-            function () use (&$called) { $called[] = 'first'; },
-            function () use (&$called) { $called[] = 'second'; },
+            function () use (&$called) {
+                $called[] = 'first';
+            },
+            function () use (&$called) {
+                $called[] = 'second';
+            },
         ]);
 
         $this->assertInstanceOf(DeferredCallback::class, $deferred);
