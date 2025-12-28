@@ -330,7 +330,7 @@ img {
         color: #fafafa !important;
     }
 
-    .logo {
+    .laravel-logo {
         filter: invert(23%) sepia(5%) saturate(531%) hue-rotate(202deg) brightness(96%) contrast(91%) !important;
     }
 
