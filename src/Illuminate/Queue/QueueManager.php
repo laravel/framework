@@ -141,7 +141,7 @@ class QueueManager implements FactoryContract, MonitorContract
      * @param  array<class-string, string>  $queues
      * @return void
      */
-    public function routes($queues)
+    public function routeMany($queues)
     {
         $this->queueRoutes()->setMany($queues);
     }
