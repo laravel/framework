@@ -137,7 +137,7 @@ class DatabaseQueryExceptionTest extends TestCase
         ];
         $exception = new QueryException('mysql::read', 'SELECT * FROM users', [], $pdoException, $connectionInfo);
 
-        $this->assertSame($connectionInfo, $exception->getConnectionInfo());
+        $this->assertSame($connectionInfo, $exception->getConnectionDetails());
     }
 
     public function testBackwardCompatibilityWithoutConnectionInfo()
@@ -146,7 +146,7 @@ class DatabaseQueryExceptionTest extends TestCase
         $exception = new QueryException('mysql', 'SELECT * FROM users WHERE id = ?', [1], $pdoException);
 
         $this->assertSame('Mock SQL error (Connection: mysql, SQL: SELECT * FROM users WHERE id = 1)', $exception->getMessage());
-        $this->assertSame([], $exception->getConnectionInfo());
+        $this->assertSame([], $exception->getConnectionDetails());
     }
 
     protected function getConnection()
