@@ -5,6 +5,8 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +14,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use InteractsWithTime;
+
     /**
      * The application instance.
      *
@@ -206,9 +210,15 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function pause($connection, $queue)
     {
+        $key = "illuminate:queue:paused:{$connection}:{$queue}";
+
+        $value = [
+            'paused_until' => null,
+        ];
+
         $this->app['cache']
             ->store()
-            ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+            ->forever($key, $value);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue)
@@ -225,9 +235,15 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function pauseFor($connection, $queue, $ttl)
     {
+        $key = "illuminate:queue:paused:{$connection}:{$queue}";
+
+        $value = [
+            'paused_until' => $this->availableAt($ttl),
+        ];
+
         $this->app['cache']
             ->store()
-            ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+            ->put($key, $value, $ttl);
 
         $this->app['events']->dispatch(
             new Events\QueuePaused($connection, $queue, $ttl)
@@ -264,6 +280,24 @@ class QueueManager implements FactoryContract, MonitorContract
         return (bool) $this->app['cache']
             ->store()
             ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+    }
+
+    /**
+     * Get the time until which the queue is paused.
+     *
+     * @param  string  $connection
+     * @param  string  $queue
+     * @return \Illuminate\Support\Carbon|null
+     */
+    public function pausedUntil($connection, $queue)
+    {
+        $value = $this->app['cache']
+            ->store()
+            ->get("illuminate:queue:paused:{$connection}:{$queue}", false);
+
+        return $value && isset($value['paused_until'])
+            ? Carbon::createFromTimestamp($value['paused_until'])
+            : null;
     }
 
     /**
