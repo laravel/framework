@@ -197,7 +197,7 @@ class NotificationSenderTest extends TestCase
         $sender->send($notifiable, new DummyNotificationWithViaQueues);
     }
 
-    public function testItCanSendQueuedNotificationsWithDefaultQueue()
+    public function testItCanSendQueuedNotificationsWithQueueRoute()
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
