@@ -87,6 +87,7 @@ class Listener
     {
         while (true) {
             $process = $this->makeProcess($connection, $queue, $options);
+
             $this->runProcess($process, $options->memory);
 
             if ($options->rest) {
