@@ -50,7 +50,8 @@ class AuthenticateSession implements AuthenticatesSessions
         if ($this->guard()->viaRemember()) {
             $passwordHashFromCookie = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
-            if (! $passwordHashFromCookie || ! $this->validatePasswordHash($request->user()->getAuthPassword(), $passwordHashFromCookie)) {
+            if (! $passwordHashFromCookie ||
+                ! $this->validatePasswordHash($request->user()->getAuthPassword(), $passwordHashFromCookie)) {
                 $this->logout($request);
             }
         }
@@ -87,6 +88,24 @@ class AuthenticateSession implements AuthenticatesSessions
         $request->session()->put([
             'password_hash_'.$this->auth->getDefaultDriver() => $this->guard()->hashPasswordForCookie($request->user()->getAuthPassword()),
         ]);
+    }
+
+    /**
+     * Validate the password hash against the stored value.
+     *
+     * @param  string  $passwordHash
+     * @param  string  $storedValue
+     * @return bool
+     */
+    protected function validatePasswordHash($passwordHash, $storedValue)
+    {
+        // Try new HMAC format first...
+        if (hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)) {
+            return true;
+        }
+
+        // Fall back to raw password hash format for backward compatibility...
+        return hash_equals($passwordHash, $storedValue);
     }
 
     /**
@@ -129,28 +148,6 @@ class AuthenticateSession implements AuthenticatesSessions
         if (static::$redirectToCallback) {
             return call_user_func(static::$redirectToCallback, $request);
         }
-    }
-
-    /**
-     * Validate the password hash against the stored value.
-     *
-     * This method first tries to validate using HMAC (new format),
-     * and falls back to raw password hash comparison (old format)
-     * for backward compatibility.
-     *
-     * @param  string  $passwordHash
-     * @param  string  $storedValue
-     * @return bool
-     */
-    protected function validatePasswordHash($passwordHash, $storedValue)
-    {
-        // Try new HMAC format first
-        if (hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)) {
-            return true;
-        }
-
-        // Fall back to old raw password hash format for backward compatibility
-        return hash_equals($passwordHash, $storedValue);
     }
 
     /**
