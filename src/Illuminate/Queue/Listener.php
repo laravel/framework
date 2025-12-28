@@ -85,9 +85,9 @@ class Listener
      */
     public function listen($connection, $queue, ListenerOptions $options)
     {
-        while (true) {
-            $process = $this->makeProcess($connection, $queue, $options);
+        $process = $this->makeProcess($connection, $queue, $options);
 
+        while (true) {
             $this->runProcess($process, $options->memory);
 
             if ($options->rest) {
