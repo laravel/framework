@@ -33,14 +33,17 @@ class SyncDriverTest extends TestCase
         [$first, $second, $third] = $driver->run([
             function () {
                 usleep(100000);
+
                 return 'first';
             },
             function () {
                 usleep(50000);
+
                 return 'second';
             },
             function () {
                 usleep(20000);
+                
                 return 'third';
             },
         ]);
@@ -75,4 +78,3 @@ class SyncDriverTest extends TestCase
         $this->assertEquals(['first', 'second'], $called);
     }
 }
-
