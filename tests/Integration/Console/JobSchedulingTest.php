@@ -81,12 +81,12 @@ class JobSchedulingTest extends TestCase
         })->count());
     }
 
-    public function testJobQueuingRespectsQueueDefaults(): void
+    public function testJobQueuingRespectsQueueRoutes(): void
     {
         Queue::fake();
 
-        Queue::defaultQueue(JobWithDefaultQueue::class, 'default-queue');
-        Queue::defaultQueue(JobWithoutDefaultQueue::class, 'fallback-queue');
+        Queue::route(JobWithDefaultQueue::class, 'default-queue');
+        Queue::route(JobWithoutDefaultQueue::class, 'fallback-queue');
 
         /** @var \Illuminate\Console\Scheduling\Schedule $scheduler */
         $scheduler = $this->app->make(Schedule::class);

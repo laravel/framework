@@ -8,7 +8,7 @@ use Illuminate\Bus\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Queue\Jobs\SqsJob;
-use Illuminate\Queue\QueueDefaults;
+use Illuminate\Queue\QueueRoutes;
 use Illuminate\Queue\SqsQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -106,11 +106,11 @@ class QueueSqsQueueTest extends TestCase
         $container = m::spy(Container::class);
 
         $container->shouldReceive('bound')
-            ->with('queue.defaults')
+            ->with('queue.routes')
             ->andReturn(true);
         $container->shouldReceive('offsetGet')
-            ->with('queue.defaults')
-            ->andReturn(new QueueDefaults());
+            ->with('queue.routes')
+            ->andReturn(new QueueRoutes());
 
         return $container;
     }

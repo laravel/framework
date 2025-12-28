@@ -23,7 +23,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
-        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $container->instance('queue.routes', $queueDefaults = m::mock());
         $queueDefaults->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
@@ -39,7 +39,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
-        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $container->instance('queue.routes', $queueDefaults = m::mock());
         $queueDefaults->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
@@ -55,7 +55,7 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
-        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $container->instance('queue.routes', $queueDefaults = m::mock());
         $queueDefaults->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
@@ -68,10 +68,10 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
     }
 
-    public function testCommandsAreDispatchedWithDefaultQueue()
+    public function testCommandsAreDispatchedWithQueueRoute()
     {
         $container = new Container;
-        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $container->instance('queue.routes', $queueDefaults = m::mock());
         $queueDefaults->shouldReceive('get')->andReturn('high-priority');
 
         $mock = m::mock(Queue::class);
@@ -124,7 +124,7 @@ class BusDispatcherTest extends TestCase
                 ],
             ]);
         });
-        $container->instance('queue.defaults', $queueDefaults = m::mock());
+        $container->instance('queue.routes', $queueDefaults = m::mock());
         $queueDefaults->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
 

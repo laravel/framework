@@ -3,30 +3,30 @@
 namespace Illuminate\Tests\Queue;
 
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\QueueDefaults;
+use Illuminate\Queue\QueueRoutes;
 use Orchestra\Testbench\TestCase;
 
-class QueueDefaultsTest extends TestCase
+class QueueRoutesTest extends TestCase
 {
     public function testSet()
     {
-        $defaults = new QueueDefaults();
+        $defaults = new QueueRoutes();
 
-        $defaults->set(QueueDefaults::class, 'some-queue');
+        $defaults->set(QueueRoutes::class, 'some-queue');
 
-        $this->assertSame([QueueDefaults::class => 'some-queue'], $defaults->all());
+        $this->assertSame([QueueRoutes::class => 'some-queue'], $defaults->all());
 
         $defaults->setMany([
-            QueueDefaults::class => 'queue-many',
+            QueueRoutes::class => 'queue-many',
             'AClass' => 'mail',
         ]);
 
-        $this->assertSame([QueueDefaults::class => 'queue-many', 'AClass' => 'mail'], $defaults->all());
+        $this->assertSame([QueueRoutes::class => 'queue-many', 'AClass' => 'mail'], $defaults->all());
     }
 
     public function testGet()
     {
-        $defaults = new QueueDefaults();
+        $defaults = new QueueRoutes();
 
         $defaults->setMany([
             BaseNotification::class => 'notifications',

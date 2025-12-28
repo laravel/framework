@@ -5,7 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
-use Illuminate\Queue\Concerns\ResolvesQueueDefaults;
+use Illuminate\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 
 /**
@@ -13,7 +13,7 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
-    use ResolvesQueueDefaults;
+    use ResolvesQueueRoutes;
 
     /**
      * The application instance.
@@ -124,26 +124,26 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Set the default queue for the given queueable class.
+     * Set the default queue route for the given class.
      *
      * @param  class-string  $class
      * @param  string  $queue
      * @return void
      */
-    public function defaultQueue($class, $queue)
+    public function route($class, $queue)
     {
-        $this->queueDefaults()->set($class, $queue);
+        $this->queueRoutes()->set($class, $queue);
     }
 
     /**
-     * Set the default queues for the given queueable classes.
+     * Set the default queue routes for the given classes.
      *
      * @param  array<class-string, string>  $queues
      * @return void
      */
-    public function defaultQueues($queues)
+    public function routes($queues)
     {
-        $this->queueDefaults()->setMany($queues);
+        $this->queueRoutes()->setMany($queues);
     }
 
     /**
@@ -352,13 +352,13 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Get the queue defaults instance.
+     * Get the queue routes instance.
      *
-     * @return \Illuminate\Queue\QueueDefaults
+     * @return \Illuminate\Queue\QueueRoutes
      */
-    protected function queueDefaults()
+    protected function queueRoutes()
     {
-        return $this->app['queue.defaults'];
+        return $this->app['queue.routes'];
     }
 
     /**

@@ -119,8 +119,8 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerDefaults()
     {
-        $this->app->singleton('queue.defaults', function () {
-            return new QueueDefaults;
+        $this->app->singleton('queue.routes', function () {
+            return new QueueRoutes;
         });
     }
 
@@ -399,7 +399,7 @@ class QueueServiceProvider extends ServiceProvider implements DeferrableProvider
         return [
             'queue',
             'queue.connection',
-            'queue.defaults',
+            'queue.routes',
             'queue.failer',
             'queue.listener',
             'queue.worker',
