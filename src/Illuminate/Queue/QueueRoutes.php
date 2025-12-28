@@ -12,7 +12,7 @@ class QueueRoutes
     protected $routes = [];
 
     /**
-     * Register the default queue route for the given class.
+     * Register the queue route for the given class.
      *
      * @param  class-string  $class
      * @param  string  $queueName
@@ -24,7 +24,7 @@ class QueueRoutes
     }
 
     /**
-     * Register the default queue routes for the given classes.
+     * Register the queue routes for the given classes.
      *
      * @param  array<class-string, string>  $defaults
      * @return void
@@ -35,7 +35,7 @@ class QueueRoutes
     }
 
     /**
-     * Get the default queue route for a given queueable instance.
+     * Get the queue route for a given queueable instance.
      *
      * @param  object  $queueable
      * @return string|null

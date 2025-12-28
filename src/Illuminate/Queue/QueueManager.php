@@ -124,7 +124,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Set the default queue route for the given class.
+     * Set the queue route for the given class.
      *
      * @param  class-string  $class
      * @param  string  $queue
@@ -136,7 +136,7 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
-     * Set the default queue routes for the given classes.
+     * Set the queue routes for the given classes.
      *
      * @param  array<class-string, string>  $queues
      * @return void
