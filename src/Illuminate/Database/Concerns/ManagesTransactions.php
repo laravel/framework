@@ -111,7 +111,7 @@ trait ManagesTransactions
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
-            $this->handleBackoff($backoff, $e, $currentAttempt, $maxAttempts);
+            $this->handleTransactionExceptionBackoff($backoff, $e, $currentAttempt, $maxAttempts);
 
             return;
         }
@@ -128,7 +128,7 @@ trait ManagesTransactions
      * @param  int  $maxAttempts
      * @return void 
      */
-    public function handleBackoff($backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
+    public function handleTransactionExceptionBackoff($backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
     {
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
