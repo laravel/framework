@@ -4157,6 +4157,18 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Truncate the table even if foreign key constraints exist.
+     *
+     * @return void
+     */
+    public function forceTruncate()
+    {
+        $this->connection->getSchemaBuilder()->withoutForeignKeyConstraints(function () {
+            $this->truncate();
+        });
+    }
+
+    /**
      * Get a new instance of the query builder.
      *
      * @return \Illuminate\Database\Query\Builder
