@@ -253,7 +253,7 @@ class RateLimiter
      * @param  string  $key
      * @return void
      */
-    public function clear($key)
+    public function clear($key): void
     {
         $key = $this->cleanRateLimiterKey($key);
 
