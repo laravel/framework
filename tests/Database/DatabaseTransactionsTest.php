@@ -244,7 +244,7 @@ class DatabaseTransactionsTest extends TestCase
         }
     }
 
-    #[DataProvider('transactionRollBackAndBackedOffProvider')]
+    #[DataProvider('transactionIsRolledBackAndBackedOffProvider')]
     public function testTransactionIsRolledBackAndBackedOff($backoff, $expectedSleepSequence)
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
@@ -282,7 +282,7 @@ class DatabaseTransactionsTest extends TestCase
         }
     }
 
-    public static function transactionRollBackAndBackedOffProvider()
+    public static function transactionIsRolledBackAndBackedOffProvider()
     {
         yield 'null backoff' => [
             null,
