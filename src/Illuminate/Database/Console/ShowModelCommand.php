@@ -97,11 +97,11 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     {
         $this->newLine();
 
-        $this->components->twoColumnDetail('<fg=green;options=bold>'.$modelData['class'].'</>');
-        $this->components->twoColumnDetail('Database', $modelData['database']);
-        $this->components->twoColumnDetail('Table', $modelData['table']);
+        $this->components->twoColumnDetail('<fg=green;options=bold>'.$modelData->class.'</>');
+        $this->components->twoColumnDetail('Database', $modelData->database);
+        $this->components->twoColumnDetail('Table', $modelData->table);
 
-        if (($policy = $modelData['policy'] ?? false)) {
+        if (($policy = $modelData->policy ?? false)) {
             $this->components->twoColumnDetail('Policy', $policy);
         }
 
@@ -112,7 +112,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
             'type <fg=gray>/</> <fg=yellow;options=bold>cast</>',
         );
 
-        foreach (($modelData['attributes'] ?? []) as $attribute) {
+        foreach ($modelData->attributes as $attribute) {
             $first = trim(sprintf(
                 '%s %s',
                 $attribute['name'],
@@ -141,7 +141,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Relations</>');
 
-        foreach (($modelData['relations'] ?? []) as $relation) {
+        foreach ($modelData->relations as $relation) {
             $this->components->twoColumnDetail(
                 sprintf('%s <fg=gray>%s</>', $relation['name'], $relation['type']),
                 $relation['related']
@@ -152,8 +152,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Events</>');
 
-        if ($modelData['events']->count()) {
-            foreach ($modelData['events'] as $event) {
+        if ($modelData->events->count()) {
+            foreach ($modelData->events as $event) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $event['event']),
                     sprintf('%s', $event['class']),
@@ -165,8 +165,8 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
 
         $this->components->twoColumnDetail('<fg=green;options=bold>Observers</>');
 
-        if ($modelData['observers']->count()) {
-            foreach ($modelData['observers'] as $observer) {
+        if ($modelData->observers->count()) {
+            foreach ($modelData->observers as $observer) {
                 $this->components->twoColumnDetail(
                     sprintf('%s', $observer['event']),
                     implode(', ', $observer['observer'])
