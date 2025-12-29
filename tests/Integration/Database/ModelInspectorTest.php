@@ -166,6 +166,8 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertEquals('created', $modelInfo['observers'][0]['event']);
         $this->assertCount(1, $modelInfo['observers'][0]['observer']);
         $this->assertEquals("Illuminate\Tests\Integration\Database\ModelInspectorTestModelObserver@created", $modelInfo['observers'][0]['observer'][0]);
+        $this->assertEquals(ModelInspectorTestModelEloquentCollection::class, $modelInfo['collection']);
+        $this->assertEquals(ModelInspectorTestModelBuilder::class, $modelInfo['builder']);
     }
 
     private function assertAttributes($expectedAttributes, $actualAttributes)
