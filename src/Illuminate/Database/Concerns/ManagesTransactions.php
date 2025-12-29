@@ -4,6 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Closure;
 use Illuminate\Database\DeadlockException;
+use Illuminate\Support\Sleep;
 use RuntimeException;
 use Throwable;
 
@@ -19,11 +20,12 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
+     * @param  callable|array|int|null  $backoff
      * @return TReturn
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1)
+    public function transaction(Closure $callback, $attempts = 1, $backoff = null)
     {
         for ($currentAttempt = 1; $currentAttempt <= $attempts; $currentAttempt++) {
             $this->beginTransaction();
@@ -40,7 +42,7 @@ trait ManagesTransactions
             // exception back out, and let the developer handle an uncaught exception.
             catch (Throwable $e) {
                 $this->handleTransactionException(
-                    $e, $currentAttempt, $attempts
+                    $e, $currentAttempt, $attempts, $backoff
                 );
 
                 continue;
@@ -81,11 +83,12 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
+     * @param  callable|array|int|null  $backoff
      * @return void
      *
      * @throws \Throwable
      */
-    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    protected function handleTransactionException(Throwable $e, $currentAttempt, $maxAttempts, $backoff)
     {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
@@ -108,10 +111,35 @@ trait ManagesTransactions
 
         if ($this->causedByConcurrencyError($e) &&
             $currentAttempt < $maxAttempts) {
+            $this->handleBackoff($backoff, $e, $currentAttempt, $maxAttempts);
+
             return;
         }
 
         throw $e;
+    }
+
+    /**
+     * Handle the backoff between transaction attempts.
+     * 
+     * @param  callable|array|int|null  $backoff
+     * @param  \Throwable  $e
+     * @param  int  $currentAttempt
+     * @param  int  $maxAttempts
+     * @return void 
+     */
+    public function handleBackoff(callable|array|int|null $backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
+    {
+        $duration = (int) match (true) {
+            is_int($backoff) => $backoff,
+            is_array($backoff) => $backoff[$currentAttempt - 1] ?? end($backoff) ?? 0,
+            is_callable($backoff) => $backoff($e, $currentAttempt, $maxAttempts) ?? 0,
+            default => 0,
+        };
+
+        if ($duration > 0) {
+            Sleep::for($duration)->milliseconds();
+        }
     }
 
     /**

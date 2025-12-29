@@ -5,7 +5,10 @@ namespace Illuminate\Tests\Database;
 use Exception;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\DatabaseTransactionsManager;
+use Illuminate\Support\Sleep;
 use Mockery as m;
+use PDOException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -239,6 +242,79 @@ class DatabaseTransactionsTest extends TestCase
             });
         } catch (Throwable) {
         }
+    }
+
+    #[DataProvider('transactionRollBackAndBackedOffProvider')]
+    public function testTransactionIsRolledBackAndBackedOff($backoff, $expectedSleepSequence)
+    {
+        $transactionManager = m::mock(new DatabaseTransactionsManager);
+        $transactionManager->shouldReceive('begin')->times(4)->with('default', 1);
+        $transactionManager->shouldReceive('rollback')->times(4)->with('default', 0);
+        $transactionManager->shouldNotReceive('commit');
+
+        $this->connection()->setTransactionManager($transactionManager);
+
+        $this->connection()->table('users')->insert([
+            'name' => 'zain', 'value' => 1,
+        ]);
+
+        Sleep::fake();
+
+        try {
+            $this->connection()->transaction(
+                callback: function () {
+                    $this->connection()->table('users')->where(['name' => 'zain'])->update([
+                        'value' => 2,
+                    ]);
+
+                    throw new PDOException('A deadlock occurred', 40001);
+                }, 
+                attempts: 4, // Final attempt doesn't have any backoff
+                backoff: $backoff,
+            );
+        } catch (PDOException) {
+        }         
+
+        if (count($expectedSleepSequence) > 0) {
+            Sleep::assertSequence($expectedSleepSequence);
+        } else {
+            Sleep::assertNeverSlept();
+        }
+    }
+
+    public static function transactionRollBackAndBackedOffProvider()
+    {
+        yield 'null backoff' => [
+            null,
+            [],
+        ];
+
+        yield 'integer backoff' => [
+            42, 
+            [
+                Sleep::for(42)->milliseconds(),
+                Sleep::for(42)->milliseconds(),
+                Sleep::for(42)->milliseconds(),
+            ],
+        ];
+
+        yield 'array backoff' => [
+            [1111, 2222],
+            [
+                Sleep::for(1111)->milliseconds(),
+                Sleep::for(2222)->milliseconds(),
+                Sleep::for(2222)->milliseconds(),
+            ],
+        ];
+
+        yield 'callable backoff' => [
+            fn (Throwable $e, int $currentAttempt, int $maxAttempts): int => $currentAttempt * 2222,
+            [
+                Sleep::for(2222)->milliseconds(),
+                Sleep::for(4444)->milliseconds(),
+                Sleep::for(6666)->milliseconds(),
+            ],            
+        ];
     }
 
     /**
