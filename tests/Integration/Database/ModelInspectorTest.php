@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Schema\Blueprint;
@@ -50,7 +51,7 @@ class ModelInspectorTest extends DatabaseTestCase
         $this->assertModelInfo($modelInfo);
     }
 
-    private function assertModelInfo(array $modelInfo)
+    private function assertModelInfo(ModelInfo|array $modelInfo)
     {
         $this->assertEquals(ModelInspectorTestModel::class, $modelInfo['class']);
         $this->assertEquals(Schema::getConnection()->getConfig()['name'], $modelInfo['database']);

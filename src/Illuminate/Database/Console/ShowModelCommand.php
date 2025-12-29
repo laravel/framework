@@ -5,6 +5,7 @@ namespace Illuminate\Database\Console;
 use Illuminate\Console\Concerns\FindsAvailableModels;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\ModelInfo;
 use Illuminate\Database\Eloquent\ModelInspector;
 use Illuminate\Support\Collection;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -66,10 +67,9 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     /**
      * Render the model information.
      *
-     * @param  array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}  $modelData
      * @return void
      */
-    protected function display(array $modelData)
+    protected function display(ModelInfo $modelData)
     {
         $this->option('json')
             ? $this->displayJson($modelData)
@@ -79,10 +79,9 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     /**
      * Render the model information as JSON.
      *
-     * @param  array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}  $modelData
      * @return void
      */
-    protected function displayJson(array $modelData)
+    protected function displayJson(ModelInfo $modelData)
     {
         $this->output->writeln(
             (new Collection($modelData))->toJson()
@@ -92,10 +91,9 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
     /**
      * Render the model information for the CLI.
      *
-     * @param  array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection, relations: \Illuminate\Support\Collection, events: \Illuminate\Support\Collection, observers: \Illuminate\Support\Collection, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}  $modelData
      * @return void
      */
-    protected function displayCli(array $modelData)
+    protected function displayCli(ModelInfo $modelData)
     {
         $this->newLine();
 
