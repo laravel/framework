@@ -22,6 +22,13 @@ class Store implements Session
     use Macroable;
 
     /**
+     * The length used when generating session IDs.
+     *
+     * @var int
+     */
+    private const SESSION_ID_LENGTH = 40;
+
+    /**
      * The session ID.
      *
      * @var string
@@ -696,7 +703,7 @@ class Store implements Session
      */
     public function isValidId($id)
     {
-        return is_string($id) && ctype_alnum($id) && strlen($id) === 40;
+        return is_string($id) && ctype_alnum($id) && strlen($id) === self::SESSION_ID_LENGTH;
     }
 
     /**
@@ -706,7 +713,7 @@ class Store implements Session
      */
     protected function generateSessionId()
     {
-        return Str::random(40);
+        return Str::random(self::SESSION_ID_LENGTH);
     }
 
     /**
@@ -739,7 +746,7 @@ class Store implements Session
      */
     public function regenerateToken()
     {
-        $this->put('_token', Str::random(40));
+        $this->put('_token', Str::random(self::SESSION_ID_LENGTH));
     }
 
     /**
