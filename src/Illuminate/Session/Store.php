@@ -22,11 +22,11 @@ class Store implements Session
     use Macroable;
 
     /**
-     * The length used when generating session IDs.
+     * The length of session ID strings.
      *
      * @var int
      */
-    private const SESSION_ID_LENGTH = 40;
+    protected const SESSION_ID_LENGTH = 40;
 
     /**
      * The session ID.
