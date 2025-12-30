@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -62,12 +63,12 @@ class ModelInfo implements Arrayable, ArrayAccess
 
     public function offsetExists(mixed $offset): bool
     {
-        return property_exists($this, $offset) ? true : false;
+        return property_exists($this, $offset);
     }
 
     public function offsetGet(mixed $offset): mixed
     {
-        return property_exists($this, $offset) ? $this->{$offset} : throw new \InvalidArgumentException("Property {$offset} does not exist.");
+        return property_exists($this, $offset) ? $this->{$offset} : throw new InvalidArgumentException("Property {$offset} does not exist.");
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
