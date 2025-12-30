@@ -4,5 +4,7 @@ use Illuminate\Support\Facades\Http;
 
 use function PHPStan\Testing\assertType;
 
-assertType('Illuminate\Http\Client\Response', Http::createPendingRequest()->get('/foo'));
-assertType('GuzzleHttp\Promise\PromiseInterface', Http::createPendingRequest()->async()->get('/foo'));
+foreach (['get', 'post', 'put', 'patch', 'delete', 'head'] as $method) {
+    assertType('Illuminate\Http\Client\Response', Http::createPendingRequest()->$method('/foo'));
+    assertType('GuzzleHttp\Promise\PromiseInterface', Http::createPendingRequest()->async()->$method('/foo'));
+}
