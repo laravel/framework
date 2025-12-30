@@ -372,4 +372,28 @@ class RepositoryTest extends TestCase
 
         $this->repository->float('a.b');
     }
+
+    public function testItGetsAsClassString(): void
+    {
+        $this->repository->set([
+            'class' => \stdClass::class,
+            'class-as-string' => 'stdClass',
+        ]);
+
+        $this->assertSame(
+            $this->repository->class('class'), \stdClass::class
+        );
+
+        $this->assertSame(
+            $this->repository->class('class-as-string'), \stdClass::class
+        );
+    }
+
+    public function testItThrowsAnExceptionWhenTryingToGetNonClassStringValueAsClassString(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('#Configuration value for key \[foo\] must be a class-string, (.*) given.#');
+
+        $this->repository->class('foo');
+    }
 }

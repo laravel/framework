@@ -201,6 +201,28 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified class-string configuration value.
+     *
+     * @param  string  $key
+     * @param  (\Closure():(class-string|null))|class-string|null  $default
+     * @return class-string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function class(string $key, $default = null): string
+    {
+        $value = $this->string($key, $default);
+
+        if (! class_exists($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Configuration value for key [%s] must be a class-string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
      * Set a given configuration value.
      *
      * @param  array|string  $key
