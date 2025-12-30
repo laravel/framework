@@ -12,16 +12,18 @@ use LogicException;
 class ModelInfo implements Arrayable, ArrayAccess
 {
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
-     * @param  string  $database
-     * @param  string  $table
-     * @param  class-string|null  $policy
-     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $attributes
-     * @param  \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>  $relations
-     * @param  \Illuminate\Support\Collection<int, array{event: string, class: string}>  $events
-     * @param  \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>  $observers
-     * @param  class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>  $collection
-     * @param  class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>  $builder
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     *
+     * @param  class-string<TModel>  $class  The model's fully-qualified class.
+     * @param  string  $database  The database connection name.
+     * @param  string  $table  The database table name.
+     * @param  class-string|null  $policy  The policy that applies to the model.
+     * @param  \Illuminate\Support\Collection<int, array<string, mixed>>  $attributes  The attributes available on the model.
+     * @param  \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>  $relations  The relations defined on the model.
+     * @param  \Illuminate\Support\Collection<int, array{event: string, class: string}>  $events  The events that the model dispatches.
+     * @param  \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>  $observers  The observers registered for the model.
+     * @param  class-string<\Illuminate\Database\Eloquent\Collection<TModel>>  $collection  The Collection class that collects the models.
+     * @param  class-string<\Illuminate\Database\Eloquent\Builder<TModel>>  $builder  The Builder class registered for the model.
      */
     public function __construct(
         public $class,
@@ -38,7 +40,7 @@ class ModelInfo implements Arrayable, ArrayAccess
     }
 
     /**
-     * Convert the data object back to array form.
+     * Convert the model info to an array.
      *
      * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection<int, array<string, mixed>>, relations: \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>, events: \Illuminate\Support\Collection<int, array{event: string, class: string}>, observers: \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}
      */
@@ -60,7 +62,7 @@ class ModelInfo implements Arrayable, ArrayAccess
 
     public function offsetExists(mixed $offset): bool
     {
-        return property_exists($this, $offset) ? $this->{$offset} : false;
+        return property_exists($this, $offset) ? true : false;
     }
 
     public function offsetGet(mixed $offset): mixed
