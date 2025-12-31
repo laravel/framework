@@ -136,11 +136,7 @@ class SyncQueue extends Queue implements QueueContract
 
             $this->handleException($queueJob, $e);
         } finally {
-            if ($this->container->bound('events')) {
-                $this->container['events']->dispatch(
-                    new JobAttempted($this->connectionName, $queueJob, $exceptionOccurred ?? false)
-                );
-            }
+            $this->raiseJobAttemptedEvent($queueJob, $exceptionOccurred ?? false);
         }
 
         return 0;
@@ -181,6 +177,20 @@ class SyncQueue extends Queue implements QueueContract
     {
         if ($this->container->bound('events')) {
             $this->container['events']->dispatch(new JobProcessed($this->connectionName, $job));
+        }
+    }
+
+    /**
+     * Raise the job attempted event.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  bool  $exceptionOccurred
+     * @return void
+     */
+    protected function raiseJobAttemptedEvent(Job $job, bool $exceptionOccurred = false)
+    {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new JobAttempted($this->connectionName, $job, $exceptionOccurred));
         }
     }
 
