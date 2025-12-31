@@ -43,7 +43,17 @@ class ModelInfo implements Arrayable, ArrayAccess
     /**
      * Convert the model info to an array.
      *
-     * @return array{"class": class-string<\Illuminate\Database\Eloquent\Model>, database: string, table: string, policy: class-string|null, attributes: \Illuminate\Support\Collection<int, array<string, mixed>>, relations: \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>, events: \Illuminate\Support\Collection<int, array{event: string, class: string}>, observers: \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>, builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>}
+     * @return array{
+     *     "class": class-string<\Illuminate\Database\Eloquent\Model>,
+     *     database: string,
+     *     table: string,
+     *     policy: class-string|null,
+     *     attributes: \Illuminate\Support\Collection<int, array<string, mixed>>,
+     *     relations: \Illuminate\Support\Collection<int, array{name: string, type: string, related: class-string<\Illuminate\Database\Eloquent\Model>}>,
+     *     events: \Illuminate\Support\Collection<int, array{event: string, class: string}>,
+     *     observers: \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>, collection: class-string<\Illuminate\Database\Eloquent\Collection<\Illuminate\Database\Eloquent\Model>>,
+     *     builder: class-string<\Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>>
+     * }
      */
     public function toArray()
     {
