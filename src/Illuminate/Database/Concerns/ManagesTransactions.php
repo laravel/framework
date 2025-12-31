@@ -20,7 +20,7 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @param  callable|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array|int|null  $backoff
      * @return TReturn
      *
      * @throws \Throwable
@@ -83,7 +83,7 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
-     * @param  callable|array|int|null  $backoff
+     * @param  \Closure|array|int|null  $backoff
      * @return void
      *
      * @throws \Throwable
@@ -121,14 +121,14 @@ trait ManagesTransactions
 
     /**
      * Handle the backoff between transaction attempts.
-     * 
-     * @param  callable|array|int|null  $backoff
+     *
+     * @param  \Closure|array|int|null  $backoff
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
-     * @return void 
+     * @return void
      */
-    public function handleTransactionExceptionBackoff($backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
+    protected function handleTransactionExceptionBackoff($backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
     {
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
