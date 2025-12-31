@@ -2,19 +2,21 @@
 
 namespace Illuminate\Tests\Auth;
 
+
 use Illuminate\Auth\AuthManager;
-use Illuminate\Container\Container;
-use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Auth\SessionGuard;
 use Illuminate\Auth\RequestGuard;
-use Illuminate\Http\Request as IlluminateRequest;
-use Illuminate\Contracts\Session\Session as SessionContract;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieFactoryContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Session\Session as SessionContract;
+use Illuminate\Http\Request as IlluminateRequest;
 use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+
 
 class AuthManagerTest extends TestCase
 {
@@ -194,4 +196,3 @@ class AuthManagerTest extends TestCase
         $this->assertSame('bar', $this->auth->foo());
     }
 }
-
