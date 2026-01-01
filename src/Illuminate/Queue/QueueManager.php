@@ -5,6 +5,7 @@ namespace Illuminate\Queue;
 use Closure;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
+use Illuminate\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 
 /**
@@ -12,6 +13,8 @@ use InvalidArgumentException;
  */
 class QueueManager implements FactoryContract, MonitorContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -118,6 +121,29 @@ class QueueManager implements FactoryContract, MonitorContract
     public function stopping($callback)
     {
         $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+    }
+
+    /**
+     * Set the queue route for the given class.
+     *
+     * @param  class-string  $class
+     * @param  string  $queue
+     * @return void
+     */
+    public function route($class, $queue)
+    {
+        $this->queueRoutes()->set($class, $queue);
+    }
+
+    /**
+     * Set the queue routes for the given classes.
+     *
+     * @param  array<class-string, string>  $queues
+     * @return void
+     */
+    public function routeMany($queues)
+    {
+        $this->queueRoutes()->setMany($queues);
     }
 
     /**
@@ -336,6 +362,16 @@ class QueueManager implements FactoryContract, MonitorContract
     public function getName($connection = null)
     {
         return $connection ?: $this->getDefaultDriver();
+    }
+
+    /**
+     * Get the queue routes instance.
+     *
+     * @return \Illuminate\Queue\QueueRoutes
+     */
+    protected function queueRoutes()
+    {
+        return $this->app['queue.routes'];
     }
 
     /**

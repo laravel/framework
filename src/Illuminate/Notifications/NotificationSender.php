@@ -235,7 +235,7 @@ class NotificationSender
                     $connection = $notification->viaConnections()[$channel] ?? $connection;
                 }
 
-                $queue = $notification->queue;
+                $queue = $notification->queue ?? $this->manager->resolveQueueRoute($notification);
 
                 if (method_exists($notification, 'viaQueues')) {
                     $queue = $notification->viaQueues()[$channel] ?? $queue;

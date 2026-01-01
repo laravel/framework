@@ -6,11 +6,14 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Manager;
 use InvalidArgumentException;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The default channel used to deliver messages.
      *
@@ -158,5 +161,15 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
         $this->locale = $locale;
 
         return $this;
+    }
+
+    /**
+     * Get the queue routes instance.
+     *
+     * @return \Illuminate\Queue\QueueRoutes
+     */
+    protected function queueRoutes()
+    {
+        return $this->container['queue.routes'];
     }
 }
