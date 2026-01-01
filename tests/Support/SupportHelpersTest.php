@@ -280,6 +280,32 @@ class SupportHelpersTest extends TestCase
         $this->assertNull(data_get($arrayAccess, 'email', 'Not found'));
     }
 
+    public function testDataGetWithCustomSeprator()
+    {
+        $object = (object) ['users' => ['name' => ['Taylor', 'Otwell']]];
+        $array = [(object) ['users' => [(object) ['name' => 'Taylor']]]];
+        $separatedArray = ['users' => ['first->name' => 'Taylor', 'middle->name' => null]];
+        $arrayAccess = new SupportTestArrayAccess(['price' => 56, 'user' => new SupportTestArrayAccess(['name' => 'John']), 'email' => null]);
+
+        $this->assertSame('Taylor', data_get($object, 'users->name->0', null, '->'));
+        $this->assertSame('Taylor', data_get($array, '0->users->0->name', null, '->'));
+        $this->assertNull(data_get($array, '0->users->3'));
+        $this->assertSame('Not found', data_get($array, '0->users->3', 'Not found', '->'));
+        $this->assertSame('Not found', data_get($array, '0->users->3', function () {
+            return 'Not found';
+        }, '->'));
+        $this->assertSame('Taylor', data_get($separatedArray, ['users', 'first->name'], null, '->'));
+        $this->assertNull(data_get($separatedArray, ['users', 'middle->name'], null, '->'));
+        $this->assertSame('Not found', data_get($separatedArray, ['users', 'last->name'], 'Not found', '->'));
+        $this->assertEquals(56, data_get($arrayAccess, 'price', null, '->'));
+        $this->assertSame('John', data_get($arrayAccess, 'user->name', null, '->'));
+        $this->assertSame('void', data_get($arrayAccess, 'foo', 'void', '->'));
+        $this->assertSame('void', data_get($arrayAccess, 'user->foo', 'void', '->'));
+        $this->assertNull(data_get($arrayAccess, 'foo', null, '->'));
+        $this->assertNull(data_get($arrayAccess, 'user->foo', null, '->'));
+        $this->assertNull(data_get($arrayAccess, 'email', 'Not found', '->'));
+    }
+
     public function testDataGetWithNestedArrays()
     {
         $array = [

@@ -36,19 +36,20 @@ if (! function_exists('data_fill')) {
 
 if (! function_exists('data_has')) {
     /**
-     * Determine if a key / property exists on an array or object using "dot" notation.
+     * Determine if a key / property exists on an array or object using separator notation.
      *
      * @param  mixed  $target
      * @param  string|array|int|null  $key
+     * @param  string  $separator
      * @return bool
      */
-    function data_has($target, $key): bool
+    function data_has($target, $key, $separator = '.'): bool
     {
         if (is_null($key) || $key === []) {
             return false;
         }
 
-        $key = is_array($key) ? $key : explode('.', $key);
+        $key = is_array($key) ? $key : explode($separator, $key);
 
         foreach ($key as $segment) {
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {
@@ -66,20 +67,21 @@ if (! function_exists('data_has')) {
 
 if (! function_exists('data_get')) {
     /**
-     * Get an item from an array or object using "dot" notation.
+     * Get an item from an array or object using separator notation.
      *
      * @param  mixed  $target
      * @param  string|array|int|null  $key
      * @param  mixed  $default
+     * @param  string  $separator
      * @return mixed
      */
-    function data_get($target, $key, $default = null)
+    function data_get($target, $key, $default = null, $separator = '.')
     {
         if (is_null($key)) {
             return $target;
         }
 
-        $key = is_array($key) ? $key : explode('.', $key);
+        $key = is_array($key) ? $key : explode($separator, $key);
 
         foreach ($key as $i => $segment) {
             unset($key[$i]);
@@ -128,17 +130,18 @@ if (! function_exists('data_get')) {
 
 if (! function_exists('data_set')) {
     /**
-     * Set an item on an array or object using dot notation.
+     * Set an item on an array or object using separator notation.
      *
      * @param  mixed  $target
      * @param  string|array  $key
      * @param  mixed  $value
      * @param  bool  $overwrite
+     * @param  string  $separator
      * @return mixed
      */
-    function data_set(&$target, $key, $value, $overwrite = true)
+    function data_set(&$target, $key, $value, $overwrite = true, $separator = '.')
     {
-        $segments = is_array($key) ? $key : explode('.', $key);
+        $segments = is_array($key) ? $key : explode($separator, $key);
 
         if (($segment = array_shift($segments)) === '*') {
             if (! Arr::accessible($target)) {
@@ -190,15 +193,16 @@ if (! function_exists('data_set')) {
 
 if (! function_exists('data_forget')) {
     /**
-     * Remove / unset an item from an array or object using "dot" notation.
+     * Remove / unset an item from an array or object using separator notation.
      *
      * @param  mixed  $target
      * @param  string|array|int|null  $key
+     * @param  string  $separator
      * @return mixed
      */
-    function data_forget(&$target, $key)
+    function data_forget(&$target, $key, $separator = '.')
     {
-        $segments = is_array($key) ? $key : explode('.', $key);
+        $segments = is_array($key) ? $key : explode($separator, $key);
 
         if (($segment = array_shift($segments)) === '*' && Arr::accessible($target)) {
             if ($segments) {
