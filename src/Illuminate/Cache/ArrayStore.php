@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
+use function Illuminate\Support\enum_value;
+
 class ArrayStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
@@ -69,11 +71,13 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
+        $key = enum_value($key);
+
         if (! isset($this->storage[$key])) {
             return;
         }
@@ -94,14 +98,14 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
-        $this->storage[$key] = [
+        $this->storage[enum_value($key)] = [
             'value' => $this->serializesValues ? serialize($value) : $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
@@ -112,12 +116,14 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         if (! is_null($existing = $this->get($key))) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
                 $value = $this->serializesValues ? serialize($incremented) : $incremented;
@@ -134,36 +140,38 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function decrement($key, $value = 1)
     {
-        return $this->increment($key, $value * -1);
+        return $this->increment(enum_value($key), $value * -1);
     }
 
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 0);
+        return $this->put(enum_value($key), $value, 0);
     }
 
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
+        $key = enum_value($key);
+
         $item = Arr::get($this->storage, $key = $this->getPrefix().$key, null);
 
         if (is_null($item)) {
@@ -180,11 +188,13 @@ class ArrayStore extends TaggableStore implements LockProvider
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
+        $key = enum_value($key);
+
         if (array_key_exists($key, $this->storage)) {
             unset($this->storage[$key]);
 

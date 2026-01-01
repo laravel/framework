@@ -529,7 +529,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Set the expiration of a cached item; null TTL will retain the item forever.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
      * @return bool
      */

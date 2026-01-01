@@ -6,6 +6,8 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\InteractsWithTime;
 
+use function Illuminate\Support\enum_value;
+
 class SessionStore implements Store
 {
     use InteractsWithTime, RetrievesMultipleKeys;
@@ -49,11 +51,13 @@ class SessionStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
+        $key = enum_value($key);
+
         if (! $this->session->exists($this->itemKey($key))) {
             return;
         }
@@ -63,7 +67,7 @@ class SessionStore implements Store
         $expiresAt = $item['expiresAt'] ?? 0;
 
         if ($this->isExpired($expiresAt)) {
-            $this->forget($key);
+            $this->forget(enum_value($key));
 
             return;
         }
@@ -85,14 +89,14 @@ class SessionStore implements Store
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
-        $this->session->put($this->itemKey($key), [
+        $this->session->put($this->itemKey(enum_value($key)), [
             'value' => $value,
             'expiresAt' => $this->toTimestamp($seconds),
         ]);
@@ -114,12 +118,14 @@ class SessionStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         if (! is_null($existing = $this->get($key))) {
             return tap(((int) $existing) + $value, function ($incremented) use ($key) {
                 $this->session->put($this->itemKey("{$key}.value"), $incremented);
@@ -134,7 +140,7 @@ class SessionStore implements Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
@@ -158,12 +164,14 @@ class SessionStore implements Store
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
+        $key = enum_value($key);
+
         $value = $this->get($key);
 
         if (is_null($value)) {
@@ -178,11 +186,13 @@ class SessionStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
+        $key = enum_value($key);
+
         if ($this->session->exists($this->itemKey($key))) {
             $this->session->forget($this->itemKey($key));
 

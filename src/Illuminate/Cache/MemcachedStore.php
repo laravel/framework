@@ -7,6 +7,8 @@ use Illuminate\Support\InteractsWithTime;
 use Memcached;
 use ReflectionMethod;
 
+use function Illuminate\Support\enum_value;
+
 class MemcachedStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime;
@@ -50,12 +52,12 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @return mixed
      */
     public function get($key)
     {
-        $value = $this->memcached->get($this->prefix.$key);
+        $value = $this->memcached->get($this->prefix.enum_value($key));
 
         if ($this->memcached->getResultCode() == 0) {
             return $value;
@@ -94,7 +96,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -102,7 +104,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
     public function put($key, $value, $seconds)
     {
         return $this->memcached->set(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
+            $this->prefix.enum_value($key), $value, $this->calculateExpiration($seconds)
         );
     }
 
@@ -129,7 +131,7 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -137,44 +139,44 @@ class MemcachedStore extends TaggableStore implements LockProvider
     public function add($key, $value, $seconds)
     {
         return $this->memcached->add(
-            $this->prefix.$key, $value, $this->calculateExpiration($seconds)
+            $this->prefix.enum_value($key), $value, $this->calculateExpiration($seconds)
         );
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  mixed  $value
      * @return int|false
      */
     public function increment($key, $value = 1)
     {
-        return $this->memcached->increment($this->prefix.$key, $value);
+        return $this->memcached->increment($this->prefix.enum_value($key), $value);
     }
 
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  mixed  $value
      * @return int|false
      */
     public function decrement($key, $value = 1)
     {
-        return $this->memcached->decrement($this->prefix.$key, $value);
+        return $this->memcached->decrement($this->prefix.enum_value($key), $value);
     }
 
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 0);
+        return $this->put(enum_value($key), $value, 0);
     }
 
     /**
@@ -205,24 +207,24 @@ class MemcachedStore extends TaggableStore implements LockProvider
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
-        return $this->memcached->touch($this->getPrefix().$key, $this->calculateExpiration($seconds));
+        return $this->memcached->touch($this->getPrefix().enum_value($key), $this->calculateExpiration($seconds));
     }
 
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string $key
      * @return bool
      */
     public function forget($key)
     {
-        return $this->memcached->delete($this->prefix.$key);
+        return $this->memcached->delete($this->prefix.enum_value($key));
     }
 
     /**

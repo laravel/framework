@@ -11,7 +11,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return void
      */
     public function get($key)
@@ -22,7 +22,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -35,7 +35,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return false
      */
@@ -47,7 +47,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return false
      */
@@ -59,7 +59,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
@@ -96,7 +96,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|null  $key
      * @param  int  $seconds
      * @return bool
      */
@@ -108,7 +108,7 @@ class NullStore extends TaggableStore implements LockProvider
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)

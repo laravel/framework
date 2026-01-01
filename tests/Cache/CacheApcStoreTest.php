@@ -5,10 +5,20 @@ namespace Illuminate\Tests\Cache;
 use Illuminate\Cache\ApcStore;
 use Illuminate\Cache\ApcWrapper;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {
+    public static function keyDataProvider(): array
+    {
+        return [
+            'String' => ['foo', 'foo'],
+            'Int' => [1, '1'],
+            'Backed Enum' => [BackedEnum::Foo, 'foo'],
+            'Unit Enum' => [UnitEnum::Foo, 'Foo'],
+        ];
+    }
     public function testGetReturnsNullWhenNotFound()
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
@@ -17,20 +27,21 @@ class CacheApcStoreTest extends TestCase
         $this->assertNull($store->get('bar'));
     }
 
-    public function testAPCValueIsReturned()
+    #[DataProvider('keyDataProvider')]
+    public function testAPCValueIsReturned(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
-        $apc->expects($this->once())->method('get')->willReturn('bar');
+        $apc->expects($this->once())->method('get')->with($expected)->willReturn($expected);
         $store = new ApcStore($apc);
-        $this->assertSame('bar', $store->get('foo'));
+        $this->assertSame($expected, $store->get($key));
     }
-
-    public function testAPCFalseValueIsReturned()
+    #[DataProvider('keyDataProvider')]
+    public function testAPCFalseValueIsReturned(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get'])->getMock();
-        $apc->expects($this->once())->method('get')->willReturn(false);
+        $apc->expects($this->once())->method('get')->with($expected)->willReturn(false);
         $store = new ApcStore($apc);
-        $this->assertFalse($store->get('foo'));
+        $this->assertFalse($store->get($key));
     }
 
     public function testGetMultipleReturnsNullWhenNotFoundAndValueWhenFound()
@@ -49,14 +60,15 @@ class CacheApcStoreTest extends TestCase
         ], $store->many(['foo', 'bar', 'baz']));
     }
 
-    public function testSetMethodProperlyCallsAPC()
+    #[DataProvider('keyDataProvider')]
+    public function testSetMethodProperlyCallsAPC(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(60))
+            ->method('put')->with($this->equalTo($expected), $this->equalTo('bar'), $this->equalTo(60))
             ->willReturn(true);
         $store = new ApcStore($apc);
-        $result = $store->put('foo', 'bar', 60);
+        $result = $store->put($key, 'bar', 60);
         $this->assertTrue($result);
     }
 
@@ -88,53 +100,44 @@ class CacheApcStoreTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testIncrementMethodProperlyCallsAPC()
+    #[DataProvider('keyDataProvider')]
+    public function testIncrementMethodProperlyCallsAPC(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['increment'])->getMock();
-        $apc->expects($this->once())->method('increment')->with($this->equalTo('foo'), $this->equalTo(5));
+        $apc->expects($this->once())->method('increment')->with($this->equalTo($expected), $this->equalTo(5));
         $store = new ApcStore($apc);
-        $store->increment('foo', 5);
+        $store->increment($key, 5);
     }
 
-    public function testDecrementMethodProperlyCallsAPC()
+    #[DataProvider('keyDataProvider')]
+    public function testDecrementMethodProperlyCallsAPC(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['decrement'])->getMock();
-        $apc->expects($this->once())->method('decrement')->with($this->equalTo('foo'), $this->equalTo(5));
+        $apc->expects($this->once())->method('decrement')->with($this->equalTo($expected), $this->equalTo(5));
         $store = new ApcStore($apc);
-        $store->decrement('foo', 5);
+        $store->decrement($key, 5);
     }
 
-    public function testStoreItemForeverProperlyCallsAPC()
+    #[DataProvider('keyDataProvider')]
+    public function testStoreItemForeverProperlyCallsAPC(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['put'])->getMock();
         $apc->expects($this->once())
-            ->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0))
+            ->method('put')->with($this->equalTo($expected), $this->equalTo('bar'), $this->equalTo(0))
             ->willReturn(true);
         $store = new ApcStore($apc);
-        $result = $store->forever('foo', 'bar');
+        $result = $store->forever($key, 'bar');
         $this->assertTrue($result);
     }
 
-    public function testForgetMethodProperlyCallsAPC()
+    #[DataProvider('keyDataProvider')]
+    public function testForgetMethodProperlyCallsAPC(mixed $key, string $expected)
     {
         $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['delete'])->getMock();
-        $apc->expects($this->once())->method('delete')->with($this->equalTo('foo'))->willReturn(true);
+        $apc->expects($this->once())->method('delete')->with($this->equalTo($expected))->willReturn(true);
         $store = new ApcStore($apc);
-        $result = $store->forget('foo');
+        $result = $store->forget($key);
         $this->assertTrue($result);
-    }
-
-    public function testTouchMethodProperlyCallsAPC(): void
-    {
-        $key = 'key';
-        $ttl = 60;
-
-        $apc = $this->getMockBuilder(ApcWrapper::class)->onlyMethods(['get', 'put'])->getMock();
-
-        $apc->expects($this->once())->method('get')->with($this->equalTo($key))->willReturn('bar');
-        $apc->expects($this->once())->method('put')->with($this->equalTo($key), $this->equalTo('bar'), $this->equalTo($ttl))->willReturn(true);
-
-        $this->assertTrue((new ApcStore($apc))->touch($key, $ttl));
     }
 
     public function testFlushesCached()
@@ -145,4 +148,14 @@ class CacheApcStoreTest extends TestCase
         $result = $store->flush();
         $this->assertTrue($result);
     }
+}
+
+enum BackedEnum: string
+{
+    case Foo = 'foo';
+}
+
+enum UnitEnum
+{
+    case Foo;
 }

@@ -11,6 +11,8 @@ use Illuminate\Redis\Connections\PredisConnection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
+use function Illuminate\Support\enum_value;
+
 class RedisStore extends TaggableStore implements LockProvider
 {
     use RetrievesMultipleKeys {
@@ -63,14 +65,14 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
         $connection = $this->connection();
 
-        $value = $connection->get($this->prefix.$key);
+        $value = $connection->get($this->prefix.enum_value($key));
 
         return ! is_null($value) ? $this->connectionAwareUnserialize($value, $connection) : null;
     }
@@ -112,7 +114,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -122,7 +124,7 @@ class RedisStore extends TaggableStore implements LockProvider
         $connection = $this->connection();
 
         return (bool) $connection->setex(
-            $this->prefix.$key, (int) max(1, $seconds), $this->connectionAwareSerialize($value, $connection)
+            $this->prefix.enum_value($key), (int) max(1, $seconds), $this->connectionAwareSerialize($value, $connection)
         );
     }
 
@@ -169,7 +171,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -179,20 +181,20 @@ class RedisStore extends TaggableStore implements LockProvider
         $connection = $this->connection();
 
         return (bool) $connection->eval(
-            LuaScripts::add(), 1, $this->prefix.$key, $this->pack($value, $connection), (int) max(1, $seconds)
+            LuaScripts::add(), 1, $this->prefix.enum_value($key), $this->pack($value, $connection), (int) max(1, $seconds)
         );
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function increment($key, $value = 1)
     {
-        return $this->connection()->incrby($this->prefix.$key, $value);
+        return $this->connection()->incrby($this->prefix.enum_value($key), $value);
     }
 
     /**
@@ -210,7 +212,7 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
@@ -218,7 +220,7 @@ class RedisStore extends TaggableStore implements LockProvider
     {
         $connection = $this->connection();
 
-        return (bool) $connection->set($this->prefix.$key, $this->connectionAwareSerialize($value, $connection));
+        return (bool) $connection->set($this->prefix.enum_value($key), $this->connectionAwareSerialize($value, $connection));
     }
 
     /**
@@ -257,24 +259,24 @@ class RedisStore extends TaggableStore implements LockProvider
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
-        return (bool) $this->connection()->expire($this->getPrefix().$key, (int) max(1, $seconds));
+        return (bool) $this->connection()->expire($this->getPrefix().enum_value($key), (int) max(1, $seconds));
     }
 
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
-        return (bool) $this->connection()->del($this->prefix.$key);
+        return (bool) $this->connection()->del($this->prefix.enum_value($key));
     }
 
     /**

@@ -15,6 +15,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Str;
 
+use function Illuminate\Support\enum_value;
+
 class DatabaseStore implements LockProvider, Store
 {
     use InteractsWithTime;
@@ -97,11 +99,13 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
+        $key = enum_value($key);
+
         return $this->many([$key])[$key];
     }
 
@@ -157,14 +161,14 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
-        return $this->putMany([$key => $value], $seconds);
+        return $this->putMany([enum_value($key) => $value], $seconds);
     }
 
     /**
@@ -194,13 +198,15 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function add($key, $value, $seconds)
     {
+        $key = enum_value($key);
+
         if (! is_null($this->get($key))) {
             return false;
         }
@@ -225,7 +231,7 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $value
      * @return int|false
      */
@@ -239,13 +245,13 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $value
      * @return int|false
      */
     public function decrement($key, $value = 1)
     {
-        return $this->incrementOrDecrement($key, $value, function ($current, $value) {
+        return $this->incrementOrDecrement(enum_value($key), $value, function ($current, $value) {
             return $current - $value;
         });
     }
@@ -310,13 +316,13 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 315360000);
+        return $this->put(enum_value($key), $value, 315360000);
     }
 
     /**
@@ -355,14 +361,14 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
         return (bool) $this->table()
-            ->where('key', '=', $this->getPrefix().$key)
+            ->where('key', '=', $this->getPrefix().enum_value($key))
             ->where('expiration', '>', $now = $this->getTime())
             ->update(['expiration' => $now + $seconds]);
     }
@@ -370,23 +376,23 @@ class DatabaseStore implements LockProvider, Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
-        return $this->forgetMany([$key]);
+        return $this->forgetMany([enum_value($key)]);
     }
 
     /**
      * Remove an item from the cache if it is expired.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forgetIfExpired($key)
     {
-        return $this->forgetManyIfExpired([$key]);
+        return $this->forgetManyIfExpired([enum_value($key)]);
     }
 
     /**

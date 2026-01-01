@@ -383,4 +383,21 @@ class CacheArrayStoreTest extends TestCase
             $store->all(false)['foo']['value']
         );
     }
+
+    public function testEnumsAreSupportedAsCacheKeys()
+    {
+        $store = new ArrayStore;
+
+        $store->put(BackedEnum::Foo, 'backed', 10);
+        $this->assertSame('backed', $store->get(BackedEnum::Foo));
+
+        $this->assertSame(1, $store->increment(BackedEnum::Foo));
+        $this->assertSame(0, $store->decrement(BackedEnum::Foo));
+
+        $this->assertTrue($store->forget(BackedEnum::Foo));
+        $this->assertNull($store->get(BackedEnum::Foo));
+
+        $this->assertTrue($store->forever(BackedEnum::Foo, 'forever'));
+        $this->assertSame('forever', $store->get(BackedEnum::Foo));
+    }
 }

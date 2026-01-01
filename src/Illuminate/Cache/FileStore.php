@@ -10,6 +10,8 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\LockableFile;
 use Illuminate\Support\InteractsWithTime;
 
+use function Illuminate\Support\enum_value;
+
 class FileStore implements Store, LockProvider
 {
     use InteractsWithTime, RetrievesMultipleKeys;
@@ -59,25 +61,25 @@ class FileStore implements Store, LockProvider
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key)
     {
-        return $this->getPayload($key)['data'] ?? null;
+        return $this->getPayload(enum_value($key))['data'] ?? null;
     }
 
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function put($key, $value, $seconds)
     {
-        $this->ensureCacheDirectoryExists($path = $this->path($key));
+        $this->ensureCacheDirectoryExists($path = $this->path(enum_value($key)));
 
         $result = $this->files->put(
             $path, $this->expiration($seconds).serialize($value), true
@@ -95,14 +97,14 @@ class FileStore implements Store, LockProvider
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
      */
     public function add($key, $value, $seconds)
     {
-        $this->ensureCacheDirectoryExists($path = $this->path($key));
+        $this->ensureCacheDirectoryExists($path = $this->path(enum_value($key)));
 
         $file = new LockableFile($path, 'c+');
 
@@ -169,12 +171,14 @@ class FileStore implements Store, LockProvider
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function increment($key, $value = 1)
     {
+        $key = enum_value($key);
+
         $raw = $this->getPayload($key);
 
         return tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
@@ -185,25 +189,25 @@ class FileStore implements Store, LockProvider
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int
      */
     public function decrement($key, $value = 1)
     {
-        return $this->increment($key, $value * -1);
+        return $this->increment(enum_value($key), $value * -1);
     }
 
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return bool
      */
     public function forever($key, $value)
     {
-        return $this->put($key, $value, 0);
+        return $this->put(enum_value($key), $value, 0);
     }
 
     /**
@@ -241,12 +245,14 @@ class FileStore implements Store, LockProvider
     /**
      * Adjust the expiration time of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
     public function touch($key, $seconds)
     {
+        $key = enum_value($key);
+
         $payload = $this->getPayload($this->getPrefix().$key);
 
         if (is_null($payload['data'])) {
@@ -259,11 +265,13 @@ class FileStore implements Store, LockProvider
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key)
     {
+        $key = enum_value($key);
+
         if ($this->files->exists($file = $this->path($key))) {
             return tap($this->files->delete($file), function ($forgotten) use ($key) {
                 if ($forgotten && $this->files->exists($file = $this->path("illuminate:cache:flexible:created:{$key}"))) {

@@ -7,7 +7,7 @@ interface Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function get($key);
@@ -25,7 +25,7 @@ interface Store
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @param  int  $seconds
      * @return bool
@@ -44,7 +44,7 @@ interface Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
@@ -53,7 +53,7 @@ interface Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return int|bool
      */
@@ -71,7 +71,7 @@ interface Store
     /**
      * Set the expiration of a cached item.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $seconds
      * @return bool
      */
@@ -80,7 +80,7 @@ interface Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function forget($key);
