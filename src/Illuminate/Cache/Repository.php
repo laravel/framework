@@ -83,7 +83,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Determine if an item exists in the cache.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  \BackedEnum|\UnitEnum|array|string  $key
      * @return bool
      */
     public function has($key): bool
