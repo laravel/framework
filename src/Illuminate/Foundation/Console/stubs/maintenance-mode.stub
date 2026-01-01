@@ -1,5 +1,7 @@
 <?php
 
+use Uri\Rfc3986\Uri;
+
 // Check if the application is in maintenance mode...
 if (! file_exists($down = __DIR__.'/down')) {
     return;
@@ -15,7 +17,7 @@ if (! isset($data['template'])) {
 
 // Allow framework to handle request if request URI is in the exclude list...
 if (isset($data['except'])) {
-    $uri = parse_url($_SERVER['REQUEST_URI'])['path'];
+    $uri = (new Uri($_SERVER['REQUEST_URI']))->getPath();
 
     $uri = rawurldecode($uri !== '/' ? trim($uri, '/') : $uri);
 
