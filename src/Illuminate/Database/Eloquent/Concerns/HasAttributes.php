@@ -182,6 +182,13 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
+     * The virtual JSON attribute aliases.
+     *
+     * @var array
+     */
+    protected $virtualJsonAttributes = [];
+
+    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -2334,18 +2341,30 @@ trait HasAttributes
      */
     protected function transformModelValue($key, $value)
     {
-        // If the attribute has a get mutator, we will call that then return what
-        // it returns as the value, which is useful for transforming values on
-        // retrieval from the model to a form that is more useful for usage.
+        if (is_null($value) && $virtualPath = $this->isVirtualCast($key)) {
+            [$targetColumn, $jsonPath] = explode('->', $virtualPath, 2);
+            $rootValue = $this->getAttributeFromArray($targetColumn);
+
+            $decoded = is_array($rootValue) ? $rootValue : $this->fromJson($rootValue);
+            $extractedValue = data_get($decoded, str_replace('->', '.', $jsonPath));
+
+            if ($this->hasCast($key)) {
+                if (is_array($extractedValue) && $this->hasCast($key, ['array', 'json', 'json:unicode'])) {
+                    return $extractedValue;
+                }
+
+                return $this->castAttribute($key, $extractedValue);
+            }
+
+            return $extractedValue;
+        }
+
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
             return $this->mutateAttributeMarkedAttribute($key, $value);
         }
 
-        // If the attribute exists within the cast array, we will convert it to
-        // an appropriate native PHP type dependent upon the associated value
-        // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
             if (static::preventsAccessingMissingAttributes() &&
                 ! array_key_exists($key, $this->attributes) &&
@@ -2357,32 +2376,6 @@ trait HasAttributes
             return $this->castAttribute($key, $value);
         }
 
-        // Check if this key is a virtual cast (e.g., 'meta->settings->volume' => 'integer')
-        // If the attribute doesn't exist in the attributes array and a virtual cast exists,
-        // retrieve the value from the parent JSON column and cast it appropriately.
-        if (! array_key_exists($key, $this->attributes) && $virtualPath = $this->isVirtualCast($key)) {
-            [$targetColumn, $jsonPath] = explode('->', $virtualPath, 2);
-            $rootValue = $this->getAttributeFromArray($targetColumn);
-
-            // If the root value is already an array, use it directly, otherwise decode it
-            $decoded = is_array($rootValue) ? $rootValue : $this->fromJson($rootValue);
-
-            $extractedValue = data_get($decoded, str_replace('->', '.', $jsonPath));
-
-            // Get the cast type for this virtual path
-            $castType = $this->getCastType($virtualPath);
-
-            // If the value is already an array and we're casting to array, return it as-is
-            if (is_array($extractedValue) && in_array($castType, ['array', 'json', 'json:unicode'])) {
-                return $extractedValue;
-            }
-
-            return $this->castAttribute($virtualPath, $extractedValue);
-        }
-
-        // If the attribute is listed as a date, we will convert it to a DateTime
-        // instance on retrieval, which makes it quite convenient to work with
-        // date fields without having to create a mutator for each property.
         if ($value !== null
             && \in_array($key, $this->getDates(), false)) {
             return $this->asDateTime($value);
@@ -2527,6 +2520,16 @@ trait HasAttributes
     }
 
     /**
+     * Get the virtual JSON attributes for the model.
+     *
+     * @return array<string, string>
+     */
+    protected function virtualJsonAttributes()
+    {
+        return [];
+    }
+
+    /**
      * Determine if the given key is a virtual cast.
      *
      * A virtual cast is a nested JSON path in the $casts array (e.g., 'meta->settings->volume' => 'integer')
@@ -2537,9 +2540,11 @@ trait HasAttributes
      */
     protected function isVirtualCast($key)
     {
-        foreach ($this->getCasts() as $castKey => $castType) {
-            if (str_contains($castKey, '->') && str_ends_with($castKey, '->'.$key)) {
-                return $castKey;
+        $virtualCasts = array_merge($this->virtualJsonAttributes, $this->virtualJsonAttributes());
+
+        foreach ($virtualCasts as $jsonPath => $alias) {
+            if ($alias === $key) {
+                return $jsonPath;
             }
         }
 

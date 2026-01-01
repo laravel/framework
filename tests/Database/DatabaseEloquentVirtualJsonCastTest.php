@@ -286,6 +286,29 @@ class DatabaseEloquentVirtualJsonCastTest extends TestCase
         $this->assertIsArray($model->tags);
         $this->assertSame(['php', 'laravel', 'testing'], $model->tags);
     }
+
+    public function testVirtualAttributesWithAliasing()
+    {
+        $model = new AliasingTestModel;
+        $model->setRawAttributes([
+            'meta' => json_encode([
+                'name' => 'John Doe',
+                'organization' => ['name' => 'Acme Corp'],
+            ]),
+        ]);
+
+        // Test that aliases work correctly
+        $this->assertSame('John Doe', $model->meta_name);
+        $this->assertSame('Acme Corp', $model->organization_name);
+
+        // Test setting via aliases
+        $model->meta_name = 'Jane Smith';
+        $model->organization_name = 'Tech Inc';
+
+        $metaData = json_decode($model->getAttributes()['meta'], true);
+        $this->assertSame('Jane Smith', $metaData['name']);
+        $this->assertSame('Tech Inc', $metaData['organization']['name']);
+    }
 }
 
 class VirtualCastTestModel extends Model
@@ -293,13 +316,51 @@ class VirtualCastTestModel extends Model
     protected $table = 'test_models';
     protected $guarded = [];
 
-    protected $casts = [
-        'meta->settings->volume' => 'integer',
-        'meta->settings->title' => 'string',
-        'meta->settings->enabled' => 'boolean',
-        'meta->settings->rating' => 'float',
-        'meta->settings->tags' => 'array',
-        'options->ui->theme->color' => 'string',
-        'options->ui->theme->mode' => 'string',
-    ];
+    protected function virtualJsonAttributes(): array
+    {
+        return [
+            'meta->settings->volume' => 'volume',
+            'meta->settings->title' => 'title',
+            'meta->settings->enabled' => 'enabled',
+            'meta->settings->rating' => 'rating',
+            'meta->settings->tags' => 'tags',
+            'options->ui->theme->color' => 'color',
+            'options->ui->theme->mode' => 'mode',
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'volume' => 'integer',
+            'title' => 'string',
+            'enabled' => 'boolean',
+            'rating' => 'float',
+            'tags' => 'array',
+            'color' => 'string',
+            'mode' => 'string',
+        ];
+    }
+}
+
+class AliasingTestModel extends Model
+{
+    protected $table = 'test_models';
+    protected $guarded = [];
+
+    protected function virtualJsonAttributes(): array
+    {
+        return [
+            'meta->name' => 'meta_name',
+            'meta->organization->name' => 'organization_name',
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'meta_name' => 'string',
+            'organization_name' => 'string',
+        ];
+    }
 }
