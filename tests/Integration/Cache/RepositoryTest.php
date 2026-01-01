@@ -318,7 +318,6 @@ class RepositoryTest extends TestCase
         $this->assertTrue($cache->forget(TestCacheKey::FOO));
         $this->assertNull($cache->get(TestCacheKey::FOO));
     }
-
 }
 
 enum TestCacheKey: string
@@ -327,5 +326,4 @@ enum TestCacheKey: string
     case BAR = 'bar';
     case BAZ = 'baz';
     case QUX = 'qux';
-
 }
