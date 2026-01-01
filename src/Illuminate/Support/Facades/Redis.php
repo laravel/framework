@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static void listen(\Closure $callback)
  * @method static string|null getName()
  * @method static \Illuminate\Redis\Connections\Connection setName(string $name)
- * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
+ * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
  * @method static void setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
  * @method static void unsetEventDispatcher()
  * @method static void macro(string $name, object|callable $macro)

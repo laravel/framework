@@ -87,7 +87,7 @@ use Illuminate\Database\Console\WipeCommand;
  * @method static \Illuminate\Database\Connection setSchemaGrammar(\Illuminate\Database\Schema\Grammars\Grammar $grammar)
  * @method static \Illuminate\Database\Query\Processors\Processor getPostProcessor()
  * @method static \Illuminate\Database\Connection setPostProcessor(\Illuminate\Database\Query\Processors\Processor $processor)
- * @method static \Illuminate\Contracts\Events\Dispatcher getEventDispatcher()
+ * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
  * @method static \Illuminate\Database\Connection setEventDispatcher(\Illuminate\Contracts\Events\Dispatcher $events)
  * @method static void unsetEventDispatcher()
  * @method static \Illuminate\Database\Connection setTransactionManager(\Illuminate\Database\DatabaseTransactionsManager $manager)
