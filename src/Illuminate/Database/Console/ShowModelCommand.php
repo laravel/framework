@@ -101,7 +101,7 @@ class ShowModelCommand extends DatabaseInspectionCommand implements PromptsForMi
         $this->components->twoColumnDetail('Database', $modelData->database);
         $this->components->twoColumnDetail('Table', $modelData->table);
 
-        if (($policy = $modelData->policy ?? false)) {
+        if ($policy = $modelData->policy ?? false) {
             $this->components->twoColumnDetail('Policy', $policy);
         }
 
