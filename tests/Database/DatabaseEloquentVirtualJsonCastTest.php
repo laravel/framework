@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Casts\AsJsonPath;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use PHPUnit\Framework\TestCase;
@@ -316,29 +317,16 @@ class VirtualCastTestModel extends Model
     protected $table = 'test_models';
     protected $guarded = [];
 
-    protected function virtualJsonAttributes(): array
-    {
-        return [
-            'meta->settings->volume' => 'volume',
-            'meta->settings->title' => 'title',
-            'meta->settings->enabled' => 'enabled',
-            'meta->settings->rating' => 'rating',
-            'meta->settings->tags' => 'tags',
-            'options->ui->theme->color' => 'color',
-            'options->ui->theme->mode' => 'mode',
-        ];
-    }
-
     protected function casts(): array
     {
         return [
-            'volume' => 'integer',
-            'title' => 'string',
-            'enabled' => 'boolean',
-            'rating' => 'float',
-            'tags' => 'array',
-            'color' => 'string',
-            'mode' => 'string',
+            'volume' => AsJsonPath::using('meta', 'settings.volume', 'int'),
+            'title' => AsJsonPath::using('meta', 'settings.title', 'string'),
+            'enabled' => AsJsonPath::using('meta', 'settings.enabled', 'bool'),
+            'rating' => AsJsonPath::using('meta', 'settings.rating', 'float'),
+            'tags' => AsJsonPath::using('meta', 'settings.tags', 'array'),
+            'color' => AsJsonPath::using('options', 'ui.theme.color', 'string'),
+            'mode' => AsJsonPath::using('options', 'ui.theme.mode', 'string'),
         ];
     }
 }
@@ -348,19 +336,11 @@ class AliasingTestModel extends Model
     protected $table = 'test_models';
     protected $guarded = [];
 
-    protected function virtualJsonAttributes(): array
-    {
-        return [
-            'meta->name' => 'meta_name',
-            'meta->organization->name' => 'organization_name',
-        ];
-    }
-
     protected function casts(): array
     {
         return [
-            'meta_name' => 'string',
-            'organization_name' => 'string',
+            'meta_name' => AsJsonPath::using('meta', 'name', 'string'),
+            'organization_name' => AsJsonPath::using('meta', 'organization.name', 'string'),
         ];
     }
 }

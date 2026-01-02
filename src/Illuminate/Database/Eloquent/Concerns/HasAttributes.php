@@ -182,13 +182,6 @@ trait HasAttributes
     protected static $setAttributeMutatorCache = [];
 
     /**
-     * The virtual JSON attribute aliases.
-     *
-     * @var array
-     */
-    protected $virtualJsonAttributes = [];
-
-    /**
      * The cache of the converted cast types.
      *
      * @var array
@@ -468,8 +461,7 @@ trait HasAttributes
             array_key_exists($key, $this->casts) ||
             $this->hasGetMutator($key) ||
             $this->hasAttributeMutator($key) ||
-            $this->isClassCastable($key) ||
-            $this->isVirtualCast($key);
+            $this->isClassCastable($key);
     }
 
     /**
@@ -1104,12 +1096,6 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (str_contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
-        }
-
-        // Check if this key is a virtual cast (e.g., 'meta->settings->volume' => 'integer')
-        // If a real column exists with the same name, it takes priority.
-        if (! array_key_exists($key, $this->attributes) && $virtualPath = $this->isVirtualCast($key)) {
-            return $this->fillJsonAttribute($virtualPath, $value);
         }
 
         if (! is_null($value) && $this->isEncryptedCastable($key)) {
@@ -2341,24 +2327,6 @@ trait HasAttributes
      */
     protected function transformModelValue($key, $value)
     {
-        if (is_null($value) && $virtualPath = $this->isVirtualCast($key)) {
-            [$targetColumn, $jsonPath] = explode('->', $virtualPath, 2);
-            $rootValue = $this->getAttributeFromArray($targetColumn);
-
-            $decoded = is_array($rootValue) ? $rootValue : $this->fromJson($rootValue);
-            $extractedValue = data_get($decoded, str_replace('->', '.', $jsonPath));
-
-            if ($this->hasCast($key)) {
-                if (is_array($extractedValue) && $this->hasCast($key, ['array', 'json', 'json:unicode'])) {
-                    return $extractedValue;
-                }
-
-                return $this->castAttribute($key, $extractedValue);
-            }
-
-            return $extractedValue;
-        }
-
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
         } elseif ($this->hasAttributeGetMutator($key)) {
@@ -2519,35 +2487,4 @@ trait HasAttributes
         })->map->name->values()->all();
     }
 
-    /**
-     * Get the virtual JSON attributes for the model.
-     *
-     * @return array<string, string>
-     */
-    protected function virtualJsonAttributes()
-    {
-        return [];
-    }
-
-    /**
-     * Determine if the given key is a virtual cast.
-     *
-     * A virtual cast is a nested JSON path in the $casts array (e.g., 'meta->settings->volume' => 'integer')
-     * that can be accessed as a direct model attribute with automatic casting.
-     *
-     * @param  string  $key
-     * @return string|null
-     */
-    protected function isVirtualCast($key)
-    {
-        $virtualCasts = array_merge($this->virtualJsonAttributes, $this->virtualJsonAttributes());
-
-        foreach ($virtualCasts as $jsonPath => $alias) {
-            if ($alias === $key) {
-                return $jsonPath;
-            }
-        }
-
-        return null;
-    }
 }
