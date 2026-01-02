@@ -353,6 +353,15 @@ class DatabaseTransactionsTest extends TestCase
             ],
         ];
 
+        yield 'collection backoff' => [
+            collect([1111, 2222]),
+            [
+                Sleep::for(1111)->milliseconds(),
+                Sleep::for(2222)->milliseconds(),
+                Sleep::for(2222)->milliseconds(),
+            ],
+        ];
+
         yield 'callable backoff' => [
             fn (Throwable $e, int $currentAttempt, int $maxAttempts): int => $currentAttempt * 2222,
             [

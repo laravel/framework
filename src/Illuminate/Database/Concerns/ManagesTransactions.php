@@ -4,6 +4,7 @@ namespace Illuminate\Database\Concerns;
 
 use Closure;
 use Illuminate\Database\DeadlockException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Sleep;
 use RuntimeException;
 use Throwable;
@@ -20,7 +21,7 @@ trait ManagesTransactions
      *
      * @param  (\Closure(static): TReturn)  $callback
      * @param  int  $attempts
-     * @param  \Closure(\Throwable, int, int): int|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @return TReturn
      *
      * @throws \Throwable
@@ -83,7 +84,7 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
-     * @param  \Closure|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @return void
      *
      * @throws \Throwable
@@ -121,7 +122,7 @@ trait ManagesTransactions
     /**
      * Handle the backoff between transaction attempts.
      *
-     * @param  \Closure|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
@@ -132,6 +133,7 @@ trait ManagesTransactions
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
             is_array($backoff) => $backoff[$currentAttempt - 1] ?? end($backoff),
+            $backoff instanceof Collection => $backoff->get($currentAttempt - 1) ?? $backoff->last(),
             is_callable($backoff) => $backoff($e, $currentAttempt, $maxAttempts),
             default => 0,
         };
