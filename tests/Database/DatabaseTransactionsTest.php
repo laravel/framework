@@ -244,7 +244,7 @@ class DatabaseTransactionsTest extends TestCase
         }
     }
 
-    #[DataProvider('transactionIsRolledBackAndBackedOffProvider')]
+    #[DataProvider('backOffProvider')]
     public function testTransactionIsRolledBackAndBackedOff($backoff, $expectedSleepSequence)
     {
         $transactionManager = m::mock(new DatabaseTransactionsManager);
@@ -282,7 +282,53 @@ class DatabaseTransactionsTest extends TestCase
         }
     }
 
-    public static function transactionIsRolledBackAndBackedOffProvider()
+    #[DataProvider('backOffProvider')]
+    public function testNestedTransactionsAreRolledBackAndBackedOff($backoff, $expectedSleepSequence)
+    {
+        $transactionManager = m::mock(new DatabaseTransactionsManager);
+        $transactionManager->shouldReceive('begin')->times(4)->with('default', 1);
+        $transactionManager->shouldReceive('begin')->times(4)->with('default', 2);
+        $transactionManager->shouldReceive('rollback')->times(4)->with('default', 1);
+        $transactionManager->shouldReceive('rollback')->times(4)->with('default', 0);
+        $transactionManager->shouldNotReceive('commit');
+
+        $this->connection()->setTransactionManager($transactionManager);
+
+        $this->connection()->table('users')->insert([
+            'name' => 'zain', 'value' => 1,
+        ]);
+
+        Sleep::fake();
+
+        try {
+            $this->connection()->transaction(
+                callback: function () {
+                    $this->connection()->table('users')->where(['name' => 'zain'])->update([
+                        'value' => 2,
+                    ]);
+
+                    $this->connection()->transaction(function () {
+                        $this->connection()->table('users')->where(['name' => 'zain'])->update([
+                            'value' => 3,
+                        ]);
+
+                        throw new PDOException('deadlock detected', 40001);
+                    });
+                }, 
+                attempts: 4,
+                backoff: $backoff,
+            );
+        } catch (PDOException) {
+        }         
+
+        if (count($expectedSleepSequence) > 0) {
+            Sleep::assertSequence($expectedSleepSequence);
+        } else {
+            Sleep::assertNeverSlept();
+        }
+    }
+
+    public static function backOffProvider()
     {
         yield 'null backoff' => [
             null,
