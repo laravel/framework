@@ -18,7 +18,6 @@ class AsJsonPath implements Castable
         {
             public function __construct(protected array $arguments)
             {
-
             }
 
             public function get($model, $key, $value, $attributes)
