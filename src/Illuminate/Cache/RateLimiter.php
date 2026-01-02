@@ -7,7 +7,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Redis\Connections\PhpRedisConnection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
-
+use Throwable;
 use function Illuminate\Support\enum_value;
 
 class RateLimiter
@@ -284,6 +284,44 @@ class RateLimiter
     public function cleanRateLimiterKey($key)
     {
         return preg_replace('/&([a-z])[a-z]+;/i', '$1', htmlentities($key));
+    }
+
+    /**
+     * Atomically debounce a callback using a key or an automatic hash.
+     *
+     * @template TReturn of mixed
+     *
+     * @param  string  $key
+     * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
+     * @param  callable():TReturn  $callback
+     * @return TReturn|false
+     */
+    public function debounce($key, $decaySeconds, $callback)
+    {
+        $key = $this->cleanRateLimiterKey($key);
+
+        $acquired = $this->cache->add(
+            $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
+        );
+
+        // If the timer was not added, the callback was already executed, so we will
+        // return false to avoid race conditions. Otherwise, the timer was added to
+        // the cache: execute the callback, hit the cache, and return that result.
+        if (! $acquired) {
+            return false;
+        }
+
+        try {
+            $result = $callback();
+
+            $this->hit($key, $decaySeconds);
+
+            return $result;
+        } catch (Throwable $e) {
+            $this->clear($key);
+
+            throw $e;
+        }
     }
 
     /**
