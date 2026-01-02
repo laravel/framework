@@ -202,6 +202,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 413 "Content Too Large" status code.
+     *
+     * @return $this
+     */
+    public function assertContentTooLarge()
+    {
+        return $this->assertStatus(413);
+    }
+
+    /**
      * Assert that the response has a 415 "Unsupported Media Type" status code.
      *
      * @return $this
