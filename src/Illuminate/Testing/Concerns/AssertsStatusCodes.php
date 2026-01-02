@@ -212,6 +212,16 @@ trait AssertsStatusCodes
     }
 
     /**
+     * Assert that the response has a 414 "URI Too Long" status code.
+     *
+     * @return $this
+     */
+    public function assertUriTooLong()
+    {
+        return $this->assertStatus(414);
+    }
+
+    /**
      * Assert that the response has a 415 "Unsupported Media Type" status code.
      *
      * @return $this
