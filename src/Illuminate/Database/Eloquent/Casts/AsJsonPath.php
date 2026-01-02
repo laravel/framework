@@ -10,16 +10,13 @@ class AsJsonPath implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<mixed, mixed>
      */
     public static function castUsing(array $arguments)
     {
         return new class($arguments) implements CastsAttributes
         {
-            public function __construct(protected array $arguments)
-            {
-            }
+            public function __construct(protected array $arguments) {}
 
             public function get($model, $key, $value, $attributes)
             {
@@ -35,6 +32,7 @@ class AsJsonPath implements Castable
                     if ($type) {
                         return $this->castValue($model, $key, $attributes[$key], $type);
                     }
+
                     return $attributes[$key];
                 }
 
@@ -114,8 +112,10 @@ class AsJsonPath implements Castable
                     default:
                         if (str_starts_with($castType, 'decimal:')) {
                             $decimals = (int) explode(':', $type, 2)[1];
+
                             return $model->asDecimal($value, $decimals);
                         }
+
                         return $value;
                 }
             }
@@ -130,7 +130,7 @@ class AsJsonPath implements Castable
      * @param  string|null  $type
      * @return string
      */
-    public static function using($targetColumn, $jsonPath, $type = null)
+    public static function using($targetColumn, $jsonPath, $type = null): string
     {
         $arguments = [$targetColumn, $jsonPath];
 
