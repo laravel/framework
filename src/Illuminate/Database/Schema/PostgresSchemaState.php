@@ -16,11 +16,18 @@ class PostgresSchemaState extends SchemaState
      */
     public function dump(Connection $connection, $path)
     {
+        $dumpCommand = $this->baseDumpCommand();
+        if ($this->hasData()) {
+            $dumpCommand .= ' --column-inserts';
+        } else {
+            $dumpCommand .= ' ---schema-only';
+        }
+
         $commands = new Collection([
-            $this->baseDumpCommand().' --schema-only > '.$path,
+            $dumpCommand.' > '.$path,
         ]);
 
-        if ($this->hasMigrationTable()) {
+        if (! $this->hasData() && $this->hasMigrationTable()) {
             $commands->push($this->baseDumpCommand().' -t '.$this->getMigrationTable().' --data-only >> '.$path);
         }
 
