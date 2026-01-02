@@ -127,7 +127,7 @@ trait ManagesTransactions
      * @param  int  $maxAttempts
      * @return void
      */
-    protected function handleTransactionExceptionBackoff($backoff = null, Throwable $e, $currentAttempt, $maxAttempts): void
+    protected function handleTransactionExceptionBackoff($backoff, Throwable $e, $currentAttempt, $maxAttempts): void
     {
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
