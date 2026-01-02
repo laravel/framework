@@ -58,4 +58,3 @@ class CommandFailed
         $this->connectionName = $connection->getName();
     }
 }
-

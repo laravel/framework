@@ -113,7 +113,6 @@ abstract class Connection
      */
     public function command($method, array $parameters = [])
     {
-
         $start = microtime(true);
 
         try {

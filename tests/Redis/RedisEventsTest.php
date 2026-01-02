@@ -102,4 +102,3 @@ class RedisEventsTest extends TestCase
         });
     }
 }
-
