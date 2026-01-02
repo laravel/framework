@@ -133,7 +133,7 @@ trait ManagesTransactions
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
             is_array($backoff) => $backoff[$currentAttempt - 1] ?? end($backoff),
-            $backoff instanceof Collection => $backoff->get($currentAttempt - 1) ?? $backoff->last(),
+            $backoff instanceof Collection => $backoff[$currentAttempt - 1] ?? $backoff->last(),
             is_callable($backoff) => $backoff($e, $currentAttempt, $maxAttempts),
             default => 0,
         };
