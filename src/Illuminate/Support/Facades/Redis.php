@@ -19,6 +19,7 @@ namespace Illuminate\Support\Facades;
  * @method static void psubscribe(array|string $channels, \Closure $callback)
  * @method static mixed command(string $method, array $parameters = [])
  * @method static void listen(\Closure $callback)
+ * @method static void listenForFailures(\Closure $callback)
  * @method static string|null getName()
  * @method static \Illuminate\Redis\Connections\Connection setName(string $name)
  * @method static \Illuminate\Contracts\Events\Dispatcher|null getEventDispatcher()
