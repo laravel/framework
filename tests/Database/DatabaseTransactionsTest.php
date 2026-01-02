@@ -268,12 +268,12 @@ class DatabaseTransactionsTest extends TestCase
                     ]);
 
                     throw new PDOException('deadlock detected', 40001);
-                }, 
+                },
                 attempts: 4,
                 backoff: $backoff,
             );
         } catch (PDOException) {
-        }         
+        }
 
         if (count($expectedSleepSequence) > 0) {
             Sleep::assertSequence($expectedSleepSequence);
@@ -314,12 +314,12 @@ class DatabaseTransactionsTest extends TestCase
 
                         throw new PDOException('deadlock detected', 40001);
                     });
-                }, 
+                },
                 attempts: 4,
                 backoff: $backoff,
             );
         } catch (PDOException) {
-        }         
+        }
 
         if (count($expectedSleepSequence) > 0) {
             Sleep::assertSequence($expectedSleepSequence);
@@ -336,7 +336,7 @@ class DatabaseTransactionsTest extends TestCase
         ];
 
         yield 'integer backoff' => [
-            42, 
+            42,
             [
                 Sleep::for(42)->milliseconds(),
                 Sleep::for(42)->milliseconds(),
@@ -359,7 +359,7 @@ class DatabaseTransactionsTest extends TestCase
                 Sleep::for(2222)->milliseconds(),
                 Sleep::for(4444)->milliseconds(),
                 Sleep::for(6666)->milliseconds(),
-            ],            
+            ],
         ];
     }
 
