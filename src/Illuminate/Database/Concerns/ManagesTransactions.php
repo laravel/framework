@@ -59,7 +59,7 @@ trait ManagesTransactions
                 $this->transactions = max(0, $this->transactions - 1);
             } catch (Throwable $e) {
                 $this->handleCommitTransactionException(
-                    $e, $currentAttempt, $attempts
+                    $e, $currentAttempt, $attempts, $backoff
                 );
 
                 continue;
@@ -109,8 +109,7 @@ trait ManagesTransactions
         // if we haven't we will return and try this query again in our loop.
         $this->rollBack();
 
-        if ($this->causedByConcurrencyError($e) &&
-            $currentAttempt < $maxAttempts) {
+        if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
             $this->handleTransactionExceptionBackoff($backoff, $e, $currentAttempt, $maxAttempts);
 
             return;
@@ -253,15 +252,18 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
+     * @param  \Closure|array|int|null  $backoff
      * @return void
      *
      * @throws \Throwable
      */
-    protected function handleCommitTransactionException(Throwable $e, $currentAttempt, $maxAttempts)
+    protected function handleCommitTransactionException(Throwable $e, $currentAttempt, $maxAttempts, $backoff)
     {
         $this->transactions = max(0, $this->transactions - 1);
 
         if ($this->causedByConcurrencyError($e) && $currentAttempt < $maxAttempts) {
+            $this->handleTransactionExceptionBackoff($backoff, $e, $currentAttempt, $maxAttempts);
+
             return;
         }
 
