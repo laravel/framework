@@ -267,7 +267,7 @@ class DatabaseTransactionsTest extends TestCase
                         'value' => 2,
                     ]);
 
-                    throw new PDOException('A deadlock occurred', 40001);
+                    throw new PDOException('deadlock detected', 40001);
                 }, 
                 attempts: 4,
                 backoff: $backoff,
