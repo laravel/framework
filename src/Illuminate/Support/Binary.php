@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Ulid;
 
 final class Binary
 {
@@ -65,6 +66,24 @@ final class Binary
                     }
 
                     return (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))
+                        ->toString();
+                },
+            ],
+            'ulid' => [
+                'encode' => function (?string $value) {
+                    if (blank($value)) {
+                        return null;
+                    }
+
+                    return (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))
+                        ->toBinary();
+                },
+                'decode' => function (?string $value) {
+                    if (blank($value)) {
+                        return null;
+                    }
+
+                    return (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))
                         ->toString();
                 },
             ],

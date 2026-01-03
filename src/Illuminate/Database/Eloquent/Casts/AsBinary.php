@@ -40,4 +40,19 @@ class AsBinary implements Castable
             }
         };
     }
+
+    public static function uuid(): string
+    {
+        return self::of('uuid');
+    }
+
+    public static function ulid(): string
+    {
+        return self::of('ulid');
+    }
+
+    public static function of(string $format): string
+    {
+        return self::class . ':' . $format;
+    }
 }
