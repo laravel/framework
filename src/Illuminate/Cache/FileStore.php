@@ -49,7 +49,7 @@ class FileStore implements Store, LockProvider
      */
     protected $serialization = 'php';
 
-    ص    /**
+    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
