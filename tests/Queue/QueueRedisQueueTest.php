@@ -127,7 +127,9 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with(1)->willReturn(2);
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('zadd')->once()->with(
+        $redis->shouldReceive('eval')->once()->with(
+            LuaScripts::later(),
+            1,
             'queues:default:delayed',
             2,
             json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 1])
@@ -157,7 +159,9 @@ class QueueRedisQueueTest extends TestCase
         $queue->expects($this->once())->method('availableAt')->with($date)->willReturn(5);
 
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('zadd')->once()->with(
+        $redis->shouldReceive('eval')->once()->with(
+            LuaScripts::later(),
+            1,
             'queues:default:delayed',
             5,
             json_encode(['uuid' => $uuid, 'displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'maxExceptions' => null, 'failOnTimeout' => false, 'backoff' => null, 'timeout' => null, 'data' => ['data'], 'createdAt' => $time->getTimestamp(), 'id' => 'foo', 'attempts' => 0, 'delay' => 5])

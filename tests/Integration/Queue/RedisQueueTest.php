@@ -534,6 +534,65 @@ class RedisQueueTest extends TestCase
             new RedisQueueIntegrationTestJob(15),
         ]);
     }
+
+    /**
+     * Test that delayed jobs work correctly with phpredis when serialization is enabled.
+     *
+     * This test reproduces issue #58214 where delayed jobs don't work when using
+     * phpredis with serialization/compression enabled because the laterRaw method
+     * uses zadd directly (which triggers phpredis serialization) instead of a Lua
+     * script (which bypasses serialization like pushRaw does).
+     */
+    public function testDelayedJobsWorkWithPhpRedisSerializationEnabled()
+    {
+        if (! extension_loaded('redis')) {
+            $this->markTestSkipped('The redis extension is not installed.');
+        }
+
+        // Get the phpredis connection and enable serialization
+        $connection = $this->redis['phpredis']->connection();
+        $client = $connection->client();
+
+        // Redis::OPT_SERIALIZER = 1, Redis::SERIALIZER_PHP = 1
+        $optSerializer = 1;
+        $serializerPhp = 1;
+
+        // Store original serializer to restore later
+        $originalSerializer = $client->getOption($optSerializer);
+
+        // Enable PHP serialization (simulates real-world usage with serialization)
+        $client->setOption($optSerializer, $serializerPhp);
+
+        try {
+            $default = config('queue.connections.redis.queue', 'default');
+            $this->setQueue('phpredis', $default);
+
+            // Push a delayed job (this is where the bug occurs - zadd serializes the payload)
+            $job = new RedisQueueIntegrationTestJob(42);
+            $this->queue->later(-10, $job);
+
+            // The job should be immediately available since we used a negative delay
+            // With the bug, this would fail because the payload is double-serialized
+            $poppedJob = $this->queue->pop();
+
+            $this->assertNotNull($poppedJob, 'Delayed job should be retrievable after delay expires');
+
+            // Verify the job payload can be decoded correctly
+            $rawBody = $poppedJob->getRawBody();
+            $decoded = json_decode($rawBody);
+
+            $this->assertNotNull($decoded, 'Job payload should be valid JSON');
+            $this->assertObjectHasProperty('data', $decoded, 'Decoded payload should have data property');
+
+            // Verify the actual job data
+            $command = unserialize($decoded->data->command);
+            $this->assertEquals($job, $command, 'Unserialized job should match original');
+            $this->assertEquals(42, $command->i, 'Job property should be preserved');
+        } finally {
+            // Restore original serializer setting
+            $client->setOption($optSerializer, $originalSerializer);
+        }
+    }
 }
 
 class RedisQueueIntegrationTestJob
