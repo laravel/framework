@@ -96,10 +96,13 @@ class EnvironmentDecryptCommand extends Command
         try {
             $encrypter = new Encrypter($key, $cipher);
 
-            $this->files->put(
-                $outputFile,
-                $encrypter->decrypt($this->files->get($encryptedFile))
-            );
+            $encryptedContents = $this->files->get($encryptedFile);
+
+            $decrypted = $this->isReadableFormat($encryptedContents)
+                ? $this->decryptReadableFormat($encryptedContents, $encrypter)
+                : $encrypter->decrypt($encryptedContents);
+
+            $this->files->put($outputFile, $decrypted);
         } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
@@ -139,5 +142,87 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
+    }
+
+    /**
+     * Determine if the content is in readable format.
+     *
+     * @param  string  $contents
+     * @return bool
+     */
+    protected function isReadableFormat(string $contents): bool
+    {
+        // Readable format has newlines and KEY=value structure
+        // Blob format is a single base64-encoded JSON string without newlines
+        if (! str_contains($contents, "\n")) {
+            return false;
+        }
+
+        // Check first non-empty line - should be KEY=base64 or #:base64 or empty
+        $lines = preg_split('/\r\n|\r|\n/', $contents);
+
+        foreach ($lines as $line) {
+            if (trim($line) === '') {
+                continue;
+            }
+
+            // Check if it matches readable format patterns
+            if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*=/', $line)) {
+                return true;
+            }
+
+            if (str_starts_with($line, '#:')) {
+                return true;
+            }
+
+            // First non-empty line doesn't match readable format
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Decrypt the environment file from readable format.
+     *
+     * @param  string  $contents
+     * @param  \Illuminate\Encryption\Encrypter  $encrypter
+     * @return string
+     */
+    protected function decryptReadableFormat(string $contents, Encrypter $encrypter): string
+    {
+        $lines = preg_split('/\r\n|\r|\n/', $contents);
+        $result = [];
+
+        foreach ($lines as $line) {
+            // Preserve blank lines
+            if (trim($line) === '') {
+                $result[] = '';
+                continue;
+            }
+
+            // Decrypt comments
+            if (str_starts_with($line, '#:')) {
+                $encrypted = substr($line, 2);
+                $result[] = $encrypter->decryptString($encrypted);
+                continue;
+            }
+
+            // Decrypt variables
+            $pos = strpos($line, '=');
+
+            if ($pos !== false) {
+                $key = substr($line, 0, $pos);
+                $encrypted = substr($line, $pos + 1);
+                $decryptedValue = $encrypter->decryptString($encrypted);
+                $result[] = $key.'='.$decryptedValue;
+                continue;
+            }
+
+            // Unknown format - try to decrypt as-is
+            $result[] = $encrypter->decryptString($line);
+        }
+
+        return implode("\n", $result);
     }
 }

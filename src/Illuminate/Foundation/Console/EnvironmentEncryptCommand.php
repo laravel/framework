@@ -24,6 +24,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
+                    {--readable : Encrypt in readable format with visible keys}
                     {--prune : Delete the original environment file}
                     {--force : Overwrite the existing encrypted environment file}';
 
@@ -102,10 +103,13 @@ class EnvironmentEncryptCommand extends Command
         try {
             $encrypter = new Encrypter($this->parseKey($key), $cipher);
 
-            $this->files->put(
-                $encryptedFile,
-                $encrypter->encrypt($this->files->get($environmentFile))
-            );
+            $contents = $this->files->get($environmentFile);
+
+            $encrypted = $this->option('readable')
+                ? $this->encryptReadableFormat($contents, $encrypter)
+                : $encrypter->encrypt($contents);
+
+            $this->files->put($encryptedFile, $encrypted);
         } catch (Exception $e) {
             $this->fail($e->getMessage());
         }
@@ -136,5 +140,156 @@ class EnvironmentEncryptCommand extends Command
         }
 
         return $key;
+    }
+
+    /**
+     * Encrypt the environment file in readable format.
+     *
+     * @param  string  $contents
+     * @param  \Illuminate\Encryption\Encrypter  $encrypter
+     * @return string
+     */
+    protected function encryptReadableFormat(string $contents, Encrypter $encrypter): string
+    {
+        $lines = preg_split('/\r\n|\r|\n/', $contents);
+        $result = [];
+        $multilineBuffer = null;
+        $multilineKey = null;
+
+        foreach ($lines as $line) {
+            // Handle multiline continuation
+            if ($multilineBuffer !== null) {
+                $multilineBuffer .= "\n".$line;
+
+                if ($this->isMultilineEnd($line)) {
+                    $result[] = $multilineKey.'='.$encrypter->encryptString($multilineBuffer);
+                    $multilineBuffer = null;
+                    $multilineKey = null;
+                }
+
+                continue;
+            }
+
+            // Preserve blank lines
+            if (trim($line) === '') {
+                $result[] = '';
+                continue;
+            }
+
+            // Handle comments - encrypt with #: prefix
+            if ($this->isComment($line)) {
+                $result[] = '#:'.$encrypter->encryptString($line);
+                continue;
+            }
+
+            // Parse variable line
+            $parsed = $this->parseEnvLine($line);
+
+            if ($parsed === null) {
+                // Invalid line - encrypt as comment
+                $result[] = '#:'.$encrypter->encryptString($line);
+                continue;
+            }
+
+            [$key, $value, $isMultilineStart] = $parsed;
+
+            if ($isMultilineStart) {
+                $multilineBuffer = $value;
+                $multilineKey = $key;
+                continue;
+            }
+
+            $result[] = $key.'='.$encrypter->encryptString($value);
+        }
+
+        // Handle unterminated multiline (edge case)
+        if ($multilineBuffer !== null) {
+            $result[] = $multilineKey.'='.$encrypter->encryptString($multilineBuffer);
+        }
+
+        return implode("\n", $result);
+    }
+
+    /**
+     * Determine if a line is a comment.
+     *
+     * @param  string  $line
+     * @return bool
+     */
+    protected function isComment(string $line): bool
+    {
+        $trimmed = ltrim($line);
+
+        return str_starts_with($trimmed, '#');
+    }
+
+    /**
+     * Parse an environment variable line.
+     *
+     * Returns [key, value, isMultilineStart] or null if invalid.
+     *
+     * @param  string  $line
+     * @return array|null
+     */
+    protected function parseEnvLine(string $line): ?array
+    {
+        // Handle export prefix
+        $line = preg_replace('/^export\s+/', '', ltrim($line));
+
+        // Find the = separator
+        $pos = strpos($line, '=');
+
+        if ($pos === false) {
+            return null;
+        }
+
+        $key = substr($line, 0, $pos);
+        $value = substr($line, $pos + 1);
+
+        // Validate key (alphanumeric, underscore, starts with letter or underscore)
+        if (! preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $key)) {
+            return null;
+        }
+
+        // Check for multiline start (value starts with " but doesn't end with ")
+        $isMultilineStart = $this->isMultilineStart($value);
+
+        return [$key, $value, $isMultilineStart];
+    }
+
+    /**
+     * Determine if a value starts a multiline string.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isMultilineStart(string $value): bool
+    {
+        $trimmed = ltrim($value);
+
+        if (! str_starts_with($trimmed, '"')) {
+            return false;
+        }
+
+        // Count unescaped quotes
+        $unescaped = str_replace('\\\\', '', $trimmed);
+        $unescaped = str_replace('\\"', '', $unescaped);
+
+        return substr_count($unescaped, '"') === 1;
+    }
+
+    /**
+     * Determine if a line ends a multiline string.
+     *
+     * @param  string  $line
+     * @return bool
+     */
+    protected function isMultilineEnd(string $line): bool
+    {
+        $unescaped = str_replace('\\\\', '', $line);
+        $unescaped = str_replace('\\"', '', $unescaped);
+
+        // Line ends with unescaped quote
+        return str_ends_with(rtrim($unescaped), '"');
     }
 }
