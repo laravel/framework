@@ -672,6 +672,21 @@ class SessionStoreTest extends TestCase
         $this->assertSame('macroable', $this->getSession()->foo());
     }
 
+    public function testUnserializeWithAllowedClassesFalsePreventsObjectInjection()
+    {
+        $session = $this->getSession();
+
+        $maliciousPayload = serialize(['foo' => 'bar', 'object' => new \stdClass]);
+
+        $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn($maliciousPayload);
+        $session->start();
+
+        $this->assertSame('bar', $session->get('foo'));
+
+        $object = $session->get('object');
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $object);
+    }
+
     public function getSession($serialization = 'php')
     {
         $reflection = new ReflectionClass(Store::class);
