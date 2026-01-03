@@ -180,6 +180,26 @@ if (! function_exists('fluent')) {
     }
 }
 
+if (! function_exists('is_binary')) {
+    /**
+     * Checks if passed value is binary formatted.
+     *
+     * @param string|mixed $value
+     */
+    function is_binary($value): bool
+    {
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (str_contains($value, "\0")) {
+            return true;
+        }
+
+        return ! mb_check_encoding($value, 'UTF-8');
+    }
+}
+
 if (! function_exists('literal')) {
     /**
      * Return a new literal or anonymous object using named arguments.
