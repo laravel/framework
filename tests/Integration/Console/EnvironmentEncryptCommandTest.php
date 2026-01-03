@@ -259,6 +259,39 @@ class EnvironmentEncryptCommandTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function testItEncryptsLinesWithoutEqualsAsComments(): void
+    {
+        $filesystem = m::mock(Filesystem::class);
+        $filesystem->shouldReceive('exists')
+            ->with(base_path('.env'))
+            ->once()
+            ->andReturn(true);
+        $filesystem->shouldReceive('exists')
+            ->with(base_path('.env.encrypted'))
+            ->once()
+            ->andReturn(false);
+        $filesystem->shouldReceive('get')
+            ->with(base_path('.env'))
+            ->once()
+            ->andReturn("APP_NAME=Laravel\nMY_ENV_WITHOUT_EQUALS\nAPP_ENV=local");
+        $filesystem->shouldReceive('put')
+            ->once()
+            ->with(base_path('.env.encrypted'), m::on(function ($content) {
+                $lines = explode("\n", $content);
+
+                return count($lines) === 3
+                    && str_starts_with($lines[0], 'APP_NAME=')
+                    && str_starts_with($lines[1], '#:')  // Line without = encrypted as comment
+                    && str_starts_with($lines[2], 'APP_ENV=');
+            }))
+            ->andReturn(true);
+        File::swap($filesystem);
+
+        $this->artisan('env:encrypt', ['--readable' => true, '--key' => 'ANvVbPbE0tWMHpUySh6liY4WaCmAYKXP'])
+            ->expectsOutputToContain('Environment successfully encrypted')
+            ->assertExitCode(0);
+    }
+
     public function testItCanRemoveTheOriginalFile(): void
     {
         $this->filesystem->shouldReceive('exists')

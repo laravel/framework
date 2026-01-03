@@ -417,4 +417,32 @@ class EnvironmentDecryptCommandTest extends TestCase
         $this->filesystem->shouldHaveReceived('put')
             ->with(base_path('.env'), $originalContent);
     }
+
+    public function testItDecryptsLinesWithoutEqualsPreservingOriginal(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create readable format with a line that was encrypted as comment (no = sign)
+        $encryptedContent = 'APP_NAME='.$encrypter->encryptString('Laravel')."\n".
+                           '#:'.$encrypter->encryptString('MY_ENV_WITHOUT_EQUALS')."\n".
+                           'APP_ENV='.$encrypter->encryptString('local');
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContent);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), "APP_NAME=Laravel\nMY_ENV_WITHOUT_EQUALS\nAPP_ENV=local");
+    }
 }
