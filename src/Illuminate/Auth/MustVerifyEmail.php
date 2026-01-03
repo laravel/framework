@@ -29,6 +29,19 @@ trait MustVerifyEmail
     }
 
     /**
+     * Mark the given user's email as not verified.
+     *
+     * @return bool
+     */
+    public function markEmailAsNotVerified()
+    {
+        return $this->forceFill([
+            'email_verified_at' => null,
+        ])->save();
+    }
+
+
+    /**
      * Send the email verification notification.
      *
      * @return void
