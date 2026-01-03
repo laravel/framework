@@ -374,6 +374,50 @@ class CacheFileStoreTest extends TestCase
         $this->assertFileDoesNotExist($flexiblePath);
     }
 
+    public function testJsonSerializationStoresValues()
+    {
+        $files = $this->mockFilesystem();
+        $store = $this->getMockBuilder(FileStore::class)->onlyMethods(['expiration'])->setConstructorArgs([$files, __DIR__, null, 'json'])->getMock();
+        $store->expects($this->once())->method('expiration')->with($this->equalTo(10))->willReturn(1111111111);
+        $contents = '1111111111'.json_encode('Hello World');
+        $hash = sha1('foo');
+        $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
+        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($contents))->willReturn(strlen($contents));
+        $result = $store->put('foo', 'Hello World', 10);
+        $this->assertTrue($result);
+    }
+
+    public function testJsonSerializationRetrievesValues()
+    {
+        $files = $this->mockFilesystem();
+        $contents = '9999999999'.json_encode('Hello World');
+        $files->expects($this->once())->method('get')->willReturn($contents);
+        $store = new FileStore($files, __DIR__, null, 'json');
+        $this->assertSame('Hello World', $store->get('foo'));
+    }
+
+    public function testJsonSerializationWithArrays()
+    {
+        $files = $this->mockFilesystem();
+        $data = ['foo' => 'bar', 'baz' => 123];
+        $contents = '9999999999'.json_encode($data);
+        $files->expects($this->once())->method('get')->willReturn($contents);
+        $store = new FileStore($files, __DIR__, null, 'json');
+        $this->assertSame($data, $store->get('test'));
+    }
+
+    public function testSetSerializationMethod()
+    {
+        $files = $this->mockFilesystem();
+        $store = new FileStore($files, __DIR__);
+
+        $store->setSerialization('json');
+        $contents = '9999999999'.json_encode(['key' => 'value']);
+        $files->expects($this->once())->method('get')->willReturn($contents);
+
+        $this->assertSame(['key' => 'value'], $store->get('test'));
+    }
+
     protected function mockFilesystem()
     {
         return $this->createMock(Filesystem::class);

@@ -69,6 +69,13 @@ class DatabaseStore implements LockProvider, Store
     protected $defaultLockTimeoutInSeconds;
 
     /**
+     * The cache store's serialization strategy.
+     *
+     * @var string
+     */
+    protected $serialization = 'php';
+
+    /**
      * Create a new database store.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -77,6 +84,7 @@ class DatabaseStore implements LockProvider, Store
      * @param  string  $lockTable
      * @param  array  $lockLottery
      * @param  int  $defaultLockTimeoutInSeconds
+     * @param  string  $serialization
      */
     public function __construct(
         ConnectionInterface $connection,
@@ -85,6 +93,7 @@ class DatabaseStore implements LockProvider, Store
         $lockTable = 'cache_locks',
         $lockLottery = [2, 100],
         $defaultLockTimeoutInSeconds = 86400,
+        $serialization = 'php',
     ) {
         $this->table = $table;
         $this->prefix = $prefix;
@@ -92,6 +101,7 @@ class DatabaseStore implements LockProvider, Store
         $this->lockTable = $lockTable;
         $this->lockLottery = $lockLottery;
         $this->defaultLockTimeoutInSeconds = $defaultLockTimeoutInSeconds;
+        $this->serialization = $serialization;
     }
 
     /**
@@ -503,6 +513,19 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Set the cache store's serialization strategy.
+     *
+     * @param  string  $serialization
+     * @return $this
+     */
+    public function setSerialization($serialization)
+    {
+        $this->serialization = $serialization;
+
+        return $this;
+    }
+
+    /**
      * Serialize the given value.
      *
      * @param  mixed  $value
@@ -510,6 +533,10 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function serialize($value)
     {
+        if ($this->serialization === 'json') {
+            return json_encode($value);
+        }
+
         $result = serialize($value);
 
         if (($this->connection instanceof PostgresConnection ||
@@ -529,6 +556,10 @@ class DatabaseStore implements LockProvider, Store
      */
     protected function unserialize($value)
     {
+        if ($this->serialization === 'json') {
+            return json_decode($value, true);
+        }
+
         if (($this->connection instanceof PostgresConnection ||
              $this->connection instanceof SQLiteConnection) &&
             ! Str::contains($value, [':', ';'])) {

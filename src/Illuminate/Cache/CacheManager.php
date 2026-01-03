@@ -194,6 +194,7 @@ class CacheManager implements FactoryContract
             $config['lock_table'] ?? 'cache_locks',
             $config['lock_lottery'] ?? [2, 100],
             $config['lock_timeout'] ?? 86400,
+            $config['serialization'] ?? 'php',
         );
 
         return $this->repository(
@@ -277,7 +278,7 @@ class CacheManager implements FactoryContract
     protected function createFileDriver(array $config)
     {
         return $this->repository(
-            (new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null))
+            (new FileStore($this->app['files'], $config['path'], $config['permission'] ?? null, $config['serialization'] ?? 'php'))
                 ->setLockDirectory($config['lock_path'] ?? null),
             $config
         );

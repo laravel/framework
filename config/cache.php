@@ -50,12 +50,14 @@ return [
             'table' => env('DB_CACHE_TABLE', 'cache'),
             'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
             'lock_table' => env('DB_CACHE_LOCK_TABLE'),
+            'serialization' => env('CACHE_SERIALIZATION', 'php'),
         ],
 
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
             'lock_path' => storage_path('framework/cache/data'),
+            'serialization' => env('CACHE_SERIALIZATION', 'php'),
         ],
 
         'memcached' => [

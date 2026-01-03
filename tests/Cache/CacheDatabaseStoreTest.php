@@ -239,6 +239,64 @@ class CacheDatabaseStoreTest extends TestCase
         return new DatabaseStore(m::mock(SQLiteConnection::class), 'table', 'prefix');
     }
 
+    public function testJsonSerializationStoresValues()
+    {
+        $store = $this->getMockBuilder(DatabaseStore::class)->onlyMethods(['getTime'])->setConstructorArgs($this->getJsonMocks())->getMock();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->willReturn(1);
+        $table->shouldReceive('upsert')->once()->with([['key' => 'prefixfoo', 'value' => json_encode('bar'), 'expiration' => 61]], 'key')->andReturnTrue();
+
+        $result = $store->put('foo', 'bar', 60);
+        $this->assertTrue($result);
+    }
+
+    public function testJsonSerializationRetrievesValues()
+    {
+        $store = $this->getJsonStore();
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
+        $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => json_encode('bar'), 'expiration' => 999999999999999]]));
+
+        $this->assertSame('bar', $store->get('foo'));
+    }
+
+    public function testJsonSerializationWithArrays()
+    {
+        $store = $this->getJsonStore();
+        $table = m::mock(stdClass::class);
+        $data = ['foo' => 'bar', 'baz' => 123];
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixtest'])->andReturn($table);
+        $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixtest', 'value' => json_encode($data), 'expiration' => 999999999999999]]));
+
+        $this->assertSame($data, $store->get('test'));
+    }
+
+    public function testSetSerializationMethod()
+    {
+        $store = $this->getStore();
+        $store->setSerialization('json');
+
+        $table = m::mock(stdClass::class);
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('whereIn')->once()->with('key', ['prefixfoo'])->andReturn($table);
+        $table->shouldReceive('get')->once()->andReturn(collect([(object) ['key' => 'prefixfoo', 'value' => json_encode(['key' => 'value']), 'expiration' => 999999999999999]]));
+
+        $this->assertSame(['key' => 'value'], $store->get('foo'));
+    }
+
+    protected function getJsonStore()
+    {
+        return new DatabaseStore(m::mock(Connection::class), 'table', 'prefix', 'cache_locks', [2, 100], 86400, 'json');
+    }
+
+    protected function getJsonMocks()
+    {
+        return [m::mock(Connection::class), 'table', 'prefix', 'cache_locks', [2, 100], 86400, 'json'];
+    }
+
     protected function getMocks()
     {
         return [m::mock(Connection::class), 'table', 'prefix'];

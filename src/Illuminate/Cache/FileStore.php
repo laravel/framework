@@ -43,17 +43,26 @@ class FileStore implements Store, LockProvider
     protected $filePermission;
 
     /**
+     * The cache store's serialization strategy.
+     *
+     * @var string
+     */
+    protected $serialization = 'php';
+
+    ص    /**
      * Create a new file cache store instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $directory
      * @param  int|null  $filePermission
+     * @param  string  $serialization
      */
-    public function __construct(Filesystem $files, $directory, $filePermission = null)
+    public function __construct(Filesystem $files, $directory, $filePermission = null, $serialization = 'php')
     {
         $this->files = $files;
         $this->directory = $directory;
         $this->filePermission = $filePermission;
+        $this->serialization = $serialization;
     }
 
     /**
@@ -80,7 +89,7 @@ class FileStore implements Store, LockProvider
         $this->ensureCacheDirectoryExists($path = $this->path($key));
 
         $result = $this->files->put(
-            $path, $this->expiration($seconds).serialize($value), true
+            $path, $this->expiration($seconds).$this->serialize($value), true
         );
 
         if ($result !== false && $result > 0) {
@@ -118,7 +127,7 @@ class FileStore implements Store, LockProvider
 
         if (empty($expire) || $this->currentTime() >= $expire) {
             $file->truncate()
-                ->write($this->expiration($seconds).serialize($value))
+                ->write($this->expiration($seconds).$this->serialize($value))
                 ->close();
 
             $this->ensurePermissionsAreCorrect($path);
@@ -312,7 +321,7 @@ class FileStore implements Store, LockProvider
         }
 
         try {
-            $data = unserialize(substr($contents, 10));
+            $data = $this->unserialize(substr($contents, 10));
         } catch (Exception) {
             $this->forget($key);
 
@@ -407,6 +416,45 @@ class FileStore implements Store, LockProvider
         $this->lockDirectory = $lockDirectory;
 
         return $this;
+    }
+
+    /**
+     * Set the cache store's serialization strategy.
+     *
+     * @param  string  $serialization
+     * @return $this
+     */
+    public function setSerialization($serialization)
+    {
+        $this->serialization = $serialization;
+
+        return $this;
+    }
+
+    /**
+     * Serialize the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function serialize($value)
+    {
+        return $this->serialization === 'json'
+            ? json_encode($value)
+            : serialize($value);
+    }
+
+    /**
+     * Unserialize the given value.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        return $this->serialization === 'json'
+            ? json_decode($value, true)
+            : unserialize($value);
     }
 
     /**
