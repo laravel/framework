@@ -40,7 +40,6 @@ trait MustVerifyEmail
         ])->save();
     }
 
-
     /**
      * Send the email verification notification.
      *
