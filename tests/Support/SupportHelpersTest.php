@@ -168,6 +168,30 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(filled($object));
     }
 
+    public function testIsBinary()
+    {
+        // Non-string values
+        $this->assertFalse(is_binary(null));
+        $this->assertFalse(is_binary(123));
+        $this->assertFalse(is_binary([]));
+
+        // Empty string
+        $this->assertFalse(is_binary(''));
+
+        // Valid UTF-8 strings
+        $this->assertFalse(is_binary('hello'));
+        $this->assertFalse(is_binary('héllo'));
+        $this->assertFalse(is_binary('日本語'));
+
+        // Binary data with null byte
+        $this->assertTrue(is_binary("hello\0world"));
+        $this->assertTrue(is_binary("\0"));
+
+        // Invalid UTF-8 sequences
+        $this->assertTrue(is_binary("\xFF\xFE"));
+        $this->assertTrue(is_binary(random_bytes(16)));
+    }
+
     public function testValue()
     {
         $callable = new class
