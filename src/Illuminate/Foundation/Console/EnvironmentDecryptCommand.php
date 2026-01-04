@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Console;
 use Dotenv\Parser\Lines;
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
@@ -100,11 +99,9 @@ class EnvironmentDecryptCommand extends Command
 
             $encryptedContents = $this->files->get($encryptedFile);
 
-            try {
-                $decrypted = $encrypter->decrypt($encryptedContents);
-            } catch (DecryptException) {
-                $decrypted = $this->decryptReadableFormat($encryptedContents, $encrypter);
-            }
+            $decrypted = $this->isReadableFormat($encryptedContents)
+                ? $this->decryptReadableFormat($encryptedContents, $encrypter)
+                : $encrypter->decrypt($encryptedContents);
 
             $this->files->put($outputFile, $decrypted);
         } catch (Exception $e) {
@@ -146,6 +143,28 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
+    }
+
+    /**
+     * Determine if the content is in readable format.
+     *
+     * @param  string  $contents
+     * @return bool
+     */
+    protected function isReadableFormat(string $contents): bool
+    {
+        // Check if content is blob format (base64-encoded JSON with iv, value, mac keys)
+        $decoded = base64_decode($contents, true);
+
+        if ($decoded !== false) {
+            $payload = json_decode($decoded, true);
+
+            if (is_array($payload) && isset($payload['iv'], $payload['value'])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
