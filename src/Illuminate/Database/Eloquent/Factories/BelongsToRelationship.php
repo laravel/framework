@@ -29,6 +29,20 @@ class BelongsToRelationship
     protected $resolved;
 
     /**
+     * The cached, resolved parent model instance.
+     *
+     * @var \Illuminate\Database\Eloquent\Model|null
+     */
+    protected $resolvedModel;
+
+    /**
+     * Whether relationships should be created in-memory without persisting.
+     *
+     * @var bool
+     */
+    protected $withInMemoryRelationships = false;
+
+    /**
      * Create a new "belongs to" relationship definition.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
@@ -69,14 +83,54 @@ class BelongsToRelationship
         return function () use ($key) {
             if (! $this->resolved) {
                 $instance = $this->factory instanceof Factory
-                    ? ($this->factory->getRandomRecycledModel($this->factory->modelName()) ?? $this->factory->create())
+                    ? ($this->factory->getRandomRecycledModel($this->factory->modelName())
+                        ?? ($this->withInMemoryRelationships ? $this->factory->make() : $this->factory->create()))
                     : $this->factory;
+
+                $this->resolvedModel = $instance;
 
                 return $this->resolved = $key ? $instance->{$key} : $instance->getKey();
             }
 
             return $this->resolved;
         };
+    }
+
+    /**
+     * Get the resolved parent model instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function getResolvedModel()
+    {
+        return $this->resolvedModel;
+    }
+
+    /**
+     * Get the relationship name.
+     *
+     * @return string
+     */
+    public function getRelationship()
+    {
+        return $this->relationship;
+    }
+
+    /**
+     * Indicate that relationships should be created in-memory without persisting.
+     *
+     * @param  bool  $state
+     * @return $this
+     */
+    public function withInMemoryRelationships(bool $state = true)
+    {
+        $this->withInMemoryRelationships = $state;
+
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->withInMemoryRelationships($state);
+        }
+
+        return $this;
     }
 
     /**

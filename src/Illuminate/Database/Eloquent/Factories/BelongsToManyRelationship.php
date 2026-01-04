@@ -5,7 +5,7 @@ namespace Illuminate\Database\Eloquent\Factories;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-class BelongsToManyRelationship
+class BelongsToManyRelationship implements ChildRelationship
 {
     /**
      * The related factory instance.
@@ -27,6 +27,13 @@ class BelongsToManyRelationship
      * @var string
      */
     protected $relationship;
+
+    /**
+     * Whether relationships should be created in-memory without persisting.
+     *
+     * @var bool
+     */
+    protected $withInMemoryRelationships = false;
 
     /**
      * Create a new attached relationship definition.
@@ -62,6 +69,54 @@ class BelongsToManyRelationship
                 is_callable($this->pivot) ? call_user_func($this->pivot, $model) : $this->pivot
             );
         });
+    }
+
+    /**
+     * Make the attached relationship for the given model without persisting.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     */
+    public function makeFor(Model $model)
+    {
+        $relationship = $model->{$this->relationship}();
+
+        if ($this->factory instanceof Factory) {
+            return $this->factory
+                ->withInMemoryRelationships()
+                ->prependState($relationship->getQuery()->pendingAttributes)
+                ->make([], $model);
+        }
+
+        // If factory is already a collection/model, just return it wrapped
+        return Collection::wrap($this->factory);
+    }
+
+    /**
+     * Get the relationship name.
+     *
+     * @return string
+     */
+    public function getRelationship()
+    {
+        return $this->relationship;
+    }
+
+    /**
+     * Indicate that relationships should be created in-memory without persisting.
+     *
+     * @param  bool  $state
+     * @return $this
+     */
+    public function withInMemoryRelationships(bool $state = true)
+    {
+        $this->withInMemoryRelationships = $state;
+
+        if ($this->factory instanceof Factory) {
+            $this->factory = $this->factory->withInMemoryRelationships($state);
+        }
+
+        return $this;
     }
 
     /**

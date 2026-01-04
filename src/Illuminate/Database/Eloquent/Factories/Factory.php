@@ -102,6 +102,13 @@ abstract class Factory
     protected $excludeRelationships = [];
 
     /**
+     * Whether relationships should be made in-memory without persisting.
+     *
+     * @var bool
+     */
+    protected $withInMemoryRelationships = false;
+
+    /**
      * The name of the database connection that will be used to create the models.
      *
      * @var \UnitEnum|string|null
@@ -163,6 +170,7 @@ abstract class Factory
      * @param  \Illuminate\Support\Collection|null  $recycle
      * @param  bool|null  $expandRelationships
      * @param  array  $excludeRelationships
+     * @param  bool  $withInMemoryRelationships
      */
     public function __construct(
         $count = null,
@@ -175,6 +183,7 @@ abstract class Factory
         ?Collection $recycle = null,
         ?bool $expandRelationships = null,
         array $excludeRelationships = [],
+        bool $withInMemoryRelationships = false,
     ) {
         $this->count = $count;
         $this->states = $states ?? new Collection;
@@ -187,6 +196,7 @@ abstract class Factory
         $this->faker = $this->withFaker();
         $this->expandRelationships = $expandRelationships ?? self::$expandRelationshipsByDefault;
         $this->excludeRelationships = $excludeRelationships;
+        $this->withInMemoryRelationships = $withInMemoryRelationships;
     }
 
     /**
@@ -299,7 +309,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(fn () => $this->createMany($records));
+        return Model::withoutEvents(fn() => $this->createMany($records));
     }
 
     /**
@@ -311,6 +321,10 @@ abstract class Factory
      */
     public function create($attributes = [], ?Model $parent = null)
     {
+        if ($this->withInMemoryRelationships) {
+            return $this->withInMemoryRelationships(false)->create($attributes, $parent);
+        }
+
         if (! empty($attributes)) {
             return $this->state($attributes)->create([], $parent);
         }
@@ -339,7 +353,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
+        return Model::withoutEvents(fn() => $this->create($attributes, $parent));
     }
 
     /**
@@ -351,7 +365,7 @@ abstract class Factory
      */
     public function lazy(array $attributes = [], ?Model $parent = null)
     {
-        return fn () => $this->create($attributes, $parent);
+        return fn() => $this->create($attributes, $parent);
     }
 
     /**
@@ -473,7 +487,7 @@ abstract class Factory
         $query->fillAndInsert(
             $madeCollection->withoutAppends()
                 ->setHidden([])
-                ->map(static fn (Model $model) => $model->attributesToArray())
+                ->map(static fn(Model $model) => $model->attributesToArray())
                 ->all()
         );
     }
@@ -486,12 +500,69 @@ abstract class Factory
      */
     protected function makeInstance(?Model $parent)
     {
+        if ($this->withInMemoryRelationships) {
+            $this->for->each(fn(BelongsToRelationship $for) => $for->withInMemoryRelationships(true));
+        }
+
         return Model::unguarded(function () use ($parent) {
             return tap($this->newModel($this->getExpandedAttributes($parent)), function ($instance) {
                 if (isset($this->connection)) {
                     $instance->setConnection($this->connection);
                 }
+
+                if ($this->withInMemoryRelationships) {
+                    $this->setInMemoryParentRelationships($instance);
+                    $this->setInMemoryChildRelationships($instance);
+                }
             });
+        });
+    }
+
+    /**
+     * Set in-memory parent relationships on the given model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $instance
+     * @return void
+     */
+    protected function setInMemoryParentRelationships(Model $instance)
+    {
+        $this->for->each(function (BelongsToRelationship $for) use ($instance) {
+            $parent = $for->getResolvedModel();
+
+            if ($parent) {
+                $instance->setRelation($for->getRelationship(), $parent);
+            }
+        });
+    }
+
+    /**
+     * Set in-memory child relationships on the given model instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $instance
+     * @return void
+     */
+    protected function setInMemoryChildRelationships(Model $instance)
+    {
+        $this->has->each(function (ChildRelationship $has) use ($instance) {
+            $children = $has->makeFor($instance);
+
+            $relationshipName = $has->getRelationship();
+            $relationship = $instance->{$relationshipName}();
+
+            $isOneRelationship = $relationship instanceof \Illuminate\Database\Eloquent\Relations\HasOne
+                || $relationship instanceof \Illuminate\Database\Eloquent\Relations\MorphOne;
+
+            if ($isOneRelationship) {
+                if ($children instanceof Enumerable) {
+                    $children = $children->first();
+                }
+            } else {
+                if ($children instanceof Model) {
+                    $children = $instance->newCollection([$children]);
+                }
+            }
+
+            $instance->setRelation($relationshipName, $children);
         });
     }
 
@@ -535,7 +606,7 @@ abstract class Factory
     protected function parentResolvers()
     {
         return $this->for
-            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->map(fn(BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
             ->collapse()
             ->all();
     }
@@ -552,8 +623,10 @@ abstract class Factory
             ->map($evaluateRelations = function ($attribute, $key) {
                 if (! $this->expandRelationships && $attribute instanceof self) {
                     $attribute = null;
-                } elseif ($attribute instanceof self &&
-                    array_intersect([$attribute->modelName(), $key], $this->excludeRelationships)) {
+                } elseif (
+                    $attribute instanceof self &&
+                    array_intersect([$attribute->modelName(), $key], $this->excludeRelationships)
+                ) {
                     $attribute = null;
                 } elseif ($attribute instanceof self) {
                     $attribute = $this->getRandomRecycledModel($attribute->modelName())?->getKey()
@@ -588,7 +661,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : fn () => $state,
+                is_callable($state) ? $state : fn() => $state,
             ]),
         ]);
     }
@@ -603,7 +676,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->prepend(
-                is_callable($state) ? $state : fn () => $state,
+                is_callable($state) ? $state : fn() => $state,
             ),
         ]);
     }
@@ -664,7 +737,8 @@ abstract class Factory
     {
         return $this->newInstance([
             'has' => $this->has->concat([new Relationship(
-                $factory, $relationship ?? $this->guessRelationship($factory->modelName())
+                $factory,
+                $relationship ?? $this->guessRelationship($factory->modelName())
             )]),
         ]);
     }
@@ -737,7 +811,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn ($model) => get_class($model)),
+                )->groupBy(fn($model) => get_class($model)),
         ]);
     }
 
@@ -869,6 +943,7 @@ abstract class Factory
             'recycle' => $this->recycle,
             'expandRelationships' => $this->expandRelationships,
             'excludeRelationships' => $this->excludeRelationships,
+            'withInMemoryRelationships' => $this->withInMemoryRelationships,
         ], $arguments)));
     }
 
@@ -898,16 +973,18 @@ abstract class Factory
 
         $resolver = static::$modelNameResolvers[static::class] ?? static::$modelNameResolvers[self::class] ?? static::$modelNameResolver ?? function (self $factory) {
             $namespacedFactoryBasename = Str::replaceLast(
-                'Factory', '', Str::replaceFirst(static::$namespace, '', $factory::class)
+                'Factory',
+                '',
+                Str::replaceFirst(static::$namespace, '', $factory::class)
             );
 
             $factoryBasename = Str::replaceLast('Factory', '', class_basename($factory));
 
             $appNamespace = static::appNamespace();
 
-            return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
-                ? $appNamespace.'Models\\'.$namespacedFactoryBasename
-                : $appNamespace.$factoryBasename;
+            return class_exists($appNamespace . 'Models\\' . $namespacedFactoryBasename)
+                ? $appNamespace . 'Models\\' . $namespacedFactoryBasename
+                : $appNamespace . $factoryBasename;
         };
 
         return $resolver($this);
@@ -996,6 +1073,46 @@ abstract class Factory
     }
 
     /**
+     * Indicate that relationships should be made in-memory without persisting.
+     *
+     * When enabled, relationships defined via for(), has(), and hasAttached()
+     * will use make() instead of create(), and will be set on the model via
+     * setRelation(). This creates a complete object graph without database
+     * writes for the explicit relationships.
+     *
+     * Behavior:
+     * - Parent relations (for): Made with make(), set via setRelation()
+     * - Child relations (has/hasAttached): Made with make(), set via setRelation()
+     * - Foreign keys: Set if related model has a key, null otherwise
+     * - Nested factories in definition() persist normally (use withoutParents() to prevent)
+     * - BelongsToMany pivot data is not available (no pivot table entries)
+     * - Recycled models are still used when available
+     *
+     * Applies to make()/makeOne() only. Calling create(), raw(), or insert()
+     * ignores this flag and behaves normally.
+     *
+     * @example
+     * ```php
+     * $user = User::factory()
+     *     ->withInMemoryRelationships()
+     *     ->for(Company::factory())
+     *     ->has(Post::factory()->count(2))
+     *     ->make();
+     *
+     * // $user->company is loaded (via setRelation)
+     * // $user->posts contains 2 Post models
+     * // No database records created for explicit relationships
+     * ```
+     *
+     * @param  bool  $state
+     * @return static
+     */
+    public function withInMemoryRelationships(bool $state = true)
+    {
+        return $this->newInstance(['withInMemoryRelationships' => $state]);
+    }
+
+    /**
      * Get the factory name for the given model name.
      *
      * @template TClass of \Illuminate\Database\Eloquent\Model
@@ -1008,11 +1125,11 @@ abstract class Factory
         $resolver = static::$factoryNameResolver ?? function (string $modelName) {
             $appNamespace = static::appNamespace();
 
-            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
-                ? Str::after($modelName, $appNamespace.'Models\\')
+            $modelName = Str::startsWith($modelName, $appNamespace . 'Models\\')
+                ? Str::after($modelName, $appNamespace . 'Models\\')
                 : Str::after($modelName, $appNamespace);
 
-            return static::$namespace.$modelName.'Factory';
+            return static::$namespace . $modelName . 'Factory';
         };
 
         return $resolver($modelName);
