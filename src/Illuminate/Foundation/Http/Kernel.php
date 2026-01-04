@@ -152,6 +152,18 @@ class Kernel implements KernelContract
             new RequestHandled($request, $response)
         );
 
+        if ($this->app instanceof \Illuminate\Foundation\Application &&
+            $this->app->shouldRecordBootstrapPerformance() &&
+            $this->app->bound('log')) {
+            $timings = $this->app->flushBootstrapPerformance();
+
+            if ($timings !== []) {
+                $this->app->make('log')->debug('bootstrap.performance', [
+                    'timings' => $timings,
+                ]);
+            }
+        }
+
         return $response;
     }
 

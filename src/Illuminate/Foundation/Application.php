@@ -41,6 +41,13 @@ class Application extends Container implements ApplicationContract, CachesConfig
     use Macroable;
 
     /**
+     * Collected per-request bootstrap performance measurements.
+     *
+     * @var array<int, array{name: string, duration_ms: float, context?: array}>
+     */
+    protected array $bootstrapPerformance = [];
+
+    /**
      * The Laravel framework version.
      *
      * @var string
@@ -336,12 +343,34 @@ class Application extends Container implements ApplicationContract, CachesConfig
     {
         $this->hasBeenBootstrapped = true;
 
+        $bootstrapStart = $this->shouldRecordBootstrapPerformance()
+            ? microtime(true)
+            : null;
+
         foreach ($bootstrappers as $bootstrapper) {
+            $bootstrapperStart = $this->shouldRecordBootstrapPerformance()
+                ? microtime(true)
+                : null;
+
             $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
 
             $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
+
+            if ($bootstrapperStart !== null) {
+                $this->recordBootstrapPerformance(
+                    'bootstrapper.'.$bootstrapper,
+                    (microtime(true) - $bootstrapperStart) * 1000
+                );
+            }
+        }
+
+        if ($bootstrapStart !== null) {
+            $this->recordBootstrapPerformance(
+                'bootstrap.total',
+                (microtime(true) - $bootstrapStart) * 1000
+            );
         }
     }
 
@@ -867,10 +896,24 @@ class Application extends Container implements ApplicationContract, CachesConfig
 
         $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
+        $providerList = $providers->collapse()->toArray();
+
+        $registerStart = $this->shouldRecordBootstrapPerformance()
+            ? microtime(true)
+            : null;
+
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-            ->load($providers->collapse()->toArray());
+            ->load($providerList);
 
         $this->fireAppCallbacks($this->registeredCallbacks);
+
+        if ($registerStart !== null) {
+            $this->recordBootstrapPerformance(
+                'providers.register_configured',
+                (microtime(true) - $registerStart) * 1000,
+                ['provider_count' => count($providerList)]
+            );
+        }
     }
 
     /**
@@ -1123,6 +1166,10 @@ class Application extends Container implements ApplicationContract, CachesConfig
             return;
         }
 
+        $bootStart = $this->shouldRecordBootstrapPerformance()
+            ? microtime(true)
+            : null;
+
         // Once the application has booted we will also fire some "booted" callbacks
         // for any listeners that need to do work after this initial booting gets
         // finished. This is useful when ordering the boot-up processes we run.
@@ -1135,6 +1182,68 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->booted = true;
 
         $this->fireAppCallbacks($this->bootedCallbacks);
+
+        if ($bootStart !== null) {
+            $this->recordBootstrapPerformance(
+                'providers.boot',
+                (microtime(true) - $bootStart) * 1000,
+                ['provider_count' => count($this->serviceProviders)]
+            );
+        }
+    }
+
+    /**
+     * Determine if bootstrap performance recording is enabled.
+     *
+     * @return bool
+     */
+    public function shouldRecordBootstrapPerformance(): bool
+    {
+        return (bool) Env::get('LARAVEL_BOOTSTRAP_TIMING', false);
+    }
+
+    /**
+     * Record a bootstrap performance measurement.
+     *
+     * @param  string  $name
+     * @param  float  $durationMs
+     * @param  array  $context
+     * @return void
+     */
+    public function recordBootstrapPerformance(string $name, float $durationMs, array $context = []): void
+    {
+        if (! $this->shouldRecordBootstrapPerformance()) {
+            return;
+        }
+
+        $entry = [
+            'name' => $name,
+            'duration_ms' => round($durationMs, 3),
+        ];
+
+        if ($context !== []) {
+            $entry['context'] = $context;
+        }
+
+        $this->bootstrapPerformance[] = $entry;
+    }
+
+    /**
+     * Flush the collected bootstrap performance measurements.
+     *
+     * @return array<int, array{name: string, duration_ms: float, context?: array}>
+     */
+    public function flushBootstrapPerformance(): array
+    {
+        if (! $this->shouldRecordBootstrapPerformance()) {
+            return [];
+        }
+
+        $entries = $this->bootstrapPerformance;
+
+        $this->bootstrapPerformance = [];
+
+        return $entries;
     }
 
     /**

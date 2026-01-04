@@ -843,6 +843,11 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     public function resolveMiddleware(array $middleware, array $excluded = [])
     {
+        $shouldRecord = $this->container instanceof \Illuminate\Foundation\Application
+            && $this->container->shouldRecordBootstrapPerformance();
+
+        $resolveStart = $shouldRecord ? microtime(true) : null;
+
         $excluded = $excluded === []
             ? $excluded
             : (new Collection($excluded))
@@ -878,7 +883,20 @@ class Router implements BindingRegistrar, RegistrarContract
             )
             ->values();
 
-        return $this->sortMiddleware($middleware);
+        $sorted = $this->sortMiddleware($middleware);
+
+        if ($resolveStart !== null) {
+            $this->container->recordBootstrapPerformance(
+                'router.resolve_middleware',
+                (microtime(true) - $resolveStart) * 1000,
+                [
+                    'middleware_count' => $middleware->count(),
+                    'excluded_count' => count($excluded),
+                ]
+            );
+        }
+
+        return $sorted;
     }
 
     /**
@@ -889,7 +907,22 @@ class Router implements BindingRegistrar, RegistrarContract
      */
     protected function sortMiddleware(Collection $middlewares)
     {
-        return (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
+        $shouldRecord = $this->container instanceof \Illuminate\Foundation\Application
+            && $this->container->shouldRecordBootstrapPerformance();
+
+        $sortStart = $shouldRecord ? microtime(true) : null;
+
+        $sorted = (new SortedMiddleware($this->middlewarePriority, $middlewares))->all();
+
+        if ($sortStart !== null) {
+            $this->container->recordBootstrapPerformance(
+                'router.sort_middleware',
+                (microtime(true) - $sortStart) * 1000,
+                ['middleware_count' => $middlewares->count()]
+            );
+        }
+
+        return $sorted;
     }
 
     /**
