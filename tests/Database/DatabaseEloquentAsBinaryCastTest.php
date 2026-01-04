@@ -8,23 +8,24 @@ use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use RuntimeException;
+use Symfony\Component\Uid\Ulid;
 
 class DatabaseEloquentAsBinaryCastTest extends TestCase
 {
     protected function tearDown(): void
     {
         $reflection = new \ReflectionClass(BinaryCodec::class);
-        $property = $reflection->getProperty('customFormats');
-        $property->setAccessible(true);
+        $property = $reflection->getProperty('customCodecs');
         $property->setValue(null, []);
 
         parent::tearDown();
     }
 
-    public function testCastRequiresFormat()
+    public function testCastThrowsWhenFormatMissing()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The binary format is required.');
+        $this->expectExceptionMessage('The binary codec format is required.');
 
         $model = new AsBinaryTestModel;
         $model->setRawAttributes(['no_format' => 'value']);
@@ -34,7 +35,7 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
     public function testCastThrowsOnInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The provided format [invalid] is invalid.');
+        $this->expectExceptionMessage('Unsupported binary codec format [invalid]. Allowed formats are: uuid, ulid.');
 
         $model = new AsBinaryTestModel;
         $model->setRawAttributes(['invalid_format' => 'value']);
@@ -44,10 +45,8 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
     public function testGetDecodesUuidFromBinary()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $bytes = Uuid::fromString($uuid)->getBytes();
-
         $model = new AsBinaryTestModel;
-        $model->setRawAttributes(['uuid' => $bytes]);
+        $model->setRawAttributes(['uuid' => Uuid::fromString($uuid)->getBytes()]);
 
         $this->assertSame($uuid, $model->uuid);
     }
@@ -55,12 +54,28 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
     public function testSetEncodesUuidToBinary()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $expectedBytes = Uuid::fromString($uuid)->getBytes();
-
         $model = new AsBinaryTestModel;
         $model->uuid = $uuid;
 
-        $this->assertSame($expectedBytes, $model->getAttributes()['uuid']);
+        $this->assertSame(Uuid::fromString($uuid)->getBytes(), $model->getAttributes()['uuid']);
+    }
+
+    public function testGetDecodesUlidFromBinary()
+    {
+        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+        $model = new AsBinaryTestModel;
+        $model->setRawAttributes(['ulid' => Ulid::fromString($ulid)->toBinary()]);
+
+        $this->assertSame($ulid, $model->ulid);
+    }
+
+    public function testSetEncodesUlidToBinary()
+    {
+        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+        $model = new AsBinaryTestModel;
+        $model->ulid = $ulid;
+
+        $this->assertSame(Ulid::fromString($ulid)->toBinary(), $model->getAttributes()['ulid']);
     }
 
     public function testGetReturnsNullForNullValue()
@@ -78,6 +93,34 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
 
         $this->assertNull($model->getAttributes()['uuid']);
     }
+
+    public function testRequiredThrowsOnNullValue()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Binary decode resulted in empty value for required attribute "required_uuid" (format: uuid).');
+
+        $model = new AsBinaryTestModel;
+        $model->setRawAttributes(['required_uuid' => null]);
+        $model->required_uuid;
+    }
+
+    public function testUuidHelperMethod()
+    {
+        $this->assertSame(AsBinary::class.':uuid,0', AsBinary::uuid());
+        $this->assertSame(AsBinary::class.':uuid,1', AsBinary::uuid(true));
+    }
+
+    public function testUlidHelperMethod()
+    {
+        $this->assertSame(AsBinary::class.':ulid,0', AsBinary::ulid());
+        $this->assertSame(AsBinary::class.':ulid,1', AsBinary::ulid(true));
+    }
+
+    public function testOfHelperMethod()
+    {
+        $this->assertSame(AsBinary::class.':uuid,0', AsBinary::of('uuid', false));
+        $this->assertSame(AsBinary::class.':ulid,1', AsBinary::of('ulid', true));
+    }
 }
 
 class AsBinaryTestModel extends Model
@@ -88,6 +131,8 @@ class AsBinaryTestModel extends Model
     {
         return [
             'uuid' => AsBinary::class.':uuid',
+            'ulid' => AsBinary::class.':ulid',
+            'required_uuid' => AsBinary::class.':uuid,1',
             'no_format' => AsBinary::class,
             'invalid_format' => AsBinary::class.':invalid',
         ];

@@ -4,14 +4,15 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Ulid;
 
 class SupportBinaryCodecTest extends TestCase
 {
     protected function tearDown(): void
     {
-        // Reset custom formats between tests
         $reflection = new \ReflectionClass(BinaryCodec::class);
         $property = $reflection->getProperty('customCodecs');
         $property->setValue(null, []);
@@ -19,60 +20,52 @@ class SupportBinaryCodecTest extends TestCase
         parent::tearDown();
     }
 
-    public function testFormatsReturnsDefaultFormats()
+    public function testAllReturnsDefaultFormats()
     {
         $formats = BinaryCodec::all();
 
         $this->assertArrayHasKey('uuid', $formats);
-        $this->assertArrayHasKey('encode', $formats['uuid']);
-        $this->assertArrayHasKey('decode', $formats['uuid']);
+        $this->assertArrayHasKey('ulid', $formats);
     }
 
-    public function testRegisterCustomFormat()
+    public function testRegisterAddsCustomFormat()
     {
         BinaryCodec::register('hex', fn ($v) => bin2hex($v ?? ''), fn ($v) => hex2bin($v ?? ''));
-        $formats = BinaryCodec::all();
 
-        $this->assertArrayHasKey('hex', $formats);
+        $this->assertArrayHasKey('hex', BinaryCodec::all());
     }
 
-    public function testEncodeUuid()
+    public function testRegisterOverridesDefaultFormat()
     {
-        $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $encoded = BinaryCodec::encode($uuid, 'uuid');
+        BinaryCodec::register('uuid', fn ($v) => 'custom-encode', fn ($v) => 'custom-decode');
 
-        $this->assertSame(Uuid::fromString($uuid)->getBytes(), $encoded);
+        $this->assertSame('custom-encode', BinaryCodec::encode('test', 'uuid'));
+        $this->assertSame('custom-decode', BinaryCodec::decode('test', 'uuid'));
     }
 
-    public function testDecodeUuid()
+    #[DataProvider('nullAndEmptyProvider')]
+    public function testEncodeReturnsNullForNullAndEmpty($value)
     {
-        $uuid = '550e8400-e29b-41d4-a716-446655440000';
-        $bytes = Uuid::fromString($uuid)->getBytes();
-
-        $this->assertSame($uuid, BinaryCodec::decode($bytes, 'uuid'));
+        $this->assertNull(BinaryCodec::encode($value, 'uuid'));
+        $this->assertNull(BinaryCodec::encode($value, 'ulid'));
     }
 
-    public function testEncodeNullReturnsNull()
+    #[DataProvider('nullAndEmptyProvider')]
+    public function testDecodeReturnsNullForNullAndEmpty($value)
     {
-        $this->assertNull(BinaryCodec::encode(null, 'uuid'));
+        $this->assertNull(BinaryCodec::decode($value, 'uuid'));
+        $this->assertNull(BinaryCodec::decode($value, 'ulid'));
     }
 
-    public function testDecodeNullReturnsNull()
+    public static function nullAndEmptyProvider(): array
     {
-        $this->assertNull(BinaryCodec::decode(null, 'uuid'));
+        return [
+            'null' => [null],
+            'empty string' => [''],
+        ];
     }
 
-    public function testEncodeEmptyStringReturnsNull()
-    {
-        $this->assertNull(BinaryCodec::encode('', 'uuid'));
-    }
-
-    public function testDecodeEmptyStringReturnsNull()
-    {
-        $this->assertNull(BinaryCodec::decode('', 'uuid'));
-    }
-
-    public function testEncodeWithInvalidFormatThrowsException()
+    public function testEncodeThrowsOnInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Format [invalid] is invalid.');
@@ -80,7 +73,7 @@ class SupportBinaryCodecTest extends TestCase
         BinaryCodec::encode('value', 'invalid');
     }
 
-    public function testDecodeWithInvalidFormatThrowsException()
+    public function testDecodeThrowsOnInvalidFormat()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Format [invalid] is invalid.');
@@ -88,28 +81,61 @@ class SupportBinaryCodecTest extends TestCase
         BinaryCodec::decode('value', 'invalid');
     }
 
-    public function testEncodeUuidFromBinaryInput()
+    public function testUuidEncodeFromString()
+    {
+        $uuid = '550e8400-e29b-41d4-a716-446655440000';
+
+        $this->assertSame(Uuid::fromString($uuid)->getBytes(), BinaryCodec::encode($uuid, 'uuid'));
+    }
+
+    public function testUuidEncodeFromBinary()
+    {
+        $bytes = Uuid::fromString('550e8400-e29b-41d4-a716-446655440000')->getBytes();
+
+        $this->assertSame($bytes, BinaryCodec::encode($bytes, 'uuid'));
+    }
+
+    public function testUuidDecodeFromBinary()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
         $bytes = Uuid::fromString($uuid)->getBytes();
 
-        // Encoding binary should return the same bytes
-        $this->assertSame($bytes, BinaryCodec::encode($bytes, 'uuid'));
+        $this->assertSame($uuid, BinaryCodec::decode($bytes, 'uuid'));
     }
 
-    public function testDecodeUuidFromStringInput()
+    public function testUuidDecodeFromString()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
 
-        // Decoding string UUID should return the same string
         $this->assertSame($uuid, BinaryCodec::decode($uuid, 'uuid'));
     }
 
-    public function testCustomFormatOverridesDefault()
+    public function testUlidEncodeFromString()
     {
-        BinaryCodec::register('uuid', fn ($v) => 'custom-encode', fn ($v) => 'custom-decode');
+        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
 
-        $this->assertSame('custom-encode', BinaryCodec::encode('test', 'uuid'));
-        $this->assertSame('custom-decode', BinaryCodec::decode('test', 'uuid'));
+        $this->assertSame(Ulid::fromString($ulid)->toBinary(), BinaryCodec::encode($ulid, 'ulid'));
+    }
+
+    public function testUlidEncodeFromBinary()
+    {
+        $bytes = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV')->toBinary();
+
+        $this->assertSame($bytes, BinaryCodec::encode($bytes, 'ulid'));
+    }
+
+    public function testUlidDecodeFromBinary()
+    {
+        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+        $bytes = Ulid::fromString($ulid)->toBinary();
+
+        $this->assertSame($ulid, BinaryCodec::decode($bytes, 'ulid'));
+    }
+
+    public function testUlidDecodeFromString()
+    {
+        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+
+        $this->assertSame($ulid, BinaryCodec::decode($ulid, 'ulid'));
     }
 }
