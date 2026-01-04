@@ -2643,6 +2643,43 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "having not between" clause to the query.
+     *
+     * @param  string  $column
+     * @param  iterable  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function havingNotBetween($column, iterable $values, $boolean = 'and')
+    {
+        return $this->havingBetween($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or having between" clause to the query.
+     *
+     * @param  string  $column
+     * @param  iterable  $values
+     * @return $this
+     */
+    public function orHavingBetween($column, iterable $values)
+    {
+        return $this->havingBetween($column, $values, 'or');
+    }
+
+    /**
+     * Add an "or having not between" clause to the query.
+     *
+     * @param  string  $column
+     * @param  iterable  $values
+     * @return $this
+     */
+    public function orHavingNotBetween($column, iterable $values)
+    {
+        return $this->havingBetween($column, $values, 'or', true);
+    }
+
+    /**
      * Add a raw having clause to the query.
      *
      * @param  string  $sql
