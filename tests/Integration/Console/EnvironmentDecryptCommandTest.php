@@ -333,63 +333,9 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env'), "APP_NAME=Laravel\nAPP_ENV=local");
+            ->with(base_path('.env'), "APP_NAME=Laravel\nAPP_ENV=local\n");
     }
 
-    public function testItDecryptsReadableFormatWithBlankLines(): void
-    {
-        $key = 'abcdefghijklmnopabcdefghijklmnop';
-        $encrypter = new Encrypter($key, 'AES-256-CBC');
-
-        // Create readable format with blank line
-        $encryptedContent = 'APP_NAME='.$encrypter->encryptString('Laravel')."\n".
-                           "\n".
-                           'APP_ENV='.$encrypter->encryptString('local');
-
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false)
-            ->shouldReceive('get')
-            ->once()
-            ->andReturn($encryptedContent);
-
-        $this->artisan('env:decrypt', ['--key' => $key])
-            ->expectsOutputToContain('Environment successfully decrypted.')
-            ->assertExitCode(0);
-
-        $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env'), "APP_NAME=Laravel\n\nAPP_ENV=local");
-    }
-
-    public function testItDecryptsReadableFormatWithComments(): void
-    {
-        $key = 'abcdefghijklmnopabcdefghijklmnop';
-        $encrypter = new Encrypter($key, 'AES-256-CBC');
-
-        // Create readable format with encrypted comment
-        $encryptedContent = '#:'.$encrypter->encryptString('# This is a comment')."\n".
-                           'APP_NAME='.$encrypter->encryptString('Laravel');
-
-        $this->filesystem->shouldReceive('exists')
-            ->once()
-            ->andReturn(true)
-            ->shouldReceive('exists')
-            ->once()
-            ->andReturn(false)
-            ->shouldReceive('get')
-            ->once()
-            ->andReturn($encryptedContent);
-
-        $this->artisan('env:decrypt', ['--key' => $key])
-            ->expectsOutputToContain('Environment successfully decrypted.')
-            ->assertExitCode(0);
-
-        $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env'), "# This is a comment\nAPP_NAME=Laravel");
-    }
 
     public function testItStillDecryptsBlobFormat(): void
     {
@@ -418,14 +364,13 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), $originalContent);
     }
 
-    public function testItDecryptsLinesWithoutEqualsPreservingOriginal(): void
+    public function testItDecryptsReadableFormatWithBase64Values(): void
     {
         $key = 'abcdefghijklmnopabcdefghijklmnop';
         $encrypter = new Encrypter($key, 'AES-256-CBC');
 
-        // Create readable format with a line that was encrypted as comment (no = sign)
-        $encryptedContent = 'APP_NAME='.$encrypter->encryptString('Laravel')."\n".
-                           '#:'.$encrypter->encryptString('MY_ENV_WITHOUT_EQUALS')."\n".
+        // Create readable format with base64 value containing = signs
+        $encryptedContent = 'APP_KEY='.$encrypter->encryptString('base64:Ge+W23u+VZI2tbrp5QCGWrsUuxgcD65i7jtTRR2ZqfY=')."\n".
                            'APP_ENV='.$encrypter->encryptString('local');
 
         $this->filesystem->shouldReceive('exists')
@@ -443,6 +388,6 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->filesystem->shouldHaveReceived('put')
-            ->with(base_path('.env'), "APP_NAME=Laravel\nMY_ENV_WITHOUT_EQUALS\nAPP_ENV=local");
+            ->with(base_path('.env'), "APP_KEY=base64:Ge+W23u+VZI2tbrp5QCGWrsUuxgcD65i7jtTRR2ZqfY=\nAPP_ENV=local\n");
     }
 }

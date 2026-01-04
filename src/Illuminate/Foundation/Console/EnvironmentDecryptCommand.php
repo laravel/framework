@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Dotenv\Parser\Lines;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
@@ -152,34 +153,17 @@ class EnvironmentDecryptCommand extends Command
      */
     protected function isReadableFormat(string $contents): bool
     {
-        // Readable format has newlines and KEY=value structure
-        // Blob format is a single base64-encoded JSON string without newlines
+        // Blob format is a single line (no newlines)
         if (! str_contains($contents, "\n")) {
             return false;
         }
 
-        // Check first non-empty line - should be KEY=base64 or #:base64 or empty
-        $lines = preg_split('/\r\n|\r|\n/', $contents);
-
-        foreach ($lines as $line) {
-            if (trim($line) === '') {
-                continue;
-            }
-
-            // Check if it matches readable format patterns
-            if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*=/', $line)) {
-                return true;
-            }
-
-            if (str_starts_with($line, '#:')) {
-                return true;
-            }
-
-            // First non-empty line doesn't match readable format
+        // Readable format has KEY=value structure
+        try {
+            return ! empty(Lines::process(preg_split('/\r\n|\r|\n/', $contents)));
+        } catch (Exception) {
             return false;
         }
-
-        return false;
     }
 
     /**
@@ -191,38 +175,20 @@ class EnvironmentDecryptCommand extends Command
      */
     protected function decryptReadableFormat(string $contents, Encrypter $encrypter): string
     {
-        $lines = preg_split('/\r\n|\r|\n/', $contents);
-        $result = [];
+        $result = '';
 
-        foreach ($lines as $line) {
-            // Preserve blank lines
-            if (trim($line) === '') {
-                $result[] = '';
+        foreach (Lines::process(preg_split('/\r\n|\r|\n/', $contents)) as $entry) {
+            $pos = strpos($entry, '=');
+
+            if ($pos === false) {
                 continue;
             }
 
-            // Decrypt comments
-            if (str_starts_with($line, '#:')) {
-                $encrypted = substr($line, 2);
-                $result[] = $encrypter->decryptString($encrypted);
-                continue;
-            }
-
-            // Decrypt variables
-            $pos = strpos($line, '=');
-
-            if ($pos !== false) {
-                $key = substr($line, 0, $pos);
-                $encrypted = substr($line, $pos + 1);
-                $decryptedValue = $encrypter->decryptString($encrypted);
-                $result[] = $key.'='.$decryptedValue;
-                continue;
-            }
-
-            // Unknown format - try to decrypt as-is
-            $result[] = $encrypter->decryptString($line);
+            $name = substr($entry, 0, $pos);
+            $encryptedValue = substr($entry, $pos + 1);
+            $result .= $name.'='.$encrypter->decryptString($encryptedValue)."\n";
         }
 
-        return implode("\n", $result);
+        return $result;
     }
 }
