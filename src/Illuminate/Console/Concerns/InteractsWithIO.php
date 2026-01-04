@@ -68,6 +68,17 @@ trait InteractsWithIO
     }
 
     /**
+     * Determine if the given argument is not present.
+     *
+     * @param  string|int  $name
+     * @return bool
+     */
+    public function doesntHaveArgument($name)
+    {
+        return ! $this->input->hasArgument($name);
+    }
+
+    /**
      * Get the value of a command argument.
      *
      * @param  string|null  $key
@@ -101,6 +112,17 @@ trait InteractsWithIO
     public function hasOption($name)
     {
         return $this->input->hasOption($name);
+    }
+
+    /**
+     * Determine whether the option is not defined in the command signature.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function doesntHaveOption($name)
+    {
+        return ! $this->input->hasOption($name);
     }
 
     /**
