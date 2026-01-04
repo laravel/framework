@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Filesystem;
 
+use Illuminate\Filesystem\StoragePath;
+
 interface Filesystem
 {
     /**
@@ -217,4 +219,9 @@ interface Filesystem
      * @return bool
      */
     public function deleteDirectory($directory);
+
+    /**
+     * Get a storage path instance for the given path.
+     */
+    public function at(string $path): StoragePath;
 }

@@ -1076,6 +1076,14 @@ class FilesystemAdapter implements CloudFilesystemContract
     }
 
     /**
+     * Get a storage path instance for the given path.
+     */
+    public function at(string $path): StoragePath
+    {
+        return new StoragePath($path, $this);
+    }
+
+    /**
      * Pass dynamic methods call onto Flysystem.
      *
      * @param  string  $method

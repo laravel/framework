@@ -97,6 +97,14 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Get a storage path instance for the default disk.
+     */
+    public function at(string $path): StoragePath
+    {
+        return $this->disk()->at($path);
+    }
+
+    /**
      * Build an on-demand disk.
      *
      * @param  string|array  $config
