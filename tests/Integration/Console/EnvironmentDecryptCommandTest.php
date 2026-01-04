@@ -336,7 +336,6 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), "APP_NAME=Laravel\nAPP_ENV=local\n");
     }
 
-
     public function testItStillDecryptsBlobFormat(): void
     {
         $key = 'abcdefghijklmnopabcdefghijklmnop';

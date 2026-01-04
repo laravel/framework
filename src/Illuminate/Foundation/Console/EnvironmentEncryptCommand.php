@@ -168,5 +168,4 @@ class EnvironmentEncryptCommand extends Command
 
         return $result;
     }
-
 }
