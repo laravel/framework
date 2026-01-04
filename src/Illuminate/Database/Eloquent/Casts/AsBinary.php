@@ -13,7 +13,7 @@ class AsBinary implements Castable
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array  $arguments
+     * @param  array{string, '0'|'1'}  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<string|null, string|null>
      */
     public static function castUsing(array $arguments)
