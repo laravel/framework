@@ -269,4 +269,34 @@ class EncrypterTest extends TestCase
         $enc = new Encrypter(str_repeat('x', 16));
         $enc->decrypt(base64_encode(json_encode($payload)));
     }
+
+    public function testEncryptedReturnsTrueForEncryptedValue()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt('foo');
+
+        $this->assertTrue(Encrypter::encrypted($encrypted));
+    }
+
+    public function testEncryptedReturnsTrueForEncryptedArray()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->encrypt(['foo' => 'bar']);
+
+        $this->assertTrue(Encrypter::encrypted($encrypted));
+    }
+
+    public function testEncryptedReturnsFalseForPlainText()
+    {
+        $this->assertFalse(Encrypter::encrypted('foo'));
+        $this->assertFalse(Encrypter::encrypted('APP_NAME=Laravel'));
+        $this->assertFalse(Encrypter::encrypted("APP_NAME=Laravel\nAPP_ENV=local"));
+    }
+
+    public function testEncryptedReturnsFalseForNonString()
+    {
+        $this->assertFalse(Encrypter::encrypted(123));
+        $this->assertFalse(Encrypter::encrypted(['foo' => 'bar']));
+        $this->assertFalse(Encrypter::encrypted(null));
+    }
 }

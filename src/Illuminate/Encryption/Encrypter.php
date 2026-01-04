@@ -93,6 +93,30 @@ class Encrypter implements EncrypterContract, StringEncrypter
     }
 
     /**
+     * Determine if the given value appears to be encrypted.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function encrypted($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        if ($decoded === false) {
+            return false;
+        }
+
+        $payload = json_decode($decoded, true);
+
+        return is_array($payload)
+            && isset($payload['iv'], $payload['value'], $payload['mac']);
+    }
+
+    /**
      * Encrypt the given value.
      *
      * @param  mixed  $value

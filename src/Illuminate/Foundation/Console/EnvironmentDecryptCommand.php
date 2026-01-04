@@ -153,18 +153,7 @@ class EnvironmentDecryptCommand extends Command
      */
     protected function isReadableFormat(string $contents): bool
     {
-        // Check if content is blob format (base64-encoded JSON with iv, value, mac keys)
-        $decoded = base64_decode($contents, true);
-
-        if ($decoded !== false) {
-            $payload = json_decode($decoded, true);
-
-            if (is_array($payload) && isset($payload['iv'], $payload['value'])) {
-                return false;
-            }
-        }
-
-        return true;
+        return ! Encrypter::encrypted($contents);
     }
 
     /**
