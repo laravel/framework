@@ -6,26 +6,33 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
 
-final class Binary
+/**
+ * @phpstan-type BinaryTransform callable(?string): ?string
+ * @phpstan-type BinaryCodecDefinition array{
+ *      encode: BinaryTransform,
+ *      decode: BinaryTransform,
+ * }
+ */
+final class BinaryCodec
 {
-    /** @var array<string, array{encode: callable, decode: callable}> */
-    private static array $customFormats = [];
+    /** @var array<string, BinaryCodecDefinition> */
+    private static array $customCodecs = [];
 
     /**
-     * @return array<string, array{encode: callable, decode: callable}>
+     * @return array<string, BinaryCodecDefinition>
      */
-    public static function formats(): array
+    public static function all(): array
     {
-        return array_replace(self::defaultFormats(), self::$customFormats);
+        return array_replace(self::defaultCodecs(), self::$customCodecs);
     }
 
     /**
-     * @param callable(?string): ?string $encode
-     * @param callable(?string): ?string $decode
+     * @param BinaryTransform $encode
+     * @param BinaryTransform $decode
      */
-    public static function registerFormat(string $name, callable $encode, callable $decode): void
+    public static function register(string $name, callable $encode, callable $decode): void
     {
-        self::$customFormats[$name] = [
+        self::$customCodecs[$name] = [
             'encode' => $encode,
             'decode' => $decode,
         ];
@@ -33,22 +40,16 @@ final class Binary
 
     public static function encode(?string $value, string $format): ?string
     {
-        $callback = self::callbackFor($format, 'encode');
-
-        return $callback($value);
+        return (self::callbackFor($format, 'encode'))($value);
     }
 
     public static function decode(?string $value, string $format): ?string
     {
-        $callback = self::callbackFor($format, 'decode');
-
-        return $callback($value);
+        return (self::callbackFor($format, 'decode'))($value);
     }
 
-    /**
-     * @return array<string, array{encode: callable, decode: callable}>
-     */
-    private static function defaultFormats(): array
+    /** @return array<string, BinaryCodecDefinition> */
+    private static function defaultCodecs(): array
     {
         return [
             'uuid' => [
@@ -90,9 +91,13 @@ final class Binary
         ];
     }
 
+    /**
+     * @param 'encode'|'decode' $direction
+     * @return BinaryTransform
+     */
     private static function callbackFor(string $format, string $direction): callable
     {
-        $formats = self::formats();
+        $formats = self::all();
 
         if (! isset($formats[$format][$direction])) {
             throw new InvalidArgumentException("Format [$format] is invalid.");

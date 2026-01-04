@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Database\Eloquent\Casts\AsBinary;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Binary;
+use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -13,7 +13,7 @@ class DatabaseEloquentAsBinaryCastTest extends TestCase
 {
     protected function tearDown(): void
     {
-        $reflection = new \ReflectionClass(Binary::class);
+        $reflection = new \ReflectionClass(BinaryCodec::class);
         $property = $reflection->getProperty('customFormats');
         $property->setAccessible(true);
         $property->setValue(null, []);
