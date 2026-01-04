@@ -27,8 +27,8 @@ final class BinaryCodec
     }
 
     /**
-     * @param BinaryTransform $encode
-     * @param BinaryTransform $decode
+     * @param  BinaryTransform  $encode
+     * @param  BinaryTransform  $decode
      */
     public static function register(string $name, callable $encode, callable $decode): void
     {
@@ -92,7 +92,7 @@ final class BinaryCodec
     }
 
     /**
-     * @param 'encode'|'decode' $direction
+     * @param  'encode'|'decode'  $direction
      * @return BinaryTransform
      */
     private static function callbackFor(string $format, string $direction): callable

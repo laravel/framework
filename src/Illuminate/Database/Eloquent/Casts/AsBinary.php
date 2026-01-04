@@ -12,12 +12,14 @@ class AsBinary implements Castable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
-     * @param array $arguments
+     *
+     * @param  array  $arguments
      * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<string|null, string|null>
      */
     public static function castUsing(array $arguments)
     {
-        return new class($arguments) implements CastsAttributes {
+        return new class($arguments) implements CastsAttributes
+        {
             private string $format;
 
             private bool $isRequired;
@@ -72,9 +74,9 @@ class AsBinary implements Castable
 
     public static function of(string $format, bool $isRequired): string
     {
-        return self::class . ':' . implode(',', [
-                $format,
-                $isRequired ? '1' : '0',
-            ]);
+        return self::class.':'.implode(',', [
+            $format,
+            $isRequired ? '1' : '0',
+        ]);
     }
 }

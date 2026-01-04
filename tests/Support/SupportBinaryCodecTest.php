@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -14,8 +13,7 @@ class SupportBinaryCodecTest extends TestCase
     {
         // Reset custom formats between tests
         $reflection = new \ReflectionClass(BinaryCodec::class);
-        $property = $reflection->getProperty('customFormats');
-        $property->setAccessible(true);
+        $property = $reflection->getProperty('customCodecs');
         $property->setValue(null, []);
 
         parent::tearDown();
@@ -33,7 +31,6 @@ class SupportBinaryCodecTest extends TestCase
     public function testRegisterCustomFormat()
     {
         BinaryCodec::register('hex', fn ($v) => bin2hex($v ?? ''), fn ($v) => hex2bin($v ?? ''));
-
         $formats = BinaryCodec::all();
 
         $this->assertArrayHasKey('hex', $formats);
