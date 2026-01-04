@@ -49,15 +49,18 @@ class ManagerTest extends TestCase
         $concrete = $manager->driver('myDriver');
         $this->assertEquals('@my-driver', $concrete->name);
 
-        $manager->extend('myDriver', static fn () => new class('@my-driver-ng')
+        $manager->extend('myDriver', static fn () => new class('@my-driver-overrode')
         {
             public function __construct(public readonly string $name)
             {
             }
         });
+        $cachedConcrete = $manager->driver('myDriver');
+        $this->assertEquals('@my-driver', $cachedConcrete->name);
 
+        $manager->forgetDrivers();
         $concrete = $manager->driver('myDriver');
-        $this->assertEquals('@my-driver', $concrete->name);
+        $this->assertEquals('@my-driver-overrode', $concrete->name);
     }
 
     public function testExtendUsingEnum()

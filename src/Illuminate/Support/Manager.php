@@ -75,7 +75,7 @@ abstract class Manager
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
-        return $this->drivers[$this->resolveDriverName($driver)] ??= $this->createDriver($driver);
+        return $this->drivers[enum_value($driver)] ??= $this->createDriver($driver);
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class Manager
      */
     protected function createDriver($driver)
     {
-        $driverName = $this->resolveDriverName($driver);
+        $driverName = enum_value($driver);
 
         // First, we will determine if a custom driver creator exists for the given driver and
         // if it does not we will check for a creator method for the driver. Custom creator
@@ -114,7 +114,7 @@ abstract class Manager
      */
     protected function callCustomCreator($driver)
     {
-        return $this->customCreators[$this->resolveDriverName($driver)]($this->container);
+        return $this->customCreators[enum_value($driver)]($this->container);
     }
 
     /**
@@ -126,7 +126,7 @@ abstract class Manager
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$this->resolveDriverName($driver)] = $callback;
+        $this->customCreators[enum_value($driver)] = $callback;
 
         return $this;
     }
@@ -186,13 +186,5 @@ abstract class Manager
     public function __call($method, $parameters)
     {
         return $this->driver()->$method(...$parameters);
-    }
-
-    /**
-     * @param  \BackedEnum|\UnitEnum|string  $driver
-     */
-    protected function resolveDriverName($driver): string
-    {
-        return (string) enum_value($driver);
     }
 }
