@@ -133,11 +133,12 @@ interface ConnectionInterface
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @return mixed
      *
      * @throws \Throwable
      */
-    public function transaction(Closure $callback, $attempts = 1);
+    public function transaction(Closure $callback, $attempts = 1, $backoff = null);
 
     /**
      * Start a new database transaction.
