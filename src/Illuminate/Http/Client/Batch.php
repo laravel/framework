@@ -104,7 +104,7 @@ class Batch
     /**
      * The date when the batch was created.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var \Carbon\CarbonImmutable|null
      */
     public $createdAt = null;
 
