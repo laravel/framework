@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Dotenv\Parser\Lines;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Env;
@@ -99,9 +100,11 @@ class EnvironmentDecryptCommand extends Command
 
             $encryptedContents = $this->files->get($encryptedFile);
 
-            $decrypted = $this->isReadableFormat($encryptedContents)
-                ? $this->decryptReadableFormat($encryptedContents, $encrypter)
-                : $encrypter->decrypt($encryptedContents);
+            try {
+                $decrypted = $encrypter->decrypt($encryptedContents);
+            } catch (DecryptException) {
+                $decrypted = $this->decryptReadableFormat($encryptedContents, $encrypter);
+            }
 
             $this->files->put($outputFile, $decrypted);
         } catch (Exception $e) {
@@ -143,27 +146,6 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
-    }
-
-    /**
-     * Determine if the content is in readable format.
-     *
-     * @param  string  $contents
-     * @return bool
-     */
-    protected function isReadableFormat(string $contents): bool
-    {
-        // Blob format is a single line (no newlines)
-        if (! str_contains($contents, "\n")) {
-            return false;
-        }
-
-        // Readable format has KEY=value structure
-        try {
-            return ! empty(Lines::process(preg_split('/\r\n|\r|\n/', $contents)));
-        } catch (Exception) {
-            return false;
-        }
     }
 
     /**

@@ -364,6 +364,37 @@ class EnvironmentDecryptCommandTest extends TestCase
             ->with(base_path('.env'), $originalContent);
     }
 
+    public function testItDecryptsBlobFormatWithNewlineInContent(): void
+    {
+        $key = 'abcdefghijklmnopabcdefghijklmnop';
+        $encrypter = new Encrypter($key, 'AES-256-CBC');
+
+        // Create blob format and inject a newline (simulating wrapped base64)
+        $originalContent = "APP_NAME=Laravel\nAPP_ENV=local";
+        $encryptedContent = $encrypter->encrypt($originalContent);
+
+        // Insert a newline in the middle of the base64 string
+        $midpoint = (int) (strlen($encryptedContent) / 2);
+        $encryptedContentWithNewline = substr($encryptedContent, 0, $midpoint)."\n".substr($encryptedContent, $midpoint);
+
+        $this->filesystem->shouldReceive('exists')
+            ->once()
+            ->andReturn(true)
+            ->shouldReceive('exists')
+            ->once()
+            ->andReturn(false)
+            ->shouldReceive('get')
+            ->once()
+            ->andReturn($encryptedContentWithNewline);
+
+        $this->artisan('env:decrypt', ['--key' => $key])
+            ->expectsOutputToContain('Environment successfully decrypted.')
+            ->assertExitCode(0);
+
+        $this->filesystem->shouldHaveReceived('put')
+            ->with(base_path('.env'), $originalContent);
+    }
+
     public function testItDecryptsReadableFormatWithBase64Values(): void
     {
         $key = 'abcdefghijklmnopabcdefghijklmnop';
