@@ -219,12 +219,8 @@ class Arr
 
     /**
      * Determine if the given key exists in the provided array.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|float  $key
-     * @return bool
      */
-    public static function exists($array, $key)
+    public static function exists(ArrayAccess|array $array, string|int|float|null $key): bool
     {
         if ($array instanceof Enumerable) {
             return $array->has($key);
@@ -435,13 +431,8 @@ class Arr
 
     /**
      * Get an item from an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int|null  $key
-     * @param  mixed  $default
-     * @return mixed
      */
-    public static function get($array, $key, $default = null)
+    public static function get(mixed $array, string|int|null $key, mixed $default = null): mixed
     {
         if (! static::accessible($array)) {
             return value($default);
@@ -472,12 +463,8 @@ class Arr
 
     /**
      * Check if an item or items exist in an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
-     * @return bool
      */
-    public static function has($array, $keys)
+    public static function has(mixed $array, string|array|null $keys): bool
     {
         $keys = (array) $keys;
 
@@ -506,12 +493,8 @@ class Arr
 
     /**
      * Determine if all keys exist in an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
-     * @return bool
      */
-    public static function hasAll($array, $keys)
+    public static function hasAll(ArrayAccess|array|null $array, string|array|null $keys): bool
     {
         $keys = (array) $keys;
 
@@ -530,12 +513,8 @@ class Arr
 
     /**
      * Determine if any of the keys exist in an array using "dot" notation.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
-     * @return bool
      */
-    public static function hasAny($array, $keys)
+    public static function hasAny(ArrayAccess|array|null $array, string|array|null $keys): bool
     {
         if (is_null($keys)) {
             return false;
