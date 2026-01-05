@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 class BeforeCommitContractTest extends TestCase
 {
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
 
