@@ -6,15 +6,14 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Support\BinaryCodec;
 use InvalidArgumentException;
-use RuntimeException;
 
 class AsBinary implements Castable
 {
     /**
      * Get the caster class to use when casting from / to this cast target.
      *
-     * @param  array{string, '0'|'1'}  $arguments
-     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes<string|null, string|null>
+     * @param  array{string}  $arguments
+     * @return \Illuminate\Contracts\Database\Eloquent\CastsAttributes
      */
     public static function castUsing(array $arguments)
     {
@@ -22,16 +21,10 @@ class AsBinary implements Castable
         {
             protected string $format;
 
-            protected bool $required;
-
             public function __construct(protected array $arguments)
             {
-                [$format, $required] = array_pad(array_values($this->arguments), 2, null);
-
-                $this->format = $format
-                    ?: throw new InvalidArgumentException('The binary codec format is required.');
-
-                $this->required = str($required ?? false)->toBoolean();
+                $this->format = $this->arguments[0]
+                    ?? throw new InvalidArgumentException('The binary codec format is required.');
 
                 if (! in_array($this->format, BinaryCodec::formats(), true)) {
                     throw new InvalidArgumentException(sprintf(
@@ -44,17 +37,7 @@ class AsBinary implements Castable
 
             public function get($model, $key, $value, $attributes)
             {
-                $decoded = BinaryCodec::decode($attributes[$key] ?? null, $this->format);
-
-                if ($this->required && blank($decoded)) {
-                    throw new RuntimeException(sprintf(
-                        'Binary decode resulted in empty value for required attribute "%s" (format: %s).',
-                        $key,
-                        $this->format,
-                    ));
-                }
-
-                return $decoded;
+                return BinaryCodec::decode($attributes[$key] ?? null, $this->format);
             }
 
             public function set($model, $key, $value, $attributes)
@@ -67,29 +50,24 @@ class AsBinary implements Castable
     /**
      * Encode / decode values as binary UUIDs.
      */
-    public static function uuid(bool $required = false): string
+    public static function uuid(): string
     {
-        return self::of('uuid', $required);
+        return self::class.':uuid';
     }
 
     /**
      * Encode / decode values as binary ULIDs.
      */
-    public static function ulid(bool $required = false): string
+    public static function ulid(): string
     {
-        return self::of('ulid', $required);
+        return self::class.':ulid';
     }
 
     /**
-     * Encode / decode values as binary values.
-     *
-     * Supported formats: "uuid", "ulid".
+     * Encode / decode values using the given format.
      */
-    public static function of(string $format, bool $required = false): string
+    public static function of(string $format): string
     {
-        return self::class.':'.implode(',', [
-            $format,
-            $required ? '1' : '0',
-        ]);
+        return self::class.':'.$format;
     }
 }
