@@ -25,7 +25,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
-                    {--readable : Encrypt in readable format with visible keys}
+                    {--readable : Encrypt in a readable format with plain-text variable names}
                     {--prune : Delete the original environment file}
                     {--force : Overwrite the existing encrypted environment file}';
 
@@ -129,21 +129,6 @@ class EnvironmentEncryptCommand extends Command
     }
 
     /**
-     * Parse the encryption key.
-     *
-     * @param  string  $key
-     * @return string
-     */
-    protected function parseKey(string $key)
-    {
-        if (Str::startsWith($key, $prefix = 'base64:')) {
-            $key = base64_decode(Str::after($key, $prefix));
-        }
-
-        return $key;
-    }
-
-    /**
      * Encrypt the environment file in readable format.
      *
      * @param  string  $contents
@@ -163,9 +148,25 @@ class EnvironmentEncryptCommand extends Command
 
             $name = substr($entry, 0, $pos);
             $value = substr($entry, $pos + 1);
+
             $result .= $name.'='.$encrypter->encryptString($value)."\n";
         }
 
         return $result;
+    }
+
+    /**
+     * Parse the encryption key.
+     *
+     * @param  string  $key
+     * @return string
+     */
+    protected function parseKey(string $key)
+    {
+        if (Str::startsWith($key, $prefix = 'base64:')) {
+            $key = base64_decode(Str::after($key, $prefix));
+        }
+
+        return $key;
     }
 }

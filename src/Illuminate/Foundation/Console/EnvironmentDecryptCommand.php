@@ -116,6 +116,44 @@ class EnvironmentDecryptCommand extends Command
     }
 
     /**
+     * Determine if the content is in readable format where each variable still has its own plain-text key.
+     *
+     * @param  string  $contents
+     * @return bool
+     */
+    protected function isReadableFormat(string $contents): bool
+    {
+        return ! Encrypter::appearsEncrypted($contents);
+    }
+
+    /**
+     * Decrypt the environment file from readable format.
+     *
+     * @param  string  $contents
+     * @param  \Illuminate\Encryption\Encrypter  $encrypter
+     * @return string
+     */
+    protected function decryptReadableFormat(string $contents, Encrypter $encrypter): string
+    {
+        $result = '';
+
+        foreach (Lines::process(preg_split('/\r\n|\r|\n/', $contents)) as $entry) {
+            $pos = strpos($entry, '=');
+
+            if ($pos === false) {
+                continue;
+            }
+
+            $name = substr($entry, 0, $pos);
+            $encryptedValue = substr($entry, $pos + 1);
+
+            $result .= $name.'='.$encrypter->decryptString($encryptedValue)."\n";
+        }
+
+        return $result;
+    }
+
+    /**
      * Parse the encryption key.
      *
      * @param  string  $key
@@ -143,42 +181,5 @@ class EnvironmentDecryptCommand extends Command
         $outputFile = ltrim($outputFile, DIRECTORY_SEPARATOR);
 
         return $path.$outputFile;
-    }
-
-    /**
-     * Determine if the content is in readable format.
-     *
-     * @param  string  $contents
-     * @return bool
-     */
-    protected function isReadableFormat(string $contents): bool
-    {
-        return ! Encrypter::encrypted($contents);
-    }
-
-    /**
-     * Decrypt the environment file from readable format.
-     *
-     * @param  string  $contents
-     * @param  \Illuminate\Encryption\Encrypter  $encrypter
-     * @return string
-     */
-    protected function decryptReadableFormat(string $contents, Encrypter $encrypter): string
-    {
-        $result = '';
-
-        foreach (Lines::process(preg_split('/\r\n|\r|\n/', $contents)) as $entry) {
-            $pos = strpos($entry, '=');
-
-            if ($pos === false) {
-                continue;
-            }
-
-            $name = substr($entry, 0, $pos);
-            $encryptedValue = substr($entry, $pos + 1);
-            $result .= $name.'='.$encrypter->decryptString($encryptedValue)."\n";
-        }
-
-        return $result;
     }
 }
