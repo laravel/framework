@@ -108,6 +108,47 @@ class HttpJsonResponseTest extends TestCase
 
         $this->assertSame('bar', $response->getData()->foo);
     }
+
+    public function testHasEncodingOption()
+    {
+        $response = new JsonResponse(['foo' => 'bar'], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        $this->assertTrue($response->hasEncodingOption(JSON_PRETTY_PRINT));
+        $this->assertTrue($response->hasEncodingOption(JSON_UNESCAPED_UNICODE));
+        $this->assertFalse($response->hasEncodingOption(JSON_UNESCAPED_SLASHES));
+    }
+
+    public function testWithEncodingOption()
+    {
+        $response = new JsonResponse(['foo' => 'bar']);
+        $this->assertFalse($response->hasEncodingOption(JSON_PRETTY_PRINT));
+
+        $result = $response->withEncodingOption(JSON_PRETTY_PRINT);
+
+        $this->assertSame($response, $result);
+        $this->assertTrue($response->hasEncodingOption(JSON_PRETTY_PRINT));
+    }
+
+    public function testWithoutEncodingOption()
+    {
+        $response = new JsonResponse(['foo' => 'bar'], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $this->assertTrue($response->hasEncodingOption(JSON_PRETTY_PRINT));
+
+        $result = $response->withoutEncodingOption(JSON_PRETTY_PRINT);
+
+        $this->assertSame($response, $result);
+        $this->assertFalse($response->hasEncodingOption(JSON_PRETTY_PRINT));
+        $this->assertTrue($response->hasEncodingOption(JSON_UNESCAPED_UNICODE));
+    }
+
+    public function testWithCallback()
+    {
+        $response = new JsonResponse(['foo' => 'bar']);
+        $result = $response->withCallback('myCallback');
+
+        $this->assertSame($response, $result);
+        $this->assertStringContainsString('myCallback', $response->getContent());
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable

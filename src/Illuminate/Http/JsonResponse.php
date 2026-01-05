@@ -135,4 +135,30 @@ class JsonResponse extends BaseJsonResponse
     {
         return (bool) ($this->encodingOptions & $option);
     }
+
+    /**
+     * Add a JSON encoding option.
+     *
+     * @param  int  $option
+     * @return $this
+     */
+    public function withEncodingOption($option)
+    {
+        $this->encodingOptions |= $option;
+
+        return $this->setData($this->getData());
+    }
+
+    /**
+     * Remove a JSON encoding option.
+     *
+     * @param  int  $option
+     * @return $this
+     */
+    public function withoutEncodingOption($option)
+    {
+        $this->encodingOptions &= ~$option;
+
+        return $this->setData($this->getData());
+    }
 }
