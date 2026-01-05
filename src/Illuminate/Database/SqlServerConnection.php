@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Closure;
 use Exception;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
+use LogicException;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
@@ -36,7 +37,11 @@ class SqlServerConnection extends Connection
     {
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {
-                return parent::transaction($callback, $attempts);
+                return parent::transaction($callback, $attempts, $backoff);
+            }
+
+            if ($backoff !== null) {
+                throw new LogicException('Transaction backoffs are only supported for sqlsrv SQL Server driver connections.');
             }
 
             $this->getPdo()->exec('BEGIN TRAN');
@@ -55,8 +60,6 @@ class SqlServerConnection extends Connection
             // be handled how the developer sees fit for their applications.
             catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
-
-                $this->handleTransactionExceptionBackoff($backoff, $e, $a, $attempts);
 
                 throw $e;
             }
