@@ -21,7 +21,7 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void forgetPushed()
  * @method static \Illuminate\Events\Dispatcher setQueueResolver(callable $resolver)
  * @method static \Illuminate\Events\Dispatcher setTransactionManagerResolver(callable|null $resolver)
- * @method static void defer(callable $callback, string[]|null $events = null)
+ * @method static mixed defer(callable $callback, string[]|null $events = null)
  * @method static array getRawListeners()
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
