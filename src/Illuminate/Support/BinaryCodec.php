@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Uid\Ulid;
 
 class BinaryCodec
@@ -25,7 +26,7 @@ class BinaryCodec
     /**
      * Encode a value to binary.
      */
-    public static function encode(?string $value, string $format): ?string
+    public static function encode(UuidInterface|Ulid|string|null $value, string $format): ?string
     {
         if (blank($value)) {
             return null;
@@ -36,8 +37,16 @@ class BinaryCodec
         }
 
         return match ($format) {
-            'uuid' => (self::isBinary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->getBytes(),
-            'ulid' => (self::isBinary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toBinary(),
+            'uuid' => match (true) {
+                $value instanceof UuidInterface => $value->getBytes(),
+                self::isBinary($value) => $value,
+                default => Uuid::fromString($value)->getBytes(),
+            },
+            'ulid' => match (true) {
+                $value instanceof Ulid => $value->toBinary(),
+                self::isBinary($value) => $value,
+                default => Ulid::fromString($value)->toBinary(),
+            },
             default => throw new InvalidArgumentException("Format [$format] is invalid."),
         };
     }

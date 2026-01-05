@@ -95,6 +95,13 @@ class SupportBinaryCodecTest extends TestCase
         $this->assertSame($bytes, BinaryCodec::encode($bytes, 'uuid'));
     }
 
+    public function testUuidEncodeFromInstance()
+    {
+        $uuid = Uuid::fromString('550e8400-e29b-41d4-a716-446655440000');
+
+        $this->assertSame($uuid->getBytes(), BinaryCodec::encode($uuid, 'uuid'));
+    }
+
     public function testUuidDecodeFromBinary()
     {
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
@@ -122,6 +129,13 @@ class SupportBinaryCodecTest extends TestCase
         $bytes = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV')->toBinary();
 
         $this->assertSame($bytes, BinaryCodec::encode($bytes, 'ulid'));
+    }
+
+    public function testUlidEncodeFromInstance()
+    {
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+
+        $this->assertSame($ulid->toBinary(), BinaryCodec::encode($ulid, 'ulid'));
     }
 
     public function testUlidDecodeFromBinary()

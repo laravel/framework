@@ -89,7 +89,7 @@ class AsBinary implements Castable
     {
         return self::class.':'.implode(',', [
             $format,
-            $isRequired ? '1' : '0',
+            $required ? '1' : '0',
         ]);
     }
 }
