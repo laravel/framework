@@ -7,12 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements ChildRelationship<TModel>
+ */
 class Relationship implements ChildRelationship
 {
     /**
      * The related factory instance.
      *
-     * @var \Illuminate\Database\Eloquent\Factories\Factory
+     * @var \Illuminate\Database\Eloquent\Factories\Factory<TModel>
      */
     protected $factory;
 
@@ -72,7 +77,7 @@ class Relationship implements ChildRelationship
      * Make the child relationship for the given parent model without persisting.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key, TModel>
      */
     public function makeFor(Model $parent)
     {

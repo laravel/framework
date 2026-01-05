@@ -8,6 +8,8 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -309,7 +311,7 @@ abstract class Factory
      */
     public function createManyQuietly(int|iterable|null $records = null)
     {
-        return Model::withoutEvents(fn() => $this->createMany($records));
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -353,7 +355,7 @@ abstract class Factory
      */
     public function createQuietly($attributes = [], ?Model $parent = null)
     {
-        return Model::withoutEvents(fn() => $this->create($attributes, $parent));
+        return Model::withoutEvents(fn () => $this->create($attributes, $parent));
     }
 
     /**
@@ -365,7 +367,7 @@ abstract class Factory
      */
     public function lazy(array $attributes = [], ?Model $parent = null)
     {
-        return fn() => $this->create($attributes, $parent);
+        return fn () => $this->create($attributes, $parent);
     }
 
     /**
@@ -487,7 +489,7 @@ abstract class Factory
         $query->fillAndInsert(
             $madeCollection->withoutAppends()
                 ->setHidden([])
-                ->map(static fn(Model $model) => $model->attributesToArray())
+                ->map(static fn (Model $model) => $model->attributesToArray())
                 ->all()
         );
     }
@@ -501,7 +503,7 @@ abstract class Factory
     protected function makeInstance(?Model $parent)
     {
         if ($this->withInMemoryRelationships) {
-            $this->for->each(fn(BelongsToRelationship $for) => $for->withInMemoryRelationships(true));
+            $this->for->each(fn (BelongsToRelationship $for) => $for->withInMemoryRelationships(true));
         }
 
         return Model::unguarded(function () use ($parent) {
@@ -549,17 +551,13 @@ abstract class Factory
             $relationshipName = $has->getRelationship();
             $relationship = $instance->{$relationshipName}();
 
-            $isOneRelationship = $relationship instanceof \Illuminate\Database\Eloquent\Relations\HasOne
-                || $relationship instanceof \Illuminate\Database\Eloquent\Relations\MorphOne;
+            $isOneRelationship = $relationship instanceof HasOne
+                || $relationship instanceof MorphOne;
 
-            if ($isOneRelationship) {
-                if ($children instanceof Enumerable) {
-                    $children = $children->first();
-                }
-            } else {
-                if ($children instanceof Model) {
-                    $children = $instance->newCollection([$children]);
-                }
+            if ($isOneRelationship && $children instanceof Enumerable) {
+                $children = $children->first();
+            } elseif (! $isOneRelationship && $children instanceof Model) {
+                $children = $instance->newCollection([$children]);
             }
 
             $instance->setRelation($relationshipName, $children);
@@ -606,7 +604,7 @@ abstract class Factory
     protected function parentResolvers()
     {
         return $this->for
-            ->map(fn(BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
+            ->map(fn (BelongsToRelationship $for) => $for->recycle($this->recycle)->attributesFor($this->newModel()))
             ->collapse()
             ->all();
     }
@@ -661,7 +659,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->concat([
-                is_callable($state) ? $state : fn() => $state,
+                is_callable($state) ? $state : fn () => $state,
             ]),
         ]);
     }
@@ -676,7 +674,7 @@ abstract class Factory
     {
         return $this->newInstance([
             'states' => $this->states->prepend(
-                is_callable($state) ? $state : fn() => $state,
+                is_callable($state) ? $state : fn () => $state,
             ),
         ]);
     }
@@ -811,7 +809,7 @@ abstract class Factory
                 ->merge(
                     Collection::wrap($model instanceof Model ? func_get_args() : $model)
                         ->flatten()
-                )->groupBy(fn($model) => get_class($model)),
+                )->groupBy(fn ($model) => get_class($model)),
         ]);
     }
 
@@ -982,9 +980,9 @@ abstract class Factory
 
             $appNamespace = static::appNamespace();
 
-            return class_exists($appNamespace . 'Models\\' . $namespacedFactoryBasename)
-                ? $appNamespace . 'Models\\' . $namespacedFactoryBasename
-                : $appNamespace . $factoryBasename;
+            return class_exists($appNamespace.'Models\\'.$namespacedFactoryBasename)
+                ? $appNamespace.'Models\\'.$namespacedFactoryBasename
+                : $appNamespace.$factoryBasename;
         };
 
         return $resolver($this);
@@ -1125,11 +1123,11 @@ abstract class Factory
         $resolver = static::$factoryNameResolver ?? function (string $modelName) {
             $appNamespace = static::appNamespace();
 
-            $modelName = Str::startsWith($modelName, $appNamespace . 'Models\\')
-                ? Str::after($modelName, $appNamespace . 'Models\\')
+            $modelName = Str::startsWith($modelName, $appNamespace.'Models\\')
+                ? Str::after($modelName, $appNamespace.'Models\\')
                 : Str::after($modelName, $appNamespace);
 
-            return static::$namespace . $modelName . 'Factory';
+            return static::$namespace.$modelName.'Factory';
         };
 
         return $resolver($modelName);

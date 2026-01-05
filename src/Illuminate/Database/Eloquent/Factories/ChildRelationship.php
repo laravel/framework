@@ -4,6 +4,9 @@ namespace Illuminate\Database\Eloquent\Factories;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ */
 interface ChildRelationship
 {
     /**
@@ -18,7 +21,7 @@ interface ChildRelationship
      * Make the child relationship for the given parent model without persisting.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key, TModel>|\Illuminate\Support\Collection
      */
     public function makeFor(Model $parent);
 

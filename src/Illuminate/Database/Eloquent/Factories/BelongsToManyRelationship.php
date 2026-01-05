@@ -5,12 +5,17 @@ namespace Illuminate\Database\Eloquent\Factories;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ *
+ * @implements ChildRelationship<TModel>
+ */
 class BelongsToManyRelationship implements ChildRelationship
 {
     /**
      * The related factory instance.
      *
-     * @var \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array
+     * @var \Illuminate\Database\Eloquent\Factories\Factory<TModel>|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array
      */
     protected $factory;
 
@@ -75,7 +80,7 @@ class BelongsToManyRelationship implements ChildRelationship
      * Make the attached relationship for the given model without persisting.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return TModel|\Illuminate\Database\Eloquent\Collection<array-key, TModel>
      */
     public function makeFor(Model $model)
     {
