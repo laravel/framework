@@ -275,7 +275,7 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt('foo');
 
-        $this->assertTrue(Encrypter::encrypted($encrypted));
+        $this->assertTrue(Encrypter::appearsEncrypted($encrypted));
     }
 
     public function testEncryptedReturnsTrueForEncryptedArray()
@@ -283,20 +283,20 @@ class EncrypterTest extends TestCase
         $e = new Encrypter(str_repeat('a', 16));
         $encrypted = $e->encrypt(['foo' => 'bar']);
 
-        $this->assertTrue(Encrypter::encrypted($encrypted));
+        $this->assertTrue(Encrypter::appearsEncrypted($encrypted));
     }
 
     public function testEncryptedReturnsFalseForPlainText()
     {
-        $this->assertFalse(Encrypter::encrypted('foo'));
-        $this->assertFalse(Encrypter::encrypted('APP_NAME=Laravel'));
-        $this->assertFalse(Encrypter::encrypted("APP_NAME=Laravel\nAPP_ENV=local"));
+        $this->assertFalse(Encrypter::appearsEncrypted('foo'));
+        $this->assertFalse(Encrypter::appearsEncrypted('APP_NAME=Laravel'));
+        $this->assertFalse(Encrypter::appearsEncrypted("APP_NAME=Laravel\nAPP_ENV=local"));
     }
 
     public function testEncryptedReturnsFalseForNonString()
     {
-        $this->assertFalse(Encrypter::encrypted(123));
-        $this->assertFalse(Encrypter::encrypted(['foo' => 'bar']));
-        $this->assertFalse(Encrypter::encrypted(null));
+        $this->assertFalse(Encrypter::appearsEncrypted(123));
+        $this->assertFalse(Encrypter::appearsEncrypted(['foo' => 'bar']));
+        $this->assertFalse(Encrypter::appearsEncrypted(null));
     }
 }
