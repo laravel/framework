@@ -38,7 +38,13 @@ class PauseCommand extends Command
 
         $manager->pauseFor($connection, $queue, $this->option('for'));
 
-        $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused.");
+        $suffix = '';
+
+        if ($for = $this->option('for')) {
+            $suffix = " for {$for} seconds";
+        }
+
+        $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused {$suffix}.");
 
         return 0;
     }
