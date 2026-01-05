@@ -1826,6 +1826,9 @@ class SupportStrTest extends TestCase
     public function testChopStart()
     {
         foreach ([
+            '' => ['', ''],
+            'Laravel' => ['', 'Laravel'],
+            'Ship it' => [['', 'Ship '], 'it'],
             'http://laravel.com' => ['http://', 'laravel.com'],
             'http://-http://' => ['http://', '-http://'],
             'http://laravel.com' => ['htp:/', 'http://laravel.com'],
@@ -1859,6 +1862,9 @@ class SupportStrTest extends TestCase
     public function testChopEnd()
     {
         foreach ([
+            '' => ['', ''],
+            'Laravel' => ['', 'Laravel'],
+            'Ship it' => [['', ' it'], 'Ship'],
             'path/to/file.php' => ['.php', 'path/to/file'],
             '.php-.php' => ['.php', '.php-'],
             'path/to/file.php' => ['.ph', 'path/to/file.php'],
