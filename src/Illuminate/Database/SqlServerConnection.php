@@ -5,11 +5,11 @@ namespace Illuminate\Database;
 use Closure;
 use Exception;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
-use LogicException;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Filesystem\Filesystem;
+use LogicException;
 use RuntimeException;
 use Throwable;
 
