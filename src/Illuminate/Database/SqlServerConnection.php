@@ -27,7 +27,7 @@ class SqlServerConnection extends Connection
      *
      * @param  \Closure  $callback
      * @param  int  $attempts
-     * @param  \Closure(\Throwable, int, int): int|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @return mixed
      *
      * @throws \Throwable
