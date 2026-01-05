@@ -44,7 +44,7 @@ class PauseCommand extends Command
             $suffix = " for {$for} seconds";
         }
 
-        $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused {$suffix}.");
+        $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused{$suffix}.");
 
         return 0;
     }
