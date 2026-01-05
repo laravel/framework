@@ -297,6 +297,20 @@ class DatabaseConnectionsTest extends DatabaseTestCase
             } catch (QueryException $exception) {
                 $this->assertSame('read', $exception->readWriteType);
             }
+
+            try {
+                DB::connection('sqlite')->select('xxxx', useReadPdo: true);
+                $this->fail();
+            } catch (QueryException $exception) {
+                $this->assertSame('read', $exception->readWriteType);
+            }
+
+            try {
+                DB::connection('sqlite')->select('xxxx', useReadPdo: false);
+                $this->fail();
+            } catch (QueryException $exception) {
+                $this->assertSame('write', $exception->readWriteType);
+            }
         } finally {
             @unlink($writePath);
             @unlink($readPath);
