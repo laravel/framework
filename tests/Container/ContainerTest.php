@@ -142,6 +142,13 @@ class ContainerTest extends TestCase
         $this->assertSame($firstInstantiation, $secondInstantiation);
     }
 
+    public function testScopedBindingsWithClosureReturnType()
+    {
+        $container = new Container;
+        $container->scoped(fn (): stdClass => new stdClass);
+        $container->forgetScopedInstances();
+    }
+
     public function testScopedIf()
     {
         $container = new Container;
