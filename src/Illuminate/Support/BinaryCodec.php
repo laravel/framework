@@ -9,7 +9,7 @@ use Symfony\Component\Uid\Ulid;
 
 class BinaryCodec
 {
-    /** @var array<string, array{encode: callable(?string): ?string, decode: callable(?string): ?string}> */
+    /** @var array<string, array{encode: callable(UuidInterface|Ulid|string|null): ?string, decode: callable(?string): ?string}> */
     protected static array $customCodecs = [];
 
     /**
