@@ -169,7 +169,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                 return 'taylor';
             },
             'options' => function ($attributes) {
-                return $attributes['name'] . '-options';
+                return $attributes['name'].'-options';
             },
         ]);
 
@@ -180,8 +180,8 @@ class DatabaseEloquentFactoryTest extends TestCase
     {
         $post = FactoryTestPostFactory::new()->create([
             'title' => 'post',
-            'user_id' => fn($attributes) => FactoryTestUserFactory::new([
-                'options' => $attributes['title'] . '-options',
+            'user_id' => fn ($attributes) => FactoryTestUserFactory::new([
+                'options' => $attributes['title'].'-options',
             ]),
         ]);
 
@@ -512,7 +512,7 @@ class DatabaseEloquentFactoryTest extends TestCase
         }));
 
         $users = FactoryTestUserFactory::times(2)->sequence(function ($sequence) {
-            return ['name' => 'index: ' . $sequence->index];
+            return ['name' => 'index: '.$sequence->index];
         })->create();
 
         $this->assertSame('index: 0', $users[0]->name);
@@ -545,7 +545,7 @@ class DatabaseEloquentFactoryTest extends TestCase
                 FactoryTestPostFactory::times(3)
                     ->state(['title' => 'Post'])
                     ->sequence(function ($sequence, $attributes, $user) {
-                        return ['title' => $user->name . ' ' . $attributes['title'] . ' ' . ($sequence->index % 3 + 1)];
+                        return ['title' => $user->name.' '.$attributes['title'].' '.($sequence->index % 3 + 1)];
                     }),
                 'posts'
             )
@@ -656,7 +656,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_model_has_factory()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $this->assertInstanceOf(FactoryTestUserFactory::class, FactoryTestUser::factory());
@@ -665,7 +665,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_dynamic_has_and_for_methods()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->hasPosts(3)->create();
@@ -745,7 +745,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_model_instances_can_be_used_in_place_of_nested_factories()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->create();
@@ -763,7 +763,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_for_method_recycles_models()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $user = FactoryTestUserFactory::new()->create();
@@ -778,7 +778,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_has_method_does_not_reassign_the_parent()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $post = FactoryTestPostFactory::new()->create();
@@ -794,7 +794,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_multiple_models_can_be_provided_to_recycle()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $users = FactoryTestUserFactory::new()->count(3)->create();
@@ -812,7 +812,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_recycled_models_can_be_combined_with_multiple_calls()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $users = FactoryTestUserFactory::new()
@@ -845,7 +845,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_no_models_can_be_provided_to_recycle()
     {
         Factory::guessFactoryNamesUsing(function ($model) {
-            return $model . 'Factory';
+            return $model.'Factory';
         });
 
         $posts = FactoryTestPostFactory::new()
@@ -917,7 +917,7 @@ class DatabaseEloquentFactoryTest extends TestCase
     public function test_factory_global_model_resolver()
     {
         Factory::guessModelNamesUsing(function ($factory) {
-            return __NAMESPACE__ . '\\' . Str::replaceLast('Factory', '', class_basename($factory::class));
+            return __NAMESPACE__.'\\'.Str::replaceLast('Factory', '', class_basename($factory::class));
         });
 
         $this->assertEquals(FactoryTestGuessModel::factory()->modelName(), FactoryTestGuessModel::class);
@@ -1373,7 +1373,7 @@ class FactoryTestPost extends Eloquent
 
     public function upperCaseName(): Attribute
     {
-        return Attribute::get(fn($attr) => Str::upper($this->user->name));
+        return Attribute::get(fn ($attr) => Str::upper($this->user->name));
     }
 
     public function user()
@@ -1416,7 +1416,7 @@ class FactoryTestCommentFactory extends Factory
         return [
             'commentable_id' => FactoryTestPostFactory::new(),
             'commentable_type' => FactoryTestPost::class,
-            'user_id' => fn() => FactoryTestUserFactory::new(),
+            'user_id' => fn () => FactoryTestUserFactory::new(),
             'body' => $this->faker->name(),
         ];
     }
@@ -1474,7 +1474,7 @@ class FactoryTestGuessModelFactory extends Factory
 {
     protected static function appNamespace()
     {
-        return __NAMESPACE__ . '\\';
+        return __NAMESPACE__.'\\';
     }
 
     public function definition()
