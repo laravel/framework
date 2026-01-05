@@ -30,7 +30,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     protected function tearDown(): void {
     Carbon::setTestNow(null);
 
-        m::close();
+
 
     parent::tearDown();
 }

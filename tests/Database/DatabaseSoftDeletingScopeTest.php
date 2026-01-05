@@ -16,7 +16,7 @@ use stdClass;
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

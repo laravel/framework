@@ -34,7 +34,7 @@ class SupportServiceProviderTest extends TestCase
     }
 
     protected function tearDown(): void {
-    m::close();
+
         if (isset($this->tempFile) && file_exists($this->tempFile)) {
             @unlink($this->tempFile);
         }

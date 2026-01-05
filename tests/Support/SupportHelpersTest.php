@@ -35,7 +35,7 @@ class SupportHelpersTest extends TestCase
     }
 
     protected function tearDown(): void {
-    m::close();
+
 
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');

@@ -19,7 +19,7 @@ use function Laravel\Prompts\select;
 class ConfiguresPromptsTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

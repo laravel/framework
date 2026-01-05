@@ -12,7 +12,7 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 class FrameTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

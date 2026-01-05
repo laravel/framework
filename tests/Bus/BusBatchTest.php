@@ -116,7 +116,7 @@ class BusBatchTest extends TestCase
 
         $this->schema()->drop('job_batches');
 
-        m::close();
+
 
     parent::tearDown();
 }

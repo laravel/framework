@@ -42,7 +42,7 @@ class ComponentTest extends TestCase
     }
 
     protected function tearDown(): void {
-    m::close();
+
 
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);

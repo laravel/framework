@@ -42,7 +42,7 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedQueueAttributesResponseModel;
 
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

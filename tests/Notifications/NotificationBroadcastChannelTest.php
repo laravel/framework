@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 class NotificationBroadcastChannelTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

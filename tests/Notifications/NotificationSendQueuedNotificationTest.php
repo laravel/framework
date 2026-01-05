@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class NotificationSendQueuedNotificationTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

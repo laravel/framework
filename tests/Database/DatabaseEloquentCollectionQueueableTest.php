@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

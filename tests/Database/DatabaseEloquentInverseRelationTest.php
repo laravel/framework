@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 class DatabaseEloquentInverseRelationTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class FoundationApplicationBuilderTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
         unset($_ENV['APP_BASE_PATH']);
 

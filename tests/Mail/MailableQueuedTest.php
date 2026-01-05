@@ -21,7 +21,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 class MailableQueuedTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

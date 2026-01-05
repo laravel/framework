@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 class MiddlewareTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();

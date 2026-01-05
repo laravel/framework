@@ -56,7 +56,7 @@ class DatabaseTransactionsTest extends TestCase
             $this->schema($connection)->drop('users');
         }
 
-        m::close();
+
 
     parent::tearDown();
 }

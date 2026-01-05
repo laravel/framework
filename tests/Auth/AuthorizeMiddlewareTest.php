@@ -49,7 +49,7 @@ class AuthorizeMiddlewareTest extends TestCase
     }
 
     protected function tearDown(): void {
-    m::close();
+
 
         Container::setInstance(null);
 

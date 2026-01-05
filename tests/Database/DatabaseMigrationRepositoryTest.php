@@ -14,7 +14,7 @@ use stdClass;
 class DatabaseMigrationRepositoryTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class DatabaseSQLiteQueryGrammarTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

@@ -22,7 +22,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class NotificationSenderTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

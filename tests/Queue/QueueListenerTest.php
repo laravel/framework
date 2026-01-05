@@ -14,7 +14,7 @@ use function Illuminate\Support\php_binary;
 class QueueListenerTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

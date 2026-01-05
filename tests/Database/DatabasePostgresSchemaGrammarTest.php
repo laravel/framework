@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

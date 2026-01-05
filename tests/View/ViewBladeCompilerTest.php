@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class ViewBladeCompilerTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

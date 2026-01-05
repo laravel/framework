@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 class HttpRedirectResponseTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

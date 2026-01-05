@@ -13,7 +13,7 @@ use ReflectionClass;
 class DatabaseQueryGrammarTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

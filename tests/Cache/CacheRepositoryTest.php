@@ -32,7 +32,7 @@ class CacheRepositoryTest extends TestCase
     }
 
     protected function tearDown(): void {
-    m::close();
+
 
         Carbon::setTestNow(null);
 

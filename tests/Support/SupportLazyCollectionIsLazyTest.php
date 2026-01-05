@@ -1341,7 +1341,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
             });
         });
 
-        m::close();
+
     }
 
     public function testTakeWhileIsLazy()

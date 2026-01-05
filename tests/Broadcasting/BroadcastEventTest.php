@@ -14,7 +14,7 @@ use Throwable;
 class BroadcastEventTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

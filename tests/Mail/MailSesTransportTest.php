@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Email;
 class MailSesTransportTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

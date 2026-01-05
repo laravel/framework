@@ -12,7 +12,7 @@ class LoadEnvironmentVariablesTest extends TestCase
     protected function tearDown(): void {
     unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
-        m::close();
+
 
     parent::tearDown();
 }

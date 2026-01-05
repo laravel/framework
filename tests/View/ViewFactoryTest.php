@@ -28,7 +28,7 @@ use stdClass;
 class ViewFactoryTest extends TestCase
 {
     protected function tearDown(): void {
-    m::close();
+
 
     parent::tearDown();
 }

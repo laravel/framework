@@ -42,7 +42,7 @@ class FilesystemAdapterTest extends TestCase
             $this->adapter = new LocalFilesystemAdapter(dirname($this->tempDir))
         );
         $filesystem->deleteDirectory(basename($this->tempDir));
-        m::close();
+
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
 

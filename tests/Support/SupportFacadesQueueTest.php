@@ -32,7 +32,7 @@ class SupportFacadesQueueTest extends TestCase
     Queue::clearResolvedInstance();
         Queue::setFacadeApplication(null);
 
-        m::close();
+
 
     parent::tearDown();
 }
