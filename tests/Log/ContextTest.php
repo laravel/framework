@@ -25,8 +25,9 @@ class ContextTest extends TestCase
     #[\Override]
     protected function tearDown(): void
     {
-
         MyAddContextProcessor::$wasConstructed = false;
+
+        parent::tearDown();
     }
 
     public function test_it_can_set_values()

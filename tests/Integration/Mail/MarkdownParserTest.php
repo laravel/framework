@@ -17,7 +17,7 @@ class MarkdownParserTest extends TestCase
         Markdown::flushState();
         EncodedHtmlString::flushState();
 
-
+        parent::tearDown();
     }
 
     #[DataProvider('markdownDataProvider')]

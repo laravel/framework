@@ -22,7 +22,7 @@ class BladeTest extends TestCase
     {
         artisan($this, 'view:clear');
 
-
+        parent::tearDown();
     }
 
     public function test_rendering_blade_string()
