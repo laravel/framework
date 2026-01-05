@@ -25,7 +25,7 @@ class EnvironmentEncryptCommand extends Command
                     {--key= : The encryption key}
                     {--cipher= : The encryption cipher}
                     {--env= : The environment to be encrypted}
-                    {--readable : Encrypt in a readable format with plain-text variable names}
+                    {--readable : Encrypt each variable individually with readable, plain-text variable names}
                     {--prune : Delete the original environment file}
                     {--force : Overwrite the existing encrypted environment file}';
 
