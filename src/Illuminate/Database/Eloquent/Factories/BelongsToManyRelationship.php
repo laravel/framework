@@ -15,7 +15,7 @@ class BelongsToManyRelationship implements ChildRelationship
     /**
      * The related factory instance.
      *
-     * @var \Illuminate\Database\Eloquent\Factories\Factory<TModel>|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array
+     * @var \Illuminate\Database\Eloquent\Factories\Factory<TModel>|\Illuminate\Support\Collection<int, TModel>|TModel|array<int, TModel>
      */
     protected $factory;
 
@@ -43,7 +43,7 @@ class BelongsToManyRelationship implements ChildRelationship
     /**
      * Create a new attached relationship definition.
      *
-     * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model|array  $factory
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory<TModel>|\Illuminate\Support\Collection<int, TModel>|TModel|array<int, TModel>  $factory
      * @param  callable|array  $pivot
      * @param  string  $relationship
      */

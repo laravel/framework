@@ -5,12 +5,15 @@ namespace Illuminate\Database\Eloquent\Factories;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @template TModel of \Illuminate\Database\Eloquent\Model
+ */
 class BelongsToRelationship
 {
     /**
      * The related factory instance.
      *
-     * @var \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model
+     * @var \Illuminate\Database\Eloquent\Factories\Factory<TModel>|TModel
      */
     protected $factory;
 
@@ -31,7 +34,7 @@ class BelongsToRelationship
     /**
      * The cached, resolved parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model|null
+     * @var TModel|null
      */
     protected $resolvedModel;
 
@@ -45,7 +48,7 @@ class BelongsToRelationship
     /**
      * Create a new "belongs to" relationship definition.
      *
-     * @param  \Illuminate\Database\Eloquent\Factories\Factory|\Illuminate\Database\Eloquent\Model  $factory
+     * @param  \Illuminate\Database\Eloquent\Factories\Factory<TModel>|TModel  $factory
      * @param  string  $relationship
      */
     public function __construct($factory, $relationship)
@@ -99,7 +102,7 @@ class BelongsToRelationship
     /**
      * Get the resolved parent model instance.
      *
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return TModel|null
      */
     public function getResolvedModel()
     {

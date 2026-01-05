@@ -83,17 +83,7 @@ class Relationship implements ChildRelationship
     {
         $relationship = $parent->{$this->relationship}();
 
-        if ($relationship instanceof MorphOneOrMany) {
-            return $this->factory
-                ->withInMemoryRelationships()
-                ->prependState($relationship->getQuery()->pendingAttributes)
-                ->make([], $parent);
-        } elseif ($relationship instanceof HasOneOrMany) {
-            return $this->factory
-                ->withInMemoryRelationships()
-                ->prependState($relationship->getQuery()->pendingAttributes)
-                ->make([], $parent);
-        } elseif ($relationship instanceof BelongsToMany) {
+        if ($relationship instanceof MorphOneOrMany || $relationship instanceof HasOneOrMany || $relationship instanceof BelongsToMany) {
             return $this->factory
                 ->withInMemoryRelationships()
                 ->prependState($relationship->getQuery()->pendingAttributes)
