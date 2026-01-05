@@ -55,7 +55,7 @@ class StorageFacadeTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testStorageFakeWithEnums()
+    public function testStorageFakeMethodsWithEnums()
     {
         $this->assertNull(Storage::persistentFake(StorageDisk::Test)->get('nonExistentFile'));
         $this->assertNull(Storage::fake(StorageDisk::Public)->get('nonExistentFile'));
