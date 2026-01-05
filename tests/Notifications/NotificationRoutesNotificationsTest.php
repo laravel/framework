@@ -13,13 +13,12 @@ use stdClass;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testNotificationCanBeDispatched()
     {

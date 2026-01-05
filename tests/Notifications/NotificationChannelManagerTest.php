@@ -24,13 +24,12 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testNotificationCanBeDispatchedToDriver()
     {

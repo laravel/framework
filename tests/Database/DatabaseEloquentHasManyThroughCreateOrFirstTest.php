@@ -23,12 +23,12 @@ class DatabaseEloquentHasManyThroughCreateOrFirstTest extends TestCase
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
-    protected function tearDown(): void {
-    Carbon::setTestNow();
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
 
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testCreateOrFirstMethodCreatesNewRecord(): void
     {

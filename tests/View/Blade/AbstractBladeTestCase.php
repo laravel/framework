@@ -23,16 +23,15 @@ abstract class AbstractBladeTestCase extends TestCase
         $this->compiler = new BladeCompiler($this->getFiles(), __DIR__);
     }
 
-    protected function tearDown(): void {
-    Container::setInstance(null);
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
 
-
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     protected function getFiles()
     {

@@ -497,13 +497,14 @@ class ValidationFileRuleTest extends TestCase
         (new ValidationServiceProvider($container))->register();
     }
 
-    protected function tearDown(): void {
-    Container::setInstance(null);
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
 
         Facade::clearResolvedInstances();
 
         Facade::setFacadeApplication(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 }

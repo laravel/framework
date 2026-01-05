@@ -107,8 +107,9 @@ class BusBatchTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    if (Facade::getFacadeApplication()) {
+    protected function tearDown(): void
+    {
+        if (Facade::getFacadeApplication()) {
             Facade::setFacadeApplication(null);
         }
 
@@ -116,10 +117,8 @@ class BusBatchTest extends TestCase
 
         $this->schema()->drop('job_batches');
 
-
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function test_jobs_can_be_added_to_the_batch()
     {

@@ -12,11 +12,12 @@ use ReflectionClass;
 
 class FacadesTest extends TestCase
 {
-    protected function tearDown(): void {
-    unset($_SERVER['__laravel.authResolved']);
+    protected function tearDown(): void
+    {
+        unset($_SERVER['__laravel.authResolved']);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testFacadeResolvedCanResolveCallback()
     {

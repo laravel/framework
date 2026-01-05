@@ -22,13 +22,14 @@ class InteractsWithDeprecationHandlingTest extends TestCase
         });
     }
 
-    protected function tearDown(): void {
-    $this->deprecationsFound = false;
+    protected function tearDown(): void
+    {
+        $this->deprecationsFound = false;
 
         HandleExceptions::flushHandlersState($this);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testWithDeprecationHandling()
     {

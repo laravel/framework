@@ -27,11 +27,12 @@ class PhpRedisCacheLockTest extends TestCase
         );
     }
 
-    protected function tearDown(): void {
-    $this->tearDownRedis();
+    protected function tearDown(): void
+    {
+        $this->tearDownRedis();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testRedisLockCanBeAcquiredAndReleasedWithoutSerializationAndCompression()
     {

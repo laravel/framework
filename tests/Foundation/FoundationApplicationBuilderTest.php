@@ -3,20 +3,18 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Foundation\Application;
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class FoundationApplicationBuilderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         unset($_ENV['APP_BASE_PATH']);
 
         unset($_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testBaseDirectoryWithArg()
     {

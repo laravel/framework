@@ -23,14 +23,13 @@ class DatabaseSQLiteBuilderTest extends TestCase
         Facade::setFacadeApplication($app);
     }
 
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         Container::setInstance(null);
         Facade::setFacadeApplication(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testCreateDatabase()
     {

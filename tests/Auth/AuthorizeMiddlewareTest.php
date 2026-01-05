@@ -48,13 +48,12 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->container->instance(Registrar::class, $this->router);
     }
 
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItCanGenerateDefinitionViaStaticMethod()
     {

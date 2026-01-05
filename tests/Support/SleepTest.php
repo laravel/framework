@@ -14,13 +14,14 @@ use RuntimeException;
 
 class SleepTest extends TestCase
 {
-    protected function tearDown(): void {
-    Sleep::fake(false);
+    protected function tearDown(): void
+    {
+        Sleep::fake(false);
 
         Carbon::setTestNow();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItSleepsForSeconds()
     {

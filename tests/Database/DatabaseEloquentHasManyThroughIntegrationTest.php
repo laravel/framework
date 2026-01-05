@@ -65,13 +65,14 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    $this->schema()->drop('users');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('countries');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItLoadsAHasManyThroughRelationWithCustomKeys()
     {

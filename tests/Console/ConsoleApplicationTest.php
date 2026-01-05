@@ -30,11 +30,12 @@ class ConsoleApplicationTest extends TestCase
 {
     use InteractsWithMockery;
 
-    protected function tearDown(): void {
-    $this->tearDownTheTestEnvironmentUsingMockery();
+    protected function tearDown(): void
+    {
+        $this->tearDownTheTestEnvironmentUsingMockery();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testAddSetsLaravelInstance()
     {

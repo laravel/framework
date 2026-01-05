@@ -230,9 +230,10 @@ class CliDumperTest extends TestCase
         return $output->fetch();
     }
 
-    protected function tearDown(): void {
-    CliDumper::resolveDumpSourceUsing(null);
+    protected function tearDown(): void
+    {
+        CliDumper::resolveDumpSourceUsing(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 }

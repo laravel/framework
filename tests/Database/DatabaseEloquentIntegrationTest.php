@@ -192,8 +192,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    foreach (['default', 'second_connection'] as $connection) {
+    protected function tearDown(): void
+    {
+        foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
             $this->schema($connection)->drop('posts');
@@ -208,8 +209,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Str::createUuidsNormally();
         DB::flushQueryLog();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     /**
      * Tests...

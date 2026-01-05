@@ -27,13 +27,12 @@ use stdClass;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    protected function tearDown(): void {
-    Carbon::setTestNow(null);
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
 
-
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testFindMethod()
     {

@@ -8,8 +8,8 @@ use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
-use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as m;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -39,12 +39,13 @@ class CacheSpyMemoTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    protected function tearDown(): void {
-    Facade::clearResolvedInstances();
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function test_cache_spy_works_with_memoized_cache()
     {

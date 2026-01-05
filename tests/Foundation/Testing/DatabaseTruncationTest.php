@@ -34,14 +34,15 @@ class DatabaseTruncationTest extends TestCase
         ]);
     }
 
-    protected function tearDown(): void {
-    $this->app = null;
+    protected function tearDown(): void
+    {
+        $this->app = null;
         static::$allTables = [];
         $this->tablesToTruncate = null;
         $this->exceptTables = null;
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testTruncateTables()
     {

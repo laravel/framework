@@ -42,12 +42,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ValidationValidatorTest extends TestCase
 {
-    protected function tearDown(): void {
-    Carbon::setTestNow(null);
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
 
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
     {

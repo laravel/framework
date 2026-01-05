@@ -22,11 +22,12 @@ class DatabaseEloquentWithAttributesTest extends TestCase
         $db->setAsGlobal();
     }
 
-    protected function tearDown(): void {
-    $this->schema()->dropIfExists((new WithAttributesModel)->getTable());
+    protected function tearDown(): void
+    {
+        $this->schema()->dropIfExists((new WithAttributesModel)->getTable());
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testAddsAttributes(): void
     {

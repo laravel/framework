@@ -16,13 +16,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentMorphTest extends TestCase
 {
-    protected function tearDown(): void {
-    Relation::morphMap([], false);
+    protected function tearDown(): void
+    {
+        Relation::morphMap([], false);
 
-
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testMorphOneSetsProperConstraints()
     {

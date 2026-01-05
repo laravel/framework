@@ -18,11 +18,12 @@ use TypeError;
 
 class ContainerTest extends TestCase
 {
-    protected function tearDown(): void {
-    Container::setInstance(null);
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testContainerSingleton()
     {

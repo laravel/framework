@@ -20,11 +20,12 @@ class SignalsTest extends TestCase
         $this->signals = new Signals($this->registry);
     }
 
-    protected function tearDown(): void {
-    $this->state = null;
+    protected function tearDown(): void
+    {
+        $this->state = null;
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testRegister()
     {

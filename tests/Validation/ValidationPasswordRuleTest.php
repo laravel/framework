@@ -541,8 +541,9 @@ class ValidationPasswordRuleTest extends TestCase
         (new ValidationServiceProvider($container))->register();
     }
 
-    protected function tearDown(): void {
-    Container::setInstance(null);
+    protected function tearDown(): void
+    {
+        Container::setInstance(null);
 
         Facade::clearResolvedInstances();
 
@@ -550,6 +551,6 @@ class ValidationPasswordRuleTest extends TestCase
 
         Password::$defaultCallback = null;
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 }

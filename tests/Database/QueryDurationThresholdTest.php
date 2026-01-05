@@ -17,11 +17,12 @@ class QueryDurationThresholdTest extends TestCase
      */
     protected $now;
 
-    protected function tearDown(): void {
-    Carbon::setTestNow(null);
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItCanHandleReachingADurationThresholdInTheDb()
     {

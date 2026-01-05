@@ -39,13 +39,14 @@ class QueueWorkerTest extends TestCase
         $container->instance(ExceptionHandler::class, $this->exceptionHandler);
     }
 
-    protected function tearDown(): void {
-    Carbon::setTestNow();
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
 
         Container::setInstance();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testJobCanBeFired()
     {

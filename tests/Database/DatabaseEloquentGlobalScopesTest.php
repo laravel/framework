@@ -21,11 +21,12 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         ])->bootEloquent();
     }
 
-    protected function tearDown(): void {
-    Model::unsetConnectionResolver();
+    protected function tearDown(): void
+    {
+        Model::unsetConnectionResolver();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testGlobalScopeIsApplied()
     {

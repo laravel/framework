@@ -13,12 +13,13 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class VitePreloadingTest extends TestCase
 {
-    protected function tearDown(): void {
-    Facade::setFacadeApplication(null);
+    protected function tearDown(): void
+    {
+        Facade::setFacadeApplication(null);
         Facade::clearResolvedInstances();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItDoesNotSetLinkTagWhenNoTagsHaveBeenPreloaded()
     {

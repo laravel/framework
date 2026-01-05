@@ -34,15 +34,14 @@ class SupportHelpersTest extends TestCase
         parent::setUp();
     }
 
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         if (is_dir(__DIR__.'/tmp')) {
             (new Filesystem)->deleteDirectory(__DIR__.'/tmp');
         }
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testE()
     {

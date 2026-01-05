@@ -28,14 +28,13 @@ class SupportFacadesQueueTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    protected function tearDown(): void {
-    Queue::clearResolvedInstance();
+    protected function tearDown(): void
+    {
+        Queue::clearResolvedInstance();
         Queue::setFacadeApplication(null);
 
-
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testFakeFor()
     {

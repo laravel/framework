@@ -99,12 +99,13 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    $this->schema()->drop('orders');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('orders');
         $this->schema()->drop('products');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     /**
      * Helpers...

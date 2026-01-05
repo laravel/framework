@@ -98,15 +98,14 @@ class DatabaseEloquentFactoryTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         $this->schema()->drop('users');
 
         Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function test_basic_model_can_be_created()
     {

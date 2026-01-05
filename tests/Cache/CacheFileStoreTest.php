@@ -13,11 +13,12 @@ use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
 {
-    protected function tearDown(): void {
-    Carbon::setTestNow(null);
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testNullIsReturnedIfFileDoesntExist()
     {
@@ -128,7 +129,6 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result);
         $result = $store->put('foo', 'baz', 10);
         $this->assertTrue($result);
-
     }
 
     public function testStoreItemDirectoryProperlySetsPermissions()
@@ -153,7 +153,6 @@ class CacheFileStoreTest extends TestCase
 
         $result = $store->put('foo', 'foo', 10);
         $this->assertTrue($result);
-
     }
 
     public function testForeversAreStoredWithHighTimestamp()

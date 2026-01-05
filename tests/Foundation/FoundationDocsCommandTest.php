@@ -36,12 +36,13 @@ class FoundationDocsCommandTest extends TestCase
         $this->app[Kernel::class]->registerCommand($this->command());
     }
 
-    protected function tearDown(): void {
-    putenv('ARTISAN_DOCS_ASK_STRATEGY');
+    protected function tearDown(): void
+    {
+        putenv('ARTISAN_DOCS_ASK_STRATEGY');
         putenv('ARTISAN_DOCS_OPEN_STRATEGY');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItCanOpenTheLaravelDocumentation(): void
     {

@@ -7,12 +7,13 @@ use PHPUnit\Framework\TestCase;
 
 class OnceTest extends TestCase
 {
-    protected function tearDown(): void {
-    Once::flush();
+    protected function tearDown(): void
+    {
+        Once::flush();
         Once::enable();
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testResultMemoization()
     {

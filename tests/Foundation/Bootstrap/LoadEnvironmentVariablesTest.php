@@ -9,13 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class LoadEnvironmentVariablesTest extends TestCase
 {
-    protected function tearDown(): void {
-    unset($_ENV['FOO'], $_SERVER['FOO']);
+    protected function tearDown(): void
+    {
+        unset($_ENV['FOO'], $_SERVER['FOO']);
         putenv('FOO');
 
-
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     protected function getAppMock($file)
     {

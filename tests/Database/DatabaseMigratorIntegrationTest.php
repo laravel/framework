@@ -77,12 +77,13 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
-    protected function tearDown(): void {
-    Facade::clearResolvedInstances();
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testBasicMigrationOfSingleFolder()
     {

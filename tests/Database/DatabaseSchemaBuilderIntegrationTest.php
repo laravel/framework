@@ -33,12 +33,13 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    protected function tearDown(): void {
-    Facade::clearResolvedInstances();
+    protected function tearDown(): void
+    {
+        Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testHasColumnWithTablePrefix()
     {

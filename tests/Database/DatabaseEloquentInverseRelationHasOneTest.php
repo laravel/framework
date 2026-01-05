@@ -51,12 +51,13 @@ class DatabaseEloquentInverseRelationHasOneTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    $this->schema()->drop('test_parent');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('test_parent');
         $this->schema()->drop('test_child');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testHasOneInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {

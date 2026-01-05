@@ -179,13 +179,14 @@ class DatabaseEloquentBelongsToManyWithAttributesTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    $this->schema()->drop('with_attributes_posts');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('with_attributes_posts');
         $this->schema()->drop('with_attributes_tags');
         $this->schema()->drop('with_attributes_pivot');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     /**
      * Get a database connection instance.

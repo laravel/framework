@@ -66,8 +66,9 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    foreach (['default'] as $connection) {
+    protected function tearDown(): void
+    {
+        foreach (['default'] as $connection) {
             $this->schema($connection)->drop('users');
             $this->schema($connection)->drop('friends');
             $this->schema($connection)->drop('posts');
@@ -76,8 +77,8 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
 
         Relation::morphMap([], false);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testBasicModelHydration()
     {

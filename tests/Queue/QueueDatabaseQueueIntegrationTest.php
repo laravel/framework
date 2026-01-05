@@ -101,11 +101,12 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void {
-    $this->schema()->drop('jobs');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('jobs');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     /**
      * Test that jobs that are not reserved and have an available_at value less then now, are popped.

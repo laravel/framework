@@ -17,11 +17,12 @@ class WithScheduleTest extends TestCase
         ScheduleListCommand::resolveTerminalWidthUsing(fn () => 80);
     }
 
-    protected function tearDown(): void {
-    ScheduleListCommand::resolveTerminalWidthUsing(null);
+    protected function tearDown(): void
+    {
+        ScheduleListCommand::resolveTerminalWidthUsing(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     protected function resolveApplication()
     {

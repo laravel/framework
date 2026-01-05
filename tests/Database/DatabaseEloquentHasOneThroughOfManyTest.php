@@ -59,15 +59,16 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         });
     }
 
-    protected function tearDown(): void {
-    $this->schema()->drop('users');
+    protected function tearDown(): void
+    {
+        $this->schema()->drop('users');
         $this->schema()->drop('intermediates');
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testItGuessesRelationName(): void
     {

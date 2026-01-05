@@ -13,12 +13,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    protected function tearDown(): void {
-
+    protected function tearDown(): void
+    {
         Builder::$defaultMorphKeyType = 'int';
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testToSqlRunsCommandsFromBlueprint()
     {

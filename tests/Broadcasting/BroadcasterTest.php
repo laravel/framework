@@ -28,13 +28,12 @@ class BroadcasterTest extends TestCase
         $this->broadcaster = new FakeBroadcaster;
     }
 
-    protected function tearDown(): void {
-
-
+    protected function tearDown(): void
+    {
         Container::setInstance(null);
 
-    parent::tearDown();
-}
+        parent::tearDown();
+    }
 
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
