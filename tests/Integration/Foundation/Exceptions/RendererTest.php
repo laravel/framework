@@ -7,7 +7,7 @@ use Illuminate\Contracts\Foundation\ExceptionRenderer;
 use Illuminate\Foundation\Exceptions\Renderer\Listener;
 use Illuminate\Foundation\Exceptions\Renderer\Renderer;
 use Illuminate\Foundation\Providers\FoundationServiceProvider;
-use Mockery;
+use Mockery as m;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
 use RuntimeException;
@@ -89,11 +89,11 @@ class RendererTest extends TestCase
         $this->app->forgetInstance(ExceptionRenderer::class);
         $this->assertFalse($this->app->bound(ExceptionRenderer::class));
 
-        $listener = Mockery::mock(Listener::class);
+        $listener = m::mock(Listener::class);
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -114,11 +114,11 @@ class RendererTest extends TestCase
 
         $this->assertTrue($this->app->bound(ExceptionRenderer::class));
 
-        $listener = Mockery::mock(Listener::class);
+        $listener = m::mock(Listener::class);
         $listener->shouldReceive('registerListeners')->never();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();
@@ -130,11 +130,11 @@ class RendererTest extends TestCase
         $this->app->forgetInstance(ExceptionRenderer::class);
         $this->assertFalse($this->app->bound(ExceptionRenderer::class));
 
-        $listener = Mockery::mock(Listener::class);
+        $listener = m::mock(Listener::class);
         $listener->shouldReceive('registerListeners')->once();
 
         $this->app->instance(Listener::class, $listener);
-        $this->app->instance(Dispatcher::class, Mockery::mock(Dispatcher::class));
+        $this->app->instance(Dispatcher::class, m::mock(Dispatcher::class));
 
         $provider = $this->app->getProvider(FoundationServiceProvider::class);
         $provider->boot();

@@ -13,9 +13,9 @@ class CacheSessionStoreTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function testItemsCanBeSetAndRetrieved()

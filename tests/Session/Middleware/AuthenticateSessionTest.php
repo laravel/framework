@@ -8,22 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Session\ArraySessionHandler;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Store;
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class AuthenticateSessionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     public function test_handle_without_session()
     {
         $request = new Request;
         $next = fn () => 'next-1';
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->never();
 
         $middleware = new AuthenticateSession($authFactory);
@@ -38,7 +33,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession(new Store('name', new ArraySessionHandler(1)));
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->never();
 
         $next = fn () => 'next-2';
@@ -64,7 +59,7 @@ class AuthenticateSessionTest extends TestCase
         // set a password-less user:
         $request->setUserResolver(fn () => $user);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->never();
 
         $next = fn () => 'next-3';
@@ -90,7 +85,7 @@ class AuthenticateSessionTest extends TestCase
         $session = new Store('name', new ArraySessionHandler(1));
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(false);
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
         $authFactory->shouldReceive('user')->andReturn(null);
@@ -123,7 +118,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
         $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
         $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
@@ -172,7 +167,7 @@ class AuthenticateSessionTest extends TestCase
         // set session:
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
         $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
         $authFactory->shouldReceive('logoutCurrentDevice')->once();
@@ -217,7 +212,7 @@ class AuthenticateSessionTest extends TestCase
         // set session on the request:
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
         $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
         $authFactory->shouldReceive('logoutCurrentDevice')->once()->andReturn(null);
@@ -262,7 +257,7 @@ class AuthenticateSessionTest extends TestCase
         // set session on the request:
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(false);
         $authFactory->shouldReceive('getRecallerName')->never();
         $authFactory->shouldReceive('logoutCurrentDevice')->never();
@@ -303,7 +298,7 @@ class AuthenticateSessionTest extends TestCase
         $session->put('password_hash_web', 'my-pass-(*&^%$#!@');
         $request->setLaravelSession($session);
 
-        $authFactory = Mockery::mock(AuthFactory::class);
+        $authFactory = m::mock(AuthFactory::class);
         $authFactory->shouldReceive('viaRemember')->andReturn(true);
         $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
         $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');

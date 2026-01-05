@@ -14,11 +14,6 @@ use UnexpectedValueException;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
         $mocks = $this->getMocks();

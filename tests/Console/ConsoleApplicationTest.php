@@ -33,6 +33,8 @@ class ConsoleApplicationTest extends TestCase
     protected function tearDown(): void
     {
         $this->tearDownTheTestEnvironmentUsingMockery();
+
+        parent::tearDown();
     }
 
     public function testAddSetsLaravelInstance()

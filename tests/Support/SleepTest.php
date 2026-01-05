@@ -16,11 +16,11 @@ class SleepTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Sleep::fake(false);
 
         Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     public function testItSleepsForSeconds()

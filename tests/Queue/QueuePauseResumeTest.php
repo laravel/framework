@@ -41,12 +41,6 @@ class QueuePauseResumeTest extends TestCase
         $this->manager = new QueueManager($app);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
-
     public function testPauseQueueWithConnection()
     {
         $this->manager->pause('redis', 'default');
