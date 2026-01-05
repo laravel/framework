@@ -490,6 +490,10 @@ class SupportArrTest extends TestCase
 
         $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
+
+        // Depth of 0 returns array unchanged (as values)
+        $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
+        $this->assertEquals([['#foo', ['#bar', ['#baz']]], '#zap'], Arr::flatten($array, 0));
     }
 
     public function testGet()

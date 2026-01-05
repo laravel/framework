@@ -322,6 +322,10 @@ class Arr
      */
     public static function flatten($array, $depth = INF)
     {
+        if ($depth < 1) {
+            return array_values(static::from($array));
+        }
+
         $result = [];
 
         foreach ($array as $item) {

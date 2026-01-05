@@ -480,6 +480,10 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      */
     public function flatten($depth = INF)
     {
+        if ($depth < 1) {
+            return $this->values();
+        }
+
         $instance = new static(function () use ($depth) {
             foreach ($this as $item) {
                 if (! is_array($item) && ! $item instanceof Enumerable) {

@@ -1329,6 +1329,10 @@ class SupportCollectionTest extends TestCase
 
         $c = new $collection([['#foo', ['#bar', ['#baz']]], '#zap']);
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], $c->flatten(2)->all());
+
+        // Depth of 0 returns collection unchanged (as values)
+        $c = new $collection([['#foo', ['#bar', ['#baz']]], '#zap']);
+        $this->assertEquals([['#foo', ['#bar', ['#baz']]], '#zap'], $c->flatten(0)->all());
     }
 
     #[DataProvider('collectionClassProvider')]
