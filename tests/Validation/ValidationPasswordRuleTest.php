@@ -465,6 +465,39 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testNullableWithEmptyString()
+    {
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => ''],
+            ['password' => ['nullable', Password::min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => null],
+            ['password' => ['nullable', Password::min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+
+        $v = new Validator(
+            resolve('translator'),
+            ['password' => ''],
+            ['password' => ['nullable', Password::sometimes()->min(8)->letters()->numbers()]]
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testItCanReturnsAsUnpackedArray()
+    {
+        $this->assertSame(['required', 'string', 'min:8'], [...Password::required()]);
+        $this->assertSame(['sometimes', 'string', 'min:8'], [...Password::sometimes()]);
+    }
+
     protected function passes($rule, $values)
     {
         $this->assertValidationRules($rule, $values, true, []);
@@ -517,5 +550,7 @@ class ValidationPasswordRuleTest extends TestCase
         Facade::setFacadeApplication(null);
 
         Password::$defaultCallback = null;
+
+        parent::tearDown();
     }
 }

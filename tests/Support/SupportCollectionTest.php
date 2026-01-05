@@ -3354,6 +3354,60 @@ class SupportCollectionTest extends TestCase
     }
 
     #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForInvalidStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(0)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForNegativeStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(-1)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(-1);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(-1);
+    }
+
+    #[DataProvider('collectionClassProvider')]
     public function testMapWithKeysOverwritingKeys($collection)
     {
         $data = new $collection([

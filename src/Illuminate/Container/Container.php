@@ -1716,7 +1716,13 @@ class Container implements ArrayAccess, ContainerContract
     public function forgetScopedInstances()
     {
         foreach ($this->scopedInstances as $scoped) {
-            unset($this->instances[$scoped]);
+            if ($scoped instanceof Closure) {
+                foreach ($this->closureReturnTypes($scoped) as $type) {
+                    unset($this->instances[$type]);
+                }
+            } else {
+                unset($this->instances[$scoped]);
+            }
         }
     }
 

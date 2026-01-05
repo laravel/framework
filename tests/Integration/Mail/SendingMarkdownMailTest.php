@@ -92,7 +92,18 @@ class SendingMarkdownMailTest extends TestCase
 
         $this->assertStringContainsString('Embed multiline content: <img', $html);
         $this->assertStringContainsString('alt="multiline image"', $html);
-        $this->assertStringContainsString('<img src="cid:', $html);
+        $this->assertStringContainsString('src="data:image/png;base64,', $html);
+        $this->assertStringNotContainsString('src="cid:', $html);
+    }
+
+    public function testEmbeddedImagesAreInlinedWhenRenderingMailable()
+    {
+        $html = app('mailer')->render('embed-image', [
+            'image' => __DIR__.'/Fixtures/empty_image.jpg',
+        ]);
+
+        $this->assertStringContainsString('src="data:image/jpeg;base64,', $html);
+        $this->assertStringNotContainsString('src="cid:', $html);
     }
 
     public function testMessageAsPublicPropertyMayBeDefinedAsViewData()

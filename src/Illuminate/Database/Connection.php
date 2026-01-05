@@ -824,14 +824,17 @@ class Connection implements ConnectionInterface
         // message to include the bindings with SQL, which will make this exception a
         // lot more helpful to the developer instead of just the database's errors.
         catch (Exception $e) {
-            if ($this->isUniqueConstraintError($e)) {
-                throw new UniqueConstraintViolationException(
-                    $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestReadWriteTypeUsed()
-                );
-            }
+            $exceptionType = $this->isUniqueConstraintError($e)
+                ? UniqueConstraintViolationException::class
+                : QueryException::class;
 
-            throw new QueryException(
-                $this->getName(), $query, $this->prepareBindings($bindings), $e, $this->latestReadWriteTypeUsed()
+            throw new $exceptionType(
+                $this->getNameWithReadWriteType(),
+                $query,
+                $this->prepareBindings($bindings),
+                $e,
+                $this->getConnectionDetails(),
+                $this->latestReadWriteTypeUsed(),
             );
         }
     }
@@ -1346,13 +1349,15 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get the database connection full name.
+     * Get the database connection with its read / write type.
      *
      * @return string|null
      */
     public function getNameWithReadWriteType()
     {
-        return $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
+        $name = $this->getName().($this->readWriteType ? '::'.$this->readWriteType : '');
+
+        return empty($name) ? null : $name;
     }
 
     /**
@@ -1364,6 +1369,23 @@ class Connection implements ConnectionInterface
     public function getConfig($option = null)
     {
         return Arr::get($this->config, $option);
+    }
+
+    /**
+     * Get the basic connection information as an array for debugging.
+     *
+     * @return array
+     */
+    protected function getConnectionDetails()
+    {
+        return [
+            'driver' => $this->getDriverName(),
+            'name' => $this->getNameWithReadWriteType(),
+            'host' => $this->getConfig('host'),
+            'port' => $this->getConfig('port'),
+            'database' => $this->getConfig('database'),
+            'unix_socket' => $this->getConfig('unix_socket'),
+        ];
     }
 
     /**
@@ -1458,7 +1480,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the event dispatcher used by the connection.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \Illuminate\Contracts\Events\Dispatcher|null
      */
     public function getEventDispatcher()
     {

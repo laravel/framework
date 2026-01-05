@@ -16,11 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();
@@ -571,6 +566,112 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->missing(['hulk.two']));
     }
 
+    public function testBackedEnumKeyPut()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->get('user'));
+        $this->assertSame('Taylor', $session->get(SessionTestKey::User));
+    }
+
+    public function testBackedEnumKeyGet()
+    {
+        $session = $this->getSession();
+        $session->put('user', 'Taylor');
+
+        $this->assertSame('Taylor', $session->get(SessionTestKey::User));
+        $this->assertSame('default', $session->get(SessionTestKey::Settings, 'default'));
+    }
+
+    public function testBackedEnumKeyHas()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+
+        $this->assertTrue($session->has(SessionTestKey::User));
+        $this->assertTrue($session->has(SessionTestKey::User, SessionTestKey::Settings));
+        $this->assertTrue($session->has([SessionTestKey::User, SessionTestKey::Settings]));
+        $this->assertFalse($session->has(SessionTestKey::Preference));
+    }
+
+    public function testBackedEnumKeyForget()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+        $this->assertTrue($session->has('user'));
+
+        $session->forget(SessionTestKey::User);
+        $this->assertFalse($session->has('user'));
+
+        $session->put(SessionTestKey::User, 'Taylor');
+        $session->put(SessionTestKey::Settings, 'dark-mode');
+        $session->forget([SessionTestKey::User, SessionTestKey::Settings]);
+        $this->assertFalse($session->has('user'));
+        $this->assertFalse($session->has('settings'));
+    }
+
+    public function testBackedEnumKeyPull()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->pull(SessionTestKey::User));
+        $this->assertNull($session->pull(SessionTestKey::User));
+        $this->assertSame('default', $session->pull(SessionTestKey::User, 'default'));
+    }
+
+    public function testBackedEnumKeyRemember()
+    {
+        $session = $this->getSession();
+
+        $result = $session->remember(SessionTestKey::User, fn () => 'Taylor');
+
+        $this->assertSame('Taylor', $result);
+        $this->assertSame('Taylor', $session->get('user'));
+        $this->assertSame('Taylor', $session->remember(SessionTestKey::User, fn () => 'Otwell'));
+    }
+
+    public function testBackedEnumKeyPush()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, ['Taylor']);
+        $session->push(SessionTestKey::User, 'Otwell');
+
+        $this->assertSame(['Taylor', 'Otwell'], $session->get('user'));
+    }
+
+    public function testBackedEnumKeyIncrement()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 5);
+
+        $this->assertSame(6, $session->increment(SessionTestKey::User));
+        $this->assertSame(6, $session->get('user'));
+
+        $this->assertSame(10, $session->increment(SessionTestKey::User, 4));
+        $this->assertSame(10, $session->get('user'));
+    }
+
+    public function testBackedEnumKeyDecrement()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 5);
+
+        $this->assertSame(4, $session->decrement(SessionTestKey::User));
+        $this->assertSame(4, $session->get('user'));
+    }
+
+    public function testBackedEnumKeyRemove()
+    {
+        $session = $this->getSession();
+        $session->put(SessionTestKey::User, 'Taylor');
+
+        $this->assertSame('Taylor', $session->remove(SessionTestKey::User));
+        $this->assertFalse($session->has('user'));
+    }
+
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $session = $this->getSession();
@@ -698,4 +799,11 @@ class SessionStoreTest extends TestCase
     {
         return 'name';
     }
+}
+
+enum SessionTestKey: string
+{
+    case User = 'user';
+    case Settings = 'settings';
+    case Preference = 'preference';
 }

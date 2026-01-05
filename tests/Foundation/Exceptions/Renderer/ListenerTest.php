@@ -9,11 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class ListenerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function test_queries_returns_expected_shape_after_query_executed()
     {
         $connection = m::mock();

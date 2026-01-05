@@ -209,8 +209,6 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2], $results);
         $this->assertSame([2, 1], $timedOutWith);
-
-        m::close();
     }
 
     public function testTapEach()

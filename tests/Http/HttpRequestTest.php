@@ -25,11 +25,6 @@ include_once 'Enums.php';
 
 class HttpRequestTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testInstanceMethod()
     {
         $request = Request::create('');

@@ -64,11 +64,9 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null)
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
     {
         $value = Arr::get($array, $key, $default);
 

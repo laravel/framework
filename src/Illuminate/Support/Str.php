@@ -260,8 +260,8 @@ class Str
     public static function chopStart($subject, $needle)
     {
         foreach ((array) $needle as $n) {
-            if (str_starts_with($subject, $n)) {
-                return substr($subject, strlen($n));
+            if ($n !== '' && str_starts_with($subject, $n)) {
+                return mb_substr($subject, mb_strlen($n));
             }
         }
 
@@ -278,8 +278,8 @@ class Str
     public static function chopEnd($subject, $needle)
     {
         foreach ((array) $needle as $n) {
-            if (str_ends_with($subject, $n)) {
-                return substr($subject, 0, -strlen($n));
+            if ($n !== '' && str_ends_with($subject, $n)) {
+                return mb_substr($subject, 0, -mb_strlen($n));
             }
         }
 

@@ -1340,8 +1340,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                     ->all();
             });
         });
-
-        m::close();
     }
 
     public function testTakeWhileIsLazy()

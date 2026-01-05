@@ -41,11 +41,11 @@ class QueueWorkerTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow();
 
         Container::setInstance();
+
+        parent::tearDown();
     }
 
     public function testJobCanBeFired()

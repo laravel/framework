@@ -65,13 +65,6 @@ class HttpClientTest extends TestCase
         RequestException::truncate();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testStubbedResponsesAreReturnedAfterFaking()
     {
         $this->factory->fake();

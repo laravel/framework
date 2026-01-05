@@ -44,7 +44,7 @@ trait InteractsWithIO
     protected $verbosity = OutputInterface::VERBOSITY_NORMAL;
 
     /**
-     * The mapping between human readable verbosity levels and Symfony's OutputInterface.
+     * The mapping between human-readable verbosity levels and Symfony's OutputInterface.
      *
      * @var array
      */
