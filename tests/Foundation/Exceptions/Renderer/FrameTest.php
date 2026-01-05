@@ -11,10 +11,11 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class FrameTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     #[RequiresOperatingSystem('Linux|DAR')]
     #[DataProvider('unixFileDataProvider')]

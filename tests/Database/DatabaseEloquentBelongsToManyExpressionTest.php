@@ -101,12 +101,13 @@ class DatabaseEloquentBelongsToManyExpressionTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('posts');
+    protected function tearDown(): void {
+    $this->schema()->drop('posts');
         $this->schema()->drop('tags');
         $this->schema()->drop('taggables');
-    }
+
+    parent::tearDown();
+}
 
     /**
      * Helpers...

@@ -52,10 +52,11 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testClearWithNoStoreArgument()
     {

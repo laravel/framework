@@ -30,7 +30,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     #[\Override]
     protected function tearDown(): void
     {
-        parent::tearDown();
+
 
         JsonResource::flushState();
         JsonApiResource::flushState();

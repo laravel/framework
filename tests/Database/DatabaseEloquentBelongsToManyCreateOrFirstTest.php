@@ -24,11 +24,12 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         Carbon::setTestNow('2023-01-01 00:00:00');
     }
 
-    protected function tearDown(): void
-    {
-        Carbon::setTestNow();
+    protected function tearDown(): void {
+    Carbon::setTestNow();
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testCreateOrFirstMethodCreatesNewRelated(): void
     {

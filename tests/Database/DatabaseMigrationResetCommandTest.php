@@ -13,11 +13,12 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        ResetCommand::prohibit(false);
+    protected function tearDown(): void {
+    ResetCommand::prohibit(false);
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testResetCommandCallsMigratorWithProperArguments()
     {

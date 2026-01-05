@@ -12,11 +12,11 @@ use Symfony\Component\Process\Process;
 
 class DatabaseSqliteSchemaStateTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testLoadSchemaToDatabase(): void
     {

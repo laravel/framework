@@ -15,12 +15,13 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        unset($_SERVER['__mailer.test']);
+    protected function tearDown(): void {
+    unset($_SERVER['__mailer.test']);
 
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testMailerSendSendsMessageWithProperViewContent(): void
     {

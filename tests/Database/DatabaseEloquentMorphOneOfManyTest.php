@@ -47,11 +47,12 @@ class DatabaseEloquentMorphOneOfManyTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('products');
+    protected function tearDown(): void {
+    $this->schema()->drop('products');
         $this->schema()->drop('states');
-    }
+
+    parent::tearDown();
+}
 
     public function testEagerLoadingAppliesConstraintsToInnerJoinSubQuery()
     {

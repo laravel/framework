@@ -58,13 +58,14 @@ class DatabaseEloquentTimestampsTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('users');
+    protected function tearDown(): void {
+    $this->schema()->drop('users');
         $this->schema()->drop('users_created_at');
         $this->schema()->drop('users_updated_at');
         Carbon::setTestNow(null);
-    }
+
+    parent::tearDown();
+}
 
     /**
      * Tests...

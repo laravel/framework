@@ -19,13 +19,12 @@ class FoundationViteTest extends TestCase
         app('config')->set('app.asset_url', 'https://example.com');
     }
 
-    protected function tearDown(): void
-    {
-        $this->cleanViteManifest();
+    protected function tearDown(): void {
+    $this->cleanViteManifest();
         $this->cleanViteHotFile();
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testViteWithJsOnly()
     {

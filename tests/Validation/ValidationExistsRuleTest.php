@@ -306,10 +306,11 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema('default')->drop('users');
-    }
+    protected function tearDown(): void {
+    $this->schema('default')->drop('users');
+
+    parent::tearDown();
+}
 
     public function getIlluminateArrayTranslator()
     {

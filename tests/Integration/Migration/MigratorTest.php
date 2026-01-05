@@ -30,12 +30,11 @@ class MigratorTest extends TestCase
         $this->subject->getRepository()->createRepository();
     }
 
-    protected function tearDown(): void
-    {
-        Migrator::withoutMigrations([]);
+    protected function tearDown(): void {
+    Migrator::withoutMigrations([]);
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testMigrate()
     {

@@ -137,13 +137,12 @@ class FileCacheLockTest extends TestCase
         Cache::lock('foo', 10)->block(5);
     }
 
-    protected function tearDown(): void
-    {
-        try {
+    protected function tearDown(): void {
+    try {
             Cache::lock('foo')->forceRelease();
         } catch (Throwable) {
         }
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 }

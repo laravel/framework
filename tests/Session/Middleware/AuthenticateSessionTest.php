@@ -13,10 +13,11 @@ use PHPUnit\Framework\TestCase;
 
 class AuthenticateSessionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function test_handle_without_session()
     {

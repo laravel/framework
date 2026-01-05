@@ -41,11 +41,11 @@ class QueuePauseResumeTest extends TestCase
         $this->manager = new QueueManager($app);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testPauseQueueWithConnection()
     {

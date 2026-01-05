@@ -73,12 +73,13 @@ class EloquentModelCustomCastingTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('casting_table');
+    protected function tearDown(): void {
+    $this->schema()->drop('casting_table');
         $this->schema()->drop('members');
         $this->schema()->drop('documents');
-    }
+
+    parent::tearDown();
+}
 
     #[RequiresPhpExtension('gmp')]
     public function testSavingCastedAttributesToDatabase()

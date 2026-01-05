@@ -44,11 +44,11 @@ class CacheCommandMutexTest extends TestCase
         };
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-        parent::tearDown();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testCanCreateMutex()
     {

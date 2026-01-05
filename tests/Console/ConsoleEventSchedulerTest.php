@@ -33,10 +33,11 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testMutexCanReceiveCustomStore()
     {

@@ -63,12 +63,13 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('users');
+    protected function tearDown(): void {
+    $this->schema()->drop('users');
         $this->schema()->drop('contracts');
         $this->schema()->drop('positions');
-    }
+
+    parent::tearDown();
+}
 
     public function testItLoadsAHasOneThroughRelationWithCustomKeys()
     {

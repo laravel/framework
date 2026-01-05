@@ -22,12 +22,13 @@ class FoundationFormRequestTest extends TestCase
 {
     protected $mocks = [];
 
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         $this->mocks = [];
-    }
+
+    parent::tearDown();
+}
 
     public function testValidatedMethodReturnsTheValidatedData()
     {

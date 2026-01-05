@@ -20,10 +20,11 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testCache()
     {

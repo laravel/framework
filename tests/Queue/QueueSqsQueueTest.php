@@ -41,10 +41,11 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedReceiveEmptyMessageResponseModel;
     protected $mockedQueueAttributesResponseModel;
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     protected function setUp(): void
     {

@@ -12,10 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
+    protected function tearDown(): void {
+    Container::setInstance(null);
+
+    parent::tearDown();
+}
 
     public function testBasicGateCheck()
     {

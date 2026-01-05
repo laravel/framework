@@ -26,12 +26,11 @@ class SchemaStateTest extends TestCase
         remote('migrate:install');
     }
 
-    protected function tearDown(): void
-    {
-        remote('db:wipe')->mustRun();
+    protected function tearDown(): void {
+    remote('db:wipe')->mustRun();
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     #[RequiresOperatingSystem('Linux|Darwin')]
     public function testSchemaDumpOnSqlite()

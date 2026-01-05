@@ -53,12 +53,11 @@ class AssertRedirectToActionTest extends TestCase
             ->assertRedirectToAction([TestActionController::class, 'show'], ['id' => 123]);
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Facade::setFacadeApplication(null);
 
-        Facade::setFacadeApplication(null);
-    }
+    parent::tearDown();
+}
 }
 
 class TestActionController extends Controller

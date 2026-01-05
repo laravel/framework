@@ -46,10 +46,11 @@ class RoutingRedirectorTest extends TestCase
         $this->redirect->setSession($this->session);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testBasicRedirectTo()
     {

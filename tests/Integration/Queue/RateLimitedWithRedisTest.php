@@ -31,12 +31,11 @@ class RateLimitedWithRedisTest extends TestCase
         $this->setUpRedis();
     }
 
-    protected function tearDown(): void
-    {
-        $this->tearDownRedis();
+    protected function tearDown(): void {
+    $this->tearDownRedis();
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testUnlimitedJobsAreExecuted()
     {

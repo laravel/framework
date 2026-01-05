@@ -33,13 +33,14 @@ class SupportServiceProviderTest extends TestCase
         $two->boot();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
         if (isset($this->tempFile) && file_exists($this->tempFile)) {
             @unlink($this->tempFile);
         }
-    }
+
+    parent::tearDown();
+}
 
     public function testPublishableServiceProviders()
     {

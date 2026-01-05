@@ -17,13 +17,12 @@ use Throwable;
 #[WithConfig('queue.connections.sqs.after_commit', true)]
 class QueueConnectionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        QueueConnectionTestJob::$ran = false;
+    protected function tearDown(): void {
+    QueueConnectionTestJob::$ran = false;
         QueueConnectionTestUniqueJob::$ran = false;
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testJobWontGetDispatchedInsideATransaction()
     {

@@ -11,12 +11,13 @@ use PHPUnit\Framework\TestCase;
 
 class FailoverQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         Container::setInstance(null);
-    }
+
+    parent::tearDown();
+}
 
     public function test_push_fails_over_on_exception()
     {

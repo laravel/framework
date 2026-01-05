@@ -58,9 +58,8 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        foreach (['default'] as $connection) {
+    protected function tearDown(): void {
+    foreach (['default'] as $connection) {
             $this->schema($connection)->drop('posts');
             $this->schema($connection)->drop('images');
             $this->schema($connection)->drop('tags');
@@ -68,7 +67,9 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
-    }
+
+    parent::tearDown();
+}
 
     public function testCreation()
     {

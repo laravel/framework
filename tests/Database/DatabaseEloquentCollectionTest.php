@@ -58,13 +58,14 @@ class DatabaseEloquentCollectionTest extends TestCase
         });
     }
 
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('users');
+    protected function tearDown(): void {
+    $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('comments');
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testAddingItemsToCollection()
     {

@@ -15,10 +15,11 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class InteractsWithIOTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     #[DataProvider('iterableDataProvider')]
     public function testWithProgressBarIterable($iterable)

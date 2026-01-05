@@ -11,10 +11,11 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseProcessorTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testInsertGetIdProcessing()
     {

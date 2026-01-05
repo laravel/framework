@@ -79,10 +79,11 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler = new Handler($this->container);
     }
 
-    protected function tearDown(): void
-    {
-        Container::setInstance(null);
-    }
+    protected function tearDown(): void {
+    Container::setInstance(null);
+
+    parent::tearDown();
+}
 
     public function testHandlerReportsExceptionAsContext()
     {

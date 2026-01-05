@@ -70,16 +70,15 @@ class DatabaseEloquentModelTest extends TestCase
 
     protected $encrypter;
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
+    protected function tearDown(): void {
+    m::close();
         Carbon::setTestNow(null);
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();
-    }
+
+    parent::tearDown();
+}
 
     public function testAttributeManipulation()
     {

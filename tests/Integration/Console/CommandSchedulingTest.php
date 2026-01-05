@@ -51,17 +51,16 @@ class CommandSchedulingTest extends TestCase
         $this->writeArtisanScript();
     }
 
-    protected function tearDown(): void
-    {
-        $this->fs->delete($this->logfile);
+    protected function tearDown(): void {
+    $this->fs->delete($this->logfile);
         $this->fs->delete(base_path('artisan'));
 
         if (! is_null($this->originalArtisan)) {
             $this->fs->put(base_path('artisan'), $this->originalArtisan);
         }
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     #[DataProvider('executionProvider')]
     public function testExecutionOrder($background, $expected): void

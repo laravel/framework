@@ -16,10 +16,11 @@ use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function test_pending_batch_may_be_configured_and_dispatched()
     {

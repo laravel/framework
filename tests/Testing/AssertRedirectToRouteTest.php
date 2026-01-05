@@ -84,10 +84,9 @@ class AssertRedirectToRouteTest extends TestCase
             ->assertRedirectToRoute('route-with-empty-uri', ['foo' => 'bar']);
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Facade::setFacadeApplication(null);
 
-        Facade::setFacadeApplication(null);
-    }
+    parent::tearDown();
+}
 }

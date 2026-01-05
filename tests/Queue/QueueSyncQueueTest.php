@@ -19,12 +19,13 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSyncQueueTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         Container::setInstance(null);
-    }
+
+    parent::tearDown();
+}
 
     public function testPushShouldFireJobInstantly()
     {

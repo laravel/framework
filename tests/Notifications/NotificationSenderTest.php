@@ -21,12 +21,11 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NotificationSenderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    m::close();
 
-        m::close();
-    }
+    parent::tearDown();
+}
 
     public function testItCanSendQueuedNotificationsWithAStringVia()
     {

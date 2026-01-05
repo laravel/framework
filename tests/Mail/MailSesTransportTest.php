@@ -19,12 +19,11 @@ use Symfony\Component\Mime\Email;
 
 class MailSesTransportTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testGetTransport(): void
     {

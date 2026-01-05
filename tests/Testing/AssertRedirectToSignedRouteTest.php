@@ -95,10 +95,9 @@ class AssertRedirectToSignedRouteTest extends TestCase
             ->assertRedirectToSignedRoute('signed-route');
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Facade::setFacadeApplication(null);
 
-        Facade::setFacadeApplication(null);
-    }
+    parent::tearDown();
+}
 }

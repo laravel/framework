@@ -9,12 +9,11 @@ use SessionHandlerInterface;
 
 class ArraySessionHandlerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Carbon::setTestNow(null);
 
-        Carbon::setTestNow(null);
-    }
+    parent::tearDown();
+}
 
     public function test_it_implements_the_session_handler_interface()
     {

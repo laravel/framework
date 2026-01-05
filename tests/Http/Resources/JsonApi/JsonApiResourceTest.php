@@ -9,11 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class JsonApiResourceTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        JsonResource::flushState();
+    protected function tearDown(): void {
+    JsonResource::flushState();
         JsonApiResource::flushState();
-    }
+
+    parent::tearDown();
+}
 
     public function testResponseWrapperIsHardCodedToData()
     {

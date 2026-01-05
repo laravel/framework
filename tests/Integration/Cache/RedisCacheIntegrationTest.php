@@ -21,11 +21,11 @@ class RedisCacheIntegrationTest extends TestCase
         $this->setUpRedis();
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $this->tearDownRedis();
-    }
+    protected function tearDown(): void {
+    $this->tearDownRedis();
+
+    parent::tearDown();
+}
 
     /**
      * @param  string  $driver

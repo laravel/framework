@@ -16,10 +16,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FoundationApplicationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {

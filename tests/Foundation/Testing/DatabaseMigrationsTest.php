@@ -42,12 +42,13 @@ class DatabaseMigrationsTest extends TestCase
         $this->withoutMockingConsoleOutput();
     }
 
-    protected function tearDown(): void
-    {
-        $this->tearDownTheApplicationTestingHooks();
+    protected function tearDown(): void {
+    $this->tearDownTheApplicationTestingHooks();
 
         RefreshDatabaseState::$migrated = false;
-    }
+
+    parent::tearDown();
+}
 
     protected function refreshApplication()
     {

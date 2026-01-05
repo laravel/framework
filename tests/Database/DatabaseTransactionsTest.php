@@ -51,14 +51,15 @@ class DatabaseTransactionsTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        foreach (['default', 'second_connection'] as $connection) {
+    protected function tearDown(): void {
+    foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');
         }
 
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testTransactionIsRecordedAndCommitted()
     {

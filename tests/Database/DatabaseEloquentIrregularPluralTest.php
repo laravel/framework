@@ -53,16 +53,15 @@ class DatabaseEloquentIrregularPluralTest extends TestCase
         });
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->schema()->drop('irregular_plural_tokens');
+    protected function tearDown(): void {
+    $this->schema()->drop('irregular_plural_tokens');
         $this->schema()->drop('irregular_plural_humans');
         $this->schema()->drop('irregular_plural_human_irregular_plural_token');
 
         Carbon::setTestNow(null);
-    }
+
+    parent::tearDown();
+}
 
     protected function schema()
     {

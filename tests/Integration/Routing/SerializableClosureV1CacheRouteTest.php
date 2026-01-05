@@ -42,7 +42,7 @@ class SerializableClosureV1CacheRouteTest extends TestCase
     {
         unset($_ENV['APP_ROUTES_CACHE']);
 
-        parent::tearDown();
+
     }
 
     public function testItCanUseCachedRouteFromSerializableClosureV1()

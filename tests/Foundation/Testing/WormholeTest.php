@@ -10,12 +10,11 @@ use PHPUnit\Framework\TestCase;
 
 class WormholeTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Date::useDefault();
 
-        Date::useDefault();
-    }
+    parent::tearDown();
+}
 
     public function testCanTravelBackToPresent()
     {

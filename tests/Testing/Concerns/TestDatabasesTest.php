@@ -96,16 +96,15 @@ class TestDatabasesTest extends TestCase
         ];
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        Container::setInstance(null);
+    protected function tearDown(): void {
+    Container::setInstance(null);
         DB::clearResolvedInstance();
         DB::setFacadeApplication(null);
 
         unset($_SERVER['LARAVEL_PARALLEL_TESTING']);
 
         m::close();
-    }
+
+    parent::tearDown();
+}
 }

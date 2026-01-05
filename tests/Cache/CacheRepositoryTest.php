@@ -31,12 +31,13 @@ class CacheRepositoryTest extends TestCase
         Carbon::setTestNow(Carbon::parse(self::getTestDate()));
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         Carbon::setTestNow(null);
-    }
+
+    parent::tearDown();
+}
 
     public function testGetReturnsValueFromCache()
     {

@@ -24,10 +24,11 @@ use PHPUnit\Framework\TestCase;
 
 class CacheEventsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testHasTriggersEvents()
     {

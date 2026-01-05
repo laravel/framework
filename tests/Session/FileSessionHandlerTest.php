@@ -25,10 +25,11 @@ class FileSessionHandlerTest extends TestCase
         $this->sessionHandler = new FileSessionHandler($this->files, '/path/to/sessions', 30);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function test_open()
     {

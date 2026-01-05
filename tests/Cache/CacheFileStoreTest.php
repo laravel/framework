@@ -13,12 +13,11 @@ use PHPUnit\Framework\TestCase;
 
 class CacheFileStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Carbon::setTestNow(null);
 
-        Carbon::setTestNow(null);
-    }
+    parent::tearDown();
+}
 
     public function testNullIsReturnedIfFileDoesntExist()
     {

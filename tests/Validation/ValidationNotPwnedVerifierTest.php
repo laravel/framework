@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationNotPwnedVerifierTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         Container::setInstance(null);
-    }
+
+    parent::tearDown();
+}
 
     public function testEmptyValues()
     {

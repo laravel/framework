@@ -33,13 +33,14 @@ class HandleExceptionsTest extends TestCase
         });
     }
 
-    protected function tearDown(): void
-    {
-        Application::setInstance(null);
+    protected function tearDown(): void {
+    Application::setInstance(null);
         HandleExceptions::flushState($this);
 
         m::close();
-    }
+
+    parent::tearDown();
+}
 
     public function testPhpDeprecations()
     {

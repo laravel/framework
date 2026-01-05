@@ -133,14 +133,15 @@ class SeedCommandTest extends TestCase
         Assert::assertSame(Command::FAILURE, $command->handle());
     }
 
-    protected function tearDown(): void
-    {
-        SeedCommand::prohibit(false);
+    protected function tearDown(): void {
+    SeedCommand::prohibit(false);
 
         Model::unsetEventDispatcher();
 
         m::close();
-    }
+
+    parent::tearDown();
+}
 }
 
 class UserWithoutModelEventsSeeder extends Seeder

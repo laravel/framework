@@ -27,12 +27,11 @@ class AblyBroadcasterTest extends TestCase
         $this->broadcaster = m::mock(AblyBroadcaster::class, [$this->ably])->makePartial();
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    m::close();
 
-        m::close();
-    }
+    parent::tearDown();
+}
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {

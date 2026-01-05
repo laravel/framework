@@ -18,11 +18,11 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake = new EventFake(m::mock(Dispatcher::class));
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testAssertDispatched()
     {

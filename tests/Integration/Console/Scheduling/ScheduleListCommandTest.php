@@ -306,12 +306,11 @@ class ScheduleListCommandTest extends TestCase
             ->expectsOutput('  * */3 * * * 1s   php artisan six ............... Next Due: 1 second from now');
     }
 
-    protected function tearDown(): void
-    {
-        putenv('SHELL_VERBOSITY');
+    protected function tearDown(): void {
+    putenv('SHELL_VERBOSITY');
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 }
 
 class FooCommand extends Command

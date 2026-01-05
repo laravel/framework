@@ -37,16 +37,17 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
-    protected function tearDown(): void
-    {
-        $filesystem = new Filesystem(
+    protected function tearDown(): void {
+    $filesystem = new Filesystem(
             $this->adapter = new LocalFilesystemAdapter(dirname($this->tempDir))
         );
         $filesystem->deleteDirectory(basename($this->tempDir));
         m::close();
 
         unset($this->tempDir, $this->filesystem, $this->adapter);
-    }
+
+    parent::tearDown();
+}
 
     public function testResponse()
     {

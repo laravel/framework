@@ -13,10 +13,11 @@ use RuntimeException;
 
 class LogLoggerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testMethodsPassErrorAdditionsToMonolog()
     {

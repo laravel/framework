@@ -107,12 +107,11 @@ class EventListCommandTest extends TestCase
         $this->assertStringNotContainsString('ExampleSubscriberEventName', $output);
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    EventListCommand::resolveEventsUsing(null);
 
-        EventListCommand::resolveEventsUsing(null);
-    }
+    parent::tearDown();
+}
 }
 
 class ExampleSubscriber

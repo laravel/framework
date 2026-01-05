@@ -21,11 +21,8 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class MiddlewareTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
@@ -33,7 +30,9 @@ class MiddlewareTest extends TestCase
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
-    }
+
+    parent::tearDown();
+}
 
     public function testConvertEmptyStringsToNull()
     {

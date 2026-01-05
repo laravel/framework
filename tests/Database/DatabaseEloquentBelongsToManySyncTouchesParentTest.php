@@ -60,12 +60,13 @@ class DatabaseEloquentBelongsToManySyncTouchesParentTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('users');
+    protected function tearDown(): void {
+    $this->schema()->drop('users');
         $this->schema()->drop('articles');
         $this->schema()->drop('article_user');
-    }
+
+    parent::tearDown();
+}
 
     /**
      * Helpers...

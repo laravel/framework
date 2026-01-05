@@ -23,10 +23,11 @@ class LengthAwarePaginatorTest extends TestCase
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2, $this->options);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->p);
-    }
+    protected function tearDown(): void {
+    unset($this->p);
+
+    parent::tearDown();
+}
 
     public function testLengthAwarePaginatorGetAndSetPageName()
     {

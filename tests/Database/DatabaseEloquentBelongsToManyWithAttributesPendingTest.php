@@ -172,12 +172,13 @@ class DatabaseEloquentBelongsToManyWithAttributesPendingTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('pending_attributes_posts');
+    protected function tearDown(): void {
+    $this->schema()->drop('pending_attributes_posts');
         $this->schema()->drop('pending_attributes_tags');
         $this->schema()->drop('pending_attributes_pivot');
-    }
+
+    parent::tearDown();
+}
 
     /**
      * Get a database connection instance.

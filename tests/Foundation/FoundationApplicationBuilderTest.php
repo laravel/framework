@@ -8,16 +8,15 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationApplicationBuilderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
+    protected function tearDown(): void {
+    m::close();
 
         unset($_ENV['APP_BASE_PATH']);
 
         unset($_ENV['LARAVEL_STORAGE_PATH'], $_SERVER['LARAVEL_STORAGE_PATH']);
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testBaseDirectoryWithArg()
     {

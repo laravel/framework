@@ -29,13 +29,12 @@ class JobEncryptionTest extends DatabaseTestCase
         $app['config']->set('queue.default', 'database');
     }
 
-    protected function tearDown(): void
-    {
-        JobEncryptionTestEncryptedJob::$ran = false;
+    protected function tearDown(): void {
+    JobEncryptionTestEncryptedJob::$ran = false;
         JobEncryptionTestNonEncryptedJob::$ran = false;
 
-        parent::tearDown();
-    }
+    parent::tearDown();
+}
 
     public function testEncryptedJobPayloadIsStoredEncrypted()
     {

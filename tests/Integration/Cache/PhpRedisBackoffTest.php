@@ -28,11 +28,11 @@ class PhpRedisBackoffTest extends TestCase
         }
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        $this->tearDownRedis();
-    }
+    protected function tearDown(): void {
+    $this->tearDownRedis();
+
+    parent::tearDown();
+}
 
     #[DataProvider('phpRedisBackoffAlgorithmsProvider')]
     public function testPhpRedisBackoffAlgorithmParsing($friendlyAlgorithmName, $expectedAlgorithm)

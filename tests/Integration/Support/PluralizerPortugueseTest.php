@@ -15,12 +15,11 @@ class PluralizerPortugueseTest extends TestCase
         Pluralizer::useLanguage('portuguese');
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    Pluralizer::useLanguage('english');
 
-        Pluralizer::useLanguage('english');
-    }
+    parent::tearDown();
+}
 
     public function testBasicSingular()
     {

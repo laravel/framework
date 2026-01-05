@@ -22,10 +22,11 @@ class DatabaseEloquentWithAttributesPendingTest extends TestCase
         $db->setAsGlobal();
     }
 
-    protected function tearDown(): void
-    {
-        $this->schema()->dropIfExists((new PendingAttributesModel)->getTable());
-    }
+    protected function tearDown(): void {
+    $this->schema()->dropIfExists((new PendingAttributesModel)->getTable());
+
+    parent::tearDown();
+}
 
     public function testAddsAttributes(): void
     {

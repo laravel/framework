@@ -14,10 +14,11 @@ use UnexpectedValueException;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
+    protected function tearDown(): void {
+    m::close();
+
+    parent::tearDown();
+}
 
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {

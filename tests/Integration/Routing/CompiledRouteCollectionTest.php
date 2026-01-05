@@ -32,12 +32,11 @@ class CompiledRouteCollectionTest extends TestCase
         $this->routeCollection = new RouteCollection;
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
+    protected function tearDown(): void {
+    unset($this->routeCollection, $this->router);
 
-        unset($this->routeCollection, $this->router);
-    }
+    parent::tearDown();
+}
 
     /**
      * @return \Illuminate\Routing\CompiledRouteCollection

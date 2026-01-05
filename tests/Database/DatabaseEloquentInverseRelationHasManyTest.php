@@ -52,11 +52,12 @@ class DatabaseEloquentInverseRelationHasManyTest extends TestCase
      *
      * @return void
      */
-    protected function tearDown(): void
-    {
-        $this->schema()->drop('test_users');
+    protected function tearDown(): void {
+    $this->schema()->drop('test_users');
         $this->schema()->drop('test_posts');
-    }
+
+    parent::tearDown();
+}
 
     public function testHasManyInverseRelationIsProperlySetToParentWhenLazyLoaded()
     {
