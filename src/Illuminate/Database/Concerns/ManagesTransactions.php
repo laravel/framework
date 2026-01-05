@@ -130,6 +130,10 @@ trait ManagesTransactions
      */
     protected function handleTransactionExceptionBackoff($backoff, Throwable $e, $currentAttempt, $maxAttempts): void
     {
+        if (is_null($backoff)) {
+            return;
+        }
+
         $duration = (int) match (true) {
             is_int($backoff) => $backoff,
             is_array($backoff) => $backoff[$currentAttempt - 1] ?? end($backoff),
