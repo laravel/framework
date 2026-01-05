@@ -12,12 +12,6 @@ use Symfony\Component\Process\Process;
 
 class DatabaseSqliteSchemaStateTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testLoadSchemaToDatabase(): void
     {
         $config = ['driver' => 'sqlite', 'database' => 'database/database.sqlite', 'prefix' => '', 'foreign_key_constraints' => true, 'name' => 'sqlite'];

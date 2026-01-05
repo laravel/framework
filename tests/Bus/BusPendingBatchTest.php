@@ -16,12 +16,6 @@ use stdClass;
 
 class BusPendingBatchTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function test_pending_batch_may_be_configured_and_dispatched()
     {
         $container = new Container;

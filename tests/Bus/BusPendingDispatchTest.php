@@ -33,12 +33,6 @@ class BusPendingDispatchTest extends TestCase
         parent::setUp();
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testOnConnection()
     {
         $this->job->shouldReceive('onConnection')->once()->with('test-connection');

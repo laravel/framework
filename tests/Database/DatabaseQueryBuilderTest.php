@@ -39,12 +39,6 @@ class DatabaseQueryBuilderTest extends TestCase
 {
     protected $called;
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicSelect()
     {
         $builder = $this->getBuilder();

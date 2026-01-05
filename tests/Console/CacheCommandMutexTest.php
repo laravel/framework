@@ -44,12 +44,6 @@ class CacheCommandMutexTest extends TestCase
         };
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCanCreateMutex()
     {
         $this->mockUsingCacheStore();

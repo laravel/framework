@@ -13,12 +13,6 @@ use Throwable;
 
 class BroadcastEventTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicEventBroadcastParameterFormatting()
     {
         $broadcaster = m::mock(Broadcaster::class);

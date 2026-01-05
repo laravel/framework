@@ -17,12 +17,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class CommandTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCallingClassCommandResolveCommandViaApplicationResolution()
     {
         $command = new class extends Command

@@ -10,12 +10,6 @@ use stdClass;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);

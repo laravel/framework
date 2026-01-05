@@ -12,12 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpExtension('memcached')]
 class CacheMemcachedStoreTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testGetReturnsNullWhenNotFound()
     {
         $memcache = $this->getMockBuilder(Memcached::class)->onlyMethods(['get', 'getResultCode'])->getMock();

@@ -15,12 +15,6 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     protected $related;
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testLookupDictionaryIsProperlyConstructedForEnums()
     {
         $relation = $this->getRelation();

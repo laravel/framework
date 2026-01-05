@@ -13,12 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class AuthenticateSessionTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function test_handle_without_session()
     {
         $request = new Request;

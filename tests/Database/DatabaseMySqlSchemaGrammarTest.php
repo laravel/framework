@@ -14,12 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicCreateTable()
     {
         $conn = $this->getConnection();

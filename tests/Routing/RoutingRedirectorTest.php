@@ -46,12 +46,6 @@ class RoutingRedirectorTest extends TestCase
         $this->redirect->setSession($this->session);
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicRedirectTo()
     {
         $response = $this->redirect->to('bar');

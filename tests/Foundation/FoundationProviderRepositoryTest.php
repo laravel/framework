@@ -14,12 +14,6 @@ use stdClass;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = m::mock(Application::class);

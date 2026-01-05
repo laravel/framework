@@ -10,12 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresQueryGrammarTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testToRawSql()
     {
         $connection = m::mock(Connection::class);

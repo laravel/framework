@@ -12,12 +12,6 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationInstallCommandTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testFireCallsRepositoryToInstall()
     {
         $command = new InstallCommand($repo = m::mock(MigrationRepositoryInterface::class));

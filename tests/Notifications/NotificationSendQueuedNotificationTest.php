@@ -14,12 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testNotificationsCanBeSent()
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');

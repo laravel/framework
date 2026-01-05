@@ -12,12 +12,6 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
         $command = new RollbackCommand($migrator = m::mock(Migrator::class));

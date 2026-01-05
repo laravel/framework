@@ -17,12 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testMailableSetsRecipientsCorrectly(): void
     {
         $this->stubMailer();

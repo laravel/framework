@@ -13,12 +13,6 @@ class SupportCapsuleManagerTraitTest extends TestCase
 {
     use CapsuleManagerTrait;
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testSetupContainerForCapsule()
     {
         $this->container = null;

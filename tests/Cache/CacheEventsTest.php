@@ -24,12 +24,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheEventsTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testHasTriggersEvents()
     {
         $dispatcher = $this->getDispatcher();

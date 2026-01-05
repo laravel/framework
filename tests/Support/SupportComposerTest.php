@@ -12,12 +12,6 @@ use function Illuminate\Support\php_binary;
 
 class SupportComposerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testDumpAutoloadRunsTheCorrectCommand()
     {
         $composer = $this->mockComposer(['composer', 'dump-autoload']);

@@ -20,12 +20,6 @@ class CacheBasedSessionHandlerTest extends TestCase
         $this->sessionHandler = new CacheBasedSessionHandler(cache: $this->cacheMock, minutes: 10);
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function test_open()
     {
         $result = $this->sessionHandler->open('path', 'session_name');

@@ -25,12 +25,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicReturnsNullOnValidAttempt()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();

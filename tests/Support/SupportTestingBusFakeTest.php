@@ -26,12 +26,6 @@ class SupportTestingBusFakeTest extends TestCase
         $this->fake = new BusFake(m::mock(QueueingDispatcher::class));
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testItUsesCustomBusRepository()
     {
         $busRepository = new BatchRepositoryFake;

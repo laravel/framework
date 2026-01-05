@@ -16,12 +16,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentInverseRelationTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBuilderCallbackIsNotAppliedWhenInverseRelationIsNotSet()
     {
         $builder = m::mock(Builder::class);

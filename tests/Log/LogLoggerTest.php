@@ -13,12 +13,6 @@ use RuntimeException;
 
 class LogLoggerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));

@@ -13,12 +13,6 @@ use stdClass;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();

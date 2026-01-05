@@ -13,12 +13,6 @@ use stdClass;
 
 class DatabaseEloquentBelongsToManyWithCastedAttributesTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testModelsAreProperlyMatchedToParents()
     {
         $relation = $this->getRelation();

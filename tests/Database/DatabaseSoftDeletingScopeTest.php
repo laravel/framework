@@ -15,12 +15,6 @@ use stdClass;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testApplyingScopeToABuilder()
     {
         $scope = m::mock(SoftDeletingScope::class.'[extend]');

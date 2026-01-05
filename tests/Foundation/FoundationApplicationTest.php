@@ -16,12 +16,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FoundationApplicationTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;

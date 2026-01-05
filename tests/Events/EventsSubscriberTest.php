@@ -9,12 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class EventsSubscriberTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testEventSubscribers()
     {
         $this->expectNotToPerformAssertions();

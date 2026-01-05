@@ -13,12 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;

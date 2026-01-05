@@ -11,12 +11,6 @@ use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
 class FrameTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     #[RequiresOperatingSystem('Linux|DAR')]
     #[DataProvider('unixFileDataProvider')]
     public function test_it_normalizes_file_path_on_unix($frameData, $basePath, $expected)

@@ -13,12 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class EloquentHasOneOrManyDeprecationTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testHasManyMatchWithNullLocalKey(): void
     {
         $relation = $this->getHasManyRelation();

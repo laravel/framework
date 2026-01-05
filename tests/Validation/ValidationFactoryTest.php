@@ -12,12 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationFactoryTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testMakeMethodCreatesValidValidator()
     {
         $translator = m::mock(TranslatorInterface::class);

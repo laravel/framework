@@ -22,12 +22,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class HttpResponseTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
         $response = new Response(new ArrayableStub);

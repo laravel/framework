@@ -13,12 +13,6 @@ use Redis;
 
 class RedisEventsTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCommandFailedEventIsDispatched()
     {
         $exception = new Exception('Test exception');

@@ -38,12 +38,6 @@ use Psr\Log\LoggerInterface;
 
 class ContextualAttributeBindingTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testDependencyCanBeResolvedFromAttributeBinding()
     {
         $container = new Container;

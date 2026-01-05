@@ -16,12 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();

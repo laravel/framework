@@ -13,12 +13,6 @@ use stdClass;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCreateInsertsNewRecordIntoTable()
     {
         $repo = $this->getRepo();

@@ -27,12 +27,6 @@ use stdClass;
 
 class ViewFactoryTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
     {
         unset($_SERVER['__test.view']);

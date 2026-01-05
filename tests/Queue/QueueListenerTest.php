@@ -13,12 +13,6 @@ use function Illuminate\Support\php_binary;
 
 class QueueListenerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testRunProcessCallsProcess()
     {
         $process = m::mock(Process::class)->makePartial();

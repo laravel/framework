@@ -11,12 +11,6 @@ use stdClass;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicCount()
     {
         $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));

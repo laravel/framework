@@ -11,12 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BeforeCommitContractTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testJobWithoutContractRespectsBeforeCommit()
     {
         $job = new class

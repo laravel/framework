@@ -11,12 +11,6 @@ use stdClass;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testServersAreAddedCorrectly()
     {
         $memcached = $this->memcachedMockWithAddServer();

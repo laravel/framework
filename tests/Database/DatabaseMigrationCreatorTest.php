@@ -10,12 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicCreateMethodStoresMigrationFile()
     {
         $creator = $this->getCreator();

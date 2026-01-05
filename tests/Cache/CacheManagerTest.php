@@ -15,12 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheManagerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
         $cacheManager = new CacheManager([

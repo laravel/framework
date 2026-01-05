@@ -41,12 +41,6 @@ class QueueSqsQueueTest extends TestCase
     protected $mockedReceiveEmptyMessageResponseModel;
     protected $mockedQueueAttributesResponseModel;
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     protected function setUp(): void
     {
         // Use Mockery to mock the SqsClient

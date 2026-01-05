@@ -12,12 +12,6 @@ use ReflectionClass;
 
 class DatabaseQueryGrammarTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testWhereRawReturnsStringWhenExpressionPassed()
     {
         $builder = m::mock(Builder::class);

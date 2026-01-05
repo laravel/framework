@@ -10,12 +10,6 @@ use stdClass;
 
 class QueueManagerTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testDefaultConnectionCanBeResolved()
     {
         $app = [

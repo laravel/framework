@@ -14,12 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 class DynamoDbFailedJobProviderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCanProperlyLogFailedJob()
     {
         $uuid = Str::orderedUuid();

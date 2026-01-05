@@ -29,12 +29,6 @@ class RedisBroadcasterTest extends TestCase
         });
     }
 
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
         $this->broadcaster->channel('test', function () {

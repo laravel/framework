@@ -11,12 +11,6 @@ use stdClass;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testRetrieveByIDReturnsUser()
     {
         $provider = $this->getProviderMock();

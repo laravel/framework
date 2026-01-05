@@ -12,12 +12,6 @@ use stdClass;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testWithPivotValueMethodSetsWhereConditionsForFetching()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->onlyMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();

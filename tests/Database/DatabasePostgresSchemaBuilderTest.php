@@ -11,12 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaBuilderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testHasTable()
     {
         $connection = m::mock(Connection::class);

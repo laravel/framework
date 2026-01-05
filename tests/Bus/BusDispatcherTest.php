@@ -15,12 +15,6 @@ use RuntimeException;
 
 class BusDispatcherTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;

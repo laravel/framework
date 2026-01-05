@@ -11,12 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class ViewFileViewFinderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicViewFinding()
     {
         $finder = $this->getFinder();

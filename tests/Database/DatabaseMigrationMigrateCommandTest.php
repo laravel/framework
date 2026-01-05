@@ -16,12 +16,6 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         $command = new MigrateCommand($migrator = m::mock(Migrator::class), $dispatcher = m::mock(Dispatcher::class));

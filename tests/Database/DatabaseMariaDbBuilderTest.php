@@ -10,12 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMariaDbBuilderTest extends TestCase
 {
-    protected function tearDown(): void {
-
-
-    parent::tearDown();
-}
-
     public function testCreateDatabase()
     {
         $connection = m::mock(Connection::class);
