@@ -22,7 +22,7 @@ class AsBinary implements Castable
         {
             protected string $format;
 
-            protected bool $isRequired;
+            protected bool $required;
 
             public function __construct(protected array $arguments)
             {
@@ -31,7 +31,7 @@ class AsBinary implements Castable
                 $this->format = $format
                     ?: throw new InvalidArgumentException('The binary codec format is required.');
 
-                $this->isRequired = str($required ?? false)->toBoolean();
+                $this->required = str($required ?? false)->toBoolean();
 
                 if (! in_array($this->format, BinaryCodec::formats(), true)) {
                     throw new InvalidArgumentException(sprintf(
@@ -46,7 +46,7 @@ class AsBinary implements Castable
             {
                 $decoded = BinaryCodec::decode($attributes[$key] ?? null, $this->format);
 
-                if ($this->isRequired && blank($decoded)) {
+                if ($this->required && blank($decoded)) {
                     throw new RuntimeException(sprintf(
                         'Binary decode resulted in empty value for required attribute "%s" (format: %s).',
                         $key,
