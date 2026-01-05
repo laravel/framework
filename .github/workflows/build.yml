@@ -12,7 +12,37 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit with coverage
+        env:
+          XDEBUG_MODE: coverage
+        run: |
+          mkdir -p build/logs
+          php -d memory_limit=1G ./vendor/bin/phpunit \
+            --configuration phpunit.xml.dist \
+            --coverage-clover build/logs/clover.xml \
+            --coverage-filter src \
+            --do-not-fail-on-warning
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
