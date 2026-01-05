@@ -233,6 +233,24 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        // When cloning, we need to re-initialize the grammars and post processor
+        // so they reference the cloned connection instead of the original.
+        $this->queryGrammar = $this->getDefaultQueryGrammar();
+
+        $this->postProcessor = $this->getDefaultPostProcessor();
+
+        if (! is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+    }
+
+    /**
      * Set the query grammar to the default implementation.
      *
      * @return void
