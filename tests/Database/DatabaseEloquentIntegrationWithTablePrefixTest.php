@@ -164,9 +164,3 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         return $this->connection($connection)->getSchemaBuilder();
     }
 }
-
-class EloquentTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-}
