@@ -941,6 +941,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function nth($step, $offset = 0)
     {
+        if ($step < 1) {
+            throw new InvalidArgumentException('Step value must be at least 1.');
+        }
+
         $new = [];
 
         $position = 0;
@@ -1359,6 +1363,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function split($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         if ($this->isEmpty()) {
             return new static;
         }
@@ -1396,6 +1404,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function splitIn($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         return $this->chunk((int) ceil($this->count() / $numberOfGroups));
     }
 
