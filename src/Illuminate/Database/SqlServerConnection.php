@@ -41,7 +41,7 @@ class SqlServerConnection extends Connection
             }
 
             if ($backoff !== null) {
-                throw new LogicException('Transaction backoffs are only supported for sqlsrv SQL Server driver connections.');
+                throw new LogicException('Transaction attempt backoffs are only supported for sqlsrv SQL Server driver connections.');
             }
 
             $this->getPdo()->exec('BEGIN TRAN');
