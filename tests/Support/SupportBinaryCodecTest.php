@@ -20,19 +20,19 @@ class SupportBinaryCodecTest extends TestCase
         parent::tearDown();
     }
 
-    public function testAllReturnsDefaultFormats()
+    public function testFormatsReturnsDefaultFormats()
     {
-        $formats = BinaryCodec::all();
+        $formats = BinaryCodec::formats();
 
-        $this->assertArrayHasKey('uuid', $formats);
-        $this->assertArrayHasKey('ulid', $formats);
+        $this->assertContains('uuid', $formats);
+        $this->assertContains('ulid', $formats);
     }
 
     public function testRegisterAddsCustomFormat()
     {
         BinaryCodec::register('hex', fn ($v) => bin2hex($v ?? ''), fn ($v) => hex2bin($v ?? ''));
 
-        $this->assertArrayHasKey('hex', BinaryCodec::all());
+        $this->assertContains('hex', BinaryCodec::formats());
     }
 
     public function testRegisterOverridesDefaultFormat()

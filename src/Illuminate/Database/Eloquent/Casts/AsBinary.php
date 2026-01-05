@@ -20,22 +20,24 @@ class AsBinary implements Castable
     {
         return new class($arguments) implements CastsAttributes
         {
-            private string $format;
+            protected string $format;
 
-            private bool $isRequired;
+            protected bool $isRequired;
 
             public function __construct(protected array $arguments)
             {
                 [$format, $required] = array_pad(array_values($this->arguments), 2, null);
-                $this->format = $format ?: throw new InvalidArgumentException('The binary codec format is required.');
-                $this->isRequired = str($required ?? false)->toBoolean();
-                $allowedFormats = array_keys(BinaryCodec::all());
 
-                if (! in_array($this->format, $allowedFormats, true)) {
+                $this->format = $format
+                    ?: throw new InvalidArgumentException('The binary codec format is required.');
+
+                $this->isRequired = str($required ?? false)->toBoolean();
+
+                if (! in_array($this->format, BinaryCodec::formats(), true)) {
                     throw new InvalidArgumentException(sprintf(
                         'Unsupported binary codec format [%s]. Allowed formats are: %s.',
                         $this->format,
-                        implode(', ', $allowedFormats),
+                        implode(', ', BinaryCodec::formats()),
                     ));
                 }
             }
@@ -62,17 +64,28 @@ class AsBinary implements Castable
         };
     }
 
-    public static function uuid(bool $isRequired = false): string
+    /**
+     * Encode / decode values as binary UUIDs.
+     */
+    public static function uuid(bool $required = false): string
     {
-        return self::of('uuid', $isRequired);
+        return self::of('uuid', $required);
     }
 
-    public static function ulid(bool $isRequired = false): string
+    /**
+     * Encode / decode values as binary ULIDs.
+     */
+    public static function ulid(bool $required = false): string
     {
-        return self::of('ulid', $isRequired);
+        return self::of('ulid', $required);
     }
 
-    public static function of(string $format, bool $isRequired): string
+    /**
+     * Encode / decode values as binary values.
+     *
+     * Supported formats: "uuid", "ulid".
+     */
+    public static function of(string $format, bool $required = false): string
     {
         return self::class.':'.implode(',', [
             $format,

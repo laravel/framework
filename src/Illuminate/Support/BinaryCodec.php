@@ -6,29 +6,13 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Uid\Ulid;
 
-/**
- * @phpstan-type BinaryTransform callable(?string): ?string
- * @phpstan-type BinaryCodecDefinition array{
- *      encode: BinaryTransform,
- *      decode: BinaryTransform,
- * }
- */
-final class BinaryCodec
+class BinaryCodec
 {
-    /** @var array<string, BinaryCodecDefinition> */
-    private static array $customCodecs = [];
+    /** @var array<string, array{encode: callable(?string): ?string, decode: callable(?string): ?string}> */
+    protected static array $customCodecs = [];
 
     /**
-     * @return array<string, BinaryCodecDefinition>
-     */
-    public static function all(): array
-    {
-        return array_replace(self::defaultCodecs(), self::$customCodecs);
-    }
-
-    /**
-     * @param  BinaryTransform  $encode
-     * @param  BinaryTransform  $decode
+     * Register a custom codec.
      */
     public static function register(string $name, callable $encode, callable $decode): void
     {
@@ -38,71 +22,53 @@ final class BinaryCodec
         ];
     }
 
+    /**
+     * Encode a value to binary.
+     */
     public static function encode(?string $value, string $format): ?string
     {
-        return (self::callbackFor($format, 'encode'))($value);
-    }
+        if (blank($value)) {
+            return null;
+        }
 
-    public static function decode(?string $value, string $format): ?string
-    {
-        return (self::callbackFor($format, 'decode'))($value);
-    }
+        if (isset(self::$customCodecs[$format])) {
+            return (self::$customCodecs[$format]['encode'])($value);
+        }
 
-    /** @return array<string, BinaryCodecDefinition> */
-    private static function defaultCodecs(): array
-    {
-        return [
-            'uuid' => [
-                'encode' => function (?string $value) {
-                    if (blank($value)) {
-                        return null;
-                    }
-
-                    return (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))
-                        ->getBytes();
-                },
-                'decode' => function (?string $value) {
-                    if (blank($value)) {
-                        return null;
-                    }
-
-                    return (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))
-                        ->toString();
-                },
-            ],
-            'ulid' => [
-                'encode' => function (?string $value) {
-                    if (blank($value)) {
-                        return null;
-                    }
-
-                    return (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))
-                        ->toBinary();
-                },
-                'decode' => function (?string $value) {
-                    if (blank($value)) {
-                        return null;
-                    }
-
-                    return (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))
-                        ->toString();
-                },
-            ],
-        ];
+        return match ($format) {
+            'uuid' => (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->getBytes(),
+            'ulid' => (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toBinary(),
+            default => throw new InvalidArgumentException("Format [$format] is invalid."),
+        };
     }
 
     /**
-     * @param  'encode'|'decode'  $direction
-     * @return BinaryTransform
+     * Decode a binary value to string.
      */
-    private static function callbackFor(string $format, string $direction): callable
+    public static function decode(?string $value, string $format): ?string
     {
-        $formats = self::all();
-
-        if (! isset($formats[$format][$direction])) {
-            throw new InvalidArgumentException("Format [$format] is invalid.");
+        if (blank($value)) {
+            return null;
         }
 
-        return $formats[$format][$direction];
+        if (isset(self::$customCodecs[$format])) {
+            return (self::$customCodecs[$format]['decode'])($value);
+        }
+
+        return match ($format) {
+            'uuid' => (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
+            'ulid' => (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toString(),
+            default => throw new InvalidArgumentException("Format [$format] is invalid."),
+        };
+    }
+
+    /**
+     * Get all available format names.
+     *
+     * @return list<string>
+     */
+    public static function formats(): array
+    {
+        return array_unique([...['uuid', 'ulid'], ...array_keys(self::$customCodecs)]);
     }
 }
