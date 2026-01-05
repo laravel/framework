@@ -138,4 +138,28 @@ class SupportBinaryCodecTest extends TestCase
 
         $this->assertSame($ulid, BinaryCodec::decode($ulid, 'ulid'));
     }
+
+    public function testIsBinary()
+    {
+        // Non-string values
+        $this->assertFalse(BinaryCodec::isBinary(null));
+        $this->assertFalse(BinaryCodec::isBinary(123));
+        $this->assertFalse(BinaryCodec::isBinary([]));
+
+        // Empty string
+        $this->assertFalse(BinaryCodec::isBinary(''));
+
+        // Valid UTF-8 strings
+        $this->assertFalse(BinaryCodec::isBinary('hello'));
+        $this->assertFalse(BinaryCodec::isBinary('héllo'));
+        $this->assertFalse(BinaryCodec::isBinary('日本語'));
+
+        // Binary data with null byte
+        $this->assertTrue(BinaryCodec::isBinary("hello\0world"));
+        $this->assertTrue(BinaryCodec::isBinary("\0"));
+
+        // Invalid UTF-8 sequences
+        $this->assertTrue(BinaryCodec::isBinary("\xFF\xFE"));
+        $this->assertTrue(BinaryCodec::isBinary(random_bytes(16)));
+    }
 }

@@ -36,8 +36,8 @@ class BinaryCodec
         }
 
         return match ($format) {
-            'uuid' => (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->getBytes(),
-            'ulid' => (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toBinary(),
+            'uuid' => (self::isBinary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->getBytes(),
+            'ulid' => (self::isBinary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toBinary(),
             default => throw new InvalidArgumentException("Format [$format] is invalid."),
         };
     }
@@ -56,8 +56,8 @@ class BinaryCodec
         }
 
         return match ($format) {
-            'uuid' => (is_binary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
-            'ulid' => (is_binary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toString(),
+            'uuid' => (self::isBinary($value) ? Uuid::fromBytes($value) : Uuid::fromString($value))->toString(),
+            'ulid' => (self::isBinary($value) ? Ulid::fromBinary($value) : Ulid::fromString($value))->toString(),
             default => throw new InvalidArgumentException("Format [$format] is invalid."),
         };
     }
@@ -70,5 +70,21 @@ class BinaryCodec
     public static function formats(): array
     {
         return array_unique([...['uuid', 'ulid'], ...array_keys(self::$customCodecs)]);
+    }
+
+    /**
+     * Determine if the given value is binary data.
+     */
+    public static function isBinary(mixed $value): bool
+    {
+        if (! is_string($value) || $value === '') {
+            return false;
+        }
+
+        if (str_contains($value, "\0")) {
+            return true;
+        }
+
+        return ! mb_check_encoding($value, 'UTF-8');
     }
 }
