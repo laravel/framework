@@ -5,6 +5,7 @@ namespace Illuminate\Queue\Console;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Factory as QueueManager;
 use Illuminate\Queue\Console\Concerns\ParsesQueue;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 #[AsCommand(name: 'queue:pause')]
@@ -41,7 +42,7 @@ class PauseCommand extends Command
         $suffix = '';
 
         if ($for = $this->option('for')) {
-            $suffix = " for {$for} seconds";
+            $suffix = ' for '.Str::plural('second', $for, true);
         }
 
         $this->components->info("Job processing on queue [{$connection}:{$queue}] has been paused{$suffix}.");
