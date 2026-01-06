@@ -11,6 +11,7 @@ use Illuminate\Support\Fluent;
  * @method $this initiallyImmediate(bool $value = true) Specify the default time to check the unique index constraint (PostgreSQL)
  * @method $this nullsNotDistinct(bool $value = true) Specify that the null values should not be treated as distinct (PostgreSQL)
  * @method $this online(bool $value = true) Specify that index creation should not lock the table (PostgreSQL/SqlServer)
+ * @method $this lock(string $value) Specify the DDL lock mode for the index operation (MySQL)
  */
 class IndexDefinition extends Fluent
 {

@@ -11,6 +11,7 @@ use Illuminate\Support\Fluent;
  * @method ForeignKeyDefinition onDelete(string $action) Add an ON DELETE action
  * @method ForeignKeyDefinition onUpdate(string $action) Add an ON UPDATE action
  * @method ForeignKeyDefinition references(string|array $columns) Specify the referenced column(s)
+ * @method ForeignKeyDefinition lock(string $value) Specify the DDL lock mode for the foreign key operation (MySQL)
  */
 class ForeignKeyDefinition extends Fluent
 {
