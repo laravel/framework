@@ -7396,6 +7396,17 @@ class ValidationValidatorTest extends TestCase
         // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], ['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->appendRules(['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->sometimes('foo\.bar', 'required', fn () => true);
+        $this->assertFalse($v->fails());
     }
 
     public function testParsingArrayKeysWithDotWhenTestingExistence()
