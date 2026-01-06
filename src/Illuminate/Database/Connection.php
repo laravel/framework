@@ -243,8 +243,6 @@ class Connection implements ConnectionInterface
         // so they reference the cloned connection instead of the original.
         $this->useDefaultQueryGrammar();
 
-        $this->useDefaultPostProcessor();
-
         if (! is_null($this->schemaGrammar)) {
             $this->useDefaultSchemaGrammar();
         }
