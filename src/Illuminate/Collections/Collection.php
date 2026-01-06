@@ -938,6 +938,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  int  $step
      * @param  int  $offset
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function nth($step, $offset = 0)
     {
@@ -1360,6 +1362,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function split($numberOfGroups)
     {
@@ -1401,6 +1405,8 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function splitIn($numberOfGroups)
     {
