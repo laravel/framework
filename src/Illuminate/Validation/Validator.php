@@ -1206,7 +1206,7 @@ class Validator implements ValidatorContract
     {
         return (new Collection($this->rules))
             ->mapWithKeys(fn ($value, $key) => [
-                static::encodeAttributeWithPlaceholder($key) => $value,
+                static::decodeAttributeWithPlaceholder($key) => $value,
             ])
             ->all();
     }
@@ -1704,7 +1704,7 @@ class Validator implements ValidatorContract
      */
     protected static function decodeAttributeWithPlaceholder(string $attribute)
     {
-        return str_replace('__dot__'.static::$placeholderHash, '\\.', $key);
+        return str_replace('__dot__'.static::$placeholderHash, '\\.', $attribute);
     }
 
     /**
