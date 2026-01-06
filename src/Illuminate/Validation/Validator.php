@@ -1235,7 +1235,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Append the validation rules.
+     * Append new validation rules to the validator.
      *
      * @param  array  $rules
      * @return $this
@@ -1676,17 +1676,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Flush the validator's global state.
-     *
-     * @return void
-     */
-    public static function flushState()
-    {
-        static::$placeholderHash = null;
-    }
-
-    /**
-     * Encode attribute with placeholder.
+     * Encode the attribute with the placeholder hash.
      *
      * @param  string  $attribute
      * @return string
@@ -1697,7 +1687,7 @@ class Validator implements ValidatorContract
     }
 
     /**
-     * Decode attribute with placeholder.
+     * Decode an attribute with a placeholder hash.
      *
      * @param  string  $attribute
      * @return string
@@ -1705,6 +1695,16 @@ class Validator implements ValidatorContract
     protected static function decodeAttributeWithPlaceholder(string $attribute)
     {
         return str_replace('__dot__'.static::$placeholderHash, '\\.', $attribute);
+    }
+
+    /**
+     * Flush the validator's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$placeholderHash = null;
     }
 
     /**
