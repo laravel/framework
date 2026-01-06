@@ -748,7 +748,7 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return str_replace('\.', '__dot__'.static::$placeholderHash, $field);
+            return static::encodeAttributeWithPlaceholder($field);
         }, $parameters);
     }
 
@@ -1206,7 +1206,7 @@ class Validator implements ValidatorContract
     {
         return (new Collection($this->rules))
             ->mapWithKeys(fn ($value, $key) => [
-                str_replace('__dot__'.static::$placeholderHash, '\\.', $key) => $value,
+                static::encodeAttributeWithPlaceholder($key) => $value,
             ])
             ->all();
     }
@@ -1221,7 +1221,7 @@ class Validator implements ValidatorContract
     {
         $rules = (new Collection($rules))
             ->mapWithKeys(function ($value, $key) {
-                return [str_replace('\.', '__dot__'.static::$placeholderHash, $key) => $value];
+                return [static::encodeAttributeWithPlaceholder($key) => $value];
             })
             ->toArray();
 
@@ -1235,7 +1235,20 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Append the validation rules.
+     *
+     * @param  array  $rules
+     * @return $this
+     */
+    public function appendRules(array $rules)
+    {
+        return $this->setRules(array_merge_recursive($this->getRulesWithoutPlaceholders(), $rules));
+    }
+
+    /**
      * Parse the given rules and merge them into current rules.
+     *
+     * @internal
      *
      * @param  array  $rules
      * @return void
@@ -1276,7 +1289,7 @@ class Validator implements ValidatorContract
 
             foreach ($response->rules as $ruleKey => $ruleValue) {
                 if ($callback($payload, $this->dataForSometimesIteration($ruleKey, ! str_ends_with($key, '.*')))) {
-                    $this->addRules([$ruleKey => $ruleValue]);
+                    $this->addRules([static::encodeAttributeWithPlaceholder($ruleKey) => $ruleValue]);
                 }
             }
         }
@@ -1670,6 +1683,28 @@ class Validator implements ValidatorContract
     public static function flushState()
     {
         static::$placeholderHash = null;
+    }
+
+    /**
+     * Encode attribute with placeholder.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected static function encodeAttributeWithPlaceholder(string $attribute)
+    {
+        return str_replace('\.', '__dot__'.static::$placeholderHash, $attribute);
+    }
+
+    /**
+     * Decode attribute with placeholder.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    protected static function decodeAttributeWithPlaceholder(string $attribute)
+    {
+        return str_replace('__dot__'.static::$placeholderHash, '\\.', $key);
     }
 
     /**
