@@ -61,8 +61,8 @@ class QueryException extends PDOException
         $this->connectionName = $connectionName;
         $this->sql = $sql;
         $this->bindings = $bindings;
-        $this->readWriteType = $readWriteType;
         $this->connectionDetails = $connectionDetails;
+        $this->readWriteType = $readWriteType;
         $this->code = $previous->getCode();
         $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
 

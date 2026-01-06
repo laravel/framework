@@ -861,6 +861,7 @@ class Connection implements ConnectionInterface
     public function logQuery($query, $bindings, $time = null)
     {
         $this->totalQueryDuration += $time ?? 0.0;
+
         $readWriteType = $this->latestReadWriteTypeUsed();
 
         $this->event(new QueryExecuted($query, $bindings, $time, $this, $readWriteType));
