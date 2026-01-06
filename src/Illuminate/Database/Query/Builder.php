@@ -1393,6 +1393,13 @@ class Builder implements BuilderContract
     {
         $type = 'between';
 
+        if ($this->isQueryable($column)) {
+            [$sub, $bindings] = $this->createSub($column);
+
+            return $this->addBinding($bindings, 'where')
+                ->whereBetween(new Expression('('.$sub.')'), $values, $boolean, $not);
+        }
+
         if ($values instanceof CarbonPeriod) {
             $values = [$values->getStartDate(), $values->getEndDate()];
         }
