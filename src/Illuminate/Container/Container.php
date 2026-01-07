@@ -1178,7 +1178,9 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Instantiate a concrete instance of the given self building type.
      *
-     * @param  \Closure(static, array): TClass|class-string<TClass>  $concrete
+     * @template TClass of object
+     *
+     * @param  object{'newInstance': \Closure(static, array): TClass|class-string<TClass>}  $concrete
      * @param  \ReflectionClass  $reflector
      * @return TClass
      *
