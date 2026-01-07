@@ -1,6 +1,10 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.45.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.45.1...12.x)
+
+## [v12.45.1](https://github.com/laravel/framework/compare/v12.45.0...v12.45.1) - 2026-01-07
+
+* [12.x] Fix `ResourceCollection` usage when used with an array instead of Model collection by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58299
 
 ## [v12.45.0](https://github.com/laravel/framework/compare/v12.44.0...v12.45.0) - 2026-01-06
 
