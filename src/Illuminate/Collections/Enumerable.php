@@ -627,6 +627,7 @@ interface Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, 
 
     /**
      * Determine if the collection contains multiple items.
+     *
      * @return bool
      */
     public function containsManyItems();
