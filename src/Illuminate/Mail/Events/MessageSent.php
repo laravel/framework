@@ -7,9 +7,6 @@ use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Collection;
 use Symfony\Component\Mime\RawMessage;
 
-/**
- * @property \Symfony\Component\Mime\Email $message
- */
 class MessageSent
 {
     public RawMessage $message {
