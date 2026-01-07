@@ -539,6 +539,25 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Execute a callback within an atomic lock.
+     *
+     * @template TReturn
+     *
+     * @param  string  $key
+     * @param  callable(): TReturn  $callback
+     * @param  int  $lockSeconds
+     * @param  int  $waitSeconds
+     * @param  string|null  $owner
+     * @return TReturn
+     *
+     * @throws \Illuminate\Contracts\Cache\LockTimeoutException
+     */
+    public function atomic($key, callable $callback, $lockSeconds = 10, $waitSeconds = 10, $owner = null)
+    {
+        return $this->store->lock($key, $lockSeconds, $owner)->block($waitSeconds, $callback);
+    }
+
+    /**
      * Remove an item from the cache.
      *
      * @param  \BackedEnum|\UnitEnum|array|string  $key

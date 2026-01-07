@@ -9,11 +9,14 @@ use DateTime;
 use DateTimeImmutable;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\FileStore;
+use Illuminate\Cache\Lock;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Cache\TaggedCache;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\LockProvider;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Filesystem\Filesystem;
@@ -431,6 +434,67 @@ class CacheRepositoryTest extends TestCase
         $nonTaggableRepo = new Repository($nonTaggable);
 
         $this->assertFalse($nonTaggableRepo->supportsTags());
+    }
+
+    public function testAtomicExecutesCallbackAndReturnsResult()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        $result = $repo->atomic('foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testAtomicPassesLockAndWaitSecondsToLock()
+    {
+        $store = m::mock(Store::class, LockProvider::class);
+        $repo = new Repository($store);
+        $lock = m::mock(Lock::class);
+
+        $store->shouldReceive('lock')->once()->with('foo', 30, null)->andReturn($lock);
+        $lock->shouldReceive('block')->once()->with(15, m::type('callable'))->andReturnUsing(function ($seconds, $callback) {
+            return $callback();
+        });
+
+        $result = $repo->atomic('foo', function () {
+            return 'bar';
+        }, 30, 15);
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testAtomicPassesOwnerToLock()
+    {
+        $store = m::mock(Store::class, LockProvider::class);
+        $repo = new Repository($store);
+        $lock = m::mock(Lock::class);
+
+        $store->shouldReceive('lock')->once()->with('foo', 10, 'my-owner')->andReturn($lock);
+        $lock->shouldReceive('block')->once()->with(10, m::type('callable'))->andReturnUsing(function ($seconds, $callback) {
+            return $callback();
+        });
+
+        $result = $repo->atomic('foo', function () {
+            return 'bar';
+        }, 10, 10, 'my-owner');
+
+        $this->assertSame('bar', $result);
+    }
+
+    public function testAtomicThrowsOnLockTimeout()
+    {
+        $repo = new Repository(new ArrayStore);
+
+        // Acquire the lock first so the atomic call will timeout
+        $repo->getStore()->lock('foo', 10)->acquire();
+
+        $this->expectException(LockTimeoutException::class);
+
+        $repo->atomic('foo', function () {
+            return 'bar';
+        }, 10, 0);
     }
 
     protected function getRepository()
