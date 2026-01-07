@@ -98,7 +98,11 @@ class ResourceCollection extends JsonResource implements Countable, IteratorAggr
      */
     public function toAttributes(Request $request)
     {
-        return $this->collection->map->resolve($request)->all();
+        if ($this->collection->first() instanceof JsonResource) {
+            return $this->collection->map->resolve($request)->all();
+        }
+
+        return $this->toArray($request);
     }
 
     /**
