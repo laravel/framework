@@ -743,11 +743,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      */
     public function containsManyItems(?callable $callback = null): bool
     {
-        if ($callback) {
-            return $this->filter($callback)->count() > 1;
+        if (! $callback) {
+            return $this->count() > 1;
         }
 
-        return $this->count() > 1;
+        $count = 0;
+
+        foreach ($this as $key => $item) {
+            if ($callback($item, $key)) {
+                $count++;
+            }
+
+            if ($count > 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
