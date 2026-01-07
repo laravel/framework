@@ -10,7 +10,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
-use function Illuminate\Support\enum_value;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Auth\Access\Events\GateEvaluated;
@@ -18,6 +17,9 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 
 use Illuminate\Tests\JsonSchema\Fixtures\Enums\UnitEnum;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+
+use function Illuminate\Support\enum_value;
+
 
 class Gate implements GateContract
 {
