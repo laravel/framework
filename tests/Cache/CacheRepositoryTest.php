@@ -500,8 +500,6 @@ class CacheRepositoryTest extends TestCase
         } catch (LockTimeoutException) {
             $this->assertFalse($called);
         }
-
-
     }
 
     protected function getRepository()
