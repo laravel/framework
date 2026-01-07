@@ -5,12 +5,17 @@ namespace Illuminate\Mail\Events;
 use Exception;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Collection;
+use Symfony\Component\Mime\RawMessage;
 
 /**
  * @property \Symfony\Component\Mime\Email $message
  */
 class MessageSent
 {
+    public RawMessage $message {
+        get => $this->sent->getOriginalMessage();
+    }
+    
     /**
      * Create a new event instance.
      *
@@ -52,22 +57,5 @@ class MessageSent
         $this->data = (($data['hasAttachments'] ?? false) === true)
             ? unserialize(base64_decode($data['data']))
             : $data['data'];
-    }
-
-    /**
-     * Dynamically get the original message.
-     *
-     * @param  string  $key
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    public function __get($key)
-    {
-        if ($key === 'message') {
-            return $this->sent->getOriginalMessage();
-        }
-
-        throw new Exception('Unable to access undefined property on '.__CLASS__.': '.$key);
     }
 }
