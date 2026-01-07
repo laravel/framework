@@ -3,11 +3,13 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
 use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Pagination\Cursor;
@@ -50,6 +52,49 @@ use Orchestra\Testbench\TestCase;
 
 class ResourceTest extends TestCase
 {
+    public function testResourceMayBeConvetedToArray()
+    {
+        $resource = new class((new User)->forceFill(['id' => 1, 'name' => 'Taylor Otwell'])) extends JsonResource
+        {
+            public function toArray(Request $request)
+            {
+                return [
+                    'id' => $this->id,
+                    'name' => $this->name,
+                    'posts' => (new AnonymousResourceCollection([
+                        new Post([
+                            'id' => 5,
+                            'title' => 'Test Title',
+                            'abstract' => 'Test abstract',
+                        ]),
+                        new Post([
+                            'id' => 10,
+                            'title' => 'Another Test Title',
+                            'abstract' => 'Another Test abstract',
+                        ]),
+                    ], PostResource::class)),
+                ];
+            }
+        };
+
+        $request = Request::create('GET', '/users');
+
+        tap($resource->toArray($request), function ($userAsArray) use ($request) {
+            $this->assertSame(1, $userAsArray['id']);
+            $this->assertSame('Taylor Otwell', $userAsArray['name']);
+
+            $this->assertInstanceOf(AnonymousResourceCollection::class, $userAsArray['posts']);
+            $this->assertSame(PostResource::class, $userAsArray['posts']->collects);
+
+            tap($userAsArray['posts']->toArray($request), function ($postsAsArray) {
+                $this->assertIsArray($postsAsArray);
+                $this->assertCount(2, $postsAsArray);
+                $this->assertSame(['id' => 5, 'title' => 'Test Title', 'custom' => true], $postsAsArray[0]);
+                $this->assertSame(['id' => 10, 'title' => 'Another Test Title', 'custom' => true], $postsAsArray[1]);
+            });
+        });
+    }
+
     public function testResourcesMayBeConvertedToJson()
     {
         Route::get('/', function () {
