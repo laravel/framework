@@ -1934,7 +1934,7 @@ class ResourceTest extends TestCase
         ], $content);
     }
 
-    public function testResourceCanOverridesWrap()
+    public function testResourceCanOverridesWrapping()
     {
         $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
         {
@@ -1956,7 +1956,7 @@ class ResourceTest extends TestCase
         ], $content);
     }
 
-    public function testResourceCollectionCanOverridesWrap()
+    public function testResourceCollectionCanOverridesWrapping()
     {
         $resource = new class([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
         {
@@ -1982,7 +1982,7 @@ class ResourceTest extends TestCase
         ], $content);
     }
 
-    public function testPaginatedResourceCollectionCanOverridesWrap()
+    public function testPaginatedResourceCollectionCanOverridesWrapping()
     {
         $resource = new class(new LengthAwarePaginator([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
         {
@@ -2004,7 +2004,7 @@ class ResourceTest extends TestCase
         $this->assertCount(1, $content['results']);
     }
 
-    public function testEmptyPaginatedResourceCollectionCanOverridesWrap()
+    public function testEmptyPaginatedResourceCollectionCanOverridesWrapping()
     {
         $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection
         {
