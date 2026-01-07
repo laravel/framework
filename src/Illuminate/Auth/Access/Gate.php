@@ -4,19 +4,17 @@ namespace Illuminate\Auth\Access;
 
 use Closure;
 use Exception;
-use ReflectionClass;
-use ReflectionFunction;
+use Illuminate\Auth\Access\Events\GateEvaluated;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Auth\Access\Events\GateEvaluated;
-use Illuminate\Database\Eloquent\Attributes\UsePolicy;
-
-use Illuminate\Tests\JsonSchema\Fixtures\Enums\UnitEnum;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use ReflectionClass;
+use ReflectionFunction;
 
 use function Illuminate\Support\enum_value;
 
