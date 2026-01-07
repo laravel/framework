@@ -48,6 +48,13 @@ class Repository
     protected static $handleUnserializeExceptionsUsing;
 
     /**
+     * The structured log location to write repository data to.
+     *
+     * @var 'extra'|'context'
+     */
+    public static string $writeContextTo = 'extra';
+
+    /**
      * Create a new Context instance.
      */
     public function __construct(Dispatcher $events)
@@ -617,6 +624,14 @@ class Repository
     }
 
     /**
+     * @return 'context'|'extra'
+     */
+    public function writesContextTo()
+    {
+        return static::$writeContextTo;
+    }
+
+    /**
      * Flush all context data.
      *
      * @return $this
@@ -698,5 +713,13 @@ class Repository
         ));
 
         return $this;
+    }
+
+    /**
+     * Flush the state of the repository.
+     */
+    public static function flushState(): void
+    {
+        self::$writeContextTo = 'extra';
     }
 }

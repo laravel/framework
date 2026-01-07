@@ -632,6 +632,21 @@ class ContextTest extends TestCase
         file_put_contents($path, '');
     }
 
+    public function test_can_set_the_context_output_location()
+    {
+        $path = storage_path('logs/laravel.log');
+        file_put_contents($path, '');
+        Context::writeContextToLogContext();
+
+        Context::add(['value_from_context' => 'hello', 'tim' => 'macdonald']);
+
+        Log::info('This is an info log.', ['value_from_context' => 'bye']);
+        $log = Str::after(file_get_contents($path), '] ');
+        $this->assertSame('testing.INFO: This is an info log. {"value_from_context":"bye","tim":"macdonald"}', Str::trim($log));
+
+        file_put_contents($path, '');
+    }
+
     public function test_it_increments_a_counter()
     {
         Context::increment('foo');

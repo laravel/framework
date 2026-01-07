@@ -23,9 +23,17 @@ class ContextLogProcessor implements ContextLogProcessorContract
             return $record;
         }
 
-        return $record->with(extra: [
-            ...$record->extra,
-            ...$app->get(ContextRepository::class)->all(),
-        ]);
+        $repository = $app->get(ContextRepository::class);
+
+        return match ($repository->writesContextTo()) {
+            'extra' => $record->with(extra: [
+                ...$record->extra,
+                ...$repository->all(),
+            ]),
+            'context' => $record->with(context: [
+                ...$repository->all(),
+                ...$record->context,
+            ]),
+        };
     }
 }

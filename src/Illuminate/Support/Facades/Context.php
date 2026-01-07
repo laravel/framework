@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Log\Context\Repository;
+
 /**
  * @method static bool has(string $key)
  * @method static bool missing(string $key)
@@ -17,30 +19,30 @@ namespace Illuminate\Support\Facades;
  * @method static array onlyHidden(array $keys)
  * @method static array except(array $keys)
  * @method static array exceptHidden(array $keys)
- * @method static \Illuminate\Log\Context\Repository add(string|array $key, mixed $value = null)
- * @method static \Illuminate\Log\Context\Repository addHidden(string|array $key, mixed $value = null)
+ * @method static Repository add(string|array $key, mixed $value = null)
+ * @method static Repository addHidden(string|array $key, mixed $value = null)
  * @method static mixed remember(string $key, mixed $value)
  * @method static mixed rememberHidden(string $key, mixed $value)
- * @method static \Illuminate\Log\Context\Repository forget(string|array $key)
- * @method static \Illuminate\Log\Context\Repository forgetHidden(string|array $key)
- * @method static \Illuminate\Log\Context\Repository addIf(string $key, mixed $value)
- * @method static \Illuminate\Log\Context\Repository addHiddenIf(string $key, mixed $value)
- * @method static \Illuminate\Log\Context\Repository push(string $key, mixed ...$values)
+ * @method static Repository forget(string|array $key)
+ * @method static Repository forgetHidden(string|array $key)
+ * @method static Repository addIf(string $key, mixed $value)
+ * @method static Repository addHiddenIf(string $key, mixed $value)
+ * @method static Repository push(string $key, mixed ...$values)
  * @method static mixed pop(string $key)
- * @method static \Illuminate\Log\Context\Repository pushHidden(string $key, mixed ...$values)
+ * @method static Repository pushHidden(string $key, mixed ...$values)
  * @method static mixed popHidden(string $key)
- * @method static \Illuminate\Log\Context\Repository increment(string $key, int $amount = 1)
- * @method static \Illuminate\Log\Context\Repository decrement(string $key, int $amount = 1)
+ * @method static Repository increment(string $key, int $amount = 1)
+ * @method static Repository decrement(string $key, int $amount = 1)
  * @method static bool stackContains(string $key, mixed $value, bool $strict = false)
  * @method static bool hiddenStackContains(string $key, mixed $value, bool $strict = false)
  * @method static mixed scope(callable $callback, array $data = [], array $hidden = [])
  * @method static bool isEmpty()
- * @method static \Illuminate\Log\Context\Repository dehydrating(callable $callback)
- * @method static \Illuminate\Log\Context\Repository hydrated(callable $callback)
- * @method static \Illuminate\Log\Context\Repository handleUnserializeExceptionsUsing(callable|null $callback)
- * @method static \Illuminate\Log\Context\Repository flush()
- * @method static \Illuminate\Log\Context\Repository|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
- * @method static \Illuminate\Log\Context\Repository|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static Repository dehydrating(callable $callback)
+ * @method static Repository hydrated(callable $callback)
+ * @method static Repository handleUnserializeExceptionsUsing(callable|null $callback)
+ * @method static Repository flush()
+ * @method static Repository|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
+ * @method static Repository|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
@@ -58,6 +60,22 @@ class Context extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return \Illuminate\Log\Context\Repository::class;
+        return Repository::class;
+    }
+
+    /**
+     * Write context data under the structured log's "extra" key.
+     */
+    public static function writeContextToLogExtra(): void
+    {
+        Repository::$writeContextTo = 'extra';
+    }
+
+    /**
+     * Write context data under the structured log's "context" key.
+     */
+    public static function writeContextToLogContext(): void
+    {
+        Repository::$writeContextTo = 'context';
     }
 }
