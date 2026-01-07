@@ -1180,7 +1180,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @template TClass of object
      *
-     * @param object{'newInstance': \Closure(static, array): TClass|class-string<TClass>} $concrete
+     * @param  object{'newInstance': \Closure(static, array): TClass|class-string<TClass>} $concrete
      *
      * @param  \ReflectionClass  $reflector
      * @return TClass
