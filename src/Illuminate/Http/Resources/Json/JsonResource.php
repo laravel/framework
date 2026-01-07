@@ -158,7 +158,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray(Request $request)
     {
-        return match(true) {
+        return match (true) {
             is_null($this->resource) => [],
             is_array($this->resource) => $this->resource,
             $this->resource instanceof Collection => $this->resource->map(fn ($val) => $val instanceof JsonResource ? $val->resolve($request) : $val)->toArray(),
