@@ -4,19 +4,20 @@ namespace Illuminate\Auth\Access;
 
 use Closure;
 use Exception;
-use Illuminate\Auth\Access\Events\GateEvaluated;
-use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Eloquent\Attributes\UsePolicy;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionFunction;
-
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Illuminate\Support\Collection;
 use function Illuminate\Support\enum_value;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Auth\Access\Events\GateEvaluated;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
+
+use Illuminate\Tests\JsonSchema\Fixtures\Enums\UnitEnum;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class Gate implements GateContract
 {
@@ -117,7 +118,7 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string|array  $ability
+     * @param  string|UnitEnum|array  $ability
      * @return bool
      */
     public function has($ability)
@@ -125,7 +126,7 @@ class Gate implements GateContract
         $abilities = is_array($ability) ? $ability : func_get_args();
 
         foreach ($abilities as $ability) {
-            if (! isset($this->abilities[$ability])) {
+            if (! isset($this->abilities[enum_value($ability)])) {
                 return false;
             }
         }
