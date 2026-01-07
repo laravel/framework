@@ -1,6 +1,14 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.45.2...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.46.0...12.x)
+
+## [v12.46.0](https://github.com/laravel/framework/compare/v12.45.2...v12.46.0) - 2026-01-07
+
+* [12.x] Add `Arr::onlyValues` and `Arr::exceptValues` by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/58317
+* [12.x] Fixed phpdoc of `Container::buildSelfBuildingInstance`, to prevent psalm from erroring when parsing the class by [@nicDamours](https://github.com/nicDamours) in https://github.com/laravel/framework/pull/58314
+* [12.x] Add `Collection::containsManyItems()` method by [@stevebauman](https://github.com/stevebauman) in https://github.com/laravel/framework/pull/58312
+* [12.x] Table prefix not applied when cloning connections by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58288
+* [12.x] Added MySQL DDL locking options to MySQL grammar by [@Vladelis](https://github.com/Vladelis) in https://github.com/laravel/framework/pull/58293
 
 ## [v12.45.2](https://github.com/laravel/framework/compare/v12.45.1...v12.45.2) - 2026-01-07
 
