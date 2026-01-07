@@ -1,0 +1,1 @@
+@includeScoped('partials.scoped-partial', ['explicitVar' => $explicitVar])
