@@ -332,6 +332,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [
             'x' => null, 'y' => null, 'z' => null, 'a' => null, 'b' => null,
         ], [
+            'x' => 'string|null', 'y' => 'integer|null', 'z' => 'numeric|null', 'a' => 'array|null', 'b' => 'bool|null',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null, 'z' => null, 'a' => null, 'b' => null,
+        ], [
             'x' => 'string', 'y' => 'integer', 'z' => 'numeric', 'a' => 'array', 'b' => 'bool',
         ]);
         $this->assertTrue($v->fails());

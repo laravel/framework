@@ -1943,18 +1943,6 @@ trait ValidatesAttributes
     }
 
     /**
-     * "Indicate" validation should pass if value is null.
-     *
-     * Always returns true, just lets us put "null" in rules.
-     *
-     * @return bool
-     */
-    public function validateNull()
-    {
-        return true;
-    }
-
-    /**
      * Validate an attribute is not contained within a list of values.
      *
      * @param  string  $attribute
