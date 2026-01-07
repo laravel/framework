@@ -15,10 +15,8 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionFunction;
-use UnitEnum;
 
 use function Illuminate\Support\enum_value;
-
 
 class Gate implements GateContract
 {
@@ -119,7 +117,7 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string|UnitEnum|array  $ability
+     * @param  string|\UnitEnum|array  $ability
      * @return bool
      */
     public function has($ability)
