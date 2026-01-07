@@ -2002,6 +2002,13 @@ class ResourceTest extends TestCase
         $this->assertArrayHasKey('meta', $content);
 
         $this->assertCount(1, $content['results']);
+        $this->assertEquals([
+            [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content['results']);
     }
 
     public function testEmptyPaginatedResourceCollectionCanOverridesWrapping()
