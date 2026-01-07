@@ -487,14 +487,21 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = new Repository(new ArrayStore);
 
-        // Acquire the lock first so the atomic call will timeout
         $repo->getStore()->lock('foo', 10)->acquire();
 
-        $this->expectException(LockTimeoutException::class);
+        $called = false;
 
-        $repo->atomic('foo', function () {
-            return 'bar';
-        }, 10, 0);
+        try {
+            $repo->atomic('foo', function () use (&$called) {
+                $called = true;
+            }, 10, 0);
+
+            $this->fail('Expected LockTimeoutException was not thrown.');
+        } catch (LockTimeoutException) {
+            $this->assertFalse($called);
+        }
+
+
     }
 
     protected function getRepository()
