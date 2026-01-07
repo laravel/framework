@@ -220,14 +220,15 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $values
+     * @param  bool  $strict
      * @return array
      */
-    public static function exceptValues($array, $values)
+    public static function exceptValues($array, $values, $strict = false)
     {
         $values = (array) $values;
 
-        return array_filter($array, function ($value) use ($values) {
-            return ! in_array($value, $values);
+        return array_filter($array, function ($value) use ($values, $strict) {
+            return ! in_array($value, $values, $strict);
         });
     }
 
@@ -710,14 +711,15 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $values
+     * @param  bool  $strict
      * @return array
      */
-    public static function onlyValues($array, $values)
+    public static function onlyValues($array, $values, $strict = false)
     {
         $values = (array) $values;
 
-        return array_filter($array, function ($value) use ($values) {
-            return in_array($value, $values);
+        return array_filter($array, function ($value) use ($values, $strict) {
+            return in_array($value, $values, $strict);
         });
     }
 
