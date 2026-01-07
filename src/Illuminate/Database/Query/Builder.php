@@ -1384,7 +1384,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where between" statement to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
@@ -1392,6 +1392,13 @@ class Builder implements BuilderContract
     public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
+
+        if ($this->isQueryable($column)) {
+            [$sub, $bindings] = $this->createSub($column);
+
+            return $this->addBinding($bindings, 'where')
+                ->whereBetween(new Expression('('.$sub.')'), $values, $boolean, $not);
+        }
 
         if ($values instanceof CarbonPeriod) {
             $values = [$values->getStartDate(), $values->getEndDate()];
@@ -1424,7 +1431,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where between" statement to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function orWhereBetween($column, iterable $values)
@@ -1446,7 +1453,7 @@ class Builder implements BuilderContract
     /**
      * Add a "where not between" statement to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @param  string  $boolean
      * @return $this
      */
@@ -1470,7 +1477,7 @@ class Builder implements BuilderContract
     /**
      * Add an "or where not between" statement to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
      * @return $this
      */
     public function orWhereNotBetween($column, iterable $values)
