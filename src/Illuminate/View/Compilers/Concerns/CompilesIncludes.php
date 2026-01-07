@@ -90,6 +90,6 @@ trait CompilesIncludes
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php echo \$__env->make({$expression}, [])->render(); ?>";
+        return "<?php echo \$__env->make({$expression})->render(); ?>";
     }
 }
