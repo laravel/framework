@@ -22,8 +22,16 @@ class ResourceCollectionTest extends TestCase
     public static function toArrayDataProvider()
     {
         yield [
-            new ResourceCollection([new Fluent(), new Fluent(), new Fluent()]),
-            [[], [], []],
+            new ResourceCollection([
+                new Fluent(['id' => 1]),
+                new Fluent(['id' => 2]),
+                new Fluent(['id' => 3]),
+            ]),
+            [
+                ['id' => 1],
+                ['id' => 2],
+                ['id' => 3],
+            ],
         ];
 
         yield [
@@ -34,6 +42,18 @@ class ResourceCollectionTest extends TestCase
             [
                 ['name' => 'Taylor Otwell'],
                 ['name' => 'Laravel'],
+            ],
+        ];
+
+        yield [
+            new class(['list' => new Fluent(['id' => 1]), 'total' => 1]) extends ResourceCollection {
+                public function toArray(Request $request) {
+                    return $this->resource->toArray();
+                }
+            },
+            [
+                'list' => ['id' => 1],
+                'total' => 1,
             ],
         ];
     }
