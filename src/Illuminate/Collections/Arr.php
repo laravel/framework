@@ -216,6 +216,22 @@ class Arr
     }
 
     /**
+     * Get all of the given array except for a specified array of values.
+     *
+     * @param  array  $array
+     * @param  mixed  $values
+     * @return array
+     */
+    public static function exceptValues($array, $values)
+    {
+        $values = (array) $values;
+
+        return array_filter($array, function ($value) use ($values) {
+            return ! in_array($value, $values);
+        });
+    }
+
+    /**
      * Determine if the given key exists in the provided array.
      *
      * @param  \ArrayAccess|array  $array
@@ -687,6 +703,22 @@ class Arr
     public static function only($array, $keys)
     {
         return array_intersect_key($array, array_flip((array) $keys));
+    }
+
+    /**
+     * Get a subset of the items from the given array by value.
+     *
+     * @param  array  $array
+     * @param  mixed  $values
+     * @return array
+     */
+    public static function onlyValues($array, $values)
+    {
+        $values = (array) $values;
+
+        return array_filter($array, function ($value) use ($values) {
+            return in_array($value, $values);
+        });
     }
 
     /**
