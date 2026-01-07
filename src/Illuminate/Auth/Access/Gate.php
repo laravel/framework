@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionFunction;
+use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
