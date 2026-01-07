@@ -1,6 +1,12 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.45.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.45.2...12.x)
+
+## [v12.45.2](https://github.com/laravel/framework/compare/v12.45.1...v12.45.2) - 2026-01-07
+
+* [12.x] Feature: allow UnitEnum in has() method of Gate class by [@webard](https://github.com/webard) in https://github.com/laravel/framework/pull/58310
+* [12.x] Fix `Validator::appendRules()` with pipe-separated rule strings by [@leo108](https://github.com/leo108) in https://github.com/laravel/framework/pull/58304
+* [12.x] Fix calling `toArray()` on `AnonymousResourceCollection` returns an array of resources by [@crynobone](https://github.com/crynobone) in https://github.com/laravel/framework/pull/58302
 
 ## [v12.45.1](https://github.com/laravel/framework/compare/v12.45.0...v12.45.1) - 2026-01-07
 
