@@ -46,8 +46,10 @@ class ResourceCollectionTest extends TestCase
         ];
 
         yield [
-            new class(['list' => new Fluent(['id' => 1]), 'total' => 1]) extends ResourceCollection {
-                public function toArray(Request $request) {
+            new class(['list' => new Fluent(['id' => 1]), 'total' => 1]) extends ResourceCollection
+            {
+                public function toArray(Request $request)
+                {
                     return $this->resource->toArray();
                 }
             },
