@@ -9,6 +9,7 @@ use Illuminate\Http\Exceptions\PostTooLargeException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Resources\JsonApi\AnonymousResourceCollection;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Http\Resources\MissingValue;
@@ -41,8 +42,8 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelations
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
@@ -1931,6 +1932,96 @@ class ResourceTest extends TestCase
                 'title' => 'Test',
             ],
         ], $content);
+    }
+
+    public function testResourceCanOverridesWrap()
+    {
+        $resource = new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = 'results';
+            public static bool $forceWrapping = true;
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                'id' => 5,
+                'title' => 'Test',
+                'data' => 'some data',
+            ],
+        ], $content);
+    }
+
+    public function testResourceCollectionCanOverridesWrap()
+    {
+        $resource = new class([
+            new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+            {
+                public static $wrap = null;
+            },
+        ]) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals([
+            'results' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test',
+                    'data' => 'some data',
+                ]
+            ],
+        ], $content);
+    }
+
+    public function testPaginatedResourceCollectionCanOverridesWrap()
+    {
+        $resource = new class(new LengthAwarePaginator([
+            new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+            {
+                public static $wrap = null;
+            },
+        ], 10, 2)) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(1, $content['results']);
+    }
+
+    public function testEmptyPaginatedResourceCollectionCanOverridesWrap()
+    {
+        $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection {
+            public static $wrap = 'results';
+        };
+
+        JsonResource::flushState();
+
+        $response = $resource->toResponse(request());
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('results', $content);
+        $this->assertArrayHasKey('links', $content);
+        $this->assertArrayHasKey('meta', $content);
+
+        $this->assertCount(0, $content['results']);
     }
 
     public function testResourceForceWrapOverridesDataKeyCheck()
