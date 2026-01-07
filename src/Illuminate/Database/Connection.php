@@ -1740,4 +1740,19 @@ class Connection implements ConnectionInterface
     {
         return static::$resolvers[$driver] ?? null;
     }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        // When cloning, re-initialize grammars to reference cloned connection...
+        $this->useDefaultQueryGrammar();
+
+        if (! is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+    }
 }
