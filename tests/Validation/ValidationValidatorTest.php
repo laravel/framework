@@ -7407,6 +7407,11 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo.bar' => 'valid'], []);
         $v->sometimes('foo\.bar', 'required', fn () => true);
         $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['name' => 'ab'], ['name' => 'required']);
+        $v->appendRules(['name' => 'string']);
+        $v->appendRules(['name' => 'min:5|max:255']);
+        $this->assertTrue($v->fails());
     }
 
     public function testParsingArrayKeysWithDotWhenTestingExistence()

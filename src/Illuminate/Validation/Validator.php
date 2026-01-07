@@ -1242,6 +1242,12 @@ class Validator implements ValidatorContract
      */
     public function appendRules(array $rules)
     {
+        $rules = (new Collection($rules))
+            ->map(function ($value) {
+                return is_string($value) ? explode('|', $value) : $value;
+            })
+            ->toArray();
+
         return $this->setRules(array_merge_recursive($this->getRulesWithoutPlaceholders(), $rules));
     }
 
