@@ -1253,7 +1253,13 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Array']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['foo' => [1, 2, 3]], ['foo' => 'Arr']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => new File('/tmp/foo', false)], ['foo' => 'Array']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => new File('/tmp/foo', false)], ['foo' => 'Arr']);
         $this->assertFalse($v->passes());
     }
 
@@ -3227,7 +3233,15 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'str']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, ['x' => ['blah' => 'test']], ['x' => 'string']);
+        $this->assertFalse($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => ['blah' => 'test']], ['x' => 'str']);
         $this->assertFalse($v->passes());
     }
 
@@ -3421,6 +3435,19 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Numeric']);
+        $this->assertTrue($v->passes());
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'asdad'], ['foo' => 'Num']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1.23'], ['foo' => 'Num']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '-1'], ['foo' => 'Num']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => '1'], ['foo' => 'Num']);
         $this->assertTrue($v->passes());
     }
 

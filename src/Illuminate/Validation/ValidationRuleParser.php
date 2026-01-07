@@ -320,6 +320,10 @@ class ValidationRuleParser
         return match ($rule) {
             'Int' => 'Integer',
             'Bool' => 'Boolean',
+            'Str' => 'String',
+            'Arr' => 'Array',
+            'Null' => 'Nullable',
+            'Num' => 'Numeric',
             default => $rule,
         };
     }
