@@ -42,8 +42,8 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelations
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipCounts;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipExists;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationshipUsingNamedParameters;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithUnlessOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\ResourceWithPreservedKeys;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
@@ -1958,11 +1958,10 @@ class ResourceTest extends TestCase
 
     public function testResourceCollectionCanOverridesWrap()
     {
-        $resource = new class([
-            new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
-            {
-                public static $wrap = null;
-            },
+        $resource = new class([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
         ]) extends ResourceCollection {
             public static $wrap = 'results';
         };
@@ -1978,18 +1977,17 @@ class ResourceTest extends TestCase
                     'id' => 5,
                     'title' => 'Test',
                     'data' => 'some data',
-                ]
+                ],
             ],
         ], $content);
     }
 
     public function testPaginatedResourceCollectionCanOverridesWrap()
     {
-        $resource = new class(new LengthAwarePaginator([
-            new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
-            {
-                public static $wrap = null;
-            },
+        $resource = new class(new LengthAwarePaginator([new class(['id' => 5, 'title' => 'Test', 'data' => 'some data']) extends JsonResource
+        {
+            public static $wrap = null;
+        },
         ], 10, 2)) extends ResourceCollection {
             public static $wrap = 'results';
         };
@@ -2008,7 +2006,8 @@ class ResourceTest extends TestCase
 
     public function testEmptyPaginatedResourceCollectionCanOverridesWrap()
     {
-        $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection {
+        $resource = new class(new LengthAwarePaginator([], 10, 2)) extends ResourceCollection
+        {
             public static $wrap = 'results';
         };
 
