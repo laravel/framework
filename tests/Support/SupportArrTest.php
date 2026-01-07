@@ -296,6 +296,34 @@ class SupportArrTest extends TestCase
         $this->assertEquals([1 => 'hAz', 2 => [12 => 'baz']], Arr::except($array, 2.5));
     }
 
+    public function testExceptValues()
+    {
+        $array = ['name' => 'taylor', 'age' => 26, 'city' => 'austin'];
+        $this->assertEquals(['name' => 'taylor', 'city' => 'austin'], Arr::exceptValues($array, [26]));
+        $this->assertEquals(['name' => 'taylor', 'city' => 'austin'], Arr::exceptValues($array, 26));
+
+        $array = ['foo', 'bar', 'baz', 'qux'];
+        $this->assertEquals([1 => 'bar', 3 => 'qux'], Arr::exceptValues($array, ['foo', 'baz']));
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 3 => 'qux'], Arr::exceptValues($array, 'baz'));
+
+        $array = [1, 2, 3, 4, 5];
+        $this->assertEquals([0 => 1, 1 => 2, 4 => 5], Arr::exceptValues($array, [3, 4]));
+
+        $array = ['a' => 1, 'b' => 2, 'c' => 1, 'd' => 3];
+        $this->assertEquals(['b' => 2, 'd' => 3], Arr::exceptValues($array, 1));
+
+        $this->assertEquals([], Arr::exceptValues([], 'foo'));
+        $this->assertEquals(['foo', 'bar'], Arr::exceptValues(['foo', 'bar'], []));
+
+        $array = [1, '1', 2, '2', 3];
+        $this->assertEquals([1 => '1', 3 => '2'], Arr::exceptValues($array, [1, 2, 3], true));
+        $this->assertEquals([], Arr::exceptValues($array, [1, 2, 3]));
+
+        $array = ['a' => true, 'b' => false, 'c' => 1, 'd' => 0];
+        $this->assertEquals(['a' => true, 'b' => false], Arr::exceptValues($array, [1, 0], true));
+        $this->assertEquals([], Arr::exceptValues($array, [1, 0]));
+    }
+
     public function testExists()
     {
         $this->assertTrue(Arr::exists([1], 0));
@@ -856,6 +884,34 @@ class SupportArrTest extends TestCase
         // Test with array having numeric key and string key
         $this->assertEquals(['foo'], Arr::only(['foo', 'bar' => 'baz'], 0));
         $this->assertEquals(['bar' => 'baz'], Arr::only(['foo', 'bar' => 'baz'], 'bar'));
+    }
+
+    public function testOnlyValues()
+    {
+        $array = ['name' => 'taylor', 'age' => 26, 'city' => 'austin'];
+        $this->assertEquals(['age' => 26], Arr::onlyValues($array, [26]));
+        $this->assertEquals(['age' => 26], Arr::onlyValues($array, 26));
+
+        $array = ['foo', 'bar', 'baz', 'qux'];
+        $this->assertEquals([0 => 'foo', 2 => 'baz'], Arr::onlyValues($array, ['foo', 'baz']));
+        $this->assertEquals([2 => 'baz'], Arr::onlyValues($array, 'baz'));
+
+        $array = [1, 2, 3, 4, 5];
+        $this->assertEquals([2 => 3, 3 => 4], Arr::onlyValues($array, [3, 4]));
+
+        $array = ['a' => 1, 'b' => 2, 'c' => 1, 'd' => 3];
+        $this->assertEquals(['a' => 1, 'c' => 1], Arr::onlyValues($array, 1));
+
+        $this->assertEquals([], Arr::onlyValues([], 'foo'));
+        $this->assertEquals([], Arr::onlyValues(['foo', 'bar'], []));
+
+        $array = [1, '1', 2, '2', 3];
+        $this->assertEquals([0 => 1, 2 => 2, 4 => 3], Arr::onlyValues($array, [1, 2, 3], true));
+        $this->assertEquals([0 => 1, 1 => '1', 2 => 2, 3 => '2', 4 => 3], Arr::onlyValues($array, [1, 2, 3]));
+
+        $array = ['a' => true, 'b' => false, 'c' => 1, 'd' => 0];
+        $this->assertEquals(['c' => 1, 'd' => 0], Arr::onlyValues($array, [1, 0], true));
+        $this->assertEquals(['a' => true, 'b' => false, 'c' => 1, 'd' => 0], Arr::onlyValues($array, [1, 0]));
     }
 
     public function testPluck()
