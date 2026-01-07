@@ -117,7 +117,7 @@ class Gate implements GateContract
     /**
      * Determine if a given ability has been defined.
      *
-     * @param  string|\UnitEnum|array  $ability
+     * @param  \UnitEnum|array|string  $ability
      * @return bool
      */
     public function has($ability)
