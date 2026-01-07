@@ -1246,7 +1246,7 @@ class Validator implements ValidatorContract
             ->map(function ($value) {
                 return is_string($value) ? explode('|', $value) : $value;
             })
-            ->toArray();
+            ->all();
 
         return $this->setRules(array_merge_recursive($this->getRulesWithoutPlaceholders(), $rules));
     }
