@@ -10,6 +10,7 @@ class AuthorResource extends JsonApiResource
     protected array $relationships = [
         'comments',
         'profile',
+        'chaperonePosts' => PostResource::class,
     ];
 
     #[\Override]

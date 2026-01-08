@@ -48,6 +48,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             return User::find($userId)->toResource();
         });
 
+        $router->get('users/{userId}/with-chaperone-posts', function ($userId) {
+            return User::find($userId)->load('chaperonePosts')->toResource();
+        });
+
         $router->get('posts', function () {
             return Post::paginate(5)->toResourceCollection();
         });
