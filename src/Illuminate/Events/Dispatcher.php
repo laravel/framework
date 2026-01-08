@@ -16,16 +16,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use ReflectionClass;
-
 use function Illuminate\Support\enum_value;
 
 class Dispatcher implements DispatcherContract
 {
-    use Macroable, ReflectsClosures;
+    use Macroable, ReflectsClosures, ResolvesQueueRoutes;
 
     /**
      * The IoC container instance.
@@ -658,6 +658,10 @@ class Dispatcher implements DispatcherContract
         $delay = method_exists($listener, 'withDelay')
             ? (isset($arguments[0]) ? $listener->withDelay($arguments[0]) : $listener->withDelay())
             : $listener->delay ?? null;
+
+        if (is_null($queue)) {
+            $queue = $this->resolveQueueRoute($listener) ?? null;
+        }
 
         is_null($delay)
             ? $connection->pushOn(enum_value($queue), $job)

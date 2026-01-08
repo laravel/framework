@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Queue\Concerns;
+namespace Illuminate\Support\Queue\Concerns;
 
 use Illuminate\Container\Container;
 use Illuminate\Queue\QueueRoutes;

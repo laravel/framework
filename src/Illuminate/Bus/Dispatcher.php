@@ -9,10 +9,10 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Pipeline\Pipeline;
-use Illuminate\Queue\Concerns\ResolvesQueueRoutes;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use RuntimeException;
 
 class Dispatcher implements QueueingDispatcher
