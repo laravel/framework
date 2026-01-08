@@ -18,6 +18,7 @@ use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
@@ -29,6 +30,8 @@ use Throwable;
  */
 class BroadcastManager implements FactoryContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -197,6 +200,10 @@ class BroadcastManager implements FactoryContract
             $queue = $event->broadcastQueue;
         } elseif (isset($event->queue)) {
             $queue = $event->queue;
+        }
+
+        if (is_null($queue)) {
+            $queue = $this->resolveQueueRoute($event) ?? null;
         }
 
         $broadcastEvent = new BroadcastEvent(clone $event);
