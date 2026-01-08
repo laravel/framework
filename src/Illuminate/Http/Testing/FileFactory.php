@@ -45,6 +45,43 @@ class FileFactory
     }
 
     /**
+     * Create a new fake file from an existing path.
+     *
+     * This is useful when you already have a fixture file on disk and want to
+     * wrap it as an uploaded file for testing purposes.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  string|null  $mimeType
+     * @return \Illuminate\Http\Testing\File
+     */
+    public function fromPath($path, $name = null, $mimeType = null)
+    {
+        $source = @fopen($path, 'rb');
+
+        if ($source === false) {
+            throw new LogicException("File does not exist or is not readable at path {$path}.");
+        }
+
+        $tmpfile = tmpfile();
+
+        $copied = stream_copy_to_stream($source, $tmpfile);
+
+        fclose($source);
+
+        if ($copied === false) {
+            throw new LogicException("Unable to read file contents from {$path}.");
+        }
+
+        return tap(new File($name ?? basename($path), $tmpfile), function ($file) use ($path, $mimeType) {
+            $file->sizeToReport = filesize($path) ?: null;
+            if ($mimeType !== null) {
+                $file->mimeTypeToReport = $mimeType;
+            }
+        });
+    }
+
+    /**
      * Create a new fake image.
      *
      * @param  string  $name

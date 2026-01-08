@@ -76,6 +76,19 @@ class File extends UploadedFile
     }
 
     /**
+     * Create a new fake file from an existing path.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  string|null  $mimeType
+     * @return \Illuminate\Http\Testing\File
+     */
+    public static function fromPath($path, $name = null, $mimeType = null)
+    {
+        return (new FileFactory)->fromPath($path, $name, $mimeType);
+    }
+
+    /**
      * Create a new fake image.
      *
      * @param  string  $name
