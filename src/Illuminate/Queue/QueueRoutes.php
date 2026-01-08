@@ -43,10 +43,10 @@ class QueueRoutes
      * Register the queue route for the given class.
      *
      * @param  array|class-string  $class
-     * @param  string|null  $queueName
+     * @param  string|null  $queue
      * @return void
      */
-    public function set(array|string $class, $queueName = null)
+    public function set(array|string $class, $queue = null)
     {
         $routes = is_array($class) ? $class : [$class => $queue];
 
