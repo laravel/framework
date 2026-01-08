@@ -194,7 +194,7 @@ class ModelMakeCommandTest extends TestCase
         $this->assertFilenameNotExists('database/seeders/FooSeeder.php');
     }
 
-    public function testItCanGenerateModelFileWithSeederption()
+    public function testItCanGenerateModelFileWithSeederOption()
     {
         $this->artisan('make:model', ['name' => 'Foo', '--seed' => true])
             ->assertExitCode(0);
@@ -257,5 +257,140 @@ class ModelMakeCommandTest extends TestCase
             ->assertExitCode(0)
             ->expectsConfirmation('Do you want to generate additional components for the model?', 'yes')
             ->expectsQuestion('Would you like any of the following?', []);
+    }
+
+    public function testItCanGenerateModelFileWithCustomTableOption()
+    {
+        $this->artisan('make:model', ['name' => 'Foo', '--table' => 'custom_foos'])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models;',
+            'use Illuminate\Database\Eloquent\Model;',
+            'class Foo extends Model',
+            'protected $table = \'custom_foos\';',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItDoesNotIncludeTablePropertyWhenNoTableOptionIsProvided()
+    {
+        $this->artisan('make:model', ['name' => 'Foo'])
+            ->assertExitCode(0);
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+            'protected $table =',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItReplacesTablePlaceholderWithCommentForPivotWhenNoTableOptionIsProvided()
+    {
+        $this->artisan('make:model', ['name' => 'Foo', '--pivot' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models;',
+            'use Illuminate\Database\Eloquent\Relations\Pivot;',
+            'class Foo extends Pivot',
+            '//',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+            'protected $table =',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItReplacesTablePlaceholderWithCommentForMorphPivotWhenNoTableOptionIsProvided()
+    {
+        $this->artisan('make:model', ['name' => 'Foo', '--morph-pivot' => true])
+            ->assertExitCode(0);
+
+        $this->assertFileContains([
+            'namespace App\Models;',
+            'use Illuminate\Database\Eloquent\Relations\MorphPivot;',
+            'class Foo extends MorphPivot',
+            '//',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+            'protected $table =',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItCanGeneratePivotModelFileWithCustomTableOption()
+    {
+        $this->artisan('make:model', [
+            'name' => 'Foo',
+            '--pivot' => true,
+            '--table' => 'pivot_foos',
+        ])->assertExitCode(0);
+
+        $this->assertFileContains([
+            'use Illuminate\Database\Eloquent\Relations\Pivot;',
+            'class Foo extends Pivot',
+            'protected $table = \'pivot_foos\';',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItCanGenerateMorphPivotModelFileWithCustomTableOption()
+    {
+        $this->artisan('make:model', [
+            'name' => 'Foo',
+            '--morph-pivot' => true,
+            '--table' => 'morph_pivot_foos',
+        ])->assertExitCode(0);
+
+        $this->assertFileContains([
+            'use Illuminate\Database\Eloquent\Relations\MorphPivot;',
+            'class Foo extends MorphPivot',
+            'protected $table = \'morph_pivot_foos\';',
+        ], 'app/Models/Foo.php');
+
+        $this->assertFileNotContains([
+            '{{ table }}',
+        ], 'app/Models/Foo.php');
+    }
+
+    public function testItGeneratesMigrationWithCustomTableNameWhenTableOptionIsProvided()
+    {
+        $this->artisan('make:model', [
+            'name' => 'Foo',
+            '--migration' => true,
+            '--table' => 'custom_foos',
+        ])->assertExitCode(0);
+
+        $this->assertMigrationFileExists('create_custom_foos_table.php');
+
+        $this->assertMigrationFileContains([
+            'Schema::create(\'custom_foos\', function (Blueprint $table) {',
+            'Schema::dropIfExists(\'custom_foos\');',
+        ], 'create_custom_foos_table.php');
+    }
+
+    public function testItGeneratesMigrationWithCustomTableNameForPivotWhenTableOptionIsProvided()
+    {
+        $this->artisan('make:model', [
+            'name' => 'Foo',
+            '--pivot' => true,
+            '--migration' => true,
+            '--table' => 'pivot_foos',
+        ])->assertExitCode(0);
+
+        $this->assertMigrationFileExists('create_pivot_foos_table.php');
+
+        $this->assertMigrationFileContains([
+            'Schema::create(\'pivot_foos\', function (Blueprint $table) {',
+            'Schema::dropIfExists(\'pivot_foos\');',
+        ], 'create_pivot_foos_table.php');
     }
 }
