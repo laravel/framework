@@ -92,7 +92,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the table name
+     * Get the table name.
      */
     protected function getTableName()
     {
@@ -235,7 +235,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__ . $stub;
+            : __DIR__.$stub;
     }
 
     /**
@@ -246,7 +246,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return is_dir(app_path('Models')) ? $rootNamespace . '\\Models' : $rootNamespace;
+        return is_dir(app_path('Models')) ? $rootNamespace.'\\Models' : $rootNamespace;
     }
 
     /**
@@ -272,7 +272,6 @@ class ModelMakeCommand extends GeneratorCommand
         );
     }
 
-
     /**
      * Build the replacements for a factory.
      *
@@ -285,7 +284,7 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('factory') || $this->option('all')) {
             $modelPath = Str::of($this->argument('name'))->studly()->replace('/', '\\')->toString();
 
-            $factoryNamespace = '\\Database\\Factories\\' . $modelPath . 'Factory';
+            $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
 
             $factoryCode = <<<EOT
             /** @use HasFactory<$factoryNamespace> */
@@ -335,7 +334,6 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function buildTableReplacements(): array
     {
-        // If a custom table was provided, inject the property block.
         if (! blank($this->option('table'))) {
             $table = $this->getTableName();
 
@@ -353,8 +351,6 @@ class ModelMakeCommand extends GeneratorCommand
             ];
         }
 
-        // No table option passed...
-        // For pivot & morph-pivot: keep placeholder but replace with comment.
         if ($this->option('pivot') || $this->option('morph-pivot')) {
             return [
                 '{{ table }}' => '//',
@@ -362,11 +358,11 @@ class ModelMakeCommand extends GeneratorCommand
         }
 
         return [
-            "    {{ table }}\n"   => '',
+            "    {{ table }}\n" => '',
             "    {{ table }}\r\n" => '',
-            "{{ table }}\n"       => '',
-            "{{ table }}\r\n"     => '',
-            '{{ table }}'         => '',
+            "{{ table }}\n" => '',
+            "{{ table }}\r\n" => '',
+            '{{ table }}' => '',
         ];
     }
 
@@ -414,6 +410,6 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-        ])))->each(fn($option) => $input->setOption($option, true));
+        ])))->each(fn ($option) => $input->setOption($option, true));
     }
 }
