@@ -16,7 +16,7 @@ class QueueRoutesTest extends TestCase
 
         $this->assertSame([QueueRoutes::class => 'some-queue'], $defaults->all());
 
-        $defaults->setMany([
+        $defaults->set([
             QueueRoutes::class => 'queue-many',
             'AClass' => 'mail',
         ]);
