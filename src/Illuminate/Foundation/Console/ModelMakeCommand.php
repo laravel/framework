@@ -92,6 +92,24 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the table name
+     */
+    protected function getTableName()
+    {
+        if (! blank($this->option('table'))) {
+            return (string) $this->option('table');
+        }
+
+        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
+
+        if ($this->option('pivot')) {
+            return Str::singular($table);
+        }
+
+        return $table;
+    }
+
+    /**
      * Create a model factory for the model.
      *
      * @return void
@@ -113,11 +131,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::snake(Str::pluralStudly(class_basename($this->argument('name'))));
-
-        if ($this->option('pivot')) {
-            $table = Str::singular($table);
-        }
+        $table = $this->getTableName();
 
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
@@ -221,7 +235,7 @@ class ModelMakeCommand extends GeneratorCommand
     {
         return file_exists($customPath = $this->laravel->basePath(trim($stub, '/')))
             ? $customPath
-            : __DIR__.$stub;
+            : __DIR__ . $stub;
     }
 
     /**
@@ -232,7 +246,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return is_dir(app_path('Models')) ? $rootNamespace.'\\Models' : $rootNamespace;
+        return is_dir(app_path('Models')) ? $rootNamespace . '\\Models' : $rootNamespace;
     }
 
     /**
@@ -247,10 +261,17 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $replace = $this->buildFactoryReplacements();
 
+        $stub = parent::buildClass($name);
+
+        $this->replaceTable($stub);
+
         return str_replace(
-            array_keys($replace), array_values($replace), parent::buildClass($name)
+            array_keys($replace),
+            array_values($replace),
+            $stub
         );
     }
+
 
     /**
      * Build the replacements for a factory.
@@ -264,7 +285,7 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('factory') || $this->option('all')) {
             $modelPath = Str::of($this->argument('name'))->studly()->replace('/', '\\')->toString();
 
-            $factoryNamespace = '\\Database\\Factories\\'.$modelPath.'Factory';
+            $factoryNamespace = '\\Database\\Factories\\' . $modelPath . 'Factory';
 
             $factoryCode = <<<EOT
             /** @use HasFactory<$factoryNamespace> */
@@ -280,6 +301,73 @@ class ModelMakeCommand extends GeneratorCommand
         }
 
         return $replacements;
+    }
+
+    /**
+     * Replace the table placeholder for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return $this
+     */
+    protected function replaceTable(&$stub): static
+    {
+        $replace = $this->buildTableReplacements();
+
+        $stub = str_replace(
+            array_keys($replace),
+            array_values($replace),
+            $stub
+        );
+
+        return $this;
+    }
+
+    /**
+     * Build the replacements for the {{ table }} placeholder.
+     *
+     * Rules:
+     * - If --table is provided: inject protected $table = '...';
+     * - If pivot/morph-pivot and no --table: replace with // (keep class body non-empty)
+     * - If normal model and no --table: remove placeholder incl. newline/spacing
+     *
+     * @return array<string, string>
+     */
+    protected function buildTableReplacements(): array
+    {
+        // If a custom table was provided, inject the property block.
+        if (! blank($this->option('table'))) {
+            $table = $this->getTableName();
+
+            $tableCode = <<<EOT
+                /**
+                 * The table associated with the model.
+                 *
+                 * @var string
+                 */
+                protected \$table = '{$table}';
+            EOT;
+
+            return [
+                '{{ table }}' => $tableCode,
+            ];
+        }
+
+        // No table option passed...
+        // For pivot & morph-pivot: keep placeholder but replace with comment.
+        if ($this->option('pivot') || $this->option('morph-pivot')) {
+            return [
+                '{{ table }}' => '//',
+            ];
+        }
+
+        return [
+            "    {{ table }}\n"   => '',
+            "    {{ table }}\r\n" => '',
+            "{{ table }}\n"       => '',
+            "{{ table }}\r\n"     => '',
+            '{{ table }}'         => '',
+        ];
     }
 
     /**
@@ -302,6 +390,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
             ['api', null, InputOption::VALUE_NONE, 'Indicates if the generated controller should be an API resource controller'],
             ['requests', 'R', InputOption::VALUE_NONE, 'Create new form request classes and use them in the resource controller'],
+            ['table', 't', InputOption::VALUE_OPTIONAL, 'Override the table name for the generated model'],
         ];
     }
 
@@ -325,6 +414,6 @@ class ModelMakeCommand extends GeneratorCommand
             'migration' => 'Migration',
             'policy' => 'Policy',
             'resource' => 'Resource Controller',
-        ])))->each(fn ($option) => $input->setOption($option, true));
+        ])))->each(fn($option) => $input->setOption($option, true));
     }
 }
