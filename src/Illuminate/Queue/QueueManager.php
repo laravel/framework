@@ -133,7 +133,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function route(array|string $class, $queue = null, $connection = null)
     {
-        $this->queueRoutes()->set($class, $queue);
+        $this->queueRoutes()->set($class, $queue, $connection);
     }
 
     /**
