@@ -22,7 +22,7 @@ class BusDispatcherTest extends TestCase
 
     public function testCommandsThatShouldQueueIsQueued()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
@@ -34,11 +34,13 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
+
+        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
@@ -50,11 +52,13 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
+
+        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('get')->andReturn(null);
         Container::setInstance($container);
@@ -66,11 +70,13 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
+
+        Container::setInstance(null);
     }
 
     public function testCommandsAreDispatchedWithQueueRoute()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('get')->andReturn('high-priority');
 
@@ -82,6 +88,8 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherQueueable);
+
+        Container::setInstance(null);
     }
 
     public function testDispatchNowShouldNeverQueue()
@@ -113,7 +121,7 @@ class BusDispatcherTest extends TestCase
 
     public function testOnConnectionOnJobWhenDispatching()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->singleton('config', function () {
             return new Config([
                 'queue' => [
@@ -138,6 +146,8 @@ class BusDispatcherTest extends TestCase
         $job = (new ShouldNotBeDispatched)->onConnection('null');
 
         $dispatcher->dispatch($job);
+
+        Container::setInstance(null);
     }
 }
 
