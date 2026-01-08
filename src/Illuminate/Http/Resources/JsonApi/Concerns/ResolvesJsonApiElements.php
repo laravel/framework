@@ -401,7 +401,7 @@ trait ResolvesJsonApiElements
      */
     public function ignoreFieldsAndIncludesInQueryString()
     {
-        return $this->respectFieldsAndIncludesFromQueryString(false);
+        return $this->respectFieldsAndIncludesInQueryString(false);
     }
 
     /**
