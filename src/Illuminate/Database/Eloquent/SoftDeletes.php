@@ -206,6 +206,16 @@ trait SoftDeletes
     }
 
     /**
+     * Determine if the model instance has not been soft-deleted.
+     *
+     * @return bool
+     */
+    public function notTrashed()
+    {
+        return is_null($this->{$this->getDeletedAtColumn()});
+    }
+
+    /**
      * Register a "softDeleted" model event callback with the dispatcher.
      *
      * @param  \Illuminate\Events\QueuedClosure|callable|class-string  $callback
