@@ -158,6 +158,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $container->instance(QueueRoutes::class, $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->with(m::type(SendQueuedNotifications::class));
         Container::setInstance($container);
@@ -175,6 +176,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $container->instance(QueueRoutes::class, $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->with(m::type(TestSendQueuedNotifications::class));
         $container->bind(SendQueuedNotifications::class, TestSendQueuedNotifications::class);
@@ -198,6 +200,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $container->instance(QueueRoutes::class, $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupId) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
@@ -227,6 +230,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $container->instance(QueueRoutes::class, $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupId) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
@@ -254,6 +258,7 @@ class NotificationChannelManagerTest extends TestCase
         $container->instance(Bus::class, $bus = m::mock());
         $container->instance(QueueRoutes::class, $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         $container->instance('queue.routes', $queueRoutes);
         $bus->shouldReceive('dispatch')->twice()->withArgs(function ($job) use ($mockedMessageGroupSet) {
             $this->assertInstanceOf(SendQueuedNotifications::class, $job);
@@ -288,6 +293,7 @@ class NotificationChannelManagerTest extends TestCase
             return true;
         });
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('listen')->once();
@@ -313,6 +319,7 @@ class NotificationChannelManagerTest extends TestCase
             return true;
         });
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('listen')->once();
@@ -341,6 +348,7 @@ class NotificationChannelManagerTest extends TestCase
             return true;
         });
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('listen')->once();
@@ -363,6 +371,7 @@ class NotificationChannelManagerTest extends TestCase
             return true;
         });
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('listen')->once();
@@ -386,6 +395,7 @@ class NotificationChannelManagerTest extends TestCase
             return true;
         });
         $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
         Container::setInstance($container);
         $manager = m::mock(ChannelManager::class.'[driver]', [$container]);
         $events->shouldReceive('listen')->once();
