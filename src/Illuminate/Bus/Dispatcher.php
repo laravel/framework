@@ -242,7 +242,7 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        $queueName = $command->queue ?? $this->resolveQueueRoute($command) ?? null;
+        $queueName = $command->queue ?? $this->resolveQueueFromQueueRoute($command) ?? null;
 
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command, queue: $queueName);

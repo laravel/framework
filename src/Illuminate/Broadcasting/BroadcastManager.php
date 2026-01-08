@@ -203,7 +203,7 @@ class BroadcastManager implements FactoryContract
         }
 
         if (is_null($queue)) {
-            $queue = $this->resolveQueueRoute($event) ?? null;
+            $queue = $this->resolveQueueFromQueueRoute($event) ?? null;
         }
 
         $broadcastEvent = new BroadcastEvent(clone $event);

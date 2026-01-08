@@ -24,7 +24,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
-        $queueRoutes->shouldReceive('get')->andReturn(null);
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -42,7 +42,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
-        $queueRoutes->shouldReceive('get')->andReturn(null);
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -60,7 +60,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
-        $queueRoutes->shouldReceive('get')->andReturn(null);
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
         Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -78,7 +78,7 @@ class BusDispatcherTest extends TestCase
     {
         Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
-        $queueRoutes->shouldReceive('get')->andReturn('high-priority');
+        $queueRoutes->shouldReceive('getQueue')->andReturn('high-priority');
 
         $mock = m::mock(Queue::class);
         $mock->shouldReceive('push')->once()->with(BusDispatcherQueueable::class, '', 'high-priority');
@@ -133,7 +133,7 @@ class BusDispatcherTest extends TestCase
             ]);
         });
         $container->instance('queue.routes', $queueRoutes = m::mock());
-        $queueRoutes->shouldReceive('get')->andReturn(null);
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
         Container::setInstance($container);
 
         $dispatcher = new Dispatcher($container, function () {

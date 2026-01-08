@@ -660,7 +660,7 @@ class Dispatcher implements DispatcherContract
             : $listener->delay ?? null;
 
         if (is_null($queue)) {
-            $queue = $this->resolveQueueRoute($listener) ?? null;
+            $queue = $this->resolveQueueFromQueueRoute($listener) ?? null;
         }
 
         is_null($delay)

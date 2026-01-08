@@ -14,7 +14,7 @@ class QueueRoutesTest extends TestCase
 
         $defaults->set(QueueRoutes::class, 'some-queue');
 
-        $this->assertSame([QueueRoutes::class => 'some-queue'], $defaults->all());
+        $this->assertSame([QueueRoutes::class => [null, 'some-queue']], $defaults->all());
 
         $defaults->set([
             QueueRoutes::class => 'queue-many',
@@ -24,7 +24,7 @@ class QueueRoutesTest extends TestCase
         $this->assertSame([QueueRoutes::class => 'queue-many', 'AClass' => 'mail'], $defaults->all());
     }
 
-    public function testGet()
+    public function testGetQueue()
     {
         $defaults = new QueueRoutes();
 
@@ -34,9 +34,9 @@ class QueueRoutesTest extends TestCase
             PaymentContract::class => 'payments',
         ]);
 
-        $this->assertSame('notifications', $defaults->get(new FinanceNotification));
-        $this->assertSame('jobs', $defaults->get(new SomeJob));
-        $this->assertSame('payments', $defaults->get(new Payment));
+        $this->assertSame('notifications', $defaults->getQueue(new FinanceNotification));
+        $this->assertSame('jobs', $defaults->getQueue(new SomeJob));
+        $this->assertSame('payments', $defaults->getQueue(new Payment));
     }
 }
 

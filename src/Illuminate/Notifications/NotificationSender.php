@@ -236,7 +236,7 @@ class NotificationSender
                 }
 
                 $queue = $notification->queue
-                    ?? $this->manager->resolveQueueRoute($notification)
+                    ?? $this->manager->resolveQueueFromQueueRoute($notification)
                     ?? null;
 
                 if (method_exists($notification, 'viaQueues')) {
