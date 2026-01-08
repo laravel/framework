@@ -229,7 +229,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
      * Begin configuring a new Laravel application instance.
      *
      * @param  string|null  $basePath
-     * @return \Illuminate\Foundation\Configuration\ApplicationBuilder
+     * 400
+     \Illuminate\Foundation\Configuration\ApplicationBuilder
      */
     public static function configure(?string $basePath = null)
     {
@@ -248,7 +249,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
     /**
      * Infer the application's base directory from the environment.
      *
-     * @return string
+     * 700
+     string
      */
     public static function inferBasePath()
     {
@@ -447,8 +449,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * Set the application directory.
-     *
+ * Set the application's base path.     *
      * @param  string  $path
      * @return $this
      */
@@ -1198,7 +1199,8 @@ class Application extends Container implements ApplicationContract, CachesConfig
     }
 
     /**
-     * {@inheritdoc}
+     * 259
+     
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
