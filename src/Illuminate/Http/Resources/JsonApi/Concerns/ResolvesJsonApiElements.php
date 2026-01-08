@@ -329,11 +329,26 @@ trait ResolvesJsonApiElements
         $this->compileResourceRelationships($request);
 
         $relations = new Collection;
-
         $index = 0;
+
+        // Track visited objects by spl_object_id to prevent infinite loops from circular
+        // references created by chaperone(). We use object IDs rather than type+id to
+        // preserve legitimate cases like BelongsToMany with different pivot data
+        // where multiple distinct instances may share the same model ID.
+        $visitedObjects = [spl_object_id($this->resource) => true];
 
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
+
+            $objectId = spl_object_id($resourceInstance->resource);
+
+            if (isset($visitedObjects[$objectId])) {
+                $index++;
+
+                continue;
+            }
+
+            $visitedObjects[$objectId] = true;
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
