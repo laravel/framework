@@ -18,10 +18,10 @@ class QueueRoutesTest extends TestCase
 
         $defaults->set([
             QueueRoutes::class => 'queue-many',
-            'AClass' => 'mail',
+            SomeJob::class => 'important',
         ]);
 
-        $this->assertSame([QueueRoutes::class => 'queue-many', 'AClass' => 'mail'], $defaults->all());
+        $this->assertSame([QueueRoutes::class => 'queue-many', SomeJob::class => 'important'], $defaults->all());
     }
 
     public function testGetQueue()
