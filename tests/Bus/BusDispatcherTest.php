@@ -82,6 +82,7 @@ class BusDispatcherTest extends TestCase
         Container::setInstance($container = new Container);
         $container->instance('queue.routes', $queueRoutes = m::mock());
         $queueRoutes->shouldReceive('getQueue')->andReturn('high-priority');
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
 
         $mock = m::mock(Queue::class);
         $mock->shouldReceive('push')->once()->with(BusDispatcherQueueable::class, '', 'high-priority');
