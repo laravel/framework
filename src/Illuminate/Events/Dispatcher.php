@@ -648,9 +648,13 @@ class Dispatcher implements DispatcherContract
     {
         [$listener, $job] = $this->createListenerAndJob($class, $method, $arguments);
 
-        $connection = $this->resolveQueue()->connection(method_exists($listener, 'viaConnection')
+        $connectionName = method_exists($listener, 'viaConnection')
             ? (isset($arguments[0]) ? $listener->viaConnection($arguments[0]) : $listener->viaConnection())
-            : $listener->connection ?? null);
+            : $listener->connection ?? null;
+
+        $connection = $this->resolveQueue()->connection(
+            $connectionName ?? $this->resolveConnectionFromQueueRoute($listener) ?? null
+        );
 
         $queue = method_exists($listener, 'viaQueue')
             ? (isset($arguments[0]) ? $listener->viaQueue($arguments[0]) : $listener->viaQueue())

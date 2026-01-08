@@ -229,7 +229,9 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
-                $connection = $notification->connection;
+                $connection = $notification->connection
+                    ?? $this->manager->resolveConnectionFromQueueRoute($notification)
+                    ?? null;
 
                 if (method_exists($notification, 'viaConnections')) {
                     $connection = $notification->viaConnections()[$channel] ?? $connection;

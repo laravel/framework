@@ -206,6 +206,8 @@ class BroadcastManager implements FactoryContract
             $queue = $this->resolveQueueFromQueueRoute($event) ?? null;
         }
 
+        $connection = $event->connection ?? $this->resolveConnectionFromQueueRoute($event) ?? null;
+
         $broadcastEvent = new BroadcastEvent(clone $event);
 
         if ($event instanceof ShouldBeUnique) {
@@ -217,7 +219,7 @@ class BroadcastManager implements FactoryContract
         }
 
         $push = fn () => $this->app->make('queue')
-            ->connection($event->connection ?? null)
+            ->connection($connection)
             ->pushOn($queue, $broadcastEvent);
 
         $event instanceof ShouldRescue
