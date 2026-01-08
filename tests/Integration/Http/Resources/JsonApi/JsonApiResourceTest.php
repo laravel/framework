@@ -604,4 +604,25 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonCount(1, 'included')
             ->assertJsonMissing(['jsonapi']);
     }
+
+    public function testItHandlesBidirectionalRelationshipsWithChaperoneWithoutInfiniteLoop()
+    {
+        $user = User::factory()->create();
+
+        $post = Post::factory()->create([
+            'user_id' => $user->getKey(),
+        ]);
+
+        // The /with-chaperone-posts route loads chaperonePosts which uses chaperone()
+        // to automatically set the inverse 'author' relationship on each Post,
+        // creating circular object references (User -> Post -> User same instance).
+        // Without the fix, this would hang forever due to infinite loop.
+        $this->getJson("/users/{$user->getKey()}/with-chaperone-posts?".http_build_query(['include' => 'chaperonePosts']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonPath('data.relationships.chaperonePosts.data.0.type', 'posts')
+            ->assertJsonPath('data.relationships.chaperonePosts.data.0.id', (string) $post->getKey())
+            ->assertJsonCount(1, 'included');
+    }
 }
