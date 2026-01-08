@@ -552,7 +552,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */
-    public function withoutOverlapping($key, callable $callback, $lockFor = 600, $waitFor = 10, $owner = null)
+    public function withoutOverlapping($key, callable $callback, $lockFor = 0, $waitFor = 10, $owner = null)
     {
         return $this->store->lock($key, $lockFor, $owner)->block($waitFor, $callback);
     }
