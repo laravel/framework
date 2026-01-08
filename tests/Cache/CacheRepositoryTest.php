@@ -440,7 +440,7 @@ class CacheRepositoryTest extends TestCase
     {
         $repo = new Repository(new ArrayStore);
 
-        $result = $repo->atomic('foo', function () {
+        $result = $repo->withoutOverlapping('foo', function () {
             return 'bar';
         });
 
@@ -458,7 +458,7 @@ class CacheRepositoryTest extends TestCase
             return $callback();
         });
 
-        $result = $repo->atomic('foo', function () {
+        $result = $repo->withoutOverlapping('foo', function () {
             return 'bar';
         }, 30, 15);
 
@@ -476,7 +476,7 @@ class CacheRepositoryTest extends TestCase
             return $callback();
         });
 
-        $result = $repo->atomic('foo', function () {
+        $result = $repo->withoutOverlapping('foo', function () {
             return 'bar';
         }, 10, 10, 'my-owner');
 
@@ -492,7 +492,7 @@ class CacheRepositoryTest extends TestCase
         $called = false;
 
         try {
-            $repo->atomic('foo', function () use (&$called) {
+            $repo->withoutOverlapping('foo', function () use (&$called) {
                 $called = true;
             }, 10, 0);
 

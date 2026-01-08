@@ -539,7 +539,7 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
-     * Execute a callback within an atomic lock.
+     * Execute a callback while holding an atomic lock on a cache mutex to prevent overlapping calls.
      *
      * @template TReturn
      *
@@ -552,7 +552,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
      */
-    public function atomic($key, callable $callback, $lockSeconds = 10, $waitSeconds = 10, $owner = null)
+    public function withoutOverlapping($key, callable $callback, $lockSeconds = 600, $waitSeconds = 10, $owner = null)
     {
         return $this->store->lock($key, $lockSeconds, $owner)->block($waitSeconds, $callback);
     }
