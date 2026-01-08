@@ -13,15 +13,25 @@ class QueueRoutesTest extends TestCase
         $defaults = new QueueRoutes();
 
         $defaults->set(QueueRoutes::class, 'some-queue');
+        $defaults->set(BaseNotification::class, 'some-queue', 'some-connection');
 
-        $this->assertSame([QueueRoutes::class => [null, 'some-queue']], $defaults->all());
+        $this->assertSame([
+            QueueRoutes::class => [null, 'some-queue'],
+            BaseNotification::class => ['some-connection', 'some-queue'],
+        ], $defaults->all());
 
+        // Ensure same class overrides
         $defaults->set([
             QueueRoutes::class => 'queue-many',
             SomeJob::class => 'important',
         ]);
 
-        $this->assertSame([QueueRoutes::class => 'queue-many', SomeJob::class => 'important'], $defaults->all());
+        $this->assertSame([
+            QueueRoutes::class => 'queue-many',
+            BaseNotification::class => ['some-connection', 'some-queue'],
+            SomeJob::class => 'important',
+        ], $defaults->all()
+        );
     }
 
     public function testGetQueue()
@@ -34,9 +44,29 @@ class QueueRoutesTest extends TestCase
             PaymentContract::class => 'payments',
         ]);
 
+        // No queue set
+        $defaults->set(PaymentContract::class, connection: 'payment-connection');
+
         $this->assertSame('notifications', $defaults->getQueue(new FinanceNotification));
         $this->assertSame('jobs', $defaults->getQueue(new SomeJob));
-        $this->assertSame('payments', $defaults->getQueue(new Payment));
+        $this->assertNull($defaults->getQueue(new Payment));
+    }
+
+    public function testGetConnection()
+    {
+        $defaults = new QueueRoutes();
+
+        $defaults->set([
+            BaseNotification::class => ['notification-connection', 'notifications'],
+            CustomTrait::class => ['job-connection', 'jobs'],
+        ]);
+
+        // No connection set
+        $defaults->set(PaymentContract::class, 'payments');
+
+        $this->assertSame('notification-connection', $defaults->getConnection(new FinanceNotification));
+        $this->assertSame('job-connection', $defaults->getConnection(new SomeJob));
+        $this->assertNull($defaults->getConnection(new Payment));
     }
 }
 
