@@ -12,8 +12,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class LoadEnvironmentVariables
 {
     /**
-     * Bootstrap the given application.
-     *
+ * Load environment variables from files.     *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
