@@ -162,14 +162,4 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
         return $this;
     }
-
-    /**
-     * Get the queue routes instance.
-     *
-     * @return \Illuminate\Queue\QueueRoutes
-     */
-    protected function queueRoutes()
-    {
-        return $this->container['queue.routes'];
-    }
 }

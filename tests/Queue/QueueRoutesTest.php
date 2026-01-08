@@ -28,7 +28,7 @@ class QueueRoutesTest extends TestCase
     {
         $defaults = new QueueRoutes();
 
-        $defaults->setMany([
+        $defaults->set([
             BaseNotification::class => 'notifications',
             CustomTrait::class => 'jobs',
             PaymentContract::class => 'payments',

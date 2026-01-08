@@ -2,6 +2,9 @@
 
 namespace Illuminate\Queue\Concerns;
 
+use Illuminate\Container\Container;
+use Illuminate\Queue\QueueRoutes;
+
 trait ResolvesQueueRoutes
 {
     /**
@@ -16,9 +19,16 @@ trait ResolvesQueueRoutes
     }
 
     /**
-     * Get the queue routes instance.
+     * Get the queue routes manager instance.
      *
      * @return \Illuminate\Queue\QueueRoutes
      */
-    abstract protected function queueRoutes();
+    protected function queueRoutes()
+    {
+        $container = Container::getInstance();
+
+        return $container->bound('queue.routes')
+            ? $container->make('queue.routes')
+            : new QueueRoutes;
+    }
 }

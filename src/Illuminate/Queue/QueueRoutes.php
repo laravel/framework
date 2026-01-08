@@ -12,30 +12,7 @@ class QueueRoutes
     protected $routes = [];
 
     /**
-     * Register the queue route for the given class.
-     *
-     * @param  class-string  $class
-     * @param  string  $queueName
-     * @return void
-     */
-    public function set($class, $queueName)
-    {
-        $this->routes[$class] = $queueName;
-    }
-
-    /**
-     * Register the queue routes for the given classes.
-     *
-     * @param  array<class-string, string>  $defaults
-     * @return void
-     */
-    public function setMany(array $defaults)
-    {
-        $this->routes = array_merge($this->routes, $defaults);
-    }
-
-    /**
-     * Get the queue route for a given queueable instance.
+     * Get the queue that a given queueable instance should be routed to.
      *
      * @param  object  $queueable
      * @return string|null
@@ -60,6 +37,22 @@ class QueueRoutes
         }
 
         return null;
+    }
+
+    /**
+     * Register the queue route for the given class.
+     *
+     * @param  array|class-string  $class
+     * @param  string|null  $queueName
+     * @return void
+     */
+    public function set(array|string $class, $queueName = null)
+    {
+        $routes = is_array($class) ? $class : [$class => $queue];
+
+        foreach ($routes as $from => $to) {
+            $this->routes[$from] = $to;
+        }
     }
 
     /**

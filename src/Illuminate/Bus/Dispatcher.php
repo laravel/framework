@@ -242,7 +242,7 @@ class Dispatcher implements QueueingDispatcher
      */
     protected function pushCommandToQueue($queue, $command)
     {
-        $queueName = $command->queue ?? $this->resolveQueueRoute($command);
+        $queueName = $command->queue ?? $this->resolveQueueRoute($command) ?? null;
 
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command, queue: $queueName);
@@ -317,15 +317,5 @@ class Dispatcher implements QueueingDispatcher
         $this->allowsDispatchingAfterResponses = false;
 
         return $this;
-    }
-
-    /**
-     * Get the queue routes instance.
-     *
-     * @return \Illuminate\Queue\QueueRoutes
-     */
-    protected function queueRoutes()
-    {
-        return $this->container['queue.routes'];
     }
 }

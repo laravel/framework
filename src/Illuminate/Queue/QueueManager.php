@@ -126,24 +126,13 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Set the queue route for the given class.
      *
-     * @param  class-string  $class
-     * @param  string  $queue
+     * @param  array|class-string  $class
+     * @param  string|null  $queue
      * @return void
      */
-    public function route($class, $queue)
+    public function route(array|string $class, $queue = null)
     {
         $this->queueRoutes()->set($class, $queue);
-    }
-
-    /**
-     * Set the queue routes for the given classes.
-     *
-     * @param  array<class-string, string>  $queues
-     * @return void
-     */
-    public function routeMany($queues)
-    {
-        $this->queueRoutes()->setMany($queues);
     }
 
     /**
@@ -349,16 +338,6 @@ class QueueManager implements FactoryContract, MonitorContract
     public function getName($connection = null)
     {
         return $connection ?: $this->getDefaultDriver();
-    }
-
-    /**
-     * Get the queue routes instance.
-     *
-     * @return \Illuminate\Queue\QueueRoutes
-     */
-    protected function queueRoutes()
-    {
-        return $this->app['queue.routes'];
     }
 
     /**

@@ -232,7 +232,11 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue')
             ? $this->queue
-            : $queue->resolveQueueRoute($this);
+            : null;
+
+        if (is_null($queueName) && method_exists($queue, 'resolveQueueRoute')) {
+            $queueName = $queue->resolveQueueRoute($this);
+        }
 
         return $queue->connection($connection)->pushOn(
             $queueName ?: null, $this->newQueuedJob()
@@ -252,7 +256,11 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue')
             ? $this->queue
-            : $queue->resolveQueueRoute($this);
+            : null;
+
+        if (is_null($queueName) && method_exists($queue, 'resolveQueueRoute')) {
+            $queueName = $queue->resolveQueueRoute($this);
+        }
 
         return $queue->connection($connection)->laterOn(
             $queueName ?: null, $delay, $this->newQueuedJob()
