@@ -235,7 +235,7 @@ class BladeTest extends TestCase
 
         $this->assertSame('Parent: parent-value, Explicit: explicit-value', trim($regularInclude));
 
-        // @includeScoped does NOT pass parent scope variables
+        // @includeIsolated does NOT pass parent scope variables
         $scopedInclude = View::make('uses-include-scoped', [
             'parentVar' => 'parent-value',
             'explicitVar' => 'explicit-value',

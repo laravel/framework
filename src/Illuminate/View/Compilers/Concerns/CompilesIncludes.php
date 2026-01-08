@@ -81,12 +81,12 @@ trait CompilesIncludes
     }
 
     /**
-     * Compile the include-scoped statements into valid PHP.
+     * Compile the include-isolated statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
-    protected function compileIncludeScoped($expression)
+    protected function compileIncludeIsolated($expression)
     {
         $expression = $this->stripParentheses($expression);
 

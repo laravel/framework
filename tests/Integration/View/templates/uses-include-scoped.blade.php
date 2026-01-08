@@ -1,1 +1,1 @@
-@includeScoped('partials.scoped-partial', ['explicitVar' => $explicitVar])
+@includeIsolated('partials.scoped-partial', ['explicitVar' => $explicitVar])

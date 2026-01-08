@@ -49,9 +49,9 @@ class BladeIncludesTest extends AbstractBladeTestCase
 
     public function testIncludeScopedsAreCompiled()
     {
-        $this->assertSame('<?php echo $__env->make(\'foo\')->render(); ?>', $this->compiler->compileString('@includeScoped(\'foo\')'));
-        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((\'])->render(); ?>', $this->compiler->compileString('@includeScoped(\'foo\', [\'((\'])'));
-        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((a)\' => \'((a)\'])->render(); ?>', $this->compiler->compileString('@includeScoped(\'foo\', [\'((a)\' => \'((a)\'])'));
-        $this->assertSame('<?php echo $__env->make(name(foo))->render(); ?>', $this->compiler->compileString('@includeScoped(name(foo))'));
+        $this->assertSame('<?php echo $__env->make(\'foo\')->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\')'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((\'])->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\', [\'((\'])'));
+        $this->assertSame('<?php echo $__env->make(\'foo\', [\'((a)\' => \'((a)\'])->render(); ?>', $this->compiler->compileString('@includeIsolated(\'foo\', [\'((a)\' => \'((a)\'])'));
+        $this->assertSame('<?php echo $__env->make(name(foo))->render(); ?>', $this->compiler->compileString('@includeIsolated(name(foo))'));
     }
 }
