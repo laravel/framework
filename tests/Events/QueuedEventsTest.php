@@ -152,7 +152,7 @@ class QueuedEventsTest extends TestCase
         $d = new Dispatcher($container);
 
         $queueRoutes = new QueueRoutes;
-        $queueRoutes->set(TestDispatcherQueueRoutes::class, 'event-queue', 'even-connection');
+        $queueRoutes->set(TestDispatcherQueueRoutes::class, 'event-queue', 'event-connection');
         $container->instance('queue.routes', $queueRoutes);
 
         $fakeQueue = new QueueFake($container);
@@ -166,7 +166,7 @@ class QueuedEventsTest extends TestCase
         $d->listen('some.event', TestDispatcherQueueRoutes::class.'@handle');
         $d->dispatch('some.event', ['foo', 'bar']);
 
-        $fakeQueue->connection('even-connection')->assertPushedOn('event-queue', CallQueuedListener::class);
+        $fakeQueue->connection('event-connection')->assertPushedOn('event-queue', CallQueuedListener::class);
     }
     public function testDelayIsSetByWithDelayDynamically()
     {
