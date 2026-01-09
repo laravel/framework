@@ -491,11 +491,22 @@ class ComponentAttributeBag implements Arrayable, ArrayAccess, IteratorAggregate
                 continue;
             }
 
+            // Empty "alt" explicitly marks an image as decorative; empty "value" and "data-*"
+            // are valid. For everything else we don't want to render the attribute at all.
+            if (!in_array($key, ['alt', 'value']) && !str_starts_with($key, 'data') && (is_string($value) && trim($value) === '')) {
+                continue;
+            }
+
             if ($value === true) {
                 $value = $key === 'x-data' || str_starts_with($key, 'wire:') ? '' : $key;
             }
 
-            $string .= ' '.$key.'="'.str_replace('"', '\\"', trim($value)).'"';
+            // Same as above. We want everything but data and value to be trimmed
+            $value = !str_starts_with($key, 'data') && $key !== 'value'
+                ? trim($value)
+                : $value;
+
+            $string .= ' '.$key.'="'.str_replace('"', '\\"', $value).'"';
         }
 
         return trim($string);
