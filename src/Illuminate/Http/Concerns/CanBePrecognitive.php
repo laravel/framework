@@ -18,20 +18,31 @@ trait CanBePrecognitive
             return $rules;
         }
 
-        $validateOnly = explode(',', $this->header('Precognition-Validate-Only'));
-        $validateOnlyPatterns = (new Collection($validateOnly))
-            ->map(fn ($pattern) => '/^'.str_replace('\*', '\d+', preg_quote($pattern, '/')).'$/');
+        $validateOnly = array_filter(explode(',', $this->header('Precognition-Validate-Only')));
 
         return (new Collection($rules))
-            ->filter(function ($rule, $ruleKey) use ($validateOnlyPatterns) {
-                foreach ($validateOnlyPatterns as $pattern) {
-                    if (preg_match($pattern, $ruleKey)) {
-                        return true;
-                    }
-                }
+            ->filter(fn ($rule, $attribute) => $this->shouldValidatePrecognitiveAttribute($attribute, $validateOnly))
+            ->all();
+    }
 
-                return false;
-            })->all();
+    /**
+     * Determine if the given attribute should be validated.
+     *
+     * @param  string  $attribute
+     * @param  array  $validateOnly
+     * @return bool
+     */
+    protected function shouldValidatePrecognitiveAttribute($attribute, $validateOnly)
+    {
+        foreach ($validateOnly as $pattern) {
+            $regex = '/^'.str_replace('\*', '[^.]+', preg_quote($pattern, '/')).'$/';
+
+            if (preg_match($regex, $attribute)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
