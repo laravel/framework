@@ -140,7 +140,7 @@ class FailoverQueue extends Queue implements QueueContract
      * @param  mixed  $job
      * @return mixed
      *
-     * @throws \RuntimeException
+     * @throws \Throwable
      */
     protected function attemptOnAllConnections(string $method, array $arguments, $job = null)
     {
