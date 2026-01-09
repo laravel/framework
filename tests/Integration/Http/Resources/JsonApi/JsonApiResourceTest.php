@@ -681,6 +681,23 @@ class JsonApiResourceTest extends TestCase
         $this->assertCount(1, array_filter($types, fn (string $t) => $t === 'users'));
     }
 
+    public function testDifferentModelInstancesWithSameTypeAndIdAreDeduplicated()
+    {
+        $user = User::factory()->create();
+
+        // This route manually creates two different User model instances with the same ID and
+        // adds them both to the loadedRelationshipsMap. Per the JSON:API spec, they should
+        // be deduplicated since they have the same type+id, even though they're different object instances.
+        $response = $this->getJson("/users/{$user->getKey()}/with-duplicate-instances")
+            ->assertHeader('Content-type', 'application/vnd.api+json');
+
+        $included = $response->json('included');
+
+        $this->assertCount(1, $included);
+        $this->assertSame('users', $included[0]['type']);
+        $this->assertSame((string) $user->getKey(), $included[0]['id']);
+    }
+
     public function testSameModelOnDifferentResourcesIsNotDeduplicated()
     {
         $user = User::factory()->create();
