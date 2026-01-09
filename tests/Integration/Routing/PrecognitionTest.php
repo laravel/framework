@@ -537,6 +537,8 @@ class PrecognitionTest extends TestCase
 
         $response->assertUnprocessable();
         $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonMissing(['errors' => ['email' => []]]);
+        $response->assertJsonMissing(['errors' => ['name' => []]]);
         $response->assertJsonPath('errors', [
             'user.name' => ['The user.name field must be a string.'],
         ]);
