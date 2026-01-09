@@ -168,6 +168,7 @@ class QueuedEventsTest extends TestCase
 
         $fakeQueue->connection('event-connection')->assertPushedOn('event-queue', CallQueuedListener::class);
     }
+
     public function testDelayIsSetByWithDelayDynamically()
     {
         $d = new Dispatcher;
