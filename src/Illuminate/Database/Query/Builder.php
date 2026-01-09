@@ -461,8 +461,8 @@ class Builder implements BuilderContract
     /**
      * Add a vector-similarity selection to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
-     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string $vector
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
      * @param  string|null  $as
      * @return $this
      */
@@ -2882,8 +2882,8 @@ class Builder implements BuilderContract
     /**
      * Add a vector-distance "order by" clause to the query.
      *
-     * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
-     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float> $vector
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
      * @return $this
      */
     public function orderByVectorDistance($column, $vector)
