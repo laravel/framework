@@ -218,7 +218,9 @@ class Dispatcher implements QueueingDispatcher
      */
     public function dispatchToQueue($command)
     {
-        $connection = $command->connection ?? $this->resolveConnectionFromQueueRoute($command) ?? null;
+        $connection = $command->connection
+            ?? $this->resolveConnectionFromQueueRoute($command)
+            ?? null;
 
         $queue = ($this->queueResolver)($connection);
 
