@@ -2880,17 +2880,6 @@ class Builder implements BuilderContract
     }
 
     /**
-     * Put the query's results in random order.
-     *
-     * @param  string|int  $seed
-     * @return $this
-     */
-    public function inRandomOrder($seed = '')
-    {
-        return $this->orderByRaw($this->grammar->compileRandom($seed));
-    }
-
-    /**
      * Add a vector-distance "order by" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
@@ -2919,6 +2908,17 @@ class Builder implements BuilderContract
         ];
 
         return $this;
+    }
+
+    /**
+     * Put the query's results in random order.
+     *
+     * @param  string|int  $seed
+     * @return $this
+     */
+    public function inRandomOrder($seed = '')
+    {
+        return $this->orderByRaw($this->grammar->compileRandom($seed));
     }
 
     /**
