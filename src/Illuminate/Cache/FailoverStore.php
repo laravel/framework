@@ -206,9 +206,8 @@ class FailoverStore extends TaggableStore implements LockProvider
      */
     protected function attemptOnAllStores(string $method, array $arguments)
     {
-        $lastException = null;
+        [$lastException, $failedCaches] = [null, []];
 
-        $failedCaches = [];
         try {
             foreach ($this->stores as $store) {
                 try {
@@ -217,6 +216,7 @@ class FailoverStore extends TaggableStore implements LockProvider
                     $lastException = $e;
 
                     $failedCaches[] = $store;
+
                     if (! in_array($store, $this->failingCaches)) {
                         $this->events->dispatch(new CacheFailedOver($store, $e));
                     }
