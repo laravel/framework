@@ -462,12 +462,16 @@ class Builder implements BuilderContract
      * Add a vector-similarity selection to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
-     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float> $vector
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string $vector
      * @param  string|null  $as
      * @return $this
      */
     public function selectVectorDistance($column, $vector, $as = null)
     {
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
         $this->addBinding(
             json_encode(
                 $vector instanceof Arrayable
@@ -2828,6 +2832,10 @@ class Builder implements BuilderContract
      */
     public function orderByVectorDistance($column, $vector)
     {
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
         $this->addBinding(
             json_encode(
                 $vector instanceof Arrayable
