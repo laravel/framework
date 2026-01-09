@@ -18,7 +18,7 @@ trait CanBePrecognitive
             return $rules;
         }
 
-        $validateOnly = array_filter(explode(',', $this->header('Precognition-Validate-Only')));
+        $validateOnly = explode(',', $this->header('Precognition-Validate-Only'));
 
         return (new Collection($rules))
             ->filter(fn ($rule, $attribute) => $this->shouldValidatePrecognitiveAttribute($attribute, $validateOnly))
