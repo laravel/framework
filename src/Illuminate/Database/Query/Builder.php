@@ -459,6 +459,33 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a vector-similarity selection to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float> $vector
+     * @param  string|null  $as
+     * @return $this
+     */
+    public function selectVectorDistance($column, $vector, $as = null)
+    {
+        $this->addBinding(
+            json_encode(
+                $vector instanceof Arrayable
+                    ? $vector->toArray()
+                    : $vector,
+                flags: JSON_THROW_ON_ERROR
+            ),
+            'select',
+        );
+
+        $as = $this->getGrammar()->wrap($as ?? $column.'_distance');
+
+        return $this->addSelect(
+            new Expression("({$this->getGrammar()->wrap($column)} <=> ?) as {$as}")
+        );
+    }
+
+    /**
      * Force the query to only return distinct results.
      *
      * @return $this
@@ -2790,6 +2817,33 @@ class Builder implements BuilderContract
     public function inRandomOrder($seed = '')
     {
         return $this->orderByRaw($this->grammar->compileRandom($seed));
+    }
+
+    /**
+     * Add a vector-distance "order by" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float> $vector
+     * @return $this
+     */
+    public function orderByVectorDistance($column, $vector)
+    {
+        $this->addBinding(
+            json_encode(
+                $vector instanceof Arrayable
+                    ? $vector->toArray()
+                    : $vector,
+                flags: JSON_THROW_ON_ERROR
+            ),
+            $this->unions ? 'unionOrder' : 'order'
+        );
+
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => new Expression("({$this->getGrammar()->wrap($column)} <=> ?)"),
+            'direction' => 'asc',
+        ];
+
+        return $this;
     }
 
     /**
