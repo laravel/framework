@@ -1399,7 +1399,7 @@ class Connection implements ConnectionInterface
      */
     protected function getConnectionDetails()
     {
-        $config = $this->latestPdoTypeRetrieved === 'read'
+        $config = $this->latestReadWriteTypeUsed() === 'read'
             ? $this->readPdoConfig
             : $this->config;
 
