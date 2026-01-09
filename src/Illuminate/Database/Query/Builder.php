@@ -1130,6 +1130,49 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a vector distance "where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $maxDistance
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
+    {
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
+        return $this->whereRaw(
+            "({$this->getGrammar()->wrap($column)} <=> ?) <= ?",
+            [
+                json_encode(
+                    $vector instanceof Arrayable
+                        ? $vector->toArray()
+                        : $vector,
+                    flags: JSON_THROW_ON_ERROR
+                ),
+                $maxDistance,
+            ],
+            $boolean
+        );
+    }
+
+    /**
+     * Add a vector distance "or where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $maxDistance
+     * @return $this
+     */
+    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance)
+    {
+        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or');
+    }
+
+    /**
      * Add a raw "where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
