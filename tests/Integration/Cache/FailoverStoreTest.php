@@ -58,6 +58,7 @@ class CantSerialize
         if (self::$throwException) {
             throw new \Exception('You cannot serialize this.');
         }
+
         return [];
     }
 }
