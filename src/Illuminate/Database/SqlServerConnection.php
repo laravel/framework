@@ -9,7 +9,6 @@ use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Illuminate\Database\Schema\SqlServerBuilder;
 use Illuminate\Filesystem\Filesystem;
-use LogicException;
 use RuntimeException;
 use Throwable;
 
@@ -35,13 +34,13 @@ class SqlServerConnection extends Connection
      */
     public function transaction(Closure $callback, $attempts = 1, $backoff = null)
     {
-        if ($backoff !== null) {
-            throw new LogicException('Transaction attempt backoffs are only supported for "sqlsrv" driver connections.');
-        }
-
         for ($a = 1; $a <= $attempts; $a++) {
             if ($this->getDriverName() === 'sqlsrv') {
                 return parent::transaction($callback, $attempts, $backoff);
+            }
+
+            if ($backoff !== null) {
+                throw new RuntimeException('Transaction attempt backoffs are only supported for "sqlsrv" driver connections.');
             }
 
             $this->getPdo()->exec('BEGIN TRAN');
