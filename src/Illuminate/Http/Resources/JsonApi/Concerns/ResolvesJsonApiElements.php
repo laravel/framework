@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 
 use Generator;
 use Illuminate\Contracts\Support\Arrayable;
-use WeakMap;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\AsPivot;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -21,6 +20,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use WeakMap;
 
 trait ResolvesJsonApiElements
 {
