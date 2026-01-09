@@ -27,6 +27,8 @@ use Illuminate\Support\Testing\Fakes\EventFake;
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
+ * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
+ * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static \Illuminate\Support\Testing\Fakes\EventFake except(array|string $eventsToDispatch)
  * @method static void assertListening(string $expectedEvent, string|array $expectedListener)
  * @method static void assertDispatched(string|\Closure $event, callable|int|null $callback = null)
