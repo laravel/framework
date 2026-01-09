@@ -639,5 +639,4 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonPath('included.0.attributes.name', 'test')
             ->assertJsonCount(1, 'included');
     }
-
 }
