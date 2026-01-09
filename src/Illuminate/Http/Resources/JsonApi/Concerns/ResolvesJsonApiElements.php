@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\JsonApi\Concerns;
 
 use Generator;
 use Illuminate\Contracts\Support\Arrayable;
+use WeakMap;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\AsPivot;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -331,24 +332,27 @@ trait ResolvesJsonApiElements
         $relations = new Collection;
         $index = 0;
 
-        // Track visited objects by spl_object_id to prevent infinite loops from circular
-        // references created by chaperone(). We use object IDs rather than type+id to
-        // preserve legitimate cases like BelongsToMany with different pivot data
-        // where multiple distinct instances may share the same model ID.
-        $visitedObjects = [spl_object_id($this->resource) => true];
+        // Track visited objects to prevent infinite loops from circular references
+        // created by chaperone(). We use a WeakMap with object instances rather than
+        // type+id to preserve legitimate cases like BelongsToMany with different pivot
+        // data where multiple distinct instances may share the same model ID.
+        $visitedObjects = new WeakMap;
+        $visitedObjects[$this->resource] = true;
 
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
 
-            $objectId = spl_object_id($resourceInstance->resource);
+            $underlyingResource = $resourceInstance->resource;
 
-            if (isset($visitedObjects[$objectId])) {
-                $index++;
+            if (is_object($underlyingResource)) {
+                if (isset($visitedObjects[$underlyingResource])) {
+                    $index++;
 
-                continue;
+                    continue;
+                }
+
+                $visitedObjects[$underlyingResource] = true;
             }
-
-            $visitedObjects[$objectId] = true;
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
@@ -359,7 +363,7 @@ trait ResolvesJsonApiElements
                 ->includePreviouslyLoadedRelationships()
                 ->resolve($request);
 
-            array_push($this->loadedRelationshipsMap, ...$resourceInstance->loadedRelationshipsMap);
+            array_push($this->loadedRelationshipsMap, ...($resourceInstance->loadedRelationshipsMap ?? []));
 
             $relations->push(array_filter([
                 'id' => $id,
