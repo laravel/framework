@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Bus;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,8 @@ class BusPendingDispatchTest extends TestCase
 {
     protected $job;
 
+    protected $dispatcher;
+
     /**
      * @var PendingDispatchWithoutDestructor
      */
@@ -27,10 +31,22 @@ class BusPendingDispatchTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
+        $container = new Container;
+        $this->dispatcher = m::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $this->dispatcher);
+        Container::setInstance($container);
+
         $this->job = m::mock(stdClass::class);
         $this->pendingDispatch = new PendingDispatchWithoutDestructor($this->job);
+    }
 
-        parent::setUp();
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        Container::setInstance(null);
     }
 
     public function testOnConnection()
@@ -106,5 +122,95 @@ class BusPendingDispatchTest extends TestCase
         $newJob = m::mock(stdClass::class);
         $this->job->shouldReceive('appendToChain')->once()->with($newJob);
         $this->pendingDispatch->appendToChain($newJob);
+    }
+
+    public function testCancelPendingDispatch()
+    {
+        $result = $this->pendingDispatch->cancelPendingDispatch();
+
+        $this->assertSame($this->pendingDispatch, $result);
+        $this->assertFalse(
+            (new ReflectionClass($this->pendingDispatch))->getProperty('pendingDispatch')->getValue($this->pendingDispatch)
+        );
+    }
+
+    public function testFlushPendingDispatchAfterCancelThrowsException()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot flush a pending dispatch that has already been dispatched.');
+
+        $this->pendingDispatch->cancelPendingDispatch();
+        $this->pendingDispatch->flushPendingDispatch();
+    }
+
+    public function testFlushPendingDispatchSetsPendingDispatchToFalse()
+    {
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->pendingDispatch->flushPendingDispatch();
+
+        $this->assertFalse(
+            (new ReflectionClass($this->pendingDispatch))->getProperty('pendingDispatch')->getValue($this->pendingDispatch)
+        );
+    }
+
+    public function testFlushPendingDispatchThrowsExceptionIfAlreadyDispatched()
+    {
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot flush a pending dispatch that has already been dispatched.');
+
+        $this->pendingDispatch->flushPendingDispatch();
+        $this->pendingDispatch->flushPendingDispatch();
+    }
+
+    public function testCancelPendingDispatchThrowsExceptionIfAlreadyDispatched()
+    {
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Cannot cancel a pending dispatch that has already been dispatched.');
+
+        $this->pendingDispatch->flushPendingDispatch();
+        $this->pendingDispatch->cancelPendingDispatch();
+    }
+
+    public function testFlushPendingDispatchWithDelay()
+    {
+        $this->job->shouldReceive('delay')->once()->with(5);
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->pendingDispatch->delay(5)->flushPendingDispatch();
+    }
+
+    public function testCancelPendingDispatchWithDelay()
+    {
+        $this->job->shouldReceive('delay')->once()->with(5);
+        $this->dispatcher->shouldNotReceive('dispatch');
+
+        $this->pendingDispatch->delay(5)->cancelPendingDispatch();
+    }
+
+    public function testFlushPendingDispatchWithOnQueue()
+    {
+        $this->job->shouldReceive('onQueue')->once()->with('high');
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->pendingDispatch->onQueue('high')->flushPendingDispatch();
+    }
+
+    public function testFlushPendingDispatchWithChainedOptions()
+    {
+        $this->job->shouldReceive('onConnection')->once()->with('redis');
+        $this->job->shouldReceive('onQueue')->once()->with('high');
+        $this->job->shouldReceive('delay')->once()->with(10);
+        $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
+
+        $this->pendingDispatch
+            ->onConnection('redis')
+            ->onQueue('high')
+            ->delay(10)
+            ->flushPendingDispatch();
     }
 }

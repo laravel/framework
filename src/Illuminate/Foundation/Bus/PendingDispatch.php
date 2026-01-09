@@ -8,6 +8,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
+use RuntimeException;
 
 class PendingDispatch
 {
@@ -26,6 +27,13 @@ class PendingDispatch
      * @var bool
      */
     protected $afterResponse = false;
+
+    /**
+     * Indicates if the job dispatch is still pending.
+     *
+     * @var bool
+     */
+    protected $pendingDispatch = true;
 
     /**
      * Create a new pending job dispatch.
@@ -195,6 +203,56 @@ class PendingDispatch
     }
 
     /**
+     * Cancel the pending dispatch of the job.
+     *
+     * @return $this
+     *
+     * @throws RuntimeException
+     */
+    public function cancelPendingDispatch()
+    {
+        if (! $this->pendingDispatch) {
+            throw new RuntimeException('Cannot cancel a pending dispatch that has already been dispatched.');
+        }
+
+        $this->pendingDispatch = false;
+
+        return $this;
+    }
+
+    /**
+     * Dispatch the job immediately.
+     *
+     * @return mixed
+     *
+     * @throws RuntimeException
+     */
+    public function flushPendingDispatch()
+    {
+        if (! $this->pendingDispatch) {
+            throw new RuntimeException('Cannot flush a pending dispatch that has already been dispatched.');
+        }
+
+        $this->pendingDispatch = false;
+
+        $this->addUniqueJobInformationToContext($this->job);
+
+        try {
+            if (! $this->shouldDispatch()) {
+                return null;
+            } elseif ($this->afterResponse) {
+                app(Dispatcher::class)->dispatchAfterResponse($this->job);
+
+                return null;
+            } else {
+                return app(Dispatcher::class)->dispatch($this->job);
+            }
+        } finally {
+            $this->removeUniqueJobInformationFromContext($this->job);
+        }
+    }
+
+    /**
      * Determine if the job should be dispatched.
      *
      * @return bool
@@ -240,18 +298,10 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        $this->addUniqueJobInformationToContext($this->job);
-
-        if (! $this->shouldDispatch()) {
-            $this->removeUniqueJobInformationFromContext($this->job);
-
+        if (! $this->pendingDispatch) {
             return;
-        } elseif ($this->afterResponse) {
-            app(Dispatcher::class)->dispatchAfterResponse($this->job);
-        } else {
-            app(Dispatcher::class)->dispatch($this->job);
         }
 
-        $this->removeUniqueJobInformationFromContext($this->job);
+        $this->flushPendingDispatch();
     }
 }
