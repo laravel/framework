@@ -332,12 +332,13 @@ trait ResolvesJsonApiElements
         $relations = new Collection;
         $index = 0;
 
-        // Track visited objects to prevent infinite loops from circular references
-        // created by chaperone(). We use a WeakMap with object instances rather than
-        // type+id to preserve legitimate cases like BelongsToMany with different pivot
-        // data where multiple distinct instances may share the same model ID.
+        // Track visited objects by instance + type to prevent infinite loops from circular references
+        // created by chaperone(). We use object instances rather than type+id to preserve legitimate
+        // cases like BelongsToMany with different pivot data where multiple distinct instances may
+        // share the same model ID. We also track by type to allow the same model to appear with
+        // different resource types (e.g., User as both "users" and "authors").
         $visitedObjects = new WeakMap;
-        $visitedObjects[$this->resource] = true;
+        $visitedObjects[$this->resource] = [$this->resolveResourceType($request) => true];
 
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
@@ -345,13 +346,14 @@ trait ResolvesJsonApiElements
             $underlyingResource = $resourceInstance->resource;
 
             if (is_object($underlyingResource)) {
-                if (isset($visitedObjects[$underlyingResource])) {
+                if (isset($visitedObjects[$underlyingResource][$type])) {
                     $index++;
 
                     continue;
                 }
 
-                $visitedObjects[$underlyingResource] = true;
+                $visitedObjects[$underlyingResource] ??= [];
+                $visitedObjects[$underlyingResource][$type] = true;
             }
 
             if (! $resourceInstance instanceof JsonApiResource &&
