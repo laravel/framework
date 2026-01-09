@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
+use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserWithArrayRelationshipResource;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -58,6 +60,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $router->get('posts/{postId}', function ($postId) {
             return Post::find($postId)->toResource();
+        });
+
+        $router->get('users/{userId}/with-array-relationship', function ($userId) {
+            $resource = new UserWithArrayRelationshipResource(User::find($userId));
+            $resource->loadedRelationshipsMap = [
+                [new ArrayBackedJsonApiResource(['id' => 99, 'name' => 'test']), 'things', '99', true],
+            ];
+
+            return $resource;
         });
     }
 

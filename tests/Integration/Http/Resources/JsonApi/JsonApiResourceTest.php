@@ -625,4 +625,19 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonPath('data.relationships.chaperonePosts.data.0.id', (string) $post->getKey())
             ->assertJsonCount(1, 'included');
     }
+
+    public function testIncludedResourcesCanBeArrayBackedCustomResources()
+    {
+        $user = User::factory()->create();
+
+        $this->getJson("/users/{$user->getKey()}/with-array-relationship")
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonPath('included.0.id', '99')
+            ->assertJsonPath('included.0.type', 'things')
+            ->assertJsonPath('included.0.attributes.name', 'test')
+            ->assertJsonCount(1, 'included');
+    }
+
 }
