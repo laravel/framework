@@ -202,7 +202,7 @@ class FailoverStore extends TaggableStore implements LockProvider
      *
      * @return mixed
      *
-     * @throws \RuntimeException
+     * @throws \Throwable
      */
     protected function attemptOnAllStores(string $method, array $arguments)
     {
