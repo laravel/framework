@@ -18,6 +18,7 @@ use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\CachesRoutes;
+use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher;
@@ -29,6 +30,8 @@ use Throwable;
  */
 class BroadcastManager implements FactoryContract
 {
+    use ResolvesQueueRoutes;
+
     /**
      * The application instance.
      *
@@ -199,6 +202,10 @@ class BroadcastManager implements FactoryContract
             $queue = $event->queue;
         }
 
+        if (is_null($queue)) {
+            $queue = $this->resolveQueueFromQueueRoute($event) ?? null;
+        }
+
         $broadcastEvent = new BroadcastEvent(clone $event);
 
         if ($event instanceof ShouldBeUnique) {
@@ -210,7 +217,11 @@ class BroadcastManager implements FactoryContract
         }
 
         $push = fn () => $this->app->make('queue')
-            ->connection($event->connection ?? null)
+            ->connection(
+                $event->connection
+                    ?? $this->resolveConnectionFromQueueRoute($event)
+                    ?? null
+            )
             ->pushOn($queue, $broadcastEvent);
 
         $event instanceof ShouldRescue

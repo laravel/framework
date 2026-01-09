@@ -28,6 +28,17 @@ class SendingQueuedMailTest extends TestCase
             return $job->middleware[0] instanceof RateLimited;
         });
     }
+
+    public function testMailIsSentWhenRoutingQueue()
+    {
+        Queue::fake();
+
+        Queue::route(Mailable::class, 'mail-queue', 'mail-connection');
+
+        Mail::to('test@mail.com')->queue(new SendingQueuedMailTestMail);
+
+        Queue::connection('mail-connection')->assertPushedOn('mail-queue', SendQueuedMailable::class);
+    }
 }
 
 class SendingQueuedMailTestMail extends Mailable
