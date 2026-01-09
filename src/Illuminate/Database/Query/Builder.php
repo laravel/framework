@@ -1173,6 +1173,30 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a vector similarity clause to the query, filtering by minimum similarity and ordering by similarity.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $minSimilarity  A value between 0.0 and 1.0, where 1.0 is identical.
+     * @param  bool  $order
+     * @return $this
+     */
+    public function whereSimilar($column, $vector, $minSimilarity, $order = true)
+    {
+        if (is_string($vector)) {
+            $vector = Str::of($vector)->toEmbeddings();
+        }
+
+        $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
+
+        if ($order) {
+            $this->orderByVectorDistance($column, $vector);
+        }
+
+        return $this;
+    }
+
+    /**
      * Add a raw "where" clause to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $sql
