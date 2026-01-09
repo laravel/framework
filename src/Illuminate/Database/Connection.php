@@ -50,6 +50,13 @@ class Connection implements ConnectionInterface
     protected $readPdo;
 
     /**
+     * The database connection configuration options for reading.
+     *
+     * @var array
+     */
+    protected $readPdoConfig = [];
+
+    /**
      * The name of the connected database.
      *
      * @var string
@@ -1327,6 +1334,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Set the read PDO connection configuration.
+     *
+     * @param  array  $config
+     * @return $this
+     */
+    public function setReadPdoConfig(array $config)
+    {
+        $this->readPdoConfig = $config;
+
+        return $this;
+    }
+
+    /**
      * Set the reconnect instance on the connection.
      *
      * @param  (callable(\Illuminate\Database\Connection): mixed)  $reconnector
@@ -1379,13 +1399,17 @@ class Connection implements ConnectionInterface
      */
     protected function getConnectionDetails()
     {
+        $config = $this->latestReadWriteTypeUsed() === 'read'
+            ? $this->readPdoConfig
+            : $this->config;
+
         return [
             'driver' => $this->getDriverName(),
             'name' => $this->getNameWithReadWriteType(),
-            'host' => $this->getConfig('host'),
-            'port' => $this->getConfig('port'),
-            'database' => $this->getConfig('database'),
-            'unix_socket' => $this->getConfig('unix_socket'),
+            'host' => $config['host'] ?? null,
+            'port' => $config['port'] ?? null,
+            'database' => $config['database'] ?? null,
+            'unix_socket' => $config['unix_socket'] ?? null,
         ];
     }
 
