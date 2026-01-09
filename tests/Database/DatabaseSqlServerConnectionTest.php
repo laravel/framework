@@ -25,8 +25,6 @@ class DatabaseSqlServerConnectionTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Transaction attempt backoffs are only supported for "sqlsrv" driver connections.');
 
-        $connection->transaction(function () {
-            return 'test';
-        }, attempts: 1, backoff: 100);
+        $connection->transaction(fn () => '', attempts: 1, backoff: 100);
     }
 }
