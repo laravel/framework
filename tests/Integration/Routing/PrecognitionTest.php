@@ -456,7 +456,7 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
-    public function testClientCanSpecifySimpleArrayWildcardToValidateWhenUsingControllerValidateWithPassingArrayOfRules()
+    public function testItCanValidateArrayWithWildcard()
     {
         Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
             ->middleware(PrecognitionInvokingController::class);
@@ -477,7 +477,7 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
-    public function testClientCanSpecifyComplexArrayWildcardToValidateWhenUsingControllerValidateWithPassingArrayOfRules()
+    public function testItCanValidateNestedArrayWithWildcard()
     {
         Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
             ->middleware(PrecognitionInvokingController::class);
@@ -501,7 +501,27 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
-    public function testItCanValidateWithWildcardMatchingNonNumericSegments()
+    public function testItCanValidateNestedObjectFieldsWithWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereProfileIsValidated'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'profile' => ['username' => 123, 'email' => 'invalid'],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'profile.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'profile.username' => ['The profile.username field must be a string.'],
+            'profile.email' => ['The profile.email field must be a valid email address.'],
+        ]);
+    }
+
+    public function testItDoesNotMatchWildcardAgainstOtherRootKeys()
     {
         Route::post('test-route', [PrecognitionTestController::class, 'methodWithMultipleRootKeys'])
             ->middleware(PrecognitionInvokingController::class);
@@ -561,28 +581,6 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
-    public function testItCanValidateSpecificNestedFieldWithWildcard()
-    {
-        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereUsersAreValidated'])
-            ->middleware(PrecognitionInvokingController::class);
-
-        $response = $this->postJson('test-route', [
-            'users' => [
-                ['name' => 123, 'email' => 'invalid'],
-                ['name' => 456, 'email' => 'also-invalid'],
-            ],
-        ], [
-            'Precognition' => 'true',
-            'Precognition-Validate-Only' => 'users.*.name',
-        ]);
-
-        $response->assertUnprocessable();
-        $response->assertJsonPath('errors', [
-            'users.0.name' => ['The users.0.name field must be a string.'],
-            'users.1.name' => ['The users.1.name field must be a string.'],
-        ]);
-    }
-
     public function testItCanValidateSpecificIndexWithoutWildcard()
     {
         Route::post('test-route', [PrecognitionTestController::class, 'methodWhereUsersAreValidated'])
@@ -599,6 +597,7 @@ class PrecognitionTest extends TestCase
         ]);
 
         $response->assertUnprocessable();
+        $response->assertJsonMissing(['errors' => ['users.0.email' => []]]);
         $response->assertJsonPath('errors', [
             'users.1.email' => ['The users.1.email field must be a valid email address.'],
         ]);
@@ -1304,6 +1303,21 @@ class PrecognitionTestController
                 'user.name' => ['required', 'string'],
                 'email' => ['required', 'email'],
                 'name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereProfileIsValidated(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'profile' => ['required', 'array'],
+                'profile.username' => ['required', 'string'],
+                'profile.email' => ['required', 'email'],
             ]);
 
             fail();
