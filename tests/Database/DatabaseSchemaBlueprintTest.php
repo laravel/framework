@@ -658,9 +658,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testNotNullMethodSetsNullableToFalse()
     {
-        $blueprint = new Blueprint('users');
-        $column = $blueprint->string('email')->notNull();
-        $this->assertFalse($column->get('nullable'));
+        $connection = $this->getConnection('MySql');
+
+        $blueprint = new Blueprint($connection, 'users', function ($table) {
+            $table->string('name')->nullable();
+            $table->string('name')->notNull()->change();
+        });
+
+        $this->assertEquals([
+            "alter table `users` add `name` varchar(255) null",
+            "alter table `users` modify `name` varchar(255) not null",
+        ], $blueprint->toSql());
     }
 
     protected function getConnection(?string $grammar = null, string $prefix = '')
