@@ -50,14 +50,14 @@ abstract class Manager
     /**
      * Get the default driver name.
      *
-     * @return string|null
+     * @return \BackedEnum|\UnitEnum|string|null
      */
     abstract public function getDefaultDriver();
 
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param  \BackedEnum|\UnitEnum|string|null  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -75,56 +75,58 @@ abstract class Manager
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
-        return $this->drivers[$driver] ??= $this->createDriver($driver);
+        return $this->drivers[enum_value($driver)] ??= $this->createDriver($driver);
     }
 
     /**
      * Create a new driver instance.
      *
-     * @param  string  $driver
+     * @param  \BackedEnum|\UnitEnum|string  $driver
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
     protected function createDriver($driver)
     {
+        $driverName = enum_value($driver);
+
         // First, we will determine if a custom driver creator exists for the given driver and
         // if it does not we will check for a creator method for the driver. Custom creator
         // callbacks allow developers to build their own "drivers" easily using Closures.
-        if (isset($this->customCreators[$driver])) {
+        if (isset($this->customCreators[$driverName])) {
             return $this->callCustomCreator($driver);
         }
 
-        $method = 'create'.Str::studly($driver).'Driver';
+        $method = 'create'.Str::studly($driverName).'Driver';
 
         if (method_exists($this, $method)) {
             return $this->$method();
         }
 
-        throw new InvalidArgumentException("Driver [$driver] not supported.");
+        throw new InvalidArgumentException("Driver [$driverName] not supported.");
     }
 
     /**
      * Call a custom driver creator.
      *
-     * @param  string  $driver
+     * @param  \BackedEnum|\UnitEnum|string  $driver
      * @return mixed
      */
     protected function callCustomCreator($driver)
     {
-        return $this->customCreators[$driver]($this->container);
+        return $this->customCreators[enum_value($driver)]($this->container);
     }
 
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
+     * @param  \BackedEnum|\UnitEnum|string  $driver
      * @param  \Closure  $callback
      * @return $this
      */
     public function extend($driver, Closure $callback)
     {
-        $this->customCreators[$driver] = $callback;
+        $this->customCreators[enum_value($driver)] = $callback;
 
         return $this;
     }
