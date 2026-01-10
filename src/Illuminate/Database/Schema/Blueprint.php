@@ -1667,6 +1667,16 @@ class Blueprint
     }
 
     /**
+     * Indicate that the column should not be nullable.
+     *
+     * @return $this
+     */
+    public function notNull()
+    {
+        return $this->nullable(false);
+    }
+
+    /**
      * Create a new custom column on the table.
      *
      * @param  string  $column
