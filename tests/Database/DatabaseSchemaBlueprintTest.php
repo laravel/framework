@@ -656,6 +656,14 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `posts` add `note` tinytext not null default \'this\'\'ll work too\''], $getSql('MySql'));
     }
 
+    public function testNotNullMethodSetsNullableToFalse()
+    {
+        $blueprint = new Blueprint('users');
+        $column = $blueprint->string('email')->notNull();
+    
+        $this->assertFalse($column->get('nullable'));
+    }
+
     protected function getConnection(?string $grammar = null, string $prefix = '')
     {
         $connection = m::mock(Connection::class)
