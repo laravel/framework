@@ -58,7 +58,7 @@ class ComposerScripts
      */
     public static function prePackageUninstall(PackageEvent $event)
     {
-        // Package uninstall events are only applicable when uninstalling packages in dev environments.
+        // Package uninstall events are only applicable when uninstalling packages in dev environments...
         if (! $event->isDevMode()) {
             return;
         }
