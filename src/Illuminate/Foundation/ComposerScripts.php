@@ -58,6 +58,11 @@ class ComposerScripts
      */
     public static function prePackageUninstall(PackageEvent $event)
     {
+        // Package uninstall events are only applicable when uninstalling packages in dev environments...
+        if (! $event->isDevMode()) {
+            return;
+        }
+
         require_once $event->getComposer()->getConfig()->get('vendor-dir').'/autoload.php';
 
         $laravel = new Application(getcwd());
