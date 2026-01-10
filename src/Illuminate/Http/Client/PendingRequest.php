@@ -1180,7 +1180,7 @@ class PendingRequest
 
                 return $this->runAfterResponseCallbacks($response);
             })
-            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
+            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException|\Illuminate\Http\Client\RequestException $e) {
                 if ($e instanceof StrayRequestException) {
                     throw $e;
                 }
