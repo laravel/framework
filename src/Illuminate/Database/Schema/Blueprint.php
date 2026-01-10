@@ -1669,7 +1669,7 @@ class Blueprint
     /**
      * Indicate that the column should not be nullable.
      *
-     * @return $this
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function notNull()
     {
