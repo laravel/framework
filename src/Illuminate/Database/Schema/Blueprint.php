@@ -705,13 +705,13 @@ class Blueprint
     /**
      * Specify a vector index for the table.
      *
-     * @param  string|array  $columns
+     * @param  string  $column
      * @param  string|null  $name
      * @return \Illuminate\Database\Schema\IndexDefinition
      */
-    public function vectorIndex($columns, $name = null)
+    public function vectorIndex($column, $name = null)
     {
-        return $this->indexCommand('vectorIndex', $columns, $name, 'hnsw', 'vector_cosine_ops');
+        return $this->indexCommand('vectorIndex', $column, $name, 'hnsw', 'vector_cosine_ops');
     }
 
     /**
