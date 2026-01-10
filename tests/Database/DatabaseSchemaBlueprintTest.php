@@ -666,8 +666,8 @@ class DatabaseSchemaBlueprintTest extends TestCase
         });
 
         $this->assertEquals([
-            "alter table `users` add `name` varchar(255) null",
-            "alter table `users` modify `name` varchar(255) not null",
+            'alter table `users` add `name` varchar(255) null',
+            'alter table `users` modify `name` varchar(255) not null',
         ], $blueprint->toSql());
     }
 
