@@ -1223,6 +1223,7 @@ class Validator implements ValidatorContract
             ->mapWithKeys(function ($value, $key) {
                 return [static::encodeAttributeWithPlaceholder($key) => $value];
             })
+            ->dot()
             ->toArray();
 
         $this->initialRules = $rules;
