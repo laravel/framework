@@ -1141,7 +1141,7 @@ class Builder implements BuilderContract
      * @param  bool  $order
      * @return $this
      */
-    public function whereSimilar($column, $vector, $minSimilarity = 0.6, $order = true)
+    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
     {
         if (is_string($vector)) {
             $vector = Str::of($vector)->toEmbeddings();
