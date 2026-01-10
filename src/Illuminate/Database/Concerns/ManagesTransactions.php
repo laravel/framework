@@ -258,7 +258,7 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @param  int  $currentAttempt
      * @param  int  $maxAttempts
-     * @param  \Closure|array|int|null  $backoff
+     * @param  \Closure(\Throwable, int, int): int|array<int>|Collection<int>|int|null  $backoff
      * @return void
      *
      * @throws \Throwable
