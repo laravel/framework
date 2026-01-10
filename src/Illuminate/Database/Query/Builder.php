@@ -16,6 +16,7 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -29,7 +30,6 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use UnitEnum;
-
 use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
@@ -468,6 +468,8 @@ class Builder implements BuilderContract
      */
     public function selectVectorDistance($column, $vector, $as = null)
     {
+        $this->ensureConnectionSupportsVectors();
+
         if (is_string($vector)) {
             Str::of($vector)->toEmbeddings();
         }
@@ -1164,6 +1166,8 @@ class Builder implements BuilderContract
      */
     public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
     {
+        $this->ensureConnectionSupportsVectors();
+
         if (is_string($vector)) {
             Str::of($vector)->toEmbeddings();
         }
@@ -2888,6 +2892,8 @@ class Builder implements BuilderContract
      */
     public function orderByVectorDistance($column, $vector)
     {
+        $this->ensureConnectionSupportsVectors();
+
         if (is_string($vector)) {
             Str::of($vector)->toEmbeddings();
         }
@@ -4530,6 +4536,18 @@ class Builder implements BuilderContract
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Ensure the database connection supports vector queries.
+     *
+     * @return void
+     */
+    protected function ensureConnectionSupportsVectors()
+    {
+        if (! $this->connection instanceof PostgresConnection) {
+            throw new RuntimeException("Vector distance queries are only supported by Postgres.");
+        }
     }
 
     /**
