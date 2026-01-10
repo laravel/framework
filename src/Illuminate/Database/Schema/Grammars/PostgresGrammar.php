@@ -430,6 +430,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a vector index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileVectorIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileIndexWithOperatorClass($blueprint, $command);
+    }
+
+    /**
      * Compile a spatial index with operator class key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

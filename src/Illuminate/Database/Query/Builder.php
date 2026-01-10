@@ -16,6 +16,7 @@ use Illuminate\Database\Concerns\ExplainsQueries;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Pagination\Paginator;
@@ -456,6 +457,39 @@ class Builder implements BuilderContract
         }
 
         return $this;
+    }
+
+    /**
+     * Add a vector-similarity selection to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  string|null  $as
+     * @return $this
+     */
+    public function selectVectorDistance($column, $vector, $as = null)
+    {
+        $this->ensureConnectionSupportsVectors();
+
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
+        $this->addBinding(
+            json_encode(
+                $vector instanceof Arrayable
+                    ? $vector->toArray()
+                    : $vector,
+                flags: JSON_THROW_ON_ERROR
+            ),
+            'select',
+        );
+
+        $as = $this->getGrammar()->wrap($as ?? $column.'_distance');
+
+        return $this->addSelect(
+            new Expression("({$this->getGrammar()->wrap($column)} <=> ?) as {$as}")
+        );
     }
 
     /**
@@ -1096,6 +1130,75 @@ class Builder implements BuilderContract
     public function orWhereColumn($first, $operator = null, $second = null)
     {
         return $this->whereColumn($first, $operator, $second, 'or');
+    }
+
+    /**
+     * Add a vector similarity clause to the query, filtering by minimum similarity and ordering by similarity.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $minSimilarity  A value between 0.0 and 1.0, where 1.0 is identical.
+     * @param  bool  $order
+     * @return $this
+     */
+    public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
+    {
+        if (is_string($vector)) {
+            $vector = Str::of($vector)->toEmbeddings();
+        }
+
+        $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
+
+        if ($order) {
+            $this->orderByVectorDistance($column, $vector);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a vector distance "where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $maxDistance
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereVectorDistanceLessThan($column, $vector, $maxDistance, $boolean = 'and')
+    {
+        $this->ensureConnectionSupportsVectors();
+
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
+        return $this->whereRaw(
+            "({$this->getGrammar()->wrap($column)} <=> ?) <= ?",
+            [
+                json_encode(
+                    $vector instanceof Arrayable
+                        ? $vector->toArray()
+                        : $vector,
+                    flags: JSON_THROW_ON_ERROR
+                ),
+                $maxDistance,
+            ],
+            $boolean
+        );
+    }
+
+    /**
+     * Add a vector distance "or where" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string  $vector
+     * @param  float  $maxDistance
+     * @return $this
+     */
+    public function orWhereVectorDistanceLessThan($column, $vector, $maxDistance)
+    {
+        return $this->whereVectorDistanceLessThan($column, $vector, $maxDistance, 'or');
     }
 
     /**
@@ -2782,6 +2885,39 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a vector-distance "order by" clause to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>  $vector
+     * @return $this
+     */
+    public function orderByVectorDistance($column, $vector)
+    {
+        $this->ensureConnectionSupportsVectors();
+
+        if (is_string($vector)) {
+            Str::of($vector)->toEmbeddings();
+        }
+
+        $this->addBinding(
+            json_encode(
+                $vector instanceof Arrayable
+                    ? $vector->toArray()
+                    : $vector,
+                flags: JSON_THROW_ON_ERROR
+            ),
+            $this->unions ? 'unionOrder' : 'order'
+        );
+
+        $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
+            'column' => new Expression("({$this->getGrammar()->wrap($column)} <=> ?)"),
+            'direction' => 'asc',
+        ];
+
+        return $this;
+    }
+
+    /**
      * Put the query's results in random order.
      *
      * @param  string|int  $seed
@@ -4401,6 +4537,18 @@ class Builder implements BuilderContract
     public function getConnection()
     {
         return $this->connection;
+    }
+
+    /**
+     * Ensure the database connection supports vector queries.
+     *
+     * @return void
+     */
+    protected function ensureConnectionSupportsVectors()
+    {
+        if (! $this->connection instanceof PostgresConnection) {
+            throw new RuntimeException('Vector distance queries are only supported by Postgres.');
+        }
     }
 
     /**

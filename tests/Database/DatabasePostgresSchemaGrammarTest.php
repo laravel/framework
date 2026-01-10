@@ -453,6 +453,56 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertSame('create index concurrently "my_index" on "geo" using gist ("coordinates" point_ops)', $statements[0]);
     }
 
+    public function testAddingVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingVectorIndexOnline()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings')->online();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index concurrently "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingVectorIndexWithName()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vectorIndex('embeddings', 'my_vector_index');
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(1, $statements);
+        $this->assertSame('create index "my_vector_index" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[0]);
+    }
+
+    public function testAddingFluentVectorIndex()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->vectorIndex();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[1]);
+    }
+
+    public function testAddingFluentIndexOnVectorColumn()
+    {
+        $blueprint = new Blueprint($this->getConnection(), 'posts');
+        $blueprint->vector('embeddings', 1536)->index();
+        $statements = $blueprint->toSql();
+
+        $this->assertCount(2, $statements);
+        $this->assertSame('create index "posts_embeddings_vectorindex" on "posts" using hnsw ("embeddings" vector_cosine_ops)', $statements[1]);
+    }
+
     public function testAddingRawIndex()
     {
         $blueprint = new Blueprint($this->getConnection(), 'users');

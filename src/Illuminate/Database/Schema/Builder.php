@@ -5,9 +5,11 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use LogicException;
+use RuntimeException;
 
 class Builder
 {
@@ -637,6 +639,38 @@ class Builder
         } finally {
             $this->enableForeignKeyConstraints();
         }
+    }
+
+    /**
+     * Create the vector extension on the schema if it does not exist.
+     *
+     * @param  string|null  $schema
+     * @return void
+     */
+    public function ensureVectorExtensionExists($schema = null)
+    {
+        $this->ensureExtensionExists('vector', $schema);
+    }
+
+    /**
+     * Create a new extension on the schema if it does not exist.
+     *
+     * @param  string  $name
+     * @param  string|null  $schema
+     * @return void
+     */
+    public function ensureExtensionExists($name, $schema = null)
+    {
+        if (! $this->getConnection() instanceof PostgresConnection) {
+            throw new RuntimeException('Extensions are only supported by Postgres.');
+        }
+
+        $name = $this->getConnection()->getSchemaGrammar()->wrap($name);
+
+        $this->getConnection()->statement(match (filled($schema)) {
+            true => "create extension if not exists {$name} schema {$this->getConnection()->getSchemaGrammar()->wrap($schema)}",
+            false => "create extension if not exists {$name}",
+        });
     }
 
     /**
