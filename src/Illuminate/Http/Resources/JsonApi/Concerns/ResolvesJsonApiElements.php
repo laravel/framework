@@ -20,6 +20,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use JsonSerializable;
+use WeakMap;
 
 trait ResolvesJsonApiElements
 {
@@ -329,11 +330,31 @@ trait ResolvesJsonApiElements
         $this->compileResourceRelationships($request);
 
         $relations = new Collection;
-
         $index = 0;
+
+        // Track visited objects by instance + type to prevent infinite loops from circular references
+        // created by chaperone(). We use object instances rather than type+id to preserve legitimate
+        // cases like BelongsToMany with different pivot data where multiple distinct instances may
+        // share the same model ID. We also track by type to allow the same model to appear with
+        // different resource types (e.g., User as both "users" and "authors").
+        $visitedObjects = new WeakMap;
+        $visitedObjects[$this->resource] = [$this->resolveResourceType($request) => true];
 
         while ($index < count($this->loadedRelationshipsMap)) {
             [$resourceInstance, $type, $id, $isUnique] = $this->loadedRelationshipsMap[$index];
+
+            $underlyingResource = $resourceInstance->resource;
+
+            if (is_object($underlyingResource)) {
+                if (isset($visitedObjects[$underlyingResource][$type])) {
+                    $index++;
+
+                    continue;
+                }
+
+                $visitedObjects[$underlyingResource] ??= [];
+                $visitedObjects[$underlyingResource][$type] = true;
+            }
 
             if (! $resourceInstance instanceof JsonApiResource &&
                 $resourceInstance instanceof JsonResource) {
@@ -344,7 +365,7 @@ trait ResolvesJsonApiElements
                 ->includePreviouslyLoadedRelationships()
                 ->resolve($request);
 
-            array_push($this->loadedRelationshipsMap, ...$resourceInstance->loadedRelationshipsMap);
+            array_push($this->loadedRelationshipsMap, ...($resourceInstance->loadedRelationshipsMap ?? []));
 
             $relations->push(array_filter([
                 'id' => $id,
