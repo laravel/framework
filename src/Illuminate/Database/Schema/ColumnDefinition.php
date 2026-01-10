@@ -23,6 +23,7 @@ use Illuminate\Support\Fluent;
  * @method $this invisible() Specify that the column should be invisible to "SELECT *" (MySQL)
  * @method $this lock(string $value) Specify the DDL lock mode for the column operation (MySQL)
  * @method $this nullable(bool $value = true) Allow NULL values to be inserted into the column
+ * @method $this notNull() Mark column and NOT NULL
  * @method $this persisted() Mark the computed generated column as persistent (SQL Server)
  * @method $this primary(bool $value = true) Add a primary index
  * @method $this spatialIndex(bool|string $indexName = null) Add a spatial index
