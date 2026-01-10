@@ -660,7 +660,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
     {
         $blueprint = new Blueprint('users');
         $column = $blueprint->string('email')->notNull();
-        
         $this->assertFalse($column->get('nullable'));
     }
 
