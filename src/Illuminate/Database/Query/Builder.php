@@ -30,6 +30,7 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 use UnitEnum;
+
 use function Illuminate\Support\enum_value;
 
 class Builder implements BuilderContract
@@ -4546,7 +4547,7 @@ class Builder implements BuilderContract
     protected function ensureConnectionSupportsVectors()
     {
         if (! $this->connection instanceof PostgresConnection) {
-            throw new RuntimeException("Vector distance queries are only supported by Postgres.");
+            throw new RuntimeException('Vector distance queries are only supported by Postgres.');
         }
     }
 
