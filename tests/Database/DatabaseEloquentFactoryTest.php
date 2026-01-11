@@ -606,6 +606,39 @@ class DatabaseEloquentFactoryTest extends TestCase
         $assert($usersByMethod);
     }
 
+    public function test_counted_cross_join_sequences()
+    {
+        $assert = function ($users) {
+            $assertions = [
+                ['first_name' => 'Thomas', 'last_name' => 'Anderson', 'options' => ['Red Pill']],
+                ['first_name' => 'Thomas', 'last_name' => 'Anderson', 'options' => ['Blue Pill']],
+                ['first_name' => 'Thomas', 'last_name' => 'Smith', 'options' => ['Red Pill']],
+                ['first_name' => 'Thomas', 'last_name' => 'Smith', 'options' => ['Blue Pill']],
+                ['first_name' => 'Agent', 'last_name' => 'Anderson', 'options' => ['Red Pill']],
+                ['first_name' => 'Agent', 'last_name' => 'Anderson', 'options' => ['Blue Pill']],
+                ['first_name' => 'Agent', 'last_name' => 'Smith', 'options' => ['Red Pill']],
+                ['first_name' => 'Agent', 'last_name' => 'Smith', 'options' => ['Blue Pill']],
+            ];
+
+            foreach ($assertions as $key => $assertion) {
+                $this->assertSame(
+                    $assertion,
+                    $users[$key]->only('first_name', 'last_name', 'options'),
+                );
+            }
+        };
+
+        $users = FactoryTestUserFactory::new()
+            ->forEachCrossJoinSequence(
+                [['first_name' => 'Thomas'], ['first_name' => 'Agent']],
+                [['last_name' => 'Anderson'], ['last_name' => 'Smith']],
+                [['options' => ['Red Pill']], ['options' => ['Blue Pill']]],
+            )
+            ->make();
+
+        $assert($users);
+    }
+
     public function test_resolve_nested_model_factories()
     {
         Factory::useNamespace('Factories\\');

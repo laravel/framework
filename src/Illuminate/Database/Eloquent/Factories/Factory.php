@@ -654,6 +654,17 @@ abstract class Factory
     }
 
     /**
+     * Add a new cross joined sequenced state transformation to the model definition and update the pending creation count to the size of the sequence.
+     *
+     * @param  array  ...$sequence
+     * @return static
+     */
+    public function forEachCrossJoinSequence(...$sequence)
+    {
+        return $this->state(new CrossJoinSequence(...$sequence))->count(array_product(array_map('count', [...$sequence])));
+    }
+
+    /**
      * Define a child relationship for the model.
      *
      * @param  \Illuminate\Database\Eloquent\Factories\Factory  $factory
