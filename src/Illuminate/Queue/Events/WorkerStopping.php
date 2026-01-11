@@ -9,10 +9,12 @@ class WorkerStopping
      *
      * @param  int  $status  The worker exit status.
      * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions  The worker options.
+     * @param  string|null  $reason  The reason why it's stopping.
      */
     public function __construct(
         public $status = 0,
         public $workerOptions = null,
+        public ?string $reason = null,
     ) {
     }
 }
