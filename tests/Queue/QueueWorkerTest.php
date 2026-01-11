@@ -406,7 +406,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
     }
 
-    public function testWorkerStoppingIsDispatchedWithReason()
+    public function testWorkerStoppingIsDispatched()
     {
         $workerOptions = new WorkerOptions();
         $workerOptions->stopWhenEmpty = true;
@@ -421,9 +421,10 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($firstJob->fired);
         $this->assertTrue($secondJob->fired);
 
-        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($workerOptions) {
             return $event instanceof WorkerStopping
                 && $event->status === 0
+                && $event->workerOptions === $workerOptions
                 && $event->reason === 'empty';
         }))->once();
     }
