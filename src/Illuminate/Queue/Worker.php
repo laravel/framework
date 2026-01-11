@@ -327,12 +327,12 @@ class Worker
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         return match (true) {
-            $this->shouldQuit => [static::EXIT_SUCCESS, 'interrupted'],
-            $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, 'memory'],
-            $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, 'restart_signal'],
-            $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, 'empty'],
-            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, 'max_time'],
-            $options->maxJobs && $jobsProcessed >= $options->maxJobs => [static::EXIT_SUCCESS, 'max_jobs'],
+            $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStopReason::INTERRUPTED],
+            $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStopReason::MEMORY],
+            $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStopReason::RESTART_SIGNAL],
+            $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStopReason::EMPTY],
+            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStopReason::MAX_TIME],
+            $options->maxJobs && $jobsProcessed >= $options->maxJobs => [static::EXIT_SUCCESS, WorkerStopReason::MAX_JOBS],
             default => null
         };
     }
@@ -823,7 +823,7 @@ class Worker
      *
      * @param  int  $status
      * @param  WorkerOptions|null  $options
-     * @param  string|null  $reason
+     * @param  WorkerStopReason|null  $reason
      * @return int
      */
     public function stop($status = 0, $options = null, $reason = null)

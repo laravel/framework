@@ -18,6 +18,7 @@ use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
+use Illuminate\Queue\WorkerStopReason;
 use Illuminate\Support\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -425,7 +426,7 @@ class QueueWorkerTest extends TestCase
             return $event instanceof WorkerStopping
                 && $event->status === 0
                 && $event->workerOptions === $workerOptions
-                && $event->reason === 'empty';
+                && $event->reason === WorkerStopReason::EMPTY;
         }))->once();
     }
 
