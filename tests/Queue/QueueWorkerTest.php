@@ -13,6 +13,7 @@ use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\WorkerStarting;
+use Illuminate\Queue\Events\WorkerStopping;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
@@ -405,6 +406,28 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
     }
 
+    public function testWorkerStoppingIsDispatchedWithReason()
+    {
+        $workerOptions = new WorkerOptions();
+        $workerOptions->stopWhenEmpty = true;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob(),
+            $secondJob = new WorkerFakeJob(),
+        ]]);
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+        $this->assertTrue($secondJob->fired);
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
+            return $event instanceof WorkerStopping
+                && $event->status === 0
+                && $event->reason === 'empty';
+        }))->once();
+    }
+
     /**
      * Helpers...
      */
@@ -452,9 +475,9 @@ class InsomniacWorker extends Worker
         $this->sleptFor = $seconds;
     }
 
-    public function stop($status = 0, $options = null)
+    public function stop($status = 0, $options = null, $reason = null)
     {
-        return $status;
+        return parent::stop($status, $options, $reason);
     }
 
     public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
