@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Events;
 
-use Illuminate\Queue\WorkerStopReason;
+use Illuminate\Queue\WorkerStoppingReason;
 
 class WorkerStopping
 {
@@ -11,7 +11,7 @@ class WorkerStopping
      *
      * @param  int  $status  The worker exit status.
      * @param  \Illuminate\Queue\WorkerOptions|null  $workerOptions  The worker options.
-     * @param  WorkerStopReason|null  $reason  The reason why it's stopping.
+     * @param  WorkerStoppingReason|null  $reason  The reason why it's stopping.
      */
     public function __construct(
         public $status = 0,

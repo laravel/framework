@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue;
 
-enum WorkerStopReason: string
+enum WorkerStoppingReason: string
 {
     case INTERRUPTED = 'interrupted';
     case MEMORY = 'memory';
