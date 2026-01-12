@@ -419,6 +419,46 @@ class BusBatchTest extends TestCase
         $this->assertNull($batch);
     }
 
+    public function test_invoke_callbacks_handles_null()
+    {
+        $queue = m::mock(Factory::class);
+        $repository = m::mock(\Illuminate\Bus\BatchRepository::class);
+        $callbackInvoked = false;
+
+        $batch = new Batch(
+            $queue,
+            $repository,
+            'test-batch-id',
+            'Test Batch',
+            100,
+            50,
+            0,
+            [],
+            ['then' => [function (Batch $b) use (&$callbackInvoked) {
+                $callbackInvoked = true;
+            }]],
+            CarbonImmutable::now(),
+            null,
+            null
+        );
+
+        // Mock repository to return null
+        $repository->shouldReceive('find')
+            ->with('test-batch-id')
+            ->once()
+            ->andReturn(null);
+
+        // Use reflection to return null
+        $reflection = new \ReflectionClass($batch);
+        $method = $reflection->getMethod('invokeCallbacks');
+        $method->setAccessible(true);
+
+        // Not throw an error.
+        $method->invoke($batch, 'then');
+
+        $this->assertFalse($callbackInvoked);
+    }
+
     public function test_batch_state_can_be_inspected()
     {
         $queue = m::mock(Factory::class);
