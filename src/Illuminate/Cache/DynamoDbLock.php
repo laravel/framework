@@ -88,10 +88,6 @@ class DynamoDbLock extends Lock
             $seconds = 86400;
         }
 
-        if ($this->getCurrentOwner() !== $this->owner) {
-            return false;
-        }
-
-        return $this->dynamo->put($this->name, $this->owner, $seconds);
+        return $this->dynamo->refreshIfOwned($this->name, $this->owner, $seconds);
     }
 }
