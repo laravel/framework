@@ -302,7 +302,7 @@ class PendingBatch
      * @param  \UnitEnum|string  $connection
      * @return $this
      */
-    public function onConnection(string|\UnitEnum $connection)
+    public function onConnection(\UnitEnum|string $connection)
     {
         $this->options['connection'] = enum_value($connection);
 
