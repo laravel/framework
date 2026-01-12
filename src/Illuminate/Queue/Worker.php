@@ -327,12 +327,12 @@ class Worker
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $startTime = 0, $jobsProcessed = 0, $job = null)
     {
         return match (true) {
-            $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStoppingReason::INTERRUPTED],
-            $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStoppingReason::MEMORY],
-            $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStoppingReason::RESTART_SIGNAL],
-            $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStoppingReason::EMPTY],
-            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStoppingReason::MAX_TIME],
-            $options->maxJobs && $jobsProcessed >= $options->maxJobs => [static::EXIT_SUCCESS, WorkerStoppingReason::MAX_JOBS],
+            $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStopReason::Interrupted],
+            $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStopReason::MaxMemoryExceeded],
+            $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStopReason::ReceivedRestartSignal],
+            $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStopReason::QueueEmpty],
+            $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStopReason::MaxTimeExceeded],
+            $options->maxJobs && $jobsProcessed >= $options->maxJobs => [static::EXIT_SUCCESS, WorkerStopReason::MaxJobsExceeded],
             default => null
         };
     }
@@ -823,7 +823,7 @@ class Worker
      *
      * @param  int  $status
      * @param  WorkerOptions|null  $options
-     * @param  WorkerStoppingReason|null  $reason
+     * @param  WorkerStopReason|null  $reason
      * @return int
      */
     public function stop($status = 0, $options = null, $reason = null)
