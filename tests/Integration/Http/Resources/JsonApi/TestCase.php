@@ -9,7 +9,6 @@ use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\ArrayBackedJsonApiResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\User;
-use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserResource;
 use Illuminate\Tests\Integration\Http\Resources\JsonApi\Fixtures\UserWithArrayRelationshipResource;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithMigration;
@@ -67,19 +66,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $resource = new UserWithArrayRelationshipResource(User::find($userId));
             $resource->loadedRelationshipsMap = [
                 [new ArrayBackedJsonApiResource(['id' => 99, 'name' => 'test']), 'things', '99', true],
-            ];
-
-            return $resource;
-        });
-
-        $router->get('users/{userId}/with-duplicate-instances', function ($userId) {
-            $instance1 = User::find($userId);
-            $instance2 = User::find($userId);
-
-            $resource = new UserWithArrayRelationshipResource(User::find($userId));
-            $resource->loadedRelationshipsMap = [
-                [new UserResource($instance1), 'users', (string) $instance1->getKey(), true],
-                [new UserResource($instance2), 'users', (string) $instance2->getKey(), true],
             ];
 
             return $resource;
