@@ -71,4 +71,21 @@ class MemcachedLock extends Lock
     {
         return $this->memcached->get($this->name);
     }
+
+    /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        if ($this->memcached->get($this->name) !== $this->owner) {
+            return false;
+        }
+
+        return $this->memcached->touch($this->name, $seconds);
+    }
 }

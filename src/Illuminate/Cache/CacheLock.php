@@ -81,4 +81,23 @@ class CacheLock extends Lock
     {
         return $this->store->get($this->name);
     }
+
+    /**
+     * Attempt to refresh the lock for the given number of seconds.
+     *
+     * @param  int|null  $seconds
+     * @return bool
+     */
+    public function refresh($seconds = null)
+    {
+        $seconds ??= $this->seconds;
+
+        if (! $this->isOwnedByCurrentProcess()) {
+            return false;
+        }
+
+        return ($seconds > 0)
+            ? $this->store->put($this->name, $this->owner, $seconds)
+            : $this->store->forever($this->name, $this->owner);
+    }
 }
