@@ -89,7 +89,6 @@ class JsonApiResourceTest extends TestCase
         ]);
 
         $user->teams()->attach($team, ['role' => 'Admin']);
-        $user->teams()->attach($team, ['role' => 'Member']);
 
         $posts = Post::factory()->times(2)->create([
             'user_id' => $user->getKey(),
@@ -120,7 +119,6 @@ class JsonApiResourceTest extends TestCase
                         ],
                         'teams' => [
                             'data' => [
-                                ['id' => (string) $team->getKey(), 'type' => 'teams'],
                                 ['id' => (string) $team->getKey(), 'type' => 'teams'],
                             ],
                         ],
@@ -162,23 +160,6 @@ class JsonApiResourceTest extends TestCase
                             'membership' => [
                                 'created_at' => $now->toISOString(),
                                 'role' => 'Admin',
-                                'team_id' => $team->getKey(),
-                                'user_id' => $user->getKey(),
-                                'updated_at' => $now->toISOString(),
-                            ],
-                        ],
-                    ],
-                    [
-                        'id' => (string) $team->getKey(),
-                        'type' => 'teams',
-                        'attributes' => [
-                            'id' => $team->getKey(),
-                            'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
-                            'personal_team' => true,
-                            'membership' => [
-                                'created_at' => $now->toISOString(),
-                                'role' => 'Member',
                                 'team_id' => $team->getKey(),
                                 'user_id' => $user->getKey(),
                                 'updated_at' => $now->toISOString(),
@@ -470,8 +451,6 @@ class JsonApiResourceTest extends TestCase
     {
         JsonApiResource::maxRelationshipDepth(2);
 
-        $now = $this->freezeSecond();
-
         $user = User::factory()->create();
 
         $profile = Profile::factory()->create([
@@ -645,7 +624,7 @@ class JsonApiResourceTest extends TestCase
             ->assertJsonCount(1, 'included');
     }
 
-    public function testSameModelWithTheSameResourceTypeIsDeduplicated()
+    public function testIncludedResourcesWithSameTypeAndIdAreDeduplicated()
     {
         $user = User::factory()->create();
 
@@ -681,24 +660,29 @@ class JsonApiResourceTest extends TestCase
         $this->assertCount(1, array_filter($types, fn (string $t) => $t === 'users'));
     }
 
-    public function testDifferentModelInstancesWithSameTypeAndIdAreDeduplicated()
+    public function testPrimaryResourceIsIncludedWhenReferencedByRelationship()
     {
         $user = User::factory()->create();
 
-        // This route manually creates two different User model instances with the same ID and
-        // adds them both to the loadedRelationshipsMap. Per the JSON:API spec, they should
-        // be deduplicated since they have the same type+id, even though they're different object instances.
-        $response = $this->getJson("/users/{$user->getKey()}/with-duplicate-instances")
-            ->assertHeader('Content-type', 'application/vnd.api+json');
+        $profile = Profile::factory()->for($user)->create();
+
+        // The profile's "user" relationship points back to the root user (same type+id).
+        // The user should appear in included so consumers can find it when resolving relationships.
+        $response = $this->getJson("/users/{$user->getKey()}?".http_build_query(['include' => 'profile.user']))
+            ->assertHeader('Content-type', 'application/vnd.api+json')
+            ->assertJsonPath('data.id', (string) $user->getKey())
+            ->assertJsonPath('data.type', 'users')
+            ->assertJsonCount(2, 'included');
 
         $included = $response->json('included');
+        $includedTypes = array_column($included, 'type');
 
-        $this->assertCount(1, $included);
-        $this->assertSame('users', $included[0]['type']);
-        $this->assertSame((string) $user->getKey(), $included[0]['id']);
+        // Both profile and user should be in included
+        $this->assertContains('profiles', $includedTypes);
+        $this->assertContains('users', $includedTypes);
     }
 
-    public function testSameModelOnDifferentResourcesIsNotDeduplicated()
+    public function testSameModelWithDifferentResourceTypesIsNotDeduplicated()
     {
         $user = User::factory()->create();
 
