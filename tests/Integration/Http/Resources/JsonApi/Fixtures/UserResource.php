@@ -12,6 +12,7 @@ class UserResource extends JsonApiResource
         'profile',
         'posts',
         'teams',
+        'chaperonePosts' => PostResource::class,
     ];
 
     #[\Override]
