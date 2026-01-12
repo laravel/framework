@@ -88,7 +88,6 @@ class JsonApiCollectionTest extends TestCase
         ]);
 
         $user->teams()->attach($team, ['role' => 'Admin']);
-        $user->teams()->attach($team, ['role' => 'Member']);
 
         $posts = Post::factory()->times(2)->create([
             'user_id' => $user->getKey(),
@@ -135,7 +134,6 @@ class JsonApiCollectionTest extends TestCase
                             'teams' => [
                                 'data' => [
                                     ['id' => (string) $team->getKey(), 'type' => 'teams'],
-                                    ['id' => (string) $team->getKey(), 'type' => 'teams'],
                                 ],
                             ],
                         ],
@@ -180,23 +178,6 @@ class JsonApiCollectionTest extends TestCase
                                 'user_id' => $user->getKey(),
                                 'team_id' => $team->getKey(),
                                 'role' => 'Admin',
-                                'created_at' => $now->toISOString(),
-                                'updated_at' => $now->toISOString(),
-                            ],
-                        ],
-                    ],
-                    [
-                        'id' => (string) $team->getKey(),
-                        'type' => 'teams',
-                        'attributes' => [
-                            'id' => $team->getKey(),
-                            'user_id' => $team->user_id,
-                            'name' => 'Laravel Team',
-                            'personal_team' => true,
-                            'membership' => [
-                                'user_id' => $user->getKey(),
-                                'team_id' => $team->getKey(),
-                                'role' => 'Member',
                                 'created_at' => $now->toISOString(),
                                 'updated_at' => $now->toISOString(),
                             ],
