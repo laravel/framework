@@ -82,10 +82,12 @@ class MemcachedLock extends Lock
     {
         $seconds ??= $this->seconds;
 
-        if ($this->memcached->get($this->name) !== $this->owner) {
+        $value = $this->memcached->get($this->name, null, \Memcached::GET_EXTENDED);
+
+        if ($value === false || ($value['value'] ?? null) !== $this->owner) {
             return false;
         }
 
-        return $this->memcached->touch($this->name, $seconds);
+        return $this->memcached->cas($value['cas'], $this->name, $this->owner, $seconds);
     }
 }
