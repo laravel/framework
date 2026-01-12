@@ -339,7 +339,7 @@ trait ResolvesJsonApiElements
         $visitedObjects = new WeakMap;
 
         $visitedObjects[$this->resource] = [
-            $this->resolveResourceType($request) => true
+            $this->resolveResourceType($request) => true,
         ];
 
         while ($index < count($this->loadedRelationshipsMap)) {
