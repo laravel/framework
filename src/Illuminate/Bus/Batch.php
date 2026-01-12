@@ -276,7 +276,6 @@ class Batch implements Arrayable, JsonSerializable
     {
         $batch = $this->fresh();
 
-        // Check if batch is null
         if (is_null($batch)) {
             return;
         }
