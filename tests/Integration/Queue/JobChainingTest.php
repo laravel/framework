@@ -369,6 +369,21 @@ class JobChainingTest extends QueueTestCase
         $this->assertEquals([$secondJob, $thirdJob], $chain->chain);
     }
 
+    public function testChainRemovesFalsyValues()
+    {
+        $chain = Bus::chain([
+            $firstJob = new JobChainingTestFirstJob,
+            $secondJob = new JobChainingTestSecondJob,
+            null,
+            '',
+            0,
+            [],
+        ]);
+
+        $this->assertEquals($firstJob, $chain->job);
+        $this->assertEquals([$secondJob], $chain->chain);
+    }
+
     public function testChainAppendRemovesFalsy()
     {
         $chain = Bus::chain([
