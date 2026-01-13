@@ -270,9 +270,9 @@ class JobChainingTest extends QueueTestCase
 
         $this->assertCount(1, $job->chained);
 
-        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
-
         Queue::push($job);
+
+        $this->runQueueWorkerCommand(['--stop-when-empty' => true]);
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);
