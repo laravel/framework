@@ -12,6 +12,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Laravel\SerializableClosure\SerializableClosure;
 use RuntimeException;
 use Throwable;
+use UnitEnum;
 
 use function Illuminate\Support\enum_value;
 
@@ -302,7 +303,7 @@ class PendingBatch
      * @param  \UnitEnum|string  $connection
      * @return $this
      */
-    public function onConnection(\UnitEnum|string $connection)
+    public function onConnection(UnitEnum|string $connection)
     {
         $this->options['connection'] = enum_value($connection);
 
