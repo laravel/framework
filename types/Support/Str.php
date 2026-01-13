@@ -61,15 +61,15 @@ assertType('string', Str::camel('Taylor Otwell'));
 
 assertType('false', Str::contains('Taylor Otwell', []));
 assertType('false', Str::contains('', 'Taylor'));
-assertType('boolean', Str::contains('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::contains('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::containsAll('Taylor Otwell', []));
 assertType('false', Str::containsAll('', 'Taylor'));
-assertType('boolean', Str::containsAll('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::containsAll('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::doesntContain('Taylor Otwell', []));
 assertType('false', Str::doesntContain('', 'Taylor'));
-assertType('boolean', Str::doesntContain('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::doesntContain('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::convertCase(''));
 assertType('string', Str::convertCase('Taylor Otwell'));
@@ -79,11 +79,11 @@ assertType('string', Str::deduplicate('Taylor Otwell'));
 
 assertType('false', Str::endsWith('Taylor Otwell', []));
 assertType('false', Str::endsWith('', 'Taylor'));
-assertType('boolean', Str::endsWith('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::endsWith('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::doesntEndWith('Taylor Otwell', []));
 assertType('false', Str::doesntEndWith('', 'Taylor'));
-assertType('boolean', Str::doesntEndWith('Taylor Otwell', 'Taylor'));
+assertType('bool' Str::doesntEndWith('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::kebab(''));
 assertType('string', Str::kebab('Taylor Otwell'));
@@ -98,25 +98,25 @@ assertType('\'\'', Str::inlineMarkdown(''));
 assertType('string', Str::inlineMarkdown('Taylor Otwell'));
 
 assertType('false', Str::isMatch([], 'Taylor Otwell'));
-assertType('boolean', Str::isMatch(['Taylor'], 'Taylor Otwell'));
+assertType('bool', Str::isMatch(['Taylor'], 'Taylor Otwell'));
 
 assertType('numeric-string', Str::password(letters: false, symbols: false, spaces: false));
 assertType('string', Str::password());
 
 assertType('false', Str::position('Taylor Otwell', ''));
 assertType('false', Str::position('', 'Taylor'));
-assertType('boolean', Str::position('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::position('Taylor Otwell', 'Taylor'));
 
 assertType('string|null', Str::replaceMatches('Taylor Otwell', '', ''));
 assertType('string[]|null', Str::replaceMatches(['Taylor', 'Otwell'], '', ''));
 
 assertType('false', Str::startsWith('Taylor Otwell', []));
 assertType('false', Str::startsWith('', 'Taylor'));
-assertType('boolean', Str::startsWith('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::startsWith('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::doesntStartWith('Taylor Otwell', []));
 assertType('false', Str::doesntStartWith('', 'Taylor'));
-assertType('boolean', Str::doesntStartWith('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::doesntStartWith('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::studly(''));
 assertType('string', Str::studly('Taylor Otwell'));
