@@ -64,7 +64,7 @@ assertType('false', Str::contains('', 'Taylor'));
 assertType('bool', Str::contains('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::containsAll('Taylor Otwell', []));
-assertType('bool', Str::containsAll('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::containsAll('Taylor Otwell', ['Taylor']));
 
 assertType('false', Str::doesntContain('Taylor Otwell', []));
 assertType('false', Str::doesntContain('', 'Taylor'));
