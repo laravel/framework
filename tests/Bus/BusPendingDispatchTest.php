@@ -165,15 +165,14 @@ class BusPendingDispatchTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testCancelPendingDispatchThrowsExceptionIfAlreadyDispatched()
+    public function testCancelPendingDispatchAfterFlushReturnsEarly()
     {
         $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot cancel a pending dispatch that has already been dispatched.');
-
         $this->pendingDispatch->flushPendingDispatch();
-        $this->pendingDispatch->cancelPendingDispatch();
+        $result = $this->pendingDispatch->cancelPendingDispatch();
+
+        $this->assertSame($this->pendingDispatch, $result);
     }
 
     public function testFlushPendingDispatchWithDelay()

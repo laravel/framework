@@ -8,7 +8,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Foundation\Queue\InteractsWithUniqueJobs;
-use RuntimeException;
 
 class PendingDispatch
 {
@@ -206,15 +205,9 @@ class PendingDispatch
      * Cancel the pending dispatch of the job.
      *
      * @return $this
-     *
-     * @throws RuntimeException
      */
     public function cancelPendingDispatch()
     {
-        if (! $this->pendingDispatch) {
-            throw new RuntimeException('Cannot cancel a pending dispatch that has already been dispatched.');
-        }
-
         $this->pendingDispatch = false;
 
         return $this;
