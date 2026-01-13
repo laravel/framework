@@ -472,7 +472,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            Str::of($vector)->toEmbeddings();
+            Str::of($vector)->toEmbeddings(cache: true);
         }
 
         $this->addBinding(
