@@ -82,7 +82,7 @@ assertType('bool', Str::endsWith('Taylor Otwell', 'Taylor'));
 
 assertType('false', Str::doesntEndWith('Taylor Otwell', []));
 assertType('false', Str::doesntEndWith('', 'Taylor'));
-assertType('bool' Str::doesntEndWith('Taylor Otwell', 'Taylor'));
+assertType('bool', Str::doesntEndWith('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::kebab(''));
 assertType('string', Str::kebab('Taylor Otwell'));
