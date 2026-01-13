@@ -336,6 +336,27 @@ class BusBatchTest extends TestCase
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
     }
 
+    public function test_pending_batch_filters_out_falsy_jobs()
+    {
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $jobsWithNulls = collect([$job, null, $secondJob, [], 0, '', false]);
+
+        $batch = new PendingBatch(new Container, $jobsWithNulls);
+
+        $this->assertCount(2, $batch->jobs);
+        $this->assertTrue($batch->jobs->contains($job));
+        $this->assertTrue($batch->jobs->contains($secondJob));
+    }
+
     public function test_failure_callbacks_execute_correctly(): void
     {
         $queue = m::mock(Factory::class);
