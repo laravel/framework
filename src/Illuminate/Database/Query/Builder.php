@@ -472,7 +472,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            Str::of($vector)->toEmbeddings(cache: true);
+            $vector = Str::of($vector)->toEmbeddings(cache: true);
         }
 
         $this->addBinding(
@@ -1144,7 +1144,7 @@ class Builder implements BuilderContract
     public function whereVectorSimilarTo($column, $vector, $minSimilarity = 0.6, $order = true)
     {
         if (is_string($vector)) {
-            $vector = Str::of($vector)->toEmbeddings();
+            $vector = Str::of($vector)->toEmbeddings(cache: true);
         }
 
         $this->whereVectorDistanceLessThan($column, $vector, 1 - $minSimilarity);
@@ -1170,7 +1170,7 @@ class Builder implements BuilderContract
         $this->ensureConnectionSupportsVectors();
 
         if (is_string($vector)) {
-            Str::of($vector)->toEmbeddings();
+            $vector = Str::of($vector)->toEmbeddings(cache: true);
         }
 
         return $this->whereRaw(
