@@ -64,7 +64,7 @@ class PendingBatch
     {
         $this->container = $container;
 
-        $this->jobs = $jobs->each(function (object|array $job) {
+        $this->jobs = $jobs->filter()->each(function (object|array $job) {
             $this->ensureJobIsBatchable($job);
         });
     }
