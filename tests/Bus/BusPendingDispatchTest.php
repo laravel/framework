@@ -134,13 +134,14 @@ class BusPendingDispatchTest extends TestCase
         );
     }
 
-    public function testFlushPendingDispatchAfterCancelThrowsException()
+    public function testFlushPendingDispatchAfterCancelReturnsEarly()
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot flush a pending dispatch that has already been dispatched.');
+        $this->dispatcher->shouldNotReceive('dispatch');
 
         $this->pendingDispatch->cancelPendingDispatch();
-        $this->pendingDispatch->flushPendingDispatch();
+        $result = $this->pendingDispatch->flushPendingDispatch();
+
+        $this->assertNull($result);
     }
 
     public function testFlushPendingDispatchSetsPendingDispatchToFalse()
@@ -154,15 +155,14 @@ class BusPendingDispatchTest extends TestCase
         );
     }
 
-    public function testFlushPendingDispatchThrowsExceptionIfAlreadyDispatched()
+    public function testFlushPendingDispatchReturnsEarlyIfAlreadyDispatched()
     {
         $this->dispatcher->shouldReceive('dispatch')->once()->with($this->job);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot flush a pending dispatch that has already been dispatched.');
+        $this->pendingDispatch->flushPendingDispatch();
+        $result = $this->pendingDispatch->flushPendingDispatch();
 
-        $this->pendingDispatch->flushPendingDispatch();
-        $this->pendingDispatch->flushPendingDispatch();
+        $this->assertNull($result);
     }
 
     public function testCancelPendingDispatchThrowsExceptionIfAlreadyDispatched()

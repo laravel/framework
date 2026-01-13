@@ -224,13 +224,11 @@ class PendingDispatch
      * Dispatch the job immediately.
      *
      * @return mixed
-     *
-     * @throws RuntimeException
      */
     public function flushPendingDispatch()
     {
         if (! $this->pendingDispatch) {
-            throw new RuntimeException('Cannot flush a pending dispatch that has already been dispatched.');
+            return null;
         }
 
         $this->pendingDispatch = false;
