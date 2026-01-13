@@ -1350,9 +1350,9 @@ class Str
      *
      * @param  string|string[]  $pattern
      * @param  (\Closure(array): string)|string[]|string  $replace
-     * @param  array|string[]  $subject
+     * @param  string|string[]  $subject
      * @param  int  $limit
-     * @return ($subject is array ? string|null : string[]|null)
+     * @return ($subject is array ? string[]|null : string|null)
      */
     public static function replaceMatches($pattern, $replace, $subject, $limit = -1)
     {
