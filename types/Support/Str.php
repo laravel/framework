@@ -138,4 +138,4 @@ assertType('\'\'', Str::ucwords(''));
 assertType('string', Str::ucwords('Taylor Otwell'));
 
 assertType('array{}', Str::ucsplit(''));
-assertType('string[]', Str::ucsplit('Taylor Otwell'));
+assertType('array<string>', Str::ucsplit('Taylor Otwell'));
