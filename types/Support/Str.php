@@ -36,16 +36,16 @@ if (Str::isUuid($uuid)) {
     assertType('mixed', $uuid);
 }
 
-if (Str::startsWith($strStartsWith)) {
+if (Str::startsWith($strStartsWith, '')) {
     assertType('non-empty-string', $strStartsWith);
 } else {
     assertType('mixed', $strStartsWith);
 }
 
-if (Str::doesntStartWith($strStartsWith)) {
-    assertType('non-empty-string', $strStartsWith);
-} else {
+if (Str::doesntStartWith($strStartsWith, '')) {
     assertType('mixed', $strStartsWith);
+} else {
+    assertType('non-empty-string', $strStartsWith);
 }
 
 /**
