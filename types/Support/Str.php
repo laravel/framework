@@ -9,8 +9,7 @@ use function PHPStan\Testing\assertType;
  * @var mixed $ulid
  * @var mixed $url
  * @var mixed $uuid
- * @var mixed $strStartsWith
- * @var mixed $strEndsWith
+ * @var string $strStartsWith
  */
 if (Str::isJson($json)) {
     assertType('non-empty-string', $json);
@@ -39,11 +38,11 @@ if (Str::isUuid($uuid)) {
 if (Str::startsWith($strStartsWith, '')) {
     assertType('non-empty-string', $strStartsWith);
 } else {
-    assertType('mixed', $strStartsWith);
+    assertType('string', $strStartsWith);
 }
 
 if (Str::doesntStartWith($strStartsWith, '')) {
-    assertType('mixed', $strStartsWith);
+    assertType('string', $strStartsWith);
 } else {
     assertType('non-empty-string', $strStartsWith);
 }
