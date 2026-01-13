@@ -258,7 +258,7 @@ class JobChainingTest extends QueueTestCase
         $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
 
-    public function testChainRemovesFalsyValues()
+    public function testChainJobRemovesFalsyValues()
     {
         $job = (new JobChainingTestFirstJob)->chain([
             new JobChainingTestSecondJob,
