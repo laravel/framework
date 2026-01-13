@@ -1,6 +1,31 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.46.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.47.0...12.x)
+
+## [v12.47.0](https://github.com/laravel/framework/compare/v12.46.0...v12.47.0) - 2026-01-13
+
+* [12.x] Add `@includeIsolated` directive for isolated Blade includes by [@KennedyTedesco](https://github.com/KennedyTedesco) in https://github.com/laravel/framework/pull/58311
+* [12.x] Fix typo in JsonApiResource trait method by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58326
+* [12.x] Add `Cache::withoutOverlapping()` to wrap `Cache::lock()->block()` by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/58303
+* Update return type annotations in FormRequest.php by [@arttiger](https://github.com/arttiger) in https://github.com/laravel/framework/pull/58333
+* [12.x] Fix QueryException showing wrong connection details for read PDO by [@mathiasgrimm](https://github.com/mathiasgrimm) in https://github.com/laravel/framework/pull/58331
+* [12.x] Only fire `CacheFailedOver` and `QueueFailedOver` on first failure by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58330
+* allow precognitive requests to use wildcards with array validations (#57437) by [@markusheinemann](https://github.com/markusheinemann) in https://github.com/laravel/framework/pull/57486
+* [12.x] Fix docblock for Failovers by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58336
+* [12.x] Only fire composer uninstall events when removing dev packages by [@cosmastech](https://github.com/cosmastech) in https://github.com/laravel/framework/pull/58338
+* Vector things by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/framework/pull/58337
+* Update tailwind version by [@laserhybiz](https://github.com/laserhybiz) in https://github.com/laravel/framework/pull/58344
+* [12.x] Allow for enum keys in additional Session Store methods by [@riesjart](https://github.com/riesjart) in https://github.com/laravel/framework/pull/58343
+* [12.x] JSON API: Deduplicate circular references  by [@mateusjatenee](https://github.com/mateusjatenee) in https://github.com/laravel/framework/pull/58348
+* [12.x] Improve `key:generate` error message when `APP_KEY` is set by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58345
+* [12.x] Add indexes to failed_jobs stub by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58355
+* [12.x] Improve types in `\Illuminate\Support\Str` helper by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/58356
+* [12.x] Fix MySQL port conflict in tests workflow by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58357
+* [12.x] Improve the return types for `Number::with*()` helpers by [@CasEbb](https://github.com/CasEbb) in https://github.com/laravel/framework/pull/58358
+* [12.x] Ensure `Bus::batch` filters out falsy items by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58360
+* [12.] Annotate tuple return type of `TableGuesser::guess()` by [@shaedrich](https://github.com/shaedrich) in https://github.com/laravel/framework/pull/58354
+* [12.x] Make Notification macroable by [@ekateiva](https://github.com/ekateiva) in https://github.com/laravel/framework/pull/58352
+* [12.x] Allow PendingBatch `onConnection` to use Enum by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58350
 
 ## [v12.46.0](https://github.com/laravel/framework/compare/v12.45.2...v12.46.0) - 2026-01-07
 
