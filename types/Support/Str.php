@@ -112,8 +112,8 @@ assertType('false', Str::startsWith('Taylor Otwell', []));
 assertType('false', Str::startsWith('', 'Taylor'));
 assertType('bool', Str::startsWith('Taylor Otwell', 'Taylor'));
 
-assertType('false', Str::doesntStartWith('Taylor Otwell', []));
-assertType('false', Str::doesntStartWith('', 'Taylor'));
+assertType('true', Str::doesntStartWith('Taylor Otwell', []));
+assertType('true', Str::doesntStartWith('', 'Taylor'));
 assertType('bool', Str::doesntStartWith('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::studly(''));
