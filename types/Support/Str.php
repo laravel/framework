@@ -65,8 +65,8 @@ assertType('bool', Str::contains('Taylor Otwell', 'Taylor'));
 assertType('false', Str::containsAll('Taylor Otwell', []));
 assertType('bool', Str::containsAll('Taylor Otwell', ['Taylor']));
 
-assertType('false', Str::doesntContain('Taylor Otwell', []));
-assertType('false', Str::doesntContain('', 'Taylor'));
+assertType('true', Str::doesntContain('Taylor Otwell', []));
+assertType('true', Str::doesntContain('', 'Taylor'));
 assertType('bool', Str::doesntContain('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::convertCase(''));
@@ -79,8 +79,8 @@ assertType('false', Str::endsWith('Taylor Otwell', []));
 assertType('false', Str::endsWith('', 'Taylor'));
 assertType('bool', Str::endsWith('Taylor Otwell', 'Taylor'));
 
-assertType('false', Str::doesntEndWith('Taylor Otwell', []));
-assertType('false', Str::doesntEndWith('', 'Taylor'));
+assertType('true', Str::doesntEndWith('Taylor Otwell', []));
+assertType('true', Str::doesntEndWith('', 'Taylor'));
 assertType('bool', Str::doesntEndWith('Taylor Otwell', 'Taylor'));
 
 assertType('\'\'', Str::kebab(''));
