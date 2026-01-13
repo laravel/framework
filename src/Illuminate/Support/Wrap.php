@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use Closure;
 use Illuminate\Support\Traits\ForwardsCalls;
-use ValueError;
 
 /**
  * @template TObject
@@ -14,7 +13,7 @@ class Wrap
     use ForwardsCalls;
 
     /**
-     * Create a new Proxyable instance.
+     * Create a new Wrap instance.
      *
      * @param  TObject  $object
      * @param  array<string, \Closure>  $methods
@@ -25,13 +24,13 @@ class Wrap
     }
 
     /**
-     * Captures a method call and executes a callback with the arguments and object.
+     * Registers a temporary macro to execute for the wrapped object method call.
      *
      * @param  string  $method
      * @param  \Closure  $callback
      * @return  $this
      */
-    public function capture($method, Closure $callback)
+    public function macro($method, Closure $callback)
     {
         $this->methods[$method] = $callback;
 
@@ -62,7 +61,7 @@ class Wrap
     }
 
     /**
-     * Dynamically handle removing a property value
+     * Dynamically handle removing a property value.
      *
      * @param  string  $name
      * @return void
@@ -73,7 +72,7 @@ class Wrap
     }
 
     /**
-     * Dynamically handle removing a property value
+     * Dynamically handle checking a property value.
      *
      * @param  string  $name
      * @return bool
@@ -102,14 +101,14 @@ class Wrap
     }
 
     /**
-     * Create a new Proxyable instance using an object.
+     * Create a new Wrap instance using an object.
      *
      * @template TProxied of object
      *
      * @param  TProxied  $object
      * @return static<TProxied>
      */
-    public static function object(object $object): static
+    public static function instance($object): static
     {
         return new static($object);
     }

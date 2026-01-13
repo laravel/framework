@@ -20,7 +20,7 @@ class WrapTest extends TestCase
         $object = m::mock(Fluent::class);
         $object->expects('get')->with('foo')->andReturn('bar');
 
-        $wrap = Wrap::object($object);
+        $wrap = Wrap::instance($object);
 
         $this->assertSame('bar', $wrap->get('foo'));
     }
@@ -30,8 +30,8 @@ class WrapTest extends TestCase
         $object = m::mock(Fluent::class);
         $object->expects('get')->never();
 
-        $wrap = Wrap::object($object);
-        $wrap->capture('get', fn ($name) => $name . 'baz');
+        $wrap = Wrap::instance($object);
+        $wrap->macro('get', fn ($name) => $name . 'baz');
 
         $this->assertSame('foobaz', $wrap->get('foo'));
     }
@@ -41,8 +41,8 @@ class WrapTest extends TestCase
         $object = m::mock(Fluent::class);
         $object->expects('invalid')->never();
 
-        $wrap = Wrap::object($object);
-        $wrap->capture('invalid', fn ($name) => $name . 'baz');
+        $wrap = Wrap::instance($object);
+        $wrap->macro('invalid', fn ($name) => $name . 'baz');
 
         $this->assertSame('foobaz', $wrap->invalid('foo'));
     }
@@ -51,7 +51,7 @@ class WrapTest extends TestCase
     {
         $object = new Fluent(['foo' => 'bar']);
 
-        $wrap = Wrap::object($object);
+        $wrap = Wrap::instance($object);
 
         $this->assertSame('bar', $wrap->foo);
         $this->assertTrue(isset($wrap->foo));
