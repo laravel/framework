@@ -465,7 +465,7 @@ class Str
      *
      * @param  string  $value
      * @param  string  $cap
-     * @return string
+     * @return ($value is '' ? ($cap is '' ? '' : non-empty-string) : non-empty-string)
      */
     public static function finish($value, $cap)
     {
@@ -481,6 +481,7 @@ class Str
      * @param  string  $before
      * @param  string|null  $after
      * @return string
+     * @return ($value is '' ? ($before is '' ? ($after is '' ? '' : ($after is null ? '' : non-empty-string)) : non-empty-string) : non-empty-string)
      */
     public static function wrap($value, $before, $after = null)
     {
@@ -744,7 +745,7 @@ class Str
      * Convert the given string to lower-case.
      *
      * @param  string  $value
-     * @return lowercase-string
+     * @return ($value is '' ? '' : non-empty-string&lowercase-string)
      */
     public static function lower($value)
     {
@@ -1081,7 +1082,7 @@ class Str
      * @param  string  $needle
      * @param  int  $offset
      * @param  string|null  $encoding
-     * @return ($haystack is '' ? false : ($needle is '' ? false : int|false) : int|false)
+     * @return ($haystack is '' ? false : ($needle is '' ? false : int|false))
      */
     public static function position($haystack, $needle, $offset = 0, $encoding = null)
     {
@@ -1398,7 +1399,7 @@ class Str
      *
      * @param  string  $value
      * @param  string  $prefix
-     * @return string
+     * @return ($value is '' ? ($prefix is '' ? '' : non-empty-string): non-empty-string)
      */
     public static function start($value, $prefix)
     {
@@ -1411,7 +1412,7 @@ class Str
      * Convert the given string to upper-case.
      *
      * @param  string  $value
-     * @return uppercase-string
+     * @return ($value is '' ? '' : non-empty-string&uppercase-string)
      */
     public static function upper($value)
     {
@@ -1804,7 +1805,7 @@ class Str
      *
      * @param  string  $string
      * @param  bool  $strict
-     * @return ($strict is true ? string|false : string)
+     * @return ($strict is true ? ($string is '' ? '' : string|false) : ($string is '' ? '' : string))
      */
     public static function fromBase64($string, $strict = false)
     {
@@ -1815,7 +1816,7 @@ class Str
      * Make a string's first character lowercase.
      *
      * @param  string  $string
-     * @return ($string is '' ? '' : string)
+     * @return ($string is '' ? '' : non-empty-string)
      */
     public static function lcfirst($string)
     {
@@ -1826,7 +1827,7 @@ class Str
      * Make a string's first character uppercase.
      *
      * @param  string  $string
-     * @return ($string is '' ? '' : string)
+     * @return ($string is '' ? '' : non-empty-string)
      */
     public static function ucfirst($string)
     {
@@ -1838,7 +1839,7 @@ class Str
      *
      * @param  string  $string
      * @param  string  $separators
-     * @return ($string is '' ? '' : string)
+     * @return ($string is '' ? '' : non-empty-string)
      */
     public static function ucwords($string, $separators = " \t\r\n\f\v")
     {
