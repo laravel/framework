@@ -25,6 +25,8 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
  * @method static \Illuminate\Contracts\Foundation\Application getApplication()
  * @method static \Illuminate\Broadcasting\BroadcastManager setApplication(\Illuminate\Contracts\Foundation\Application $app)
  * @method static \Illuminate\Broadcasting\BroadcastManager forgetDrivers()
+ * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
+ * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static mixed auth(\Illuminate\Http\Request $request)
  * @method static mixed validAuthenticationResponse(\Illuminate\Http\Request $request, mixed $result)
  * @method static void broadcast(array $channels, string $event, array $payload = [])

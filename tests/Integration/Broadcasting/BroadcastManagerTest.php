@@ -43,6 +43,18 @@ class BroadcastManagerTest extends TestCase
         Queue::assertPushed(BroadcastEvent::class);
     }
 
+    public function testEventsCanBeBroadcastUsingQueueRoutes()
+    {
+        Bus::fake();
+        Queue::fake();
+
+        Queue::route(TestEvent::class, 'broadcast-queue', 'broadcast-connection');
+
+        Broadcast::queue(new TestEvent);
+        Bus::assertNotDispatched(BroadcastEvent::class);
+        Queue::connection('broadcast-connection')->assertPushedOn('broadcast-queue', BroadcastEvent::class);
+    }
+
     public function testEventsCanBeRescued()
     {
         Bus::fake();

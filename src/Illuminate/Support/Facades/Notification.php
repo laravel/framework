@@ -20,6 +20,8 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
  * @method static \Illuminate\Contracts\Container\Container getContainer()
  * @method static \Illuminate\Notifications\ChannelManager setContainer(\Illuminate\Contracts\Container\Container $container)
  * @method static \Illuminate\Notifications\ChannelManager forgetDrivers()
+ * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
+ * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static void assertSentOnDemand(string|\Closure $notification, callable|null $callback = null)
  * @method static void assertSentTo(mixed $notifiable, string|\Closure $notification, callable|null $callback = null)
  * @method static void assertSentOnDemandTimes(string $notification, int $times = 1)

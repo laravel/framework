@@ -23,6 +23,10 @@ class BusDispatcherTest extends TestCase
     public function testCommandsThatShouldQueueIsQueued()
     {
         $container = new Container;
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
@@ -31,11 +35,17 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(m::mock(ShouldQueue::class));
+
+        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
     {
         $container = new Container;
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('push')->once();
@@ -44,11 +54,17 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
+
+        Container::setInstance(null);
     }
 
     public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
     {
         $container = new Container;
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
             $mock->shouldReceive('later')->once()->with(10, m::type(BusDispatcherTestSpecificQueueAndDelayCommand::class), '', 'foo');
@@ -57,6 +73,27 @@ class BusDispatcherTest extends TestCase
         });
 
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
+
+        Container::setInstance(null);
+    }
+
+    public function testCommandsAreDispatchedWithQueueRoute()
+    {
+        Container::setInstance($container = new Container);
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn('high-priority');
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+
+        $mock = m::mock(Queue::class);
+        $mock->shouldReceive('push')->once()->with(BusDispatcherQueueable::class, '', 'high-priority');
+
+        $dispatcher = new Dispatcher($container, function () use ($mock) {
+            return $mock;
+        });
+
+        $dispatcher->dispatch(new BusDispatcherQueueable);
+
+        Container::setInstance(null);
     }
 
     public function testDispatchNowShouldNeverQueue()
@@ -88,7 +125,7 @@ class BusDispatcherTest extends TestCase
 
     public function testOnConnectionOnJobWhenDispatching()
     {
-        $container = new Container;
+        Container::setInstance($container = new Container);
         $container->singleton('config', function () {
             return new Config([
                 'queue' => [
@@ -99,6 +136,10 @@ class BusDispatcherTest extends TestCase
                 ],
             ]);
         });
+        $container->instance('queue.routes', $queueRoutes = m::mock());
+        $queueRoutes->shouldReceive('getQueue')->andReturn(null);
+        $queueRoutes->shouldReceive('getConnection')->andReturn(null);
+        Container::setInstance($container);
 
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock(Queue::class);
@@ -110,6 +151,8 @@ class BusDispatcherTest extends TestCase
         $job = (new ShouldNotBeDispatched)->onConnection('null');
 
         $dispatcher->dispatch($job);
+
+        Container::setInstance(null);
     }
 }
 
@@ -145,6 +188,11 @@ class BusDispatcherTestSpecificQueueAndDelayCommand implements ShouldQueue
 {
     public $queue = 'foo';
     public $delay = 10;
+}
+
+class BusDispatcherQueueable implements ShouldQueue
+{
+    use Queueable;
 }
 
 class StandAloneCommand

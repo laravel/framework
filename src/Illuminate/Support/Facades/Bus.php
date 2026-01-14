@@ -22,6 +22,8 @@ use Illuminate\Support\Testing\Fakes\BusFake;
  * @method static \Illuminate\Bus\Dispatcher map(array $map)
  * @method static \Illuminate\Bus\Dispatcher withDispatchingAfterResponses()
  * @method static \Illuminate\Bus\Dispatcher withoutDispatchingAfterResponses()
+ * @method static string|null resolveConnectionFromQueueRoute(object $queueable)
+ * @method static string|null resolveQueueFromQueueRoute(object $queueable)
  * @method static \Illuminate\Support\Testing\Fakes\BusFake except(array|string $jobsToDispatch)
  * @method static void assertDispatched(string|\Closure $command, callable|int|null $callback = null)
  * @method static void assertDispatchedOnce(string|\Closure $command, int $times = null)
