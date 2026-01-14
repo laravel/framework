@@ -42,11 +42,11 @@ class Response implements ArrayAccess, Stringable
     protected $decoded;
 
     /**
-     * The flags used when decoding the JSON response.
+     * The flags that were used when decoding the JSON response.
      *
-     * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null
+     * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
      */
-    protected ?int $decodingFlags = null;
+    protected int $decodingFlags;
 
     /**
      * The request cookies.
