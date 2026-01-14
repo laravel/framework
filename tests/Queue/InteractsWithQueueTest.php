@@ -56,7 +56,7 @@ class InteractsWithQueueTest extends TestCase
         $queueJob->mockery_verify();
     }
 
-    public function testDoesntCreateAnExceptionWhenBooleanIsFalse()
+    public function testDoesNotFailJobWhenConditionIsFalse()
     {
         $queueJob = m::mock(Job::class);
         $queueJob->shouldNotReceive('fail');
