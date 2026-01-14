@@ -67,7 +67,7 @@ class HttpClientTest extends TestCase
 
     protected function tearDown(): void
     {
-        Response::$defaultJsonDecodingFlags = 0;
+        Response::flushState();
     }
 
     public function testStubbedResponsesAreReturnedAfterFaking()

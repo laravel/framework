@@ -595,4 +595,12 @@ class Response implements ArrayAccess, Stringable
             ? $this->macroCall($method, $parameters)
             : $this->response->{$method}(...$parameters);
     }
+
+    /**
+     * Flush the global state of the Response.
+     */
+    public static function flushState(): void
+    {
+        self::$defaultJsonDecodingFlags = 0;
+    }
 }
