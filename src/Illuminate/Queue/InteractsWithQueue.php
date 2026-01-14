@@ -68,7 +68,7 @@ trait InteractsWithQueue
     /**
      * Fail the job from the queue when the boolean is true.
      *
-     * @param  boolean $boolean
+     * @param  bool $boolean
      * @param  \Throwable|string|null  $exception
      * @return void
      */
