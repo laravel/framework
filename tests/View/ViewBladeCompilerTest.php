@@ -315,7 +315,7 @@ class ViewBladeCompilerTest extends TestCase
         $result = 1;
         $pids = [];
 
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $pid = pcntl_fork();
             if ($pid === 0) {
                 try {
