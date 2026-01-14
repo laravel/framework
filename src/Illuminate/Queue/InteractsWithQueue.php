@@ -66,6 +66,20 @@ trait InteractsWithQueue
     }
 
     /**
+     * Fail the job from the queue when the boolean is true.
+     *
+     * @param  boolean $boolean
+     * @param  \Throwable|string|null  $exception
+     * @return void
+     */
+    public function failIf(bool $boolean, $exception = null)
+    {
+        if ($boolean) {
+            $this->fail($exception);
+        }
+    }
+
+    /**
      * Release the job back into the queue after (n) seconds.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
