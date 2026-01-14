@@ -23,7 +23,7 @@ class PendingBatchFake extends PendingBatch
     public function __construct(BusFake $bus, Collection $jobs)
     {
         $this->bus = $bus;
-        $this->jobs = $jobs;
+        $this->jobs = $jobs->filter()->values();
     }
 
     /**
