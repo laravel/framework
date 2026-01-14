@@ -4,7 +4,7 @@ namespace Illuminate\Queue;
 
 enum WorkerStopReason: string
 {
-    case CacheFailure = 'cache_failure';
+    case CacheFailed = 'cache_failed';
     case Interrupted = 'interrupted';
     case MaxJobsExceeded = 'max_jobs';
     case MaxMemoryExceeded = 'memory';

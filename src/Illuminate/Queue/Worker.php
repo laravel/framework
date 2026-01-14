@@ -345,7 +345,7 @@ class Worker
         return match (true) {
             $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStopReason::Interrupted],
             $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStopReason::MaxMemoryExceeded],
-            $this->cacheFailed => [static::$cacheFailedExitCode ?? static::EXIT_CACHE_FAILED, WorkerStopReason::CacheFailure],
+            $this->cacheFailed => [static::$cacheFailedExitCode ?? static::EXIT_CACHE_FAILED, WorkerStopReason::CacheFailed],
             $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStopReason::ReceivedRestartSignal],
             $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStopReason::QueueEmpty],
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStopReason::MaxTimeExceeded],
