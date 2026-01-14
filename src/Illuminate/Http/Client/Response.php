@@ -21,11 +21,11 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
+     * The flags passed to `json_decode` by default.
+     *
      * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
      */
     public static int $defaultJsonDecodingFlags = 0;
-
-    protected $decodingFlags = null;
 
     /**
      * The underlying PSR response.
@@ -40,6 +40,13 @@ class Response implements ArrayAccess, Stringable
      * @var array
      */
     protected $decoded;
+
+    /**
+     * The flags used when decoding the JSON response.
+     *
+     * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>|null
+     */
+    protected ?int $decodingFlags = null;
 
     /**
      * The request cookies.
