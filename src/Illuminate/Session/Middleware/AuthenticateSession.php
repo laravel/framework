@@ -86,6 +86,7 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         $passwordHash = $request->user()->getAuthPassword();
+
         if (is_callable([$this->guard(), 'hashPasswordForCookie'])) {
             $passwordHash = $this->guard()->hashPasswordForCookie($passwordHash);
         }
