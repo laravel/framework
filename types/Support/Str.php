@@ -105,7 +105,7 @@ assertType('string', Str::password());
 
 assertType('false', Str::position('Taylor Otwell', ''));
 assertType('false', Str::position('', 'Taylor'));
-assertType('bool', Str::position('Taylor Otwell', 'Taylor'));
+assertType('int|false', Str::position('Taylor Otwell', 'Taylor'));
 
 assertType('string|null', Str::replaceMatches('Taylor Otwell', '', ''));
 assertType('array<string>|null', Str::replaceMatches(['Taylor', 'Otwell'], '', ''));
