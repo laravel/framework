@@ -140,7 +140,7 @@ class PendingRequest
     /**
      * The number of milliseconds to wait between retries.
      *
-     * @var Closure|int
+     * @var (Closure(int, mixed): int)|int
      */
     protected $retryDelay = 100;
 
@@ -154,7 +154,7 @@ class PendingRequest
     /**
      * The callback that will determine if the request should be retried.
      *
-     * @var callable|null
+     * @var (callable(\Throwable, static, string): bool)|null
      */
     protected $retryWhenCallback = null;
 
@@ -651,8 +651,8 @@ class PendingRequest
      * Specify the number of times the request should be attempted.
      *
      * @param  array|int  $times
-     * @param  Closure|int  $sleepMilliseconds
-     * @param  callable|null  $when
+     * @param  (Closure(int, mixed): int)|int  $sleepMilliseconds
+     * @param  (callable(\Throwable, static, string): bool)|null  $when
      * @param  bool  $throw
      * @return $this
      */
@@ -660,8 +660,8 @@ class PendingRequest
     {
         $this->tries = $times;
         $this->retryDelay = $sleepMilliseconds;
-        $this->retryThrow = $throw;
         $this->retryWhenCallback = $when;
+        $this->retryThrow = $throw;
 
         return $this;
     }
