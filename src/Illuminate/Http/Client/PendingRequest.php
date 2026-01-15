@@ -154,7 +154,7 @@ class PendingRequest
     /**
      * The callback that will determine if the request should be retried.
      *
-     * @var (callable(\Throwable, static, string): bool)|null
+     * @var (callable(\Throwable, static, string|null): bool)|null
      */
     protected $retryWhenCallback = null;
 
@@ -652,7 +652,7 @@ class PendingRequest
      *
      * @param  array|int  $times
      * @param  (Closure(int, mixed): int)|int  $sleepMilliseconds
-     * @param  (callable(\Throwable, static, string): bool)|null  $when
+     * @param  (callable(\Throwable, static, string|null): bool)|null  $when
      * @param  bool  $throw
      * @return $this
      */
