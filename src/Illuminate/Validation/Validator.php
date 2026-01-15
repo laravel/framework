@@ -748,7 +748,7 @@ class Validator implements ValidatorContract
     protected function replaceDotInParameters(array $parameters)
     {
         return array_map(function ($field) {
-            return static::encodeAttributeWithPlaceholder($field);
+            return static::encodeAttributeWithPlaceholder((string) ($field ?? ''));
         }, $parameters);
     }
 
