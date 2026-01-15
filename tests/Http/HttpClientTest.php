@@ -4317,9 +4317,11 @@ class HttpClientTest extends TestCase
 
     public function testJsonDecodingIsCachedWhenFlagsMatch()
     {
+        Response::$defaultJsonDecodingFlags = JSON_BIGINT_AS_STRING;
+
         $response = new BodyTrackingResponse(Factory::psr7Response('{"foo":"bar"}'));
 
-        // First call decodes
+        // First call decodes with default (JSON_BIGINT_AS_STRING)
         $response->json();
         $this->assertSame(1, $response->bodyCallCount);
 
@@ -4328,16 +4330,20 @@ class HttpClientTest extends TestCase
         $this->assertSame(1, $response->bodyCallCount);
 
         // Explicit flags matching default still uses cache
-        $response->json(flags: 0);
+        $response->json(flags: JSON_BIGINT_AS_STRING);
         $this->assertSame(1, $response->bodyCallCount);
 
         // Different flags triggers re-decode
-        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $response->json(flags: 0);
         $this->assertSame(2, $response->bodyCallCount);
 
         // Same explicit flags uses cache
-        $response->json(flags: JSON_BIGINT_AS_STRING);
+        $response->json(flags: 0);
         $this->assertSame(2, $response->bodyCallCount);
+
+        // Null flags means "use default", cached flags differ, so re-decode
+        $response->json();
+        $this->assertSame(3, $response->bodyCallCount);
     }
 }
 
