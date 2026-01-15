@@ -75,11 +75,7 @@ class CompilerEngine extends PhpEngine
         try {
             $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
         } catch (ViewException $e) {
-            if (! Str::of($e->getMessage())->contains(['No such file or directory', 'File does not exist at path'])) {
-                throw $e;
-            }
-
-            if (! isset($this->compiledOrNotExpired[$path])) {
+            if (! Str::of($e->getMessage())->contains(['No such file or directory', 'File does not exist at path', 'Failed opening required'])) {
                 throw $e;
             }
 

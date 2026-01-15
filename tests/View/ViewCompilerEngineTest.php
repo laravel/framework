@@ -169,6 +169,88 @@ class ViewCompilerEngineTest extends TestCase
         $engine->get($path);
     }
 
+    public function testViewsAreRecompiledOnFirstRenderWhenCompiledViewIsMissing()
+    {
+        $compiled = __DIR__.'/fixtures/basic.php';
+        $path = __DIR__.'/fixtures/foo.php';
+
+        $files = m::mock(Filesystem::class);
+        $engine = $this->getEngine($files);
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andThrow(new FileNotFoundException(
+                "File does not exist at path {$path}."
+            ));
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andReturnUsing(function () {
+                echo 'compiled-content';
+            });
+
+        $engine->getCompiler()
+            ->shouldReceive('getCompiledPath')
+            ->twice()
+            ->with($path)
+            ->andReturn($compiled);
+
+        $engine->getCompiler()
+            ->shouldReceive('isExpired')
+            ->once()
+            ->andReturn(true);
+
+        $engine->getCompiler()
+            ->shouldReceive('compile')
+            ->twice()
+            ->with($path);
+
+        $this->assertSame('compiled-content', $engine->get($path));
+    }
+
+    public function testViewsAreRecompiledWhenCompiledViewIsMissingViaFailedOpeningRequired()
+    {
+        $compiled = __DIR__.'/fixtures/basic.php';
+        $path = __DIR__.'/fixtures/foo.php';
+
+        $files = m::mock(Filesystem::class);
+        $engine = $this->getEngine($files);
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andThrow(new ErrorException(
+                "Failed opening required '{$compiled}' (include_path='.:')",
+            ));
+
+        $files->shouldReceive('getRequire')
+            ->once()
+            ->with($compiled, [])
+            ->andReturnUsing(function () {
+                echo 'compiled-content';
+            });
+
+        $engine->getCompiler()
+            ->shouldReceive('getCompiledPath')
+            ->twice()
+            ->with($path)
+            ->andReturn($compiled);
+
+        $engine->getCompiler()
+            ->shouldReceive('isExpired')
+            ->once()
+            ->andReturn(true);
+
+        $engine->getCompiler()
+            ->shouldReceive('compile')
+            ->twice()
+            ->with($path);
+
+        $this->assertSame('compiled-content', $engine->get($path));
+    }
+
     public function testViewsAreRecompiledJustOnceWhenCompiledViewIsMissing()
     {
         $compiled = __DIR__.'/fixtures/basic.php';
