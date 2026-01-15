@@ -117,7 +117,7 @@ class TestViewsTest extends TestCase
 
         (new ReflectionProperty($instance::class, 'originalCompiledViewPath'))->setValue(null, null);
 
-        $method = new ReflectionMethod($instance, 'testCompiledViewPath');
+        $method = new ReflectionMethod($instance, 'parallelSafeCompiledViewPath');
 
         return $method->invoke($instance);
     }
