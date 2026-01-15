@@ -85,8 +85,14 @@ class AuthenticateSession implements AuthenticatesSessions
             return;
         }
 
+        $passwordHash = $request->user()->getAuthPassword();
+
+        if (is_callable([$this->guard(), 'hashPasswordForCookie'])) {
+            $passwordHash = $this->guard()->hashPasswordForCookie($passwordHash);
+        }
+
         $request->session()->put([
-            'password_hash_'.$this->auth->getDefaultDriver() => $this->guard()->hashPasswordForCookie($request->user()->getAuthPassword()),
+            'password_hash_'.$this->auth->getDefaultDriver() => $passwordHash,
         ]);
     }
 
@@ -100,7 +106,8 @@ class AuthenticateSession implements AuthenticatesSessions
     protected function validatePasswordHash($passwordHash, $storedValue)
     {
         // Try new HMAC format first...
-        if (hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)) {
+        if (is_callable([$this->guard(), 'hashPasswordForCookie']) &&
+            hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)) {
             return true;
         }
 
