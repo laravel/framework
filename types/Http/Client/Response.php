@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Client\Response;
+
 use function PHPStan\Testing\assertType;
 
 assertType(
