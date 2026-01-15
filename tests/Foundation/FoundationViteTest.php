@@ -1714,12 +1714,20 @@ class FoundationViteTest extends TestCase
     {
         $this->makeViteManifest();
 
-        app(Vite::class)('resources/js/app.js');
+        $vite = app(Vite::class);
+        $vite('resources/js/app.js');
+        $vite->useCspNonce('test-nonce');
+        $vite->useScriptTagAttributes(['data-turbo-track' => 'reload']);
+        $vite->useStyleTagAttributes(['data-turbo-track' => 'reload']);
+        $vite->usePreloadTagAttributes(['data-turbo-track' => 'reload']);
+
         app()->forgetScopedInstances();
         $this->assertCount(1, app(Vite::class)->preloadedAssets());
+        $this->assertSame('test-nonce', app(Vite::class)->cspNonce());
 
         app(Vite::class)->flush();
         $this->assertCount(0, app(Vite::class)->preloadedAssets());
+        $this->assertNull(app(Vite::class)->cspNonce());
     }
 
     protected function cleanViteManifest($path = 'build')

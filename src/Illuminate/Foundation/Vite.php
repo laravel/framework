@@ -1043,6 +1043,10 @@ class Vite implements Htmlable
      */
     public function flush()
     {
+        $this->nonce = null;
         $this->preloadedAssets = [];
+        $this->scriptTagAttributesResolvers = [];
+        $this->styleTagAttributesResolvers = [];
+        $this->preloadTagAttributesResolvers = [];
     }
 }
