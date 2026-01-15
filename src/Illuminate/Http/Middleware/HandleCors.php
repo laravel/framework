@@ -26,7 +26,7 @@ class HandleCors
     /**
      * All of the registered skip callbacks.
      *
-     * @var array
+     * @var array<int, \Closure(\Illuminate\Http\Request): bool>
      */
     protected static $skipCallbacks = [];
 
