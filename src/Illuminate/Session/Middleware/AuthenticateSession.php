@@ -86,7 +86,7 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         $passwordHash = $request->user()->getAuthPassword();
-        if (method_exists($this->guard(), 'hashPasswordForCookie')) {
+        if (is_callable([$this->guard(), 'hashPasswordForCookie'])) {
             $passwordHash = $this->guard()->hashPasswordForCookie($passwordHash);
         }
 
@@ -106,7 +106,7 @@ class AuthenticateSession implements AuthenticatesSessions
     {
         // Try new HMAC format first...
         if (
-            method_exists($this->guard(), 'hashPasswordForCookie') &&
+            is_callable([$this->guard(), 'hashPasswordForCookie']) &&
             hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)
         ) {
             return true;
