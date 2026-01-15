@@ -21,13 +21,6 @@ class Response implements ArrayAccess, Stringable
     }
 
     /**
-     * The flags passed to `json_decode` by default.
-     *
-     * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
-     */
-    public static int $defaultJsonDecodingFlags = 0;
-
-    /**
      * The underlying PSR response.
      *
      * @var \Psr\Http\Message\ResponseInterface
@@ -70,6 +63,13 @@ class Response implements ArrayAccess, Stringable
     protected $truncateExceptionsAt = null;
 
     /**
+     * The flags passed to `json_decode` by default.
+     *
+     * @var int-mask<JSON_BIGINT_AS_STRING, JSON_INVALID_UTF8_IGNORE, JSON_INVALID_UTF8_SUBSTITUTE, JSON_OBJECT_AS_ARRAY, JSON_THROW_ON_ERROR>
+     */
+    public static int $defaultJsonDecodingFlags = 0;
+
+    /**
      * Create a new response instance.
      *
      * @param  \Psr\Http\Message\MessageInterface  $response
@@ -99,9 +99,13 @@ class Response implements ArrayAccess, Stringable
      */
     public function json($key = null, $default = null, $flags = null)
     {
-        if (! $this->decoded || ($flags !== null && $this->decodingFlags !== $flags)) {
+        if (! $this->decoded || (! is_null($flags) && $this->decodingFlags !== $flags)) {
             $flags = $flags ?? self::$defaultJsonDecodingFlags;
-            $this->decoded = json_decode($this->body(), true, flags: $flags);
+
+            $this->decoded = json_decode(
+                $this->body(), true, flags: $flags
+            );
+
             $this->decodingFlags = $flags;
         }
 
