@@ -86,10 +86,10 @@ assertType('bool', Str::doesntEndWith('Taylor Otwell', 'Taylor'));
 assertType('\'\'', Str::kebab(''));
 assertType('string', Str::kebab('Taylor Otwell'));
 
-assertType('', Str::lower(''));
-assertType('lowercase-string', Str::lower('Taylor'));
-assertType('', Str::upper(''));
-assertType('uppercase-string', Str::upper('Taylor'));
+assertType('\'\'', Str::lower(''));
+assertType('lowercase-string&non-empty-string', Str::lower('Taylor'));
+assertType('\'\'', Str::upper(''));
+assertType('uppercase-string&non-empty-string', Str::upper('Taylor'));
 
 assertType('\'\'', Str::markdown(''));
 assertType('string', Str::markdown('Taylor Otwell'));
