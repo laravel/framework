@@ -37,9 +37,7 @@ trait TestViews
      */
     protected function setUpParallelTestingViewDirectory()
     {
-        $path = $this->testCompiledViewPath();
-
-        if ($path) {
+        if ($path = $this->testCompiledViewPath()) {
             File::ensureDirectoryExists($path);
         }
     }
@@ -51,9 +49,7 @@ trait TestViews
      */
     protected function setUpParallelTestingViews()
     {
-        $path = $this->testCompiledViewPath();
-
-        if ($path) {
+        if ($path = $this->testCompiledViewPath()) {
             $this->switchToCompiledViewPath($path);
         }
     }
@@ -65,19 +61,15 @@ trait TestViews
      */
     protected function testCompiledViewPath()
     {
-        if (! isset(self::$originalCompiledViewPath)) {
-            self::$originalCompiledViewPath = $this->app['config']->get('view.compiled', '');
-        }
+        self::$originalCompiledViewPath ??= $this->app['config']->get('view.compiled', '');
 
-        $path = self::$originalCompiledViewPath;
-
-        if (! $path) {
+        if (! self::$originalCompiledViewPath) {
             return null;
         }
 
         $token = ParallelTesting::token();
 
-        return rtrim($path, '\/').'/'.'test_'.$token;
+        return rtrim(self::$originalCompiledViewPath, '\/').'/test_'.$token;
     }
 
     /**
