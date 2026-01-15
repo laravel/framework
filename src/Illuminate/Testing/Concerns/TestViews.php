@@ -22,44 +22,24 @@ trait TestViews
     protected function bootTestViews()
     {
         ParallelTesting::setUpProcess(function () {
-            $this->setUpParallelTestingViewDirectory();
+            if ($path = $this->parallelSafeCompiledViewPath()) {
+                File::ensureDirectoryExists($path);
+            }
         });
 
         ParallelTesting::setUpTestCase(function () {
-            $this->setUpParallelTestingViews();
+            if ($path = $this->parallelSafeCompiledViewPath()) {
+                $this->switchToCompiledViewPath($path);
+            }
         });
     }
 
     /**
-     * Create the parallel testing view directory.
-     *
-     * @return void
-     */
-    protected function setUpParallelTestingViewDirectory()
-    {
-        if ($path = $this->testCompiledViewPath()) {
-            File::ensureDirectoryExists($path);
-        }
-    }
-
-    /**
-     * Set up parallel testing views for the current test case.
-     *
-     * @return void
-     */
-    protected function setUpParallelTestingViews()
-    {
-        if ($path = $this->testCompiledViewPath()) {
-            $this->switchToCompiledViewPath($path);
-        }
-    }
-
-    /**
-     * Returns the test compiled view path.
+     * Get the test compiled view path.
      *
      * @return string|null
      */
-    protected function testCompiledViewPath()
+    protected function parallelSafeCompiledViewPath()
     {
         self::$originalCompiledViewPath ??= $this->app['config']->get('view.compiled', '');
 
@@ -67,9 +47,9 @@ trait TestViews
             return null;
         }
 
-        $token = ParallelTesting::token();
-
-        return rtrim(self::$originalCompiledViewPath, '\/').'/test_'.$token;
+        return rtrim(self::$originalCompiledViewPath, '\/')
+            .'/test_'
+            .ParallelTesting::token();
     }
 
     /**
