@@ -81,17 +81,6 @@ class HandleCors
     }
 
     /**
-     * Register a callback that instructs the middleware to be skipped.
-     *
-     * @param  \Closure  $callback
-     * @return void
-     */
-    public static function skipWhen(Closure $callback)
-    {
-        static::$skipCallbacks[] = $callback;
-    }
-
-    /**
      * Get the path from the configuration to determine if the CORS service should run.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -131,6 +120,17 @@ class HandleCors
         return array_filter($paths, function ($path) {
             return is_string($path);
         });
+    }
+
+    /**
+     * Register a callback that instructs the middleware to be skipped.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function skipWhen(Closure $callback)
+    {
+        static::$skipCallbacks[] = $callback;
     }
 
     /**
