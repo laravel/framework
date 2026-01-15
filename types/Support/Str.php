@@ -131,13 +131,13 @@ assertType('\'\'', Str::fromBase64(''));
 assertType('string', Str::fromBase64('Taylor Otwell'));
 
 assertType('\'\'', Str::lcfirst(''));
-assertType('string', Str::lcfirst('Taylor Otwell'));
+assertType('non-empty-string', Str::lcfirst('Taylor Otwell'));
 
 assertType('\'\'', Str::ucfirst(''));
-assertType('string', Str::ucfirst('Taylor Otwell'));
+assertType('non-empty-string', Str::ucfirst('Taylor Otwell'));
 
 assertType('\'\'', Str::ucwords(''));
-assertType('string', Str::ucwords('Taylor Otwell'));
+assertType('non-empty-string', Str::ucwords('Taylor Otwell'));
 
 assertType('array{}', Str::ucsplit(''));
 assertType('array<string>', Str::ucsplit('Taylor Otwell'));
