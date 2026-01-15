@@ -123,6 +123,20 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Get the specified integer configuration value.
+     *
+     * @param  string  $key
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function int(string $key, $default = null): int
+    {
+        return $this->integer($key, $default);
+    }
+
+    /**
      * Get the specified float configuration value.
      *
      * @param  string  $key
