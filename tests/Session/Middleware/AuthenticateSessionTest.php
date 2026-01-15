@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Session\Middleware;
 
+use BadMethodCallException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
@@ -313,6 +314,46 @@ class AuthenticateSessionTest extends TestCase
         $this->assertEquals('next-9', $response);
         // Session should be updated to new format (HMAC)
         $this->assertEquals('mac:my-pass-(*&^%$#!@', $session->get('password_hash_web'));
+        $this->assertEquals('1', $session->get('a'));
+        $this->assertEquals('2', $session->get('b'));
+    }
+
+    public function test_handle_with_old_format_cookie_and_legacy_guard()
+    {
+        $user = new class
+        {
+            public function getAuthPassword()
+            {
+                return 'my-pass-(*&^%$#!@';
+            }
+        };
+
+        // Cookie contains OLD format (raw password hash, not HMAC)
+        $request = new Request(cookies: ['recaller-name' => 'a|b|my-pass-(*&^%$#!@']);
+        $request->setUserResolver(fn () => $user);
+
+        $session = new Store('name', new ArraySessionHandler(1));
+        $session->put('a', '1');
+        $session->put('b', '2');
+        // Session also contains old format for this test
+        $session->put('password_hash_web', 'my-pass-(*&^%$#!@');
+        $request->setLaravelSession($session);
+
+        $authFactory = m::mock(AuthFactory::class);
+        $authFactory->shouldReceive('viaRemember')->andReturn(true);
+        $authFactory->shouldReceive('getRecallerName')->once()->andReturn('recaller-name');
+        $authFactory->shouldReceive('getDefaultDriver')->andReturn('web');
+        $authFactory->shouldReceive('user')->andReturn($user);
+        // For legacy guards without hashPasswordForCookie method, we use fallback to raw hash
+        $authFactory->shouldReceive('hashPasswordForCookie')->andThrowExceptions([new BadMethodCallException]);
+
+        $middleware = new AuthenticateSession($authFactory);
+        $response = $middleware->handle($request, fn () => 'next-9');
+
+        // Should succeed because of backward compatibility fallback
+        $this->assertEquals('next-9', $response);
+        // Session should stay intact
+        $this->assertEquals('my-pass-(*&^%$#!@', $session->get('password_hash_web'));
         $this->assertEquals('1', $session->get('a'));
         $this->assertEquals('2', $session->get('b'));
     }

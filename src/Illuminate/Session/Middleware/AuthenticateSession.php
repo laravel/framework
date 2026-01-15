@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session\Middleware;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -87,8 +88,9 @@ class AuthenticateSession implements AuthenticatesSessions
 
         $passwordHash = $request->user()->getAuthPassword();
 
-        if (is_callable([$this->guard(), 'hashPasswordForCookie'])) {
+        try {
             $passwordHash = $this->guard()->hashPasswordForCookie($passwordHash);
+        } catch (BadMethodCallException) {
         }
 
         $request->session()->put([
@@ -105,14 +107,13 @@ class AuthenticateSession implements AuthenticatesSessions
      */
     protected function validatePasswordHash($passwordHash, $storedValue)
     {
-        // Try new HMAC format first...
-        if (is_callable([$this->guard(), 'hashPasswordForCookie']) &&
-            hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)) {
-            return true;
+        try {
+            // Try new HMAC format first, then fall back to raw password hash format for backward compatibility
+            return hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)
+                || hash_equals($passwordHash, $storedValue);
+        } catch (BadMethodCallException) {
+            return hash_equals($passwordHash, $storedValue);
         }
-
-        // Fall back to raw password hash format for backward compatibility...
-        return hash_equals($passwordHash, $storedValue);
     }
 
     /**
