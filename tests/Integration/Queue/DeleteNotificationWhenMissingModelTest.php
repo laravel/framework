@@ -28,10 +28,11 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
             $table->id();
             $table->string('name');
         });
+    }
 
-        $this->beforeApplicationDestroyed(function () {
-            Schema::dropIfExists('delete_notification_test_models');
-        });
+    protected function destroyDatabaseMigrations()
+    {
+        Schema::dropIfExists('delete_notification_test_models');
     }
 
     #[\Override]
