@@ -87,7 +87,9 @@ class SendQueuedNotifications implements ShouldQueue
         $this->tries = property_exists($notification, 'tries') ? $notification->tries : null;
         $this->timeout = property_exists($notification, 'timeout') ? $notification->timeout : null;
         $this->maxExceptions = property_exists($notification, 'maxExceptions') ? $notification->maxExceptions : null;
-        $this->deleteWhenMissingModels = property_exists($notification, 'deleteWhenMissingModels') ? $notification->deleteWhenMissingModels : false;
+        $this->deleteWhenMissingModels = property_exists($notification, 'deleteWhenMissingModels')
+            ? $notification->deleteWhenMissingModels
+            : false;
 
         if ($notification instanceof ShouldQueueAfterCommit) {
             $this->afterCommit = true;
