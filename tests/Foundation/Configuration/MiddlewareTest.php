@@ -287,8 +287,8 @@ class MiddlewareTest extends TestCase
     {
         $configuration = new Middleware();
         $middleware = new PreventRequestForgery(
-            m::mock(Application::class),
-            m::mock(Encrypter::class)
+            Mockery::mock(Application::class),
+            Mockery::mock(Encrypter::class)
         );
 
         $this->assertSame([], $middleware->getExcludedPaths());
