@@ -22,23 +22,20 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
         $this->driver = 'database';
     }
 
-    protected function defineDatabaseMigrations()
+    protected function setUp(): void
     {
-        Schema::create('delete_notification_test_models', function (Blueprint $table) {
+        parent::setUp();
+
+        Schema::create('notification_test_models', function (Blueprint $table) {
             $table->id();
             $table->string('name');
         });
     }
 
-    protected function destroyDatabaseMigrations()
-    {
-        Schema::dropIfExists('delete_notification_test_models');
-    }
-
-    #[\Override]
     protected function tearDown(): void
     {
         DeleteMissingModelNotification::$handled = false;
+        Schema::dropIfExists('notification_test_models');
 
         parent::tearDown();
     }
@@ -61,7 +58,7 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
 
 class NotificationTestModel extends Model
 {
-    protected $table = 'delete_notification_test_models';
+    protected $table = 'notification_test_models';
 
     public $timestamps = false;
 
