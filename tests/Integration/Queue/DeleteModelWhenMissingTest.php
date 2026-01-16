@@ -130,7 +130,7 @@ class DeleteMissingModelNotification extends Notification implements ShouldQueue
 
     public function via($notifiable): array
     {
-        return ['database'];
+        return ['mail'];
     }
 
     public function toArray($notifiable): array
