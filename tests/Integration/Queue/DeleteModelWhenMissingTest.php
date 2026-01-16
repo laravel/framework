@@ -49,6 +49,7 @@ class DeleteModelWhenMissingTest extends QueueTestCase
 
     public function test_deleteModelWhenMissing_and_display_name(): void
     {
+        // Test with queued job
         $model = MyTestModel::query()->create(['name' => 'test']);
 
         DeleteMissingModelJob::dispatch($model);
@@ -59,16 +60,14 @@ class DeleteModelWhenMissingTest extends QueueTestCase
 
         $this->assertFalse(DeleteMissingModelJob::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
-    }
 
-    public function test_deleteModelWhenMissing_works_with_queued_notifications(): void
-    {
-        $model = MyTestModel::query()->create(['name' => 'test']);
+        // Test with queued notification
+        $model = MyTestModel::query()->create(['name' => 'test2']);
 
         $notifiable = new TestNotifiableUser;
         $notifiable->notify(new DeleteMissingModelNotification($model));
 
-        MyTestModel::query()->where('name', 'test')->delete();
+        MyTestModel::query()->where('name', 'test2')->delete();
 
         $this->runQueueWorkerCommand(['--once' => '1']);
 
