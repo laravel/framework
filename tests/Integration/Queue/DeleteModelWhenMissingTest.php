@@ -2,10 +2,13 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
@@ -39,6 +42,7 @@ class DeleteModelWhenMissingTest extends QueueTestCase
     protected function tearDown(): void
     {
         DeleteMissingModelJob::$handled = false;
+        DeleteMissingModelNotification::$handled = false;
 
         parent::tearDown();
     }
@@ -54,6 +58,21 @@ class DeleteModelWhenMissingTest extends QueueTestCase
         $this->runQueueWorkerCommand(['--once' => '1']);
 
         $this->assertFalse(DeleteMissingModelJob::$handled);
+        $this->assertNull(\DB::table('failed_jobs')->first());
+    }
+
+    public function test_deleteModelWhenMissing_works_with_queued_notifications(): void
+    {
+        $model = MyTestModel::query()->create(['name' => 'test']);
+
+        $notifiable = new TestNotifiableUser;
+        $notifiable->notify(new DeleteMissingModelNotification($model));
+
+        MyTestModel::query()->where('name', 'test')->delete();
+
+        $this->runQueueWorkerCommand(['--once' => '1']);
+
+        $this->assertFalse(DeleteMissingModelNotification::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
     }
 }
@@ -90,4 +109,34 @@ class MyTestModel extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+}
+
+class TestNotifiableUser
+{
+    use Notifiable;
+}
+
+class DeleteMissingModelNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public static bool $handled = false;
+
+    public $deleteWhenMissingModels = true;
+
+    public function __construct(public MyTestModel $model)
+    {
+    }
+
+    public function via($notifiable): array
+    {
+        return ['database'];
+    }
+
+    public function toArray($notifiable): array
+    {
+        self::$handled = true;
+
+        return ['model_id' => $this->model->id];
+    }
 }
