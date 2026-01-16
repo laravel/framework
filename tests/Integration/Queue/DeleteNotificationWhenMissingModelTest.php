@@ -35,12 +35,13 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
     protected function tearDown(): void
     {
         DeleteMissingModelNotification::$handled = false;
+        FailingMissingModelNotification::$handled = false;
         Schema::dropIfExists('notification_test_models');
 
         parent::tearDown();
     }
 
-    public function test_deleteWhenMissingModels_works_with_queued_notifications(): void
+    public function test_deleteWhenMissingModels_deletes_job_when_true(): void
     {
         $model = NotificationTestModel::query()->create(['name' => 'test']);
 
@@ -53,6 +54,21 @@ class DeleteNotificationWhenMissingModelTest extends QueueTestCase
 
         $this->assertFalse(DeleteMissingModelNotification::$handled);
         $this->assertNull(\DB::table('failed_jobs')->first());
+    }
+
+    public function test_deleteWhenMissingModels_fails_job_when_false(): void
+    {
+        $model = NotificationTestModel::query()->create(['name' => 'test']);
+
+        $notifiable = new TestNotifiableUser;
+        $notifiable->notify(new FailingMissingModelNotification($model));
+
+        NotificationTestModel::query()->where('name', 'test')->delete();
+
+        $this->runQueueWorkerCommand(['--once' => '1']);
+
+        $this->assertFalse(FailingMissingModelNotification::$handled);
+        $this->assertNotNull(\DB::table('failed_jobs')->first());
     }
 }
 
@@ -77,6 +93,31 @@ class DeleteMissingModelNotification extends Notification implements ShouldQueue
     public static bool $handled = false;
 
     public $deleteWhenMissingModels = true;
+
+    public function __construct(public NotificationTestModel $model)
+    {
+    }
+
+    public function via($notifiable): array
+    {
+        return ['mail'];
+    }
+
+    public function toArray($notifiable): array
+    {
+        self::$handled = true;
+
+        return ['model_id' => $this->model->id];
+    }
+}
+
+class FailingMissingModelNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    public static bool $handled = false;
+
+    public $deleteWhenMissingModels = false;
 
     public function __construct(public NotificationTestModel $model)
     {
