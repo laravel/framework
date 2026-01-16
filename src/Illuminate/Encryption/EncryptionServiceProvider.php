@@ -2,6 +2,7 @@
 
 namespace Illuminate\Encryption;
 
+use Illuminate\Support\Env;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -16,6 +17,7 @@ class EncryptionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerEncrypter();
+        $this->registerFileEncrypter();
         $this->registerSerializableClosureSecurityKey();
     }
 
@@ -33,6 +35,35 @@ class EncryptionServiceProvider extends ServiceProvider
                 ->previousKeys(array_map(
                     fn ($key) => $this->parseKey(['key' => $key]),
                     $config['previous_keys'] ?? []
+                ));
+        });
+    }
+
+    /**
+     * Register the file encrypter.
+     *
+     * @return void
+     */
+    protected function registerFileEncrypter()
+    {
+        $this->app->singleton('file.encrypter', function ($app) {
+            $key = Env::get('FILE_ENCRYPTION_KEY');
+
+            if (empty($key)) {
+                throw new MissingAppKeyException('No FILE_ENCRYPTION_KEY has been specified.');
+            }
+
+            $previousKeys = Env::get('FILE_ENCRYPTION_PREVIOUS_KEYS', '');
+
+            $previousKeysArray = array_filter(
+                explode(',', $previousKeys),
+                fn ($key) => ! empty($key)
+            );
+
+            return (new FileEncrypter($this->parseKey(['key' => $key])))
+                ->previousKeys(array_map(
+                    fn ($key) => $this->parseKey(['key' => trim($key)]),
+                    $previousKeysArray
                 ));
         });
     }

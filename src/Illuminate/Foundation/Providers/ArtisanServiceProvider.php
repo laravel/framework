@@ -55,6 +55,8 @@ use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\EventListCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
+use Illuminate\Foundation\Console\FileDecryptCommand;
+use Illuminate\Foundation\Console\FileEncryptCommand;
 use Illuminate\Foundation\Console\InterfaceMakeCommand;
 use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Foundation\Console\JobMiddlewareMakeCommand;
@@ -141,6 +143,8 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
         'EventCache' => EventCacheCommand::class,
         'EventClear' => EventClearCommand::class,
         'EventList' => EventListCommand::class,
+        'FileDecrypt' => FileDecryptCommand::class,
+        'FileEncrypt' => FileEncryptCommand::class,
         'InvokeSerializedClosure' => InvokeSerializedClosureCommand::class,
         'KeyGenerate' => KeyGenerateCommand::class,
         'Optimize' => OptimizeCommand::class,
@@ -500,6 +504,33 @@ class ArtisanServiceProvider extends ServiceProvider implements DeferrableProvid
     {
         $this->app->singleton(EventClearCommand::class, function ($app) {
             return new EventClearCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerFileDecryptCommand()
+    {
+        $this->app->singleton(FileDecryptCommand::class, function ($app) {
+            return new FileDecryptCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerFileEncryptCommand()
+    {
+        $this->app->singleton(FileEncryptCommand::class, function ($app) {
+            return new FileEncryptCommand(
+                $app['files'],
+                new \Illuminate\Encryption\FileEncryptionPathValidator
+            );
         });
     }
 

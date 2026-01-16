@@ -435,6 +435,21 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('decrypt_file')) {
+    /**
+     * Decrypt and return the contents of an encrypted file.
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
+     */
+    function decrypt_file($path)
+    {
+        return app('file.encrypter')->decryptedContents($path);
+    }
+}
+
 if (! function_exists('defer')) {
     /**
      * Defer execution of the given callback.

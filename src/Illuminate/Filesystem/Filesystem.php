@@ -192,6 +192,44 @@ class Filesystem
     }
 
     /**
+     * Get the decrypted contents of an encrypted file.
+     *
+     * @param  string  $path
+     * @return string
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
+     */
+    public function decryptedContents($path)
+    {
+        return app('file.encrypter')->decryptedContents($path);
+    }
+
+    /**
+     * Stream decrypted file contents through a callback.
+     *
+     * @param  string  $path
+     * @param  callable  $callback
+     * @return void
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
+     */
+    public function decryptedStream($path, callable $callback)
+    {
+        app('file.encrypter')->decryptedStream($path, $callback);
+    }
+
+    /**
+     * Determine if a file appears to be encrypted.
+     *
+     * @param  string  $path
+     * @return bool
+     */
+    public function isEncrypted($path)
+    {
+        return app('file.encrypter')->isEncrypted($path);
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
