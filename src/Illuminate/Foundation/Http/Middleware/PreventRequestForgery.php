@@ -10,12 +10,13 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
+use Illuminate\Session\OriginMismatchException;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 
-class VerifyCsrfToken
+class PreventRequestForgery
 {
     use InteractsWithTime,
         ExcludesPaths;
@@ -56,6 +57,20 @@ class VerifyCsrfToken
     protected $addHttpCookie = true;
 
     /**
+     * Indicates whether requests from the same site should be allowed.
+     *
+     * @var bool
+     */
+    protected static $allowSameSite = false;
+
+    /**
+     * Indicates whether only origin verification should be used.
+     *
+     * @var bool
+     */
+    protected static $originOnly = false;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -75,6 +90,7 @@ class VerifyCsrfToken
      * @return mixed
      *
      * @throws \Illuminate\Session\TokenMismatchException
+     * @throws \Illuminate\Session\OriginMismatchException
      */
     public function handle($request, Closure $next)
     {
@@ -82,6 +98,7 @@ class VerifyCsrfToken
             $this->isReading($request) ||
             $this->runningUnitTests() ||
             $this->inExceptArray($request) ||
+            $this->hasValidOrigin($request) ||
             $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
@@ -123,6 +140,33 @@ class VerifyCsrfToken
     public function getExcludedPaths()
     {
         return array_merge($this->except, static::$neverVerify);
+    }
+
+    /**
+     * Determine if the request has a valid origin based on the Sec-Fetch-Site header.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     *
+     * @throws \Illuminate\Session\OriginMismatchException
+     */
+    protected function hasValidOrigin($request)
+    {
+        $secFetchSite = $request->header('Sec-Fetch-Site');
+
+        if ($secFetchSite === 'same-origin') {
+            return true;
+        }
+
+        if ($secFetchSite === 'same-site' && static::$allowSameSite) {
+            return true;
+        }
+
+        if (static::$originOnly) {
+            throw new OriginMismatchException('Origin mismatch.');
+        }
+
+        return false;
     }
 
     /**
@@ -168,6 +212,10 @@ class VerifyCsrfToken
      */
     public function shouldAddXsrfTokenCookie()
     {
+        if (static::$originOnly) {
+            return false;
+        }
+
         return $this->addHttpCookie;
     }
 
@@ -228,6 +276,28 @@ class VerifyCsrfToken
     }
 
     /**
+     * Indicate that requests from the same site should be allowed.
+     *
+     * @param  bool  $allow
+     * @return void
+     */
+    public static function allowSameSite($allow = true)
+    {
+        static::$allowSameSite = $allow;
+    }
+
+    /**
+     * Indicate that only origin verification should be used.
+     *
+     * @param  bool  $originOnly
+     * @return void
+     */
+    public static function useOriginOnly($originOnly = true)
+    {
+        static::$originOnly = $originOnly;
+    }
+
+    /**
      * Determine if the cookie contents should be serialized.
      *
      * @return bool
@@ -245,5 +315,7 @@ class VerifyCsrfToken
     public static function flushState()
     {
         static::$neverVerify = [];
+        static::$allowSameSite = false;
+        static::$originOnly = false;
     }
 }
