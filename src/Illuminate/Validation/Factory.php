@@ -145,6 +145,26 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Validate the given data and cast the results.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
+     * @param  array  $messages
+     * @param  array  $attributes
+     * @return array
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Validation\InvalidCastException
+     */
+    public function validateAndCast(array $data, array $rules, array $casts = [], array $messages = [], array $attributes = [])
+    {
+        return $this->make($data, $rules, $messages, $attributes)
+            ->casts($casts)
+            ->validateAndCast();
+    }
+
+    /**
      * Resolve a new Validator instance.
      *
      * @param  array  $data

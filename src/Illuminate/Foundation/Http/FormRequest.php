@@ -10,7 +10,9 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\ValidatedInput;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
+use Illuminate\Validation\ValidationCaster;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -154,6 +156,16 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get the casts for validated data.
+     *
+     * @return array
+     */
+    protected function validationCasts()
+    {
+        return method_exists($this, 'casts') ? $this->container->call([$this, 'casts']) : [];
+    }
+
+    /**
      * Handle a failed validation attempt.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
@@ -234,6 +246,21 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
+     * Get a validated input container for the casted validated input.
+     *
+     * @param  array|null  $keys
+     * @return \Illuminate\Support\ValidatedInput|array<string, mixed>
+     */
+    public function safeCast(?array $keys = null)
+    {
+        $casted = $this->validatedWithCasts();
+
+        return is_array($keys)
+            ? (new ValidatedInput($casted))->only($keys)
+            : new ValidatedInput($casted);
+    }
+
+    /**
      * Get the validated data from the request.
      *
      * @param  array|int|string|null  $key
@@ -243,6 +270,27 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function validated($key = null, $default = null)
     {
         return data_get($this->validator->validated(), $key, $default);
+    }
+
+    /**
+     * Get the validated and casted data from the request.
+     *
+     * @param  array|int|string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function validatedWithCasts($key = null, $default = null)
+    {
+        $validated = $this->validator->validated();
+        $casts = $this->validationCasts();
+
+        if (empty($casts)) {
+            return data_get($validated, $key, $default);
+        }
+
+        $casted = (new ValidationCaster)->apply($validated, $casts);
+
+        return data_get($casted, $key, $default);
     }
 
     /**

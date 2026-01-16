@@ -25,6 +25,34 @@ interface Validator extends MessageProvider
     public function validated();
 
     /**
+     * Set the casts to apply to validated data.
+     *
+     * @param  array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
+     * @return $this
+     */
+    public function casts(array $casts);
+
+    /**
+     * Validate the data and return casted results.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Validation\InvalidCastException
+     */
+    public function validateAndCast();
+
+    /**
+     * Get the casted validated data.
+     *
+     * @return array<string, mixed>
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Validation\InvalidCastException
+     */
+    public function casted();
+
+    /**
      * Determine if the data fails the validation rules.
      *
      * @return bool
