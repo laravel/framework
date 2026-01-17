@@ -400,7 +400,8 @@ class ValidationAiModeratedRuleTest extends TestCase
     {
         $container = Container::getInstance();
 
-        $mockResult = new class($flagged, $categories) implements AiModerationResult {
+        $mockResult = new class($flagged, $categories) implements AiModerationResult 
+        {
             public function __construct(
                 private bool $flagged,
                 private array $categories
