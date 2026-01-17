@@ -12,6 +12,7 @@ use Illuminate\Support\Caster;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\InvalidCastException;
 use Mockery as m;
@@ -34,6 +35,7 @@ class CasterTest extends TestCase
 
         Carbon::setTestNow();
         Date::use(Carbon::class);
+        Facade::clearResolvedInstances();
         m::close();
     }
 
@@ -455,15 +457,19 @@ class CasterTest extends TestCase
 
     public function test_hashed_cast()
     {
-        Hash::expects('isHashed')->with('password')->andReturn(false);
-        Hash::expects('make')->with('password')->andReturn('hashed');
+        $hasher = m::mock('stdClass');
+        $hasher->expects('isHashed')->with('password')->andReturn(false);
+        $hasher->expects('make')->with('password')->andReturn('hashed');
+        Hash::swap($hasher);
 
         $this->assertSame('hashed', Caster::value('password', 'hashed'));
     }
 
     public function test_hashed_cast_skips_already_hashed()
     {
-        Hash::expects('isHashed')->with('$2y$10$already')->andReturn(true);
+        $hasher = m::mock('stdClass');
+        $hasher->expects('isHashed')->with('$2y$10$already')->andReturn(true);
+        Hash::swap($hasher);
 
         $this->assertSame('$2y$10$already', Caster::value('$2y$10$already', 'hashed'));
     }
