@@ -10,9 +10,9 @@ use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Caster;
 use Illuminate\Support\ValidatedInput;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
-use Illuminate\Validation\ValidationCaster;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -284,13 +284,23 @@ class FormRequest extends Request implements ValidatesWhenResolved
         $validated = $this->validator->validated();
         $casts = $this->validationCasts();
 
-        if (empty($casts)) {
-            return data_get($validated, $key, $default);
-        }
-
-        $casted = (new ValidationCaster)->apply($validated, $casts);
+        $casted = empty($casts)
+            ? $validated
+            : Caster::make($casts)->cast($validated);
 
         return data_get($casted, $key, $default);
+    }
+
+    /**
+     * Get the validated and casted data from the request.
+     *
+     * @param  array|int|string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function casted($key = null, $default = null)
+    {
+        return $this->validatedWithCasts($key, $default);
     }
 
     /**

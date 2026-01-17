@@ -11,6 +11,7 @@ use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Contracts\Validation\ValidatorAwareRule;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Caster;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\MessageBag;
@@ -331,7 +332,7 @@ class Validator implements ValidatorContract
     /**
      * The casts to apply to validated data.
      *
-     * @var array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>|null
+     * @var array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>|null
      */
     protected $casts;
 
@@ -602,7 +603,7 @@ class Validator implements ValidatorContract
     /**
      * Set the casts to apply to validated data.
      *
-     * @param  array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
+     * @param  array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
      * @return $this
      */
     public function casts(array $casts)
@@ -615,7 +616,7 @@ class Validator implements ValidatorContract
     /**
      * Get the casts to be applied.
      *
-     * @return array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>|null
+     * @return array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>|null
      */
     public function getCasts()
     {
@@ -634,32 +635,40 @@ class Validator implements ValidatorContract
     {
         throw_if($this->fails(), $this->exception, $this);
 
-        return $this->casted();
-    }
-
-    /**
-     * Get the casted validated data.
-     *
-     * @return array<string, mixed>
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Validation\InvalidCastException
-     */
-    public function casted()
-    {
         $validated = $this->validated();
 
         if (empty($this->casts)) {
             return $validated;
         }
 
-        return (new ValidationCaster)->apply($validated, $this->casts);
+        return Caster::make($this->casts)->cast($validated);
+    }
+
+    /**
+     * Get the casted validated data.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     * @throws \Illuminate\Validation\InvalidCastException
+     */
+    public function casted($key = null, $default = null)
+    {
+        $validated = $this->validated();
+
+        $casted = empty($this->casts)
+            ? $validated
+            : Caster::make($this->casts)->cast($validated);
+
+        return $key === null ? $casted : data_get($casted, $key, $default);
     }
 
     /**
      * Get a validated input container for the casted validated input.
      *
-     * @param  list<string>|null  $keys
+     * @param  array|null  $keys
      * @return \Illuminate\Support\ValidatedInput|array<string, mixed>
      */
     public function safeCasted(?array $keys = null)

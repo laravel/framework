@@ -27,7 +27,7 @@ interface Validator extends MessageProvider
     /**
      * Set the casts to apply to validated data.
      *
-     * @param  array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
+     * @param  array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
      * @return $this
      */
     public function casts(array $casts);
@@ -45,12 +45,14 @@ interface Validator extends MessageProvider
     /**
      * Get the casted validated data.
      *
-     * @return array<string, mixed>
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return mixed
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Illuminate\Validation\InvalidCastException
      */
-    public function casted();
+    public function casted($key = null, $default = null);
 
     /**
      * Determine if the data fails the validation rules.

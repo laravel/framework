@@ -149,7 +149,7 @@ class Factory implements FactoryContract
      *
      * @param  array  $data
      * @param  array  $rules
-     * @param  array<string, string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
+     * @param  array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
      * @param  array  $messages
      * @param  array  $attributes
      * @return array

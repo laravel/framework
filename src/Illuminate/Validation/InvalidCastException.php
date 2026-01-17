@@ -3,7 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
-use Illuminate\Contracts\Validation\CastsValidatedValue;
+use Illuminate\Contracts\Support\CastsValue;
 use RuntimeException;
 use Throwable;
 
@@ -19,7 +19,7 @@ class InvalidCastException extends RuntimeException
     /**
      * The cast type that caused the exception.
      *
-     * @var string|CastsValidatedValue|CastsAttributes|null
+     * @var string|CastsValue|CastsAttributes|null
      */
     public $castType;
 
@@ -28,13 +28,13 @@ class InvalidCastException extends RuntimeException
      *
      * @param  string  $message
      * @param  string|null  $key
-     * @param  string|\Illuminate\Contracts\Validation\CastsValidatedValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|null  $castType
+     * @param  string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|null  $castType
      * @param  \Throwable|null  $previous
      */
     public function __construct(
         string $message,
         ?string $key = null,
-        string|CastsValidatedValue|CastsAttributes|null $castType = null,
+        string|CastsValue|CastsAttributes|null $castType = null,
         ?Throwable $previous = null
     ) {
         parent::__construct($message, 0, $previous);

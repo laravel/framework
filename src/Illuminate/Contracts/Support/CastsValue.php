@@ -1,14 +1,14 @@
 <?php
 
-namespace Illuminate\Contracts\Validation;
+namespace Illuminate\Contracts\Support;
 
 /**
  * @template TValue
  */
-interface CastsValidatedValue
+interface CastsValue
 {
     /**
-     * Cast the validated value.
+     * Cast the given value.
      *
      * @param  mixed  $value
      * @param  string  $key

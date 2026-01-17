@@ -53,6 +53,7 @@ jobs:
             Illuminate\\Support\\Facades\\Broadcast \
             Illuminate\\Support\\Facades\\Bus \
             Illuminate\\Support\\Facades\\Cache \
+            Illuminate\\Support\\Facades\\Cast \
             Illuminate\\Support\\Facades\\Concurrency \
             Illuminate\\Support\\Facades\\Config \
             Illuminate\\Support\\Facades\\Context \

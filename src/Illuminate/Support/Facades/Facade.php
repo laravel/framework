@@ -282,6 +282,7 @@ abstract class Facade
             'Broadcast' => Broadcast::class,
             'Bus' => Bus::class,
             'Cache' => Cache::class,
+            'Cast' => Cast::class,
             'Concurrency' => Concurrency::class,
             'Config' => Config::class,
             'Context' => Context::class,
