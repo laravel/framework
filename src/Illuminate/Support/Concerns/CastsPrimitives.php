@@ -74,10 +74,10 @@ trait CastsPrimitives
         [$type, $parameters] = $this->parseCastArguments($cast);
 
         return match ($type) {
-            'int', 'integer' => $this->asInteger($value),
+            'int', 'integer' => (int) $value,
             'bool', 'boolean' => $this->asBoolean($value),
             'float', 'double', 'real' => $this->asFloat($value),
-            'string' => $this->asString($value),
+            'string' => (string) $value,
             'array' => $this->asArray($value),
             'object' => $this->asObject($value),
             'collection' => new Collection($this->asArray($value)),
@@ -131,17 +131,6 @@ trait CastsPrimitives
     }
 
     /**
-     * Cast a value to an integer.
-     *
-     * @param  mixed  $value
-     * @return int
-     */
-    protected function asInteger($value)
-    {
-        return (int) $value;
-    }
-
-    /**
      * Cast a value to a float.
      *
      * @param  mixed  $value
@@ -155,17 +144,6 @@ trait CastsPrimitives
             'NaN' => NAN,
             default => (float) $value,
         };
-    }
-
-    /**
-     * Cast a value to a string.
-     *
-     * @param  mixed  $value
-     * @return string
-     */
-    protected function asString($value)
-    {
-        return (string) $value;
     }
 
     /**
