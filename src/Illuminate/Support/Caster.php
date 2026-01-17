@@ -288,7 +288,8 @@ class Caster
         {
             public function __construct(
                 protected string $enumClass
-            ) {}
+            ) {
+            }
 
             public function cast(mixed $value, string $key, array $attributes)
             {
