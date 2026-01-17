@@ -375,6 +375,7 @@ trait CastsPrimitives
             return Hash::make($value);
         }
 
+        /** @phpstan-ignore staticMethod.notFound */
         if (! Hash::verifyConfiguration($value)) {
             throw new \RuntimeException("Could not verify the hashed value's configuration.");
         }
