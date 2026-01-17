@@ -71,6 +71,7 @@ class QueueWorkerTest extends TestCase
                 && $event->queueName === 'queue';
         }))->once();
     }
+
     public function testWorkerCanWorkUntilQueueIsEmpty()
     {
         $workerOptions = new WorkerOptions;
