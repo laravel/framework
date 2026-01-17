@@ -202,7 +202,8 @@ class ValidationAiModeratedRuleTest extends TestCase
 
     public function testCustomVerifier()
     {
-        $customResult = new class implements AiModerationResult {
+        $customResult = new class implements AiModerationResult 
+        {
             public function flagged(): bool
             {
                 return true;
@@ -422,7 +423,8 @@ class ValidationAiModeratedRuleTest extends TestCase
             }
         };
 
-        $mockVerifier = new class($mockResult, $captureData) implements AiModerationVerifier {
+        $mockVerifier = new class($mockResult, $captureData) implements AiModerationVerifier 
+        {
             public function __construct(
                 private AiModerationResult $result,
                 private ?Closure $captureData
