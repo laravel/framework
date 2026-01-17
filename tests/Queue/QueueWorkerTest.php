@@ -68,7 +68,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) {
             return $event instanceof JobPopping
                 && $event->connectionName === 'default'
-                && $event->queueName === 'queue';
+                && $event->queue === 'queue';
         }))->once();
     }
 
