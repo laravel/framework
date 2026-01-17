@@ -16,6 +16,10 @@ return [
     'accepted' => 'The :attribute field must be accepted.',
     'accepted_if' => 'The :attribute field must be accepted when :other is :value.',
     'active_url' => 'The :attribute field must be a valid URL.',
+    'ai_moderated' => [
+        'flagged' => 'The :attribute field contains content that violates our content policy.',
+        'categories' => 'The :attribute field contains inappropriate content in the following categories: :categories.',
+    ],
     'after' => 'The :attribute field must be a date after :date.',
     'after_or_equal' => 'The :attribute field must be a date after or equal to :date.',
     'alpha' => 'The :attribute field must only contain letters.',
