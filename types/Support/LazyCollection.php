@@ -539,6 +539,9 @@ assertType('Illuminate\Support\LazyCollection<int, User>', $collection->mapInto(
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\LazyCollection<int, string>', $collection->make(['string'])->merge(['string']));
 
+assertType('Illuminate\Support\LazyCollection<int, int|string>', $collection->make([1])->merge(['string']));
+assertType('Illuminate\Support\LazyCollection<int, int|string>', $collection->make(['string'])->merge([1]));
+
 assertType('Illuminate\Support\LazyCollection<int, int>', $collection->make([1])->mergeRecursive([2]));
 assertType('Illuminate\Support\LazyCollection<int, string>', $collection->make(['string'])->mergeRecursive(['string']));
 
