@@ -35,6 +35,7 @@ class CasterTest extends TestCase
 
         Carbon::setTestNow();
         Date::use(Carbon::class);
+        Caster::useDateFormat(null);
         Facade::clearResolvedInstances();
         m::close();
     }
@@ -83,6 +84,13 @@ class CasterTest extends TestCase
     public function test_cast_array_from_json()
     {
         $result = Caster::value('{"foo":"bar"}', 'array');
+
+        $this->assertSame(['foo' => 'bar'], $result);
+    }
+
+    public function test_json_cast_is_alias_for_array()
+    {
+        $result = Caster::value('{"foo":"bar"}', 'json');
 
         $this->assertSame(['foo' => 'bar'], $result);
     }
@@ -469,9 +477,23 @@ class CasterTest extends TestCase
     {
         $hasher = m::mock('stdClass');
         $hasher->expects('isHashed')->with('$2y$10$already')->andReturn(true);
+        $hasher->expects('verifyConfiguration')->with('$2y$10$already')->andReturn(true);
         Hash::swap($hasher);
 
         $this->assertSame('$2y$10$already', Caster::value('$2y$10$already', 'hashed'));
+    }
+
+    public function test_hashed_cast_throws_on_invalid_configuration()
+    {
+        $hasher = m::mock('stdClass');
+        $hasher->expects('isHashed')->with('$2y$10$outdated')->andReturn(true);
+        $hasher->expects('verifyConfiguration')->with('$2y$10$outdated')->andReturn(false);
+        Hash::swap($hasher);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Could not verify the hashed value's configuration.");
+
+        Caster::value('$2y$10$outdated', 'hashed');
     }
 
     public function test_hashed_cast_preserves_null()
@@ -497,6 +519,155 @@ class CasterTest extends TestCase
         $result = $caster->cast(['email' => 'test@example.com']);
 
         $this->assertSame('PREFIX:test@example.com', $result['email']->value);
+    }
+
+    public function test_cast_unit_enum()
+    {
+        $result = Caster::value('Read', CasterTestPermission::class);
+
+        $this->assertSame(CasterTestPermission::Read, $result);
+    }
+
+    public function test_cast_unit_enum_passthrough()
+    {
+        $result = Caster::value(CasterTestPermission::Write, CasterTestPermission::class);
+
+        $this->assertSame(CasterTestPermission::Write, $result);
+    }
+
+    public function test_cast_datetime_from_timestamp()
+    {
+        $timestamp = 1736956200;
+        $result = Caster::value($timestamp, 'datetime');
+
+        $this->assertInstanceOf(Carbon::class, $result);
+        $this->assertSame($timestamp, $result->getTimestamp());
+    }
+
+    public function test_cast_datetime_from_carbon_instance()
+    {
+        $carbon = Carbon::parse('2026-01-15 14:30:00');
+        $result = Caster::value($carbon, 'datetime');
+
+        $this->assertInstanceOf(Carbon::class, $result);
+        $this->assertSame('2026-01-15 14:30:00', $result->format('Y-m-d H:i:s'));
+    }
+
+    public function test_cast_empty_string_to_array_returns_empty()
+    {
+        $this->assertSame([], Caster::value('', 'array'));
+    }
+
+    public function test_cast_empty_string_to_object_returns_empty_object()
+    {
+        $result = Caster::value('', 'object');
+
+        $this->assertInstanceOf(stdClass::class, $result);
+        $this->assertSame([], (array) $result);
+    }
+
+    public function test_bool_cast_differs_from_eloquent()
+    {
+        // Eloquent does simple (bool) cast, Caster handles string truthy values
+        $this->assertTrue(Caster::value('true', 'bool'));
+        $this->assertTrue(Caster::value('on', 'bool'));
+        $this->assertTrue(Caster::value('yes', 'bool'));
+        $this->assertFalse(Caster::value('false', 'bool'));
+        $this->assertFalse(Caster::value('off', 'bool'));
+        $this->assertFalse(Caster::value('no', 'bool'));
+    }
+
+    public function test_multiple_wildcard_levels()
+    {
+        $caster = Caster::make(['*.*.value' => 'int']);
+
+        $result = $caster->cast([
+            'a' => ['x' => ['value' => '1'], 'y' => ['value' => '2']],
+            'b' => ['z' => ['value' => '3']],
+        ]);
+
+        $this->assertSame(1, $result['a']['x']['value']);
+        $this->assertSame(2, $result['a']['y']['value']);
+        $this->assertSame(3, $result['b']['z']['value']);
+    }
+
+    public function test_castable_with_arguments()
+    {
+        $result = Caster::make(['amount' => CasterTestMoneyWithCurrency::class.':USD'])
+            ->cast(['amount' => '100.00']);
+
+        $this->assertInstanceOf(CasterTestMoneyWithCurrency::class, $result['amount']);
+        $this->assertSame('100.00', $result['amount']->amount);
+        $this->assertSame('USD', $result['amount']->currency);
+    }
+
+    public function test_caster_receives_full_data_context()
+    {
+        $caster = Caster::make(['derived' => new CasterTestContextAwareCast]);
+
+        $result = $caster->cast([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'derived' => 'placeholder',
+        ]);
+
+        $this->assertSame('John Doe', $result['derived']);
+    }
+
+    public function test_decimal_cast_throws_on_invalid_value()
+    {
+        $this->expectException(\Illuminate\Support\Exceptions\MathException::class);
+
+        Caster::value('not-a-number', 'decimal:2');
+    }
+
+    public function test_global_date_format()
+    {
+        Caster::useDateFormat('d/m/Y');
+
+        $result = Caster::value('15/01/2026', 'date');
+
+        $this->assertInstanceOf(Carbon::class, $result);
+        $this->assertSame('2026-01-15', $result->format('Y-m-d'));
+    }
+
+    public function test_instance_date_format()
+    {
+        $result = Caster::make(['date' => 'datetime'])
+            ->dateFormat('d/m/Y H:i')
+            ->cast(['date' => '15/01/2026 14:30']);
+
+        $this->assertSame('2026-01-15 14:30', $result['date']->format('Y-m-d H:i'));
+    }
+
+    public function test_instance_date_format_overrides_global()
+    {
+        Caster::useDateFormat('Y-m-d');
+
+        $result = Caster::make(['date' => 'date'])
+            ->dateFormat('d/m/Y')
+            ->cast(['date' => '15/01/2026']);
+
+        $this->assertSame('2026-01-15', $result['date']->format('Y-m-d'));
+    }
+
+    public function test_inline_date_format_overrides_instance()
+    {
+        $result = Caster::make(['date' => 'datetime:m-d-Y H:i'])
+            ->dateFormat('d/m/Y H:i')
+            ->cast(['date' => '01-15-2026 14:30']);
+
+        $this->assertSame('2026-01-15 14:30', $result['date']->format('Y-m-d H:i'));
+    }
+
+    public function test_date_format_applies_to_immutable_dates()
+    {
+        Caster::useDateFormat('d/m/Y');
+
+        $result = Caster::value('15/01/2026', 'immutable_date');
+
+        $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $result);
+        $this->assertSame('2026-01-15', $result->format('Y-m-d'));
     }
 }
 
@@ -568,5 +739,42 @@ class CasterTestPlainClass
 {
     public function __construct(public string $value)
     {
+    }
+}
+
+enum CasterTestPermission
+{
+    case Read;
+    case Write;
+    case Delete;
+}
+
+class CasterTestMoneyWithCurrency implements Castable
+{
+    public function __construct(public string $amount, public string $currency)
+    {
+    }
+
+    public static function castUsing(array $arguments)
+    {
+        return new class($arguments[0] ?? 'USD') implements CastsValue
+        {
+            public function __construct(private string $currency)
+            {
+            }
+
+            public function cast(mixed $value, string $key, array $attributes)
+            {
+                return new CasterTestMoneyWithCurrency($value, $this->currency);
+            }
+        };
+    }
+}
+
+class CasterTestContextAwareCast implements CastsValue
+{
+    public function cast(mixed $value, string $key, array $attributes)
+    {
+        return ($attributes['first_name'] ?? '').' '.($attributes['last_name'] ?? '');
     }
 }

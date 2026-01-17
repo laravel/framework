@@ -43,6 +43,7 @@ trait CastsPrimitives
         'immutable_datetime',
         'int',
         'integer',
+        'json',
         'object',
         'real',
         'string',
@@ -73,18 +74,20 @@ trait CastsPrimitives
     {
         [$type, $parameters] = $this->parseCastArguments($cast);
 
+        $dateFormat = $parameters[0] ?? $this->getDateFormat();
+
         return match ($type) {
             'int', 'integer' => (int) $value,
             'bool', 'boolean' => $this->asBoolean($value),
             'float', 'double', 'real' => $this->asFloat($value),
             'string' => (string) $value,
-            'array' => $this->asArray($value),
+            'array', 'json' => $this->asArray($value),
             'object' => $this->asObject($value),
             'collection' => new Collection($this->asArray($value)),
-            'date' => $this->asDate($value, $parameters[0] ?? null),
-            'datetime' => $this->asDateTime($value, $parameters[0] ?? null),
-            'immutable_date' => $this->asDate($value, $parameters[0] ?? null, true),
-            'immutable_datetime' => $this->asDateTime($value, $parameters[0] ?? null, true),
+            'date' => $this->asDate($value, $dateFormat),
+            'datetime' => $this->asDateTime($value, $dateFormat),
+            'immutable_date' => $this->asDate($value, $dateFormat, true),
+            'immutable_datetime' => $this->asDateTime($value, $dateFormat, true),
             'timestamp' => $this->asTimestamp($value),
             'decimal' => $this->asDecimal($value, (int) ($parameters[0] ?? 2)),
             'encrypted' => $this->asEncrypted($value, $parameters[0] ?? null),
@@ -92,6 +95,16 @@ trait CastsPrimitives
             'hashed' => $this->asHashed($value),
             default => throw new InvalidCastException("Unknown primitive cast type: {$type}"),
         };
+    }
+
+    /**
+     * Get the date format for parsing.
+     *
+     * @return string|null
+     */
+    protected function getDateFormat()
+    {
+        return null;
     }
 
     /**
@@ -315,7 +328,7 @@ trait CastsPrimitives
      * @param  string|null  $subtype
      * @return string
      */
-    protected function asEncrypted($value, ?string $subtype = null)
+    protected function asEncrypted(#[\SensitiveParameter] $value, ?string $subtype = null)
     {
         $value = match ($subtype) {
             'array', 'json', 'collection', 'object' => json_encode($value),
@@ -349,17 +362,23 @@ trait CastsPrimitives
      *
      * @param  mixed  $value
      * @return string|null
+     *
+     * @throws \RuntimeException
      */
-    protected function asHashed($value)
+    protected function asHashed(#[\SensitiveParameter] $value)
     {
         if ($value === null) {
             return null;
         }
 
-        if (Hash::isHashed($value)) {
-            return $value;
+        if (! Hash::isHashed($value)) {
+            return Hash::make($value);
         }
 
-        return Hash::make($value);
+        if (! Hash::verifyConfiguration($value)) {
+            throw new \RuntimeException("Could not verify the hashed value's configuration.");
+        }
+
+        return $value;
     }
 }

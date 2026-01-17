@@ -13,11 +13,25 @@ class Caster
     use CastsPrimitives;
 
     /**
+     * The global date format.
+     *
+     * @var string|null
+     */
+    protected static $globalDateFormat;
+
+    /**
      * The cast definitions.
      *
      * @var array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>
      */
     protected $casts = [];
+
+    /**
+     * The instance date format.
+     *
+     * @var string|null
+     */
+    protected $instanceDateFormat;
 
     /**
      * The paths that have already been cast.
@@ -76,6 +90,40 @@ class Caster
     public function getCasts()
     {
         return $this->casts;
+    }
+
+    /**
+     * Set the global date format.
+     *
+     * @param  string|null  $format
+     * @return void
+     */
+    public static function useDateFormat(?string $format)
+    {
+        static::$globalDateFormat = $format;
+    }
+
+    /**
+     * Set the instance date format.
+     *
+     * @param  string|null  $format
+     * @return $this
+     */
+    public function dateFormat(?string $format)
+    {
+        $this->instanceDateFormat = $format;
+
+        return $this;
+    }
+
+    /**
+     * Get the date format for parsing.
+     *
+     * @return string|null
+     */
+    protected function getDateFormat()
+    {
+        return $this->instanceDateFormat ?? static::$globalDateFormat;
     }
 
     /**
