@@ -202,7 +202,7 @@ class ValidationAiModeratedRuleTest extends TestCase
 
     public function testCustomVerifier()
     {
-        $customResult = new class implements AiModerationResult 
+        $customResult = new class implements AiModerationResult
         {
             public function flagged(): bool
             {
