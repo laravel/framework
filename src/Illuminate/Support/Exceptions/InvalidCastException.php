@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Validation;
+namespace Illuminate\Support\Exceptions;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\CastsValue;

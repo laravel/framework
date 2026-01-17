@@ -629,7 +629,7 @@ class Validator implements ValidatorContract
      * @return array<string, mixed>
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     public function validateAndCast()
     {
@@ -652,7 +652,7 @@ class Validator implements ValidatorContract
      * @return mixed
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     public function casted($key = null, $default = null)
     {

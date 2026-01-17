@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\InvalidCastException;
+use Illuminate\Support\Exceptions\InvalidCastException;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

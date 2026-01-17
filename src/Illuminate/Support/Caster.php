@@ -6,7 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Contracts\Support\CastsValue;
 use Illuminate\Support\Concerns\CastsPrimitives;
-use Illuminate\Validation\InvalidCastException;
+use Illuminate\Support\Exceptions\InvalidCastException;
 
 class Caster
 {

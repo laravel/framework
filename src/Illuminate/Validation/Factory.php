@@ -155,7 +155,7 @@ class Factory implements FactoryContract
      * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     public function validateAndCast(array $data, array $rules, array $casts = [], array $messages = [], array $attributes = [])
     {

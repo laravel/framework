@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\InvalidCastException;
+use Illuminate\Support\Exceptions\InvalidCastException;
 use InvalidArgumentException;
 use stdClass;
 
