@@ -684,10 +684,10 @@ class Worker
      * Raise an event indicating a job is being popped from the queue.
      *
      * @param  string  $connectionName
-     * @param  string  $queue
+     * @param  string|null  $queue
      * @return void
      */
-    protected function raiseBeforeJobPopEvent($connectionName, $queue)
+    protected function raiseBeforeJobPopEvent($connectionName, $queue = null)
     {
         $this->events->dispatch(new JobPopping($connectionName, $queue));
     }
