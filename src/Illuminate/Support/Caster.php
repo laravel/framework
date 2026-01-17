@@ -13,34 +13,6 @@ class Caster
     use CastsPrimitives;
 
     /**
-     * The primitive cast types.
-     *
-     * @var list<string>
-     */
-    protected static $primitiveCastTypes = [
-        'array',
-        'bool',
-        'boolean',
-        'collection',
-        'date',
-        'datetime',
-        'decimal',
-        'decrypted',
-        'double',
-        'encrypted',
-        'float',
-        'hashed',
-        'immutable_date',
-        'immutable_datetime',
-        'int',
-        'integer',
-        'object',
-        'real',
-        'string',
-        'timestamp',
-    ];
-
-    /**
      * The cast definitions.
      *
      * @var array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>
@@ -231,11 +203,11 @@ class Caster
         }
 
         if (is_string($cast)) {
-            $baseCast = Str::before($cast, ':') ?: $cast;
-
-            if (in_array($baseCast, static::$primitiveCastTypes)) {
+            if ($this->isPrimitiveCast($cast)) {
                 return $cast;
             }
+
+            $baseCast = Str::before($cast, ':');
 
             if (class_exists($cast) || class_exists($baseCast)) {
                 return $this->resolvedCasters[$cast] ?? ($this->resolvedCasters[$cast] = $this->resolveClassCaster($cast));
@@ -305,38 +277,6 @@ class Caster
     }
 
     /**
-     * Cast a value using primitive cast rules.
-     *
-     * @return mixed
-     *
-     * @throws \Illuminate\Validation\InvalidCastException
-     */
-    protected function castPrimitive(mixed $value, string $cast)
-    {
-        [$type, $parameters] = $this->parseCastArguments($cast);
-
-        return match ($type) {
-            'int', 'integer' => $this->asInteger($value),
-            'bool', 'boolean' => $this->asBoolean($value),
-            'float', 'double', 'real' => $this->asFloat($value),
-            'string' => $this->asString($value),
-            'array' => $this->asArray($value),
-            'object' => $this->asObject($value),
-            'collection' => new Collection($this->asArray($value)),
-            'date' => $this->asDate($value, $parameters[0] ?? null),
-            'datetime' => $this->asDateTime($value, $parameters[0] ?? null),
-            'immutable_date' => $this->asDate($value, $parameters[0] ?? null, true),
-            'immutable_datetime' => $this->asDateTime($value, $parameters[0] ?? null, true),
-            'timestamp' => $this->asTimestamp($value),
-            'decimal' => $this->asDecimal($value, (int) ($parameters[0] ?? 2)),
-            'encrypted' => $this->asEncrypted($value, $parameters[0] ?? null),
-            'decrypted' => $this->asDecrypted($value, $parameters[0] ?? null),
-            'hashed' => $this->asHashed($value),
-            default => throw new InvalidCastException("Unknown primitive cast type: {$type}"),
-        };
-    }
-
-    /**
      * Apply cast using wildcard path matching.
      *
      * @param  array<string, mixed>  $data
@@ -388,21 +328,5 @@ class Caster
         }
 
         return $paths->all();
-    }
-
-    /**
-     * Parse cast string into type and arguments.
-     *
-     * @return array{0: string, 1: list<string>}
-     */
-    protected function parseCastArguments(string $cast)
-    {
-        if (! str_contains($cast, ':')) {
-            return [$cast, []];
-        }
-
-        [$type, $args] = explode(':', $cast, 2);
-
-        return [$type, explode(',', $args)];
     }
 }

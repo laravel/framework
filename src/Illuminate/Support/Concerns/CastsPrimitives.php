@@ -12,13 +12,105 @@ use DateTimeInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Exceptions\MathException;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\InvalidCastException;
 use InvalidArgumentException;
 use stdClass;
 
 trait CastsPrimitives
 {
+    /**
+     * The primitive cast types.
+     *
+     * @var list<string>
+     */
+    protected static $primitiveCastTypes = [
+        'array',
+        'bool',
+        'boolean',
+        'collection',
+        'date',
+        'datetime',
+        'decimal',
+        'decrypted',
+        'double',
+        'encrypted',
+        'float',
+        'hashed',
+        'immutable_date',
+        'immutable_datetime',
+        'int',
+        'integer',
+        'object',
+        'real',
+        'string',
+        'timestamp',
+    ];
+
+    /**
+     * Determine if the given cast type is a primitive.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isPrimitiveCast(string $cast)
+    {
+        return in_array(Str::before($cast, ':'), static::$primitiveCastTypes);
+    }
+
+    /**
+     * Cast a value using primitive cast rules.
+     *
+     * @param  mixed  $value
+     * @param  string  $cast
+     * @return mixed
+     *
+     * @throws \Illuminate\Validation\InvalidCastException
+     */
+    protected function castPrimitive(mixed $value, string $cast)
+    {
+        [$type, $parameters] = $this->parseCastArguments($cast);
+
+        return match ($type) {
+            'int', 'integer' => $this->asInteger($value),
+            'bool', 'boolean' => $this->asBoolean($value),
+            'float', 'double', 'real' => $this->asFloat($value),
+            'string' => $this->asString($value),
+            'array' => $this->asArray($value),
+            'object' => $this->asObject($value),
+            'collection' => new Collection($this->asArray($value)),
+            'date' => $this->asDate($value, $parameters[0] ?? null),
+            'datetime' => $this->asDateTime($value, $parameters[0] ?? null),
+            'immutable_date' => $this->asDate($value, $parameters[0] ?? null, true),
+            'immutable_datetime' => $this->asDateTime($value, $parameters[0] ?? null, true),
+            'timestamp' => $this->asTimestamp($value),
+            'decimal' => $this->asDecimal($value, (int) ($parameters[0] ?? 2)),
+            'encrypted' => $this->asEncrypted($value, $parameters[0] ?? null),
+            'decrypted' => $this->asDecrypted($value, $parameters[0] ?? null),
+            'hashed' => $this->asHashed($value),
+            default => throw new InvalidCastException("Unknown primitive cast type: {$type}"),
+        };
+    }
+
+    /**
+     * Parse cast string into type and arguments.
+     *
+     * @param  string  $cast
+     * @return array{0: string, 1: list<string>}
+     */
+    protected function parseCastArguments(string $cast)
+    {
+        if (! str_contains($cast, ':')) {
+            return [$cast, []];
+        }
+
+        [$type, $args] = explode(':', $cast, 2);
+
+        return [$type, explode(',', $args)];
+    }
+
     /**
      * Cast a value to a boolean.
      *
