@@ -109,8 +109,28 @@ class SupportPluralizerTest extends TestCase
     public function testPluralStudlySupportsCollections()
     {
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
-        $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
-        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
+        $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one'])));
+        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two'])));
+    }
+
+    /**
+     * NEW TESTS for Issue #56932
+     */
+
+    public function testUppercaseAcronymsPluralizeWithUppercaseS()
+    {
+        // Current Laravel behavior (documenting the issue)
+        $this->assertSame('CDS', Str::plural('CD'));
+        $this->assertSame('DVDS', Str::plural('DVD'));
+        $this->assertSame('URLS', Str::plural('URL'));
+    }
+
+    public function testUppercaseAcronymsPluralizeWithLowercaseSUsingInflector()
+    {
+        // Inflector behavior (expected English output)
+        $this->assertSame('CDs', Str::of('CD')->plural()->__toString());
+        $this->assertSame('DVDs', Str::of('DVD')->plural()->__toString());
+        $this->assertSame('URLs', Str::of('URL')->plural()->__toString());
     }
 
     private function assertPluralStudly($expected, $value, $count = 2)
