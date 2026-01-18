@@ -19,7 +19,8 @@ class KeyGenerateCommand extends Command
      */
     protected $signature = 'key:generate
                     {--show : Display the key instead of modifying files}
-                    {--force : Force the operation to run when in production}';
+                    {--force : Force the operation to run when in production}
+                    {--name=APP_KEY : The name of the environment variable that should be set}';
 
     /**
      * The console command description.
@@ -94,17 +95,19 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
+        $name = $this->option('name');
+
         $replaced = preg_replace(
-            $this->keyReplacementPattern(),
-            'APP_KEY='.$key,
+            $this->keyReplacementPattern($name),
+            "{$name}={$key}",
             $input = file_get_contents($this->laravel->environmentFilePath())
         );
 
         if ($replaced === $input || $replaced === null) {
-            if (isset($_ENV['APP_KEY'])) {
-                $this->components->error('Unable to set application key. APP_KEY is already present in the environment.');
+            if (isset($_ENV[$name])) {
+                $this->components->error("Unable to set application key. {$name} is already present in the environment.");
             } else {
-                $this->components->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+                $this->components->error("Unable to set application key. No {$name} variable was found in the .env file.");
             }
 
             return false;
@@ -116,14 +119,15 @@ class KeyGenerateCommand extends Command
     }
 
     /**
-     * Get a regex pattern that will match env APP_KEY with any random key.
+     * Get a regex pattern that will match the environment key with any random key.
      *
+     * @param  string  $name
      * @return string
      */
-    protected function keyReplacementPattern()
+    protected function keyReplacementPattern($name)
     {
         $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
 
-        return "/^APP_KEY{$escaped}/m";
+        return "/^{$name}{$escaped}/m";
     }
 }
