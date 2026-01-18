@@ -1798,6 +1798,68 @@ class SupportArrTest extends TestCase
         ], Arr::prependKeysWith($array, 'test.'));
     }
 
+    public function testPrefix(): void
+    {
+        $this->assertEquals(
+            ['$9', '$54', '$77.489'],
+            Arr::prefix([9, 54, 77.489], '$'),
+        );
+
+        $this->assertEquals(
+            ['https://cdn.example.com/banners/winter.jpg', 'https://cdn.example.com/icons/check.svg'],
+            Arr::prefix(['banners/winter.jpg', 'icons/check.svg'], 'https://cdn.example.com/'),
+        );
+
+        $this->assertEquals(
+            ['#laravel', '#programming', '#php'],
+            Arr::prefix(['laravel', 'programming', 'php'], '#'),
+        );
+
+        $this->assertEquals(
+            ['%term', '%term_2'],
+            Arr::prefix(['term', 'term_2'], '%'),
+        );
+
+        $this->assertEquals(
+            ['mixed_1', 'mixed_one'],
+            Arr::prefix([1, 'one'], 'mixed_'),
+        );
+
+        $this->assertEquals(
+            ['key_1' => 'prefix_::value::', 'key_2' => 'prefix_::value_2::'],
+            Arr::prefix(['key_1' => '::value::', 'key_2' => '::value_2::'], 'prefix_'),
+        );
+    }
+
+    public function testSuffix(): void
+    {
+        $this->assertEquals(
+            ['9€', '54€', '77.489€'],
+            Arr::suffix([9, 54, 77.489], '€'),
+        );
+
+        $this->assertEquals(
+            ['invoice_1001.pdf', 'report_january.pdf'],
+            Arr::suffix(['invoice_1001', 'report_january'], '.pdf'),
+        );
+
+        $this->assertEquals(
+            ['term%', 'term_2%'],
+            Arr::suffix(['term', 'term_2'], '%'),
+        );
+
+        $this->assertEquals(
+            ['1_mixed', 'one_mixed'],
+            Arr::suffix([1, 'one'], '_mixed'),
+        );
+
+        $this->assertEquals(
+            ['key_1' => '::value::_suffix', 'key_2' => '::value_2::_suffix'],
+            Arr::suffix(['key_1' => '::value::', 'key_2' => '::value_2::'], '_suffix'),
+        );
+    }
+
+
     public function testTake(): void
     {
         $array = [1, 2, 3, 4, 5, 6];

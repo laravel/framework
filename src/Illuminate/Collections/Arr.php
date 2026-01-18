@@ -695,6 +695,34 @@ class Arr
     }
 
     /**
+     * Prefix the values of an array.
+     *
+     * @template TKey of array-key
+     *
+     * @param  array<TKey, scalar>  $array
+     * @param  string  $prefix
+     * @return array<TKey, string>
+     */
+    public static function prefix(array $array, string $prefix): array
+    {
+        return static::map($array, fn ($item) => $prefix.$item);
+    }
+
+    /**
+     * Suffix the values of an array.
+     *
+     * @template TKey of array-key
+     *
+     * @param  array<TKey, scalar>  $array
+     * @param  string  $suffix
+     * @return array<TKey, string>
+     */
+    public static function suffix(array $array, string $suffix): array
+    {
+        return static::map($array, fn ($item) => $item.$suffix);
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
