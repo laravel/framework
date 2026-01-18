@@ -866,6 +866,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Eager load relation counts on the model if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadMissingCount(string|array $relations): self
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        $this->newCollection([$this])->loadMissingCount($relations);
+
+        return $this;
+    }
+
+    /**
      * Eager load relation max column values on the model.
      *
      * @param  array|string  $relations
