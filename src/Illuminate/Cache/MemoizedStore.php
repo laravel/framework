@@ -190,7 +190,7 @@ class MemoizedStore implements LockProvider, Store
             throw new BadMethodCallException('This cache store does not support locks.');
         }
 
-        return $this->repository->restoreLock(...func_get_args());
+        return $this->repository->getStore()->restoreLock(...func_get_args());
     }
 
     /**
