@@ -109,8 +109,8 @@ class SupportPluralizerTest extends TestCase
     public function testPluralStudlySupportsCollections()
     {
         $this->assertPluralStudly('SomeUsers', 'SomeUser', collect());
-        $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one'])));
-        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two'])));
+        $this->assertPluralStudly('SomeUser', 'SomeUser', collect(['one']));
+        $this->assertPluralStudly('SomeUsers', 'SomeUser', collect(['one', 'two']));
     }
 
     /**
