@@ -68,7 +68,7 @@ trait CastsPrimitives
      * @param  string  $cast
      * @return mixed
      *
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     protected function castPrimitive(mixed $value, string $cast)
     {

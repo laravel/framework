@@ -281,12 +281,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     public function validatedWithCasts($key = null, $default = null)
     {
-        $validated = $this->validator->validated();
         $casts = $this->validationCasts();
 
         $casted = empty($casts)
-            ? $validated
-            : Caster::make($casts)->cast($validated);
+            ? $this->validator->validated()
+            : Caster::make($casts)->cast($this->validator->validated());
 
         return data_get($casted, $key, $default);
     }

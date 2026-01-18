@@ -51,7 +51,6 @@ class Caster
      * Create a new Caster instance.
      *
      * @param  array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>  $casts
-     * @return void
      */
     public function __construct(array $casts = [])
     {
@@ -242,7 +241,7 @@ class Caster
      * @param  string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string  $cast
      * @return \Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|string
      *
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     protected function resolveCaster(mixed $cast)
     {
@@ -271,7 +270,7 @@ class Caster
      * @param  class-string|string  $cast
      * @return \Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes
      *
-     * @throws \Illuminate\Validation\InvalidCastException
+     * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
     protected function resolveClassCaster(string $cast)
     {

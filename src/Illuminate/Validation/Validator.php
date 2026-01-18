@@ -637,11 +637,9 @@ class Validator implements ValidatorContract
 
         $validated = $this->validated();
 
-        if (empty($this->casts)) {
-            return $validated;
-        }
-
-        return Caster::make($this->casts)->cast($validated);
+        return empty($this->casts)
+            ? $validated
+            : Caster::make($this->casts)->cast($validated);
     }
 
     /**
@@ -656,13 +654,11 @@ class Validator implements ValidatorContract
      */
     public function casted($key = null, $default = null)
     {
-        $validated = $this->validated();
-
         $casted = empty($this->casts)
-            ? $validated
-            : Caster::make($this->casts)->cast($validated);
+            ? $this->validated()
+            : Caster::make($this->casts)->cast($this->validated());
 
-        return $key === null ? $casted : data_get($casted, $key, $default);
+        return is_null($key) ? $casted : data_get($casted, $key, $default);
     }
 
     /**
