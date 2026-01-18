@@ -131,7 +131,9 @@ class EloquentCollectionLoadMissingCountTest extends DatabaseTestCase
         $queryLog = DB::getQueryLog();
 
         $this->assertCount(1, $queryLog);
-        $this->assertStringContainsString("where \"users\".\"id\" in ($user2->id)", $queryLog[0]['query']);
+        $query = str_replace(['"', '`', '[', ']'], '', $queryLog[0]['query']);
+
+        $this->assertStringContainsString("where users.id in ($user2->id)", $query);
     }
 }
 
