@@ -12,6 +12,7 @@ use Illuminate\Queue\Events\JobPopped;
 use Illuminate\Queue\Events\JobPopping;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\JobReleasedAfterException;
 use Illuminate\Queue\Events\WorkerStarting;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Queue\QueueManager;
@@ -403,6 +404,25 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($secondJob->fired);
 
         $this->events->shouldHaveReceived('dispatch')->with(m::type(WorkerStarting::class))->once();
+    }
+
+    public function testJobReleasedEvent()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['backoff' => 10]));
+
+        $this->events->shouldHaveReceived('dispatch')->with(m::on(function ($event) use ($job) {
+            return $event instanceof JobReleasedAfterException
+                && $event->connectionName === 'default'
+                && $event->job === $job
+                && $event->backoff === 10;
+        }))->once();
     }
 
     /**
