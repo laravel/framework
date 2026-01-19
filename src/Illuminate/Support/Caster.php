@@ -357,23 +357,31 @@ class Caster
      */
     protected function expandWildcardPath(array $data, string $pattern)
     {
-        $paths = new Collection(['']);
+        $paths = [''];
 
         foreach (explode('.', $pattern) as $segment) {
-            $paths = $paths->flatMap(function ($path) use ($data, $segment) {
+            $expanded = [];
+
+            foreach ($paths as $path) {
                 if ($segment !== '*') {
-                    return [$path === '' ? $segment : "{$path}.{$segment}"];
+                    $expanded[] = $path === '' ? $segment : "{$path}.{$segment}";
+
+                    continue;
                 }
 
                 $current = $path === '' ? $data : Arr::get($data, $path);
 
-                return is_array($current)
-                    ? (new Collection($current))->keys()->map(fn ($key) => $path === '' ? (string) $key : "{$path}.{$key}")
-                    : [];
-            });
+                if (is_array($current)) {
+                    foreach (array_keys($current) as $key) {
+                        $expanded[] = $path === '' ? (string) $key : "{$path}.{$key}";
+                    }
+                }
+            }
+
+            $paths = $expanded;
         }
 
-        return $paths->all();
+        return $paths;
     }
 
     /**
