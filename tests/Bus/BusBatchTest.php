@@ -257,8 +257,7 @@ class BusBatchTest extends TestCase
 
     public function test_batch_finished_event_is_dispatched()
     {
-        $events = m::mock(EventDispatcher::class);
-        Container::getInstance()->instance(EventDispatcher::class, $events);
+        Container::getInstance()->instance(EventDispatcher::class, $events = m::mock(EventDispatcher::class));
 
         $queue = m::mock(Factory::class);
         $batch = $this->createTestBatch($queue);
@@ -276,9 +275,7 @@ class BusBatchTest extends TestCase
 
         $batch = $batch->add([$job]);
 
-        $events->shouldReceive('dispatch')
-            ->once()
-            ->with(m::on(function ($event) use ($batch) {
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
                 return $event instanceof BatchFinished && $event->batch === $batch;
             }));
 
