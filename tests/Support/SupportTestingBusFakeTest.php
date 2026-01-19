@@ -854,6 +854,18 @@ class SupportTestingBusFakeTest extends TestCase
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
     }
+
+    public function testDispatchAfterResponseWithHandler()
+    {
+        $job = new BusJobStub;
+        $handler = function () {
+            return 'handled';
+        };
+
+        $this->fake->dispatchAfterResponse($job, $handler);
+
+        $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
+    }
 }
 
 class BusJobStub
