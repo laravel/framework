@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Concerns\QueriesRelationships;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection as BaseCollection;
@@ -136,6 +137,53 @@ class Collection extends BaseCollection implements QueueableCollection
                 ->syncOriginalAttributes($attributes)
                 ->mergeCasts($models->get($model->getKey())->getCasts());
         });
+
+        return $this;
+    }
+
+    /**
+     * Load a set of relationship's column aggregations onto the collection if they are not already eager loaded.
+     *
+     * @param  array<array-key, array|(callable(\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|string>|string $relations
+     * @param  string  $column
+     * @param  string|null  $function
+     * @return $this
+     */
+    public function loadMissingAggregate(string|array $relations, string $column, ?string $function = null): self
+    {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
+        if (is_string($relations)) {
+            $relations = [$relations];
+        }
+
+        foreach ($relations as $key => $value) {
+            $name = is_numeric($key) ? $value : $key;
+
+            $segments = explode(' ', $name);
+
+            // If the relationship has been aliased, we will extract the alias as the attribute
+            // name. Otherwise, we will calculate the default name for the aggregate column
+            // so we can determine if the relationship aggregate is already loaded.
+            if (count($segments) === 3 && Str::lower($segments[1]) === 'as') {
+                $attribute = $segments[2];
+            } else {
+                /** @see QueriesRelationships::withAggregate() for the source of attribute naming. */
+                $attribute = Str::snake(
+                    preg_replace(
+                        '/[^[:alnum:][:space:]_]/u',
+                        '',
+                        sprintf('%s %s %s', $name, $function, strtolower($this->first()->getQuery()->getGrammar()->getValue($column)))
+                    )
+                );
+            }
+
+            $this
+                ->filter(fn ($model) => $model instanceof Model && ! $model->hasAttribute($attribute))
+                ->loadAggregate([$key => $value], $column, $function);
+        }
 
         return $this;
     }

@@ -853,6 +853,21 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     }
 
     /**
+     * Eager load relation's column aggregations on the model if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @param  string  $column
+     * @param  string|null  $function
+     * @return $this
+     */
+    public function loadMissingAggregate($relations, $column, $function = null)
+    {
+        $this->newCollection([$this])->loadMissingAggregate($relations, $column, $function);
+
+        return $this;
+    }
+
+    /**
      * Eager load relation counts on the model.
      *
      * @param  array|string  $relations
