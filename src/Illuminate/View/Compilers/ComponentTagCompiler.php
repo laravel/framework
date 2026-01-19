@@ -339,14 +339,12 @@ class ComponentTagCompiler
                     ? Str::after($component, $delimiter)
                     : $component;
 
-                $guess = match (true) {
+                if (! is_null($guess = match (true) {
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess,
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess,
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.'.Str::afterLast($formattedComponent, '.')) => $guess,
                     default => null,
-                };
-
-                if (! is_null($guess)) {
+                })) {
                     return $guess;
                 }
             } catch (InvalidArgumentException) {
