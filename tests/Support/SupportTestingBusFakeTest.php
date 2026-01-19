@@ -848,6 +848,22 @@ class SupportTestingBusFakeTest extends TestCase
             return $batchedCollection->jobs->count() === 1 && $batchedCollection->jobs->first()->value === 'hello';
         });
     }
+
+    public function testDispatchAfterResponsePassesThroughWithHandler()
+    {
+        $dispatcher = m::mock(QueueingDispatcher::class);
+
+        $job = new BusJobStub;
+        $handler = function ($job) {
+            return 'handled';
+        };
+
+        $dispatcher->shouldReceive('dispatchAfterResponse')->once()->with($job, $handler);
+
+        $fake = (new BusFake($dispatcher))->except(BusJobStub::class);
+
+        $fake->dispatchAfterResponse($job, $handler);
+    }
 }
 
 class BusJobStub
