@@ -32,7 +32,12 @@ class KeyGenerateCommandTest extends TestCase
 
         $envPath = base_path($this->testEnvFileName);
 
-        file_put_contents($envPath, sprintf('%s=', $optionValue ?? 'APP_KEY'));
+        $envFileContent = 'NAMESPACE.APP_ENV=local'.PHP_EOL
+            .'APP_DEBUG=false'.PHP_EOL;
+
+        $appKeyLine = sprintf('%s=', $optionValue ?? 'APP_KEY');
+
+        file_put_contents($envPath, $envFileContent.$appKeyLine);
 
         $this->app['config']->set('app.key', '');
 
@@ -49,7 +54,9 @@ class KeyGenerateCommandTest extends TestCase
 
         $content = file_get_contents($envPath);
 
-        $this->assertStringContainsString("{$optionValue}=base64:", $content);
+        $expectedSubString = $envFileContent."{$expectedEnvVariable}=base64:";
+
+        $this->assertStringContainsString($expectedEnvVariable, $content);
     }
 
     public static function keyNamesDataProvider(): Generator
@@ -67,6 +74,16 @@ class KeyGenerateCommandTest extends TestCase
         yield 'custom key' => [
             'optionValue' => 'MY_SPECIAL_APP_KEY',
             'expectedEnvVariable' => 'MY_SPECIAL_APP_KEY',
+        ];
+
+        yield 'custom key with regex char' => [
+            'optionValue' => 'NAMESPACE.APP_KEY',
+            'expectedEnvVariable' => 'NAMESPACE.APP_KEY',
+        ];
+
+        yield 'custom key with regex char 2' => [
+            'optionValue' => 'NAMESPACE$APP_KEY',
+            'expectedEnvVariable' => 'NAMESPACE$APP_KEY',
         ];
     }
 }
