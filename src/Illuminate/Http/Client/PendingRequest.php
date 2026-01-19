@@ -31,6 +31,7 @@ use OutOfBoundsException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Throwable;
 
 /**
  * @template TAsync of bool = false
@@ -1180,7 +1181,7 @@ class PendingRequest
 
                 return $this->runAfterResponseCallbacks($response);
             })
-            ->otherwise(function (OutOfBoundsException|TransferException|StrayRequestException $e) {
+            ->otherwise(function (Throwable $e) {
                 if ($e instanceof StrayRequestException) {
                     throw $e;
                 }
@@ -1198,7 +1199,7 @@ class PendingRequest
 
                 return $e instanceof RequestException && $e->hasResponse() ? $this->populateResponse($this->newResponse($e->getResponse())) : $e;
             })
-            ->then(function (Response|ConnectionException|TransferException $response) use ($method, $url, $options, $attempt) {
+            ->then(function (Response|Throwable $response) use ($method, $url, $options, $attempt) {
                 return $this->handlePromiseResponse($response, $method, $url, $options, $attempt);
             });
     }
@@ -1206,14 +1207,14 @@ class PendingRequest
     /**
      * Handle the response of an asynchronous request.
      *
-     * @param  \Illuminate\Http\Client\Response  $response
+     * @param  \Illuminate\Http\Client\Response|\Throwable  $response
      * @param  string  $method
      * @param  string  $url
      * @param  array  $options
      * @param  int  $attempt
      * @return mixed
      */
-    protected function handlePromiseResponse(Response|ConnectionException|TransferException $response, $method, $url, $options, $attempt)
+    protected function handlePromiseResponse(Response|Throwable $response, $method, $url, $options, $attempt)
     {
         if ($response instanceof Response && $response->successful()) {
             return $response;
