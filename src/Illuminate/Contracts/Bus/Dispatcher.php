@@ -13,15 +13,6 @@ interface Dispatcher
     public function dispatch($command);
 
     /**
-     * Dispatch a command to its appropriate handler after the current process.
-     *
-     * @param  mixed  $command
-     * @param  mixed  $handler
-     * @return void
-     */
-    public function dispatchAfterResponse($command, $handler = null);
-
-    /**
      * Dispatch a command to its appropriate handler in the current process.
      *
      * Queueable jobs will be dispatched to the "sync" queue.
@@ -40,6 +31,15 @@ interface Dispatcher
      * @return mixed
      */
     public function dispatchNow($command, $handler = null);
+
+    /**
+     * Dispatch a command to its appropriate handler after the current process.
+     *
+     * @param  mixed  $command
+     * @param  mixed  $handler
+     * @return void
+     */
+    public function dispatchAfterResponse($command, $handler = null);
 
     /**
      * Determine if the given command has a handler.
