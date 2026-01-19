@@ -855,7 +855,7 @@ class SupportTestingBusFakeTest extends TestCase
         });
     }
 
-    public function testDispatchAfterResponsePassesThroughWithHandler()
+    public function testDispatchAfterResponseWithHandler()
     {
         $dispatcher = m::mock(QueueingDispatcher::class);
 
