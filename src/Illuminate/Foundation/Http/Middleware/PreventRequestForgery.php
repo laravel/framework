@@ -10,7 +10,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Cookie\CookieValuePrefix;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\Concerns\ExcludesPaths;
-use Illuminate\Session\OriginMismatchException;
+use Illuminate\Http\Exceptions\OriginMismatchException;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\InteractsWithTime;
@@ -90,7 +90,7 @@ class PreventRequestForgery
      * @return mixed
      *
      * @throws \Illuminate\Session\TokenMismatchException
-     * @throws \Illuminate\Session\OriginMismatchException
+     * @throws \Illuminate\Http\Exceptions\OriginMismatchException
      */
     public function handle($request, Closure $next)
     {
@@ -138,7 +138,7 @@ class PreventRequestForgery
      * @param  \Illuminate\Http\Request  $request
      * @return bool
      *
-     * @throws \Illuminate\Session\OriginMismatchException
+     * @throws \Illuminate\Http\Exceptions\OriginMismatchException
      */
     protected function hasValidOrigin($request)
     {
