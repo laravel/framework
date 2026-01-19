@@ -337,6 +337,13 @@ class Validator implements ValidatorContract
     protected $casts;
 
     /**
+     * The cached casted data.
+     *
+     * @var array<string, mixed>|null
+     */
+    protected $castedData;
+
+    /**
      * Create a new Validator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Translator  $translator
@@ -609,6 +616,7 @@ class Validator implements ValidatorContract
     public function casts(array $casts)
     {
         $this->casts = $casts;
+        $this->castedData = null;
 
         return $this;
     }
@@ -633,32 +641,28 @@ class Validator implements ValidatorContract
      */
     public function validateAndCast()
     {
-        throw_if($this->fails(), $this->exception, $this);
-
-        $validated = $this->validated();
-
-        return empty($this->casts)
-            ? $validated
-            : Caster::make($this->casts)->cast($validated);
+        return $this->casted();
     }
 
     /**
      * Get the casted validated data.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @return array<string, mixed>
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
-    public function casted($key = null, $default = null)
+    public function casted()
     {
-        $casted = empty($this->casts)
-            ? $this->validated()
-            : Caster::make($this->casts)->cast($this->validated());
+        if (is_null($this->castedData)) {
+            $validated = $this->validated();
 
-        return is_null($key) ? $casted : data_get($casted, $key, $default);
+            $this->castedData = empty($this->casts)
+                ? $validated
+                : Caster::make($this->casts)->cast($validated);
+        }
+
+        return $this->castedData;
     }
 
     /**

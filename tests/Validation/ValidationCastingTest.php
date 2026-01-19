@@ -99,7 +99,7 @@ class ValidationCastingTest extends TestCase
         $this->assertSame('25', $result['age']);
     }
 
-    public function test_validator_casted_returns_all_casted_data()
+    public function test_validator_casted()
     {
         $validator = new Validator($this->getTranslator(), [
             'price' => '19.99',
@@ -108,31 +108,13 @@ class ValidationCastingTest extends TestCase
         ]);
 
         $validator->casts(['price' => 'float']);
-        $validator->passes();
 
         $result = $validator->casted();
 
         $this->assertSame(19.99, $result['price']);
     }
 
-    public function test_validator_casted_with_key()
-    {
-        $validator = new Validator($this->getTranslator(), [
-            'price' => '19.99',
-            'qty' => '5',
-        ], [
-            'price' => 'required|numeric',
-            'qty' => 'required|integer',
-        ]);
-
-        $validator->casts(['price' => 'float', 'qty' => 'int']);
-        $validator->passes();
-
-        $this->assertSame(19.99, $validator->casted('price'));
-        $this->assertSame(5, $validator->casted('qty'));
-    }
-
-    public function test_validator_casted_with_default()
+    public function test_validator_casted_caches_result()
     {
         $validator = new Validator($this->getTranslator(), [
             'price' => '19.99',
@@ -141,9 +123,12 @@ class ValidationCastingTest extends TestCase
         ]);
 
         $validator->casts(['price' => 'float']);
-        $validator->passes();
 
-        $this->assertSame('default', $validator->casted('missing', 'default'));
+        $result1 = $validator->casted();
+        $result2 = $validator->casted();
+
+        $this->assertSame(19.99, $result1['price']);
+        $this->assertSame($result1, $result2);
     }
 
     public function test_validator_casted_returns_uncasted_when_no_casts_defined()
@@ -153,8 +138,6 @@ class ValidationCastingTest extends TestCase
         ], [
             'price' => 'required|numeric',
         ]);
-
-        $validator->passes();
 
         $result = $validator->casted();
 
@@ -310,7 +293,7 @@ class ValidationCastingTest extends TestCase
         $this->assertSame('default', $request->casted('missing', 'default'));
     }
 
-    public function test_form_request_validated_with_casts()
+    public function test_form_request_safe_casted()
     {
         $request = $this->createFormRequest(
             ['age' => '25', 'name' => 'John'],
@@ -319,28 +302,13 @@ class ValidationCastingTest extends TestCase
 
         $request->validateResolved();
 
-        $result = $request->validatedWithCasts();
-
-        $this->assertSame(25, $result['age']);
-        $this->assertSame('John', $result['name']);
-    }
-
-    public function test_form_request_safe_cast()
-    {
-        $request = $this->createFormRequest(
-            ['age' => '25', 'name' => 'John'],
-            ValidationCastingTestFormRequestWithCasts::class
-        );
-
-        $request->validateResolved();
-
-        $result = $request->safeCast();
+        $result = $request->safeCasted();
 
         $this->assertInstanceOf(ValidatedInput::class, $result);
         $this->assertSame(25, $result['age']);
     }
 
-    public function test_form_request_safe_cast_with_keys()
+    public function test_form_request_safe_casted_with_keys()
     {
         $request = $this->createFormRequest(
             ['age' => '25', 'name' => 'John'],
@@ -349,7 +317,7 @@ class ValidationCastingTest extends TestCase
 
         $request->validateResolved();
 
-        $result = $request->safeCast(['age']);
+        $result = $request->safeCasted(['age']);
 
         $this->assertSame(25, $result['age']);
         $this->assertArrayNotHasKey('name', $result);
@@ -397,7 +365,7 @@ class ValidationCastingTest extends TestCase
         $this->assertSame('John', $result['name']);
     }
 
-    public function test_form_request_with_custom_cast_object()
+    public function test_form_request_casted_with_custom_cast_object()
     {
         $request = $this->createFormRequest(
             ['email' => 'test@example.com'],
@@ -412,7 +380,7 @@ class ValidationCastingTest extends TestCase
         $this->assertSame('test@example.com', $result['email']->value);
     }
 
-    public function test_form_request_with_wildcards()
+    public function test_form_request_casted_with_wildcards()
     {
         $request = $this->createFormRequest(
             ['items' => [['qty' => '10'], ['qty' => '20']]],

@@ -45,14 +45,12 @@ interface Validator extends MessageProvider
     /**
      * Get the casted validated data.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
-     * @return mixed
+     * @return array<string, mixed>
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Illuminate\Support\Exceptions\InvalidCastException
      */
-    public function casted($key = null, $default = null);
+    public function casted();
 
     /**
      * Determine if the data fails the validation rules.

@@ -251,7 +251,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  array|null  $keys
      * @return \Illuminate\Support\ValidatedInput|array<string, mixed>
      */
-    public function safeCast(?array $keys = null)
+    public function safeCasted(?array $keys = null)
     {
         $casted = $this->validatedWithCasts();
 
