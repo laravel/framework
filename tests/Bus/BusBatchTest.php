@@ -276,8 +276,8 @@ class BusBatchTest extends TestCase
         $batch = $batch->add([$job]);
 
         $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) use ($batch) {
-                return $event instanceof BatchFinished && $event->batch === $batch;
-            }));
+            return $event instanceof BatchFinished && $event->batch === $batch;
+        }));
 
         $batch->recordSuccessfulJob('test-id');
     }
