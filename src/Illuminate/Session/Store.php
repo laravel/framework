@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
@@ -16,9 +17,18 @@ use RuntimeException;
 use SessionHandlerInterface;
 use stdClass;
 
+use function Illuminate\Support\enum_value;
+
 class Store implements Session
 {
     use Macroable;
+
+    /**
+     * The length of session ID strings.
+     *
+     * @var int
+     */
+    protected const SESSION_ID_LENGTH = 40;
 
     /**
      * The session ID.
@@ -262,7 +272,7 @@ class Store implements Session
     /**
      * Checks if a key exists.
      *
-     * @param  string|array  $key
+     * @param  \BackedEnum|\UnitEnum|string|array  $key
      * @return bool
      */
     public function exists($key)
@@ -277,7 +287,7 @@ class Store implements Session
     /**
      * Determine if the given key is missing from the session data.
      *
-     * @param  string|array  $key
+     * @param  \BackedEnum|\UnitEnum|string|array  $key
      * @return bool
      */
     public function missing($key)
@@ -288,7 +298,7 @@ class Store implements Session
     /**
      * Determine if a key is present and not null.
      *
-     * @param  string|array  $key
+     * @param  \BackedEnum|\UnitEnum|string|array  $key
      * @return bool
      */
     public function has($key)
@@ -301,7 +311,7 @@ class Store implements Session
     /**
      * Determine if any of the given keys are present and not null.
      *
-     * @param  string|array  $key
+     * @param  \BackedEnum|\UnitEnum|string|array  $key
      * @return bool
      */
     public function hasAny($key)
@@ -314,25 +324,25 @@ class Store implements Session
     /**
      * Get an item from the session.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $default
      * @return mixed
      */
     public function get($key, $default = null)
     {
-        return Arr::get($this->attributes, $key, $default);
+        return Arr::get($this->attributes, enum_value($key), $default);
     }
 
     /**
      * Get the value of a given key and then forget it.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $default
      * @return mixed
      */
     public function pull($key, $default = null)
     {
-        return Arr::pull($this->attributes, $key, $default);
+        return Arr::pull($this->attributes, enum_value($key), $default);
     }
 
     /**
@@ -374,25 +384,25 @@ class Store implements Session
     /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
-     * @param  string|array  $key
+     * @param  \BackedEnum|\UnitEnum|string|array  $key
      * @param  mixed  $value
      * @return void
      */
     public function put($key, $value = null)
     {
         if (! is_array($key)) {
-            $key = [$key => $value];
+            $key = [enum_value($key) => $value];
         }
 
         foreach ($key as $arrayKey => $arrayValue) {
-            Arr::set($this->attributes, $arrayKey, $arrayValue);
+            Arr::set($this->attributes, enum_value($arrayKey), $arrayValue);
         }
     }
 
     /**
      * Get an item from the session, or store the default value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -410,7 +420,7 @@ class Store implements Session
     /**
      * Push a value onto a session array.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -426,7 +436,7 @@ class Store implements Session
     /**
      * Increment the value of an item in the session.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $amount
      * @return mixed
      */
@@ -440,7 +450,7 @@ class Store implements Session
     /**
      * Decrement the value of an item in the session.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $amount
      * @return int
      */
@@ -540,25 +550,35 @@ class Store implements Session
     }
 
     /**
+     * Get the session cache instance.
+     *
+     * @return \Illuminate\Contracts\Cache\Repository
+     */
+    public function cache()
+    {
+        return Cache::store('session');
+    }
+
+    /**
      * Remove an item from the session, returning its value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function remove($key)
     {
-        return Arr::pull($this->attributes, $key);
+        return Arr::pull($this->attributes, enum_value($key));
     }
 
     /**
      * Remove one or many items from the session.
      *
-     * @param  string|array  $keys
+     * @param  \BackedEnum|\UnitEnum|string|array  $keys
      * @return void
      */
     public function forget($keys)
     {
-        Arr::forget($this->attributes, $keys);
+        Arr::forget($this->attributes, collect((array) $keys)->map(fn ($key) => enum_value($key))->all());
     }
 
     /**
@@ -685,7 +705,7 @@ class Store implements Session
      */
     public function isValidId($id)
     {
-        return is_string($id) && ctype_alnum($id) && strlen($id) === 40;
+        return is_string($id) && ctype_alnum($id) && strlen($id) === self::SESSION_ID_LENGTH;
     }
 
     /**
@@ -695,7 +715,7 @@ class Store implements Session
      */
     protected function generateSessionId()
     {
-        return Str::random(40);
+        return Str::random(self::SESSION_ID_LENGTH);
     }
 
     /**
@@ -728,7 +748,7 @@ class Store implements Session
      */
     public function regenerateToken()
     {
-        $this->put('_token', Str::random(40));
+        $this->put('_token', Str::random(self::SESSION_ID_LENGTH));
     }
 
     /**
@@ -776,6 +796,27 @@ class Store implements Session
     public function setPreviousUrl($url)
     {
         $this->put('_previous.url', $url);
+    }
+
+    /**
+     * Get the previous route name from the session.
+     *
+     * @return string|null
+     */
+    public function previousRoute()
+    {
+        return $this->get('_previous.route');
+    }
+
+    /**
+     * Set the "previous" route name in the session.
+     *
+     * @param  string|null  $route
+     * @return void
+     */
+    public function setPreviousRoute($route)
+    {
+        $this->put('_previous.route', $route);
     }
 
     /**

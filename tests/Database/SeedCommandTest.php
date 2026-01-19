@@ -139,7 +139,7 @@ class SeedCommandTest extends TestCase
 
         Model::unsetEventDispatcher();
 
-        m::close();
+        parent::tearDown();
     }
 }
 

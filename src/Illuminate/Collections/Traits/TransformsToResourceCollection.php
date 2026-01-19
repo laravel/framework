@@ -2,9 +2,12 @@
 
 namespace Illuminate\Support\Traits;
 
+use Illuminate\Database\Eloquent\Attributes\UseResource;
+use Illuminate\Database\Eloquent\Attributes\UseResourceCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use LogicException;
+use ReflectionClass;
 
 trait TransformsToResourceCollection
 {
@@ -47,6 +50,18 @@ trait TransformsToResourceCollection
 
         throw_unless(method_exists($className, 'guessResourceName'), LogicException::class, sprintf('Expected class %s to implement guessResourceName method. Make sure the model uses the TransformsToResource trait.', $className));
 
+        $useResourceCollection = $this->resolveResourceCollectionFromAttribute($className);
+
+        if ($useResourceCollection !== null && class_exists($useResourceCollection)) {
+            return new $useResourceCollection($this);
+        }
+
+        $useResource = $this->resolveResourceFromAttribute($className);
+
+        if ($useResource !== null && class_exists($useResource)) {
+            return $useResource::collection($this);
+        }
+
         $resourceClasses = $className::guessResourceName();
 
         foreach ($resourceClasses as $resourceClass) {
@@ -64,5 +79,43 @@ trait TransformsToResourceCollection
         }
 
         throw new LogicException(sprintf('Failed to find resource class for model [%s].', $className));
+    }
+
+    /**
+     * Get the resource class from the class attribute.
+     *
+     * @param  class-string<\Illuminate\Http\Resources\Json\JsonResource>  $class
+     * @return class-string<*>|null
+     */
+    protected function resolveResourceFromAttribute(string $class): ?string
+    {
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        $attributes = (new ReflectionClass($class))->getAttributes(UseResource::class);
+
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->class
+            : null;
+    }
+
+    /**
+     * Get the resource collection class from the class attribute.
+     *
+     * @param  class-string<\Illuminate\Http\Resources\Json\ResourceCollection>  $class
+     * @return class-string<*>|null
+     */
+    protected function resolveResourceCollectionFromAttribute(string $class): ?string
+    {
+        if (! class_exists($class)) {
+            return null;
+        }
+
+        $attributes = (new ReflectionClass($class))->getAttributes(UseResourceCollection::class);
+
+        return $attributes !== []
+            ? $attributes[0]->newInstance()->class
+            : null;
     }
 }

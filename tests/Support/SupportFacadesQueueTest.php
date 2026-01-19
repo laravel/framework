@@ -30,10 +30,10 @@ class SupportFacadesQueueTest extends TestCase
 
     protected function tearDown(): void
     {
-        Queue::clearResolvedInstances();
+        Queue::clearResolvedInstance();
         Queue::setFacadeApplication(null);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testFakeFor()

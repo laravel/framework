@@ -66,6 +66,8 @@ class DatabaseEloquentHasOneThroughOfManyTest extends TestCase
         $this->schema()->drop('logins');
         $this->schema()->drop('states');
         $this->schema()->drop('prices');
+
+        parent::tearDown();
     }
 
     public function testItGuessesRelationName(): void

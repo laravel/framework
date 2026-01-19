@@ -11,11 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 class BroadcastedEventsTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testShouldBroadcastSuccess()
     {
         $d = m::mock(Dispatcher::class);

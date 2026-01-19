@@ -79,6 +79,21 @@ class PendingDispatch
     }
 
     /**
+     * Set the desired job deduplicator callback.
+     *
+     * This feature is only supported by some queues, such as Amazon SQS FIFO.
+     *
+     * @param  callable|null  $deduplicator
+     * @return $this
+     */
+    public function withDeduplicator($deduplicator)
+    {
+        $this->job->withDeduplicator($deduplicator);
+
+        return $this;
+    }
+
+    /**
      * Set the desired connection for the chain.
      *
      * @param  \BackedEnum|string|null  $connection
@@ -169,11 +184,12 @@ class PendingDispatch
     /**
      * Indicate that the job should be dispatched after the response is sent to the browser.
      *
+     * @param  bool  $afterResponse
      * @return $this
      */
-    public function afterResponse()
+    public function afterResponse($afterResponse = true)
     {
-        $this->afterResponse = true;
+        $this->afterResponse = $afterResponse;
 
         return $this;
     }

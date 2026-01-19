@@ -21,8 +21,11 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\JsonApi\JsonApiResource;
 use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
@@ -176,7 +179,10 @@ trait InteractsWithTestCaseLifecycle
         Factory::flushState();
         EncodedHtmlString::flushState();
         EncryptCookies::flushState();
+        HandleCors::flushState();
         HandleExceptions::flushState($this);
+        JsonApiResource::flushState();
+        JsonResource::flushState();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
         Once::flush();
@@ -203,7 +209,7 @@ trait InteractsWithTestCaseLifecycle
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $uses = $this->traitsUsedByTest ?? array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[RefreshDatabase::class])) {
             $this->refreshDatabase();

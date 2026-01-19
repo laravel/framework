@@ -103,7 +103,7 @@ abstract class Component
      */
     protected function usingQuestionHelper($callable)
     {
-        $property = with(new ReflectionClass(OutputStyle::class))
+        $property = (new ReflectionClass(OutputStyle::class))
             ->getParentClass()
             ->getProperty('questionHelper');
 

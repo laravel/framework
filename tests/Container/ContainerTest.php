@@ -21,6 +21,8 @@ class ContainerTest extends TestCase
     protected function tearDown(): void
     {
         Container::setInstance(null);
+
+        parent::tearDown();
     }
 
     public function testContainerSingleton()
@@ -138,6 +140,13 @@ class ContainerTest extends TestCase
         $firstInstantiation = $container->make('class');
         $secondInstantiation = $container->make('class');
         $this->assertSame($firstInstantiation, $secondInstantiation);
+    }
+
+    public function testScopedBindingsWithClosureReturnType()
+    {
+        $container = new Container;
+        $container->scoped(fn (): stdClass => new stdClass);
+        $container->forgetScopedInstances();
     }
 
     public function testScopedIf()

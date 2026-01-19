@@ -12,7 +12,7 @@ trait Batchable
     /**
      * The batch ID (if applicable).
      *
-     * @var string
+     * @var string|null
      */
     public $batchId;
 

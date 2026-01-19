@@ -468,7 +468,7 @@ abstract class HasOneOrManyThrough extends Relation
      * @param  int|null  $perPage
      * @param  array  $columns
      * @param  string  $pageName
-     * @param  int  $page
+     * @param  int|null  $page
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)

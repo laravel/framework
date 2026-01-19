@@ -9,10 +9,10 @@ class OnceTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Once::flush();
         Once::enable();
+
+        parent::tearDown();
     }
 
     public function testResultMemoization()

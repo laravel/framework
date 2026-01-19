@@ -49,15 +49,19 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
         User::create();
 
-        Post::create(['user_id' => 1]);
+        Post::insert([
+            ['user_id' => 1],
+            ['user_id' => 1],
+        ]);
 
-        Comment::create(['parent_id' => null, 'post_id' => 1]);
-        Comment::create(['parent_id' => 1, 'post_id' => 1]);
-        Comment::create(['parent_id' => 2, 'post_id' => 1]);
+        Comment::insert([
+            ['parent_id' => null, 'post_id' => 1],
+            ['parent_id' => 1, 'post_id' => 1],
+            ['parent_id' => 2, 'post_id' => 1],
+        ]);
 
         Revision::create(['comment_id' => 1]);
 
-        Post::create(['user_id' => 1]);
         PostRelation::create(['post_id' => 2]);
         PostSubRelation::create(['post_relation_id' => 1]);
         PostSubSubRelation::create(['post_sub_relation_id' => 1]);

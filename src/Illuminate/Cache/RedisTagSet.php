@@ -13,7 +13,7 @@ class RedisTagSet extends TagSet
      *
      * @param  string  $key
      * @param  int|null  $ttl
-     * @param  string  $updateWhen
+     * @param  string|null  $updateWhen
      * @return void
      */
     public function addEntry(string $key, ?int $ttl = null, $updateWhen = null)
@@ -48,11 +48,17 @@ class RedisTagSet extends TagSet
                 $cursor = $defaultCursorValue;
 
                 do {
-                    [$cursor, $entries] = $connection->zscan(
+                    $results = $connection->zscan(
                         $this->store->getPrefix().$tagKey,
                         $cursor,
                         ['match' => '*', 'count' => 1000]
                     );
+
+                    if (! is_array($results)) {
+                        break;
+                    }
+
+                    [$cursor, $entries] = $results;
 
                     if (! is_array($entries)) {
                         break;
@@ -79,11 +85,19 @@ class RedisTagSet extends TagSet
      */
     public function flushStaleEntries()
     {
-        $this->store->connection()->pipeline(function ($pipe) {
+        $flushStaleEntries = function ($pipe) {
             foreach ($this->tagIds() as $tagKey) {
                 $pipe->zremrangebyscore($this->store->getPrefix().$tagKey, 0, Carbon::now()->getTimestamp());
             }
-        });
+        };
+
+        $connection = $this->store->connection();
+
+        if ($connection instanceof PhpRedisConnection) {
+            $flushStaleEntries($connection);
+        } else {
+            $connection->pipeline($flushStaleEntries);
+        }
     }
 
     /**

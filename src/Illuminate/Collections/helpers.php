@@ -34,6 +34,36 @@ if (! function_exists('data_fill')) {
     }
 }
 
+if (! function_exists('data_has')) {
+    /**
+     * Determine if a key / property exists on an array or object using "dot" notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array|int|null  $key
+     * @return bool
+     */
+    function data_has($target, $key): bool
+    {
+        if (is_null($key) || $key === []) {
+            return false;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $segment) {
+            if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && property_exists($target, $segment)) {
+                $target = $target->{$segment};
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+}
+
 if (! function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.

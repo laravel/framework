@@ -24,7 +24,7 @@ class AddLinkHeadersForPreloadedAssets
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  int  $limit
+     * @param  int|null  $limit
      * @return \Illuminate\Http\Response
      */
     public function handle($request, $next, $limit = null)

@@ -41,11 +41,6 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->setAsGlobal();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testConnectionCanBeCreated()
     {
         $this->assertInstanceOf(PDO::class, $this->db->getConnection()->getPdo());
@@ -104,6 +99,19 @@ class DatabaseConnectionFactoryTest extends TestCase
 
         $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
         $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
+    }
+
+    public function testReadWriteConnectionSetsReadPdoConfig()
+    {
+        $connection = $this->db->getConnection('read_write');
+
+        $readPdoConfig = new ReflectionProperty(get_class($connection), 'readPdoConfig');
+
+        $config = $readPdoConfig->getValue($connection);
+
+        $this->assertNotEmpty($config);
+        $this->assertArrayHasKey('database', $config);
+        $this->assertSame(':memory:', $config['database']);
     }
 
     public function testIfDriverIsntSetExceptionIsThrown()

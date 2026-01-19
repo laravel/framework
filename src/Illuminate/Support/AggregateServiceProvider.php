@@ -7,14 +7,14 @@ class AggregateServiceProvider extends ServiceProvider
     /**
      * The provider class names.
      *
-     * @var array
+     * @var array<int, class-string<\Illuminate\Support\ServiceProvider>>
      */
     protected $providers = [];
 
     /**
      * An array of the service provider instances.
      *
-     * @var array
+     * @var array<int, \Illuminate\Support\ServiceProvider>
      */
     protected $instances = [];
 
@@ -35,7 +35,7 @@ class AggregateServiceProvider extends ServiceProvider
     /**
      * Get the services provided by the provider.
      *
-     * @return array
+     * @return array<int, string>
      */
     public function provides()
     {

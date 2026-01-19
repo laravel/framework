@@ -10,11 +10,6 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpExtension('redis')]
 class PhpRedisClusterConnectionTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testItScansUsingDefaultNode()
     {
         $client = m::mock(\RedisCluster::class);

@@ -456,6 +456,155 @@ class PrecognitionTest extends TestCase
         ]);
     }
 
+    public function testItCanValidateArrayWithWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'raw_array' => [123, 'someString'],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'raw_array.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'raw_array.0' => [
+                'The raw_array.0 field must be a string.',
+            ],
+        ]);
+    }
+
+    public function testItCanValidateNestedArrayWithWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereArrayRulesAreValidateViaControllerValidate'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'nested_array' => [
+                ['name' => 123],
+                ['name' => 'someString'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'nested_array.*.name',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'nested_array.0.name' => [
+                'The nested_array.0.name field must be a string.',
+            ],
+        ]);
+    }
+
+    public function testItCanValidateNestedObjectFieldsWithWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereProfileIsValidated'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'profile' => ['username' => 123, 'email' => 'invalid'],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'profile.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonPath('errors', [
+            'profile.username' => ['The profile.username field must be a string.'],
+            'profile.email' => ['The profile.email field must be a valid email address.'],
+        ]);
+    }
+
+    public function testItDoesNotMatchWildcardAgainstOtherRootKeys()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWithMultipleRootKeys'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'user' => ['name' => 123],
+            'email' => 'not-an-email',
+            'name' => 123,
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'user.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertHeaderMissing('Precognition-Success');
+        $response->assertJsonMissing(['errors' => ['email' => []]]);
+        $response->assertJsonMissing(['errors' => ['name' => []]]);
+        $response->assertJsonPath('errors', [
+            'user.name' => ['The user.name field must be a string.'],
+        ]);
+    }
+
+    public function testItDoesNotMatchWildcardAcrossSegments()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereUsersAreValidated'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'users' => [
+                ['name' => 123, 'email' => 'invalid'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'users.*',
+        ]);
+
+        $response->assertNoContent();
+        $response->assertHeader('Precognition-Success', 'true');
+    }
+
+    public function testItCanValidateAllNestedFieldsWithDoubleWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereUsersAreValidated'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'users' => [
+                ['name' => 123, 'email' => 'invalid'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'users,users.*.*',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonPath('errors', [
+            'users.0.name' => ['The users.0.name field must be a string.'],
+            'users.0.email' => ['The users.0.email field must be a valid email address.'],
+        ]);
+    }
+
+    public function testItCanValidateSpecificIndexWithoutWildcard()
+    {
+        Route::post('test-route', [PrecognitionTestController::class, 'methodWhereUsersAreValidated'])
+            ->middleware(PrecognitionInvokingController::class);
+
+        $response = $this->postJson('test-route', [
+            'users' => [
+                ['name' => 123, 'email' => 'invalid'],
+                ['name' => 456, 'email' => 'also-invalid'],
+            ],
+        ], [
+            'Precognition' => 'true',
+            'Precognition-Validate-Only' => 'users.1.email',
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonMissing(['errors' => ['users.0.email' => []]]);
+        $response->assertJsonPath('errors', [
+            'users.1.email' => ['The users.1.email field must be a valid email address.'],
+        ]);
+    }
+
     public function testItAppendsAnAdditionalVaryHeaderInsteadOfReplacingAnyExistingVaryHeaders()
     {
         Route::get('test-route', function () {
@@ -1109,6 +1258,68 @@ class PrecognitionTestController
             $this->validate($request, [
                 'nested' => ['required', 'array', 'min:1'],
                 'nested.*.name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereArrayRulesAreValidateViaControllerValidate(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'nested_array' => ['required', 'array', 'min:1'],
+                'nested_array.*.name' => ['required', 'string'],
+                'raw_array' => ['required', 'array', 'min:1'],
+                'raw_array.*' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereUsersAreValidated(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'users' => ['required', 'array'],
+                'users.*.name' => ['required', 'string'],
+                'users.*.email' => ['required', 'email'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWithMultipleRootKeys(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'user' => ['required', 'array'],
+                'user.name' => ['required', 'string'],
+                'email' => ['required', 'email'],
+                'name' => ['required', 'string'],
+            ]);
+
+            fail();
+        });
+
+        fail();
+    }
+
+    public function methodWhereProfileIsValidated(Request $request)
+    {
+        precognitive(function () use ($request) {
+            $this->validate($request, [
+                'profile' => ['required', 'array'],
+                'profile.username' => ['required', 'string'],
+                'profile.email' => ['required', 'email'],
             ]);
 
             fail();

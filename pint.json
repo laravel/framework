@@ -63,6 +63,7 @@
             "on_multiline": "ignore"
         },
         "method_chaining_indentation": true,
+        "modernize_types_casting": true,
         "multiline_whitespace_before_semicolons": {
             "strategy": "no_multi_line"
         },

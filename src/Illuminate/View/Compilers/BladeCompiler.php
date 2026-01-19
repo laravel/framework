@@ -13,6 +13,7 @@ use Illuminate\Support\Stringable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\View\Component;
 use InvalidArgumentException;
+use ParseError;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -620,7 +621,11 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function hasEvenNumberOfParentheses(string $expression)
     {
-        $tokens = token_get_all('<?php '.$expression);
+        try {
+            $tokens = token_get_all('<?php '.$expression);
+        } catch (ParseError) {
+            return false;
+        }
 
         if (Arr::last($tokens) !== ')') {
             return false;

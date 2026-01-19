@@ -21,4 +21,17 @@ class SupportBenchmarkTest extends TestCase
     {
         $this->assertIsArray(Benchmark::value(fn () => 1 + 1));
     }
+
+    public function testMacroable(): void
+    {
+        $macroName = __FUNCTION__;
+
+        $this->assertFalse(Benchmark::hasMacro($macroName));
+
+        // Register a macro to test
+        Benchmark::macro($macroName, fn () => true);
+
+        $this->assertTrue(Benchmark::hasMacro($macroName));
+        $this->assertTrue(Benchmark::$macroName());
+    }
 }

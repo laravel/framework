@@ -1087,6 +1087,25 @@ class TestResponseTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function testAssertFailedDependency(): void
+    {
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_FAILED_DEPENDENCY)
+        );
+
+        $response->assertFailedDependency();
+
+        $response = TestResponse::fromBaseResponse(
+            (new Response)->setStatusCode(Response::HTTP_OK)
+        );
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage("Expected response status code [424] but received 200.\nFailed asserting that 200 is identical to 424.");
+
+        $response->assertFailedDependency();
+        $this->fail();
+    }
+
     public function testAssertClientError(): void
     {
         $statusCode = 400;
@@ -2656,6 +2675,31 @@ class TestResponseTest extends TestCase
         $response->assertRedirectContains('url.net');
     }
 
+    public function testAssertHeaderContainsSuccess(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'prefix-value-suffix');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
+    public function testAssertHeaderContainsFailure(): void
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->headers->set('X-Custom-Header', 'unrelated');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Header [X-Custom-Header] was found, but [unrelated] does not contain [value].');
+
+        $response->assertHeaderContains('X-Custom-Header', 'value');
+    }
+
     public function testAssertRedirect(): void
     {
         $response = TestResponse::fromBaseResponse(
@@ -2808,16 +2852,60 @@ class TestResponseTest extends TestCase
         $response->assertSessionMissing('foo');
     }
 
-    #[TestWith(['foo', 'badvalue'])]
-    #[TestWith(['foo', null])]
-    #[TestWith([['foo', 'bar'], null])]
-    public function testAssertSessionMissingValue(array|string $key, mixed $value): void
+    #[TestWith(['foo', 'goodvalue'])]
+    #[TestWith([['foo', 'bar'], 'goodvalue'])]
+    public function testAssertSessionMissingValueIsPresent(array|string $key, mixed $value): void
     {
         $this->expectException(AssertionFailedError::class);
 
         app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
 
         $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    public function testAssertSessionMissingValueIsPresentClosure(): void
+    {
+        $this->expectException(AssertionFailedError::class);
+
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $key = 'foo';
+
+        $value = function ($value) {
+            return $value === 'goodvalue';
+        };
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    #[TestWith(['foo', 'badvalue'])]
+    public function testAssertSessionMissingValueIsMissing(array|string $key, mixed $value): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $response = TestResponse::fromBaseResponse(new Response());
+        $response->assertSessionMissing($key, $value);
+    }
+
+    public function testAssertSessionMissingValueIsMissingClosure(): void
+    {
+        app()->instance('session.store', $store = new Store('test-session', new ArraySessionHandler(1)));
+
+        $store->put('foo', 'goodvalue');
+
+        $key = 'foo';
+
+        $value = function ($value) {
+            return $value === 'badvalue';
+        };
 
         $response = TestResponse::fromBaseResponse(new Response());
         $response->assertSessionMissing($key, $value);

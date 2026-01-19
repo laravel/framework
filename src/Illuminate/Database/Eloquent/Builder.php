@@ -26,9 +26,9 @@ use ReflectionMethod;
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  *
- * @property-read HigherOrderBuilderProxy $orWhere
- * @property-read HigherOrderBuilderProxy $whereNot
- * @property-read HigherOrderBuilderProxy $orWhereNot
+ * @property-read HigherOrderBuilderProxy|$this $orWhere
+ * @property-read HigherOrderBuilderProxy|$this $whereNot
+ * @property-read HigherOrderBuilderProxy|$this $orWhereNot
  *
  * @mixin \Illuminate\Database\Query\Builder
  */
@@ -238,6 +238,21 @@ class Builder implements BuilderContract
         foreach ($scopes as $scope) {
             $this->withoutGlobalScope($scope);
         }
+
+        return $this;
+    }
+
+    /**
+     * Remove all global scopes except the given scopes.
+     *
+     * @param  array  $scopes
+     * @return $this
+     */
+    public function withoutGlobalScopesExcept(array $scopes = [])
+    {
+        $this->withoutGlobalScopes(
+            array_diff(array_keys($this->scopes), $scopes)
+        );
 
         return $this;
     }

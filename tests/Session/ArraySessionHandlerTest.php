@@ -11,9 +11,9 @@ class ArraySessionHandlerTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
+
+        parent::tearDown();
     }
 
     public function test_it_implements_the_session_handler_interface()
@@ -48,6 +48,7 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
+        Carbon::setTestNow(Carbon::now());
         $handler->write('foo', 'bar');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10));
@@ -58,6 +59,7 @@ class ArraySessionHandlerTest extends TestCase
     {
         $handler = new ArraySessionHandler(10);
 
+        Carbon::setTestNow(Carbon::now());
         $handler->write('foo', 'bar');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(10)->addSecond());
@@ -100,6 +102,7 @@ class ArraySessionHandlerTest extends TestCase
 
         $this->assertSame(0, $handler->gc(300));
 
+        Carbon::setTestNow(Carbon::now());
         $handler->write('foo', 'bar');
         $this->assertSame(0, $handler->gc(300));
         $this->assertSame('bar', $handler->read('foo'));

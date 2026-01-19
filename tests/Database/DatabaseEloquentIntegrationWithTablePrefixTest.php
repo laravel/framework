@@ -76,6 +76,8 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         }
 
         Relation::morphMap([], false);
+
+        parent::tearDown();
     }
 
     public function testBasicModelHydration()
@@ -89,6 +91,53 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         $this->assertInstanceOf(EloquentTestUser::class, $models[0]);
         $this->assertSame('abigailotwell@gmail.com', $models[0]->email);
         $this->assertCount(1, $models);
+    }
+
+    public function testTablePrefixWithClonedConnection()
+    {
+        $originalConnection = $this->connection();
+        $originalPrefix = $originalConnection->getTablePrefix();
+
+        $clonedConnection = clone $originalConnection;
+        $clonedConnection->setTablePrefix('cloned_');
+
+        $this->assertSame($originalPrefix, $originalConnection->getTablePrefix());
+        $this->assertSame('cloned_', $clonedConnection->getTablePrefix());
+
+        $clonedConnection->getSchemaBuilder()->create('test_table', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+        });
+
+        $this->assertTrue($clonedConnection->getSchemaBuilder()->hasTable('test_table'));
+        $query = $clonedConnection->table('test_table')->toSql();
+        $this->assertStringContainsString('cloned_test_table', $query);
+
+        $clonedConnection->getSchemaBuilder()->drop('test_table');
+    }
+
+    public function testQueryGrammarUsesCorrectPrefixAfterCloning()
+    {
+        $originalConnection = $this->connection();
+
+        $clonedConnection = clone $originalConnection;
+        $clonedConnection->setTablePrefix('new_prefix_');
+
+        $selectSql = $clonedConnection->table('users')->toSql();
+        $this->assertStringContainsString('new_prefix_users', $selectSql);
+
+        $insertSql = $clonedConnection->table('users')->toSql();
+        $this->assertStringContainsString('new_prefix_users', $insertSql);
+
+        $updateSql = $clonedConnection->table('users')->where('id', 1)->toSql();
+        $this->assertStringContainsString('new_prefix_users', $updateSql);
+
+        $deleteSql = $clonedConnection->table('users')->where('id', 1)->toSql();
+        $this->assertStringContainsString('new_prefix_users', $deleteSql);
+
+        $originalSql = $originalConnection->table('users')->toSql();
+        $this->assertStringContainsString('prefix_users', $originalSql);
+        $this->assertStringNotContainsString('new_prefix_users', $originalSql);
     }
 
     /**

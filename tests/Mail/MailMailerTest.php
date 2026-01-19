@@ -19,7 +19,7 @@ class MailMailerTest extends TestCase
     {
         unset($_SERVER['__mailer.test']);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testMailerSendSendsMessageWithProperViewContent(): void

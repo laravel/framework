@@ -71,6 +71,8 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
+
+        parent::tearDown();
     }
 
     public function testItLoadsRelationshipsAutomatically()

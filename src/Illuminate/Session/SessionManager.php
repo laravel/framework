@@ -269,7 +269,7 @@ class SessionManager extends Manager
     /**
      * Get the default session driver name.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultDriver()
     {

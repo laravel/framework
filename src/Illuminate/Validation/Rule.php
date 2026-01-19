@@ -185,6 +185,14 @@ class Rule
     }
 
     /**
+     * Get a datetime rule builder instance.
+     */
+    public static function dateTime(): Date
+    {
+        return (new Date)->format('Y-m-d H:i:s');
+    }
+
+    /**
      * Get an email rule builder instance.
      *
      * @return \Illuminate\Validation\Rules\Email

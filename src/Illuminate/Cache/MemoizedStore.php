@@ -68,12 +68,9 @@ class MemoizedStore implements LockProvider, Store
 
         if (count($missing) > 0) {
             $retrieved = tap($this->repository->many($missing), function ($values) {
-                $this->cache = [
-                    ...$this->cache,
-                    ...collect($values)->mapWithKeys(fn ($value, $key) => [
-                        $this->prefix($key) => $value,
-                    ]),
-                ];
+                foreach ($values as $key => $value) {
+                    $this->cache[$this->prefix($key)] = $value;
+                }
             });
         }
 
@@ -189,11 +186,11 @@ class MemoizedStore implements LockProvider, Store
      */
     public function restoreLock($name, $owner)
     {
-        if (! $this->repository instanceof LockProvider) {
+        if (! $this->repository->getStore() instanceof LockProvider) {
             throw new BadMethodCallException('This cache store does not support locks.');
         }
 
-        return $this->repository->resoreLock(...func_get_args());
+        return $this->repository->getStore()->restoreLock(...func_get_args());
     }
 
     /**

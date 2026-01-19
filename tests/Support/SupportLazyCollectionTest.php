@@ -186,6 +186,8 @@ class SupportLazyCollectionTest extends TestCase
 
         $mock = m::mock(LazyCollection::class.'[now]');
 
+        $timedOutWith = [];
+
         $results = $mock
             ->times(10)
             ->tap(function ($collection) use ($mock, $timeout) {
@@ -200,12 +202,13 @@ class SupportLazyCollectionTest extends TestCase
                         $timeout->getTimestamp()
                     );
             })
-            ->takeUntilTimeout($timeout)
+            ->takeUntilTimeout($timeout, function ($value, $key) use (&$timedOutWith) {
+                $timedOutWith = [$value, $key];
+            })
             ->all();
 
         $this->assertSame([1, 2], $results);
-
-        m::close();
+        $this->assertSame([2, 1], $timedOutWith);
     }
 
     public function testTapEach()
@@ -385,6 +388,21 @@ class SupportLazyCollectionTest extends TestCase
 
         $multipleCollection = new LazyCollection([1, 2, 3]);
         $this->assertFalse($multipleCollection->containsOneItem());
+    }
+
+    public function testContainsManyItems()
+    {
+        $emptyCollection = new LazyCollection([]);
+        $this->assertFalse($emptyCollection->containsManyItems());
+
+        $singleCollection = new LazyCollection([1]);
+        $this->assertFalse($singleCollection->containsManyItems());
+
+        $multipleCollection = new LazyCollection([1, 2]);
+        $this->assertTrue($multipleCollection->containsManyItems());
+
+        $manyCollection = new LazyCollection([1, 2, 3]);
+        $this->assertTrue($manyCollection->containsManyItems());
     }
 
     public function testDoesntContain()

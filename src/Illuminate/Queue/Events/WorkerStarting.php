@@ -14,7 +14,7 @@ class WorkerStarting
     public function __construct(
         public $connectionName,
         public $queue,
-        public $workerOptions
+        public $workerOptions,
     ) {
     }
 }

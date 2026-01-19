@@ -25,11 +25,6 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthGuardTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicReturnsNullOnValidAttempt()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();
@@ -158,7 +153,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $mock->getProvider()->shouldReceive('retrieveByCredentials')->times(3)->with(['foo'])->andReturn($user);
         $mock->getProvider()->shouldReceive('validateCredentials')->twice()->andReturnTrue();
         $mock->getProvider()->shouldReceive('validateCredentials')->once()->andReturnFalse();
@@ -233,7 +228,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $mock->login($user);
     }
 
@@ -261,7 +256,7 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('getName')->willReturn('foo');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $mock->getSession()->shouldReceive('put')->with('foo', 'bar')->once();
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $mock->login($user);
     }
 
@@ -498,10 +493,11 @@ class AuthGuardTest extends TestCase
         $guard = new SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 576000)->andReturn($foreverCookie);
+        $expectedHash = hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac');
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 576000)->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
         $user->shouldReceive('getAuthPassword')->andReturn('bar');
@@ -518,10 +514,11 @@ class AuthGuardTest extends TestCase
         $guard->setRememberDuration(5000);
         $guard->setCookieJar($cookie);
         $foreverCookie = new Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|bar', 5000)->andReturn($foreverCookie);
+        $expectedHash = hash_hmac('sha256', 'bar', 'base-key-for-password-hash-mac');
+        $cookie->shouldReceive('make')->once()->with($guard->getRecallerName(), 'foo|recaller|'.$expectedHash, 5000)->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
         $user->shouldReceive('getAuthPassword')->andReturn('bar');
@@ -540,7 +537,7 @@ class AuthGuardTest extends TestCase
         $cookie->shouldReceive('make')->once()->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $user = m::mock(Authenticatable::class);
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
         $user->shouldReceive('getAuthPassword')->andReturn('foo');
@@ -608,7 +605,7 @@ class AuthGuardTest extends TestCase
         $guard->getProvider()->shouldReceive('retrieveByToken')->once()->with('id', 'recaller')->andReturn($user);
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn('bar');
         $guard->getSession()->shouldReceive('put')->with($guard->getName(), 'bar')->once();
-        $session->shouldReceive('migrate')->once();
+        $session->shouldReceive('regenerate')->once();
         $this->assertSame($user, $guard->user());
         $this->assertTrue($guard->viaRemember());
     }

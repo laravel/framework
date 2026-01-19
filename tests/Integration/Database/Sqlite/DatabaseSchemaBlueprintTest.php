@@ -13,11 +13,6 @@ use RuntimeException;
 #[RequiresDatabase('sqlite')]
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     protected function defineEnvironment($app)
     {
         $app['config']->set([

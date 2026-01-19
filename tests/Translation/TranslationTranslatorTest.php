@@ -5,6 +5,9 @@ namespace Illuminate\Tests\Translation;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Tests\Translation\Fixtures\Enums\Bar;
+use Illuminate\Tests\Translation\Fixtures\Enums\Baz;
+use Illuminate\Tests\Translation\Fixtures\Enums\Foo;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
 use Mockery as m;
@@ -12,11 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class TranslationTranslatorTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
@@ -280,6 +278,35 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame(
             'the date is 1st Jan 1970',
             $t->get('test', ['date' => $date])
+        );
+    }
+
+    public function testGetJsonReplacesWithEnums()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()
+            ->shouldReceive('load')
+            ->once()
+            ->with('en', '*', '*')
+            ->andReturn([
+                'string_backed_enum' => 'Laravel 12 was released in :month 2025',
+                'int_backed_enum' => 'Stay tuned for Laravel v:version',
+                'unit_enum' => ':person gets excited about every new Laravel release',
+            ]);
+
+        $this->assertSame(
+            'Laravel 12 was released in February 2025',
+            $t->get('string_backed_enum', ['month' => Baz::February])
+        );
+
+        $this->assertSame(
+            'Stay tuned for Laravel v13',
+            $t->get('int_backed_enum', ['version' => Bar::Thirteen])
+        );
+
+        $this->assertSame(
+            'Hosni gets excited about every new Laravel release',
+            $t->get('unit_enum', ['person' => Foo::Hosni])
         );
     }
 

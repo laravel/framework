@@ -363,7 +363,7 @@ class ApplicationBuilder
     /**
      * Register and configure the application's exception handler.
      *
-     * @param  callable|null  $using
+     * @param  callable(\Illuminate\Foundation\Configuration\Exceptions)|null  $using
      * @return $this
      */
     public function withExceptions(?callable $using = null)
@@ -373,12 +373,12 @@ class ApplicationBuilder
             \Illuminate\Foundation\Exceptions\Handler::class
         );
 
-        $using ??= fn () => true;
-
-        $this->app->afterResolving(
-            \Illuminate\Foundation\Exceptions\Handler::class,
-            fn ($handler) => $using(new Exceptions($handler)),
-        );
+        if ($using !== null) {
+            $this->app->afterResolving(
+                \Illuminate\Foundation\Exceptions\Handler::class,
+                fn ($handler) => $using(new Exceptions($handler)),
+            );
+        }
 
         return $this;
     }

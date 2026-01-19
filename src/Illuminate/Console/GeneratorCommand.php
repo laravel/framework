@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
+use Illuminate\Console\Concerns\FindsAvailableModels;
 use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -12,6 +13,8 @@ use Symfony\Component\Finder\Finder;
 
 abstract class GeneratorCommand extends Command implements PromptsForMissingInput
 {
+    use FindsAvailableModels;
+
     /**
      * The filesystem instance.
      *
@@ -243,16 +246,12 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      * Get a list of possible model names.
      *
      * @return array<int, string>
+     *
+     * @deprecated 12.38.0 Use `findAvailableModels()` method instead.
      */
     protected function possibleModels()
     {
-        $modelPath = is_dir(app_path('Models')) ? app_path('Models') : app_path();
-
-        return (new Collection(Finder::create()->files()->depth(0)->in($modelPath)))
-            ->map(fn ($file) => $file->getBasename('.php'))
-            ->sort()
-            ->values()
-            ->all();
+        return $this->findAvailableModels();
     }
 
     /**

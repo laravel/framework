@@ -20,6 +20,7 @@ use InvalidArgumentException;
 use JsonSerializable;
 use Mockery as m;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use stdClass;
@@ -446,6 +447,38 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf($collection, $chunks);
         $this->assertInstanceOf($collection, $chunks->first());
         $this->assertInstanceOf($collection, $chunks->skip(1)->first());
+
+        // Test invalid size parameter (size must be at least 1)
+        // instead of throwing an error. Now it throws InvalidArgumentException.
+        try {
+            $collection::times(5)->sliding(0, 1)->toArray();
+            $this->fail('Expected InvalidArgumentException for size = 0');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Size value must be at least 1.', $e->getMessage());
+        }
+
+        try {
+            $collection::times(5)->sliding(-1, 1)->toArray();
+            $this->fail('Expected InvalidArgumentException for size = -1');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Size value must be at least 1.', $e->getMessage());
+        }
+
+        // Test invalid step parameter (step must be at least 1)
+        // Now it throws InvalidArgumentException with an error message.
+        try {
+            $collection::times(5)->sliding(2, 0)->toArray();
+            $this->fail('Expected InvalidArgumentException for step = 0');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Step value must be at least 1.', $e->getMessage());
+        }
+
+        try {
+            $collection::times(5)->sliding(2, -1)->toArray();
+            $this->fail('Expected InvalidArgumentException for step = -1');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame('Step value must be at least 1.', $e->getMessage());
+        }
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -867,6 +900,20 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) > 4));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsManyItems($collection)
+    {
+        $this->assertFalse((new $collection([]))->containsManyItems());
+        $this->assertFalse((new $collection([1]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2, 3]))->containsManyItems());
+
+        $this->assertTrue(collect([1, 2, 2])->containsManyItems(fn ($number) => $number === 2));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 4));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) > 4));
+        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 3));
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);
@@ -1180,6 +1227,50 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(StaffEnum::Taylor, $c->value('name'));
         $this->assertEquals(StaffEnum::Joe, $c->where('id', 2)->value('name'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testValueWithNegativeValue($collection)
+    {
+        $c = new $collection([['id' => 1, 'balance' => 0], ['id' => 2, 'balance' => 200]]);
+
+        $this->assertEquals(0, $c->value('balance'));
+
+        $c = new $collection([['id' => 1, 'balance' => ''], ['id' => 2, 'balance' => 200]]);
+
+        $this->assertEquals('', $c->value('balance'));
+
+        $c = new $collection([['id' => 1, 'balance' => null], ['id' => 2, 'balance' => 200]]);
+
+        $this->assertEquals(null, $c->value('balance'));
+
+        $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 200]]);
+
+        $this->assertEquals(200, $c->value('balance'));
+
+        $c = new $collection([['id' => 1], ['id' => 2, 'balance' => 0], ['id' => 3, 'balance' => 200]]);
+
+        $this->assertEquals(0, $c->value('balance'));
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testValueWithObjects($collection)
+    {
+        $c = new $collection([
+            literal(id: 1),
+            literal(id: 2, balance: ''),
+            literal(id: 3, balance: 200),
+        ]);
+
+        $this->assertEquals('', $c->value('balance'));
+
+        $c = new $collection([
+            literal(id: 1),
+            literal(id: 2, balance: literal(currency: 'USD', value: 0)),
+            literal(id: 3, balance: literal(currency: 'USD', value: 200)),
+        ]);
+
+        $this->assertEquals(0, $c->value('balance.value'));
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -2490,6 +2581,18 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('male', $data->get('gender'));
     }
 
+    public function testGetOrPutWithNoKey()
+    {
+        $data = new Collection(['taylor', 'shawn']);
+        $this->assertSame('dayle', $data->getOrPut(null, 'dayle'));
+        $this->assertSame('john', $data->getOrPut(null, 'john'));
+        $this->assertSame(['taylor', 'shawn', 'dayle', 'john'], $data->all());
+
+        $data = new Collection(['taylor', '' => 'shawn']);
+        $this->assertSame('shawn', $data->getOrPut(null, 'dayle'));
+        $this->assertSame(['taylor', '' => 'shawn'], $data->all());
+    }
+
     public function testPut()
     {
         $data = new Collection(['name' => 'taylor', 'email' => 'foo']);
@@ -3262,6 +3365,60 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['c', 'e'], $data->nth(2, -4)->all());
         $this->assertEquals(['e'], $data->nth(4, -2)->all());
         $this->assertEquals(['e'], $data->nth(2, -2)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForInvalidStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(0)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForNegativeStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(-1)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(-1);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(-1);
     }
 
     #[DataProvider('collectionClassProvider')]
@@ -4159,6 +4316,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([], $c->forPage(3, 2)->all());
     }
 
+    #[IgnoreDeprecations]
     public function testPrepend()
     {
         $c = new Collection(['one', 'two', 'three', 'four']);
@@ -4177,6 +4335,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(
             [null => 0, 'one' => 1, 'two' => 2],
             $c->prepend(0, null)->all()
+        );
+
+        $c = new Collection(['one' => 1, 'two' => 2]);
+        $this->assertEquals(
+            [null => 0, 'one' => 1, 'two' => 2],
+            $c->prepend(0, '')->all()
         );
     }
 

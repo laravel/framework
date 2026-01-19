@@ -222,4 +222,55 @@ class TrimStringsTest extends TestCase
             $this->assertEquals('This title contains a combination of a invisible character at beginning and the end', $req->title);
         });
     }
+
+    public function test_trim_strings_can_ignore_nested_attributes_using_wildcards()
+    {
+        $request = new Request;
+
+        $request->merge([
+            'users' => [
+                ['name' => '  foo  ', 'role' => '  admin  '],
+                ['name' => '  bar  ', 'role' => '  editor  '],
+            ],
+            'teams' => [
+                ['name' => '  team  '],
+            ],
+            'orders' => [
+                [
+                    'items' => [
+                        ['meta' => ['title' => '  foo  ', 'sku' => '  SKU-1  ', 'tags' => ['  alpha  ']]],
+                    ],
+                ],
+                [
+                    'items' => [
+                        ['meta' => ['title' => '  bar  ', 'sku' => '  SKU-2  ', 'tags' => ['  beta  ']]],
+                    ],
+                ],
+            ],
+        ]);
+
+        $middleware = new class extends TrimStrings
+        {
+            protected $except = [
+                'users.*.name',
+                'orders.*.items.*.meta.title',
+                'orders.*.items.*.meta.tags.*',
+            ];
+        };
+
+        $middleware->handle($request, function ($req) {
+            $this->assertSame('  foo  ', $req->input('users.0.name'));
+            $this->assertSame('  bar  ', $req->input('users.1.name'));
+            $this->assertSame('admin', $req->input('users.0.role'));
+            $this->assertSame('editor', $req->input('users.1.role'));
+            $this->assertSame('team', $req->input('teams.0.name'));
+            $this->assertSame('  foo  ', $req->input('orders.0.items.0.meta.title'));
+            $this->assertSame('SKU-1', $req->input('orders.0.items.0.meta.sku'));
+            $this->assertSame('  alpha  ', $req->input('orders.0.items.0.meta.tags.0'));
+
+            $this->assertSame('  bar  ', $req->input('orders.1.items.0.meta.title'));
+            $this->assertSame('SKU-2', $req->input('orders.1.items.0.meta.sku'));
+            $this->assertSame('  beta  ', $req->input('orders.1.items.0.meta.tags.0'));
+        });
+    }
 }

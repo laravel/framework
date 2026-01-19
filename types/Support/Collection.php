@@ -526,24 +526,33 @@ assertType('Illuminate\Support\Collection<string, int>', $collection::make(['str
 
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name'));
 assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy('name', true));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, mixed>>', $collection->groupBy(['name', 'email']));
 assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<int, User>>', $collection->groupBy(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return 'foo';
 }));
+assertType('Illuminate\Support\Collection<int, Illuminate\Support\Collection<int, User>>', $collection->groupBy(static fn ($user) => 0));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy(static fn ($user) => Digit::One));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy(static fn ($user) => NamedDigit::One));
+assertType('Illuminate\Support\Collection<(int|string), Illuminate\Support\Collection<int, User>>', $collection->groupBy(static fn ($user) => NumberedDigit::One));
 
-assertType('Illuminate\Support\Collection<string, Illuminate\Support\Collection<string, User>>', $collection->keyBy(fn () => '')->groupBy(function ($user) {
+assertType("Illuminate\Support\Collection<string, Illuminate\Support\Collection<'bar', User>>", $collection->keyBy(fn ($user) => 'bar')->groupBy(function ($user) {
     return 'foo';
 }, preserveKeys: true));
 
 assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy('name'));
-assertType('Illuminate\Support\Collection<string, User>', $collection->keyBy(function ($user, $int) {
+assertType("Illuminate\Support\Collection<'foo', User>", $collection->keyBy(function ($user, $int) {
     assertType('User', $user);
     assertType('int', $int);
 
     return 'foo';
 }));
+assertType("Illuminate\Support\Collection<0, User>", $collection->keyBy(static fn ($user): int => 0));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(static fn ($user) => Digit::One));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(static fn ($user) => NamedDigit::One));
+assertType('Illuminate\Support\Collection<(int|string), User>', $collection->keyBy(static fn ($user) => NumberedDigit::One));
 
 assertType('bool', $collection->has(0));
 assertType('bool', $collection->has([0, 1]));
@@ -636,6 +645,9 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User
 
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->merge(['string']));
+
+assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->merge(['string']));
+assertType('Illuminate\Support\Collection<int, int|string>', $collection->make(['string'])->merge([1]));
 
 assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->mergeRecursive([2 => 'string']));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->mergeRecursive(['string']));
@@ -967,6 +979,10 @@ assertType('Illuminate\Support\Collection<int, int|User>', $collection->pad(2, 0
 assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([1])->countBy());
 assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make(['string' => 'string'])->countBy('string'));
 assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy('email'));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy(static fn ($user) => 'email'));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy(static fn ($user) => 0));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy(static fn ($user) => Digit::One));
+assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make([new User])->countBy(static fn ($user) => NamedDigit::One));
 assertType('Illuminate\Support\Collection<(int|string), int>', $collection->make(['string'])->countBy(function ($string, $int) {
     assertType('string', $string);
     assertType('int', $int);
@@ -1173,3 +1189,24 @@ assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->unless);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->until);
 assertType('Illuminate\Support\HigherOrderCollectionProxy<int, Animal>', $coll->when);
+
+enum Digit
+{
+    case One;
+    case Two;
+    case Three;
+}
+
+enum NamedDigit: string
+{
+    case One = 'one';
+    case Two = 'two';
+    case Three = 'three';
+}
+
+enum NumberedDigit: int
+{
+    case One = 1;
+    case Two = 2;
+    case Three = 3;
+}

@@ -10,7 +10,7 @@ class Ask extends Component
      * Renders the component using the given arguments.
      *
      * @param  string  $question
-     * @param  string  $default
+     * @param  string|null  $default
      * @param  bool  $multiline
      * @return mixed
      */

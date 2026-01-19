@@ -302,6 +302,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  string  $tag
      * @return void
+     *
+     * @throws \Illuminate\Contracts\Encryption\DecryptException
      */
     protected function ensureTagIsValid($tag)
     {
@@ -322,6 +324,30 @@ class Encrypter implements EncrypterContract, StringEncrypter
     protected function shouldValidateMac()
     {
         return ! self::$supportedCiphers[strtolower($this->cipher)]['aead'];
+    }
+
+    /**
+     * Determine if the given value appears to be encrypted by this encrypter.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function appearsEncrypted($value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $decoded = base64_decode($value, true);
+
+        if ($decoded === false) {
+            return false;
+        }
+
+        $payload = json_decode($decoded, true);
+
+        return is_array($payload)
+            && isset($payload['iv'], $payload['value'], $payload['mac']);
     }
 
     /**
@@ -359,6 +385,8 @@ class Encrypter implements EncrypterContract, StringEncrypter
      *
      * @param  array  $keys
      * @return $this
+     *
+     * @throws \RuntimeException
      */
     public function previousKeys(array $keys)
     {

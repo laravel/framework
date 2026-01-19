@@ -2,6 +2,7 @@
 
 namespace Illuminate\Session\Middleware;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -48,9 +49,10 @@ class AuthenticateSession implements AuthenticatesSessions
         }
 
         if ($this->guard()->viaRemember()) {
-            $passwordHash = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
+            $passwordHashFromCookie = explode('|', $request->cookies->get($this->guard()->getRecallerName()))[2] ?? null;
 
-            if (! $passwordHash || ! hash_equals($request->user()->getAuthPassword(), $passwordHash)) {
+            if (! $passwordHashFromCookie ||
+                ! $this->validatePasswordHash($request->user()->getAuthPassword(), $passwordHashFromCookie)) {
                 $this->logout($request);
             }
         }
@@ -59,7 +61,9 @@ class AuthenticateSession implements AuthenticatesSessions
             $this->storePasswordHashInSession($request);
         }
 
-        if (! hash_equals($request->session()->get('password_hash_'.$this->auth->getDefaultDriver()), $request->user()->getAuthPassword())) {
+        $sessionPasswordHash = $request->session()->get('password_hash_'.$this->auth->getDefaultDriver());
+
+        if (! $this->validatePasswordHash($request->user()->getAuthPassword(), $sessionPasswordHash)) {
             $this->logout($request);
         }
 
@@ -82,9 +86,34 @@ class AuthenticateSession implements AuthenticatesSessions
             return;
         }
 
+        $passwordHash = $request->user()->getAuthPassword();
+
+        try {
+            $passwordHash = $this->guard()->hashPasswordForCookie($passwordHash);
+        } catch (BadMethodCallException) {
+        }
+
         $request->session()->put([
-            'password_hash_'.$this->auth->getDefaultDriver() => $request->user()->getAuthPassword(),
+            'password_hash_'.$this->auth->getDefaultDriver() => $passwordHash,
         ]);
+    }
+
+    /**
+     * Validate the password hash against the stored value.
+     *
+     * @param  string  $passwordHash
+     * @param  string  $storedValue
+     * @return bool
+     */
+    protected function validatePasswordHash($passwordHash, $storedValue)
+    {
+        try {
+            // Try new HMAC format first, then fall back to raw password hash format for backward compatibility
+            return hash_equals($this->guard()->hashPasswordForCookie($passwordHash), $storedValue)
+                || hash_equals($passwordHash, $storedValue);
+        } catch (BadMethodCallException) {
+            return hash_equals($passwordHash, $storedValue);
+        }
     }
 
     /**

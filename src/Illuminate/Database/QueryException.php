@@ -31,20 +31,38 @@ class QueryException extends PDOException
     protected $bindings;
 
     /**
+     * The PDO read / write type for the executed query.
+     *
+     * @var null|'read'|'write'
+     */
+    public $readWriteType;
+
+    /**
+     * The connection details for the query (host, port, database, etc.).
+     *
+     * @var array
+     */
+    protected $connectionDetails = [];
+
+    /**
      * Create a new query exception instance.
      *
      * @param  string  $connectionName
      * @param  string  $sql
      * @param  array  $bindings
      * @param  \Throwable  $previous
+     * @param  null|'read'|'write'  $readWriteType
+     * @param  array  $connectionDetails
      */
-    public function __construct($connectionName, $sql, array $bindings, Throwable $previous)
+    public function __construct($connectionName, $sql, array $bindings, Throwable $previous, array $connectionDetails = [], $readWriteType = null)
     {
         parent::__construct('', 0, $previous);
 
         $this->connectionName = $connectionName;
         $this->sql = $sql;
         $this->bindings = $bindings;
+        $this->connectionDetails = $connectionDetails;
+        $this->readWriteType = $readWriteType;
         $this->code = $previous->getCode();
         $this->message = $this->formatMessage($connectionName, $sql, $bindings, $previous);
 
@@ -64,7 +82,40 @@ class QueryException extends PDOException
      */
     protected function formatMessage($connectionName, $sql, $bindings, Throwable $previous)
     {
-        return $previous->getMessage().' (Connection: '.$connectionName.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+        $details = $this->formatConnectionDetails();
+
+        return $previous->getMessage().' (Connection: '.$connectionName.$details.', SQL: '.Str::replaceArray('?', $bindings, $sql).')';
+    }
+
+    /**
+     * Format the connection details for the error message.
+     *
+     * @return string
+     */
+    protected function formatConnectionDetails()
+    {
+        if (empty($this->connectionDetails)) {
+            return '';
+        }
+
+        $driver = $this->connectionDetails['driver'] ?? '';
+
+        $segments = [];
+
+        if ($driver !== 'sqlite') {
+            if (! empty($this->connectionDetails['unix_socket'])) {
+                $segments[] = 'Socket: '.$this->connectionDetails['unix_socket'];
+            } else {
+                $host = $this->connectionDetails['host'] ?? '';
+
+                $segments[] = 'Host: '.(is_array($host) ? implode(', ', $host) : $host);
+                $segments[] = 'Port: '.($this->connectionDetails['port'] ?? '');
+            }
+        }
+
+        $segments[] = 'Database: '.($this->connectionDetails['database'] ?? '');
+
+        return ', '.implode(', ', $segments);
     }
 
     /**
@@ -105,5 +156,15 @@ class QueryException extends PDOException
     public function getBindings()
     {
         return $this->bindings;
+    }
+
+    /**
+     * Get information about the connection such as host, port, database, etc.
+     *
+     * @return array
+     */
+    public function getConnectionDetails()
+    {
+        return $this->connectionDetails;
     }
 }

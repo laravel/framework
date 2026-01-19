@@ -269,7 +269,7 @@ trait InteractsWithData
      */
     public function integer($key, $default = 0)
     {
-        return intval($this->data($key, $default));
+        return (int) $this->data($key, $default);
     }
 
     /**
@@ -281,7 +281,7 @@ trait InteractsWithData
      */
     public function float($key, $default = 0.0)
     {
-        return floatval($this->data($key, $default));
+        return (float) $this->data($key, $default);
     }
 
     /**

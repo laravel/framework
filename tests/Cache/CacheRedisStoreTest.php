@@ -9,11 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $redis = $this->getRedis();

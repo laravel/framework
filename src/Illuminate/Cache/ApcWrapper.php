@@ -23,7 +23,7 @@ class ApcWrapper
      * @param  string  $key
      * @param  mixed  $value
      * @param  int  $seconds
-     * @return array|bool
+     * @return bool
      */
     public function put($key, $value, $seconds)
     {
@@ -34,8 +34,8 @@ class ApcWrapper
      * Increment the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function increment($key, $value)
     {
@@ -46,8 +46,8 @@ class ApcWrapper
      * Decrement the value of an item in the cache.
      *
      * @param  string  $key
-     * @param  mixed  $value
-     * @return int|bool
+     * @param  int  $value
+     * @return int|false
      */
     public function decrement($key, $value)
     {

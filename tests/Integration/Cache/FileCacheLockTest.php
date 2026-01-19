@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Sleep;
 use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\TestCase;
+use Throwable;
 
 #[WithConfig('cache.default', 'file')]
 class FileCacheLockTest extends TestCase
@@ -100,6 +101,18 @@ class FileCacheLockTest extends TestCase
         $this->assertTrue($secondLock->isOwnedByCurrentProcess());
     }
 
+    public function testCacheRememberReturnsValueWhenLockWithSameKeyExists()
+    {
+        $lock = Cache::lock('my-key', 5);
+        $this->assertTrue($lock->get());
+
+        $value = Cache::remember('my-key', 60, fn () => 'expected-value');
+
+        $this->assertSame('expected-value', $value);
+
+        $lock->release();
+    }
+
     public function testOtherOwnerDoesNotOwnLockAfterRestore()
     {
         $firstLock = Cache::lock('foo', 10);
@@ -122,5 +135,15 @@ class FileCacheLockTest extends TestCase
         // try to get lock and hit block timeout
         $this->expectException(LockTimeoutException::class);
         Cache::lock('foo', 10)->block(5);
+    }
+
+    protected function tearDown(): void
+    {
+        try {
+            Cache::lock('foo')->forceRelease();
+        } catch (Throwable) {
+        }
+
+        parent::tearDown();
     }
 }

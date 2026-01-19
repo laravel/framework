@@ -44,7 +44,7 @@ trait InteractsWithIO
     protected $verbosity = OutputInterface::VERBOSITY_NORMAL;
 
     /**
-     * The mapping between human readable verbosity levels and Symfony's OutputInterface.
+     * The mapping between human-readable verbosity levels and Symfony's OutputInterface.
      *
      * @var array
      */
@@ -430,6 +430,8 @@ trait InteractsWithIO
      */
     protected function parseVerbosity($level = null)
     {
+        $level ??= '';
+
         if (isset($this->verbosityMap[$level])) {
             $level = $this->verbosityMap[$level];
         } elseif (! is_int($level)) {

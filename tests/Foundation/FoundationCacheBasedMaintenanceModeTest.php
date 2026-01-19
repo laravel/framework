@@ -5,14 +5,11 @@ namespace Illuminate\Tests\Foundation;
 use Illuminate\Contracts\Cache\Factory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\CacheBasedMaintenanceMode;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class FoundationCacheBasedMaintenanceModeTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
-
     public function test_it_determines_whether_maintenance_mode_is_active()
     {
         $cache = m::mock(Factory::class, Repository::class);

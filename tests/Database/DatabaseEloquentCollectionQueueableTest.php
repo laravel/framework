@@ -10,11 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentCollectionQueueableTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSerializesPivotsEntitiesId()
     {
         $spy = m::spy(Pivot::class);

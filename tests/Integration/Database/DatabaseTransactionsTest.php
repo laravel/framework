@@ -105,6 +105,31 @@ class DatabaseTransactionsTest extends DatabaseTestCase
         $this->assertTrue($secondObject->ran);
         $this->assertFalse($thirdObject->ran);
     }
+
+    public function testAfterRollbackCallbacksAreExecuted()
+    {
+        $afterCommitRan = false;
+        $afterRollbackRan = false;
+
+        try {
+            DB::transaction(function () use (&$afterCommitRan, &$afterRollbackRan) {
+                DB::afterCommit(function () use (&$afterCommitRan) {
+                    $afterCommitRan = true;
+                });
+
+                DB::afterRollBack(function () use (&$afterRollbackRan) {
+                    $afterRollbackRan = true;
+                });
+
+                throw new \RuntimeException('rollback');
+            });
+        } catch (\RuntimeException) {
+            // Ignore the expected rollback exception.
+        }
+
+        $this->assertFalse($afterCommitRan);
+        $this->assertTrue($afterRollbackRan);
+    }
 }
 
 class TestObjectForTransactions

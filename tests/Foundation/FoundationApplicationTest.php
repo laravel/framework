@@ -16,20 +16,19 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FoundationApplicationTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;
+
         $app['config'] = $config = m::mock(stdClass::class);
+        $config->shouldReceive('get')->once()->with('app.locale')->andReturn('bar');
         $config->shouldReceive('set')->once()->with('app.locale', 'foo');
         $app['translator'] = $trans = m::mock(stdClass::class);
         $trans->shouldReceive('setLocale')->once()->with('foo');
         $app['events'] = $events = m::mock(stdClass::class);
-        $events->shouldReceive('dispatch')->once()->with(m::type(LocaleUpdated::class));
+        $events->shouldReceive('dispatch')->once()->with(m::on(function (LocaleUpdated $event) {
+            return $event->locale === 'foo' && $event->previousLocale === 'bar';
+        }));
 
         $app->setLocale('foo');
     }
@@ -609,6 +608,58 @@ class FoundationApplicationTest extends TestCase
             $this->assertSame(['X-FOO' => 'BAR'], $exception->getHeaders());
         }
     }
+
+    public function test_routes_are_cached()
+    {
+        $app = new Application();
+        $app->instance('routes.cached', true);
+        $this->assertTrue($app->routesAreCached());
+    }
+
+    public function test_routes_are_not_cached_by_instance_falls_back_to_file()
+    {
+        $app = new Application();
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->routesAreCached());
+        $this->assertStringContainsString('routes-v7.php', $files->pathRequested);
+    }
+
+    public function test_events_are_cached_uses_container_instance()
+    {
+        $app = new Application();
+        $app->instance('events.cached', true);
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertTrue($app->eventsAreCached());
+        $this->assertFalse(isset($files->pathRequested));
+    }
+
+    public function test_events_are_cached_checks_filesystem_if_not_set()
+    {
+        $app = new Application();
+        $files = new FileExistsFake;
+        $app->instance('files', $files);
+
+        $this->assertFalse($app->eventsAreCached());
+        $this->assertStringContainsString('events.php', $files->pathRequested);
+        $this->assertTrue($app->bound('events.cached'));
+        $this->assertFalse($app->make('events.cached'));
+    }
+
+    public function testCoreContainerAliasesAreRegisteredByDefault(): void
+    {
+        $app = new Application();
+
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertSame('translator', $app->getAlias(\Illuminate\Contracts\Translation\Translator::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertSame('auth.password', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBrokerFactory::class));
+        $this->assertTrue($app->isAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
+        $this->assertSame('auth.password.broker', $app->getAlias(\Illuminate\Contracts\Auth\PasswordBroker::class));
+    }
 }
 
 class ApplicationBasicServiceProviderStub extends ServiceProvider
@@ -741,5 +792,17 @@ class ConcreteTerminator
     public function terminate()
     {
         return self::$counter++;
+    }
+}
+
+class FileExistsFake
+{
+    public string $pathRequested;
+
+    public function exists(string $path): bool
+    {
+        $this->pathRequested = $path;
+
+        return false;
     }
 }

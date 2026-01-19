@@ -20,7 +20,7 @@ class DatabaseEloquentMorphTest extends TestCase
     {
         Relation::morphMap([], false);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testMorphOneSetsProperConstraints()
