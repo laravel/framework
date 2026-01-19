@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\MaintenanceMode;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\TrimStrings;
 use Illuminate\Http\Middleware\TrustHosts;
@@ -30,6 +31,7 @@ class MiddlewareTest extends TestCase
         Container::setInstance(null);
         ConvertEmptyStringsToNull::flushState();
         EncryptCookies::flushState();
+        PreventRequestForgery::flushState();
         PreventRequestsDuringMaintenance::flushState();
         TrimStrings::flushState();
         TrustProxies::flushState();
@@ -279,5 +281,28 @@ class MiddlewareTest extends TestCase
 
         $configuration->preventRequestsDuringMaintenance(['metrics/*']);
         $this->assertTrue($method->invoke($middleware, $request));
+    }
+
+    public function testPreventRequestForgery()
+    {
+        $configuration = new Middleware();
+        $middleware = new PreventRequestForgery(
+            Mockery::mock(Application::class),
+            Mockery::mock(Encrypter::class)
+        );
+
+        $this->assertSame([], $middleware->getExcludedPaths());
+
+        $configuration->preventRequestForgery(
+            except: ['/webhook', '/api/*'],
+            originOnly: true,
+            allowSameSite: true
+        );
+
+        $this->assertSame(['/webhook', '/api/*'], $middleware->getExcludedPaths());
+
+        $reflection = new ReflectionClass(PreventRequestForgery::class);
+        $this->assertTrue($reflection->getStaticPropertyValue('originOnly'));
+        $this->assertTrue($reflection->getStaticPropertyValue('allowSameSite'));
     }
 }
