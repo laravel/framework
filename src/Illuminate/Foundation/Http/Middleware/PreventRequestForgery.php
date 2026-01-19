@@ -18,8 +18,8 @@ use Symfony\Component\HttpFoundation\Cookie;
 
 class PreventRequestForgery
 {
-    use InteractsWithTime,
-        ExcludesPaths;
+    use ExcludesPaths,
+        InteractsWithTime;
 
     /**
      * The application instance.
@@ -130,16 +130,6 @@ class PreventRequestForgery
     protected function runningUnitTests()
     {
         return $this->app->runningInConsole() && $this->app->runningUnitTests();
-    }
-
-    /**
-     * Get the URIs that should be excluded.
-     *
-     * @return array
-     */
-    public function getExcludedPaths()
-    {
-        return array_merge($this->except, static::$neverVerify);
     }
 
     /**
@@ -295,6 +285,16 @@ class PreventRequestForgery
     public static function useOriginOnly($originOnly = true)
     {
         static::$originOnly = $originOnly;
+    }
+
+    /**
+     * Get the URIs that should be excluded.
+     *
+     * @return array
+     */
+    public function getExcludedPaths()
+    {
+        return array_merge($this->except, static::$neverVerify);
     }
 
     /**
