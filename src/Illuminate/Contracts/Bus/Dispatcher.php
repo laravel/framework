@@ -13,7 +13,7 @@ interface Dispatcher
     public function dispatch($command);
 
     /**
-     * Dispatch a command to its appropriate handler after the current process.
+     * Dispatch a command to its appropriate handler after the current process
      *
      * @param  mixed  $command
      * @param  mixed  $handler
