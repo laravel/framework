@@ -389,7 +389,6 @@ class BusBatchTest extends TestCase
         $this->assertTrue($batch->jobs->contains($secondJob));
     }
 
-
     public function test_failure_callbacks_execute_correctly(): void
     {
         $queue = m::mock(Factory::class);
