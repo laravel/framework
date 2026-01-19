@@ -7,7 +7,7 @@ class GateEvaluated
     /**
      * The authenticatable model.
      *
-     * @var \Illuminate\Contracts\Auth\Authenticatable|null
+     * @var \Illuminate\Contracts\Auth\Identity\Identifiable|null
      */
     public $user;
 
@@ -35,7 +35,7 @@ class GateEvaluated
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable|null  $user
      * @param  string  $ability
      * @param  bool|null  $result
      * @param  array  $arguments

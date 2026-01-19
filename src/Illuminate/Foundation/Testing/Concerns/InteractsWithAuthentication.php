@@ -2,14 +2,14 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable as UserContract;
 
 trait InteractsWithAuthentication
 {
     /**
      * Set the currently logged in user for the application.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable  $user
      * @param  string|null  $guard
      * @return $this
      */
@@ -36,7 +36,7 @@ trait InteractsWithAuthentication
     /**
      * Set the currently logged in user for the application.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable  $user
      * @param  string|null  $guard
      * @return $this
      */
@@ -93,7 +93,7 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated as the given user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable  $user
      * @param  string|null  $guard
      * @return $this
      */

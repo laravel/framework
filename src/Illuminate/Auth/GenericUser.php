@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable as UserContract;
 
 class GenericUser implements UserContract
 {
@@ -41,6 +41,16 @@ class GenericUser implements UserContract
     public function getAuthIdentifier()
     {
         return $this->attributes[$this->getAuthIdentifierName()];
+    }
+
+    /**
+     * Get the unique broadcast identifier for the user.
+     *
+     * @return mixed
+     */
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return $this->getAuthIdentifier();
     }
 
     /**

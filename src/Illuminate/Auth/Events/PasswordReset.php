@@ -11,7 +11,7 @@ class PasswordReset
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The user.
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user  The user.
      */
     public function __construct(
         public $user,

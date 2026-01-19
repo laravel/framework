@@ -21,8 +21,8 @@ use Illuminate\Container\Attributes\Storage;
 use Illuminate\Container\Attributes\Tag;
 use Illuminate\Container\Container;
 use Illuminate\Container\RewindableGenerator;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Guard as GuardContract;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable as StatefulIdentifiableContract;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Connection;
@@ -140,13 +140,13 @@ class ContextualAttributeBindingTest extends TestCase
             $manager->shouldReceive('userResolver')->andReturn(fn ($guard = null) => $manager->guard($guard)->user());
             $manager->shouldReceive('guard')->with('foo')->andReturnUsing(function () {
                 $guard = m::mock(GuardContract::class);
-                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard->shouldReceive('user')->andReturn(m:mock(StatefulIdentifiableContract::class));
 
                 return $guard;
             });
             $manager->shouldReceive('guard')->with('bar')->andReturnUsing(function () {
                 $guard = m::mock(GuardContract::class);
-                $guard->shouldReceive('user')->andReturn(m:mock(AuthenticatableContract::class));
+                $guard->shouldReceive('user')->andReturn(m:mock(StatefulIdentifiableContract::class));
 
                 return $guard;
             });
@@ -472,7 +472,7 @@ final class ComplexDependency implements ContainerTestContract
 
 final class AuthedTest
 {
-    public function __construct(#[Authenticated('foo')] AuthenticatableContract $foo, #[CurrentUser('bar')] AuthenticatableContract $bar)
+    public function __construct(#[Authenticated('foo')] StatefulIdentifiableContract $foo, #[CurrentUser('bar')] StatefulIdentifiableContract $bar)
     {
     }
 }

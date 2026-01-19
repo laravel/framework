@@ -17,7 +17,7 @@ trait CreatesUserProviders
      * Create the user provider implementation for the driver.
      *
      * @param  string|null  $provider
-     * @return \Illuminate\Contracts\Auth\UserProvider|null
+     * @return \Illuminate\Contracts\Auth\Providers\StatefulUserProvider|null
      *
      * @throws \InvalidArgumentException
      */

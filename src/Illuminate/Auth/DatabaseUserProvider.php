@@ -3,13 +3,20 @@
 namespace Illuminate\Auth;
 
 use Closure;
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
+use Illuminate\Contracts\Auth\Identity\HasPassword;
+use Illuminate\Contracts\Auth\Identity\Identifiable as UserContract;
+use Illuminate\Contracts\Auth\Identity\Rememberable;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use InvalidArgumentException;
 
-class DatabaseUserProvider implements UserProvider
+/**
+ * @implements StatefulUserProvider<StatefulIdentifiable>
+ */
+class DatabaseUserProvider implements StatefulUserProvider
 {
     /**
      * The active database connection.
@@ -50,7 +57,7 @@ class DatabaseUserProvider implements UserProvider
      * Retrieve a user by their unique identifier.
      *
      * @param  mixed  $identifier
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable|null
      */
     public function retrieveById($identifier)
     {
@@ -64,7 +71,7 @@ class DatabaseUserProvider implements UserProvider
      *
      * @param  mixed  $identifier
      * @param  string  $token
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable|null
      */
     public function retrieveByToken($identifier, #[\SensitiveParameter] $token)
     {
@@ -80,12 +87,18 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Update the "remember me" token for the given user in storage.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @param  string  $token
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function updateRememberToken(UserContract $user, #[\SensitiveParameter] $token)
     {
+        if (! $user instanceof Rememberable) {
+            throw new InvalidArgumentException('The user must implement the '.Rememberable::class.' contract to update the remember token.');
+        }
+
         $this->connection->table($this->table)
             ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
             ->update([$user->getRememberTokenName() => $token]);
@@ -95,7 +108,7 @@ class DatabaseUserProvider implements UserProvider
      * Retrieve a user by the given credentials.
      *
      * @param  array  $credentials
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable|null
      */
     public function retrieveByCredentials(#[\SensitiveParameter] array $credentials)
     {
@@ -148,12 +161,18 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Validate a user against the given credentials.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @param  array  $credentials
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function validateCredentials(UserContract $user, #[\SensitiveParameter] array $credentials)
     {
+        if (! $user instanceof HasPassword) {
+            throw new InvalidArgumentException('The user must implement the '.HasPassword::class.' contract to validate credentials.');
+        }
+
         if (is_null($plain = $credentials['password'])) {
             return false;
         }
@@ -168,13 +187,19 @@ class DatabaseUserProvider implements UserProvider
     /**
      * Rehash the user's password if required and supported.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @param  array  $credentials
      * @param  bool  $force
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function rehashPasswordIfRequired(UserContract $user, #[\SensitiveParameter] array $credentials, bool $force = false)
     {
+        if (! $user instanceof HasPassword) {
+            throw new InvalidArgumentException('The user must implement the '.HasPassword::class.' contract to rehash their password.');
+        }
+
         if (! $this->hasher->needsRehash($user->getAuthPassword()) && ! $force) {
             return;
         }

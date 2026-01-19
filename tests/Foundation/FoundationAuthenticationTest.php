@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Foundation;
 
 use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 use Mockery as m;
@@ -76,7 +76,7 @@ class FoundationAuthenticationTest extends TestCase
 
     public function testAssertAuthenticatedAs()
     {
-        $expected = m::mock(Authenticatable::class);
+        $expected = m::mock(StatefulIdentifiable::class);
         $expected->shouldReceive('getAuthIdentifier')
             ->andReturn('1');
 
@@ -85,7 +85,7 @@ class FoundationAuthenticationTest extends TestCase
             ->once()
             ->andReturn($expected);
 
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthIdentifier')
             ->andReturn('1');
 
@@ -94,9 +94,9 @@ class FoundationAuthenticationTest extends TestCase
 
     protected function setupProvider(array $credentials)
     {
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
 
-        $provider = m::mock(UserProvider::class);
+        $provider = m::mock(StatefulUserProvider::class);
 
         $provider->shouldReceive('retrieveByCredentials')
             ->with($credentials)

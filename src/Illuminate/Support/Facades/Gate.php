@@ -24,7 +24,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
  * @method static mixed getPolicyFor(object|string $class)
  * @method static \Illuminate\Auth\Access\Gate guessPolicyNamesUsing(callable $callback)
  * @method static mixed resolvePolicy(object|string $class)
- * @method static \Illuminate\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Authenticatable|mixed $user)
+ * @method static \Illuminate\Auth\Access\Gate forUser(\Illuminate\Contracts\Auth\Identity\Identifiable|mixed $user)
  * @method static array abilities()
  * @method static array policies()
  * @method static \Illuminate\Auth\Access\Gate defaultDenialResponse(\Illuminate\Auth\Access\Response $response)

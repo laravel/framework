@@ -7,8 +7,8 @@ use DateTime;
 use DateTimeImmutable;
 use Egulias\EmailValidator\Validation\NoRFCWarningsValidation;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Contracts\Validation\DataAwareRule;
@@ -1314,7 +1314,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         // Fails when password is incorrect.
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword');
 
         $auth = m::mock(Guard::class);
@@ -1338,7 +1338,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         // Succeeds when password is correct.
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword');
 
         $auth = m::mock(Guard::class);
@@ -1362,7 +1362,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         // We can use a specific guard.
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword');
 
         $auth = m::mock(Guard::class);

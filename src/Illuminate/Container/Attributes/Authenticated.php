@@ -21,7 +21,7 @@ class Authenticated implements ContextualAttribute
      *
      * @param  self  $attribute
      * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|null
      */
     public static function resolve(self $attribute, Container $container)
     {

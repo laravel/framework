@@ -4,6 +4,8 @@ namespace Illuminate\Auth;
 
 use Closure;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
+use Illuminate\Contracts\Auth\Identity\Identifiable;
+use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 /**
@@ -89,15 +91,13 @@ class AuthManager implements FactoryContract
             return $this->callCustomCreator($name, $config);
         }
 
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($name, $config);
-        }
-
-        throw new InvalidArgumentException(
-            "Auth driver [{$config['driver']}] for guard [{$name}] is not defined."
-        );
+        return match ($config['driver']) {
+            'session' => $this->createSessionDriver($name, $config),
+            'token' => $this->createTokenDriver($name, $config),
+            default => throw new InvalidArgumentException(
+                "Auth driver [{$config['driver']}] for guard [{$name}] is not defined."
+            ),
+        };
     }
 
     /**
@@ -221,7 +221,7 @@ class AuthManager implements FactoryContract
      * Register a new callback based request guard.
      *
      * @param  string  $driver
-     * @param  callable  $callback
+     * @param  callable(Request):Identifiable  $callback
      * @return $this
      */
     public function viaRequest($driver, callable $callback)

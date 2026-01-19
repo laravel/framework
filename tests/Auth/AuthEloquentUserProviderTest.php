@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
 use Illuminate\Contracts\Hashing\Hasher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -133,7 +133,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -145,7 +145,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -157,7 +157,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->never();
         $provider = new EloquentUserProvider($hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -170,7 +170,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(true);
         $hasher->shouldReceive('make')->once()->with('plain')->andReturn('rehashed');
 
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $user->shouldReceive('getAuthPasswordName')->once()->andReturn('password_attribute');
         $user->shouldReceive('forceFill')->once()->with(['password_attribute' => 'rehashed'])->andReturnSelf();
@@ -186,7 +186,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $hasher->shouldReceive('needsRehash')->once()->with('hash')->andReturn(false);
         $hasher->shouldNotReceive('make');
 
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $user->shouldNotReceive('getAuthPasswordName');
         $user->shouldNotReceive('forceFill');
@@ -227,6 +227,60 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertSame($callback, $provider->getQueryCallback());
     }
 
+    public function testUpdateRememberTokenRequiresRememberableContract(): void
+    {
+        // Arrange
+
+        $hasher = m::mock(Hasher::class);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = new EloquentProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\Rememberable contract to update the remember token.');
+
+        // Act
+
+        $provider->updateRememberToken($user, 'token');
+    }
+
+    public function testValidateCredentialsRequiresHasAuthPasswordContract(): void
+    {
+        // Arrange
+
+        $hasher = m::mock(Hasher::class);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = new EloquentProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\HasPassword contract to validate credentials.');
+
+        // Act
+
+        $provider->validateCredentials($user, ['password' => 'secret']);
+    }
+
+    public function testRehashPasswordRequiresHasAuthPasswordContract(): void
+    {
+        // Arrange
+
+        $hasher = m::mock(Hasher::class);
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = new EloquentProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\HasPassword contract to rehash their password.');
+
+        // Act
+
+        $provider->rehashPasswordIfRequired($user, ['password' => 'secret'], true);
+    }
+
     protected function getProviderMock()
     {
         $hasher = m::mock(Hasher::class);
@@ -238,4 +292,22 @@ class AuthEloquentUserProviderTest extends TestCase
 class EloquentProviderUserStub
 {
     //
+}
+
+class EloquentProviderIdentifiableOnlyStub implements \Illuminate\Contracts\Auth\Identity\Identifiable
+{
+    public function getAuthIdentifierName()
+    {
+        return 'id';
+    }
+
+    public function getAuthIdentifier()
+    {
+        return 1;
+    }
+
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return 1;
+    }
 }

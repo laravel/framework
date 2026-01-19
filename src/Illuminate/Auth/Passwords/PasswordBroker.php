@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Auth\Events\PasswordResetLinkSent;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Timebox;
@@ -24,7 +24,7 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * The user provider implementation.
      *
-     * @var \Illuminate\Contracts\Auth\UserProvider
+     * @var \Illuminate\Contracts\Auth\Providers\StatefulUserProvider
      */
     protected $users;
 
@@ -53,17 +53,17 @@ class PasswordBroker implements PasswordBrokerContract
      * Create a new password broker instance.
      *
      * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $users
+     * @param  \Illuminate\Contracts\Auth\Providers\StatefulUserProvider  $users
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  int  $timeboxDuration
      */
     public function __construct(
         #[\SensitiveParameter] TokenRepositoryInterface $tokens,
-        UserProvider $users,
-        ?Dispatcher $dispatcher = null,
-        ?Timebox $timebox = null,
-        int $timeboxDuration = 200000,
+        StatefulUserProvider                            $users,
+        ?Dispatcher                                     $dispatcher = null,
+        ?Timebox                                        $timebox = null,
+        int                                             $timeboxDuration = 200000,
     ) {
         $this->users = $users;
         $this->tokens = $tokens;

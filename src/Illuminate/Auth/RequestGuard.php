@@ -3,36 +3,44 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Identity\Identifiable;
+use Illuminate\Contracts\Auth\Providers\BasicUserProvider;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
+use SensitiveParameter;
 
+/**
+ * @implements Guard<Identifiable>
+ */
 class RequestGuard implements Guard
 {
     use GuardHelpers, Macroable;
 
-    /**
-     * The guard callback.
-     *
-     * @var callable
-     */
     protected $callback;
 
     /**
      * The request instance.
      *
-     * @var \Illuminate\Http\Request
+     * @var Request
      */
     protected $request;
 
     /**
+     * The user provider implementation.
+     */
+    protected ?BasicUserProvider $provider;
+
+    /**
      * Create a new authentication guard.
      *
-     * @param  callable  $callback
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Auth\UserProvider|null  $provider
+     * @param  callable(Request):Identifiable  $callback
+     * @param  Request  $request
+     * @param  StatefulUserProvider|null  $provider
+     * @return void
      */
-    public function __construct(callable $callback, Request $request, ?UserProvider $provider = null)
+    public function __construct(callable $callback, Request $request, ?BasicUserProvider $provider = null)
     {
         $this->request = $request;
         $this->callback = $callback;
@@ -42,7 +50,7 @@ class RequestGuard implements Guard
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Identifiable|null
      */
     public function user()
     {
@@ -53,9 +61,11 @@ class RequestGuard implements Guard
             return $this->user;
         }
 
-        return $this->user = call_user_func(
+        $user = call_user_func(
             $this->callback, $this->request, $this->getProvider()
         );
+
+        return $this->user = $user;
     }
 
     /**
@@ -64,7 +74,7 @@ class RequestGuard implements Guard
      * @param  array  $credentials
      * @return bool
      */
-    public function validate(#[\SensitiveParameter] array $credentials = [])
+    public function validate(#[SensitiveParameter] array $credentials = [])
     {
         return ! is_null((new static(
             $this->callback, $credentials['request'], $this->getProvider()
@@ -72,9 +82,24 @@ class RequestGuard implements Guard
     }
 
     /**
+     * Set the current user.
+     *
+     * @param  Identifiable  $user
+     * @return $this
+     *
+     * @throws InvalidArgumentException
+     */
+    public function setUser(Identifiable $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
      * Set the current request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return $this
      */
     public function setRequest(Request $request)
@@ -82,5 +107,26 @@ class RequestGuard implements Guard
         $this->request = $request;
 
         return $this;
+    }
+
+    /**
+     * Set the user provider used by the guard.
+     *
+     * @param  BasicUserProvider  $provider
+     * @return void
+     */
+    public function setProvider(BasicUserProvider $provider): void
+    {
+        $this->provider = $provider;
+    }
+
+    /**
+     * Get the user provider used by the guard.
+     *
+     * @return BasicUserProvider|null
+     */
+    public function getProvider(): ?BasicUserProvider
+    {
+        return $this->provider;
     }
 }

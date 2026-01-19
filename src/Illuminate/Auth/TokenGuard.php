@@ -3,19 +3,20 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Auth\Identity\Identifiable;
+use Illuminate\Contracts\Auth\Providers\BasicUserProvider;
+use Illuminate\Contracts\Auth\Providers\CredentialsUserProvider;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 
+/**
+ * @implements Guard<Identifiable>
+ */
 class TokenGuard implements Guard
 {
     use GuardHelpers, Macroable;
 
-    /**
-     * The request instance.
-     *
-     * @var \Illuminate\Http\Request
-     */
     protected $request;
 
     /**
@@ -40,20 +41,26 @@ class TokenGuard implements Guard
     protected $hash = false;
 
     /**
+     * The user provider implementation.
+     */
+    protected BasicUserProvider&CredentialsUserProvider $provider;
+
+    /**
      * Create a new authentication guard.
      *
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
+     * @param  \Illuminate\Contracts\Auth\Providers\StatefulUserProvider  $provider
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $inputKey
      * @param  string  $storageKey
      * @param  bool  $hash
+     * @return void
      */
     public function __construct(
-        UserProvider $provider,
-        Request $request,
-        $inputKey = 'api_token',
-        $storageKey = 'api_token',
-        $hash = false,
+        BasicUserProvider&CredentialsUserProvider $provider,
+        Request              $request,
+                             $inputKey = 'api_token',
+                             $storageKey = 'api_token',
+                             $hash = false
     ) {
         $this->hash = $hash;
         $this->request = $request;
@@ -65,7 +72,7 @@ class TokenGuard implements Guard
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return Identifiable|null
      */
     public function user()
     {
@@ -135,6 +142,21 @@ class TokenGuard implements Guard
     }
 
     /**
+     * Set the current user.
+     *
+     * @param  Identifiable  $user
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setUser(Identifiable $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
      * Set the current request instance.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -145,5 +167,26 @@ class TokenGuard implements Guard
         $this->request = $request;
 
         return $this;
+    }
+
+    /**
+     * Set the user provider used by the guard.
+     *
+     * @param  StatefulUserProvider  $provider
+     * @return void
+     */
+    public function setProvider(BasicUserProvider $provider): void
+    {
+        $this->provider = $provider;
+    }
+
+    /**
+     * Get the user provider used by the guard.
+     *
+     * @return BasicUserProvider|null
+     */
+    public function getProvider(): ?BasicUserProvider
+    {
+        return $this->provider;
     }
 }

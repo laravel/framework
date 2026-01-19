@@ -10,10 +10,12 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\OtherDeviceLogout;
 use Illuminate\Auth\Events\Validated;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable as StatefulIdentifiableContract;
+use Illuminate\Contracts\Auth\Identity\Identifiable as IdentifiableContract;
+use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
@@ -27,6 +29,9 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
+/**
+ * @implements StatefulGuard<StatefulIdentifiableContract>
+ */
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
 {
     use GuardHelpers, Macroable;
@@ -43,7 +48,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * The user we last attempted to retrieve.
      *
-     * @var \Illuminate\Contracts\Auth\Authenticatable
+     * @var \Illuminate\Contracts\Auth\Identity\Identifiable
      */
     protected $lastAttempted;
 
@@ -81,6 +86,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @var \Symfony\Component\HttpFoundation\Request
      */
     protected $request;
+
+    /**
+     * The user provider implementation.
+     */
+    protected StatefulUserProvider $provider;
 
     /**
      * The event dispatcher instance.
@@ -128,16 +138,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Create a new authentication guard.
      *
      * @param  string  $name
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
+     * @param  \Illuminate\Contracts\Auth\Providers\StatefulUserProvider  $provider
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  bool  $rehashOnLogin
      * @param  int  $timeboxDuration
+     * @param  string|null  $hashKey
+     * @return void
      */
     public function __construct(
         $name,
-        UserProvider $provider,
+        StatefulUserProvider $provider,
         Session $session,
         ?Request $request = null,
         ?Timebox $timebox = null,
@@ -156,7 +168,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return StatefulIdentifiableContract|null
      */
     public function user()
     {
@@ -279,7 +291,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Log the given user ID into the application without sessions or cookies.
      *
      * @param  mixed  $id
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|false
      */
     public function onceUsingId($id)
     {
@@ -491,10 +503,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Determine if the user should login by executing the given callbacks.
      *
      * @param  array|callable|null  $callbacks
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @return bool
      */
-    protected function shouldLogin($callbacks, AuthenticatableContract $user)
+    protected function shouldLogin($callbacks, StatefulIdentifiableContract $user)
     {
         foreach (Arr::wrap($callbacks) as $callback) {
             if (! $callback($user, $this)) {
@@ -508,11 +520,11 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Rehash the user's password if enabled and required.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable  $user
      * @param  array  $credentials
      * @return void
      */
-    protected function rehashPasswordIfRequired(AuthenticatableContract $user, #[\SensitiveParameter] array $credentials)
+    protected function rehashPasswordIfRequired(StatefulIdentifiableContract $user, #[\SensitiveParameter] array $credentials)
     {
         if ($this->rehashOnLogin) {
             $this->provider->rehashPasswordIfRequired($user, $credentials);
@@ -524,7 +536,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  mixed  $id
      * @param  bool  $remember
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|false
      */
     public function loginUsingId($id, $remember = false)
     {
@@ -540,11 +552,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Log a user into the application.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  StatefulIdentifiableContract  $user
      * @param  bool  $remember
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
-    public function login(AuthenticatableContract $user, $remember = false)
+    public function login(StatefulIdentifiableContract $user, $remember = false)
     {
         $this->updateSession($user->getAuthIdentifier());
 
@@ -581,10 +595,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Create a new "remember me" token for the user if one doesn't already exist.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable&\Illuminate\Contracts\Auth\Identity\Rememberable  $user
      * @return void
      */
-    protected function ensureRememberTokenIsSet(AuthenticatableContract $user)
+    protected function ensureRememberTokenIsSet(StatefulIdentifiableContract $user)
     {
         if (empty($user->getRememberToken())) {
             $this->cycleRememberToken($user);
@@ -594,10 +608,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Queue the recaller cookie into the cookie jar.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable&\Illuminate\Contracts\Auth\Identity\Rememberable&\Illuminate\Contracts\Auth\Identity\HasPassword  $user
      * @return void
      */
-    protected function queueRecallerCookie(AuthenticatableContract $user)
+    protected function queueRecallerCookie(StatefulIdentifiableContract $user)
     {
         $this->getCookieJar()->queue($this->createRecaller(
             $user->getAuthIdentifier().'|'.$user->getRememberToken().'|'.$user->getAuthPassword()
@@ -690,10 +704,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Refresh the "remember me" token for the user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable&\Illuminate\Contracts\Auth\Identity\Rememberable  $user
      * @return void
      */
-    protected function cycleRememberToken(AuthenticatableContract $user)
+    protected function cycleRememberToken(StatefulIdentifiableContract $user)
     {
         $user->setRememberToken($token = Str::random(60));
 
@@ -706,7 +720,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * The application must be using the AuthenticateSession middleware.
      *
      * @param  string  $password
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|null
      *
      * @throws \Illuminate\Auth\AuthenticationException
      */
@@ -732,7 +746,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Rehash the current user's password for logging out other devices via AuthenticateSession.
      *
      * @param  string  $password
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|null
      *
      * @throws \InvalidArgumentException
      */
@@ -775,7 +789,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fires the validated event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @return void
      */
     protected function fireValidatedEvent($user)
@@ -786,7 +800,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fire the login event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @param  bool  $remember
      * @return void
      */
@@ -798,7 +812,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fire the authenticated event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @return void
      */
     protected function fireAuthenticatedEvent($user)
@@ -809,7 +823,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fire the other device logout event if the dispatcher is set.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @return void
      */
     protected function fireOtherDeviceLogoutEvent($user)
@@ -820,7 +834,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Fire the failed authentication attempt event with the given arguments.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable|null  $user
      * @param  array  $credentials
      * @return void
      */
@@ -832,7 +846,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the last user we attempted to authenticate.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable
      */
     public function getLastAttempted()
     {
@@ -953,7 +967,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Return the currently cached user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return \Illuminate\Contracts\Auth\Identity\Identifiable|null
      */
     public function getUser()
     {
@@ -963,11 +977,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
-    public function setUser(AuthenticatableContract $user)
+    public function setUser(IdentifiableContract $user)
     {
+        $this->assertUserType($user);
+
         $this->user = $user;
 
         $this->loggedOut = false;
@@ -1008,5 +1026,43 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     public function getTimebox()
     {
         return $this->timebox;
+    }
+
+    /**
+     * Set the user provider used by the guard.
+     *
+     * @param  StatefulUserProvider  $provider
+     * @return void
+     */
+    public function setProvider(StatefulUserProvider $provider): void
+    {
+        $this->provider = $provider;
+    }
+
+    /**
+     * Get the user provider used by the guard.
+     *
+     * @return StatefulUserProvider
+     */
+    public function getProvider(): StatefulUserProvider
+    {
+        return $this->provider;
+    }
+
+    /**
+     * Assert that the user is of the correct type.
+     *
+     * @param  IdentifiableContract  $user
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function assertUserType(IdentifiableContract $user): void
+    {
+        if ($user instanceof StatefulIdentifiable) {
+            return;
+        }
+
+        throw new InvalidArgumentException('The user must implement the '.StatefulIdentifiable::class.' contract.');
     }
 }

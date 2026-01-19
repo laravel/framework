@@ -2,6 +2,13 @@
 
 namespace Illuminate\Contracts\Auth;
 
+use Illuminate\Contracts\Auth\Identity\Identifiable;
+
+/**
+ * Base user identification capabilities for simple ID grants.
+ *
+ * @template-covariant TUser of Identifiable
+ */
 interface Guard
 {
     /**
@@ -21,7 +28,7 @@ interface Guard
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return TUser|null
      */
     public function user();
 
@@ -50,8 +57,8 @@ interface Guard
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  TUser  $user
      * @return $this
      */
-    public function setUser(Authenticatable $user);
+    public function setUser(Identifiable $user);
 }

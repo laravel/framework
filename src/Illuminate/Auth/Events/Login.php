@@ -12,7 +12,7 @@ class Login
      * Create a new event instance.
      *
      * @param  string  $guard  The authentication guard name.
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  The authenticated user.
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user  The authenticated user.
      * @param  bool  $remember  Indicates if the user should be "remembered".
      */
     public function __construct(

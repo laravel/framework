@@ -136,7 +136,7 @@ interface Gate
     /**
      * Get a guard instance for the given user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable|mixed  $user
      * @return static
      */
     public function forUser($user);

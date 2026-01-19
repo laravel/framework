@@ -12,7 +12,7 @@ class OtherDeviceLogout
      * Create a new event instance.
      *
      * @param  string  $guard  The authentication guard name.
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user  \Illuminate\Contracts\Auth\Authenticatable
+     * @param  \Illuminate\Contracts\Auth\Identity\Identifiable  $user  \Illuminate\Contracts\Auth\Identifiable
      */
     public function __construct(
         public $guard,

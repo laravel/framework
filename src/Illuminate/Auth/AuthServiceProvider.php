@@ -5,7 +5,7 @@ namespace Illuminate\Auth;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\Identity\Identifiable as IdentifiableContract;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\ServiceProvider;
@@ -46,7 +46,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerUserResolver()
     {
-        $this->app->bind(AuthenticatableContract::class, fn ($app) => call_user_func($app['auth']->userResolver()));
+        $this->app->bind(IdentifiableContract::class, fn ($app) => call_user_func($app['auth']->userResolver()));
     }
 
     /**

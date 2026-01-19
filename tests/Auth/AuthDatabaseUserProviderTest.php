@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Illuminate\Auth\DatabaseUserProvider;
 use Illuminate\Auth\GenericUser;
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionInterface;
@@ -155,7 +155,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -168,7 +168,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(false);
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -181,7 +181,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->never();
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn(null);
         $result = $provider->validateCredentials($user, ['password' => 'plain']);
 
@@ -200,7 +200,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $table->shouldReceive('where')->once()->with('id', 1)->andReturnSelf();
         $table->shouldReceive('update')->once()->with(['password_attribute' => 'rehashed']);
 
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
         $user->shouldReceive('getAuthIdentifier')->once()->andReturn(1);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
@@ -222,7 +222,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $table->shouldNotReceive('where');
         $table->shouldNotReceive('update');
 
-        $user = m::mock(Authenticatable::class);
+        $user = m::mock(StatefulIdentifiable::class);
         $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
         $user->shouldNotReceive('getAuthIdentifierName');
         $user->shouldNotReceive('getAuthIdentifier');
@@ -230,5 +230,78 @@ class AuthDatabaseUserProviderTest extends TestCase
 
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $provider->rehashPasswordIfRequired($user, ['password' => 'plain']);
+    }
+
+    public function testUpdateRememberTokenRequiresRememberableContract(): void
+    {
+        // Arrange
+
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = new DatabaseProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\Rememberable contract to update the remember token.');
+
+        // Act
+
+        $provider->updateRememberToken($user, 'token');
+    }
+
+    public function testValidateCredentialsRequiresHasAuthPasswordContract(): void
+    {
+        // Arrange
+
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = new DatabaseProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\HasPassword contract to validate credentials.');
+
+        // Assert
+
+        $provider->validateCredentials($user, ['password' => 'secret']);
+    }
+
+    public function testRehashPasswordRequiresHasAuthPasswordContract()
+    {
+        // Arrange
+
+        $conn = m::mock(Connection::class);
+        $hasher = m::mock(Hasher::class);
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = new DatabaseProviderIdentifiableOnlyStub;
+
+        // Anticipate
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The user must implement the Illuminate\Contracts\Auth\Identity\HasPassword contract to rehash their password.');
+
+        // Act
+
+        $provider->rehashPasswordIfRequired($user, ['password' => 'secret'], true);
+    }
+}
+
+class DatabaseProviderIdentifiableOnlyStub implements \Illuminate\Contracts\Auth\Identity\Identifiable
+{
+    public function getAuthIdentifierName()
+    {
+        return 'id';
+    }
+    public function getAuthIdentifier()
+    {
+        return 1;
+    }
+    public function getAuthIdentifierForBroadcasting()
+    {
+        return 1;
     }
 }

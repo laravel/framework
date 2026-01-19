@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Str;
-
 use function Illuminate\Support\enum_value;
 
 trait AuthorizesRequests
@@ -28,7 +27,7 @@ trait AuthorizesRequests
     /**
      * Authorize a given action for a user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|mixed  $user
+     * @param  \Illuminate\Contracts\Auth\Identity\StatefulIdentifiable|mixed  $user
      * @param  mixed  $ability
      * @param  mixed  $arguments
      * @return \Illuminate\Auth\Access\Response

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Auth;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Auth\Middleware\AuthenticateWithBasicAuth;
 use Illuminate\Auth\RequestGuard;
@@ -13,7 +14,6 @@ use Illuminate\Container\Container;
 use Illuminate\Http\Request;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class AuthenticateMiddlewareTest extends TestCase
 {
@@ -200,7 +200,7 @@ class AuthenticateMiddlewareTest extends TestCase
     protected function createAuthDriver($authenticated)
     {
         return new RequestGuard(function () use ($authenticated) {
-            return $authenticated ? new stdClass : null;
+            return $authenticated ? new GenericUser(['id' => 1]) : null;
         }, m::mock(Request::class), m::mock(EloquentUserProvider::class));
     }
 

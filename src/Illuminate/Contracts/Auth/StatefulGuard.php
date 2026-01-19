@@ -2,6 +2,15 @@
 
 namespace Illuminate\Contracts\Auth;
 
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
+
+/**
+ * Persistent credentials-based authentication (passwords, tokens) authentication.
+ *
+ * @template-covariant TUser of StatefulIdentifiable
+ *
+ * @extends Guard<TUser>
+ */
 interface StatefulGuard extends Guard
 {
     /**
@@ -24,18 +33,18 @@ interface StatefulGuard extends Guard
     /**
      * Log a user into the application.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  TUser  $user
      * @param  bool  $remember
      * @return void
      */
-    public function login(Authenticatable $user, $remember = false);
+    public function login(StatefulIdentifiable $user, $remember = false);
 
     /**
      * Log the given user ID into the application.
      *
      * @param  mixed  $id
      * @param  bool  $remember
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return TUser|false
      */
     public function loginUsingId($id, $remember = false);
 
@@ -43,7 +52,7 @@ interface StatefulGuard extends Guard
      * Log the given user ID into the application without sessions or cookies.
      *
      * @param  mixed  $id
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return TUser|false
      */
     public function onceUsingId($id);
 
