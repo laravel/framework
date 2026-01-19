@@ -207,32 +207,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function loadMissingCount(string|array $relations): self
     {
-        if ($this->isEmpty()) {
-            return $this;
-        }
-
-        if (is_string($relations)) {
-            $relations = func_get_args();
-        }
-
-        foreach ($relations as $key => $value) {
-            $name = is_numeric($key) ? $value : $key;
-
-            $segments = explode(' ', $name);
-
-            // If the relationship has been aliased, we will extract the alias as the attribute
-            // name. Otherwise, we will calculate the default name for the count column
-            // so we can determine if the relationship count is already loaded.
-            $attribute = count($segments) === 3 && Str::lower($segments[1]) === 'as'
-                ? $segments[2]
-                : Str::snake($name).'_count';
-
-            $this
-                ->filter(fn ($model) => $model instanceof Model && ! $model->hasAttribute($attribute))
-                ->loadCount([$key => $value]);
-        }
-
-        return $this;
+        return $this->loadMissingAggregate($relations, '*', 'count');
     }
 
     /**
