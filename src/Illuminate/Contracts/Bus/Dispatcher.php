@@ -4,7 +4,7 @@ namespace Illuminate\Contracts\Bus;
 
 interface Dispatcher
 {
-     /**
+    /**
      * Create a new chain of queueable jobs.
      *
      * @param  \Illuminate\Support\Collection|array|null  $jobs
