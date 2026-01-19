@@ -20,6 +20,13 @@ class Caster
     protected static $globalDateFormat;
 
     /**
+     * The resolved class-based caster instances.
+     *
+     * @var array<string, \Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes>
+     */
+    protected static $resolvedClassCasters = [];
+
+    /**
      * The cast definitions.
      *
      * @var array<string, string|\Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes|class-string>
@@ -39,13 +46,6 @@ class Caster
      * @var array<string, true>
      */
     protected $processedPaths = [];
-
-    /**
-     * The resolved caster instances cache.
-     *
-     * @var array<string|int, \Illuminate\Contracts\Support\CastsValue|\Illuminate\Contracts\Database\Eloquent\CastsAttributes>
-     */
-    protected $resolvedCasters = [];
 
     /**
      * Create a new Caster instance.
@@ -135,7 +135,6 @@ class Caster
     {
         $result = $data;
         $this->processedPaths = [];
-        $this->resolvedCasters = [];
 
         $casts = $this->casts;
 
@@ -257,7 +256,7 @@ class Caster
             $baseCast = Str::before($cast, ':');
 
             if (class_exists($cast) || class_exists($baseCast)) {
-                return $this->resolvedCasters[$cast] ?? ($this->resolvedCasters[$cast] = $this->resolveClassCaster($cast));
+                return static::$resolvedClassCasters[$cast] ?? (static::$resolvedClassCasters[$cast] = $this->resolveClassCaster($cast));
             }
         }
 
@@ -375,5 +374,16 @@ class Caster
         }
 
         return $paths->all();
+    }
+
+    /**
+     * Flush the caster's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$resolvedClassCasters = [];
+        static::$globalDateFormat = null;
     }
 }

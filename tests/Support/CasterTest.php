@@ -35,7 +35,7 @@ class CasterTest extends TestCase
 
         Carbon::setTestNow();
         Date::use(Carbon::class);
-        Caster::useDateFormat(null);
+        Caster::flushState();
         Facade::clearResolvedInstances();
         m::close();
     }

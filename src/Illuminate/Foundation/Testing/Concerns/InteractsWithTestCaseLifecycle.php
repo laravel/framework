@@ -27,6 +27,7 @@ use Illuminate\Mail\Markdown;
 use Illuminate\Queue\Console\WorkCommand;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Caster;
 use Illuminate\Support\EncodedHtmlString;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
@@ -169,6 +170,7 @@ trait InteractsWithTestCaseLifecycle
 
         AboutCommand::flushState();
         Artisan::forgetBootstrappers();
+        Caster::flushState();
         Component::flushCache();
         Component::forgetComponentsResolver();
         Component::forgetFactory();
