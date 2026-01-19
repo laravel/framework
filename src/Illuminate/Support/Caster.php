@@ -357,14 +357,14 @@ class Caster
      */
     protected function expandWildcardPath(array $data, string $pattern)
     {
-        $paths = [''];
+        $results = [''];
 
         foreach (explode('.', $pattern) as $segment) {
-            $expanded = [];
+            $append = [];
 
-            foreach ($paths as $path) {
+            foreach ($results as $path) {
                 if ($segment !== '*') {
-                    $expanded[] = $path === '' ? $segment : "{$path}.{$segment}";
+                    $append[] = $path === '' ? $segment : $path.'.'.$segment;
 
                     continue;
                 }
@@ -373,15 +373,15 @@ class Caster
 
                 if (is_array($current)) {
                     foreach (array_keys($current) as $key) {
-                        $expanded[] = $path === '' ? (string) $key : "{$path}.{$key}";
+                        $append[] = $path === '' ? (string) $key : $path.'.'.$key;
                     }
                 }
             }
 
-            $paths = $expanded;
+            $results = $append;
         }
 
-        return $paths;
+        return $results;
     }
 
     /**
