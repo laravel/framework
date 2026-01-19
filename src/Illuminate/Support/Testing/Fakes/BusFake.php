@@ -727,7 +727,7 @@ class BusFake implements Fake, QueueingDispatcher
         if ($this->shouldFakeJob($command)) {
             $this->commandsAfterResponse[get_class($command)][] = $this->getCommandRepresentation($command);
         } else {
-            return $this->dispatcher->dispatchAfterResponse($command, $handler);
+            $this->dispatcher->dispatchAfterResponse($command, $handler);
         }
     }
 
