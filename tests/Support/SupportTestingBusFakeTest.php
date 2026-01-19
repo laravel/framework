@@ -857,18 +857,14 @@ class SupportTestingBusFakeTest extends TestCase
 
     public function testDispatchAfterResponseWithHandler()
     {
-        $dispatcher = m::mock(QueueingDispatcher::class);
-
         $job = new BusJobStub;
-        $handler = function ($job) {
+        $handler = function () {
             return 'handled';
         };
 
-        $dispatcher->shouldReceive('dispatchAfterResponse')->once()->with($job, $handler);
+        $this->fake->dispatchAfterResponse($job, $handler);
 
-        $fake = (new BusFake($dispatcher))->except(BusJobStub::class);
-
-        $fake->dispatchAfterResponse($job, $handler);
+        $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
     }
 }
 
