@@ -114,6 +114,18 @@ class ApcStore extends TaggableStore
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * Note: APC does not support selective flushing, so this behaves the same as flush().
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        return $this->apc->flush();
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string

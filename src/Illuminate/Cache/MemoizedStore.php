@@ -219,6 +219,18 @@ class MemoizedStore implements LockProvider, Store
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        $this->cache = [];
+
+        return $this->repository->flushUnprotected();
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string

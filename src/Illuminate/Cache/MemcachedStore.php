@@ -101,6 +101,10 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function put($key, $value, $seconds)
     {
+        if (str_starts_with($key, ProtectedCache::PREFIX)) {
+            $this->registerProtectedKey($key);
+        }
+
         return $this->memcached->set(
             $this->prefix.$key, $value, $this->calculateExpiration($seconds)
         );
@@ -174,6 +178,10 @@ class MemcachedStore extends TaggableStore implements LockProvider
      */
     public function forever($key, $value)
     {
+        if (str_starts_with($key, ProtectedCache::PREFIX)) {
+            $this->registerProtectedKey($key);
+        }
+
         return $this->put($key, $value, 0);
     }
 
@@ -221,6 +229,77 @@ class MemcachedStore extends TaggableStore implements LockProvider
     public function flush()
     {
         return $this->memcached->flush();
+    }
+
+    /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        // Backup protected items
+        $protectedKeys = $this->getProtectedKeys();
+        $backup = [];
+
+        foreach ($protectedKeys as $key) {
+            $value = $this->memcached->get($this->prefix.$key);
+
+            if ($this->memcached->getResultCode() == 0) {
+                $backup[$key] = $value;
+            }
+        }
+
+        // Flush everything
+        $this->memcached->flush();
+
+        // Restore protected items
+        foreach ($backup as $key => $value) {
+            $this->memcached->set($this->prefix.$key, $value, 0);
+        }
+
+        // Restore the registry
+        if (! empty($backup)) {
+            $this->memcached->set($this->protectedKeysRegistryKey(), array_keys($backup), 0);
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the protected keys registry key.
+     *
+     * @return string
+     */
+    protected function protectedKeysRegistryKey()
+    {
+        return $this->prefix.'__protected_keys_registry__';
+    }
+
+    /**
+     * Get all registered protected keys.
+     *
+     * @return array
+     */
+    protected function getProtectedKeys()
+    {
+        return $this->memcached->get($this->protectedKeysRegistryKey()) ?: [];
+    }
+
+    /**
+     * Register a key as protected.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    protected function registerProtectedKey($key)
+    {
+        $keys = $this->getProtectedKeys();
+
+        if (! in_array($key, $keys)) {
+            $keys[] = $key;
+            $this->memcached->set($this->protectedKeysRegistryKey(), $keys, 0);
+        }
     }
 
     /**

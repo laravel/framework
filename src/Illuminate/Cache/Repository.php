@@ -653,6 +653,44 @@ class Repository implements ArrayAccess, CacheContract
     }
 
     /**
+     * Get a protected cache repository instance.
+     *
+     * @return \Illuminate\Cache\ProtectedCache
+     */
+    public function protected(): ProtectedCache
+    {
+        $cache = new ProtectedCache($this->store, $this->config);
+
+        if (! is_null($this->events)) {
+            $cache->setEventDispatcher($this->events);
+        }
+
+        return $cache->setDefaultCacheTime($this->default);
+    }
+
+    /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected(): bool
+    {
+        $this->event(new CacheFlushing($this->getName()));
+
+        $result = method_exists($this->store, 'flushUnprotected')
+            ? $this->store->flushUnprotected()
+            : $this->store->flush();
+
+        if ($result) {
+            $this->event(new CacheFlushed($this->getName()));
+        } else {
+            $this->event(new CacheFlushFailed($this->getName()));
+        }
+
+        return $result;
+    }
+
+    /**
      * Format the key for a cache item.
      *
      * @param  string  $key

@@ -65,7 +65,17 @@ class ClearCommand extends Command
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $successful = $this->cache()->flush();
+        $cache = $this->cache();
+
+        // When using tags, flush() resets the tag - protected items don't apply.
+        // Only use flushUnprotected() when not using tags to preserve protected items.
+        if ($this->option('preserve-protected') && empty($this->tags())) {
+            $successful = method_exists($cache, 'flushUnprotected')
+                ? $cache->flushUnprotected()
+                : $cache->flush();
+        } else {
+            $successful = $cache->flush();
+        }
 
         $this->flushFacades();
 
@@ -79,7 +89,13 @@ class ClearCommand extends Command
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 
-        $this->components->info('Application cache cleared successfully.');
+        if (! empty($this->tags())) {
+            $this->components->info('Application cache cleared successfully.');
+        } elseif ($this->option('preserve-protected')) {
+            $this->components->info('Application cache cleared successfully (protected items preserved).');
+        } else {
+            $this->components->info('Application cache cleared successfully.');
+        }
 
         return self::SUCCESS;
     }
@@ -145,6 +161,7 @@ class ClearCommand extends Command
     {
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
+            ['preserve-protected', null, InputOption::VALUE_NONE, 'Preserve protected cache items'],
         ];
     }
 }

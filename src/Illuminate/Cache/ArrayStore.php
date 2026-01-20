@@ -184,6 +184,22 @@ class ArrayStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        $this->storage = array_filter(
+            $this->storage,
+            fn ($value, $key) => str_starts_with($key, ProtectedCache::PREFIX),
+            ARRAY_FILTER_USE_BOTH
+        );
+
+        return true;
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string

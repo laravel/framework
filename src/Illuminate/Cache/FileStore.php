@@ -280,6 +280,33 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        if (! $this->files->isDirectory($this->directory)) {
+            return false;
+        }
+
+        foreach ($this->files->directories($this->directory) as $directory) {
+            // Skip the protected directory
+            if (basename($directory) === 'protected') {
+                continue;
+            }
+
+            $deleted = $this->files->deleteDirectory($directory);
+
+            if (! $deleted || $this->files->exists($directory)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Retrieve an item and expiry time from the cache by key.
      *
      * @param  string  $key
@@ -345,6 +372,15 @@ class FileStore implements Store, LockProvider
      */
     public function path($key)
     {
+        $isProtected = str_starts_with($key, ProtectedCache::PREFIX);
+
+        if ($isProtected) {
+            $cleanKey = substr($key, strlen(ProtectedCache::PREFIX));
+            $parts = array_slice(str_split($hash = sha1($cleanKey), 2), 0, 2);
+
+            return $this->directory.'/protected/'.implode('/', $parts).'/'.$hash;
+        }
+
         $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
 
         return $this->directory.'/'.implode('/', $parts).'/'.$hash;

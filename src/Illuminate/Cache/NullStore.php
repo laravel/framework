@@ -115,6 +115,16 @@ class NullStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        return true;
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string

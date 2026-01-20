@@ -278,6 +278,65 @@ class RedisStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        $connection = $this->connection();
+
+        // Get connection-level prefix
+        $connectionPrefix = match (true) {
+            $connection instanceof PhpRedisConnection => $connection->_prefix(''),
+            $connection instanceof PredisConnection => $connection->getOptions()->prefix ?: '',
+            default => '',
+        };
+
+        $fullPrefix = $connectionPrefix.$this->prefix;
+        $protectedPrefix = $fullPrefix.ProtectedCache::PREFIX;
+
+        $defaultCursorValue = match (true) {
+            $connection instanceof PhpRedisConnection && version_compare(phpversion('redis'), '6.1.0', '>=') => null,
+            default => '0',
+        };
+
+        $cursor = $defaultCursorValue;
+
+        do {
+            $scanResult = $connection->scan($cursor, ['match' => $fullPrefix.'*', 'count' => 1000]);
+
+            if (! is_array($scanResult)) {
+                break;
+            }
+
+            [$cursor, $keys] = $scanResult;
+
+            if (! is_array($keys) || empty($keys)) {
+                continue;
+            }
+
+            // Filter out protected keys
+            $keysToDelete = array_filter($keys, fn ($key) => ! str_starts_with($key, $protectedPrefix));
+
+            if (! empty($keysToDelete)) {
+                // For Predis, scan returns keys with the connection prefix, but del() adds it again.
+                // We need to strip the connection prefix before passing to del().
+                if ($connection instanceof PredisConnection && $connectionPrefix !== '') {
+                    $keysToDelete = array_map(
+                        fn ($key) => substr($key, strlen($connectionPrefix)),
+                        $keysToDelete
+                    );
+                }
+
+                $connection->del(...$keysToDelete);
+            }
+        } while (((string) $cursor) !== $defaultCursorValue);
+
+        return true;
+    }
+
+    /**
      * Remove all expired tag set entries.
      *
      * @return void

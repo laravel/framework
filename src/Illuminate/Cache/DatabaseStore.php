@@ -426,6 +426,20 @@ class DatabaseStore implements LockProvider, Store
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        $this->table()
+            ->where('key', 'not like', $this->prefix.ProtectedCache::PREFIX.'%')
+            ->delete();
+
+        return true;
+    }
+
+    /**
      * Get a query builder for the cache table.
      *
      * @return \Illuminate\Database\Query\Builder

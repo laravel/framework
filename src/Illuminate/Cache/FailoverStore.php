@@ -172,6 +172,16 @@ class FailoverStore extends TaggableStore implements LockProvider
     }
 
     /**
+     * Remove all non-protected items from the cache.
+     *
+     * @return bool
+     */
+    public function flushUnprotected()
+    {
+        return $this->attemptOnAllStores(__FUNCTION__, func_get_args());
+    }
+
+    /**
      * Remove all expired tag set entries.
      *
      * @return void

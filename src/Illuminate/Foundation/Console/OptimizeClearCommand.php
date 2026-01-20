@@ -45,7 +45,11 @@ class OptimizeClearCommand extends Command
             ->toArray();
 
         foreach ($tasks as $description => $command) {
-            $this->components->task($description, fn () => $this->callSilently($command) == 0);
+            $arguments = $command === 'cache:clear' && $this->option('preserve-protected')
+                ? ['--preserve-protected' => true]
+                : [];
+
+            $this->components->task($description, fn () => $this->callSilently($command, $arguments) == 0);
         }
 
         $this->newLine();
@@ -78,6 +82,7 @@ class OptimizeClearCommand extends Command
     {
         return [
             ['except', 'e', InputOption::VALUE_OPTIONAL, 'The commands to skip'],
+            ['preserve-protected', null, InputOption::VALUE_NONE, 'Preserve protected cache items'],
         ];
     }
 }
