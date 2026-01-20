@@ -115,9 +115,9 @@ class MySqlGrammar extends Grammar
         }
 
         return match ($indexHint->type) {
-            'hint' => "use index (`{$index}`)",
-            'force' => "force index (`{$index}`)",
-            default => "ignore index (`{$index}`)",
+            'hint' => "use index ({$index})",
+            'force' => "force index ({$index})",
+            default => "ignore index ({$index})",
         };
     }
 

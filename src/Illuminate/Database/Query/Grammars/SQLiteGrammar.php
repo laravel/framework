@@ -192,7 +192,7 @@ class SQLiteGrammar extends Grammar
             throw new InvalidArgumentException('Index name contains invalid characters.');
         }
 
-        return "indexed by `{$index}`";
+        return "indexed by {$index}";
     }
 
     /**

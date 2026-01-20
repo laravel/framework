@@ -7068,7 +7068,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
-        $this->assertSame('select [foo] from [users] with (index(test_index))', $builder->toSql());
+        $this->assertSame('select [foo] from [users] with (index([test_index]))', $builder->toSql());
     }
 
     public function testIgnoreIndexSqlServer()
