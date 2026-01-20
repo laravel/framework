@@ -292,6 +292,8 @@ class Builder implements BuilderContract
         foreach ($columns as $as => $column) {
             if (is_string($as) && $this->isQueryable($column)) {
                 $this->selectSub($column, $as);
+            } elseif (is_string($as) && $this->grammar->isExpression($column)) {
+                $this->selectExpression($column, $as);
             } else {
                 $this->columns[] = $column;
             }
@@ -315,6 +317,20 @@ class Builder implements BuilderContract
 
         return $this->selectRaw(
             '('.$query.') as '.$this->grammar->wrap($as), $bindings
+        );
+    }
+
+    /**
+     * Add a select expression to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression  $expression
+     * @param  string  $as
+     * @return $this
+     */
+    public function selectExpression($expression, $as)
+    {
+        return $this->selectRaw(
+            '('.$expression->getValue($this->grammar).') as '.$this->grammar->wrap($as)
         );
     }
 
@@ -447,6 +463,8 @@ class Builder implements BuilderContract
                 }
 
                 $this->selectSub($column, $as);
+            } elseif (is_string($as) && $this->grammar->isExpression($column)) {
+                $this->selectExpression($column, $as);
             } else {
                 if (is_array($this->columns) && in_array($column, $this->columns, true)) {
                     continue;
