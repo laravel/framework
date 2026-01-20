@@ -339,8 +339,8 @@ class ComponentTagCompiler
                     ? Str::after($component, $delimiter)
                     : $component;
 
-                /** @phpstan-ignore variable.undefined */
-                if (! is_null($guess = match (true) {
+
+                if (! is_null($guess = match (true) { // @phpstan-ignore variable.undefined
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent) => $guess, // @phpstan-ignore variable.undefined
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.index') => $guess, // @phpstan-ignore variable.undefined
                     $viewFactory->exists($guess = $path['prefixHash'].$delimiter.$formattedComponent.'.'.Str::afterLast($formattedComponent, '.')) => $guess, // @phpstan-ignore variable.undefined
