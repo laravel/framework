@@ -122,6 +122,33 @@ class TestViewsTest extends TestCase
         return $method->invoke($instance);
     }
 
+    public function testTearDownProcessDeletesCompiledViewDirectory()
+    {
+        Container::getInstance()->make(ParallelTesting::class)->resolveTokenUsing(fn () => '7');
+
+        $instance = new class
+        {
+            use TestViews;
+
+            public $app;
+
+            public function __construct()
+            {
+                $this->app = Container::getInstance();
+            }
+        };
+
+        (new ReflectionProperty($instance::class, 'originalCompiledViewPath'))->setValue(null, null);
+
+        $method = new ReflectionMethod($instance, 'bootTestViews');
+        $method->invoke($instance);
+
+        $parallelTesting = Container::getInstance()->make(ParallelTesting::class);
+        $tearDownCallbacks = (new ReflectionProperty($parallelTesting, 'tearDownProcessCallbacks'))->getValue($parallelTesting);
+
+        $this->assertCount(1, $tearDownCallbacks);
+    }
+
     public function switchToCompiledViewPath($path)
     {
         $instance = new class
