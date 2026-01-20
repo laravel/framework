@@ -1,6 +1,8 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.48.0...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.48.1...12.x)
+
+## [v12.48.1](https://github.com/laravel/framework/compare/v12.48.0...v12.48.1) - 2026-01-20
 
 ## [v12.48.0](https://github.com/laravel/framework/compare/v12.47.0...v12.48.0) - 2026-01-20
 
