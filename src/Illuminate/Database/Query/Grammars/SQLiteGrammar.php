@@ -176,12 +176,23 @@ class SQLiteGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
-        return $indexHint->type === 'force'
-            ? "indexed by {$indexHint->index}"
-            : '';
+        if ($indexHint->type !== 'force') {
+            return '';
+        }
+
+        $index = $indexHint->index;
+
+        // Validate index name contains only safe characters
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
+            throw new \InvalidArgumentException('Index name contains invalid characters.');
+        }
+
+        return "indexed by `{$index}`";
     }
 
     /**
