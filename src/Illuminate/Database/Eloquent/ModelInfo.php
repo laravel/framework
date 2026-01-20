@@ -25,7 +25,7 @@ class ModelInfo implements Arrayable, ArrayAccess
      * @param  \Illuminate\Support\Collection<int, array{event: string, observer: array<int, string>}>  $observers  The observers registered for the model.
      * @param  class-string<\Illuminate\Database\Eloquent\Collection<TModel>>  $collection  The Collection class that collects the models.
      * @param  class-string<\Illuminate\Database\Eloquent\Builder<TModel>>  $builder  The Builder class registered for the model.
-     * @param \Illuminate\Http\Resources\Json\JsonResource|null  $resource  The JSON resource that represents the model.
+     * @param  \Illuminate\Http\Resources\Json\JsonResource|null  $resource  The JSON resource that represents the model.
      */
     public function __construct(
         public $class,
