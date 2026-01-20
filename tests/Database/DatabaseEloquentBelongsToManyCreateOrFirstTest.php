@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Carbon;
-use Mockery;
+use Mockery as m;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +27,8 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
-        Mockery::close();
+
+        parent::tearDown();
     }
 
     public function testCreateOrFirstMethodCreatesNewRelated(): void
@@ -291,7 +292,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = m::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -364,7 +365,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = m::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -406,7 +407,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         {
             protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null): BelongsToMany
             {
-                $relation = Mockery::mock(BelongsToMany::class)->makePartial();
+                $relation = m::mock(BelongsToMany::class)->makePartial();
                 $relation->__construct(...func_get_args());
                 $instance = new BelongsToManyCreateOrFirstTestRelatedModel([
                     'id' => 456,
@@ -457,7 +458,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
         $processorClass = 'Illuminate\Database\Query\Processors\\'.$database.'Processor';
         $processor = new $processorClass;
-        $connection = Mockery::mock(Connection::class, ['getPostProcessor' => $processor]);
+        $connection = m::mock(Connection::class, ['getPostProcessor' => $processor]);
         $grammar = new $grammarClass($connection);
         $connection->shouldReceive('getQueryGrammar')->andReturn($grammar);
         $connection->shouldReceive('getTablePrefix')->andReturn('');
@@ -465,7 +466,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             return new BaseBuilder($connection, $grammar, $processor);
         });
         $connection->shouldReceive('getDatabaseName')->andReturn('database');
-        $resolver = Mockery::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
+        $resolver = m::mock(ConnectionResolverInterface::class, ['connection' => $connection]);
 
         foreach ($models as $model) {
             /** @var Model $model */
@@ -473,7 +474,7 @@ class DatabaseEloquentBelongsToManyCreateOrFirstTest extends TestCase
             $class::setConnectionResolver($resolver);
         }
 
-        $connection->shouldReceive('getPdo')->andReturn($pdo = Mockery::mock(PDO::class));
+        $connection->shouldReceive('getPdo')->andReturn($pdo = m::mock(PDO::class));
 
         foreach ($lastInsertIds as $id) {
             $pdo->expects('lastInsertId')->andReturn($id);

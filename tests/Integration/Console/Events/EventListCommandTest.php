@@ -109,9 +109,9 @@ class EventListCommandTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         EventListCommand::resolveEventsUsing(null);
+
+        parent::tearDown();
     }
 }
 

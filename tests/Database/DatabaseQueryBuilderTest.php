@@ -39,11 +39,6 @@ class DatabaseQueryBuilderTest extends TestCase
 {
     protected $called;
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testBasicSelect()
     {
         $builder = $this->getBuilder();
@@ -1067,6 +1062,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereBetween('id', collect([1, 2]));
         $this->assertSame('select * from "users" where "id" between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $subqueryBuilder = $this->getBuilder();
+        $subqueryBuilder->select('id')->from('posts')->where('status', 'published')->orderByDesc('created_at')->limit(1);
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween($subqueryBuilder, collect([1, 2]));
+        $this->assertSame('select * from "users" where (select "id" from "posts" where "status" = ? order by "created_at" desc limit 1) between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 'published', 1 => 1, 2 => 2], $builder->getBindings());
     }
 
     public function testOrWhereBetween()

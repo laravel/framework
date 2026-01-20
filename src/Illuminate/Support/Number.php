@@ -345,9 +345,11 @@ class Number
     /**
      * Execute the given callback using the given locale.
      *
+     * @template TReturn
+     *
      * @param  string  $locale
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withLocale(string $locale, callable $callback)
     {
@@ -365,9 +367,11 @@ class Number
     /**
      * Execute the given callback using the given currency.
      *
+     * @template TReturn
+     *
      * @param  string  $currency
-     * @param  callable  $callback
-     * @return mixed
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
     public static function withCurrency(string $currency, callable $callback)
     {

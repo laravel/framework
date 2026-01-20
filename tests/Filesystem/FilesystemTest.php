@@ -37,10 +37,10 @@ class FilesystemTest extends TestCase
 
     protected function tearDown(): void
     {
-        m::close();
-
         $files = new Filesystem;
         $files->deleteDirectory(self::$tempDir, $preserve = true);
+
+        parent::tearDown();
     }
 
     public function testGetRetrievesFiles()

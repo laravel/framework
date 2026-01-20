@@ -92,7 +92,7 @@ class Storage extends Facade
     /**
      * Replace the given disk with a local testing disk.
      *
-     * @param  string|null  $disk
+     * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
@@ -118,13 +118,13 @@ class Storage extends Facade
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param  string|null  $disk
+     * @param  \UnitEnum|string|null  $disk
      * @param  array  $config
      * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public static function persistentFake($disk = null, array $config = [])
     {
-        $disk = $disk ?: static::$app['config']->get('filesystems.default');
+        $disk = enum_value($disk) ?: static::$app['config']->get('filesystems.default');
 
         static::set($disk, $fake = static::createLocalDriver(
             self::buildDiskConfiguration($disk, $config, root: self::getRootPath($disk))

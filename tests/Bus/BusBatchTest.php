@@ -117,7 +117,7 @@ class BusBatchTest extends TestCase
 
         $this->schema()->drop('job_batches');
 
-        m::close();
+        parent::tearDown();
     }
 
     public function test_jobs_can_be_added_to_the_batch()
@@ -334,6 +334,27 @@ class BusBatchTest extends TestCase
         $this->assertEquals(1, $_SERVER['__catch.count']);
         $this->assertEquals(2, $_SERVER['__progress.count']);
         $this->assertSame('Something went wrong.', $_SERVER['__catch.exception']->getMessage());
+    }
+
+    public function test_pending_batch_filters_out_falsy_jobs()
+    {
+        $job = new class
+        {
+            use Batchable;
+        };
+
+        $secondJob = new class
+        {
+            use Batchable;
+        };
+
+        $jobsWithNulls = collect([$job, null, $secondJob, [], 0, '', false]);
+
+        $batch = new PendingBatch(new Container, $jobsWithNulls);
+
+        $this->assertCount(2, $batch->jobs);
+        $this->assertTrue($batch->jobs->contains($job));
+        $this->assertTrue($batch->jobs->contains($secondJob));
     }
 
     public function test_failure_callbacks_execute_correctly(): void

@@ -19,13 +19,6 @@ use Symfony\Component\Mime\Email;
 
 class MailSesV2TransportTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testGetTransport(): void
     {
         $container = new Container;

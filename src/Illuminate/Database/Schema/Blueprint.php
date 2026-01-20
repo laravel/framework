@@ -215,7 +215,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex'] as $index) {
+            foreach (['primary', 'unique', 'index', 'fulltext', 'fullText', 'spatialIndex', 'vectorIndex'] as $index) {
                 // If the column is supposed to be changed to an auto increment column and
                 // the specified index is primary, there is no need to add a command on
                 // MySQL, as it will be handled during the column definition instead.
@@ -227,7 +227,11 @@ class Blueprint
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.
                 if ($column->{$index} === true) {
-                    $this->{$index}($column->name);
+                    $indexMethod = $index === 'index' && $column->type === 'vector'
+                        ? 'vectorIndex'
+                        : $index;
+
+                    $this->{$indexMethod}($column->name);
                     $column->{$index} = null;
 
                     continue 2;
@@ -247,7 +251,11 @@ class Blueprint
                 // value, we'll go ahead and call the index method and pass the name for
                 // the index since the developer specified the explicit name for this.
                 elseif (isset($column->{$index})) {
-                    $this->{$index}($column->name, $column->{$index});
+                    $indexMethod = $index === 'index' && $column->type === 'vector'
+                        ? 'vectorIndex'
+                        : $index;
+
+                    $this->{$indexMethod}($column->name, $column->{$index});
                     $column->{$index} = null;
 
                     continue 2;
@@ -692,6 +700,18 @@ class Blueprint
     public function spatialIndex($columns, $name = null, $operatorClass = null)
     {
         return $this->indexCommand('spatialIndex', $columns, $name, null, $operatorClass);
+    }
+
+    /**
+     * Specify a vector index for the table.
+     *
+     * @param  string  $column
+     * @param  string|null  $name
+     * @return \Illuminate\Database\Schema\IndexDefinition
+     */
+    public function vectorIndex($column, $name = null)
+    {
+        return $this->indexCommand('vectorIndex', $column, $name, 'hnsw', 'vector_cosine_ops');
     }
 
     /**

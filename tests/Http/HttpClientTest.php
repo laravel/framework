@@ -65,13 +65,6 @@ class HttpClientTest extends TestCase
         RequestException::truncate();
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-
-        parent::tearDown();
-    }
-
     public function testStubbedResponsesAreReturnedAfterFaking()
     {
         $this->factory->fake();
@@ -4238,6 +4231,60 @@ class HttpClientTest extends TestCase
             'post' => ['post'],
             'delete' => ['delete'],
         ];
+    }
+
+    public function testAfterResponse()
+    {
+        $this->factory->fake([
+            'http://200.com*' => $this->factory::response('OK'),
+        ]);
+
+        $response = $this->factory
+            ->afterResponse(fn (Response $response): TestResponse => new TestResponse($response->toPsrResponse()))
+            ->afterResponse(fn () => 'abc')
+            ->afterResponse(function ($r) {
+                $this->assertInstanceOf(TestResponse::class, $r);
+            })
+            ->afterResponse(fn (Response $r) => new Response($r->toPsrResponse()->withBody(Utils::streamFor(strtolower($r->body())))))
+            ->get('http://200.com');
+
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame('ok', $response->body());
+    }
+
+    public function testAfterResponseWithThrows()
+    {
+        $this->factory->fake([
+            'http://500.com*' => $this->factory::response('oh no', 500),
+        ]);
+
+        try {
+            $this->factory->throw()
+                ->afterResponse(fn ($response) => new TestResponse($response->toPsrResponse()))
+                ->post('http://500.com');
+        } catch (RequestException $e) {
+            $this->assertInstanceOf(TestResponse::class, $e->response);
+        }
+    }
+
+    public function testAfterResponseWithAsync()
+    {
+        $this->factory->fake([
+            'http://200.com*' => $this->factory::response('OK', 200),
+            'http://401.com*' => $this->factory::response('Unauthorized.', 401),
+        ]);
+
+        $o = $this->factory->pool(function (Pool $pool): void {
+            $pool->as('200')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://200.com');
+            $pool->as('401-throwing')->throw()->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()))->get('http://401.com');
+            $pool->as('401-response')->afterResponse(fn (Response $response) => new TestResponse($response->toPsrResponse()->withBody(Utils::streamFor('different'))))->get('http://401.com');
+        }, 0);
+
+        $this->assertInstanceOf(TestResponse::class, $o['200']);
+        $this->assertInstanceOf(TestResponse::class, $o['401-response']);
+        $this->assertEquals('different', $o['401-response']->body());
+        $this->assertInstanceOf(RequestException::class, $o['401-throwing']);
+        $this->assertInstanceOf(TestResponse::class, $o['401-throwing']->response);
     }
 }
 

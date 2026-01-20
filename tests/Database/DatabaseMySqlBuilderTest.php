@@ -13,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlBuilderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        Mockery::close();
-    }
-
     public function testCreateDatabase(): void
     {
         $connection = Mockery::mock(Connection::class);

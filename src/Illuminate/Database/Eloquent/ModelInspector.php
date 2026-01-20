@@ -17,16 +17,9 @@ use function Illuminate\Support\enum_value;
 class ModelInspector
 {
     /**
-     * The Laravel application instance.
-     *
-     * @var \Illuminate\Contracts\Foundation\Application
-     */
-    protected $app;
-
-    /**
      * The methods that can be called in a model to indicate a relation.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $relationMethods = [
         'hasMany',
@@ -45,11 +38,10 @@ class ModelInspector
     /**
      * Create a new model inspector instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app  The Laravel application instance.
      */
-    public function __construct(Application $app)
+    public function __construct(protected Application $app)
     {
-        $this->app = $app;
     }
 
     /**
@@ -83,6 +75,7 @@ class ModelInspector
             observers: $this->getObservers($model),
             collection: $this->getCollectedBy($model),
             builder: $this->getBuilder($model),
+            resource: $this->getResource($model),
         );
     }
 
@@ -294,6 +287,17 @@ class ModelInspector
     protected function getBuilder($model)
     {
         return $model->newQuery()::class;
+    }
+
+    /**
+     * Get the class used for JSON response transforming.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Http\Resources\Json\JsonResource|null
+     */
+    protected function getResource($model)
+    {
+        return rescue(static fn () => $model->toResource()::class, null, false);
     }
 
     /**

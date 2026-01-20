@@ -1434,7 +1434,7 @@ class Mailable implements MailableContract, Renderable
     {
         $string = $escape ? EncodedHtmlString::convert($string, withQuote: isset($this->markdown)) : $string;
 
-        [$html, $text] = $this->renderForAssertions();
+        [$html] = $this->renderForAssertions();
 
         PHPUnit::assertStringContainsString(
             $string,
@@ -1456,7 +1456,7 @@ class Mailable implements MailableContract, Renderable
     {
         $string = $escape ? EncodedHtmlString::convert($string, withQuote: isset($this->markdown)) : $string;
 
-        [$html, $text] = $this->renderForAssertions();
+        [$html] = $this->renderForAssertions();
 
         PHPUnit::assertStringNotContainsString(
             $string,
@@ -1480,7 +1480,7 @@ class Mailable implements MailableContract, Renderable
             return EncodedHtmlString::convert($string, withQuote: isset($this->markdown));
         }, $strings) : $strings;
 
-        [$html, $text] = $this->renderForAssertions();
+        [$html] = $this->renderForAssertions();
 
         PHPUnit::assertThat($strings, new SeeInOrder($html));
 
@@ -1495,7 +1495,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInText($string)
     {
-        [$html, $text] = $this->renderForAssertions();
+        [, $text] = $this->renderForAssertions();
 
         PHPUnit::assertStringContainsString(
             $string,
@@ -1514,7 +1514,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertDontSeeInText($string)
     {
-        [$html, $text] = $this->renderForAssertions();
+        [, $text] = $this->renderForAssertions();
 
         PHPUnit::assertStringNotContainsString(
             $string,
@@ -1533,7 +1533,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function assertSeeInOrderInText($strings)
     {
-        [$html, $text] = $this->renderForAssertions();
+        [, $text] = $this->renderForAssertions();
 
         PHPUnit::assertThat($strings, new SeeInOrder($text));
 

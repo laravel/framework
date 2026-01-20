@@ -64,11 +64,9 @@ class Arr
     /**
      * Get an array item from an array using "dot" notation.
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
      */
-    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null)
+    public static function array(ArrayAccess|array $array, string|int|null $key, ?array $default = null): array
     {
         $value = Arr::get($array, $key, $default);
 
@@ -215,6 +213,23 @@ class Arr
         static::forget($array, $keys);
 
         return $array;
+    }
+
+    /**
+     * Get all of the given array except for a specified array of values.
+     *
+     * @param  array  $array
+     * @param  mixed  $values
+     * @param  bool  $strict
+     * @return array
+     */
+    public static function exceptValues($array, $values, $strict = false)
+    {
+        $values = (array) $values;
+
+        return array_filter($array, function ($value) use ($values, $strict) {
+            return ! in_array($value, $values, $strict);
+        });
     }
 
     /**
@@ -689,6 +704,23 @@ class Arr
     public static function only($array, $keys)
     {
         return array_intersect_key($array, array_flip((array) $keys));
+    }
+
+    /**
+     * Get a subset of the items from the given array by value.
+     *
+     * @param  array  $array
+     * @param  mixed  $values
+     * @param  bool  $strict
+     * @return array
+     */
+    public static function onlyValues($array, $values, $strict = false)
+    {
+        $values = (array) $values;
+
+        return array_filter($array, function ($value) use ($values, $strict) {
+            return in_array($value, $values, $strict);
+        });
     }
 
     /**

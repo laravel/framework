@@ -8,11 +8,12 @@ use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Notifications\Factory as FactoryContract;
 use Illuminate\Support\Manager;
 use Illuminate\Support\Queue\Concerns\ResolvesQueueRoutes;
+use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
-    use ResolvesQueueRoutes;
+    use Macroable, ResolvesQueueRoutes;
 
     /**
      * The default channel used to deliver messages.

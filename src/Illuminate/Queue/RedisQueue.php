@@ -263,8 +263,9 @@ class RedisQueue extends Queue implements QueueContract, ClearableQueue
      */
     protected function laterRaw($delay, $payload, $queue = null)
     {
-        $this->getConnection()->zadd(
-            $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
+        $this->getConnection()->eval(
+            LuaScripts::later(), 1, $this->getQueue($queue).':delayed',
+            $this->availableAt($delay), $payload
         );
 
         return json_decode($payload, true)['id'] ?? null;

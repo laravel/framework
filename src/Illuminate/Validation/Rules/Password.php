@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation\Rules;
 
+use ArrayIterator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Validation\DataAwareRule;
 use Illuminate\Contracts\Validation\ImplicitRule;
@@ -12,8 +13,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Traits\Conditionable;
 use InvalidArgumentException;
+use IteratorAggregate;
+use Traversable;
 
-class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
+class Password implements DataAwareRule, ImplicitRule, IteratorAggregate, Rule, ValidatorAwareRule
 {
     use Conditionable;
 
@@ -332,24 +335,17 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
     {
         $this->messages = [];
 
-        if (! $this->required && ! $this->sometimes && ($this->data === null || ! Arr::has($this->data, $attribute))) {
+        if (! $this->required && ! $this->sometimes && ! Arr::has($this->data ?? [], $attribute)) {
             return true;
         }
 
-        if ($value === null && ! $this->required && $this->validator && $this->validator->hasRule($attribute, ['Nullable'])) {
+        if (blank($value) && ! $this->required && $this->validator?->hasRule($attribute, ['Nullable'])) {
             return true;
         }
 
         $validator = Validator::make(
             $this->data,
-            [$attribute => [
-                ...($this->required ? ['required'] : []),
-                ...($this->sometimes ? ['sometimes'] : []),
-                'string',
-                'min:'.$this->min,
-                ...($this->max ? ['max:'.$this->max] : []),
-                ...$this->customRules,
-            ]],
+            [$attribute => [...$this]],
             $this->validator->customMessages,
             $this->validator->customAttributes
         )->after(function ($validator) use ($attribute, $value) {
@@ -431,5 +427,22 @@ class Password implements Rule, DataAwareRule, ImplicitRule, ValidatorAwareRule
             'compromisedThreshold' => $this->compromisedThreshold,
             'customRules' => $this->customRules,
         ];
+    }
+
+    /**
+     * Get an iterator for the password validation rules.
+     *
+     * @return \ArrayIterator<TKey, TValue>
+     */
+    public function getIterator(): Traversable
+    {
+        return new ArrayIterator([
+            ...($this->required ? ['required'] : []),
+            ...($this->sometimes ? ['sometimes'] : []),
+            'string',
+            'min:'.$this->min,
+            ...($this->max ? ['max:'.$this->max] : []),
+            ...$this->customRules,
+        ]);
     }
 }

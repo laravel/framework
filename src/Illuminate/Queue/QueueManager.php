@@ -225,6 +225,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forever("illuminate:queue:paused:{$connection}:{$queue}", true);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue)
+        );
     }
 
     /**
@@ -240,6 +244,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->put("illuminate:queue:paused:{$connection}:{$queue}", true, $ttl);
+
+        $this->app['events']->dispatch(
+            new Events\QueuePaused($connection, $queue, $ttl)
+        );
     }
 
     /**
@@ -254,6 +262,10 @@ class QueueManager implements FactoryContract, MonitorContract
         $this->app['cache']
             ->store()
             ->forget("illuminate:queue:paused:{$connection}:{$queue}");
+
+        $this->app['events']->dispatch(
+            new Events\QueueResumed($connection, $queue)
+        );
     }
 
     /**

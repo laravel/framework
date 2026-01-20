@@ -418,9 +418,7 @@ class Worker
             return false;
         }
 
-        return $this->cache && (bool) $this->cache->get(
-            "illuminate:queue:paused:{$connectionName}:{$queue}", false
-        );
+        return $this->cache && $this->manager->isPaused($connectionName, $queue);
     }
 
     /**
