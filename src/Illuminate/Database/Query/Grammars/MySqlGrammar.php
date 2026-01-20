@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class MySqlGrammar extends Grammar
 {
@@ -109,9 +110,8 @@ class MySqlGrammar extends Grammar
     {
         $index = $indexHint->index;
 
-        // Validate index name contains only safe characters (alphanumeric, underscore, dollar sign)
         if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
-            throw new \InvalidArgumentException('Index name contains invalid characters.');
+            throw new InvalidArgumentException('Index name contains invalid characters.');
         }
 
         return match ($indexHint->type) {
@@ -304,7 +304,7 @@ class MySqlGrammar extends Grammar
         }
 
         if (! is_numeric($seed)) {
-            throw new \InvalidArgumentException('The seed value must be numeric.');
+            throw new InvalidArgumentException('The seed value must be numeric.');
         }
 
         return 'RAND('.(int) $seed.')';
