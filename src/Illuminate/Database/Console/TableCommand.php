@@ -42,10 +42,10 @@ class TableCommand extends DatabaseInspectionCommand
         $tables = (new Collection($connection->getSchemaBuilder()->getTables()))
             ->keyBy('schema_qualified_name')->all();
 
+        $tableNames = (new Collection($tables))->keys();
         $tableName = $this->argument('table') ?: search(
             'Which table would you like to inspect?',
-            fn (string $query) => (new Collection($tables))
-                ->keys()
+            fn (string $query) => $tableNames
                 ->filter(fn ($table) => str_contains(strtolower($table), strtolower($query)))
                 ->values()
                 ->all()
