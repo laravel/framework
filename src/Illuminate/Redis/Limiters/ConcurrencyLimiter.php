@@ -2,12 +2,13 @@
 
 namespace Illuminate\Redis\Limiters;
 
+use Illuminate\Cache\Limiters\ConcurrencyLimiter as BaseConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Support\Sleep;
 use Illuminate\Support\Str;
 use Throwable;
 
-class ConcurrencyLimiter
+class ConcurrencyLimiter extends BaseConcurrencyLimiter
 {
     /**
      * The Redis factory implementation.
@@ -15,27 +16,6 @@ class ConcurrencyLimiter
      * @var \Illuminate\Redis\Connections\Connection
      */
     protected $redis;
-
-    /**
-     * The name of the limiter.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * The allowed number of concurrent tasks.
-     *
-     * @var int
-     */
-    protected $maxLocks;
-
-    /**
-     * The number of seconds a slot should be maintained.
-     *
-     * @var int
-     */
-    protected $releaseAfter;
 
     /**
      * Create a new concurrency limiter instance.

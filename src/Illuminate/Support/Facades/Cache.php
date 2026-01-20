@@ -37,6 +37,7 @@ use Mockery;
  * @method static mixed rememberForever(\BackedEnum|\UnitEnum|string $key, \Closure $callback)
  * @method static mixed flexible(string $key, array $ttl, callable $callback, array|null $lock = null, bool $alwaysDefer = false)
  * @method static mixed withoutOverlapping(string $key, callable $callback, int $lockFor = 0, int $waitFor = 10, string|null $owner = null)
+ * @method static \Illuminate\Cache\Limiters\ConcurrencyLimiterBuilder funnel(string $name)
  * @method static bool forget(\BackedEnum|\UnitEnum|array|string $key)
  * @method static bool delete(\BackedEnum|\UnitEnum|array|string $key)
  * @method static bool deleteMultiple(iterable $keys)
