@@ -43,6 +43,7 @@ class TableCommand extends DatabaseInspectionCommand
             ->keyBy('schema_qualified_name')->all();
 
         $tableNames = (new Collection($tables))->keys();
+
         $tableName = $this->argument('table') ?: search(
             'Which table would you like to inspect?',
             fn (string $query) => $tableNames
