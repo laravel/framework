@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class MySqlGrammar extends Grammar
 {
@@ -105,6 +106,10 @@ class MySqlGrammar extends Grammar
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $indexHint->index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
         return match ($indexHint->type) {
             'hint' => "use index ({$indexHint->index})",
             'force' => "force index ({$indexHint->index})",
@@ -288,7 +293,7 @@ class MySqlGrammar extends Grammar
      */
     public function compileRandom($seed)
     {
-        return 'RAND('.$seed.')';
+        return 'RAND('.((int) $seed).')';
     }
 
     /**

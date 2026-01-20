@@ -7,6 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -113,6 +114,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $indexHint->index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
         return $indexHint->type === 'force'
                     ? "with (index({$indexHint->index}))"
                     : '';
