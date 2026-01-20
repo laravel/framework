@@ -1544,6 +1544,13 @@ class Builder implements BuilderContract
     {
         $type = 'betweenColumns';
 
+        if ($this->isQueryable($column)) {
+            [$sub, $bindings] = $this->createSub($column);
+
+            return $this->addBinding($bindings, 'where')
+                ->whereBetweenColumns(new Expression('('.$sub.')'), $values, $boolean, $not);
+        }
+
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
         return $this;
