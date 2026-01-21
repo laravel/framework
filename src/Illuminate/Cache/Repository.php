@@ -491,7 +491,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @template TCacheValue
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  array{ 0: \DateTimeInterface|\DateInterval|int, 1: \DateTimeInterface|\DateInterval|int }  $ttl
      * @param  (callable(): TCacheValue)  $callback
      * @param  array{ seconds?: int, owner?: string }|null  $lock
@@ -500,6 +500,8 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function flexible($key, $ttl, $callback, $lock = null, $alwaysDefer = false)
     {
+        $key = enum_value($key);
+
         [
             $key => $value,
             "illuminate:cache:flexible:created:{$key}" => $created,
@@ -543,7 +545,7 @@ class Repository implements ArrayAccess, CacheContract
      *
      * @template TReturn
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  callable(): TReturn  $callback
      * @param  int  $lockFor
      * @param  int  $waitFor
@@ -554,7 +556,7 @@ class Repository implements ArrayAccess, CacheContract
      */
     public function withoutOverlapping($key, callable $callback, $lockFor = 0, $waitFor = 10, $owner = null)
     {
-        return $this->store->lock($key, $lockFor, $owner)->block($waitFor, $callback);
+        return $this->store->lock(enum_value($key), $lockFor, $owner)->block($waitFor, $callback);
     }
 
     /**
@@ -794,7 +796,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  string  $key
      * @return mixed
      */
     public function offsetGet($key): mixed
@@ -805,7 +807,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Store an item in the cache for the default time.
      *
-     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  string  $key
      * @param  mixed  $value
      * @return void
      */

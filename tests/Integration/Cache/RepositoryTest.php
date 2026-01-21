@@ -317,6 +317,20 @@ class RepositoryTest extends TestCase
         $cache->put(TestCacheKey::FOO, 'x');
         $this->assertTrue($cache->forget(TestCacheKey::FOO));
         $this->assertNull($cache->get(TestCacheKey::FOO));
+
+        // flexible / withoutOverlapping
+        $value = $cache->flexible(
+            TestCacheKey::FOO,
+            [5, 10],
+            fn () => 'flexible'
+        );
+        $this->assertSame('flexible', $value);
+
+        $result = $cache->withoutOverlapping(
+            TestCacheKey::FOO,
+            fn () => 'overlapping'
+        );
+        $this->assertSame('overlapping', $result);
     }
 }
 
