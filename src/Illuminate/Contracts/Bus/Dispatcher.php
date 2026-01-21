@@ -4,13 +4,6 @@ namespace Illuminate\Contracts\Bus;
 
 interface Dispatcher
 {
-    /**
-     * Create a new chain of queueable jobs.
-     *
-     * @param  \Illuminate\Support\Collection|array|null  $jobs
-     * @return mixed
-     */
-    public function chain($jobs = null);
 
     /**
      * Dispatch a command to its appropriate handler.
@@ -48,6 +41,14 @@ interface Dispatcher
      * @return void
      */
     public function dispatchAfterResponse($command, $handler = null);
+
+    /**
+     * Create a new chain of queueable jobs.
+     *
+     * @param  \Illuminate\Support\Collection|array|null  $jobs
+     * @return mixed
+     */
+    public function chain($jobs = null);
 
     /**
      * Determine if the given command has a handler.
