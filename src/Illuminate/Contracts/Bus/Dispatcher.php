@@ -4,7 +4,6 @@ namespace Illuminate\Contracts\Bus;
 
 interface Dispatcher
 {
-
     /**
      * Dispatch a command to its appropriate handler.
      *
