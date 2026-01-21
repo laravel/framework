@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Http;
 use Orchestra\Testbench\TestCase;
+use RuntimeException;
 
 class HttpClientTest extends TestCase
 {
@@ -108,5 +109,23 @@ class HttpClientTest extends TestCase
         $this->assertEquals('second response', $response2->body());
         $this->assertEquals('unnamed', $response3->body());
         $this->assertEquals('unnamed', $response4->body());
+    }
+
+    public function testAsyncCanHandleThrownException()
+    {
+        Http::fake(
+            ['*' => Http::response(['luke' => 'kuzmish'])]
+        );
+
+        $thrown = new RuntimeException();
+        $actual = Http::async()
+            ->afterResponse(
+                fn (Response $response) => $response->json('luke') === 'kuzmish'
+                    ? throw $thrown
+                    : null
+            )->get('https://cosmastech.com')
+            ->wait();
+
+        $this->assertSame($thrown, $actual);
     }
 }

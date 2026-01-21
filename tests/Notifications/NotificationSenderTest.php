@@ -21,13 +21,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class NotificationSenderTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testItCanSendQueuedNotificationsWithAStringVia()
     {
         $notifiable = m::mock(Notifiable::class);

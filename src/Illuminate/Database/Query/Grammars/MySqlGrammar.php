@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class MySqlGrammar extends Grammar
 {
@@ -102,13 +103,21 @@ class MySqlGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
+        $index = $indexHint->index;
+
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
         return match ($indexHint->type) {
-            'hint' => "use index ({$indexHint->index})",
-            'force' => "force index ({$indexHint->index})",
-            default => "ignore index ({$indexHint->index})",
+            'hint' => "use index ({$index})",
+            'force' => "force index ({$index})",
+            default => "ignore index ({$index})",
         };
     }
 
@@ -285,10 +294,20 @@ class MySqlGrammar extends Grammar
      *
      * @param  string|int  $seed
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function compileRandom($seed)
     {
-        return 'RAND('.$seed.')';
+        if ($seed === '' || $seed === null) {
+            return 'RAND()';
+        }
+
+        if (! is_numeric($seed)) {
+            throw new InvalidArgumentException('The seed value must be numeric.');
+        }
+
+        return 'RAND('.(int) $seed.')';
     }
 
     /**

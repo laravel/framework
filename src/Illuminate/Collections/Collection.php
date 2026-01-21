@@ -741,6 +741,33 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Determine if the collection contains multiple items. If a callback is provided, determine if multiple items match the condition.
+     *
+     * @param  (callable(TValue, TKey): bool)|null  $callback
+     * @return bool
+     */
+    public function containsManyItems(?callable $callback = null): bool
+    {
+        if (! $callback) {
+            return $this->count() > 1;
+        }
+
+        $count = 0;
+
+        foreach ($this as $key => $item) {
+            if ($callback($item, $key)) {
+                $count++;
+            }
+
+            if ($count > 1) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
@@ -870,8 +897,10 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Merge the collection with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  $items
-     * @return static
+     * @template TMergeValue
+     *
+     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TMergeValue>|iterable<TKey, TMergeValue>  $items
+     * @return static<TKey, TValue|TMergeValue>
      */
     public function merge($items)
     {
@@ -938,9 +967,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  int  $step
      * @param  int  $offset
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function nth($step, $offset = 0)
     {
+        if ($step < 1) {
+            throw new InvalidArgumentException('Step value must be at least 1.');
+        }
+
         $new = [];
 
         $position = 0;
@@ -1356,9 +1391,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function split($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         if ($this->isEmpty()) {
             return new static;
         }
@@ -1393,9 +1434,15 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      *
      * @param  int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function splitIn($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         return $this->chunk((int) ceil($this->count() / $numberOfGroups));
     }
 

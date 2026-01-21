@@ -24,7 +24,7 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: forge
         ports:
-          - 33306:3306
+          - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       redis:
         image: redis:7.0
@@ -103,7 +103,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: randomSecret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |
@@ -177,7 +177,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: random_secret
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-logs-${{ matrix.php }}-${{ matrix.phpunit }}-${{ matrix.stability }}
           path: |

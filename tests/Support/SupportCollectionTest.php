@@ -900,6 +900,20 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsOneItem(fn ($word) => strlen($word) > 4));
     }
 
+    #[DataProvider('collectionClassProvider')]
+    public function testContainsManyItems($collection)
+    {
+        $this->assertFalse((new $collection([]))->containsManyItems());
+        $this->assertFalse((new $collection([1]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2]))->containsManyItems());
+        $this->assertTrue((new $collection([1, 2, 3]))->containsManyItems());
+
+        $this->assertTrue(collect([1, 2, 2])->containsManyItems(fn ($number) => $number === 2));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 4));
+        $this->assertFalse(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) > 4));
+        $this->assertTrue(collect(['ant', 'bear', 'cat'])->containsManyItems(fn ($word) => strlen($word) === 3));
+    }
+
     public function testIterable()
     {
         $c = new Collection(['foo']);
@@ -3351,6 +3365,60 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['c', 'e'], $data->nth(2, -4)->all());
         $this->assertEquals(['e'], $data->nth(4, -2)->all());
         $this->assertEquals(['e'], $data->nth(2, -2)->all());
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForInvalidStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(0)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testNthThrowsExceptionForNegativeStep($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Step value must be at least 1.');
+
+        (new $collection([1, 2, 3]))->nth(-1)->all();
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->split(-1);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForInvalidNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(0);
+    }
+
+    #[DataProvider('collectionClassProvider')]
+    public function testSplitInThrowsExceptionForNegativeNumberOfGroups($collection)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of groups must be at least 1.');
+
+        (new $collection([1, 2, 3]))->splitIn(-1);
     }
 
     #[DataProvider('collectionClassProvider')]

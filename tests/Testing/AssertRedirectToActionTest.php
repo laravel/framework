@@ -55,9 +55,9 @@ class AssertRedirectToActionTest extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Facade::setFacadeApplication(null);
+
+        parent::tearDown();
     }
 }
 

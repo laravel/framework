@@ -694,6 +694,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
     }
 
     /**
+     * Determine if the collection contains multiple items.
+     *
+     * @return bool
+     */
+    public function containsManyItems(): bool
+    {
+        return $this->take(2)->count() > 1;
+    }
+
+    /**
      * Join all items from the collection using a string. The final items can use a separate glue string.
      *
      * @param  string  $glue
@@ -898,9 +908,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * @param  int  $step
      * @param  int  $offset
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
     public function nth($step, $offset = 0)
     {
+        if ($step < 1) {
+            throw new InvalidArgumentException('Step value must be at least 1.');
+        }
+
         return new static(function () use ($step, $offset) {
             $position = 0;
 
@@ -1280,10 +1296,16 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \InvalidArgumentException
      */
     #[\Override]
     public function split($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         return $this->passthru(__FUNCTION__, func_get_args());
     }
 
@@ -1386,9 +1408,15 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      *
      * @param  int  $numberOfGroups
      * @return static<int, static>
+     *
+     * @throws \InvalidArgumentException
      */
     public function splitIn($numberOfGroups)
     {
+        if ($numberOfGroups < 1) {
+            throw new InvalidArgumentException('Number of groups must be at least 1.');
+        }
+
         return $this->chunk((int) ceil($this->count() / $numberOfGroups));
     }
 

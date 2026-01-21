@@ -44,10 +44,9 @@ class ValidationValidatorTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
-        m::close();
+
+        parent::tearDown();
     }
 
     public function testNestedErrorMessagesAreRetrievedFromLocalArray()
@@ -7396,6 +7395,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
         // Interpreted dot followed by escaped dot fails on empty value
         $v = new Validator($trans, ['foo' => [['bar.baz' => ''], ['bar.baz' => '']]], ['foo.*.bar\.baz' => 'required']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], ['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->appendRules(['foo\.bar' => 'required']);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['foo.bar' => 'valid'], []);
+        $v->sometimes('foo\.bar', 'required', fn () => true);
+        $this->assertFalse($v->fails());
+
+        $v = new Validator($trans, ['name' => 'ab'], ['name' => 'required']);
+        $v->appendRules(['name' => 'string']);
+        $v->appendRules(['name' => 'min:5|max:255']);
         $this->assertTrue($v->fails());
     }
 

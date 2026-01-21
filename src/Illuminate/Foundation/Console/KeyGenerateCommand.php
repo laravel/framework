@@ -101,7 +101,11 @@ class KeyGenerateCommand extends Command
         );
 
         if ($replaced === $input || $replaced === null) {
-            $this->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+            if (isset($_ENV['APP_KEY'])) {
+                $this->components->error('Unable to set application key. APP_KEY is already present in the environment.');
+            } else {
+                $this->components->error('Unable to set application key. No APP_KEY variable was found in the .env file.');
+            }
 
             return false;
         }
