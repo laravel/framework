@@ -181,6 +181,9 @@ class Arr
 
         $flatten($array, $prepend);
 
+        // Cleanup self referencing closure to avoid memory leak
+        $flatten = null;
+
         return $results;
     }
 
