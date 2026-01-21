@@ -279,6 +279,48 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
     }
+
+    public function testRelationLoadedWithNestedRelations()
+    {
+        $model = new EloquentRelationResetModelStub;
+        $related = new EloquentRelationResetModelStub;
+        $nested = new EloquentRelationResetModelStub;
+
+        $this->assertFalse($model->relationLoaded('related.nested'));
+
+        $model->setRelation('related', $related);
+        $this->assertFalse($model->relationLoaded('related.nested'));
+
+        $related->setRelation('nested', $nested);
+        $this->assertTrue($model->relationLoaded('related.nested'));
+    }
+
+    public function testRelationLoadedWithNullNestedRelation()
+    {
+        $model = new EloquentRelationResetModelStub;
+        $model->setRelation('related', null);
+
+        $this->assertTrue($model->relationLoaded('related.nested'));
+    }
+
+    public function testRelationLoadedWithCollectionRelation()
+    {
+        $model = new EloquentRelationResetModelStub;
+        $item1 = new EloquentRelationResetModelStub;
+        $item2 = new EloquentRelationResetModelStub;
+        $nested1 = new EloquentRelationResetModelStub;
+        $nested2 = new EloquentRelationResetModelStub;
+
+        $model->setRelation('items', new Collection([$item1, $item2]));
+
+        $this->assertFalse($model->relationLoaded('items.nested'));
+
+        $item1->setRelation('nested', $nested1);
+        $this->assertFalse($model->relationLoaded('items.nested'));
+
+        $item2->setRelation('nested', $nested2);
+        $this->assertTrue($model->relationLoaded('items.nested'));
+    }
 }
 
 class EloquentRelationResetModelStub extends Model

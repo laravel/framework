@@ -1081,7 +1081,44 @@ trait HasRelationships
      */
     public function relationLoaded($key)
     {
-        return array_key_exists($key, $this->relations);
+        if (! str_contains($key, '.')) {
+            return array_key_exists($key, $this->relations);
+        }
+
+        $relations = explode('.', $key);
+        $lastIndex = array_key_last($relations);
+        $stack = [[$this, 0]];
+        $stackIndex = 0;
+
+        while ($stackIndex >= 0) {
+            [$model, $index] = $stack[$stackIndex--];
+
+            if (! array_key_exists($relations[$index], $model->relations)) {
+                return false;
+            }
+
+            if ($index === $lastIndex) {
+                continue;
+            }
+
+            $related = $model->relations[$relations[$index]];
+
+            if (is_null($related)) {
+                continue;
+            }
+
+            $nextIndex = $index + 1;
+
+            if ($related instanceof EloquentCollection) {
+                foreach ($related as $item) {
+                    $stack[++$stackIndex] = [$item, $nextIndex];
+                }
+            } else {
+                $stack[++$stackIndex] = [$related, $nextIndex];
+            }
+        }
+
+        return true;
     }
 
     /**
