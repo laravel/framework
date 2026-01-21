@@ -860,6 +860,22 @@ class SupportTestingBusFakeTest extends TestCase
 
         $this->fake->assertDispatchedAfterResponse(BusJobStub::class);
     }
+
+    public function testDoesNotDispatchEmptyBatch()
+    {
+        $batch = $this->fake->batch([])->dispatch();
+
+        $this->assertNull($batch);
+        $this->fake->assertNothingBatched();
+    }
+
+    public function testDoesNotDispatchEmptyBatchAfterResponse()
+    {
+        $batch = $this->fake->batch([])->dispatchAfterResponse();
+
+        $this->assertNull($batch);
+        $this->fake->assertNothingBatched();
+    }
 }
 
 class BusJobStub
