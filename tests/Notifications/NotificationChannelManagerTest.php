@@ -160,10 +160,13 @@ class NotificationChannelManagerTest extends TestCase
         Container::setInstance($container);
         $manager = $container->make(ChannelManager::class, ['container' => $container]);
         $manager->extend('test', function () use ($events) {
-            return new class($events) {
+            return new class($events)
+            {
                 private $count = 0;
 
-                public function __construct(private $events) {}
+                public function __construct(private $events)
+                {
+                }
 
                 public function send($notifiable, Notification $notification)
                 {
