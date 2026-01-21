@@ -184,7 +184,7 @@ abstract class Seeder
             ? $this->container->call([$this, 'run'], $parameters)
             : $this->run(...$parameters);
 
-        $uses = array_flip(class_uses_recursive(static::class));
+        $uses = class_uses_recursive(static::class);
 
         if (isset($uses[WithoutModelEvents::class])) {
             $callback = $this->withoutModelEvents($callback);

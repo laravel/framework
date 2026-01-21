@@ -1062,7 +1062,7 @@ class Blueprint
 
         $modelTraits = class_uses_recursive($model);
 
-        if (in_array(HasUlids::class, $modelTraits, true)) {
+        if (isset($modelTraits[HasUlids::class])) {
             return $this->foreignUlid($column, 26)
                 ->table($model->getTable())
                 ->referencesModelColumn($model->getKeyName());

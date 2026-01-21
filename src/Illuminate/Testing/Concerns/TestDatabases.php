@@ -44,7 +44,7 @@ trait TestDatabases
         });
 
         ParallelTesting::setUpTestCase(function ($testCase) {
-            $uses = array_flip(class_uses_recursive(get_class($testCase)));
+            $uses = class_uses_recursive(get_class($testCase));
 
             $databaseTraits = [
                 Testing\DatabaseMigrations::class,
