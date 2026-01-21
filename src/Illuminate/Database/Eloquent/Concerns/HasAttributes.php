@@ -239,6 +239,30 @@ trait HasAttributes
             $attributes[$key] = $this->mutateAttributeForArray($key, null);
         }
 
+        // Finally, we will apply any masking to the attributes that have been
+        // configured to be masked on the model. This ensures consistent masking
+        // whether attributes are accessed directly or converted to an array.
+        return $this->addMaskedAttributesToArray($attributes);
+    }
+
+    /**
+     * Add the masked attributes to the attributes array.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    protected function addMaskedAttributesToArray(array $attributes)
+    {
+        if (! method_exists($this, 'shouldMaskAttribute')) {
+            return $attributes;
+        }
+
+        foreach ($attributes as $key => $value) {
+            if ($this->shouldMaskAttribute($key, $value)) {
+                $attributes[$key] = $this->maskAttributeValue($key, $value);
+            }
+        }
+
         return $attributes;
     }
 
@@ -2331,9 +2355,9 @@ trait HasAttributes
         // it returns as the value, which is useful for transforming values on
         // retrieval from the model to a form that is more useful for usage.
         if ($this->hasGetMutator($key)) {
-            return $this->mutateAttribute($key, $value);
+            return $this->applyMaskingIfNeeded($key, $this->mutateAttribute($key, $value));
         } elseif ($this->hasAttributeGetMutator($key)) {
-            return $this->mutateAttributeMarkedAttribute($key, $value);
+            return $this->applyMaskingIfNeeded($key, $this->mutateAttributeMarkedAttribute($key, $value));
         }
 
         // If the attribute exists within the cast array, we will convert it to
@@ -2347,7 +2371,7 @@ trait HasAttributes
                 $this->throwMissingAttributeExceptionIfApplicable($key);
             }
 
-            return $this->castAttribute($key, $value);
+            return $this->applyMaskingIfNeeded($key, $this->castAttribute($key, $value));
         }
 
         // If the attribute is listed as a date, we will convert it to a DateTime
@@ -2356,6 +2380,22 @@ trait HasAttributes
         if ($value !== null
             && \in_array($key, $this->getDates(), false)) {
             return $this->asDateTime($value);
+        }
+
+        return $this->applyMaskingIfNeeded($key, $value);
+    }
+
+    /**
+     * Apply masking to the attribute value if needed.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function applyMaskingIfNeeded(string $key, mixed $value): mixed
+    {
+        if (method_exists($this, 'shouldMaskAttribute') && $this->shouldMaskAttribute($key, $value)) {
+            return $this->maskAttributeValue($key, $value);
         }
 
         return $value;
