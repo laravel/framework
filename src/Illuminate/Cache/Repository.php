@@ -23,11 +23,11 @@ use Illuminate\Cache\Events\WritingManyKeys;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Events\Dispatcher;
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 use function Illuminate\Support\defer;
 use function Illuminate\Support\enum_value;
