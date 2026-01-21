@@ -392,6 +392,44 @@ class BusPendingBatchTest extends TestCase
 
         $this->assertCount(2, $anotherBatch->failureCallbacks());
     }
+
+    public function test_batch_is_not_dispatched_when_empty()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldNotReceive('dispatch');
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $pendingBatch = new PendingBatch($container, new Collection([]));
+
+        $repository = m::mock(BatchRepository::class);
+        $repository->shouldNotReceive('store');
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatch();
+
+        $this->assertNull($result);
+    }
+
+    public function test_batch_is_not_dispatched_after_response_when_empty()
+    {
+        $container = new Container;
+
+        $eventDispatcher = m::mock(Dispatcher::class);
+        $eventDispatcher->shouldNotReceive('dispatch');
+        $container->instance(Dispatcher::class, $eventDispatcher);
+
+        $pendingBatch = new PendingBatch($container, new Collection([]));
+
+        $repository = m::mock(BatchRepository::class);
+        $repository->shouldNotReceive('store');
+        $container->instance(BatchRepository::class, $repository);
+
+        $result = $pendingBatch->dispatchAfterResponse();
+
+        $this->assertNull($result);
+    }
 }
 
 class BatchableJob
