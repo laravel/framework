@@ -15,6 +15,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     use Macroable;
 
     /**
+     * The resolved notification sender instance.
+     *
+     * @var \Illuminate\Notifications\NotificationSender|null
+     */
+    protected $notificationSender;
+
+    /**
      * The default channel used to deliver messages.
      *
      * @var string
@@ -27,13 +34,6 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * @var string|null
      */
     protected $locale;
-
-    /**
-     * The locale used when sending notifications.
-     *
-     * @var \Illuminate\Notifications\NotificationSender|null
-     */
-    protected $notificationSender;
 
     /**
      * Send the given notification to the given notifiable entities.
