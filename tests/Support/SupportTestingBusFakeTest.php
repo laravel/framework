@@ -34,7 +34,7 @@ class SupportTestingBusFakeTest extends TestCase
 
         $this->assertNull($fake->findBatch('non-existent-batch'));
 
-        $batch = $fake->batch([])->dispatch();
+        $batch = $fake->batch([new BusJobStub])->dispatch();
 
         $this->assertSame($batch, $fake->findBatch($batch->id));
         $this->assertSame($batch, $busRepository->find($batch->id));
@@ -733,14 +733,14 @@ class SupportTestingBusFakeTest extends TestCase
     {
         $this->assertNull($this->fake->findBatch('non-existent-batch'));
 
-        $batch = $this->fake->batch([])->dispatch();
+        $batch = $this->fake->batch([new BusJobStub])->dispatch();
 
         $this->assertSame($batch, $this->fake->findBatch($batch->id));
     }
 
     public function testBatchesCanBeCancelled()
     {
-        $batch = $this->fake->batch([])->dispatch();
+        $batch = $this->fake->batch([new BusJobStub])->dispatch();
 
         $this->assertFalse($batch->cancelled());
 
