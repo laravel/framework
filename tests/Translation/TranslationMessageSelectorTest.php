@@ -75,6 +75,18 @@ class TranslationMessageSelectorTest extends TestCase
             ['[first](//example.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 0],
             ['[first](//example.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 1],
             ['[second](//test.com)', '{0}[first](//example.com)|{2.3}[second](//test.com)', 2.3],
+
+            // Negative range tests
+            ['first', '[*,-1]first|{0}second|[1,*]third', -3],
+            ['first', '[*,-1]first|{0}second|[1,*]third', -1],
+            ['second', '[*,-1]first|{0}second|[1,*]third', 0],
+            ['third', '[*,-1]first|{0}second|[1,*]third', 1],
+            ['third', '[*,-1]first|{0}second|[1,*]third', 10],
+            ['first', '[*,-1]first|{0}second|[1,*]third', -10],
+            ['first', '[*,-5]first|[-4,-1]second|{0}third|[1,*]fourth', -10],
+            ['second', '[*,-5]first|[-4,-1]second|{0}third|[1,*]fourth', -3],
+            ['third', '[*,-5]first|[-4,-1]second|{0}third|[1,*]fourth', 0],
+            ['fourth', '[*,-5]first|[-4,-1]second|{0}third|[1,*]fourth', 5],
         ];
     }
 }
