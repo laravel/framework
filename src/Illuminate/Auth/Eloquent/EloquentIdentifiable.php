@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth\Eloquent;
 
-
 use Illuminate\Database\Eloquent\Model;
 
 /**

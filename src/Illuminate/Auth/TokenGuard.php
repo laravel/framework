@@ -57,7 +57,7 @@ class TokenGuard implements Guard
      */
     public function __construct(
         BasicUserProvider&CredentialsUserProvider $provider,
-        Request              $request,
+        Request $request,
                              $inputKey = 'api_token',
                              $storageKey = 'api_token',
                              $hash = false

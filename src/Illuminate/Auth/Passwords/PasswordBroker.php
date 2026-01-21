@@ -60,10 +60,10 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function __construct(
         #[\SensitiveParameter] TokenRepositoryInterface $tokens,
-        StatefulUserProvider                            $users,
-        ?Dispatcher                                     $dispatcher = null,
-        ?Timebox                                        $timebox = null,
-        int                                             $timeboxDuration = 200000,
+        StatefulUserProvider $users,
+        ?Dispatcher $dispatcher = null,
+        ?Timebox $timebox = null,
+        int $timeboxDuration = 200000,
     ) {
         $this->users = $users;
         $this->tokens = $tokens;

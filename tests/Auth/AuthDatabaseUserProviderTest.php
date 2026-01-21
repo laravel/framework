@@ -296,10 +296,12 @@ class DatabaseProviderIdentifiableOnlyStub implements \Illuminate\Contracts\Auth
     {
         return 'id';
     }
+
     public function getAuthIdentifier()
     {
         return 1;
     }
+
     public function getAuthIdentifierForBroadcasting()
     {
         return 1;

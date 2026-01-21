@@ -3,10 +3,10 @@
 namespace Illuminate\Auth;
 
 use Closure;
-use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
 use Illuminate\Contracts\Auth\Identity\HasPassword;
 use Illuminate\Contracts\Auth\Identity\Identifiable as UserContract;
 use Illuminate\Contracts\Auth\Identity\Rememberable;
+use Illuminate\Contracts\Auth\Identity\StatefulIdentifiable;
 use Illuminate\Contracts\Auth\Providers\StatefulUserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Support\Arrayable;

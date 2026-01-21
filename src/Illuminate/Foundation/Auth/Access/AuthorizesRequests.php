@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth\Access;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Support\Str;
+
 use function Illuminate\Support\enum_value;
 
 trait AuthorizesRequests
