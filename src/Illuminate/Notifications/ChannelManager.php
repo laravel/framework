@@ -29,6 +29,13 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected $locale;
 
     /**
+     * The locale used when sending notifications.
+     *
+     * @var \Illuminate\Notifications\NotificationSender|null
+     */
+    protected $notificationSender;
+
+    /**
      * Send the given notification to the given notifiable entities.
      *
      * @param  \Illuminate\Support\Collection|mixed  $notifiables
@@ -37,9 +44,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function send($notifiables, $notification)
     {
-        (new NotificationSender(
-            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
-        )->send($notifiables, $notification);
+        $this->resolveNotificationSender()->send($notifiables, $notification);
     }
 
     /**
@@ -52,9 +57,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     public function sendNow($notifiables, $notification, ?array $channels = null)
     {
-        (new NotificationSender(
-            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale)
-        )->sendNow($notifiables, $notification, $channels);
+        $this->resolveNotificationSender()->sendNow($notifiables, $notification, $channels);
     }
 
     /**
@@ -117,6 +120,18 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
 
             throw $e;
         }
+    }
+
+    /**
+     * Resolve the NotificationSender instance.
+     *
+     * @return \Illuminate\Notifications\NotificationSender
+     */
+    protected function resolveNotificationSender()
+    {
+        return $this->notificationSender ??= new NotificationSender(
+            $this, $this->container->make(Bus::class), $this->container->make(Dispatcher::class), $this->locale
+        );
     }
 
     /**
