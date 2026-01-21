@@ -360,12 +360,16 @@ class PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      *
      * @throws \Throwable
      */
     public function dispatch()
     {
+        if ($this->jobs->isEmpty()) {
+            return null;
+        }
+
         $repository = $this->container->make(BatchRepository::class);
 
         try {
@@ -390,10 +394,14 @@ class PendingBatch
     /**
      * Dispatch the batch after the response is sent to the browser.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      */
     public function dispatchAfterResponse()
     {
+        if ($this->jobs->isEmpty()) {
+            return null;
+        }
+
         $repository = $this->container->make(BatchRepository::class);
 
         $batch = $this->store($repository);

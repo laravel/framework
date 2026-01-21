@@ -29,10 +29,14 @@ class PendingBatchFake extends PendingBatch
     /**
      * Dispatch the batch.
      *
-     * @return \Illuminate\Bus\Batch
+     * @return \Illuminate\Bus\Batch|null
      */
     public function dispatch()
     {
+        if ($this->jobs->isEmpty()) {
+            return null;
+        }
+
         return $this->bus->recordPendingBatch($this);
     }
 
@@ -43,6 +47,10 @@ class PendingBatchFake extends PendingBatch
      */
     public function dispatchAfterResponse()
     {
+        if ($this->jobs->isEmpty()) {
+            return null;
+        }
+
         return $this->bus->recordPendingBatch($this);
     }
 }
