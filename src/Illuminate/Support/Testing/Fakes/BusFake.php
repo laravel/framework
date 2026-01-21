@@ -775,7 +775,9 @@ class BusFake implements Fake, QueueingDispatcher
      */
     public function dispatchFakeBatch($name = '')
     {
-        return $this->batch([])->name($name)->dispatch();
+        return $this->recordPendingBatch(
+            $this->batch([])->name($name)
+        );
     }
 
     /**
