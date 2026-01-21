@@ -785,7 +785,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Determine if a cached value exists.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function offsetExists($key): bool
@@ -796,7 +796,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function offsetGet($key): mixed
@@ -807,7 +807,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Store an item in the cache for the default time.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -819,7 +819,7 @@ class Repository implements ArrayAccess, CacheContract
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return void
      */
     public function offsetUnset($key): void
