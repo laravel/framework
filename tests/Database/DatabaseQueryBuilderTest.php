@@ -5426,6 +5426,57 @@ SQL;
         $this->assertSame('select (1 + 1) as "expr" from "one"', $builder->toSql());
     }
 
+    public function testSelectRawWithExistingAlias()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('one')->select([
+            'requirements' => new Raw('IF(condition, "value1", "value2") AS requirements'),
+        ]);
+
+        // The raw expression already has an alias, so it should not wrap it or add another alias
+        $this->assertSame('select IF(condition, "value1", "value2") AS requirements from "one"', $builder->toSql());
+    }
+
+    public function testSelectRawWithExistingAliasUppercase()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('one')->select([
+            'col' => new Raw('CASE WHEN x = 1 THEN "a" ELSE "b" END AS col'),
+        ]);
+
+        // Should not add another alias even though array key is provided
+        $this->assertSame('select CASE WHEN x = 1 THEN "a" ELSE "b" END AS col from "one"', $builder->toSql());
+    }
+
+    public function testSelectRawWithComplexIfExpressionAndAlias()
+    {
+        // Test the exact scenario from GitHub issue #58461
+        $builder = $this->getBuilder();
+        $selects = [
+            'requirements' => new Raw('IF(
+                conference_registration_categories.id IS NULL,
+                IF(
+                    includes_accommodation = "yes" AND includes_dinner = "yes",
+                    "Accommodation and Dinner",
+                    IF(
+                        includes_accommodation = "yes",
+                        "Accommodation only",
+                        IF(includes_dinner = "yes", "Dinner only", "-")
+                    )
+                )
+            ) AS requirements'),
+            'other_col' => 'other_col',
+        ];
+        
+        $builder->from('registrations')->select($selects);
+        
+        $sql = $builder->toSql();
+        
+        // Should not double-alias the expression
+        $this->assertStringNotContainsString('AS requirements) as "requirements"', $sql);
+        $this->assertStringContainsString('AS requirements', $sql);
+    }
+
     public function testSelect()
     {
         $builder = $this->getBuilder();
