@@ -292,7 +292,7 @@ class Builder implements BuilderContract
         foreach ($columns as $as => $column) {
             if (is_string($as) && $this->isQueryable($column)) {
                 $this->selectSub($column, $as);
-            } elseif (is_string($as) && $this->grammar->isExpression($column)) {
+            } elseif (is_string($as) && $this->grammar->isExpression($column) && ! $this->expressionHasAlias($column)) {
                 $this->selectExpression($column, $as);
             } else {
                 $this->columns[] = $column;
@@ -384,6 +384,21 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Check if an expression already has an alias (AS clause).
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression  $expression
+     * @return bool
+     */
+    protected function expressionHasAlias($expression)
+    {
+        $value = $expression->getValue($this->grammar);
+
+        // Check if the expression contains an AS clause (case-insensitive)
+        // Using word boundary to avoid matching "AS" within column names
+        return (bool) preg_match('/\s+as\s+/i', $value);
+    }
+
+    /**
      * Creates a subquery and parse it.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|string  $query
@@ -463,7 +478,7 @@ class Builder implements BuilderContract
                 }
 
                 $this->selectSub($column, $as);
-            } elseif (is_string($as) && $this->grammar->isExpression($column)) {
+            } elseif (is_string($as) && $this->grammar->isExpression($column) && ! $this->expressionHasAlias($column)) {
                 $this->selectExpression($column, $as);
             } else {
                 if (is_array($this->columns) && in_array($column, $this->columns, true)) {
