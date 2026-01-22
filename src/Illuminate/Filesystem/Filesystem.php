@@ -640,7 +640,7 @@ class Filesystem
     public function ensureDirectoryExists($path, $mode = 0755, $recursive = true)
     {
         if (! $this->isDirectory($path)) {
-            $this->makeDirectory($path, $mode, $recursive);
+            $this->makeDirectory($path, $mode, $recursive, true);
         }
     }
 
