@@ -2,12 +2,12 @@ name: tests
 
 on:
   push:
-#    branches:
-#      - master
-#      - '*.x'
-#  pull_request:
-#  schedule:
-#    - cron: '0 0 * * *'
+    branches:
+      - master
+      - '*.x'
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   linux_tests:
