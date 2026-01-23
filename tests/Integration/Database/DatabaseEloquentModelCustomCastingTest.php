@@ -339,7 +339,7 @@ class TestEloquentModelWithCustomCast extends Model
         }
 
         if (isset($this->attributes['dob'])) {
-            return Carbon::parse($this->attributes['dob'])->toDateString() . ' ' .
+            return Carbon::parse($this->attributes['dob'])->toDateString().' '.
                 Carbon::parse($value)->toTimeString();
         }
 
@@ -368,7 +368,7 @@ class DOBCaster implements CastsAttributes
             return [$key => null];
         }
 
-        return [$key => (string)$value];
+        return [$key => (string) $value];
     }
 }
 
