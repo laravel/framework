@@ -135,13 +135,20 @@ class SessionManager extends Manager
      */
     protected function createRedisDriver()
     {
-        $handler = $this->createCacheHandler('redis');
+        $store = $this->config->get('session.store') ?: 'redis';
+        $cache = $this->container->make('cache');
+        $config = $this->config->get("cache.stores.{$store}");
 
-        $handler->getCache()->getStore()->setConnection(
-            $this->config->get('session.connection')
-        );
+        $repository = is_array($config) && ($config['driver'] ?? null) === 'redis'
+            ? $cache->build(array_merge($config, [
+                'connection' => $this->config->get('session.connection'),
+            ]))
+            : $cache->store($store);
 
-        return $this->buildSession($handler);
+        return $this->buildSession(new CacheBasedSessionHandler(
+            $repository,
+            $this->config->get('session.lifetime')
+        ));
     }
 
     /**
@@ -174,9 +181,10 @@ class SessionManager extends Manager
     protected function createCacheHandler($driver)
     {
         $store = $this->config->get('session.store') ?: $driver;
+        $cache = $this->container->make('cache');
 
         return new CacheBasedSessionHandler(
-            clone $this->container->make('cache')->store($store),
+            $cache->store($store),
             $this->config->get('session.lifetime')
         );
     }
