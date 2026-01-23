@@ -1739,7 +1739,9 @@ class Mailable implements MailableContract, Renderable
         $envelope = $this->envelope();
 
         if (isset($envelope->from)) {
-            $this->from($envelope->from->address, $envelope->from->name);
+            $name = $envelope->from->name ?? Container::getInstance()->get(ConfigRepository::class)->get('mail.from.name', null);
+
+            $this->from($envelope->from->address, $name);
         }
 
         foreach (['to', 'cc', 'bcc', 'replyTo'] as $type) {

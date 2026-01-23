@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Markdown;
@@ -15,6 +16,8 @@ class SendingMarkdownMailTest extends TestCase
     protected function defineEnvironment($app)
     {
         $app['config']->set('mail.driver', 'array');
+        $app['config']->set('mail.from.name', 'Default Name');
+
 
         $app['view']->addNamespace('mail', __DIR__.'/Fixtures')
             ->addLocation(__DIR__.'/Fixtures');
@@ -168,6 +171,27 @@ class SendingMarkdownMailTest extends TestCase
         $this->assertEquals($expectedContentId, $htmlCid, 'Multiple clones should preserve original CID');
     }
 
+    public function testNullAddressFromNameDefaultsToGlobal()
+    {
+        Mail::to('test@mail.com')->send(new MailableWithNullAddressName());
+
+        $from = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->getFrom();
+
+        $this->assertCount(1, $from);
+        $this->assertEquals('taylor@laravel.com', $from[0]->getAddress());
+        $this->assertEquals('Default Name', $from[0]->getName());
+    }
+
+    public function testNullEnvelopeFromNameDefaultsToGlobal()
+    {
+        Mail::to('test@mail.com')->send(new MailableWithNullName());
+
+        $from = app('mailer')->getSymfonyTransport()->messages()[0]->getOriginalMessage()->getFrom();
+
+        $this->assertCount(1, $from);
+        $this->assertEquals('taylor@laravel.com', $from[0]->getAddress());
+        $this->assertEquals('Default Name', $from[0]->getName());
+    }
     /**
      * Extract Content IDs from email for embedded image validation.
      *
@@ -313,6 +337,42 @@ class EmbedImageMailable extends Mailable
         );
     }
 }
+
+class MailableWithNullAddressName extends Mailable
+{
+    public function envelope()
+    {
+        return new Envelope(
+            from: new Address('taylor@laravel.com')
+        );
+    }
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'basic',
+        );
+    }
+}
+
+class MailableWithNullName extends Mailable
+{
+    public function envelope()
+    {
+        return new Envelope(
+            from: 'taylor@laravel.com',
+        );
+    }
+
+
+    public function content()
+    {
+        return new Content(
+            markdown: 'basic',
+        );
+    }
+}
+
 
 class MessageAsPublicPropertyMailable extends Mailable
 {
