@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Log;
 
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Log\Logger;
@@ -13,7 +12,6 @@ use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger as Monolog;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 class LogLoggerTest extends TestCase
