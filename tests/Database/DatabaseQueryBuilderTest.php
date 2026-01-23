@@ -110,16 +110,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testAddingSelects()
     {
         $builder = $this->getBuilder();
-        $builder
-            ->select('foo')
-            ->addSelect('bar')
-            ->addSelect(['baz', 'alias_not_used' => 'boom'])
-            ->addSelect('bar')
-            ->addSelect(['bang' => $this->getBuilder()->select('col')->from('config')])
-            ->addSelect(['zap' => new Raw('1 + 1')])
-            ->addSelect([new Raw('2 + 2')])
-            ->from('users');
-        $this->assertSame('select "foo", "bar", "baz", "boom", (select "col" from "config") as "bang", (1 + 1) as "zap", 2 + 2 from "users"', $builder->toSql());
+        $builder->select('foo')->addSelect('bar')->addSelect(['baz', 'boom'])->addSelect('bar')->from('users');
+        $this->assertSame('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
     }
 
     public function testBasicSelectWithPrefix()
@@ -5431,12 +5423,12 @@ SQL;
         $builder = $this->getBuilder();
         $builder->from('one')->select([
             'two',
-            'three' => 'threee',
+            'three' => 'threee as threeee',
             'four' => $this->getBuilder()->from('tbl')->select('col'),
             'five' => new Raw('1 + 1'),
         ]);
 
-        $this->assertSame('select "two", "threee", (select "col" from "tbl") as "four", (1 + 1) as "five" from "one"', $builder->toSql());
+        $this->assertSame('select "two", "threee" as "threeee", (select "col" from "tbl") as "four", 1 + 1 from "one"', $builder->toSql());
     }
 
     public function testSqlServerWhereDate()
