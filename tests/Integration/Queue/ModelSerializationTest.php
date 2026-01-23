@@ -207,6 +207,68 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
+    public function testItReloadsRelationshipsForCollections()
+    {
+        $order1 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $order2 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order1->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product2->id]);
+
+        $orders = Order::with('line', 'lines', 'products')->get();
+
+        $serialized = serialize(new CollectionRelationSerializationTestClass($orders));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertCount(2, $unSerialized->orders);
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('products'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('products'));
+    }
+
+    public function testItReloadsNestedRelationshipsForCollections()
+    {
+        $order1 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $order2 = tap(Order::create(), function (Order $order) {
+            $order->wasRecentlyCreated = false;
+        });
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order1->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order2->id, 'product_id' => $product2->id]);
+
+        $orders = Order::with('line.product', 'lines.product')->get();
+
+        $serialized = serialize(new CollectionRelationSerializationTestClass($orders));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertCount(2, $unSerialized->orders);
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[0]->line->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[0]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[0]->lines->first()->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('line'));
+        $this->assertTrue($unSerialized->orders[1]->line->relationLoaded('product'));
+        $this->assertTrue($unSerialized->orders[1]->relationLoaded('lines'));
+        $this->assertTrue($unSerialized->orders[1]->lines->first()->relationLoaded('product'));
+    }
+
     public function testItCanRunModelBootsAndTraitInitializations()
     {
         $model = new ModelBootTestWithTraitInitialization();
@@ -679,6 +741,18 @@ class CollectionSerializationTestClass
     public function __construct($users)
     {
         $this->users = $users;
+    }
+}
+
+class CollectionRelationSerializationTestClass
+{
+    use SerializesModels;
+
+    public $orders;
+
+    public function __construct($orders)
+    {
+        $this->orders = $orders;
     }
 }
 
