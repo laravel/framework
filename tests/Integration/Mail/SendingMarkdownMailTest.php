@@ -170,7 +170,7 @@ class SendingMarkdownMailTest extends TestCase
         $this->assertEquals($expectedContentId, $htmlCid, 'Multiple clones should preserve original CID');
     }
 
-    public function testNullAddressFromNameDefaultsToGlobal()
+    public function testNullAddressFromNameDefaultsToDefault()
     {
         Mail::to('test@mail.com')->send(new MailableWithNullAddressName());
 
