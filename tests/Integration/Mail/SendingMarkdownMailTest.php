@@ -192,6 +192,7 @@ class SendingMarkdownMailTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $from[0]->getAddress());
         $this->assertEquals('Default Name', $from[0]->getName());
     }
+
     /**
      * Extract Content IDs from email for embedded image validation.
      *
