@@ -18,7 +18,6 @@ class SendingMarkdownMailTest extends TestCase
         $app['config']->set('mail.driver', 'array');
         $app['config']->set('mail.from.name', 'Default Name');
 
-
         $app['view']->addNamespace('mail', __DIR__.'/Fixtures')
             ->addLocation(__DIR__.'/Fixtures');
     }
