@@ -712,6 +712,8 @@ trait HasAttributes
      */
     protected function mutateAttribute($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         return $this->{'get'.Str::studly($key).'Attribute'}($value);
     }
 
@@ -727,6 +729,8 @@ trait HasAttributes
         if (array_key_exists($key, $this->attributeCastCache)) {
             return $this->attributeCastCache[$key];
         }
+
+        $this->mergeAttributesFromCachedCasts();
 
         $attribute = $this->{Str::camel($key)}();
 
@@ -1159,6 +1163,8 @@ trait HasAttributes
      */
     protected function setMutatedAttributeValue($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         return $this->{'set'.Str::studly($key).'Attribute'}($value);
     }
 
@@ -1171,6 +1177,8 @@ trait HasAttributes
      */
     protected function setAttributeMarkedMutatedAttributeValue($key, $value)
     {
+        $this->mergeAttributesFromCachedCasts();
+
         $attribute = $this->{Str::camel($key)}();
 
         $callback = $attribute->set ?: function ($value) use ($key) {
