@@ -23,7 +23,12 @@ class Js implements Htmlable, Stringable
      *
      * @var int
      */
-    protected const REQUIRED_FLAGS = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_THROW_ON_ERROR;
+    protected const REQUIRED_FLAGS = 0
+        | JSON_HEX_TAG
+        | JSON_HEX_APOS
+        | JSON_HEX_AMP
+        | JSON_HEX_QUOT
+        | JSON_THROW_ON_ERROR;
 
     /**
      * Create a new class instance.
