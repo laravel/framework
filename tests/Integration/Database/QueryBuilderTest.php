@@ -573,6 +573,27 @@ class QueryBuilderTest extends DatabaseTestCase
         $this->assertSame(2, $results);
     }
 
+    public function testWhereNullOrEmpty()
+    {
+        Schema::create('nullable_values', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->nullable();
+        });
+
+        try {
+            DB::table('nullable_values')->insert([
+                ['name' => null],
+                ['name' => ''],
+                ['name' => 'filled'],
+            ]);
+
+            $this->assertSame(2, DB::table('nullable_values')->whereNullOrEmpty('name')->count());
+            $this->assertSame(1, DB::table('nullable_values')->whereNotNullOrEmpty('name')->count());
+        } finally {
+            Schema::drop('nullable_values');
+        }
+    }
+
     public function testPaginateWithSpecificColumns()
     {
         $result = DB::table('posts')->paginate(5, ['title', 'content']);

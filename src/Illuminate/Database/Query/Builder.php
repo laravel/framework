@@ -1499,6 +1499,56 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where null or empty string" clause to the query.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNullOrEmpty($column, $boolean = 'and')
+    {
+        return $this->whereNested(function ($query) use ($column) {
+            $query->whereNull($column)->orWhere($column, '');
+        }, $boolean);
+    }
+
+    /**
+     * Add an "or where null or empty string" clause to the query.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orWhereNullOrEmpty($column)
+    {
+        return $this->whereNullOrEmpty($column, 'or');
+    }
+
+    /**
+     * Add a "where not null and not empty string" clause to the query.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotNullOrEmpty($column, $boolean = 'and')
+    {
+        return $this->whereNested(function ($query) use ($column) {
+            $query->whereNotNull($column)->where($column, '!=', '');
+        }, $boolean);
+    }
+
+    /**
+     * Add an "or where not null and not empty string" clause to the query.
+     *
+     * @param  string|\Illuminate\Contracts\Database\Query\Expression  $column
+     * @return $this
+     */
+    public function orWhereNotNullOrEmpty($column)
+    {
+        return $this->whereNotNullOrEmpty($column, 'or');
+    }
+
+    /**
      * Add a "where between" statement to the query.
      *
      * @param  \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string  $column
