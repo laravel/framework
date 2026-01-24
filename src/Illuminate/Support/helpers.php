@@ -407,7 +407,7 @@ if (! function_exists('tap_until')) {
      *
      * @param  TValue  $value
      * @param  callable(): bool  $until
-     * @param  (callable(TValue): mixed)|null  $callback
+     * @param  (\Closure(TValue): mixed)|null  $callback
      * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
      */
     function tap_until($value, $until, $callback = null)
