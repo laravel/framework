@@ -20,7 +20,7 @@ trait Tappable
      * then return the instance.
      *
      * @param  (callable(): bool)  $until
-     * @param  (callable($this): mixed)|null  $callback
+     * @param  (\Closure($this): mixed)|null  $callback
      * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : $this)
      */
     public function tapUntil($until, $callback = null)
