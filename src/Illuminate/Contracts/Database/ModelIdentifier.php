@@ -2,12 +2,14 @@
 
 namespace Illuminate\Contracts\Database;
 
+use Illuminate\Database\Eloquent\Relations\Relation;
+
 class ModelIdentifier
 {
     /**
      * The class name of the model.
      *
-     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     * @var class-string<\Illuminate\Database\Eloquent\Model>|string
      */
     public $class;
 
@@ -52,7 +54,7 @@ class ModelIdentifier
     public function __construct($class, $id, array $relations, $connection)
     {
         $this->id = $id;
-        $this->class = $class;
+        $this->class = Relation::getMorphAlias($class);
         $this->relations = $relations;
         $this->connection = $connection;
     }
@@ -68,5 +70,13 @@ class ModelIdentifier
         $this->collectionClass = $collectionClass;
 
         return $this;
+    }
+
+    /**
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    public function getClass(): string
+    {
+        return Relation::getMorphedModel($this->class) ?? $this->class;
     }
 }
