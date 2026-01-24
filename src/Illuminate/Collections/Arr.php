@@ -1175,7 +1175,7 @@ class Arr
      * @param  array|string  $array
      * @return string
      */
-    public static function toCssStyles($array)
+    public static function toCssStyles(array|string $array): string
     {
         $styleList = static::wrap($array);
 
