@@ -251,13 +251,17 @@ class Repository implements ArrayAccess, CacheContract
     {
         $value = $this->get($key, $default);
 
-        if (! is_int($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Cache value for key [%s] must be an integer, %s given.', $key, gettype($value))
-            );
+        if (is_int($value)) {
+            return $value;
         }
 
-        return $value;
+        if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+            return (int) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Cache value for key [%s] must be an integer, %s given.', $key, gettype($value))
+        );
     }
 
     /**
@@ -273,13 +277,17 @@ class Repository implements ArrayAccess, CacheContract
     {
         $value = $this->get($key, $default);
 
-        if (! is_float($value)) {
-            throw new InvalidArgumentException(
-                sprintf('Cache value for key [%s] must be a float, %s given.', $key, gettype($value))
-            );
+        if (is_float($value)) {
+            return $value;
         }
 
-        return $value;
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+            return (float) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Cache value for key [%s] must be a float, %s given.', $key, gettype($value))
+        );
     }
 
     /**

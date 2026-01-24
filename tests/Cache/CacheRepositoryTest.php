@@ -556,6 +556,13 @@ class CacheRepositoryTest extends TestCase
         $this->assertSame(456, $repo->integer('foo', 456));
     }
 
+    public function testItGetsAsIntegerFromNumericString()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('123');
+        $this->assertSame(123, $repo->integer('foo'));
+    }
+
     public function testItThrowsExceptionWhenGettingNonIntegerAsInteger()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -563,6 +570,16 @@ class CacheRepositoryTest extends TestCase
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
+        $repo->integer('foo');
+    }
+
+    public function testItThrowsExceptionWhenGettingFloatStringAsInteger()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cache value for key [foo] must be an integer, string given.');
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('1.5');
         $repo->integer('foo');
     }
 
@@ -578,6 +595,13 @@ class CacheRepositoryTest extends TestCase
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
         $this->assertSame(2.5, $repo->float('foo', 2.5));
+    }
+
+    public function testItGetsAsFloatFromNumericString()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('1.5');
+        $this->assertSame(1.5, $repo->float('foo'));
     }
 
     public function testItThrowsExceptionWhenGettingNonFloatAsFloat()
