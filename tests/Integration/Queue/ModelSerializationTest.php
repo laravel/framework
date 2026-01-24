@@ -429,7 +429,10 @@ class ModelSerializationTest extends TestCase
             'email' => 'taylor@laravel.com',
         ]);
 
-        $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass($user, new DataValueObject('hello')));
+        $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass(
+            $user,
+            new DataValueObject('hello')
+        ));
 
         $this->assertSame(
             'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:4:"user";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"value";O:50:"Illuminate\Tests\Integration\Queue\DataValueObject":1:{s:5:"value";s:5:"hello";}}',
