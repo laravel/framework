@@ -46,14 +46,14 @@ class ModelIdentifier
     /**
      * Create a new model identifier.
      *
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $class
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>|null  $class
      * @param  mixed  $id
      * @param  array  $relations
      * @param  mixed  $connection
      */
     public function __construct($class, $id, array $relations, $connection)
     {
-        $this->class = Relation::getMorphAlias($class);
+        $this->class = $class === null ? null : Relation::getMorphAlias($class);
         $this->id = $id;
         $this->relations = $relations;
         $this->connection = $connection;
