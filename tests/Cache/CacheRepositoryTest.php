@@ -548,6 +548,15 @@ class CacheRepositoryTest extends TestCase
         }
     }
 
+    public function testTaggedCacheWorksWithEnumKey()
+    {
+        $cache = (new Repository(new ArrayStore()))->tags('test-tag');
+
+        $cache->put(TestCacheKey::FOO, 5);
+        $this->assertSame(6, $cache->increment(TestCacheKey::FOO));
+        $this->assertSame(5, $cache->decrement(TestCacheKey::FOO));
+    }
+
     protected function getRepository()
     {
         $dispatcher = new Dispatcher(m::mock(Container::class));
@@ -562,4 +571,9 @@ class CacheRepositoryTest extends TestCase
     {
         return '2030-07-25 12:13:14 UTC';
     }
+}
+
+enum TestCacheKey: string
+{
+    case FOO = 'foo';
 }
