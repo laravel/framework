@@ -25,7 +25,7 @@ class HigherOrderTapProxy
      *
      * @param  string  $method
      * @param  array  $parameters
-     * @return Target
+     * @return ($until is null ? Target : mixed)
      */
     public function __call($method, $parameters)
     {
