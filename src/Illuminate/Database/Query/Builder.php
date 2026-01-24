@@ -5,6 +5,7 @@ namespace Illuminate\Database\Query;
 use BackedEnum;
 use Carbon\CarbonPeriod;
 use Closure;
+use DatePeriod;
 use DateTimeInterface;
 use Illuminate\Contracts\Database\Query\Builder as BuilderContract;
 use Illuminate\Contracts\Database\Query\ConditionExpression;
@@ -1553,8 +1554,8 @@ class Builder implements BuilderContract
                 ->whereBetween(new Expression('('.$sub.')'), $values, $boolean, $not);
         }
 
-        if ($values instanceof CarbonPeriod) {
-            $values = [$values->getStartDate(), $values->getEndDate()];
+        if ($values instanceof DatePeriod) {
+            return $this->whereBetweenDatePeriod($column, $values, $boolean, $not);
         }
 
         $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -1562,6 +1563,50 @@ class Builder implements BuilderContract
         $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'where');
 
         return $this;
+    }
+
+    /**
+     * Add a "where between" statement for a DatePeriod to the query.
+     *
+     * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
+     * @param  \DatePeriod  $period
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    protected function whereBetweenDatePeriod($column, DatePeriod $period, $boolean = 'and', $not = false)
+    {
+        $startDate = $period->start ?? $period->getStartDate();
+        $endDate = $period->end ?? $period->getEndDate();
+
+        // Calculate end date if it's null (when using recurrences)
+        if ($endDate === null) {
+            $recurrences = $period->recurrences ?? 0;
+            $endDate = clone $startDate;
+
+            for ($i = 0; $i < $recurrences; $i++) {
+                $endDate = $endDate->add($period->getDateInterval());
+            }
+        }
+
+        // Determine operators based on inclusion/exclusion flags
+        $includeStart = ! ($period->include_start_date === false);
+        $includeEnd = $period->include_end_date === true;
+
+        $lowerOp = $includeStart ? '>=' : '>';
+        $upperOp = $includeEnd ? '<=' : '<';
+
+        if ($not) {
+            // For NOT BETWEEN: value < start OR value > end
+            return $this->where(function ($query) use ($column, $startDate, $endDate, $lowerOp, $upperOp) {
+                $query->where($column, $lowerOp === '>=' ? '<' : '<=', $startDate)
+                      ->orWhere($column, $upperOp === '<=' ? '>' : '>=', $endDate);
+            }, null, null, $boolean);
+        }
+
+        // For BETWEEN: start <=/< value AND value <=/> end
+        return $this->where($column, $lowerOp, $startDate, $boolean)
+                    ->where($column, $upperOp, $endDate, $boolean);
     }
 
     /**
@@ -2791,8 +2836,8 @@ class Builder implements BuilderContract
     {
         $type = 'between';
 
-        if ($values instanceof CarbonPeriod) {
-            $values = [$values->getStartDate(), $values->getEndDate()];
+        if ($values instanceof DatePeriod) {
+            return $this->havingBetweenDatePeriod($column, $values, $boolean, $not);
         }
 
         $this->havings[] = compact('type', 'column', 'values', 'boolean', 'not');
@@ -2800,6 +2845,51 @@ class Builder implements BuilderContract
         $this->addBinding(array_slice($this->cleanBindings(Arr::flatten($values)), 0, 2), 'having');
 
         return $this;
+    }
+
+    /**
+     * Add a "having between" clause for a DatePeriod to the query.
+     *
+     * @param  string  $column
+     * @param  \DatePeriod  $period
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    protected function havingBetweenDatePeriod($column, DatePeriod $period, $boolean = 'and', $not = false)
+    {
+        $startDate = $period->start ?? $period->getStartDate();
+        $endDate = $period->end ?? $period->getEndDate();
+
+        // Calculate end date if it's null (when using recurrences)
+        if ($endDate === null) {
+            $recurrences = $period->recurrences ?? 0;
+            $endDate = clone $startDate;
+
+            for ($i = 0; $i < $recurrences; $i++) {
+                $endDate = $endDate->add($period->getDateInterval());
+            }
+        }
+
+        // Determine operators based on inclusion/exclusion flags
+        $includeStart = ! ($period->include_start_date === false);
+        $includeEnd = $period->include_end_date === true;
+
+        $lowerOp = $includeStart ? '>=' : '>';
+        $upperOp = $includeEnd ? '<=' : '<';
+
+        if ($not) {
+            // For NOT BETWEEN: value < start OR value > end
+            return $this->havingRaw(
+                "({$this->grammar->wrap($column)} {$lowerOp} ? OR {$this->grammar->wrap($column)} {$upperOp} ?)",
+                [$lowerOp === '>=' ? $startDate : $startDate, $upperOp === '<=' ? $endDate : $endDate],
+                $boolean
+            );
+        }
+
+        // For BETWEEN: start <=/< value AND value <=/> end
+        return $this->having($column, $lowerOp, $startDate, $boolean)
+                    ->having($column, $upperOp, $endDate, $boolean);
     }
 
     /**
