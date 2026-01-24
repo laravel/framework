@@ -1152,7 +1152,7 @@ class Arr
      * @param  array|string  $array
      * @return string
      */
-    public static function toCssClasses($array)
+    public static function toCssClasses(array|string $array): string
     {
         $classList = static::wrap($array);
 
