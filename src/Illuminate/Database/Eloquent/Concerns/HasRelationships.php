@@ -1085,40 +1085,23 @@ trait HasRelationships
             return array_key_exists($key, $this->relations);
         }
 
-        $relations = explode('.', $key);
-        $lastIndex = array_key_last($relations);
-        $stack = [[$this, 0]];
-        $stackIndex = 0;
+        [$first, $rest] = explode('.', $key, 2);
 
-        while ($stackIndex >= 0) {
-            [$model, $index] = $stack[$stackIndex--];
-
-            if (! array_key_exists($relations[$index], $model->relations)) {
-                return false;
-            }
-
-            if ($index === $lastIndex) {
-                continue;
-            }
-
-            $related = $model->relations[$relations[$index]];
-
-            if (is_null($related)) {
-                continue;
-            }
-
-            $nextIndex = $index + 1;
-
-            if ($related instanceof EloquentCollection) {
-                foreach ($related as $item) {
-                    $stack[++$stackIndex] = [$item, $nextIndex];
-                }
-            } else {
-                $stack[++$stackIndex] = [$related, $nextIndex];
-            }
+        if (! array_key_exists($first, $this->relations)) {
+            return false;
         }
 
-        return true;
+        $related = $this->relations[$first];
+
+        if (is_null($related)) {
+            return true;
+        }
+
+        if ($related instanceof EloquentCollection) {
+            return $related->every(fn ($item) => $item->relationLoaded($rest));
+        }
+
+        return $related->relationLoaded($rest);
     }
 
     /**
