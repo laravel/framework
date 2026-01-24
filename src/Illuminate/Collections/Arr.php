@@ -24,7 +24,7 @@ class Arr
      * @param  mixed  $value
      * @return bool
      */
-    public static function accessible($value)
+    public static function accessible(mixed $value): bool
     {
         return is_array($value) || $value instanceof ArrayAccess;
     }
