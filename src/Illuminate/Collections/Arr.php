@@ -35,7 +35,7 @@ class Arr
      * @param  mixed  $value
      * @return bool
      */
-    public static function arrayable($value)
+    public static function arrayable(mixed $value): bool
     {
         return is_array($value)
             || $value instanceof Arrayable
