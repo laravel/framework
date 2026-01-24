@@ -571,7 +571,6 @@ class CacheRepositoryTest extends TestCase
     {
         return '2030-07-25 12:13:14 UTC';
     }
-
 }
 
 enum TestCacheKey: string
