@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Attributes\WithoutRelations;
@@ -67,6 +68,13 @@ class ModelSerializationTest extends TestCase
             $table->unsignedInteger('user_id');
             $table->unsignedInteger('role_id');
         });
+    }
+
+    protected function tearDown(): void
+    {
+        Relation::morphMap([], false);
+
+        parent::tearDown();
     }
 
     public function testItSerializeUserOnDefaultConnection()
@@ -409,6 +417,29 @@ class ModelSerializationTest extends TestCase
         unserialize($serialized);
 
         $this->assertTrue(true);
+    }
+
+    public function test_it_users_morphmap_for_serialization()
+    {
+        Relation::morphMap([
+            'user' => User::class,
+        ]);
+
+        $user = User::create([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationAttributeTargetsClassTestClass($user, new DataValueObject('hello')));
+
+        $this->assertSame(
+            'O:83:"Illuminate\Tests\Integration\Queue\ModelSerializationAttributeTargetsClassTestClass":2:{s:4:"user";O:45:"Illuminate\Contracts\Database\ModelIdentifier":5:{s:5:"class";s:4:"user";s:2:"id";i:1;s:9:"relations";a:0:{}s:10:"connection";s:7:"testing";s:15:"collectionClass";N;}s:5:"value";O:50:"Illuminate\Tests\Integration\Queue\DataValueObject":1:{s:5:"value";s:5:"hello";}}',
+            $serialized
+        );
+
+        /** @var ModelSerializationAttributeTargetsClassTestClass $unserialized */
+        $unserialized = unserialize($serialized);
+
+        $this->assertTrue($unserialized->user->is($user));
     }
 }
 
