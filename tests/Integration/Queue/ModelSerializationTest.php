@@ -419,6 +419,7 @@ class ModelSerializationTest extends TestCase
         $this->assertTrue(true);
     }
 
+    #[WithConfig('database.default', 'testing')]
     public function test_it_users_morphmap_for_serialization()
     {
         Relation::morphMap([
