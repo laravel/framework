@@ -378,13 +378,42 @@ if (! function_exists('tap')) {
      * @template TValue
      *
      * @param  TValue  $value
-     * @param  (callable(TValue): mixed)|null  $callback
+     * @param  (callable(TValue): mixed)|int|null  $callback
      * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
      */
     function tap($value, $callback = null)
     {
         if (is_null($callback)) {
             return new HigherOrderTapProxy($value);
+        }
+
+        if (is_int($callback)) {
+            return tap_until($value, function () use (&$callback) {
+                return $callback-- !== 0;
+            });
+        }
+
+        $callback($value);
+
+        return $value;
+    }
+}
+
+if (! function_exists('tap_until')) {
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @template TValue
+     *
+     * @param  TValue  $value
+     * @param  callable(): bool  $until
+     * @param  (callable(TValue): mixed)|null  $callback
+     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : TValue)
+     */
+    function tap_until($value, $until, $callback = null)
+    {
+        if (is_null($callback)) {
+            return new HigherOrderTapProxy($value, $until);
         }
 
         $callback($value);
