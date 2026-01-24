@@ -96,7 +96,7 @@ class RateLimiter
     /**
      * Attempts to execute a callback if it's not limited.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @param  \Closure  $callback
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
@@ -120,14 +120,14 @@ class RateLimiter
     /**
      * Determine if the given key has been "accessed" too many times.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return bool
      */
     public function tooManyAttempts($key, $maxAttempts)
     {
         if ($this->attempts($key) >= $maxAttempts) {
-            if ($this->cache->has($this->cleanRateLimiterKey($key).':timer')) {
+            if ($this->cache->has($this->cleanRateLimiterKey(enum_value($key)).':timer')) {
                 return true;
             }
 
@@ -140,7 +140,7 @@ class RateLimiter
     /**
      * Increment (by 1) the counter for a given key for a given decay time.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @return int
      */
@@ -152,14 +152,14 @@ class RateLimiter
     /**
      * Increment the counter for a given key for a given decay time by a given amount.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @param  int  $amount
      * @return int
      */
     public function increment($key, $decaySeconds = 60, $amount = 1)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         $this->cache->add(
             $key.':timer', $this->availableAt($decaySeconds), $decaySeconds
@@ -183,7 +183,7 @@ class RateLimiter
     /**
      * Decrement the counter for a given key for a given decay time by a given amount.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  \DateTimeInterface|\DateInterval|int  $decaySeconds
      * @param  int  $amount
      * @return int
@@ -196,12 +196,12 @@ class RateLimiter
     /**
      * Get the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return mixed
      */
     public function attempts($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         return $this->withoutSerializationOrCompression(fn () => $this->cache->get($key, 0));
     }
@@ -209,12 +209,12 @@ class RateLimiter
     /**
      * Reset the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function resetAttempts($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         return $this->cache->forget($key);
     }
@@ -222,13 +222,13 @@ class RateLimiter
     /**
      * Get the number of retries left for the given key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return int
      */
     public function remaining($key, $maxAttempts)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         $attempts = $this->attempts($key);
 
@@ -238,7 +238,7 @@ class RateLimiter
     /**
      * Get the number of retries left for the given key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  int  $maxAttempts
      * @return int
      */
@@ -250,12 +250,12 @@ class RateLimiter
     /**
      * Clear the hits and lockout timer for the given key.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return void
      */
     public function clear($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         $this->resetAttempts($key);
 
@@ -265,12 +265,12 @@ class RateLimiter
     /**
      * Get the number of seconds until the "key" is accessible again.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return int
      */
     public function availableIn($key)
     {
-        $key = $this->cleanRateLimiterKey($key);
+        $key = $this->cleanRateLimiterKey(enum_value($key));
 
         return max(0, $this->cache->get($key.':timer') - $this->currentTime());
     }
