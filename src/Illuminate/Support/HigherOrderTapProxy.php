@@ -2,6 +2,8 @@
 
 namespace Illuminate\Support;
 
+use Closure;
+
 /**
  * @template Target
  */
@@ -11,7 +13,7 @@ class HigherOrderTapProxy
      * Create a new tap proxy instance.
      *
      * @param  Target  $target  The target being tapped.
-     * @param  (Closure(): bool)|null  $until
+     * @param  (\Closure(): bool)|null  $until
      */
     public function __construct(public $target, public ?Closure $until = null)
     {
