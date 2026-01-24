@@ -8,18 +8,11 @@ namespace Illuminate\Support;
 class HigherOrderTapProxy
 {
     /**
-     * The target being tapped.
-     *
-     * @var Target
-     */
-    public $target;
-
-    /**
      * Create a new tap proxy instance.
      *
-     * @param  Target  $target
+     * @param  Target  $target  The target being tapped.
      */
-    public function __construct($target)
+    public function __construct(public $target)
     {
         $this->target = $target;
     }
