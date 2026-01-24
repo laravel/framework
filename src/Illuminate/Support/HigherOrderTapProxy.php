@@ -11,8 +11,9 @@ class HigherOrderTapProxy
      * Create a new tap proxy instance.
      *
      * @param  Target  $target  The target being tapped.
+     * @param  (callable(): bool)|null  $until
      */
-    public function __construct(public $target)
+    public function __construct(public $target, public ?callable $until = null)
     {
         $this->target = $target;
     }
@@ -28,6 +29,8 @@ class HigherOrderTapProxy
     {
         $this->target->{$method}(...$parameters);
 
-        return $this->target;
+        return $this->until !== null && $until()
+            ? $this
+            : $this->target;
     }
 }
