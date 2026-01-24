@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 
+use function Illuminate\Support\enum_value;
+
 class Repository implements ArrayAccess, ConfigContract
 {
     use Macroable;
@@ -33,18 +35,18 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Determine if the given configuration value exists.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @return bool
      */
     public function has($key)
     {
-        return Arr::has($this->items, $key);
+        return Arr::has($this->items, enum_value($key));
     }
 
     /**
      * Get the specified configuration value.
      *
-     * @param  array|string  $key
+     * @param  \BackedEnum|\UnitEnum|array|string  $key
      * @param  mixed  $default
      * @return mixed
      */
@@ -54,7 +56,7 @@ class Repository implements ArrayAccess, ConfigContract
             return $this->getMany($key);
         }
 
-        return Arr::get($this->items, $key, $default);
+        return Arr::get($this->items, enum_value($key), $default);
     }
 
     /**
@@ -81,19 +83,19 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified string configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(string|null))|string|null  $default
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function string(string $key, $default = null): string
+    public function string(\BackedEnum|\UnitEnum|string $key, $default = null): string
     {
         $value = $this->get($key, $default);
 
         if (! is_string($value)) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a string, %s given.', $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a string, %s given.', enum_value($key), gettype($value))
             );
         }
 
@@ -103,19 +105,19 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified integer configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(int|null))|int|null  $default
      * @return int
      *
      * @throws \InvalidArgumentException
      */
-    public function integer(string $key, $default = null): int
+    public function integer(\BackedEnum|\UnitEnum|string $key, $default = null): int
     {
         $value = $this->get($key, $default);
 
         if (! is_int($value)) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an integer, %s given.', $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be an integer, %s given.', enum_value($key), gettype($value))
             );
         }
 
@@ -125,19 +127,19 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified float configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(float|null))|float|null  $default
      * @return float
      *
      * @throws \InvalidArgumentException
      */
-    public function float(string $key, $default = null): float
+    public function float(\BackedEnum|\UnitEnum|string $key, $default = null): float
     {
         $value = $this->get($key, $default);
 
         if (! is_float($value)) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a float, %s given.', $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a float, %s given.', enum_value($key), gettype($value))
             );
         }
 
@@ -147,19 +149,19 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified boolean configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(bool|null))|bool|null  $default
      * @return bool
      *
      * @throws \InvalidArgumentException
      */
-    public function boolean(string $key, $default = null): bool
+    public function boolean(\BackedEnum|\UnitEnum|string $key, $default = null): bool
     {
         $value = $this->get($key, $default);
 
         if (! is_bool($value)) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be a boolean, %s given.', enum_value($key), gettype($value))
             );
         }
 
@@ -169,19 +171,19 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified array configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return array<array-key, mixed>
      *
      * @throws \InvalidArgumentException
      */
-    public function array(string $key, $default = null): array
+    public function array(\BackedEnum|\UnitEnum|string $key, $default = null): array
     {
         $value = $this->get($key, $default);
 
         if (! is_array($value)) {
             throw new InvalidArgumentException(
-                sprintf('Configuration value for key [%s] must be an array, %s given.', $key, gettype($value))
+                sprintf('Configuration value for key [%s] must be an array, %s given.', enum_value($key), gettype($value))
             );
         }
 
@@ -191,11 +193,11 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified array configuration value as a collection.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return Collection<array-key, mixed>
      */
-    public function collection(string $key, $default = null): Collection
+    public function collection(\BackedEnum|\UnitEnum|string $key, $default = null): Collection
     {
         return new Collection($this->array($key, $default));
     }
@@ -203,7 +205,7 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Set a given configuration value.
      *
-     * @param  array|string  $key
+     * @param  \BackedEnum|\UnitEnum|array|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -212,14 +214,14 @@ class Repository implements ArrayAccess, ConfigContract
         $keys = is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
-            Arr::set($this->items, $key, $value);
+            Arr::set($this->items, enum_value($key), $value);
         }
     }
 
     /**
      * Prepend a value onto an array configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
@@ -235,7 +237,7 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Push a value onto an array configuration value.
      *
-     * @param  string  $key
+     * @param  \BackedEnum|\UnitEnum|string  $key
      * @param  mixed  $value
      * @return void
      */
