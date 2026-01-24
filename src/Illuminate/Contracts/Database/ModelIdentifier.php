@@ -53,8 +53,8 @@ class ModelIdentifier
      */
     public function __construct($class, $id, array $relations, $connection)
     {
-        $this->id = $id;
         $this->class = Relation::getMorphAlias($class);
+        $this->id = $id;
         $this->relations = $relations;
         $this->connection = $connection;
     }
