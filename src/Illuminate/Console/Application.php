@@ -245,7 +245,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     protected function addToParent(SymfonyCommand|callable $command)
     {
-        return parent::addCommand($command);
+        return parent::add($command);
     }
 
     /**
