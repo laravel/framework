@@ -9,7 +9,7 @@ class ModelIdentifier
     /**
      * The class name of the model.
      *
-     * @var class-string<\Illuminate\Database\Eloquent\Model>|string
+     * @var class-string<\Illuminate\Database\Eloquent\Model>|string|null
      */
     public $class;
 
@@ -73,10 +73,14 @@ class ModelIdentifier
     }
 
     /**
-     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     * @return class-string<\Illuminate\Database\Eloquent\Model>|null
      */
-    public function getClass(): string
+    public function getClass(): ?string
     {
+        if ($this->class === null) {
+            return null;
+        }
+
         return Relation::getMorphedModel($this->class) ?? $this->class;
     }
 }
