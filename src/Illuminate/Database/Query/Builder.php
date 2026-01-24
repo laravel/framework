@@ -1590,7 +1590,7 @@ class Builder implements BuilderContract
         }
 
         // Determine operators based on inclusion/exclusion flags
-        $includeStart = ! ($period->include_start_date === false);
+        $includeStart = $period->include_start_date !== false;
         $includeEnd = $period->include_end_date === true;
 
         $lowerOp = $includeStart ? '>=' : '>';
@@ -2872,7 +2872,7 @@ class Builder implements BuilderContract
         }
 
         // Determine operators based on inclusion/exclusion flags
-        $includeStart = ! ($period->include_start_date === false);
+        $includeStart = $period->include_start_date !== false;
         $includeEnd = $period->include_end_date === true;
 
         $lowerOp = $includeStart ? '>=' : '>';
