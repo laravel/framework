@@ -519,4 +519,13 @@ class MemoizedStoreTest extends TestCase
 
         $this->assertSame('value-2', $value);
     }
+
+    public function test_it_supports_restore_lock()
+    {
+        $owner = Cache::lock('foo', 10)->owner();
+
+        $restoredLock = Cache::memo()->restoreLock('foo', $owner);
+
+        $this->assertSame($owner, $restoredLock->owner());
+    }
 }

@@ -1169,7 +1169,7 @@ class Container implements ArrayAccess, ContainerContract
         array_pop($this->buildStack);
 
         $this->fireAfterResolvingAttributeCallbacks(
-            $reflector->getAttributes(), $instance = $reflector->newInstanceArgs($instances)
+            $reflector->getAttributes(), $instance = new $concrete(...$instances)
         );
 
         return $instance;
