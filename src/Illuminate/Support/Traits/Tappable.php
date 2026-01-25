@@ -8,7 +8,7 @@ trait Tappable
      * Call the given Closure with this instance then return the instance.
      *
      * @param  (callable($this): mixed)|int|null  $callback
-     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : $this)
+     * @return ($callback is null ? \Illuminate\Support\HigherOrderTapProxy : ($callback is int ? \Illuminate\Support\HigherOrderTapProxy : $this))
      */
     public function tap($callback = null)
     {
