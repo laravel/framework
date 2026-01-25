@@ -268,6 +268,7 @@ class Pipeline implements PipelineContract
 
         return $parameters;
     }
+
     /**
      * Get the array of configured pipes.
      *
