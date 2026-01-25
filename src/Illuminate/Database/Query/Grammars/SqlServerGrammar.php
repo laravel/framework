@@ -130,6 +130,87 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where row in" clause.
+     *
+     * SQL Server does not support the row constructor syntax (col1, col2) IN ((v1, v2), ...),
+     * so we convert it to multiple OR conditions.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereRowIn(Builder $query, $where)
+    {
+        return $this->compileRowInCondition($where['columns'], $where['values'], false);
+    }
+
+    /**
+     * Compile a "where not row in" clause.
+     *
+     * SQL Server does not support the row constructor syntax (col1, col2) NOT IN ((v1, v2), ...),
+     * so we convert it to multiple AND conditions with NOT.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotRowIn(Builder $query, $where)
+    {
+        return $this->compileRowInCondition($where['columns'], $where['values'], true);
+    }
+
+    /**
+     * Compile row in condition for SQL Server fallback.
+     *
+     * @param  array  $columns
+     * @param  array  $values
+     * @param  bool  $not
+     * @return string
+     */
+    protected function compileRowInCondition(array $columns, array $values, bool $not)
+    {
+        // Handle empty values like whereIn/whereNotIn
+        if (empty($values)) {
+            return $not ? '1 = 1' : '0 = 1';
+        }
+
+        // Handle subquery (Expression)
+        if (count($values) === 1 && $values[0] instanceof \Illuminate\Contracts\Database\Query\Expression) {
+            $columnList = $this->columnize($columns);
+
+            return '('.$columnList.')'.($not ? ' not' : '').' in ('.$values[0]->getValue($this).')';
+        }
+
+        $conditions = [];
+
+        foreach ($values as $row) {
+            $rowConditions = [];
+
+            foreach ($columns as $index => $column) {
+                $value = $row[$index] ?? null;
+
+                if ($value instanceof \Illuminate\Contracts\Database\Query\Expression) {
+                    $rowConditions[] = $this->wrap($column).' = '.$value->getValue($this);
+                } else {
+                    $rowConditions[] = $this->wrap($column).' = '.$this->parameter($value);
+                }
+            }
+
+            $conditions[] = '('.implode(' and ', $rowConditions).')';
+        }
+
+        if ($not) {
+            // NOT IN: negate each condition with AND
+            // (col1, col2) NOT IN ((1, 2), (3, 4)) => NOT ((col1 = 1 AND col2 = 2) OR (col1 = 3 AND col2 = 4))
+            return 'not ('.implode(' or ', $conditions).')';
+        }
+
+        // IN: join conditions with OR
+        // (col1, col2) IN ((1, 2), (3, 4)) => (col1 = 1 AND col2 = 2) OR (col1 = 3 AND col2 = 4)
+        return '('.implode(' or ', $conditions).')';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param  \Illuminate\Database\Query\Builder  $query

@@ -1476,6 +1476,259 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testBasicWhereRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('status', '=', 'active')->orWhereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where "status" = ? or ("id", "name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 'active', 1 => 1, 2 => 'Alice', 3 => 2, 4 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testBasicWhereNotRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('status', '=', 'active')->orWhereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where "status" = ? or ("id", "name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 'active', 1 => 1, 2 => 'Alice', 3 => 2, 4 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereRowInWithSingleColumn()
+    {
+        // Single column delegates to whereIn for cleaner SQL
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id'], [[1], [2], [3]]);
+        $this->assertSame('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        // Also works with whereNotRowIn
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id'], [[1], [2], [3]]);
+        $this->assertSame('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
+    public function testWhereRowInWithThreeColumns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(
+            ['first_name', 'last_name', 'email'],
+            [
+                ['John', 'Doe', 'john@example.com'],
+                ['Jane', 'Doe', 'jane@example.com'],
+            ]
+        );
+        $this->assertSame('select * from "users" where ("first_name", "last_name", "email") in ((?, ?, ?), (?, ?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 'John', 1 => 'Doe', 2 => 'john@example.com', 3 => 'Jane', 4 => 'Doe', 5 => 'jane@example.com'], $builder->getBindings());
+    }
+
+    public function testRawWhereRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[new Raw(1), 'Alice']]);
+        $this->assertSame('select * from "users" where ("id", "name") in ((1, ?))', $builder->toSql());
+        $this->assertEquals([0 => 'Alice'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('status', '=', 'active')->orWhereRowIn(['id', 'name'], [[new Raw(1), new Raw("'Alice'")]]);
+        $this->assertSame('select * from "users" where "status" = ? or ("id", "name") in ((1, \'Alice\'))', $builder->toSql());
+        $this->assertEquals([0 => 'active'], $builder->getBindings());
+    }
+
+    public function testWhereRowInWithEmptyColumnsThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Columns cannot be empty.');
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn([], [[1, 'Alice']]);
+    }
+
+    public function testEmptyWhereRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], []);
+        $this->assertSame('select * from "users" where 0 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereRowIn(['id', 'name'], []);
+        $this->assertSame('select * from "users" where "id" = ? or 0 = 1', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testEmptyWhereNotRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], []);
+        $this->assertSame('select * from "users" where 1 = 1', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereNotRowIn(['id', 'name'], []);
+        $this->assertSame('select * from "users" where "id" = ? or 1 = 1', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testWhereRowInWithNonArrayValueThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each value for whereRowIn must be an array.');
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [1, 2, 3]);
+    }
+
+    public function testWhereRowInWithMismatchedColumnCountThrowsException()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each value row must have the same number of columns.');
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice', 'extra']]);
+    }
+
+    public function testSubSelectWhereRowIns()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], function ($q) {
+            $q->select('id', 'name')->from('users')->where('age', '>', 25)->limit(3);
+        });
+        $this->assertSame('select * from "users" where ("id", "name") in (select "id", "name" from "users" where "age" > ? limit 3)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], function ($q) {
+            $q->select('id', 'name')->from('users')->where('age', '>', 25)->limit(3);
+        });
+        $this->assertSame('select * from "users" where ("id", "name") not in (select "id", "name" from "users" where "age" > ? limit 3)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+    }
+
+    public function testWhereRowInSqlServer()
+    {
+        // SQL Server uses fallback syntax with OR conditions
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from [users] where (([id] = ? and [name] = ?) or ([id] = ? and [name] = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('status', '=', 'active')->orWhereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from [users] where [status] = ? or (([id] = ? and [name] = ?) or ([id] = ? and [name] = ?))', $builder->toSql());
+        $this->assertEquals([0 => 'active', 1 => 1, 2 => 'Alice', 3 => 2, 4 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereNotRowInSqlServer()
+    {
+        // SQL Server uses fallback syntax with NOT (... OR ...)
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from [users] where not (([id] = ? and [name] = ?) or ([id] = ? and [name] = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('status', '=', 'active')->orWhereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from [users] where [status] = ? or not (([id] = ? and [name] = ?) or ([id] = ? and [name] = ?))', $builder->toSql());
+        $this->assertEquals([0 => 'active', 1 => 1, 2 => 'Alice', 3 => 2, 4 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereRowInWithSingleValueSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice']]);
+        $this->assertSame('select * from [users] where (([id] = ? and [name] = ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice'], $builder->getBindings());
+    }
+
+    public function testSubSelectWhereRowInsSqlServer()
+    {
+        // SQL Server supports subquery syntax for row in
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], function ($q) {
+            $q->select('id', 'name')->from('users')->where('age', '>', 25)->limit(3);
+        });
+        $this->assertSame('select * from [users] where ([id], [name]) in (select top 3 [id], [name] from [users] where [age] > ?)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], function ($q) {
+            $q->select('id', 'name')->from('users')->where('age', '>', 25)->limit(3);
+        });
+        $this->assertSame('select * from [users] where ([id], [name]) not in (select top 3 [id], [name] from [users] where [age] > ?)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+    }
+
+    public function testWhereRowInMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from `users` where (`id`, `name`) in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereNotRowInMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from `users` where (`id`, `name`) not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereRowInPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereNotRowInPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereRowInSQLite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereNotRowInSQLite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from "users" where ("id", "name") not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereRowInMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from `users` where (`id`, `name`) in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
+    public function testWhereNotRowInMariaDb()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereNotRowIn(['id', 'name'], [[1, 'Alice'], [2, 'Bob']]);
+        $this->assertSame('select * from `users` where (`id`, `name`) not in ((?, ?), (?, ?))', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'Alice', 2 => 2, 3 => 'Bob'], $builder->getBindings());
+    }
+
     public function testBasicWhereColumn()
     {
         $builder = $this->getBuilder();

@@ -1392,6 +1392,127 @@ class Builder implements BuilderContract
     }
 
     /**
+     * Add a "where row in" clause to the query.
+     *
+     * @param  array  $columns
+     * @param  mixed  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
+     */
+    public function whereRowIn(array $columns, $values, $boolean = 'and', $not = false)
+    {
+        if (empty($columns)) {
+            throw new InvalidArgumentException('Columns cannot be empty.');
+        }
+
+        // For single column, delegate to whereIn for cleaner SQL output.
+        // e.g., "id" in (?, ?, ?) instead of ("id") in ((?), (?), (?))
+        if (count($columns) === 1) {
+            // Convert [[1], [2], [3]] to [1, 2, 3] for whereIn
+            if (is_array($values) || $values instanceof Arrayable) {
+                $flatValues = [];
+
+                foreach ($values as $row) {
+                    $flatValues[] = is_array($row) ? array_values($row)[0] : $row;
+                }
+
+                $values = $flatValues;
+            }
+
+            return $this->whereIn($columns[0], $values, $boolean, $not);
+        }
+
+        $type = $not ? 'NotRowIn' : 'RowIn';
+
+        // If the value is a query builder instance we will assume the developer wants to
+        // look for any values that exist within this given query. So, we will add the
+        // query accordingly so that this query is properly executed when it is run.
+        if ($this->isQueryable($values)) {
+            [$query, $bindings] = $this->createSub($values);
+
+            $values = [new Expression($query)];
+
+            $this->addBinding($bindings, 'where');
+
+            $this->wheres[] = compact('type', 'columns', 'values', 'boolean');
+
+            return $this;
+        }
+
+        // Next, if the value is Arrayable we need to cast it to its raw array form so we
+        // have the underlying array value instead of an Arrayable object which is not
+        // able to be added as a binding, etc. We will then add to the wheres array.
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        // Validate row shape for non-empty values
+        foreach ($values as $row) {
+            if (! is_array($row)) {
+                throw new InvalidArgumentException(
+                    'Each value for whereRowIn must be an array.'
+                );
+            }
+
+            if (count($row) !== count($columns)) {
+                throw new InvalidArgumentException(
+                    'Each value row must have the same number of columns.'
+                );
+            }
+        }
+
+        $this->wheres[] = compact('type', 'columns', 'values', 'boolean');
+
+        // Finally, we'll add a binding for each value unless that value is an expression
+        // in which case we will just skip over it since it will be the query as a raw
+        // string and not as a parameterized place-holder to be replaced by the PDO.
+        // Flatten bindings: [[1, 2], [3, 4]] → [1, 2, 3, 4]
+        $this->addBinding(
+            $this->cleanBindings(Arr::flatten($values, 1))
+        );
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where row in" clause to the query.
+     *
+     * @param  array  $columns
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereRowIn(array $columns, $values)
+    {
+        return $this->whereRowIn($columns, $values, 'or');
+    }
+
+    /**
+     * Add a "where row not in" clause to the query.
+     *
+     * @param  array  $columns
+     * @param  mixed  $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNotRowIn(array $columns, $values, $boolean = 'and')
+    {
+        return $this->whereRowIn($columns, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where row not in" clause to the query.
+     *
+     * @param  array  $columns
+     * @param  mixed  $values
+     * @return $this
+     */
+    public function orWhereNotRowIn(array $columns, $values)
+    {
+        return $this->whereNotRowIn($columns, $values, 'or');
+    }
+
+    /**
      * Add a "where in raw" clause for integer values to the query.
      *
      * @param  string  $column

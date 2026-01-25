@@ -396,6 +396,65 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where row in" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereRowIn(Builder $query, $where)
+    {
+        return $this->compileRowIn($query, $where);
+    }
+
+    /**
+     * Compile a "where not row in" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotRowIn(Builder $query, $where)
+    {
+        return $this->compileRowIn($query, $where, true);
+    }
+
+    /**
+     * Compile a row in clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @param  bool  $not
+     * @return string
+     */
+    protected function compileRowIn(Builder $query, $where, $not = false)
+    {
+        $values = $where['values'];
+
+        // Handle empty values like whereIn/whereNotIn
+        if (empty($values)) {
+            return $not ? '1 = 1' : '0 = 1';
+        }
+
+        $columns = $this->columnize($where['columns']);
+
+        $operator = $not ? 'not in' : 'in';
+
+        // Handle subquery (Expression)
+        if (count($values) === 1 && $values[0] instanceof Expression) {
+            return '('.$columns.') '.$operator.' ('.$values[0]->getValue($this).')';
+        }
+
+        $valueSets = [];
+
+        foreach ($values as $row) {
+            $valueSets[] = '('.$this->parameterize($row).')';
+        }
+
+        return '('.$columns.') '.$operator.' ('.implode(', ', $valueSets).')';
+    }
+
+    /**
      * Compile a "where null" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
