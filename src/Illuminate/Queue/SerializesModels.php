@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Queue\Attributes\WithoutEagerLoads;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use ReflectionClass;
 use ReflectionProperty;
@@ -72,9 +73,13 @@ trait SerializesModels
      */
     public function __unserialize(array $values)
     {
-        $properties = (new ReflectionClass($this))->getProperties();
+        $reflectionClass = new ReflectionClass($this);
 
-        $class = get_class($this);
+        [$class, $properties, $classLevelWithoutEagerLoads] = [
+            get_class($this),
+            $reflectionClass->getProperties(),
+            ! empty($reflectionClass->getAttributes(WithoutEagerLoads::class)),
+        ];
 
         foreach ($properties as $property) {
             if ($property->isStatic()) {
@@ -94,7 +99,11 @@ trait SerializesModels
             }
 
             $property->setValue(
-                $this, $this->getRestoredPropertyValue($values[$name])
+                $this, $this->getRestoredPropertyValue(
+                    $values[$name],
+                    $classLevelWithoutEagerLoads ||
+                    ! empty($property->getAttributes(WithoutEagerLoads::class))
+                )
             );
         }
     }

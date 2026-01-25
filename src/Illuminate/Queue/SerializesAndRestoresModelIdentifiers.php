@@ -50,26 +50,28 @@ trait SerializesAndRestoresModelIdentifiers
      * Get the restored property value after deserialization.
      *
      * @param  mixed  $value
+     * @param  bool  $withoutEagerLoads
      * @return mixed
      */
-    protected function getRestoredPropertyValue($value)
+    protected function getRestoredPropertyValue($value, $withoutEagerLoads = false)
     {
         if (! $value instanceof ModelIdentifier) {
             return $value;
         }
 
         return is_array($value->id)
-            ? $this->restoreCollection($value)
-            : $this->restoreModel($value);
+            ? $this->restoreCollection($value, $withoutEagerLoads)
+            : $this->restoreModel($value, $withoutEagerLoads);
     }
 
     /**
      * Restore a queueable collection instance.
      *
      * @param  \Illuminate\Contracts\Database\ModelIdentifier  $value
+     * @param  bool  $withoutEagerLoads
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    protected function restoreCollection($value)
+    protected function restoreCollection($value, $withoutEagerLoads = false)
     {
         if (! $value->class || count($value->id) === 0) {
             return ! is_null($value->collectionClass ?? null)
@@ -79,7 +81,10 @@ trait SerializesAndRestoresModelIdentifiers
 
         $collection = $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->get();
+        )->useWritePdo()->when(
+            $withoutEagerLoads,
+            fn ($query) => $query->withoutEagerLoads()
+        )->get();
 
         if (is_a($value->class, Pivot::class, true) ||
             in_array(AsPivot::class, class_uses($value->class))) {
@@ -101,13 +106,17 @@ trait SerializesAndRestoresModelIdentifiers
      * Restore the model from the model identifier instance.
      *
      * @param  \Illuminate\Contracts\Database\ModelIdentifier  $value
+     * @param  bool  $withoutEagerLoads
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function restoreModel($value)
+    public function restoreModel($value, $withoutEagerLoads = false)
     {
         return $this->getQueryForModelRestoration(
             (new $value->class)->setConnection($value->connection), $value->id
-        )->useWritePdo()->firstOrFail()->loadMissing($value->relations ?? []);
+        )->useWritePdo()->when(
+            $withoutEagerLoads,
+            fn ($query) => $query->withoutEagerLoads()
+        )->firstOrFail()->loadMissing($value->relations ?? []);
     }
 
     /**

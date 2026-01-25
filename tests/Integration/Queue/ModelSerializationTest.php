@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Queue\Attributes\WithoutEagerLoads;
 use Illuminate\Queue\Attributes\WithoutRelations;
 use Illuminate\Queue\SerializesModels;
 use LogicException;
@@ -399,6 +400,28 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('hello', $unserialized->value->value);
     }
 
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_respects_without_eager_loads_attribute()
+    {
+        $order = ModelSerializationTestCustomOrder::create();
+
+        $serialized = serialize(new ModelSerializationWithoutEagerLoads($order->withoutRelations()));
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->order->relationLoaded('lines'));
+    }
+
+    #[WithConfig('database.default', 'testing')]
+    public function test_it_respects_without_eager_loads_attribute_applied_to_class()
+    {
+        $order = ModelSerializationTestCustomOrder::create();
+
+        $serialized = serialize(new ModelSerializationWithoutEagerLoadsTargetsClass($order->withoutRelations()));
+        $unserialized = unserialize($serialized);
+
+        $this->assertFalse($unserialized->order->relationLoaded('lines'));
+    }
+
     public function test_serialization_types_empty_custom_eloquent_collection()
     {
         $class = new ModelSerializationTypedCustomCollectionTestClass(
@@ -655,6 +678,32 @@ class ModelSerializationAttributeTargetsClassTestClass
 
     public function __construct(public User $user, public DataValueObject $value)
     {
+    }
+}
+
+class ModelSerializationWithoutEagerLoads
+{
+    use SerializesModels;
+
+    #[WithoutEagerLoads]
+    public ModelSerializationTestCustomOrder $order;
+
+    public function __construct(ModelSerializationTestCustomOrder $order)
+    {
+        $this->order = $order;
+    }
+}
+
+#[WithoutEagerLoads]
+class ModelSerializationWithoutEagerLoadsTargetsClass
+{
+    use SerializesModels;
+
+    public ModelSerializationTestCustomOrder $order;
+
+    public function __construct(ModelSerializationTestCustomOrder $order)
+    {
+        $this->order = $order;
     }
 }
 
