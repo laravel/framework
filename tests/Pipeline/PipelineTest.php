@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Pipeline;
 
 use Exception;
 use Illuminate\Container\Container;
+use Illuminate\Pipeline\DefaultValue;
 use Illuminate\Pipeline\Pipeline;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -427,6 +428,54 @@ class PipelineTest extends TestCase
             throw $e;
         }
     }
+
+    public function testPipelineUsageWithObjectDefaultParametersPlaceholder()
+    {
+        $parameters = [DefaultValue::class, 'two', DefaultValue::class];
+        $passedParameters = [null, 'two', 1];
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestDefaultParameterPipe::class.':'.implode(',', $parameters))
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertSame($passedParameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
+
+    public function testPipelineThrowExceptionOnFillParameterWithoutDefaultValue()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The parameter parameter1 must have a default value.');
+
+        $parameters = [DefaultValue::class];
+        (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestDefaultParameterPipeThree::class.':'.implode(',', $parameters))
+            ->then(function ($piped) {
+                return $piped;
+            });
+    }
+
+    public function testPipelineUsageWithInvokableDefaultParametersPlaceholder()
+    {
+        $parameters = [DefaultValue::class, 'two', DefaultValue::class];
+        $passedParameters = [null, 'two', 1];
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestDefaultParameterPipeTwo::class.':'.implode(',', $parameters))
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertSame($passedParameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
 }
 
 class PipelineTestPipeOne
@@ -459,6 +508,36 @@ class PipelineTestParameterPipe
     public function handle($piped, $next, $parameter1 = null, $parameter2 = null)
     {
         $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2];
+
+        return $next($piped);
+    }
+}
+
+class PipelineTestDefaultParameterPipe
+{
+    public function handle($piped, $next, $parameter1 = null, $parameter2 = null, $parameter3 = 1)
+    {
+        $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2, $parameter3];
+
+        return $next($piped);
+    }
+}
+
+class PipelineTestDefaultParameterPipeTwo
+{
+    public function __invoke($piped, $next, $parameter1 = null, $parameter2 = null, $parameter3 = 1)
+    {
+        $_SERVER['__test.pipe.parameters'] = [$parameter1, $parameter2, $parameter3];
+
+        return $next($piped);
+    }
+}
+
+class PipelineTestDefaultParameterPipeThree
+{
+    public function handle($piped, $next, $parameter1)
+    {
+        $_SERVER['__test.pipe.parameters'] = [$parameter1];
 
         return $next($piped);
     }
