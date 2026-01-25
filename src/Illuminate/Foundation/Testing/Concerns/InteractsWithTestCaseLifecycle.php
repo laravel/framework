@@ -7,7 +7,6 @@ use Illuminate\Console\Application as Artisan;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Foundation\Bootstrap\RegisterProviders;
@@ -191,7 +190,6 @@ trait InteractsWithTestCaseLifecycle
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);
         RegisterProviders::flushState();
-        Relation::flushState();
         Response::flushState();
         Sleep::fake(false);
         TrimStrings::flushState();
