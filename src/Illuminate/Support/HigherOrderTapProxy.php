@@ -17,7 +17,6 @@ class HigherOrderTapProxy
      */
     public function __construct(public $target, public ?Closure $until = null)
     {
-        $this->target = $target;
     }
 
     /**
