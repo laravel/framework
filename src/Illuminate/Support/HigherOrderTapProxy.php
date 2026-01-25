@@ -31,7 +31,7 @@ class HigherOrderTapProxy
     {
         $this->target->{$method}(...$parameters);
 
-        return $this->until !== null && $this->until()
+        return $this->until !== null && ($this->until)()
             ? $this
             : $this->target;
     }
