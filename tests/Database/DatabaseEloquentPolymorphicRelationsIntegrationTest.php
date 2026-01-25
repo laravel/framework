@@ -67,7 +67,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
             $this->schema($connection)->drop('taggables');
         }
 
-        Relation::morphMap([], false);
+        Relation::flushState();
 
         parent::tearDown();
     }

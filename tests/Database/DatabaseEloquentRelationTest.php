@@ -15,6 +15,13 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Relation::flushState();
+        parent::tearDown();
+    }
+
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;
@@ -215,8 +222,6 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertEquals([
             'reset' => EloquentRelationResetModelStub::class,
         ], Relation::morphMap());
-
-        Relation::morphMap([], false);
     }
 
     public function testSettingMorphMapWithNumericKeys()
@@ -226,8 +231,6 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertEquals([
             1 => 'App\User',
         ], Relation::morphMap());
-
-        Relation::morphMap([], false);
     }
 
     public function testGetMorphAlias()

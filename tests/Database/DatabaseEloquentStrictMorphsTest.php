@@ -70,8 +70,7 @@ class DatabaseEloquentStrictMorphsTest extends TestCase
 
     protected function tearDown(): void
     {
-        Relation::morphMap([], false);
-        Relation::requireMorphMap(false);
+        Relation::flushState();
 
         parent::tearDown();
     }
