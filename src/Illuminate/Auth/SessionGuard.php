@@ -141,7 +141,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  \Illuminate\Support\Timebox|null  $timebox
      * @param  bool  $rehashOnLogin
      * @param  int  $timeboxDuration
-     * @param string|null $hashKey
+     * @param  string|null  $hashKey
      */
     public function __construct(
         $name,
