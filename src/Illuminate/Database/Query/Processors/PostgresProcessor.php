@@ -94,6 +94,7 @@ class PostgresProcessor extends Processor
                 'generation' => $result->generated ? [
                     'type' => match ($result->generated) {
                         's' => 'stored',
+                        'v' => 'virtual',
                         default => null,
                     },
                     'expression' => $result->default,

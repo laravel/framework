@@ -16,11 +16,11 @@ class SleepTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Sleep::fake(false);
 
         Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     public function testItSleepsForSeconds()
@@ -258,7 +258,7 @@ class SleepTest extends TestCase
         Sleep::fake();
         Carbon::setTestNow(now()->startOfDay());
 
-        Sleep::until(strval(now()->addMinute()->timestamp));
+        Sleep::until((string) now()->addMinute()->timestamp);
 
         Sleep::assertSequence([
             Sleep::for(60)->seconds(),

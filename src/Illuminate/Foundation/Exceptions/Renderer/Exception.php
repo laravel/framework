@@ -113,38 +113,40 @@ class Exception
      */
     public function frames()
     {
-        $classMap = once(fn () => array_map(function ($path) {
-            return (string) realpath($path);
-        }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap()));
+        return once(function () {
+            $classMap = array_map(function ($path) {
+                return (string) realpath($path);
+            }, array_values(ClassLoader::getRegisteredLoaders())[0]->getClassMap());
 
-        $trace = array_values(array_filter(
-            $this->exception->getTrace(), fn ($trace) => isset($trace['file']),
-        ));
+            $trace = array_values(array_filter(
+                $this->exception->getTrace(), fn ($trace) => isset($trace['file']),
+            ));
 
-        if (($trace[1]['class'] ?? '') === HandleExceptions::class) {
-            array_shift($trace);
-            array_shift($trace);
-        }
-
-        $frames = [];
-        $previousFrame = null;
-
-        foreach (array_reverse($trace) as $frameData) {
-            $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
-            $frames[] = $frame;
-            $previousFrame = $frame;
-        }
-
-        $frames = array_reverse($frames);
-
-        foreach ($frames as $frame) {
-            if (! $frame->isFromVendor()) {
-                $frame->markAsMain();
-                break;
+            if (($trace[1]['class'] ?? '') === HandleExceptions::class) {
+                array_shift($trace);
+                array_shift($trace);
             }
-        }
 
-        return new Collection($frames);
+            $frames = [];
+            $previousFrame = null;
+
+            foreach (array_reverse($trace) as $frameData) {
+                $frame = new Frame($this->exception, $classMap, $frameData, $this->basePath, $previousFrame);
+                $frames[] = $frame;
+                $previousFrame = $frame;
+            }
+
+            $frames = array_reverse($frames);
+
+            foreach ($frames as $frame) {
+                if (! $frame->isFromVendor()) {
+                    $frame->markAsMain();
+                    break;
+                }
+            }
+
+            return new Collection($frames);
+        });
     }
 
     /**

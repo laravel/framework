@@ -430,6 +430,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a vector index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileVectorIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileIndexWithOperatorClass($blueprint, $command);
+    }
+
+    /**
      * Compile a spatial index with operator class key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -1257,7 +1269,7 @@ class PostgresGrammar extends Grammar
         }
 
         if (! is_null($column->virtualAs)) {
-            return " generated always as ({$this->getValue($column->virtualAs)})";
+            return " generated always as ({$this->getValue($column->virtualAs)}) virtual";
         }
     }
 

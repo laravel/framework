@@ -232,7 +232,7 @@ if (! function_exists('laravel_cloud')) {
     function laravel_cloud(): bool
     {
         return ($_ENV['LARAVEL_CLOUD'] ?? false) === '1' ||
-               ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
+            ($_SERVER['LARAVEL_CLOUD'] ?? false) === '1';
     }
 }
 
@@ -398,11 +398,13 @@ if (! function_exists('throw_if')) {
      * Throw the given exception if the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is true ? never : ($condition is non-empty-mixed ? never : TValue))
      *
      * @throws TException
@@ -410,6 +412,10 @@ if (! function_exists('throw_if')) {
     function throw_if($condition, $exception = 'RuntimeException', ...$parameters)
     {
         if ($condition) {
+            if ($exception instanceof Closure) {
+                $exception = $exception(...$parameters);
+            }
+
             if (is_string($exception) && class_exists($exception)) {
                 $exception = new $exception(...$parameters);
             }
@@ -426,11 +432,13 @@ if (! function_exists('throw_unless')) {
      * Throw the given exception unless the given condition is true.
      *
      * @template TValue
+     * @template TParams of mixed
      * @template TException of \Throwable
+     * @template TExceptionValue of TException|class-string<TException>|string
      *
      * @param  TValue  $condition
-     * @param  TException|class-string<TException>|string  $exception
-     * @param  mixed  ...$parameters
+     * @param  Closure(TParams): TExceptionValue|TExceptionValue  $exception
+     * @param  TParams  ...$parameters
      * @return ($condition is false ? never : ($condition is non-empty-mixed ? TValue : never))
      *
      * @throws TException

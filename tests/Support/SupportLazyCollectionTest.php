@@ -209,8 +209,6 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2], $results);
         $this->assertSame([2, 1], $timedOutWith);
-
-        m::close();
     }
 
     public function testTapEach()
@@ -390,6 +388,21 @@ class SupportLazyCollectionTest extends TestCase
 
         $multipleCollection = new LazyCollection([1, 2, 3]);
         $this->assertFalse($multipleCollection->containsOneItem());
+    }
+
+    public function testContainsManyItems()
+    {
+        $emptyCollection = new LazyCollection([]);
+        $this->assertFalse($emptyCollection->containsManyItems());
+
+        $singleCollection = new LazyCollection([1]);
+        $this->assertFalse($singleCollection->containsManyItems());
+
+        $multipleCollection = new LazyCollection([1, 2]);
+        $this->assertTrue($multipleCollection->containsManyItems());
+
+        $manyCollection = new LazyCollection([1, 2, 3]);
+        $this->assertTrue($manyCollection->containsManyItems());
     }
 
     public function testDoesntContain()

@@ -28,11 +28,6 @@ class RouteRegistrarTest extends TestCase
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testMiddlewareFluentRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {
@@ -125,6 +120,23 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('all-users', Request::create('users', 'GET'));
         $this->assertSame(['one', 'two'], $this->getRoute()->middleware());
+    }
+
+    public function testMiddlewareAsNull()
+    {
+        $this->router->middleware(null)->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame([], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware(null);
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertSame([], $this->getRoute()->middleware());
     }
 
     public function testWithoutMiddlewareRegistration()

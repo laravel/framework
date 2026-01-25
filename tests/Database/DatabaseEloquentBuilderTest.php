@@ -29,11 +29,9 @@ class DatabaseEloquentBuilderTest extends TestCase
 {
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         Carbon::setTestNow(null);
 
-        m::close();
+        parent::tearDown();
     }
 
     public function testFindMethod()
@@ -2153,6 +2151,33 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not "eloquent_builder_test_model_parent_stubs"."morph_type" <=> ?', $builder->toSql());
         $this->assertEquals(['baz', EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
+    }
+
+    public function testWhereNotMorphedToWithSQLite()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $relatedModel = new EloquentBuilderTestModelCloseRelatedStub;
+        $relatedModel->id = 1;
+
+        $builder = $model->whereNotMorphedTo('morph', $relatedModel);
+
+        $this->assertStringNotContainsString('<=>', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not (("eloquent_builder_test_model_parent_stubs"."morph_type" IS ? and "eloquent_builder_test_model_parent_stubs"."morph_id" in (?)))', $builder->toSql());
+        $this->assertEquals([$relatedModel->getMorphClass(), $relatedModel->getKey()], $builder->getBindings());
+    }
+
+    public function testWhereNotMorphedToClassWithSQLite()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $builder = $model->whereNotMorphedTo('morph', EloquentBuilderTestModelCloseRelatedStub::class);
+
+        $this->assertStringNotContainsString('<=>', $builder->toSql());
+        $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where not "eloquent_builder_test_model_parent_stubs"."morph_type" IS ?', $builder->toSql());
+        $this->assertEquals([EloquentBuilderTestModelCloseRelatedStub::class], $builder->getBindings());
     }
 
     public function testWhereMorphedToAlias()

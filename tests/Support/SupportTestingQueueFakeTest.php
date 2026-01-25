@@ -31,13 +31,6 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->job = new JobStub;
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        m::close();
-    }
-
     public function testAssertPushed()
     {
         try {

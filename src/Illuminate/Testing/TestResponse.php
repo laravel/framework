@@ -373,11 +373,34 @@ class TestResponse implements ArrayAccess
         $actual = $this->headers->get($headerName);
 
         if (! is_null($value)) {
-            PHPUnit::withResponse($this)->assertEquals(
+            PHPUnit::withResponse($this)->assertEqualsIgnoringCase(
                 $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the response contains the given header and that its value contains the given string.
+     *
+     * @param  string  $headerName
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertHeaderContains($headerName, $value)
+    {
+        PHPUnit::withResponse($this)->assertTrue(
+            $this->headers->has($headerName), "Header [{$headerName}] not present on response."
+        );
+
+        $actual = $this->headers->get($headerName, '');
+
+        PHPUnit::withResponse($this)->assertTrue(
+            Str::contains($actual, $value),
+            "Header [{$headerName}] was found, but [{$actual}] does not contain [{$value}]."
+        );
 
         return $this;
     }

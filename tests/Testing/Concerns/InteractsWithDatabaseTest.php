@@ -18,11 +18,6 @@ class InteractsWithDatabaseTest extends TestCase
         Facade::setFacadeApplication(null);
     }
 
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCastToJsonSqlite()
     {
         $grammar = 'SQLite';

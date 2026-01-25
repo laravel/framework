@@ -10,11 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRateLimiterTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut()
     {
         $cache = m::mock(Cache::class);
@@ -74,6 +69,18 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter = new RateLimiter($cache);
 
         $rateLimiter->hit('key', 1);
+    }
+
+    public function testRemainingIsNotNegative(): void
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('get')->with('key', 0)->andReturn(5);
+        $cache->shouldReceive('getStore')->andReturn(new ArrayStore);
+
+        $rateLimiter = new RateLimiter($cache);
+
+        $this->assertSame(0, $rateLimiter->remaining('key', 3));
+        $this->assertSame(0, $rateLimiter->retriesLeft('key', 3));
     }
 
     public function testRetriesLeftReturnsCorrectCount()

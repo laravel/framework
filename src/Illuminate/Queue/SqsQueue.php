@@ -234,7 +234,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
             return $options;
         }
 
-        $transformToString = fn ($value) => strval($value);
+        $transformToString = fn ($value) => (string) $value;
 
         // The message group ID is required for FIFO queues and is optional for
         // standard queues. Job objects contain a group ID. With string jobs
@@ -242,7 +242,7 @@ class SqsQueue extends Queue implements QueueContract, ClearableQueue
         $messageGroupId = null;
 
         if ($isObject) {
-            $messageGroupId = transform($job->messageGroup ?? null, $transformToString);
+            $messageGroupId = transform($job->messageGroup ?? (method_exists($job, 'messageGroup') ? $job->messageGroup() : null), $transformToString);
         } elseif ($isFifo) {
             $messageGroupId = transform($queue, $transformToString);
         }

@@ -63,9 +63,6 @@ window.highlight = function (
                 pre(node) {
                     this.addClassToHast(node, ['bg-transparent!', truncate ? 'truncate' : 'w-fit min-w-full']);
                 },
-                code(node) {
-                    this.addClassToHast(node, 'flex flex-col');
-                },
                 line(node, line) {
                     if (!editor) {
                         return;
@@ -89,7 +86,7 @@ window.highlight = function (
                     node.children.unshift(lineNumberSpan);
 
                     this.addClassToHast(node, [
-                        'block px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4',
+                        'inline-block w-full px-4 py-1 h-7 even:bg-white odd:bg-white/2 even:dark:bg-white/2 odd:dark:bg-white/4',
                         highlight ? 'bg-rose-200! dark:bg-rose-900!' : '',
                     ]);
                 },

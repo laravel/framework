@@ -110,7 +110,7 @@
                     language="sql"
                     truncate
                     class="min-w-0"
-                    data-tippy-content="{{ $sql }}"
+                    data-tippy-content="{{ nl2br($sql) }}"
                 />
             </div>
             <div class="text-neutral-500 dark:text-neutral-200 text-right flex-shrink-0">{{ $time }}ms</div>

@@ -8,6 +8,23 @@ use Predis\Command\ServerFlushDatabase;
 class PredisClusterConnection extends PredisConnection
 {
     /**
+     * Get the keys that match the given pattern.
+     *
+     * @param  string  $pattern
+     * @return array
+     */
+    public function keys(string $pattern)
+    {
+        $keys = [];
+
+        foreach ($this->client as $node) {
+            $keys[] = $node->keys($pattern);
+        }
+
+        return array_merge(...$keys);
+    }
+
+    /**
      * Flush the selected Redis database on all cluster nodes.
      *
      * @return void

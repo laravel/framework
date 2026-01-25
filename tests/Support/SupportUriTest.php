@@ -2,11 +2,23 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Uri;
 use PHPUnit\Framework\TestCase;
 
 class SupportUriTest extends TestCase
 {
+    public function test_can_build_special_urls()
+    {
+        Uri::setUrlGeneratorResolver(fn () => new CustomUrlGeneratorResolver);
+
+        $this->assertEquals('https://laravel.com/to', Uri::to('')->value());
+        $this->assertEquals('https://laravel.com/route', Uri::route('')->value());
+        $this->assertEquals('https://laravel.com/signed-route', Uri::signedRoute('')->value());
+        $this->assertEquals('https://laravel.com/signed-route', Uri::temporarySignedRoute('', '')->value());
+        $this->assertEquals('https://laravel.com/action', Uri::action('')->value());
+    }
+
     public function test_basic_uri_interactions()
     {
         $uri = Uri::of($originalUri = 'https://laravel.com/docs/installation');
@@ -230,5 +242,68 @@ class SupportUriTest extends TestCase
         $uri = new Uri('https://laravel.com/');
 
         $this->assertSame('https://laravel.com/foobar', (string) $uri->myMacro());
+    }
+}
+
+class CustomUrlGeneratorResolver implements UrlGenerator
+{
+    public function current()
+    {
+        return 'https://laravel.com/current';
+    }
+
+    public function previous($fallback = false)
+    {
+        return 'https://laravel.com/previous';
+    }
+
+    public function to($path, $extra = [], $secure = null)
+    {
+        return 'https://laravel.com/to';
+    }
+
+    public function secure($path, $parameters = [])
+    {
+        return 'https://laravel.com/secure';
+    }
+
+    public function asset($path, $secure = null)
+    {
+        return 'https://laravel.com/asset';
+    }
+
+    public function route($name, $parameters = [], $absolute = true)
+    {
+        return 'https://laravel.com/route';
+    }
+
+    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
+    {
+        return 'https://laravel.com/signed-route';
+    }
+
+    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
+    {
+        return 'https://laravel.com/temporary-signed-route';
+    }
+
+    public function query($path, $query = [], $extra = [], $secure = null)
+    {
+        return 'https://laravel.com/query';
+    }
+
+    public function action($action, $parameters = [], $absolute = true)
+    {
+        return 'https://laravel.com/action';
+    }
+
+    public function getRootControllerNamespace()
+    {
+        return 'App\\Http\\Controllers';
+    }
+
+    public function setRootControllerNamespace($rootNamespace)
+    {
+        return $this;
     }
 }

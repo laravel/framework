@@ -7,6 +7,7 @@ use Illuminate\Database\Query\JoinLateralClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 class SqlServerGrammar extends Grammar
 {
@@ -110,12 +111,22 @@ class SqlServerGrammar extends Grammar
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  \Illuminate\Database\Query\IndexHint  $indexHint
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compileIndexHint(Builder $query, $indexHint)
     {
-        return $indexHint->type === 'force'
-            ? "with (index({$indexHint->index}))"
-            : '';
+        if ($indexHint->type !== 'force') {
+            return '';
+        }
+
+        $index = $indexHint->index;
+
+        if (! preg_match('/^[a-zA-Z0-9_$]+$/', $index)) {
+            throw new InvalidArgumentException('Index name contains invalid characters.');
+        }
+
+        return "with (index([{$index}]))";
     }
 
     /**
@@ -453,9 +464,12 @@ class SqlServerGrammar extends Grammar
      * @param  array  $values
      * @return array
      */
+    #[\Override]
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $cleanBindings = Arr::except($bindings, 'select');
+
+        $values = Arr::flatten(array_map(fn ($value) => value($value), $values));
 
         return array_values(
             array_merge($values, Arr::flatten($cleanBindings))

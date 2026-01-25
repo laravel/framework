@@ -201,7 +201,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The callback that is responsible for handling lazy loading violations.
      *
-     * @var callable|null
+     * @var (callable(self, string))|null
      */
     protected static $lazyLoadingViolationCallback;
 
@@ -215,7 +215,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The callback that is responsible for handling discarded attribute violations.
      *
-     * @var callable|null
+     * @var (callable(self, array))|null
      */
     protected static $discardedAttributeViolationCallback;
 
@@ -229,7 +229,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * The callback that is responsible for handling missing attribute violations.
      *
-     * @var callable|null
+     * @var (callable(self, string))|null
      */
     protected static $missingAttributeViolationCallback;
 
@@ -526,7 +526,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling lazy loading violations.
      *
-     * @param  callable|null  $callback
+     * @param  (callable(self, string))|null  $callback
      * @return void
      */
     public static function handleLazyLoadingViolationUsing(?callable $callback)
@@ -548,7 +548,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling discarded attribute violations.
      *
-     * @param  callable|null  $callback
+     * @param  (callable(self, array))|null  $callback
      * @return void
      */
     public static function handleDiscardedAttributeViolationUsing(?callable $callback)
@@ -570,7 +570,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     /**
      * Register a callback that is responsible for handling missing attribute violations.
      *
-     * @param  callable|null  $callback
+     * @param  (callable(self, string))|null  $callback
      * @return void
      */
     public static function handleMissingAttributeViolationUsing(?callable $callback)
@@ -2447,11 +2447,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
 
         static::$modelsShouldPreventAccessingMissingAttributes = false;
 
-        $result = ! is_null($this->getAttribute($offset));
-
-        static::$modelsShouldPreventAccessingMissingAttributes = $shouldPrevent;
-
-        return $result;
+        try {
+            return ! is_null($this->getAttribute($offset));
+        } finally {
+            static::$modelsShouldPreventAccessingMissingAttributes = $shouldPrevent;
+        }
     }
 
     /**
@@ -2595,7 +2595,17 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
         $this->relationAutoloadCallback = null;
         $this->relationAutoloadContext = null;
 
-        return array_keys(get_object_vars($this));
+        $keys = get_object_vars($this);
+
+        if (version_compare(PHP_VERSION, '8.4.0', '>=')) {
+            foreach ((new ReflectionClass($this))->getProperties() as $property) {
+                if ($property->hasHooks()) {
+                    unset($keys[$property->getName()]);
+                }
+            }
+        }
+
+        return array_keys($keys);
     }
 
     /**

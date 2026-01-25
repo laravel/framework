@@ -84,6 +84,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(string|null))|string|null  $default
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function string(string $key, $default = null): string
     {
@@ -104,6 +106,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(int|null))|int|null  $default
      * @return int
+     *
+     * @throws \InvalidArgumentException
      */
     public function integer(string $key, $default = null): int
     {
@@ -124,6 +128,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(float|null))|float|null  $default
      * @return float
+     *
+     * @throws \InvalidArgumentException
      */
     public function float(string $key, $default = null): float
     {
@@ -144,6 +150,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(bool|null))|bool|null  $default
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     public function boolean(string $key, $default = null): bool
     {
@@ -164,6 +172,8 @@ class Repository implements ArrayAccess, ConfigContract
      * @param  string  $key
      * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
      * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
      */
     public function array(string $key, $default = null): array
     {

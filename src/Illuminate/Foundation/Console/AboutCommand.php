@@ -188,7 +188,21 @@ class AboutCommand extends Command
 
         static::addToSection('Drivers', fn () => array_filter([
             'Broadcasting' => config('broadcasting.default'),
-            'Cache' => config('cache.default'),
+            'Cache' => function ($json) {
+                $cacheStore = config('cache.default');
+
+                if (config('cache.stores.'.$cacheStore.'.driver') === 'failover') {
+                    $secondary = new Collection(config('cache.stores.'.$cacheStore.'.stores'));
+
+                    return value(static::format(
+                        value: $cacheStore,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+
+                return $cacheStore;
+            },
             'Database' => config('database.default'),
             'Logs' => function ($json) {
                 $logChannel = config('logging.default');
@@ -207,9 +221,37 @@ class AboutCommand extends Command
 
                 return $logs;
             },
-            'Mail' => config('mail.default'),
+            'Mail' => function ($json) {
+                $mailMailer = config('mail.default');
+
+                if (in_array(config('mail.mailers.'.$mailMailer.'.transport'), ['failover', 'roundrobin'])) {
+                    $secondary = new Collection(config('mail.mailers.'.$mailMailer.'.mailers'));
+
+                    return value(static::format(
+                        value: $mailMailer,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+
+                return $mailMailer;
+            },
             'Octane' => config('octane.server'),
-            'Queue' => config('queue.default'),
+            'Queue' => function ($json) {
+                $queueConnection = config('queue.default');
+
+                if (config('queue.connections.'.$queueConnection.'.driver') === 'failover') {
+                    $secondary = new Collection(config('queue.connections.'.$queueConnection.'.connections'));
+
+                    return value(static::format(
+                        value: $queueConnection,
+                        console: fn ($value) => '<fg=yellow;options=bold>'.$value.'</> <fg=gray;options=bold>/</> '.$secondary->implode(', '),
+                        json: fn () => $secondary->all(),
+                    ), $json);
+                }
+
+                return $queueConnection;
+            },
             'Scout' => config('scout.driver'),
             'Session' => config('session.driver'),
         ]));

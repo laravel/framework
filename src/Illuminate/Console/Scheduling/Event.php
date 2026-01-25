@@ -11,6 +11,7 @@ use Illuminate\Console\Application;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Log\Context\Repository;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Stringable;
@@ -197,8 +198,10 @@ class Event
      */
     protected function execute($container)
     {
+        $context = json_encode($container[Repository::class]->dehydrate());
+
         return Process::fromShellCommandline(
-            $this->buildCommand(), base_path(), null, null, null
+            $this->buildCommand(), base_path(), ['__LARAVEL_CONTEXT' => $context], null, null
         )->run(
             laravel_cloud()
                 ? fn ($type, $line) => fwrite($type === 'out' ? STDOUT : STDERR, $line)

@@ -111,8 +111,8 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function resolve($request = null)
     {
-        $data = $this->toArray(
-            $request ?: Container::getInstance()->make('request')
+        $data = $this->resolveResourceData(
+            $request ?: $this->resolveRequestFromContainer()
         );
 
         if ($data instanceof Arrayable) {
@@ -122,6 +122,32 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
         }
 
         return $this->filter((array) $data);
+    }
+
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     */
+    public function toAttributes(Request $request)
+    {
+        if (property_exists($this, 'attributes')) {
+            return $this->attributes;
+        }
+
+        return $this->toArray($request);
+    }
+
+    /**
+     * Resolve the resource data to an array.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function resolveResourceData(Request $request)
+    {
+        return $this->toAttributes($request);
     }
 
     /**
@@ -220,6 +246,16 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     }
 
     /**
+     * Resolve the HTTP request instance from container.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    protected function resolveRequestFromContainer()
+    {
+        return Container::getInstance()->make('request');
+    }
+
+    /**
      * Set the string that should wrap the outer-most resource array.
      *
      * @param  string  $value
@@ -249,7 +285,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public function response($request = null)
     {
         return $this->toResponse(
-            $request ?: Container::getInstance()->make('request')
+            $request ?: $this->resolveRequestFromContainer()
         );
     }
 
@@ -271,6 +307,17 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function jsonSerialize(): array
     {
-        return $this->resolve(Container::getInstance()->make('request'));
+        return $this->resolve($this->resolveRequestFromContainer());
+    }
+
+    /**
+     * Flush the resource's global state.
+     *
+     * @return void
+     */
+    public static function flushState()
+    {
+        static::$wrap = 'data';
+        static::$forceWrapping = false;
     }
 }

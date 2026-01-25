@@ -20,11 +20,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FoundationHelpersTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        m::close();
-    }
-
     public function testCache()
     {
         $app = new Application;
@@ -290,7 +285,7 @@ class FoundationHelpersTest extends TestCase
             $this->fail(
                 sprintf('abort function must throw %s when receiving code as Responable implementation.', HttpResponseException::class)
             );
-        } catch (HttpResponseException $ex) {
+        } catch (HttpResponseException) {
             $this->assertSame($request, $code->request);
         }
     }
