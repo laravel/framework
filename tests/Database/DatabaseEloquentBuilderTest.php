@@ -2194,7 +2194,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertSame('select * from "eloquent_builder_test_model_parent_stubs" where "eloquent_builder_test_model_parent_stubs"."morph_type" = ?', $builder->toSql());
         $this->assertEquals(['alias'], $builder->getBindings());
 
-        Relation::morphMap([], false);
+        Relation::flushState();
     }
 
     public function testWhereKeyMethodWithInt()
