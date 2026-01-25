@@ -11,6 +11,22 @@ use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Symfony\Component\Process\Process;
 
+/**
+ * Get the MySQL SSL CA constant for the current PHP version.
+ *
+ * @return int
+ */
+function get_mysql_ssl_ca_constant_for_test()
+{
+    if (PHP_VERSION_ID >= 80500) {
+        /** @phpstan-ignore class.notFound */
+        return \Pdo\Mysql::ATTR_SSL_CA;
+    }
+
+    // @phpstan-ignore-next-line
+    return @constant('PDO::MYSQL_ATTR_SSL_CA');
+}
+
 class DatabaseMySqlSchemaStateTest extends TestCase
 {
     #[DataProvider('provider')]
@@ -65,7 +81,7 @@ class DatabaseMySqlSchemaStateTest extends TestCase
                 'username' => 'root',
                 'database' => 'forge',
                 'options' => [
-                    PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA => 'ssl.ca',
+                    get_mysql_ssl_ca_constant_for_test() => 'ssl.ca',
                 ],
             ],
         ];

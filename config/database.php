@@ -2,6 +2,24 @@
 
 use Illuminate\Support\Str;
 
+/**
+ * Get the MySQL SSL CA constant for the current PHP version.
+ *
+ * @return int
+ */
+if (! function_exists('get_mysql_ssl_ca_constant')) {
+    function get_mysql_ssl_ca_constant()
+    {
+        if (PHP_VERSION_ID >= 80500) {
+            /** @phpstan-ignore class.notFound */
+            return \Pdo\Mysql::ATTR_SSL_CA;
+        }
+
+        // @phpstan-ignore-next-line
+        return @constant('PDO::MYSQL_ATTR_SSL_CA');
+    }
+}
+
 return [
 
     /*
@@ -61,7 +79,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+                get_mysql_ssl_ca_constant() => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -81,7 +99,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+                get_mysql_ssl_ca_constant() => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

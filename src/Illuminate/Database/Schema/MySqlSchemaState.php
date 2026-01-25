@@ -10,6 +10,22 @@ use Symfony\Component\Process\Process;
 class MySqlSchemaState extends SchemaState
 {
     /**
+     * Get the MySQL SSL CA constant for the current PHP version.
+     *
+     * @return int
+     */
+    protected static function getMysqlSslCaConstant()
+    {
+        if (PHP_VERSION_ID >= 80500) {
+            /** @phpstan-ignore class.notFound */
+            return \Pdo\Mysql::ATTR_SSL_CA;
+        }
+
+        // @phpstan-ignore-next-line
+        return @constant('PDO::MYSQL_ATTR_SSL_CA');
+    }
+
+    /**
      * Dump the database's schema into a file.
      *
      * @param  \Illuminate\Database\Connection  $connection
@@ -111,8 +127,7 @@ class MySqlSchemaState extends SchemaState
             ? ' --socket="${:LARAVEL_LOAD_SOCKET}"'
             : ' --host="${:LARAVEL_LOAD_HOST}" --port="${:LARAVEL_LOAD_PORT}"';
 
-        /** @phpstan-ignore class.notFound */
-        if (isset($config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA])) {
+        if (isset($config['options'][static::getMysqlSslCaConstant()])) {
             $value .= ' --ssl-ca="${:LARAVEL_LOAD_SSL_CA}"';
         }
 
@@ -141,7 +156,7 @@ class MySqlSchemaState extends SchemaState
             'LARAVEL_LOAD_USER' => $config['username'],
             'LARAVEL_LOAD_PASSWORD' => $config['password'] ?? '',
             'LARAVEL_LOAD_DATABASE' => $config['database'],
-            'LARAVEL_LOAD_SSL_CA' => $config['options'][PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA] ?? '', // @phpstan-ignore class.notFound
+            'LARAVEL_LOAD_SSL_CA' => $config['options'][static::getMysqlSslCaConstant()] ?? '',
         ];
     }
 
