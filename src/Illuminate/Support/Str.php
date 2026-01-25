@@ -53,6 +53,13 @@ class Str
     protected static $studlyCache = [];
 
     /**
+     * The cache of flat-cased words.
+     *
+     * @var array<string, string>
+     */
+    protected static $flatCache = [];
+
+    /**
      * The callback that should be used to generate UUIDs.
      *
      * @var (callable(): \Ramsey\Uuid\UuidInterface)|null
@@ -472,6 +479,23 @@ class Str
         $quoted = preg_quote($cap, '/');
 
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
+    }
+
+    /**
+     * Convert a string to flat case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function flat($value)
+    {
+        $key = $value;
+
+        if (isset(static::$flatCache[$key])) {
+            return static::$flatCache[$key];
+        }
+
+        return static::$flatCache[$key] = static::lower(static::replace(['-', '_', ' '], '', $value, false));
     }
 
     /**
