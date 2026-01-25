@@ -476,6 +476,23 @@ class PipelineTest extends TestCase
 
         unset($_SERVER['__test.pipe.parameters']);
     }
+
+    public function testPipelineUsageWithObjectDefaultParametersPlaceholderMoreThanMethodParameters()
+    {
+        $parameters = [DefaultValue::class, 'two', DefaultValue::class, DefaultValue::class];
+        $passedParameters = [null, 'two', 1];
+        $result = (new Pipeline(new Container))
+            ->send('foo')
+            ->through(PipelineTestDefaultParameterPipeTwo::class.':'.implode(',', $parameters))
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        $this->assertSame('foo', $result);
+        $this->assertSame($passedParameters, $_SERVER['__test.pipe.parameters']);
+
+        unset($_SERVER['__test.pipe.parameters']);
+    }
 }
 
 class PipelineTestPipeOne
