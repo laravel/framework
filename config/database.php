@@ -15,8 +15,7 @@ if (! function_exists('get_mysql_ssl_ca_constant')) {
             return \Pdo\Mysql::ATTR_SSL_CA;
         }
 
-        // @phpstan-ignore-next-line
-        return @constant('PDO::MYSQL_ATTR_SSL_CA');
+        return \PDO::MYSQL_ATTR_SSL_CA;
     }
 }
 

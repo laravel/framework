@@ -21,7 +21,7 @@ class MySqlSchemaState extends SchemaState
             return \Pdo\Mysql::ATTR_SSL_CA;
         }
 
-        return @constant('PDO::MYSQL_ATTR_SSL_CA');
+        return \PDO::MYSQL_ATTR_SSL_CA;
     }
 
     /**
