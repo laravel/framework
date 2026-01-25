@@ -112,6 +112,8 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
 
     /**
      * The key used to hash recaller cookie values.
+     *
+     * @var string|null
      */
     protected $hashKey;
 
