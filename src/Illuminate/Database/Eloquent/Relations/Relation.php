@@ -523,6 +523,17 @@ abstract class Relation implements BuilderContract
     }
 
     /**
+     * Flush the state of Relation.
+     */
+    public static function flushState(): void
+    {
+        self::$morphMap = [];
+        self::$requireMorphMap = false;
+        self::$selfJoinCount = 0;
+        self::$constraints = true;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
