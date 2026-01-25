@@ -254,7 +254,7 @@ class Pipeline implements PipelineContract
         $reflection = new \ReflectionMethod($pipe, $method);
         $methodParameters = $reflection->getParameters();
 
-        for ($index = 2; $index < count($parameters); $index++) {
+        for ($index = 2; $index < count($parameters) && $index < count($methodParameters); $index++) {
             if ($parameters[$index] !== DefaultValue::class) {
                 continue;
             }
