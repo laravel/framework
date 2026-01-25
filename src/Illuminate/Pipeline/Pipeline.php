@@ -216,8 +216,8 @@ class Pipeline implements PipelineContract
                     }
 
                     $carry = method_exists($pipe, $this->method)
-                        ? $pipe->{$this->method}(...$parameters)
-                        : $pipe(...$parameters);
+                        ? $pipe->{$this->method}(...$this->fillParametersWithDefaultValues($pipe, $this->method, $parameters))
+                        : $pipe(...$this->fillParametersWithDefaultValues($pipe, '__invoke', $parameters));
 
                     return $this->handleCarry($carry);
                 } catch (Throwable $e) {
@@ -246,6 +246,28 @@ class Pipeline implements PipelineContract
         return [$name, $parameters];
     }
 
+    /**
+     * Sets default values for parameters specified as DefaultValue.
+     */
+    protected function fillParametersWithDefaultValues(object $pipe, string $method, array $parameters): array
+    {
+        $reflection = new \ReflectionMethod($pipe, $method);
+        $methodParameters = $reflection->getParameters();
+
+        for ($index = 2; $index < count($parameters); $index++) {
+            if ($parameters[$index] !== DefaultValue::class) {
+                continue;
+            }
+            $methodParameter = $methodParameters[$index];
+
+            if (! $methodParameter->isDefaultValueAvailable()) {
+                throw new \RuntimeException("The parameter {$methodParameter->name} must have a default value.");
+            }
+            $parameters[$index] = $methodParameter->getDefaultValue();
+        }
+
+        return $parameters;
+    }
     /**
      * Get the array of configured pipes.
      *
