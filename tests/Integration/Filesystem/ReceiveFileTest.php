@@ -49,4 +49,27 @@ class ReceiveFileTest extends TestCase
         $response->assertForbidden();
         Storage::assertMissing('receive-file-test.txt');
     }
+
+    public function testDownloadUrlCannotBeUsedForUpload()
+    {
+        Storage::put('receive-file-test.txt', 'Original Content');
+
+        $downloadUrl = Storage::temporaryUrl('receive-file-test.txt', now()->addMinutes(1));
+
+        $response = $this->call('PUT', $downloadUrl, [], [], [], [], 'Malicious Content');
+
+        $response->assertForbidden();
+        $this->assertSame('Original Content', Storage::get('receive-file-test.txt'));
+    }
+
+    public function testUploadUrlCannotBeUsedForDownload()
+    {
+        Storage::put('receive-file-test.txt', 'Secret Content');
+
+        $uploadUrl = Storage::temporaryUploadUrl('receive-file-test.txt', now()->addMinutes(1));
+
+        $response = $this->get($uploadUrl['url']);
+
+        $response->assertForbidden();
+    }
 }
