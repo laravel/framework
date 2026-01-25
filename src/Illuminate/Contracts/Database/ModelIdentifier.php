@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 class ModelIdentifier
 {
     /**
-     * Use the Relation morphMap for a model's name when serializing.
+     * Use the Relation morphMap for a Model's name when serializing.
      */
     protected static bool $useMorphMap = false;
 
@@ -82,6 +82,8 @@ class ModelIdentifier
     }
 
     /**
+     * Get the fully-qualified class name of the Model.
+     *
      * @return class-string<\Illuminate\Database\Eloquent\Model>|null
      */
     public function getClass(): ?string
@@ -90,9 +92,7 @@ class ModelIdentifier
             return null;
         }
 
-        return self::$useMorphMap
-            ? (Relation::getMorphedModel($this->class) ?? $this->class)
-            : $this->class;
+        return Relation::getMorphedModel($this->class) ?? $this->class;
     }
 
     /**
