@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 class ModelIdentifier
 {
     /**
+     * Use the Relation morphMap for a model's name when serializing.
+     */
+    protected static bool $useMorphMap = false;
+
+    /**
      * The class name of the model.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>|string|null
@@ -53,7 +58,11 @@ class ModelIdentifier
      */
     public function __construct($class, $id, array $relations, $connection)
     {
-        $this->class = $class === null ? null : Relation::getMorphAlias($class);
+        if ($class !== null && self::$useMorphMap) {
+            $class = Relation::getMorphAlias($class);
+        }
+
+        $this->class = $class;
         $this->id = $id;
         $this->relations = $relations;
         $this->connection = $connection;
@@ -81,6 +90,24 @@ class ModelIdentifier
             return null;
         }
 
-        return Relation::getMorphedModel($this->class) ?? $this->class;
+        return self::$useMorphMap
+            ? (Relation::getMorphedModel($this->class) ?? $this->class)
+            : $this->class;
+    }
+
+    /**
+     * Indicate whether to use the relational morph-map when serializing Models.
+     */
+    public static function useMorphMap(bool $useMorphMap = true): void
+    {
+        static::$useMorphMap = $useMorphMap;
+    }
+
+    /**
+     * Flush the ModelIdentifier's shared state.
+     */
+    public static function flushState(): void
+    {
+        self::$useMorphMap = false;
     }
 }

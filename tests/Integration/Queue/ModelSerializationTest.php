@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Database\Eloquent\Attributes\Boot;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Collection;
@@ -70,9 +71,11 @@ class ModelSerializationTest extends TestCase
         });
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         Relation::morphMap([], false);
+        ModelIdentifier::flushState();
 
         parent::tearDown();
     }
@@ -425,6 +428,7 @@ class ModelSerializationTest extends TestCase
         Relation::morphMap([
             'user' => User::class,
         ]);
+        ModelIdentifier::useMorphMap();
 
         $user = User::create([
             'email' => 'taylor@laravel.com',
