@@ -75,7 +75,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
             $this->schema($connection)->drop('photos');
         }
 
-        Relation::morphMap([], false);
+        Relation::flushState();
 
         parent::tearDown();
     }

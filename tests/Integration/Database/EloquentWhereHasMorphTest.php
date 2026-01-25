@@ -53,6 +53,13 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
         }
     }
 
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Relation::flushState();
+        parent::tearDown();
+    }
+
     public function testWhereHasMorph()
     {
         $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
@@ -68,15 +75,11 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'posts']);
 
-        try {
-            $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
-                $query->where('title', 'foo');
-            })->orderBy('id')->get();
+        $comments = Comment::whereHasMorph('commentable', [Post::class, Video::class], function (Builder $query) {
+            $query->where('title', 'foo');
+        })->orderBy('id')->get();
 
-            $this->assertEquals([1, 4], $comments->pluck('id')->all());
-        } finally {
-            Relation::morphMap([], false);
-        }
+        $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithWildcard()
@@ -98,15 +101,11 @@ class EloquentWhereHasMorphTest extends DatabaseTestCase
 
         Comment::where('commentable_type', Post::class)->update(['commentable_type' => 'posts']);
 
-        try {
-            $comments = Comment::whereHasMorph('commentable', '*', function (Builder $query) {
-                $query->where('title', 'foo');
-            })->orderBy('id')->get();
+        $comments = Comment::whereHasMorph('commentable', '*', function (Builder $query) {
+            $query->where('title', 'foo');
+        })->orderBy('id')->get();
 
-            $this->assertEquals([1, 4], $comments->pluck('id')->all());
-        } finally {
-            Relation::morphMap([], false);
-        }
+        $this->assertEquals([1, 4], $comments->pluck('id')->all());
     }
 
     public function testWhereHasMorphWithWildcardAndOnlyNullMorphTypes()
