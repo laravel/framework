@@ -859,18 +859,24 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     {
         $dictionary = [];
 
+        $isAssociative = Arr::isAssoc($this->items);
+
         foreach ($this->items as $key => $item) {
             $pair = $callback($item, $key);
 
-            $key = key($pair);
+            $pairKey = key($pair);
 
             $value = reset($pair);
 
-            if (! isset($dictionary[$key])) {
-                $dictionary[$key] = [];
+            if (! isset($dictionary[$pairKey])) {
+                $dictionary[$pairKey] = [];
             }
 
-            $dictionary[$key][] = $value;
+            if ($isAssociative) {
+                $dictionary[$pairKey][$key] = $value;
+            } else {
+                $dictionary[$pairKey][] = $value;
+            }
         }
 
         return new static($dictionary);
