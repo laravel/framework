@@ -101,8 +101,11 @@ class DatabaseEloquentBelongsToManyAggregateTest extends TestCase
      */
     protected function tearDown(): void
     {
-        $this->schema()->drop('orders');
-        $this->schema()->drop('products');
+        $this->schema()->dropIfExists('order_product');
+        $this->schema()->dropIfExists('allocations');
+        $this->schema()->dropIfExists('orders');
+        $this->schema()->dropIfExists('products');
+        $this->schema()->dropIfExists('transactions');
 
         parent::tearDown();
     }
@@ -193,6 +196,6 @@ class BelongsToManyAggregateTestTestTransaction extends Eloquent
     {
         return $this
             ->belongsToMany(BelongsToManyAggregateTestTestTransaction::class, 'allocations', 'from_id', 'to_id')
-            ->withPivot('quantity');
+            ->withPivot('amount');
     }
 }
