@@ -306,7 +306,6 @@ class DatabaseEloquentModelCustomCastingTest extends DatabaseTestCase
         ]);
 
         $model->dob->addDay();
-        
         $this->assertSame('2000-11-12 11:11:00', $model->tob);
     }
 }
