@@ -119,7 +119,7 @@ class DatabaseLockTest extends DatabaseTestCase
         $owner = 'owner-123';
 
         $selectBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
-        $selectBuilder->shouldReceive('first')->once()->andReturn((object)['owner' => $owner]);
+        $selectBuilder->shouldReceive('first')->once()->andReturn((object) ['owner' => $owner]);
 
         $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
         $deleteBuilder->shouldReceive('where')->with('owner', $owner)->once()->andReturnSelf();

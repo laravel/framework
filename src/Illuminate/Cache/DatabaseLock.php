@@ -126,7 +126,6 @@ class DatabaseLock extends Lock
                     ->delete();
 
                 return true;
-
             } catch (Throwable $e) {
                 if ($this->causedByConcurrencyError($e)) {
                     return true;
