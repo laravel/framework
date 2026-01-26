@@ -228,8 +228,6 @@ class RateLimiter
      */
     public function remaining($key, $maxAttempts)
     {
-        $key = $this->cleanRateLimiterKey($key);
-
         $attempts = $this->attempts($key);
 
         return max(0, $maxAttempts - $attempts);
