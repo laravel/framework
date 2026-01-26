@@ -129,7 +129,6 @@ class DatabaseLock extends Lock
 
             } catch (Throwable $e) {
                 if ($this->causedByConcurrencyError($e)) {
-                    // Ignore concurrency errors - the lock will expire naturally...
                     return true;
                 }
 
