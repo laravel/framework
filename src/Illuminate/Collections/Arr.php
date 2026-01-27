@@ -33,7 +33,19 @@ class Arr
      * Determine whether the given value is arrayable.
      *
      * @param  mixed  $value
-     * @return bool
+     * @return ($value is array
+     *     ? true
+     *     : ($value is \Illuminate\Contracts\Support\Arrayable
+     *         ? true
+     *         : ($value is \Traversable
+     *             ? true
+     *             : ($value is \Illuminate\Contracts\Support\Jsonable
+     *                 ? true
+     *                 : ($value is \JsonSerializable ? true : false)
+     *             )
+     *         )
+     *     )
+     * )
      */
     public static function arrayable($value)
     {
@@ -122,7 +134,7 @@ class Arr
      * Cross join the given arrays, returning all possible permutations.
      *
      * @param  iterable  ...$arrays
-     * @return array
+     * @return array<int, array<int, mixed>>
      */
     public static function crossJoin(...$arrays)
     {
@@ -148,8 +160,9 @@ class Arr
     /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
-     * @param  array  $array
-     * @return array
+     * @template TValue
+     * @param  array<array-key, TValue>  $array
+     * @return array{array-key, TValue>
      */
     public static function divide($array)
     {
@@ -626,7 +639,7 @@ class Arr
      * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
      *
      * @param  array  $array
-     * @return bool
+     * @return ($array is list ? false : true)
      */
     public static function isAssoc(array $array)
     {
@@ -639,7 +652,7 @@ class Arr
      * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
      *
      * @param  array  $array
-     * @return bool
+     * @return ($array is list ? true : false)
      */
     public static function isList($array)
     {
@@ -1069,9 +1082,10 @@ class Arr
     /**
      * Sort the array using the given callback or "dot" notation.
      *
-     * @param  iterable  $array
-     * @param  callable|array|string|null  $callback
-     * @return array
+     * @template TValue
+     * @param  iterable<TValue>  $array
+     * @param  callable|string|null|array<int, (callable(mixed, mixed): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
+     * @return array<TValue>
      */
     public static function sort($array, $callback = null)
     {
@@ -1081,9 +1095,10 @@ class Arr
     /**
      * Sort the array in descending order using the given callback or "dot" notation.
      *
-     * @param  iterable  $array
-     * @param  callable|array|string|null  $callback
-     * @return array
+     * @template TValue
+     * @param  iterable<TValue>  $array
+     * @param  callable|string|null|array<int, (callable(mixed, mixed): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
+     * @return array<TValue>
      */
     public static function sortDesc($array, $callback = null)
     {
@@ -1093,10 +1108,12 @@ class Arr
     /**
      * Recursively sort an array by keys and values.
      *
-     * @param  array  $array
-     * @param  int  $options
+     * @template TKey of array-key
+     * @template TValue
+     * @param  array<TKey, TValue>  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
      * @param  bool  $descending
-     * @return array
+     * @return array<TKey, TValue>
      */
     public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
     {
@@ -1122,9 +1139,12 @@ class Arr
     /**
      * Recursively sort an array by keys and values in descending order.
      *
-     * @param  array  $array
+     * @template TKey of array-key
+     * @template TValue
+     * @param  array<TKey, TValue>  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
      * @param  int  $options
-     * @return array
+     * @return array<TKey, TValue>
      */
     public static function sortRecursiveDesc($array, $options = SORT_REGULAR)
     {
@@ -1152,8 +1172,8 @@ class Arr
     /**
      * Conditionally compile classes from an array into a CSS class list.
      *
-     * @param  array|string  $array
-     * @return string
+     * @param  array<string, bool>|string  $array
+     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : non-empty-string))
      */
     public static function toCssClasses($array)
     {
@@ -1175,8 +1195,8 @@ class Arr
     /**
      * Conditionally compile styles from an array into a style list.
      *
-     * @param  array|string  $array
-     * @return string
+     * @param  array<string, bool>|string  $array
+     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : non-empty-string))
      */
     public static function toCssStyles($array)
     {
@@ -1198,9 +1218,11 @@ class Arr
     /**
      * Filter the array using the given callback.
      *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
+     * @template TKey of array-key
+     * @template TValue
+     * @param  array<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return array<TKey, TValue>
      */
     public static function where($array, callable $callback)
     {
@@ -1210,9 +1232,11 @@ class Arr
     /**
      * Filter the array using the negation of the given callback.
      *
-     * @param  array  $array
-     * @param  callable  $callback
-     * @return array
+     * @template TKey of array-key
+     * @template TValue
+     * @param  array<TKey, TValue>  $array
+     * @param  callable(TValue, TKey): bool  $callback
+     * @return array<TKey, TValue>
      */
     public static function reject($array, callable $callback)
     {
@@ -1259,8 +1283,9 @@ class Arr
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
+	 * @template TValue
      * @param  mixed  $value
-     * @return array
+     * @return ($value is null ? array{} : ($value is array ? TValue : array{TValue}))
      */
     public static function wrap($value)
     {
