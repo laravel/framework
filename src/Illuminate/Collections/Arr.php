@@ -134,6 +134,7 @@ class Arr
      * Cross join the given arrays, returning all possible permutations.
      *
      * @template TValue
+     *
      * @param  iterable<TValue>  ...$arrays
      * @return array<int, array<array-key, TValue>>
      */
@@ -161,8 +162,9 @@ class Arr
     /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
-	 * @template TKey of array-key
+     * @template TKey of array-key
      * @template TValue
+     *
      * @param  array<TKey, TValue>  $array
      * @return array{TKey[], TValue[]}
      */
@@ -1085,6 +1087,7 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @template TValue
+     *
      * @param  iterable<TValue>  $array
      * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
      * @return array<TValue>
@@ -1098,6 +1101,7 @@ class Arr
      * Sort the array in descending order using the given callback or "dot" notation.
      *
      * @template TValue
+     *
      * @param  iterable<TValue>  $array
      * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
      * @return array<TValue>
@@ -1112,6 +1116,7 @@ class Arr
      *
      * @template TKey of array-key
      * @template TValue
+     *
      * @param  array<TKey, TValue>  $array
      * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
      * @param  bool  $descending
@@ -1143,6 +1148,7 @@ class Arr
      *
      * @template TKey of array-key
      * @template TValue
+     *
      * @param  array<TKey, TValue>  $array
      * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $options
      * @param  int  $options
@@ -1222,6 +1228,7 @@ class Arr
      *
      * @template TKey of array-key
      * @template TValue
+     *
      * @param  array<TKey, TValue>  $array
      * @param  callable(TValue, TKey): bool  $callback
      * @return array<TKey, TValue>
@@ -1236,6 +1243,7 @@ class Arr
      *
      * @template TKey of array-key
      * @template TValue
+     *
      * @param  array<TKey, TValue>  $array
      * @param  callable(TValue, TKey): bool  $callback
      * @return array<TKey, TValue>
@@ -1285,7 +1293,8 @@ class Arr
     /**
      * If the given value is not an array and not null, wrap it in one.
      *
-	 * @template TValue
+     * @template TValue
+     *
      * @param  mixed  $value
      * @return ($value is null ? array{} : ($value is array ? TValue : array{TValue}))
      */
