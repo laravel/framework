@@ -94,7 +94,6 @@ class SupportNumberTest extends TestCase
         Number::useRoundingMode(null);
     }
 
-
     public function testSpellout()
     {
         $this->assertSame('ten', Number::spell(10));
