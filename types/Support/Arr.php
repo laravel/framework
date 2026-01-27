@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
+use JsonSerializable;
+use Traversable;
 
 use function PHPStan\Testing\assertType;
 
@@ -99,3 +103,60 @@ assertType("'string'|User", Arr::last($traversable, function ($user) {
 assertType("'string'|User", Arr::last($traversable, null, function () {
     return 'string';
 }));
+
+assertType("array{'a'|'b'[], 1|2[]}", Arr::divide(['a' => 1, 'b' => 2]));
+assertType("array{0[], 1[]}", Arr::divide([1]));
+
+
+/**
+ * @return iterable<int>
+ */
+function generateArray(): iterable {
+    yield 1;
+}
+assertType("true", Arr::arrayable([]));
+assertType("true", Arr::arrayable(new class implements Arrayable {}));
+assertType("true", Arr::arrayable(new class implements Jsonable {}));
+assertType("true", Arr::arrayable(generateArray()));
+assertType("true", Arr::arrayable(new class implements JsonSerializable {
+    #[\Override] 
+    public function jsonSerialize(): mixed
+    {
+        return '';
+    }
+}));
+assertType("false", Arr::arrayable(1));
+
+assertType("array<int, array<1|2|3>>", Arr::crossJoin([1], [2], ['a' => 3]));
+
+assertType("false", Arr::isAssoc([1]));
+assertType("true", Arr::isAssoc(['a' => 1]));
+assertType("true", Arr::isList([1]));
+assertType("false", Arr::isList(['a' => 1]));
+
+assertType("int[]", Arr::sort([1, 3, 2]));
+assertType("array<string, int>", Arr::sort(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType("int[]", Arr::sortDesc([1, 3, 2]));
+assertType("array<string, int>", Arr::sortDesc(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType("int[]", Arr::sortRecursive([1, 3, 2]));
+assertType("array<string, int>", Arr::sortRecursive(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType("int[]", Arr::sortRecursiveDesc([1, 3, 2]));
+assertType("array<string, int>", Arr::sortRecursiveDesc(['a' => 1, 'c' => 3, 'b' => 2]));
+
+assertType("array{}", Arr::toCssClasses(['hidden' => false]));
+assertType("array{}", Arr::toCssClasses([]));
+assertType("array{}", Arr::toCssClasses(''));
+assertType("non-empty-string", Arr::toCssClasses(['hidden' => true]));
+assertType("non-empty-string", Arr::toCssClasses(['hidden']));
+assertType("non-empty-string", Arr::toCssClasses('hidden'));
+
+assertType("array{}", Arr::toCssStyles(['background: red' => false]));
+assertType("array{}", Arr::toCssStyles([]));
+assertType("array{}", Arr::toCssStyles(''));
+assertType("non-empty-string", Arr::toCssStyles(['background: red' => true]));
+assertType("non-empty-string", Arr::toCssStyles(['background: red']));
+assertType("non-empty-string", Arr::toCssStyles('background: red'));
+
+assertType("array{}", Arr::wrap(null));
+assertType("array<1>", Arr::wrap(1));
+assertType("array<1>", Arr::wrap([1]));
