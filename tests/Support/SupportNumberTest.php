@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Number;
+use NumberFormatter;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -72,6 +73,28 @@ class SupportNumberTest extends TestCase
         Number::useLocale('en');
     }
 
+    #[RequiresPhpExtension('intl')]
+    public function testFormatWithRoundingModeParameter()
+    {
+        $this->assertSame('13', Number::format(12.5, precision: 0, roundingMode: NumberFormatter::ROUND_HALFUP));
+        $this->assertSame('12', Number::format(12.5, precision: 0, roundingMode: NumberFormatter::ROUND_HALFEVEN));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testGlobalRoundingMode()
+    {
+        Number::useRoundingMode(NumberFormatter::ROUND_HALFUP);
+
+        $this->assertSame('13', Number::format(12.5, precision: 0));
+
+        Number::useRoundingMode(NumberFormatter::ROUND_HALFEVEN);
+
+        $this->assertSame('12', Number::format(12.5, precision: 0));
+
+        Number::useRoundingMode(null);
+    }
+
+
     public function testSpellout()
     {
         $this->assertSame('ten', Number::spell(10));
@@ -138,6 +161,29 @@ class SupportNumberTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
+    public function testPercentageWithRoundingModeParameter()
+    {
+        $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4, roundingMode: NumberFormatter::ROUND_HALFUP));
+        $this->assertSame('0.13%', Number::percentage(0.125, precision: 2, roundingMode: NumberFormatter::ROUND_HALFUP));
+        $this->assertSame('0.12%', Number::percentage(0.125, precision: 2, roundingMode: NumberFormatter::ROUND_HALFEVEN));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testGlobalRoundingModeAffectsPercentage()
+    {
+        Number::useRoundingMode(NumberFormatter::ROUND_HALFUP);
+
+        $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+        $this->assertSame('0.13%', Number::percentage(0.125, precision: 2));
+
+        Number::useRoundingMode(NumberFormatter::ROUND_HALFEVEN);
+
+        $this->assertSame('0.12%', Number::percentage(0.125, precision: 2));
+
+        Number::useRoundingMode(null);
+    }
+
+    #[RequiresPhpExtension('intl')]
     public function testToCurrency()
     {
         $this->assertSame('$0.00', Number::currency(0));
@@ -167,6 +213,13 @@ class SupportNumberTest extends TestCase
         $this->assertSame('123.456.789,12 $', Number::currency(123456789.12345, 'USD', 'de'));
         $this->assertSame('123.456.789,12 €', Number::currency(123456789.12345, 'EUR', 'de'));
         $this->assertSame('1 234,56 $US', Number::currency(1234.56, 'USD', 'fr'));
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testToCurrencyWithRoundingMode()
+    {
+        $this->assertSame('$13', Number::currency(12.5, precision: 0, roundingMode: NumberFormatter::ROUND_HALFUP));
+        $this->assertSame('$12', Number::currency(12.5, precision: 0, roundingMode: NumberFormatter::ROUND_HALFEVEN));
     }
 
     public function testBytesToHuman()

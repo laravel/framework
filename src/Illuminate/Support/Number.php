@@ -25,6 +25,13 @@ class Number
     protected static $currency = 'USD';
 
     /**
+     * The current default rounding mode.
+     *
+     * @var int|null
+     */
+    protected static $roundingMode = null;
+
+    /**
      * Format the given number according to the current locale.
      *
      * @param  int|float  $number
@@ -33,7 +40,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null)
+    public static function format(int|float $number, ?int $precision = null, ?int $maxPrecision = null, ?string $locale = null, ?int $roundingMode = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -43,6 +50,11 @@ class Number
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } elseif (! is_null($precision)) {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+        $rounding = $roundingMode ?? static::$roundingMode;
+
+        if (! is_null($rounding)) {
+            $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, $rounding);
         }
 
         return $formatter->format($number);
@@ -158,7 +170,7 @@ class Number
      * @param  string|null  $locale
      * @return string|false
      */
-    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null)
+    public static function percentage(int|float $number, int $precision = 0, ?int $maxPrecision = null, ?string $locale = null, ?int $roundingMode = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -168,6 +180,12 @@ class Number
             $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
         } else {
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+        }
+
+        $rounding = $roundingMode ?? static::$roundingMode;
+
+        if (! is_null($rounding)) {
+            $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, $rounding);
         }
 
         return $formatter->format($number / 100);
@@ -182,7 +200,7 @@ class Number
      * @param  int|null  $precision
      * @return string|false
      */
-    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null)
+    public static function currency(int|float $number, string $in = '', ?string $locale = null, ?int $precision = null, ?int $roundingMode = null)
     {
         static::ensureIntlExtensionIsInstalled();
 
@@ -192,7 +210,34 @@ class Number
             $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
         }
 
+        $rounding = $roundingMode ?? static::$roundingMode;
+
+        if (! is_null($rounding)) {
+            $formatter->setAttribute(NumberFormatter::ROUNDING_MODE, $rounding);
+        }
+
         return $formatter->formatCurrency($number, ! empty($in) ? $in : static::$currency);
+    }
+
+    /**
+     * Set the default rounding mode.
+     *
+     * @param  int|null  $roundingMode
+     * @return void
+     */
+    public static function useRoundingMode(?int $roundingMode)
+    {
+        static::$roundingMode = $roundingMode;
+    }
+
+    /**
+     * Get the default rounding mode.
+     *
+     * @return int|null
+     */
+    public static function defaultRoundingMode()
+    {
+        return static::$roundingMode;
     }
 
     /**
