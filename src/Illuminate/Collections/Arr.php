@@ -133,8 +133,9 @@ class Arr
     /**
      * Cross join the given arrays, returning all possible permutations.
      *
-     * @param  iterable  ...$arrays
-     * @return array<int, array<int, mixed>>
+     * @template TValue
+     * @param  iterable<TValue>  ...$arrays
+     * @return array<int, array<array-key, TValue>>
      */
     public static function crossJoin(...$arrays)
     {
@@ -160,9 +161,10 @@ class Arr
     /**
      * Divide an array into two arrays. One with keys and the other with values.
      *
+	 * @template TKey of array-key
      * @template TValue
-     * @param  array<array-key, TValue>  $array
-     * @return array{array-key, TValue>
+     * @param  array<TKey, TValue>  $array
+     * @return array{TKey[], TValue[]}
      */
     public static function divide($array)
     {
@@ -1084,7 +1086,7 @@ class Arr
      *
      * @template TValue
      * @param  iterable<TValue>  $array
-     * @param  callable|string|null|array<int, (callable(mixed, mixed): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
+     * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
      * @return array<TValue>
      */
     public static function sort($array, $callback = null)
@@ -1097,7 +1099,7 @@ class Arr
      *
      * @template TValue
      * @param  iterable<TValue>  $array
-     * @param  callable|string|null|array<int, (callable(mixed, mixed): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
+     * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
      * @return array<TValue>
      */
     public static function sortDesc($array, $callback = null)
@@ -1173,7 +1175,7 @@ class Arr
      * Conditionally compile classes from an array into a CSS class list.
      *
      * @param  array<string, bool>|string  $array
-     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : non-empty-string))
+     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : ($array is array{} ? '' : non-empty-string)))
      */
     public static function toCssClasses($array)
     {
@@ -1196,7 +1198,7 @@ class Arr
      * Conditionally compile styles from an array into a style list.
      *
      * @param  array<string, bool>|string  $array
-     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : non-empty-string))
+     * @return ($array is array<string, false> ? '' : ($array is '' ? '' : ($array is array{} ? '' : non-empty-string)))
      */
     public static function toCssStyles($array)
     {
