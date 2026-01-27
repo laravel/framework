@@ -6,7 +6,6 @@ use Exception;
 use Illuminate\Foundation\Configuration\HealthRouteManager;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Orchestra\Testbench\TestCase;
@@ -26,7 +25,7 @@ class HealthRouteManagerTest extends TestCase
     {
         HealthRouteManager::register('health');
 
-        $view = str_replace('/tests/Integration/', '/src/Illuminate/', __DIR__ . '/../resources/health-up.blade.php');
+        $view = str_replace('/tests/Integration/', '/src/Illuminate/', __DIR__.'/../resources/health-up.blade.php');
 
         $this->get('health')
             ->assertViewIs($view)
@@ -36,7 +35,7 @@ class HealthRouteManagerTest extends TestCase
     public function testCanHaveACustomResponseRegistered()
     {
         HealthRouteManager::register('health');
-        HealthRouteManager::respondUsing(fn() => ['ok' => true]);
+        HealthRouteManager::respondUsing(fn () => ['ok' => true]);
 
         $this->get('health')->assertJson(['ok' => true]);
     }
@@ -44,7 +43,7 @@ class HealthRouteManagerTest extends TestCase
     public function testCanAccessTheExceptionMessageInTheRespondUsingCallback()
     {
         HealthRouteManager::register('health');
-        HealthRouteManager::respondUsing(fn($exception) => [
+        HealthRouteManager::respondUsing(fn ($exception) => [
             'ok' => false,
             'exception' => $exception,
         ]);
@@ -74,7 +73,7 @@ class HealthRouteManagerTest extends TestCase
 
     protected function getRegisteredRoutes(): Collection
     {
-        return collect(Route::getRoutes()->getRoutes())->map(fn(\Illuminate\Routing\Route $route) => $route->uri());
+        return collect(Route::getRoutes()->getRoutes())->map(fn (\Illuminate\Routing\Route $route) => $route->uri());
     }
 
     protected function tearDown(): void

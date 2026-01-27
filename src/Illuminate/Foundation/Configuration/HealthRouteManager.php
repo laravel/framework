@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\View;
 
 class HealthRouteManager
 {
-    /** @var  Closure(?string $exception): void|null */
+    /** @var Closure(?string): void|null */
     protected static ?Closure $responseCallback = null;
 
     public static function register(string $route): void
