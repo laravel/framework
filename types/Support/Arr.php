@@ -132,7 +132,7 @@ assertType('true', Arr::arrayable(new class implements Jsonable
 assertType('true', Arr::arrayable(generateArray()));
 assertType('true', Arr::arrayable(new class implements JsonSerializable
 {
-    #[\Override] 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return '{"foo":"bar"}';
