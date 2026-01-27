@@ -115,24 +115,43 @@ function generateArray(): iterable
     yield 1;
 }
 assertType('true', Arr::arrayable([]));
-assertType('true', Arr::arrayable(new class implements Arrayable {}));
-assertType('true', Arr::arrayable(new class implements Jsonable {}));
+assertType('true', Arr::arrayable(new class implements Arrayable
+{
+    public function toArray()
+    {
+        return [];
+    }
+}));
+assertType('true', Arr::arrayable(new class implements Jsonable
+{
+    public function toJson($options = 0)
+    {
+        return '{"foo":"bar"}';
+    }
+}));
 assertType('true', Arr::arrayable(generateArray()));
 assertType('true', Arr::arrayable(new class implements JsonSerializable
 {
     #[\Override] 
     public function jsonSerialize(): mixed
     {
-        return '';
+        return '{"foo":"bar"}';
     }
 }));
 assertType('false', Arr::arrayable(1));
 
 assertType('array<int, array<1|2|3>>', Arr::crossJoin([1], [2], ['a' => 3]));
 
+/** @phpstan-ignore staticMethod.impossibleType */
 assertType('false', Arr::isAssoc([1]));
+
+/** @phpstan-ignore staticMethod.impossibleType */
 assertType('true', Arr::isAssoc(['a' => 1]));
+
+/** @phpstan-ignore staticMethod.impossibleType */
 assertType('true', Arr::isList([1]));
+
+/** @phpstan-ignore staticMethod.impossibleType */
 assertType('false', Arr::isList(['a' => 1]));
 
 assertType('array<1|2|3>', Arr::sort([1, 3, 2]));
