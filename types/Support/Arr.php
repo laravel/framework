@@ -104,8 +104,8 @@ assertType("'string'|User", Arr::last($traversable, null, function () {
     return 'string';
 }));
 
-assertType("array{'a'|'b'[], 1|2[]}", Arr::divide(['a' => 1, 'b' => 2]));
-assertType('array{0[], 1[]}', Arr::divide([1]));
+assertType("array{array<'a'|'b'>, array<1|2>}", Arr::divide(['a' => 1, 'b' => 2]));
+assertType('array{array<0>, array<1>}', Arr::divide([1]));
 
 /**
  * @return iterable<int>
@@ -135,25 +135,25 @@ assertType('true', Arr::isAssoc(['a' => 1]));
 assertType('true', Arr::isList([1]));
 assertType('false', Arr::isList(['a' => 1]));
 
-assertType('int[]', Arr::sort([1, 3, 2]));
+assertType('array<1|2|3>', Arr::sort([1, 3, 2]));
 assertType('array<string, int>', Arr::sort(['a' => 1, 'c' => 3, 'b' => 2]));
-assertType('int[]', Arr::sortDesc([1, 3, 2]));
+assertType('array<1|2|3>', Arr::sortDesc([1, 3, 2]));
 assertType('array<string, int>', Arr::sortDesc(['a' => 1, 'c' => 3, 'b' => 2]));
 assertType('int[]', Arr::sortRecursive([1, 3, 2]));
-assertType('array<string, int>', Arr::sortRecursive(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sortRecursive(['a' => 1, 'c' => 3, 'b' => 2]));
 assertType('int[]', Arr::sortRecursiveDesc([1, 3, 2]));
-assertType('array<string, int>', Arr::sortRecursiveDesc(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sortRecursiveDesc(['a' => 1, 'c' => 3, 'b' => 2]));
 
-assertType('array{}', Arr::toCssClasses(['hidden' => false]));
-assertType('array{}', Arr::toCssClasses([]));
-assertType('array{}', Arr::toCssClasses(''));
+assertType('\'\'', Arr::toCssClasses(['hidden' => false]));
+assertType('\'\'', Arr::toCssClasses([]));
+assertType('\'\'', Arr::toCssClasses(''));
 assertType('non-empty-string', Arr::toCssClasses(['hidden' => true]));
 assertType('non-empty-string', Arr::toCssClasses(['hidden']));
 assertType('non-empty-string', Arr::toCssClasses('hidden'));
 
-assertType('array{}', Arr::toCssStyles(['background: red' => false]));
-assertType('array{}', Arr::toCssStyles([]));
-assertType('array{}', Arr::toCssStyles(''));
+assertType('\'\'', Arr::toCssStyles(['background: red' => false]));
+assertType('\'\'', Arr::toCssStyles([]));
+assertType('\'\'', Arr::toCssStyles(''));
 assertType('non-empty-string', Arr::toCssStyles(['background: red' => true]));
 assertType('non-empty-string', Arr::toCssStyles(['background: red']));
 assertType('non-empty-string', Arr::toCssStyles('background: red'));
