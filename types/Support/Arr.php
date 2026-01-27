@@ -142,16 +142,16 @@ assertType('false', Arr::arrayable(1));
 
 assertType('array<int, array<1|2|3>>', Arr::crossJoin([1], [2], ['a' => 3]));
 
-/** @phpstan-ignore staticMethod.alreadyNarrowedType */
+/** @phpstan-ignore staticMethod.impossibleType , staticMethod.alreadyNarrowedType */
 assertType('false', Arr::isAssoc([1]));
 
-/** @phpstan-ignore staticMethod.alreadyNarrowedType */
+/** @phpstan-ignore staticMethod.impossibleType , staticMethod.alreadyNarrowedType */
 assertType('true', Arr::isAssoc(['a' => 1]));
 
-/** @phpstan-ignore staticMethod.alreadyNarrowedType */
+/** @phpstan-ignore staticMethod.impossibleType , staticMethod.alreadyNarrowedType */
 assertType('true', Arr::isList([1]));
 
-/** @phpstan-ignore staticMethod.alreadyNarrowedType */
+/** @phpstan-ignore staticMethod.impossibleType , staticMethod.alreadyNarrowedType */
 assertType('false', Arr::isList(['a' => 1]));
 
 assertType('array<1|2|3>', Arr::sort([1, 3, 2]));
