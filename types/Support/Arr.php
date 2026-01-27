@@ -178,5 +178,5 @@ assertType('non-empty-string', Arr::toCssStyles(['background: red']));
 assertType('non-empty-string', Arr::toCssStyles('background: red'));
 
 assertType('array{}', Arr::wrap(null));
-assertType('array<1>', Arr::wrap(1));
-assertType('array<1>', Arr::wrap([1]));
+assertType('array{1}', Arr::wrap(1));
+assertType('array{1}', Arr::wrap([1]));
