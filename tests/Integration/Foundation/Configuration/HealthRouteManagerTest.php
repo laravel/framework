@@ -8,6 +8,7 @@ use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\View;
 use Orchestra\Testbench\TestCase;
 
 class HealthRouteManagerTest extends TestCase
@@ -25,11 +26,12 @@ class HealthRouteManagerTest extends TestCase
     {
         HealthRouteManager::register('health');
 
-        $view = str_replace('/tests/Integration/', '/src/Illuminate/', __DIR__.'/../resources/health-up.blade.php');
+        $response = $this->get('health');
 
-        $this->get('health')
-            ->assertViewIs($view)
-            ->assertViewHas('exception');
+        $this->assertInstanceOf(View::class, $response->original);
+        $this->assertStringEndsWith('health-up.blade.php', $response->original->name());
+
+        $response->assertViewHas('exception');
     }
 
     public function testCanHaveACustomResponseRegistered()
