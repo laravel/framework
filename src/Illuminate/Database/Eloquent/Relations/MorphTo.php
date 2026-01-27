@@ -108,6 +108,7 @@ class MorphTo extends BelongsTo
     protected function buildDictionary(EloquentCollection $models)
     {
         $isAssociative = Arr::isAssoc($models->all());
+
         foreach ($models as $key => $model) {
             if ($model->{$this->morphType}) {
                 $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});

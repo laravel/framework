@@ -178,16 +178,17 @@ abstract class HasOneOrManyThrough extends Relation
      * Build model dictionary keyed by the relation's foreign key.
      *
      * @param  \Illuminate\Database\Eloquent\Collection<int, TRelatedModel>  $results
-     * @return array<array<TRelatedModel>>
+     * @return array<array<array-key, TRelatedModel>>
      */
     protected function buildDictionary(EloquentCollection $results)
     {
         $dictionary = [];
 
+        $isAssociative = Arr::isAssoc($results->all());
+
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
-        $isAssociative = Arr::isAssoc($results->all());
         foreach ($results as $key => $result) {
             if ($isAssociative) {
                 $dictionary[$result->laravel_through_key][$key] = $result;
