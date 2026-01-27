@@ -1295,7 +1295,7 @@ class Arr
      *
      * @template TValue
      *
-     * @param  mixed  $value
+     * @param  TValue  $value
      * @return ($value is null ? array{} : ($value is array ? TValue : array{TValue}))
      */
     public static function wrap($value)
