@@ -43,11 +43,11 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
-
-        if (package_version_compare('symfony/process', '7.4.5', '>=')) {
-            $escape = '';
-        }
+        $escape = match (true) {
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            '\\' === DIRECTORY_SEPARATOR => '',
+            default => '\'',
+        };
 
         $artisanBinary = artisan_binary();
 
@@ -65,7 +65,11 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+        $escape = match (true) {
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            '\\' === DIRECTORY_SEPARATOR => '',
+            default => '\'',
+        };
 
         $artisanBinary = artisan_binary();
 
@@ -83,7 +87,11 @@ class QueueListenerTest extends TestCase
         $options->memory = 2;
         $options->timeout = 3;
         $process = $listener->makeProcess(null, 'queue', $options);
-        $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+        $escape = match (true) {
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            '\\' === DIRECTORY_SEPARATOR => '',
+            default => '\'',
+        };
 
         $artisanBinary = artisan_binary();
 
