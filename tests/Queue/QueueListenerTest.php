@@ -10,6 +10,7 @@ use Symfony\Component\Process\Process;
 
 use function Illuminate\Support\artisan_binary;
 use function Illuminate\Support\php_binary;
+use function Orchestra\Testbench\package_version_compare;
 
 class QueueListenerTest extends TestCase
 {
@@ -43,6 +44,10 @@ class QueueListenerTest extends TestCase
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
+
+        if (package_version_compare('symfony/process', '7.4.5', '>=') {
+            $escape = '';
+        }
 
         $artisanBinary = artisan_binary();
 
