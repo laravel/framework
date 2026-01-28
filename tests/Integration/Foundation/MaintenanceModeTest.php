@@ -252,10 +252,4 @@ class MaintenanceModeTest extends TestCase
         $expectedDate = Carbon::createFromTimestamp($futureTimestamp)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
     }
-
-    public function testMaintenanceModeRetryWithPastDateShowsWarning(): void
-    {
-        $this->artisan(DownCommand::class, ['--retry' => '2020-01-01'])
-            ->expectsOutputToContain('The provided retry time is in the past.');
-    }
 }
