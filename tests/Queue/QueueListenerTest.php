@@ -45,7 +45,7 @@ class QueueListenerTest extends TestCase
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = '\\' === DIRECTORY_SEPARATOR ? '' : '\'';
 
-        if (package_version_compare('symfony/process', '7.4.5', '>=') {
+        if (package_version_compare('symfony/process', '7.4.5', '>=')) {
             $escape = '';
         }
 
