@@ -3,9 +3,9 @@
 namespace Illuminate\Bus;
 
 use Aws\DynamoDb\DynamoDbClient;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\Arr;
