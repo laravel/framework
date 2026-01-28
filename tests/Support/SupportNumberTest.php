@@ -48,6 +48,11 @@ class SupportNumberTest extends TestCase
 
         $this->assertSame('∞', Number::format(INF));
         $this->assertSame('NaN', Number::format(NAN));
+
+        $this->assertSame(
+            '5.10',
+            Number::format(5.1, precision: 2, maxPrecision: 4, locale: 'en')
+        );
     }
 
     #[RequiresPhpExtension('intl')]
@@ -135,6 +140,11 @@ class SupportNumberTest extends TestCase
         $this->assertSame('0.00%', Number::percentage(0, precision: 2));
         $this->assertSame('0.12%', Number::percentage(0.12345, precision: 2));
         $this->assertSame('0.1235%', Number::percentage(0.12345, precision: 4));
+
+        $this->assertSame(
+            '1.50%',
+            Number::percentage(1.5, precision: 2, maxPrecision: 4, locale: 'en')
+        );
     }
 
     #[RequiresPhpExtension('intl')]

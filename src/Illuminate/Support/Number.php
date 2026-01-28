@@ -37,12 +37,28 @@ class Number
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::DECIMAL);
+        $formatter = new NumberFormatter(
+            $locale ?? static::$locale,
+            NumberFormatter::DECIMAL
+        );
+
+        if (! is_null($precision)) {
+            $formatter->setAttribute(
+                NumberFormatter::MIN_FRACTION_DIGITS,
+                $precision
+            );
+        }
 
         if (! is_null($maxPrecision)) {
-            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+            $formatter->setAttribute(
+                NumberFormatter::MAX_FRACTION_DIGITS,
+                $maxPrecision
+            );
         } elseif (! is_null($precision)) {
-            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+            $formatter->setAttribute(
+                NumberFormatter::FRACTION_DIGITS,
+                $precision
+            );
         }
 
         return $formatter->format($number);
@@ -162,12 +178,28 @@ class Number
     {
         static::ensureIntlExtensionIsInstalled();
 
-        $formatter = new NumberFormatter($locale ?? static::$locale, NumberFormatter::PERCENT);
+        $formatter = new NumberFormatter(
+            $locale ?? static::$locale,
+            NumberFormatter::PERCENT
+        );
+
+        if (! is_null($precision)) {
+            $formatter->setAttribute(
+                NumberFormatter::MIN_FRACTION_DIGITS,
+                $precision
+            );
+        }
 
         if (! is_null($maxPrecision)) {
-            $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $maxPrecision);
+            $formatter->setAttribute(
+                NumberFormatter::MAX_FRACTION_DIGITS,
+                $maxPrecision
+            );
         } else {
-            $formatter->setAttribute(NumberFormatter::FRACTION_DIGITS, $precision);
+            $formatter->setAttribute(
+                NumberFormatter::FRACTION_DIGITS,
+                $precision
+            );
         }
 
         return $formatter->format($number / 100);
