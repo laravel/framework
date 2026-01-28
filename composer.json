@@ -209,6 +209,11 @@
     },
     "config": {
         "sort-packages": true,
+        "audit": {
+            "ignore": {
+                "GHSA-vvj3-c3rp-c85p": "Ensure testing features are compatible with affected PHPUnit versions"
+            }
+        },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "php-http/discovery": false
