@@ -44,7 +44,7 @@ class QueueListenerTest extends TestCase
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = match (true) {
-            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '"',
             '\\' === DIRECTORY_SEPARATOR => '',
             default => '\'',
         };
@@ -66,7 +66,7 @@ class QueueListenerTest extends TestCase
         $options->timeout = 3;
         $process = $listener->makeProcess('connection', 'queue', $options);
         $escape = match (true) {
-            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '"',
             '\\' === DIRECTORY_SEPARATOR => '',
             default => '\'',
         };
@@ -88,7 +88,7 @@ class QueueListenerTest extends TestCase
         $options->timeout = 3;
         $process = $listener->makeProcess(null, 'queue', $options);
         $escape = match (true) {
-            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '',
+            package_version_compare('symfony/process', '7.4.5', '>=') && windows_os() => '"',
             '\\' === DIRECTORY_SEPARATOR => '',
             default => '\'',
         };
