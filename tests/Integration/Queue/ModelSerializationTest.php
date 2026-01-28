@@ -75,7 +75,7 @@ class ModelSerializationTest extends TestCase
     protected function tearDown(): void
     {
         Relation::morphMap([], false);
-        ModelIdentifier::flushState();
+        ModelIdentifier::useMorphMap(false);
 
         parent::tearDown();
     }

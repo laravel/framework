@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Contracts\Database\ModelIdentifier;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -187,7 +186,6 @@ trait InteractsWithTestCaseLifecycle
         JsonResource::flushState();
         Markdown::flushState();
         Migrator::withoutMigrations([]);
-        ModelIdentifier::flushState();
         Once::flush();
         PreventRequestsDuringMaintenance::flushState();
         Queue::createPayloadUsing(null);

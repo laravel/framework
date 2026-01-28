@@ -102,12 +102,4 @@ class ModelIdentifier
     {
         static::$useMorphMap = $useMorphMap;
     }
-
-    /**
-     * Flush the ModelIdentifier's shared state.
-     */
-    public static function flushState(): void
-    {
-        self::$useMorphMap = false;
-    }
 }
