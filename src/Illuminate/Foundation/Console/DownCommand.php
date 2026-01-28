@@ -61,10 +61,6 @@ class DownCommand extends Command
 
             $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
 
-            if ($this->isRetryTimeInPast($downFilePayload['retry'])) {
-                $this->components->warn('The provided retry time is in the past.');
-            }
-
             $this->components->info('Application is now in maintenance mode.');
 
             if ($downFilePayload['secret'] !== null) {
@@ -141,7 +137,7 @@ class DownCommand extends Command
     }
 
     /**
-     * Get the number of seconds or HTTP-date the client should wait before retrying their request.
+     * Get the number of seconds or date / time the client should wait before retrying their request.
      *
      * @return int|string|null
      */
@@ -164,25 +160,6 @@ class DownCommand extends Command
         }
 
         return null;
-    }
-
-    /**
-     * Determine if the retry time is in the past.
-     *
-     * @param  int|string|null  $retryTime
-     * @return bool
-     */
-    protected function isRetryTimeInPast($retryTime)
-    {
-        if (! is_string($retryTime)) {
-            return false;
-        }
-
-        try {
-            return Carbon::parse($retryTime)->isPast();
-        } catch (Exception) {
-            return false;
-        }
     }
 
     /**
