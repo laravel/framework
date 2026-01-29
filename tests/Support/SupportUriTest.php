@@ -42,6 +42,7 @@ class SupportUriTest extends TestCase
         $this->assertEquals('hello', $uri->fragment());
         $this->assertEquals(['version' => 1], $uri->query()->all());
         $this->assertEquals(1, $uri->query()->integer('version'));
+        $this->assertEquals('taylor:password@laravel.com', $uri->authority());
     }
 
     public function test_complicated_query_string_parsing()
