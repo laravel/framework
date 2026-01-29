@@ -10015,7 +10015,6 @@ class ValidationValidatorTest extends TestCase
             ]
         ];
 
-
         $validator = new Validator($trans, $data, $rules, $messages, []);
 
         $this->assertSame([
