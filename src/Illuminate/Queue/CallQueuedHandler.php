@@ -220,6 +220,9 @@ class CallQueuedHandler
 
     /**
      * Determine if the given command should be unique.
+     *
+     * @param  mixed  $command
+     * @return bool
      */
     protected function commandShouldBeUnique(mixed $command): bool
     {
@@ -229,6 +232,9 @@ class CallQueuedHandler
 
     /**
      * Determine if the given command should be unique until processing begins.
+     *
+     * @param  mixed  $command
+     * @return bool
      */
     protected function commandShouldBeUniqueUntilProcessing(mixed $command): bool
     {
