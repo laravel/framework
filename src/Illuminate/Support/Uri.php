@@ -41,6 +41,9 @@ class Uri implements Htmlable, JsonSerializable, Responsable, Stringable
 
     /**
      * Create a new URI instance.
+     *
+     * @param  \League\Uri\Contracts\UriInterface|\Stringable|string  $uri
+     * @return static
      */
     public static function of(UriInterface|Stringable|string $uri = ''): static
     {
