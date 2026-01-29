@@ -9995,6 +9995,39 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($validator->passes());
     }
 
+    public function testMessagesDefaultWhenUsingSizeSpecificCustomMessages()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $data = [
+            'arr_key' => [0, 0, 0],
+            'numeric_key' => 5,
+        ];
+
+        $rules = [
+            'arr_key' => 'array|max:1',
+            'numeric_key' => 'integer|max:2'
+        ];
+
+        $messages = [
+            'max' => [
+                'array' => 'array must be up to :max',
+            ]
+        ];
+
+
+        $validator = new Validator($trans, $data, $rules, $messages, []);
+
+        $this->assertSame([
+            'arr_key' => [
+                'array must be up to 1'
+            ],
+            'numeric_key' => [
+                'validation.max.numeric'
+            ]
+        ], $validator->messages()->messages());
+    }
+
     protected function getTranslator()
     {
         return m::mock(TranslatorContract::class);
