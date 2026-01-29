@@ -10023,7 +10023,7 @@ class ValidationValidatorTest extends TestCase
             ],
             'numeric_data' => [
                 'validation.max.numeric',
-            ]
+            ],
         ], $validator->messages()->messages());
     }
 
