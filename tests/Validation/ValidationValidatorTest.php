@@ -10000,13 +10000,13 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
 
         $data = [
-            'arr_key' => [0, 0, 0],
-            'numeric_key' => 5,
+            'array_data' => [0, 0, 0],
+            'numeric_data' => 5,
         ];
 
         $rules = [
-            'arr_key' => 'array|max:1',
-            'numeric_key' => 'integer|max:2'
+            'array_data' => 'array|max:1',
+            'numeric_data' => 'integer|max:2'
         ];
 
         $messages = [
@@ -10019,10 +10019,10 @@ class ValidationValidatorTest extends TestCase
         $validator = new Validator($trans, $data, $rules, $messages, []);
 
         $this->assertSame([
-            'arr_key' => [
+            'array_data' => [
                 'array must be up to 1'
             ],
-            'numeric_key' => [
+            'numeric_data' => [
                 'validation.max.numeric'
             ]
         ], $validator->messages()->messages());
