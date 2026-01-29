@@ -10006,23 +10006,23 @@ class ValidationValidatorTest extends TestCase
 
         $rules = [
             'array_data' => 'array|max:1',
-            'numeric_data' => 'integer|max:2'
+            'numeric_data' => 'integer|max:2',
         ];
 
         $messages = [
             'max' => [
                 'array' => 'array must be up to :max',
-            ]
+            ],
         ];
 
         $validator = new Validator($trans, $data, $rules, $messages, []);
 
         $this->assertSame([
             'array_data' => [
-                'array must be up to 1'
+                'array must be up to 1',
             ],
             'numeric_data' => [
-                'validation.max.numeric'
+                'validation.max.numeric',
             ]
         ], $validator->messages()->messages());
     }
