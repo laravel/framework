@@ -120,7 +120,7 @@
         "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^10.5.35|^11.5.3|^12.0.1",
+        "phpunit/phpunit": "^10.5.62|^11.5.50|^12.5.8",
         "predis/predis": "^2.3|^3.0",
         "resend/resend-php": "^0.10.0|^1.0",
         "symfony/cache": "^7.2.0",
