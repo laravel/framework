@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\BatchRepository;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
@@ -259,10 +260,48 @@ class CallQueuedHandler
         $this->ensureUniqueJobLockIsReleasedViaContext();
 
         if ($shouldDelete) {
+            $this->ensureSuccessfulBatchJobIsRecordedForMissingModel($job, $class);
+
             return $job->delete();
         }
 
         return $job->fail($e);
+    }
+
+    /**
+     * Ensure the batch is notified of a successful job completion when the job
+     * is deleted due to missing models.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  string  $class
+     * @return void
+     */
+    protected function ensureSuccessfulBatchJobIsRecordedForMissingModel(Job $job, string $class)
+    {
+        if (! in_array(Batchable::class, class_uses_recursive($class), true)) {
+            return;
+        }
+
+        if (! $this->container->bound(BatchRepository::class)) {
+            return;
+        }
+
+        $payload = $job->payload();
+        $batchId = $payload['data']['batchId'] ?? null;
+
+        if (! is_string($batchId) || $batchId === '') {
+            return;
+        }
+
+        $jobId = $job->uuid();
+
+        if (! is_string($jobId) || $jobId === '') {
+            return;
+        }
+
+        if ($batch = $this->container->make(BatchRepository::class)->find($batchId)) {
+            $batch->recordSuccessfulJob($jobId);
+        }
     }
 
     /**
