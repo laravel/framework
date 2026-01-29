@@ -107,4 +107,41 @@ class DatabaseLockTest extends DatabaseTestCase
             $this->assertFalse($lock->acquire());
         }
     }
+
+    #[TestWith(['Serialization failure: 1213 Deadlock', 40001, true])]
+    #[TestWith(['Table does not exist', 1146, false])]
+    public function testReleaseIgnoresConcurrencyException(string $message, int $code, bool $hasConcurrencyError)
+    {
+        $connection = m::mock(Connection::class);
+        $selectBuilder = m::mock(Builder::class);
+        $deleteBuilder = m::mock(Builder::class);
+
+        $owner = 'owner-123';
+
+        $selectBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $selectBuilder->shouldReceive('first')->once()->andReturn((object) ['owner' => $owner]);
+
+        $deleteBuilder->shouldReceive('where')->with('key', 'foo')->once()->andReturnSelf();
+        $deleteBuilder->shouldReceive('where')->with('owner', $owner)->once()->andReturnSelf();
+        $deleteBuilder->shouldReceive('delete')->once()->andThrow(
+            new QueryException(
+                'mysql',
+                'delete from cache_locks where key = ? and owner = ?',
+                ['foo', $owner],
+                new PDOException($message, $code)
+            )
+        );
+
+        $connection->shouldReceive('table')->with('cache_locks')->andReturn($selectBuilder, $deleteBuilder);
+
+        $lock = new DatabaseLock($connection, 'cache_locks', 'foo', 10, $owner); // same owner...
+
+        if ($hasConcurrencyError) {
+            $this->assertTrue($lock->release());
+        } else {
+            $this->expectException(QueryException::class);
+            $this->expectExceptionMessage($message);
+            $lock->release();
+        }
+    }
 }

@@ -119,7 +119,7 @@
         "pda/pheanstalk": "^5.0.6|^7.0.0",
         "php-http/discovery": "^1.15",
         "phpstan/phpstan": "^2.0",
-        "phpunit/phpunit": "^11.5.3|^12.0.1",
+        "phpunit/phpunit": "^11.5.50|^12.5.8",
         "predis/predis": "^2.3|^3.0",
         "resend/resend-php": "^0.10.0|^1.0",
         "symfony/cache": "^7.4.0|^8.0.0",
@@ -208,6 +208,11 @@
     },
     "config": {
         "sort-packages": true,
+        "audit": {
+            "ignore": {
+                "GHSA-vvj3-c3rp-c85p": "Ensure testing features are compatible with affected PHPUnit versions"
+            }
+        },
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "php-http/discovery": false
