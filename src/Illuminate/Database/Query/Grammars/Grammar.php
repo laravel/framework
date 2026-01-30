@@ -510,8 +510,8 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * @param Builder $query
-     * @param $where
+     * @param  Builder  $query
+     * @param  $where
      * @return string
      */
     protected function whereDayIn(Builder $query, $where): string
@@ -532,8 +532,8 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * @param Builder $query
-     * @param $where
+     * @param  Builder  $query
+     * @param  $where
      * @return string
      */
     protected function whereMonthIn(Builder $query, $where): string
@@ -554,8 +554,8 @@ class Grammar extends BaseGrammar
     }
 
     /**
-     * @param Builder $query
-     * @param $where
+     * @param  Builder  $query
+     * @param  $where
      * @return string
      */
     protected function whereYearIn(Builder $query, $where): string
@@ -581,9 +581,9 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "where date in" clause.
      *
-     * @param string $type
+     * @param  string $type
      * @param  \Illuminate\Database\Query\Builder  $query
-     * @param array $where
+     * @param  array  $where
      * @return string
      */
     protected function dateBasedWhereIn(string $type, Builder $query, array $where): string

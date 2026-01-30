@@ -1737,10 +1737,10 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $column
-     * @param $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  $column
+     * @param  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return mixed
      */
     public function whereDayIn($column, $values, $boolean = 'and', bool $not = false): mixed
@@ -1749,9 +1749,9 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $column
-     * @param $values
-     * @param string $boolean
+     * @param  $column
+     * @param  $values
+     * @param  string  $boolean
      * @return mixed
      */
     public function whereDayNotIn($column, $values, $boolean = 'and'): mixed
@@ -1760,8 +1760,8 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param string $column
-     * @param $values
+     * @param  string  $column
+     * @param  $values
      * @return mixed
      */
     public function orWhereDayIn($column, $values): mixed
@@ -1922,10 +1922,10 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $column
-     * @param $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  $column
+     * @param  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return mixed
      */
     public function whereMonthIn($column, $values, $boolean = 'and', bool $not = false): mixed
@@ -1934,9 +1934,9 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $column
-     * @param $values
-     * @param string $boolean
+     * @param  $column
+     * @param  $values
+     * @param  string  $boolean
      * @return mixed
      */
     public function whereMonthNotIn($column, $values, $boolean = 'and'): mixed
@@ -1945,8 +1945,8 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $column
-     * @param $values
+     * @param  $column
+     * @param  $values
      * @return mixed
      */
     public function orWhereMonthIn($column, $values): mixed
@@ -2002,10 +2002,10 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param string $column
-     * @param $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  string  $column
+     * @param  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return mixed
      */
     public function whereYearIn($column, $values, $boolean = 'and', bool $not = false): mixed
@@ -2014,9 +2014,9 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param string $column
-     * @param $values
-     * @param string $boolean
+     * @param  string  $column
+     * @param  $values
+     * @param  string  $boolean
      * @return mixed
      */
     public function whereYearNotIn($column, $values, $boolean = 'and'): mixed
@@ -2058,11 +2058,11 @@ class Builder implements BuilderContract
     }
 
     /**
-     * @param $type
-     * @param $column
-     * @param $values
-     * @param string $boolean
-     * @param bool $not
+     * @param  $type
+     * @param  $column
+     * @param  $values
+     * @param  string  $boolean
+     * @param  bool  $not
      * @return $this|Builder
      */
     protected function addDateBasedWhereIn($type, $column, $values, string $boolean = 'and', bool $not = false): Builder|static

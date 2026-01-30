@@ -135,6 +135,7 @@ class DatabaseSqlServerQueryGrammarTest extends TestCase
             $builder->toSql()
         );
     }
+
     public function testMultipleDateBasedWhereIns()
     {
         $builder = $this->getBuilder();

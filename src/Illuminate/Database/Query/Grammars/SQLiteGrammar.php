@@ -172,9 +172,9 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * @param string $type
-     * @param Builder $query
-     * @param array $where
+     * @param  string  $type
+     * @param  Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function dateBasedWhereIn(string $type, Builder $query, array $where): string

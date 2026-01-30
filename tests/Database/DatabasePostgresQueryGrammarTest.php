@@ -166,6 +166,7 @@ class DatabasePostgresQueryGrammarTest extends TestCase
         );
         $this->assertEquals([2023, 2024], $builder->getBindings());
     }
+
     public function testOrWhereYearIn()
     {
         $builder = $this->getBuilder();

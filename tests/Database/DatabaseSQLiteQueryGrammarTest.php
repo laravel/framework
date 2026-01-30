@@ -145,6 +145,7 @@ class DatabaseSQLiteQueryGrammarTest extends TestCase
         );
         $this->assertEquals([2024, 2025], $builder->getBindings());
     }
+
     public function testMultipleDateBasedWhereIns()
     {
         $builder = $this->getBuilder();
