@@ -646,6 +646,9 @@ assertType('Illuminate\Support\Collection<int, User>', $collection->mapInto(User
 assertType('Illuminate\Support\Collection<int, int>', $collection->make([1])->merge([2]));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->merge(['string']));
 
+assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->merge(['string']));
+assertType('Illuminate\Support\Collection<int, int|string>', $collection->make(['string'])->merge([1]));
+
 assertType('Illuminate\Support\Collection<int, int|string>', $collection->make([1])->mergeRecursive([2 => 'string']));
 assertType('Illuminate\Support\Collection<int, string>', $collection->make(['string'])->mergeRecursive(['string']));
 

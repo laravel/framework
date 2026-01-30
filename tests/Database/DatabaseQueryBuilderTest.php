@@ -1153,6 +1153,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereBetweenColumns('id', [new Raw(1), new Raw(2)]);
         $this->assertSame('select * from "users" where "id" between 1 and 2', $builder->toSql());
         $this->assertEquals([], $builder->getBindings());
+
+        $subqueryBuilder = $this->getBuilder();
+        $subqueryBuilder->select('created_at')->from('posts')->where('status', 'published')->orderByDesc('created_at')->limit(1);
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetweenColumns($subqueryBuilder, ['created_at', 'updated_at']);
+        $this->assertSame('select * from "users" where (select "created_at" from "posts" where "status" = ? order by "created_at" desc limit 1) between "created_at" and "updated_at"', $builder->toSql());
+        $this->assertEquals([0 => 'published'], $builder->getBindings());
     }
 
     public function testOrWhereBetweenColumns()
@@ -5403,6 +5410,27 @@ SQL;
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testSelectExpression()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('one')->selectExpression(new Raw('1 + 1'), 'expr');
+
+        $this->assertSame('select (1 + 1) as "expr" from "one"', $builder->toSql());
+    }
+
+    public function testSelect()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('one')->select([
+            'two',
+            'three' => 'threee as threeee',
+            'four' => $this->getBuilder()->from('tbl')->select('col'),
+            'five' => new Raw('1 + 1'),
+        ]);
+
+        $this->assertSame('select "two", "threee" as "threeee", (select "col" from "tbl") as "four", 1 + 1 from "one"', $builder->toSql());
+    }
+
     public function testSqlServerWhereDate()
     {
         $builder = $this->getSqlServerBuilder();
@@ -7039,7 +7067,7 @@ SQL;
     {
         $builder = $this->getSqlServerBuilder();
         $builder->select('foo')->from('users')->forceIndex('test_index');
-        $this->assertSame('select [foo] from [users] with (index(test_index))', $builder->toSql());
+        $this->assertSame('select [foo] from [users] with (index([test_index]))', $builder->toSql());
     }
 
     public function testIgnoreIndexSqlServer()
