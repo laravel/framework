@@ -700,10 +700,12 @@ class LazyCollection implements CanBeEscapedWhenCastToString, Enumerable
      * Determine if the collection contains multiple items.
      *
      * @return bool
+     *
+     * @deprecated 12.50.0 Use the `hasMany()` method instead.
      */
     public function containsManyItems(): bool
     {
-        return $this->take(2)->count() > 1;
+        return $this->hasMany();
     }
 
     /**

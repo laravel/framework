@@ -605,6 +605,23 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         );
     }
 
+    public function testHasManyIsLazy()
+    {
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasMany();
+        });
+
+        $this->assertEnumerates(2, function ($collection) {
+            $collection->hasMany(fn ($item) => $item <= 2);
+        });
+
+        $this->assertEnumeratesCollection(
+            LazyCollection::times(10, fn ($i) => ['age' => $i]),
+            2,
+            fn ($collection) => $collection->hasMany('age', '<=', 2),
+        );
+    }
+
     public function testJoinIsLazy()
     {
         $this->assertEnumeratesOnce(function ($collection) {
