@@ -334,6 +334,27 @@ trait EnumeratesValues
     }
 
     /**
+     * Determine if the collection contains multiple items, optionally matching the given criteria.
+     *
+     * @param  (callable(TValue, TKey): bool)|string|null  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function hasMany($key = null, $operator = null, $value = null): bool
+    {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        return $this
+            ->unless($filter == null)
+            ->filter($filter)
+            ->take(2)
+            ->count() === 2;
+    }
+
+    /**
      * Get a single key's value from the first matching item in the collection.
      *
      * @template TValueDefault
@@ -1017,27 +1038,6 @@ trait EnumeratesValues
         return $this->escapeWhenCastingToString
             ? e($this->toJson())
             : $this->toJson();
-    }
-
-    /**
-     * Determine if the collection contains multiple items, optionally matching the given criteria.
-     *
-     * @param  (callable(TValue, TKey): bool)|string|null  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @return bool
-     */
-    public function hasMany($key = null, $operator = null, $value = null): bool
-    {
-        $filter = func_num_args() > 1
-            ? $this->operatorForWhere(...func_get_args())
-            : $key;
-
-        return $this
-            ->unless($filter == null)
-            ->filter($filter)
-            ->take(2)
-            ->count() === 2;
     }
 
     /**
