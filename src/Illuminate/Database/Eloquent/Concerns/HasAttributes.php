@@ -2424,6 +2424,16 @@ trait HasAttributes
     }
 
     /**
+     * Remove all appended properties from the model.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
+    }
+
+    /**
      * Get the mutated attributes for a given instance.
      *
      * @return array

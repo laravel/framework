@@ -545,8 +545,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
                 $groupKey = match (true) {
                     is_bool($groupKey) => (int) $groupKey,
                     $groupKey instanceof \UnitEnum => enum_value($groupKey),
-                    $groupKey instanceof \Stringable => (string) $groupKey,
-                    is_null($groupKey) => (string) $groupKey,
+                    $groupKey instanceof \Stringable, is_null($groupKey) => (string) $groupKey,
                     default => $groupKey,
                 };
 
@@ -739,30 +738,16 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
-     * Determine if the collection contains multiple items. If a callback is provided, determine if multiple items match the condition.
+     * Determine if the collection contains multiple items.
      *
      * @param  (callable(TValue, TKey): bool)|null  $callback
      * @return bool
+     *
+     * @deprecated 12.50.0 Use the `hasMany()` method instead.
      */
     public function containsManyItems(?callable $callback = null): bool
     {
-        if (! $callback) {
-            return $this->count() > 1;
-        }
-
-        $count = 0;
-
-        foreach ($this as $key => $item) {
-            if ($callback($item, $key)) {
-                $count++;
-            }
-
-            if ($count > 1) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasMany($callback);
     }
 
     /**
