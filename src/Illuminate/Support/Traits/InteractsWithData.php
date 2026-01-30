@@ -313,11 +313,12 @@ trait InteractsWithData
      * Retrieve data from the instance as an enum.
      *
      * @template TEnum of \BackedEnum
+     * @template TDefault of TEnum|null
      *
      * @param  string  $key
      * @param  class-string<TEnum>  $enumClass
-     * @param  TEnum|null  $default
-     * @return TEnum|null
+     * @param  TDefault  $default
+     * @return TEnum|TDefault
      */
     public function enum($key, $enumClass, $default = null)
     {

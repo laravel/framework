@@ -1,6 +1,28 @@
 # Release Notes for 12.x
 
-## [Unreleased](https://github.com/laravel/framework/compare/v12.48.1...12.x)
+## [Unreleased](https://github.com/laravel/framework/compare/v12.49.0...12.x)
+
+## [v12.49.0](https://github.com/laravel/framework/compare/v12.48.1...v12.49.0) - 2026-01-28
+
+* [12.x] Clean up compiled views after parallel testing by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58440
+* [12.x] Support "where subquery between columns" by [@gdebrauwer](https://github.com/gdebrauwer) in https://github.com/laravel/framework/pull/58441
+* [12.x] Use searchable prompt for db:table command by [@sakshamgorey](https://github.com/sakshamgorey) in https://github.com/laravel/framework/pull/58442
+* [12.x] keep single NotificationSender instance by [@rodrigopedra](https://github.com/rodrigopedra) in https://github.com/laravel/framework/pull/58452
+* [12.x] Allow enum keys in Cache::flexible() and withoutOverlapping() by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58444
+* [12.x] Add preserveKeys method to AnonymousResourceCollection by [@comhon-project](https://github.com/comhon-project) in https://github.com/laravel/framework/pull/58443
+* Bump tar from 7.5.3 to 7.5.6 in /src/Illuminate/Foundation/resources/exceptions/renderer by [@dependabot](https://github.com/dependabot)[bot] in https://github.com/laravel/framework/pull/58454
+* [12.x] Fix memory leak in `Arr::dot()` by [@benjamin-commentor](https://github.com/benjamin-commentor) in https://github.com/laravel/framework/pull/58458
+* 12.x fix: use multibyte-safe functions in Str::afterLast() by [@irabbi360](https://github.com/irabbi360) in https://github.com/laravel/framework/pull/58457
+* [12.x] Ensure Session now() and flash() accept enums by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58459
+* [12.x] Revert "feat: aliasing when selecting database expressions (#58436)" by [@u01jmg3](https://github.com/u01jmg3) in https://github.com/laravel/framework/pull/58469
+* [12.x] Add `hasSole()` method to collections by [@JosephSilber](https://github.com/JosephSilber) in https://github.com/laravel/framework/pull/58463
+* [12.x] Skip message serialization when log level is not handled by [@dxnter](https://github.com/dxnter) in https://github.com/laravel/framework/pull/58475
+* [12.x] Add missing [@param](https://github.com/param) documentation to SessionGuard constructor by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58493
+* [12.x] do assignment instead of mutating to handle immutable carbon object. by [@MrPunyapal](https://github.com/MrPunyapal) in https://github.com/laravel/framework/pull/58498
+* Enhance index hint validation for multiple indexes by [@FlexIDK](https://github.com/FlexIDK) in https://github.com/laravel/framework/pull/58505
+* [12.x] Make QueueFake assertPushedTimes public by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58511
+* [12.x] Ignore deadlock on DatabaseLock release by [@jackbayliss](https://github.com/jackbayliss) in https://github.com/laravel/framework/pull/58507
+* [12.x] Allow `down` command --retry option to accept datetime values by [@alies-dev](https://github.com/alies-dev) in https://github.com/laravel/framework/pull/58509
 
 ## [v12.48.1](https://github.com/laravel/framework/compare/v12.48.0...v12.48.1) - 2026-01-20
 
