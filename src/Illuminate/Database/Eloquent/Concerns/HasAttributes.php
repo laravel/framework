@@ -2400,16 +2400,6 @@ trait HasAttributes
     }
 
     /**
-     * Remove appended properties from the collection.
-     *
-     * @return $this
-     */
-    public function withoutAppends()
-    {
-        return $this->setAppends([]);
-    }
-
-    /**
      * Merge new appended attributes with existing appended attributes on the model.
      *
      * @param  array<string>  $appends
@@ -2431,6 +2421,16 @@ trait HasAttributes
     public function hasAppended($attribute)
     {
         return in_array($attribute, $this->appends);
+    }
+
+    /**
+     * Remove all appended properties from the model.
+     *
+     * @return $this
+     */
+    public function withoutAppends()
+    {
+        return $this->setAppends([]);
     }
 
     /**
