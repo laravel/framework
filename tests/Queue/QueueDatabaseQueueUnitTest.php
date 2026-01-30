@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Carbon\Carbon;
+use Illuminate\Bus\Batchable;
 use Illuminate\Container\Container;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\DatabaseQueue;
@@ -88,6 +89,32 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $container->shouldHaveReceived('bound')->with('events')->twice();
 
         Carbon::setTestNow();
+        Str::createUuidsNormally();
+    }
+
+    public function testPushIncludesBatchIdInPayloadForBatchableJob()
+    {
+        $uuid = Str::uuid()->toString();
+
+        Str::createUuidsUsing(function () use ($uuid) {
+            return $uuid;
+        });
+
+        $job = (new MyBatchableJob)->withBatchId('test-batch-id');
+
+        $queue = $this->getMockBuilder(DatabaseQueue::class)->onlyMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();
+        $queue->expects($this->any())->method('currentTime')->willReturn('time');
+        $queue->setContainer($container = m::spy(Container::class));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock(stdClass::class));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $payload = json_decode($array['payload'], true);
+            $this->assertSame('test-batch-id', $payload['data']['batchId']);
+        });
+
+        $queue->push($job, ['data']);
+
+        $container->shouldHaveReceived('bound')->with('events')->twice();
+
         Str::createUuidsNormally();
     }
 
@@ -177,4 +204,9 @@ class MyTestJob
     {
         // ...
     }
+}
+
+class MyBatchableJob
+{
+    use Batchable;
 }
