@@ -107,6 +107,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new Translator($this->getLoader(), 'en');
         $t->setFallback('lv');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lv', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('lv', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo']);
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
@@ -365,6 +366,7 @@ class TranslationTranslatorTest extends TestCase
             return ['en', 'lz'];
         });
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lz', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('lz', 'foo', '*')->andReturn([]);
         $this->assertSame('foo', $t->get('foo'));
