@@ -209,6 +209,32 @@ class NotificationSenderTest extends TestCase
 
         $sender->sendNow($notifiable, new DummyNotificationWithViaConnections(), ['mail']);
     }
+
+    public function testItPreservesLocaleSetInViaMethod()
+    {
+        $notifiable = new AnonymousNotifiable;
+        $manager = m::mock(ChannelManager::class);
+        $manager->shouldReceive('driver')->andReturn($driver = m::mock());
+        $driver->shouldReceive('send')->once()->withArgs(function ($notifiable, $notification) {
+            return $notification->locale === 'fr';
+        });
+        $bus = m::mock(BusDispatcher::class);
+
+        $events = m::mock(EventDispatcher::class);
+        $events->shouldReceive('listen')->once();
+        $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
+        $events->shouldReceive('dispatch')->once();
+
+        $app = m::mock(\Illuminate\Container\Container::class);
+        $app->shouldReceive('getLocale')->andReturn('en');
+        $app->shouldReceive('setLocale')->with('fr')->once();
+        $app->shouldReceive('setLocale')->with('en')->once();
+        \Illuminate\Container\Container::setInstance($app);
+
+        $sender = new NotificationSender($manager, $bus, $events);
+
+        $sender->sendNow($notifiable, new DummyNotificationWithLocaleInVia);
+    }
 }
 
 class DummyQueuedNotificationWithStringVia extends Notification implements ShouldQueue
@@ -388,5 +414,15 @@ class TestDatabaseNotificationMiddleware
     public function handle($command, $next)
     {
         return $next($command);
+    }
+}
+
+class DummyNotificationWithLocaleInVia extends Notification
+{
+    public function via($notifiable)
+    {
+        $this->locale = 'fr';
+
+        return 'mail';
     }
 }
