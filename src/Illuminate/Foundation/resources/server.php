@@ -3,7 +3,9 @@
 $publicPath = getcwd();
 
 $uri = urldecode(
-    parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? ''
+    (class_exists(\Uri\Rfc3986\Uri::class)
+        ? \Uri\Rfc3986\Uri::parse($_SERVER['REQUEST_URI'])?->getPath()
+        : parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)) ?? ''
 );
 
 // This file allows us to emulate Apache's "mod_rewrite" functionality from the

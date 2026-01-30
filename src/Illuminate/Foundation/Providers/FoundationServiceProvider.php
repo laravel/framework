@@ -35,6 +35,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\VarDumper\Caster\StubCaster;
 use Symfony\Component\VarDumper\Cloner\AbstractCloner;
+use Uri\Rfc3986\Uri as Rfc3986Uri;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -133,7 +134,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             'html' == $format => HtmlDumper::register($basePath, $compiledViewPath),
             'cli' == $format => CliDumper::register($basePath, $compiledViewPath),
             'server' == $format => null,
-            $format && 'tcp' == parse_url($format, PHP_URL_SCHEME) => null,
+            $format && 'tcp' == Rfc3986Uri::parse($format)?->getScheme() => null,
             default => in_array(PHP_SAPI, ['cli', 'phpdbg']) ? CliDumper::register($basePath, $compiledViewPath) : HtmlDumper::register($basePath, $compiledViewPath),
         };
     }
