@@ -510,6 +510,16 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    protected function whereDayIn(Builder $query, $where): string
+    {
+        return $this->dateBasedWhereIn('day', $query, $where);
+    }
+
+    /**
      * Compile a "where month" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -522,6 +532,16 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    protected function whereMonthIn(Builder $query, $where): string
+    {
+        return $this->dateBasedWhereIn('month', $query, $where);
+    }
+
+    /**
      * Compile a "where year" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -531,6 +551,16 @@ class Grammar extends BaseGrammar
     protected function whereYear(Builder $query, $where)
     {
         return $this->dateBasedWhere('year', $query, $where);
+    }
+
+    /**
+     * @param Builder $query
+     * @param $where
+     * @return string
+     */
+    protected function whereYearIn(Builder $query, $where): string
+    {
+        return $this->dateBasedWhereIn('year', $query, $where);
     }
 
     /**
@@ -547,6 +577,30 @@ class Grammar extends BaseGrammar
 
         return $type.'('.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
     }
+
+    /**
+     * Compile a "where date in" clause.
+     *
+     * @param string $type
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param array $where
+     * @return string
+     */
+    protected function dateBasedWhereIn(string $type, Builder $query, array $where): string
+    {
+        $column = $this->wrap($where['column']);
+        $values = $this->parameterize($where['values']);
+        $not = $where['not'] ? ' not' : '';
+
+        return sprintf(
+            '%s(%s)%s in (%s)',
+            $type,
+            $column,
+            $not,
+            $values
+        );
+    }
+
 
     /**
      * Compile a where clause comparing two columns.

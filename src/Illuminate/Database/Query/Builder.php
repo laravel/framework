@@ -1737,6 +1737,39 @@ class Builder implements BuilderContract
     }
 
     /**
+     * @param $column
+     * @param $values
+     * @param string $boolean
+     * @param bool $not
+     * @return mixed
+     */
+    public function whereDayIn($column, $values, $boolean = 'and', bool $not = false): mixed
+    {
+        return $this->addDateBasedWhereIn('DayIn', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * @param $column
+     * @param $values
+     * @param string $boolean
+     * @return mixed
+     */
+    public function whereDayNotIn($column, $values, $boolean = 'and'): mixed
+    {
+        return $this->addDateBasedWhereIn('DayIn', $column, $values, $boolean, true);
+    }
+
+    /**
+     * @param string $column
+     * @param $values
+     * @return mixed
+     */
+    public function orWhereDayIn($column, $values): mixed
+    {
+        return $this->whereDayIn($column, $values, 'or');
+    }
+
+    /**
      * Add a "where time" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1889,6 +1922,38 @@ class Builder implements BuilderContract
     }
 
     /**
+     * @param $column
+     * @param $values
+     * @param string $boolean
+     * @param bool $not
+     * @return mixed
+     */
+    public function whereMonthIn($column, $values, $boolean = 'and', bool $not = false): mixed
+    {
+        return $this->addDateBasedWhereIn('MonthIn', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * @param $column
+     * @param $values
+     * @param string $boolean
+     * @return mixed
+     */
+    public function whereMonthNotIn($column, $values, $boolean = 'and'): mixed
+    {
+        return $this->addDateBasedWhereIn('MonthIn', $column, $values, $boolean, true);
+    }
+
+    /**
+     * @param $column
+     * @param $values
+     * @return mixed
+     */
+    public function orWhereMonthIn($column, $values): mixed
+    {
+        return $this->whereMonthIn($column, $values, 'or');
+    }
+    /**
      * Add a "where year" statement to the query.
      *
      * @param  \Illuminate\Contracts\Database\Query\Expression|string  $column
@@ -1937,6 +2002,41 @@ class Builder implements BuilderContract
     }
 
     /**
+     * @param string $column
+     * @param $values
+     * @param string $boolean
+     * @param bool $not
+     * @return mixed
+     */
+    public function whereYearIn($column, $values, $boolean = 'and', bool $not = false): mixed
+    {
+        return $this->addDateBasedWhereIn('YearIn', $column, $values, $boolean, $not);
+    }
+
+    /**
+     * @param string $column
+     * @param $values
+     * @param string $boolean
+     * @return mixed
+     */
+    public function whereYearNotIn($column, $values, $boolean = 'and'): mixed
+    {
+        return $this->addDateBasedWhereIn('YearIn', $column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where year" statement to the query.
+     *
+     * @param  string  $column
+     * @param  $values
+     * @return $this
+     */
+    public function orWhereYearIn($column, $values): static
+    {
+        return $this->whereYearIn($column, $values, 'or');
+    }
+
+    /**
      * Add a date based (year, month, day, time) statement to the query.
      *
      * @param  string  $type
@@ -1953,6 +2053,39 @@ class Builder implements BuilderContract
         if (! $value instanceof ExpressionContract) {
             $this->addBinding($value, 'where');
         }
+
+        return $this;
+    }
+
+    /**
+     * @param $type
+     * @param $column
+     * @param $values
+     * @param string $boolean
+     * @param bool $not
+     * @return $this|Builder
+     */
+    protected function addDateBasedWhereIn($type, $column, $values, string $boolean = 'and', bool $not = false): Builder|static
+    {
+        if ($this->isQueryable($values)) {
+            [$query, $bindings] = $this->createSub($values);
+
+            $values = [new Expression($query)];
+
+            $this->addBinding($bindings, 'where');
+        }
+
+        if ($values instanceof Arrayable) {
+            $values = $values->toArray();
+        }
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
+
+        if (count($values) !== count(Arr::flatten($values, 1))) {
+            throw new InvalidArgumentException("Nested arrays may not be passed to the {$type} method.");
+        }
+
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }

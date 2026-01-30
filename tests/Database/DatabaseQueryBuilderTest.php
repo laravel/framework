@@ -7219,4 +7219,206 @@ SQL;
             m::mock(Processor::class),
         ])->makePartial();
     }
+
+    public function testWhereDayIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereDayIn('created_at', [1, 15, 30]);
+
+        $this->assertSame(
+            'select * from "users" where day("created_at") in (?, ?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 15, 30], $builder->getBindings());
+    }
+
+    public function testOrWhereDayIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->where('id', 1)
+            ->orWhereDayIn('created_at', [5, 10]);
+
+        $this->assertSame(
+            'select * from "users" where "id" = ? or day("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 5, 10], $builder->getBindings());
+    }
+
+    public function testWhereDayNotIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereDayNotIn('created_at', [1, 15, 30]);
+
+        $this->assertSame(
+            'select * from "users" where day("created_at") not in (?, ?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 15, 30], $builder->getBindings());
+    }
+
+    public function testWhereMonthIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereMonthIn('created_at', [1, 6, 12]);
+
+        $this->assertSame(
+            'select * from "users" where month("created_at") in (?, ?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 6, 12], $builder->getBindings());
+    }
+
+    public function testOrWhereMonthIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->where('active', 1)
+            ->orWhereMonthIn('created_at', [3, 7]);
+
+        $this->assertSame(
+            'select * from "users" where "active" = ? or month("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 3, 7], $builder->getBindings());
+    }
+
+    public function testWhereMonthNotIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereMonthNotIn('created_at', [1, 12, 4]);
+
+        $this->assertSame(
+            'select * from "users" where month("created_at") not in (?, ?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([1, 12, 4], $builder->getBindings());
+    }
+
+    public function testWhereYearIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereYearIn('created_at', [2023, 2024]);
+
+        $this->assertSame(
+            'select * from "users" where year("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([2023, 2024], $builder->getBindings());
+    }
+
+    public function testOrWhereYearIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->where('role', 'admin')
+            ->orWhereYearIn('created_at', [2022, 2024]);
+
+        $this->assertSame(
+            'select * from "users" where "role" = ? or year("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals(['admin', 2022, 2024], $builder->getBindings());
+    }
+
+    public function testWhereYearNotIn()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereYearNotIn('created_at', [2022, 2024, 2026]);
+
+        $this->assertSame(
+            'select * from "users" where year("created_at") not in (?, ?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([2022, 2024, 2026], $builder->getBindings());
+    }
+
+    public function testMultipleDateBasedWhereIns()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereYearIn('created_at', [2024])
+            ->whereMonthIn('created_at', [1, 2])
+            ->whereDayIn('created_at', [10, 20]);
+
+        $this->assertSame(
+            'select * from "users" where year("created_at") in (?) and month("created_at") in (?, ?) and day("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals([2024, 1, 2, 10, 20], $builder->getBindings());
+    }
+
+    public function testMultipleDateBasedOrWhereIns()
+    {
+        $builder = $this->getBuilder();
+
+        $builder->select('*')->from('users')
+            ->whereYearIn('created_at', [2023])
+            ->orWhereMonthIn('created_at', [5, 6])
+            ->orWhereDayIn('created_at', [10, 20]);
+
+        $this->assertSame(
+            'select * from "users" where year("created_at") in (?) or month("created_at") in (?, ?) or day("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+
+        $this->assertEquals(
+            [2023, 5, 6, 10, 20],
+            $builder->getBindings()
+        );
+    }
+
+    public function testWhereDayInSubquery()
+    {
+        $builder = $this->getBuilder();
+        // Using a subquery as the values
+        $builder->select('*')->from('users')->whereDayIn('created_at', function ($query) {
+            $query->select('day')->from('holidays');
+        });
+
+        $this->assertSame(
+            'select * from "users" where day("created_at") in (select "day" from "holidays")',
+            $builder->toSql()
+        );
+    }
+
+    public function testWhereDayInCollection()
+    {
+        $builder = $this->getBuilder();
+        // Using a Laravel Collection instead of an array
+        $builder->select('*')->from('users')->whereDayIn('created_at', collect([5, 10]));
+
+        $this->assertSame(
+            'select * from "users" where day("created_at") in (?, ?)',
+            $builder->toSql()
+        );
+        $this->assertEquals([5, 10], $builder->getBindings());
+    }
 }

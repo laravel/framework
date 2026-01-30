@@ -146,6 +146,27 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * @param string $type
+     * @param Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function dateBasedWhereIn(string $type, Builder $query, array $where): string
+    {
+        $column = $this->wrap($where['column']);
+        $values = $this->parameterize($where['values']);
+        $not = $where['not'] ? ' not' : '';
+
+        return sprintf(
+            'datepart(%s, %s)%s in (%s)',
+            $type,
+            $column,
+            $not,
+            $values
+        );
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

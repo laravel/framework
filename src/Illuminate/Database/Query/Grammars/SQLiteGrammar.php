@@ -172,6 +172,33 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * @param string $type
+     * @param Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function dateBasedWhereIn(string $type, Builder $query, array $where): string
+    {
+        $column = $this->wrap($where['column']);
+        $values = $this->parameterize($where['values']);
+        $not = $where['not'] ? ' not' : '';
+
+        $format = [
+            'year' => '%Y',
+            'month' => '%m',
+            'day' => '%d',
+        ][$type];
+
+        return sprintf(
+            'cast(strftime("%s", %s) as integer)%s in (%s)',
+            $format,
+            $column,
+            $not,
+            $values
+        );
+    }
+
+    /**
      * Compile the index hints for the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
