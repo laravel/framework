@@ -19,7 +19,7 @@
         "illuminate/contracts": "^13.0",
         "illuminate/macroable": "^13.0",
         "illuminate/support": "^13.0",
-        "symfony/process": "^7.4.0|^8.0.0"
+        "symfony/process": "^7.4.5|^8.0.5"
     },
     "autoload": {
         "psr-4": {

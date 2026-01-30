@@ -53,7 +53,7 @@
         "symfony/mime": "^7.4.0|^8.0.0",
         "symfony/polyfill-php84": "^1.33",
         "symfony/polyfill-php85": "^1.33",
-        "symfony/process": "^7.4.0|^8.0.0",
+        "symfony/process": "^7.4.5|^8.0.5",
         "symfony/routing": "^7.4.0|^8.0.0",
         "symfony/uid": "^7.4.0|^8.0.0",
         "symfony/var-dumper": "^7.4.0|^8.0.0",

@@ -24,7 +24,7 @@
         "laravel/prompts": "^0.3.0",
         "nunomaduro/termwind": "^2.0",
         "symfony/console": "^7.4.0|^8.0.0",
-        "symfony/process": "^7.4.0|^8.0.0"
+        "symfony/process": "^7.4.5|^8.0.5"
     },
     "autoload": {
         "psr-4": {
