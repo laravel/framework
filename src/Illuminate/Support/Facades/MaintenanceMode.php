@@ -4,6 +4,9 @@ namespace Illuminate\Support\Facades;
 
 use Illuminate\Foundation\MaintenanceModeManager;
 
+/**
+ * @see \Illuminate\Foundation\MaintenanceModeManager
+ */
 class MaintenanceMode extends Facade
 {
     /**
