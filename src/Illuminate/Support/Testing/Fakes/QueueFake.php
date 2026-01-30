@@ -121,7 +121,7 @@ class QueueFake extends QueueManager implements Fake, Queue
      * @param  int  $times
      * @return void
      */
-    protected function assertPushedTimes($job, $times = 1)
+    public function assertPushedTimes($job, $times = 1)
     {
         $count = $this->pushed($job)->count();
 
