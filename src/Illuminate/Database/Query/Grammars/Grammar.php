@@ -601,7 +601,6 @@ class Grammar extends BaseGrammar
         );
     }
 
-
     /**
      * Compile a where clause comparing two columns.
      *
