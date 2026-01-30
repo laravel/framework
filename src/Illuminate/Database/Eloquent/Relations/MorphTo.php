@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Concerns\InteractsWithDictionary;
+use Illuminate\Support\Arr;
 
 /**
  * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
@@ -106,12 +107,18 @@ class MorphTo extends BelongsTo
      */
     protected function buildDictionary(EloquentCollection $models)
     {
-        foreach ($models as $model) {
+        $isAssociative = Arr::isAssoc($models->all());
+
+        foreach ($models as $key => $model) {
             if ($model->{$this->morphType}) {
                 $morphTypeKey = $this->getDictionaryKey($model->{$this->morphType});
                 $foreignKeyKey = $this->getDictionaryKey($model->{$this->foreignKey});
 
-                $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
+                if ($isAssociative) {
+                    $this->dictionary[$morphTypeKey][$foreignKeyKey][$key] = $model;
+                } else {
+                    $this->dictionary[$morphTypeKey][$foreignKeyKey][] = $model;
+                }
             }
         }
     }
