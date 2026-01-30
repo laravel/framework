@@ -2882,7 +2882,7 @@ trait ValidatesAttributes
      */
     protected function trim($value)
     {
-        return (string) (is_string($value) ? trim($value) : $value);
+        return is_string($value) ? trim($value) : (string) $value;
     }
 
     /**
