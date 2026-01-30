@@ -581,7 +581,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile a "where date in" clause.
      *
-     * @param  string $type
+     * @param  string  $type
      * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $where
      * @return string
