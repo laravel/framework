@@ -155,9 +155,17 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key. These are
         // only one level deep so we do not need to do any fancy searching through it.
-        $this->load('*', '*', $locale);
+        $locales = $fallback ? $this->localeArray($locale) : [$locale];
 
-        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
+        $line = null;
+
+        foreach ($locales as $localeForJson) {
+            $this->load('*', '*', $localeForJson);
+
+            if (! is_null($line = $this->loaded['*']['*'][$localeForJson][$key] ?? null)) {
+                break;
+            }
+        }
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a

@@ -113,6 +113,16 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testGetMethodProperlyLoadsAndRetrievesJsonItemForFallback()
+    {
+        $t = new Translator($this->getLoader(), 'fr');
+        $t->setFallback('en');
+        $t->getLoader()->shouldReceive('load')->once()->with('fr', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['Hello' => 'Hello', 'Welcome :name' => 'Welcome :name']);
+        $this->assertSame('Hello', $t->get('Hello'));
+        $this->assertSame('Welcome Taylor', $t->get('Welcome :name', ['name' => 'Taylor']));
+    }
+
     public function testGetMethodProperlyLoadsAndRetrievesItemForGlobalNamespace()
     {
         $t = new Translator($this->getLoader(), 'en');
