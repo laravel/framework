@@ -55,7 +55,7 @@ class Migrator
     /**
      * The custom connection resolver callback.
      *
-     * @var (\Closure(\Illuminate\Database\ConnectionResolverInterface, string): \Illuminate\Database\Connection)|null
+     * @var (\Closure(\Illuminate\Database\ConnectionResolverInterface, ?string): \Illuminate\Database\Connection)|null
      */
     protected static $connectionResolverCallback;
 
@@ -713,7 +713,7 @@ class Migrator
     /**
      * Set a connection resolver callback.
      *
-     * @param  \Closure(\Illuminate\Database\ConnectionResolverInterface, string): \Illuminate\Database\Connection  $callback
+     * @param  \Closure(\Illuminate\Database\ConnectionResolverInterface, ?string): \Illuminate\Database\Connection  $callback
      * @return void
      */
     public static function resolveConnectionsUsing(Closure $callback)
