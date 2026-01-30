@@ -2878,7 +2878,7 @@ trait ValidatesAttributes
      * Trim the value if it is a string.
      *
      * @param  mixed  $value
-     * @return mixed
+     * @return string
      */
     protected function trim($value)
     {
