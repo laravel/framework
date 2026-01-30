@@ -1502,7 +1502,7 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         try {
-            return (string) BigDecimal::of($value)->toScale($decimals, RoundingMode::HALF_UP);
+            return (string) BigDecimal::of((string) $value)->toScale($decimals, RoundingMode::HALF_UP);
         } catch (BrickMathException $e) {
             throw new MathException('Unable to cast value to a decimal.', previous: $e);
         }
