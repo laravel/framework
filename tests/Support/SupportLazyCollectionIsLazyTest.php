@@ -317,7 +317,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
 
         $this->assertEnumeratesOnce(function ($collection) {
-            foreach ($collection as $key => $value) {
+            foreach ($collection as $ignored) {
                 // Silence is golden!
             }
         });
