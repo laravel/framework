@@ -223,7 +223,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
      * Qualify the given model class base name.
      *
      * @param  string  $model
-     * @return string
+     * @return class-string
      */
     protected function qualifyModel(string $model)
     {
@@ -481,7 +481,13 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Get the console command arguments.
      *
-     * @return array
+     * @return (\Symfony\Component\Console\Input\InputArgument|array{
+     *    0: non-empty-string,
+     *    1?: \Symfony\Component\Console\Input\InputArgument::REQUIRED|\Symfony\Component\Console\Input\InputArgument::OPTIONAL,
+     *    2?: string,
+     *    3?: mixed,
+     *    4?: list<string|\Symfony\Component\Console\Completion\Suggestion>|\Closure(\Symfony\Component\Console\Completion\CompletionInput, \Symfony\Component\Console\Completion\CompletionSuggestions): list<string|\Symfony\Component\Console\Completion\Suggestion>
+     * })[]
      */
     protected function getArguments()
     {
@@ -493,7 +499,7 @@ abstract class GeneratorCommand extends Command implements PromptsForMissingInpu
     /**
      * Prompt for missing input arguments using the returned questions.
      *
-     * @return array
+     * @return array<string, string|array{string, string}|(\Closure(): int|string|bool|array<int|string>)>
      */
     protected function promptForMissingArgumentsUsing()
     {
