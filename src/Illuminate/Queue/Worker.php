@@ -28,6 +28,7 @@ class Worker
     const EXIT_SUCCESS = 0;
     const EXIT_ERROR = 1;
     const EXIT_MEMORY_LIMIT = 12;
+    const EXIT_CACHE_FAILED = 13;
 
     /**
      * The name of the worker.
@@ -93,11 +94,25 @@ class Worker
     public $paused = false;
 
     /**
+     * Indicates if the worker restart cache retrieval fails.
+     *
+     * @var bool
+     */
+    public $cacheFailed = false;
+
+    /**
      * The callbacks used to pop jobs from queues.
      *
      * @var callable[]
      */
     protected static $popCallbacks = [];
+
+    /**
+     * The custom exit code to be used when cache retrieval fails.
+     *
+     * @var int|null
+     */
+    public static $cacheFailedExitCode;
 
     /**
      * The custom exit code to be used when memory is exceeded.
@@ -297,6 +312,7 @@ class Worker
     {
         return ! ((($this->isDownForMaintenance)() && ! $options->force) ||
             $this->paused ||
+            $this->cacheFailed ||
             $this->events->until(new Looping($connectionName, $queue)) === false);
     }
 
@@ -329,6 +345,7 @@ class Worker
         return match (true) {
             $this->shouldQuit => [static::EXIT_SUCCESS, WorkerStopReason::Interrupted],
             $this->memoryExceeded($options->memory) => [static::$memoryExceededExitCode ?? static::EXIT_MEMORY_LIMIT, WorkerStopReason::MaxMemoryExceeded],
+            $this->cacheFailed => [static::$cacheFailedExitCode ?? static::EXIT_CACHE_FAILED, WorkerStopReason::CacheFailed],
             $this->queueShouldRestart($lastRestart) => [static::EXIT_SUCCESS, WorkerStopReason::ReceivedRestartSignal],
             $options->stopWhenEmpty && is_null($job) => [static::EXIT_SUCCESS, WorkerStopReason::QueueEmpty],
             $options->maxTime && hrtime(true) / 1e9 - $startTime >= $options->maxTime => [static::EXIT_SUCCESS, WorkerStopReason::MaxTimeExceeded],
@@ -778,7 +795,12 @@ class Worker
         }
 
         if ($this->cache) {
-            return $this->cache->get('illuminate:queue:restart');
+            try {
+                return $this->cache->get('illuminate:queue:restart');
+            } catch (Throwable $e) {
+                $this->exceptions->report($e);
+                $this->cacheFailed = true;
+            }
         }
     }
 
