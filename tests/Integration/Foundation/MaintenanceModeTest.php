@@ -252,4 +252,20 @@ class MaintenanceModeTest extends TestCase
         $expectedDate = Carbon::createFromTimestamp($futureTimestamp)->format(DateTimeInterface::RFC7231);
         $this->assertSame($expectedDate, $data['retry']);
     }
+
+    public function testMaintenanceModeRespectsBootstrapConfiguredExcludedPaths()
+    {
+        PreventRequestsDuringMaintenance::except([
+            '/api/*',
+            '/webhooks/*',
+        ]);
+        $this->artisan(DownCommand::class);
+
+        $data = json_decode(file_get_contents(storage_path('framework/down')), true);
+
+        $this->assertSame([
+            '/api/*',
+            '/webhooks/*',
+        ], $data['except']);
+    }
 }
