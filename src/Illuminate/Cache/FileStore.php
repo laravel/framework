@@ -410,6 +410,54 @@ class FileStore implements Store, LockProvider
     }
 
     /**
+     * Atomically refresh the expiration of a cache key if it matches the expected owner.
+     *
+     * @param  string  $key
+     * @param  mixed  $expectedOwner
+     * @param  int  $seconds
+     * @return bool
+     */
+    public function refreshIfOwned($key, $expectedOwner, $seconds)
+    {
+        $this->ensureCacheDirectoryExists($path = $this->path($key));
+
+        $file = new LockableFile($path, 'c+');
+
+        try {
+            $file->getExclusiveLock();
+        } catch (LockTimeoutException) {
+            $file->close();
+
+            return false;
+        }
+
+        $contents = $file->read();
+
+        if (strlen($contents) < 10) {
+            $file->close();
+
+            return false;
+        }
+
+        $expire = substr($contents, 0, 10);
+        $currentOwner = unserialize(substr($contents, 10));
+
+        if ($currentOwner !== $expectedOwner || $this->currentTime() >= $expire) {
+            $file->close();
+
+            return false;
+        }
+
+        $file->truncate()
+            ->write($this->expiration($seconds).serialize($expectedOwner))
+            ->close();
+
+        $this->ensurePermissionsAreCorrect($path);
+
+        return true;
+    }
+
+    /**
      * Get the cache key prefix.
      *
      * @return string
