@@ -216,6 +216,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
     }
 
+    public function testPutWithEnum()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->put(StoragePath::FILE, 'Something inside');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
+    }
+
     public function testPrepend()
     {
         file_put_contents($this->tempDir.'/file.txt', 'World');
@@ -357,6 +364,30 @@ class FilesystemAdapterTest extends TestCase
         );
     }
 
+    public function testPutFileAsWithEnum()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFileAs(StoragePath::BASE, $uploadedFile, 'new.txt');
+
+        $this->assertSame('new.txt', $storagePath);
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+
+        $this->assertSame('uploaded file content', $filesystemAdapter->read($storagePath));
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
+    }
+
     public function testPutFileAsWithAbsoluteFilePath()
     {
         file_put_contents($filePath = $this->tempDir.'/foo.txt', 'normal file content');
@@ -388,6 +419,28 @@ class FilesystemAdapterTest extends TestCase
         $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
 
         $storagePath = $filesystemAdapter->putFile('/', $uploadedFile);
+
+        $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
+
+        $this->assertFileExists($filePath);
+
+        $filesystemAdapter->assertExists($storagePath);
+
+        $filesystemAdapter->assertExists(
+            $storagePath,
+            'uploaded file content'
+        );
+    }
+
+    public function testPutFileWithEnum()
+    {
+        file_put_contents($filePath = $this->tempDir.'/foo.txt', 'uploaded file content');
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+
+        $uploadedFile = new UploadedFile($filePath, 'org.txt', null, null, true);
+
+        $storagePath = $filesystemAdapter->putFile(StoragePath::BASE, $uploadedFile);
 
         $this->assertSame(44, strlen($storagePath)); // random 40 characters + ".txt"
 
@@ -768,4 +821,10 @@ class FilesystemAdapterTest extends TestCase
         $path = $filesystemAdapter->path('different');
         $this->assertEquals('my-root/someprefix/different', $path);
     }
+}
+
+enum StoragePath: string
+{
+    case FILE = 'file.txt';
+    case BASE = '/';
 }
