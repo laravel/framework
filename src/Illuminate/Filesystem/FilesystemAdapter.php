@@ -39,6 +39,9 @@ use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
+use function Illuminate\Support\enum_value;
+
+
 /**
  * @mixin \League\Flysystem\FilesystemOperator
  */
@@ -389,13 +392,15 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
+     * @param  \UnitEnum|string  $path
      * @param  \Psr\Http\Message\StreamInterface|\Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|resource  $contents
      * @param  mixed  $options
      * @return string|bool
      */
     public function put($path, $contents, $options = [])
     {
+        $path = enum_value($path);
+
         $options = is_string($options)
             ? ['visibility' => $options]
             : (array) $options;

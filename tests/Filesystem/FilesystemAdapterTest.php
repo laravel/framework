@@ -158,7 +158,6 @@ class FilesystemAdapterTest extends TestCase
         $this->filesystem->write('/foo/bar/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $this->assertTrue($filesystemAdapter->directoryExists('/foo/bar'));
-    }
 
     public function testDirectoryMissing()
     {
@@ -213,6 +212,13 @@ class FilesystemAdapterTest extends TestCase
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
         $filesystemAdapter->put('file.txt', 'Something inside');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
+    }
+
+    public function testPutWithEnum()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem, $this->adapter);
+        $filesystemAdapter->put(StoragePath::FILE, 'Something inside');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
     }
 
@@ -768,4 +774,9 @@ class FilesystemAdapterTest extends TestCase
         $path = $filesystemAdapter->path('different');
         $this->assertEquals('my-root/someprefix/different', $path);
     }
+}
+
+enum StoragePath: string
+{
+    case FILE = 'file.txt';
 }
