@@ -41,7 +41,6 @@ use Throwable;
 
 use function Illuminate\Support\enum_value;
 
-
 /**
  * @mixin \League\Flysystem\FilesystemOperator
  */
@@ -445,7 +444,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     public function putFile($path, $file = null, $options = [])
     {
         $path = enum_value($path);
-        
+
         if (is_null($file) || is_array($file)) {
             [$path, $file, $options] = ['', $path, $file ?? []];
         }
