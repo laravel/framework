@@ -37,7 +37,13 @@ trait HasParameters
     /**
      * Get the console command arguments.
      *
-     * @return array
+     * @return (\Symfony\Component\Console\Input\InputArgument|array{
+     *    0: non-empty-string,
+     *    1?: \Symfony\Component\Console\Input\InputArgument::REQUIRED|\Symfony\Component\Console\Input\InputArgument::OPTIONAL,
+     *    2?: string,
+     *    3?: mixed,
+     *    4?: list<string|\Symfony\Component\Console\Completion\Suggestion>|\Closure(\Symfony\Component\Console\Completion\CompletionInput, \Symfony\Component\Console\Completion\CompletionSuggestions): list<string|\Symfony\Component\Console\Completion\Suggestion>
+     * })[]
      */
     protected function getArguments()
     {
@@ -47,7 +53,14 @@ trait HasParameters
     /**
      * Get the console command options.
      *
-     * @return array
+     * @return (\Symfony\Component\Console\Input\InputOption|array{
+     *    0: non-empty-string,
+     *    1?: string|non-empty-array<string>,
+     *    2?: \Symfony\Component\Console\Input\InputOption::VALUE_*,
+     *    3?: string,
+     *    4?: mixed,
+     *    5?: list<string|\Symfony\Component\Console\Completion\Suggestion>|\Closure(\Symfony\Component\Console\Completion\CompletionInput, \Symfony\Component\Console\Completion\CompletionSuggestions): list<string|\Symfony\Component\Console\Completion\Suggestion>
+     * })[]
      */
     protected function getOptions()
     {
