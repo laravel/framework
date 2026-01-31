@@ -288,7 +288,7 @@ if (! function_exists('preg_replace_array')) {
     function preg_replace_array($pattern, array $replacements, $subject): string
     {
         return preg_replace_callback($pattern, function () use (&$replacements) {
-                return array_shift($replacements);
+            return array_shift($replacements);
         }, $subject);
     }
 }
