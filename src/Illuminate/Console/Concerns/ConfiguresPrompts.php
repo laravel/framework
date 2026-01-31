@@ -120,7 +120,7 @@ trait ConfiguresPrompts
      * @param  \Closure(): PResult  $prompt
      * @param  bool|string  $required
      * @param  (\Closure(PResult): mixed)|null  $validate
-     * @return mixed
+     * @return PResult
      */
     protected function promptUntilValid($prompt, $required, $validate)
     {
