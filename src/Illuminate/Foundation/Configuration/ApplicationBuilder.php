@@ -303,6 +303,13 @@ class ApplicationBuilder
             }
         });
 
+        $this->app->afterResolving(ConsoleKernel::class, function () use ($callback) {
+            if (! is_null($callback)) {
+                $middleware = (new Middleware);
+                $callback($middleware);
+            }
+        });
+
         return $this;
     }
 
