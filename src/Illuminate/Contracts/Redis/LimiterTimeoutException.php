@@ -2,9 +2,9 @@
 
 namespace Illuminate\Contracts\Redis;
 
-use Exception;
+use Illuminate\Contracts\Cache\LimiterTimeoutException as BaseLimiterTimeoutException;
 
-class LimiterTimeoutException extends Exception
+class LimiterTimeoutException extends BaseLimiterTimeoutException
 {
     //
 }
