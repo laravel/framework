@@ -1086,11 +1086,12 @@ class Arr
     /**
      * Sort the array using the given callback or "dot" notation.
      *
+     * @template TKey
      * @template TValue
      *
-     * @param  iterable<TValue>  $array
+     * @param  iterable<TKey, TValue>  $array
      * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
-     * @return array<TValue>
+     * @return array<TKey, TValue>
      */
     public static function sort($array, $callback = null)
     {
@@ -1104,7 +1105,7 @@ class Arr
      *
      * @param  iterable<TValue>  $array
      * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
-     * @return array<TValue>
+     * @return array<TKey, TValue>
      */
     public static function sortDesc($array, $callback = null)
     {
