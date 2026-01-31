@@ -437,13 +437,15 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Store the uploaded file on the disk.
      *
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $path
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|\UnitEnum|string  $path
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null  $file
      * @param  mixed  $options
      * @return string|false
      */
     public function putFile($path, $file = null, $options = [])
     {
+        $path = enum_value($path);
+        
         if (is_null($file) || is_array($file)) {
             [$path, $file, $options] = ['', $path, $file ?? []];
         }
@@ -456,7 +458,7 @@ class FilesystemAdapter implements CloudFilesystemContract
     /**
      * Store the uploaded file on the disk with a given name.
      *
-     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string  $path
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|\UnitEnum|string  $path
      * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile|string|array|null  $file
      * @param  string|array|null  $name
      * @param  mixed  $options
@@ -464,6 +466,8 @@ class FilesystemAdapter implements CloudFilesystemContract
      */
     public function putFileAs($path, $file, $name = null, $options = [])
     {
+        $path = enum_value($path);
+
         if (is_null($name) || is_array($name)) {
             [$path, $file, $name, $options] = ['', $path, $file, $name ?? []];
         }
