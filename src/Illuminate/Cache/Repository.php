@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 use function Illuminate\Support\defer;
 use function Illuminate\Support\enum_value;
@@ -213,6 +214,124 @@ class Repository implements ArrayAccess, CacheContract
         return tap($this->get($key, $default), function () use ($key) {
             $this->forget($key);
         });
+    }
+
+    /**
+     * Retrieve a string item from the cache.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  (\Closure():(string|null))|string|null  $default
+     * @return string
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function string($key, $default = null): string
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_string($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Cache value for key [%s] must be a string, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Retrieve an integer item from the cache.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  (\Closure():(int|null))|int|null  $default
+     * @return int
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function integer($key, $default = null): int
+    {
+        $value = $this->get($key, $default);
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+            return (int) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Cache value for key [%s] must be an integer, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Retrieve a float item from the cache.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  (\Closure():(float|null))|float|null  $default
+     * @return float
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function float($key, $default = null): float
+    {
+        $value = $this->get($key, $default);
+
+        if (is_float($value)) {
+            return $value;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_FLOAT) !== false) {
+            return (float) $value;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('Cache value for key [%s] must be a float, %s given.', $key, gettype($value))
+        );
+    }
+
+    /**
+     * Retrieve a boolean item from the cache.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  (\Closure():(bool|null))|bool|null  $default
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function boolean($key, $default = null): bool
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_bool($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Cache value for key [%s] must be a boolean, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
+    }
+
+    /**
+     * Retrieve an array item from the cache.
+     *
+     * @param  \BackedEnum|\UnitEnum|string  $key
+     * @param  (\Closure():(array<array-key, mixed>|null))|array<array-key, mixed>|null  $default
+     * @return array<array-key, mixed>
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function array($key, $default = null): array
+    {
+        $value = $this->get($key, $default);
+
+        if (! is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Cache value for key [%s] must be an array, %s given.', $key, gettype($value))
+            );
+        }
+
+        return $value;
     }
 
     /**
