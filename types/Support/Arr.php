@@ -154,13 +154,13 @@ assertType('true', Arr::isList([1]));
 /** @phpstan-ignore staticMethod.impossibleType , staticMethod.alreadyNarrowedType */
 assertType('false', Arr::isList(['a' => 1]));
 
-assertType('array<1|2|3>', Arr::sort([1, 3, 2]));
-assertType('array<string, int>', Arr::sort(['a' => 1, 'c' => 3, 'b' => 2]));
-assertType('array<1|2|3>', Arr::sortDesc([1, 3, 2]));
-assertType('array<string, int>', Arr::sortDesc(['a' => 1, 'c' => 3, 'b' => 2]));
-assertType('int[]', Arr::sortRecursive([1, 3, 2]));
+assertType('array<0|1|2, 1|2|3>', Arr::sort([1, 3, 2]));
+assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sort(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType('array<0|1|2, 1|2|3>', Arr::sortDesc([1, 3, 2]));
+assertType('array<'a'|'b'|'c', 1|2|3>', Arr::sortDesc(['a' => 1, 'c' => 3, 'b' => 2]));
+assertType('array<0|1|2, 1|2|3>', Arr::sortRecursive([1, 3, 2]));
 assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sortRecursive(['a' => 1, 'c' => 3, 'b' => 2]));
-assertType('int[]', Arr::sortRecursiveDesc([1, 3, 2]));
+assertType('array<0|1|2, 1|2|3>', Arr::sortRecursiveDesc([1, 3, 2]));
 assertType("array<'a'|'b'|'c', 1|2|3>", Arr::sortRecursiveDesc(['a' => 1, 'c' => 3, 'b' => 2]));
 
 assertType('\'\'', Arr::toCssClasses(['hidden' => false]));
