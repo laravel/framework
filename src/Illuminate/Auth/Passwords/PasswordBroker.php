@@ -75,9 +75,10 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Send a password reset link to a user.
      *
-     * @param  array  $credentials
-     * @param  \Closure|null  $callback
+     * @param array $credentials
+     * @param \Closure|null $callback
      * @return string
+     * @throws \Throwable
      */
     public function sendResetLink(#[\SensitiveParameter] array $credentials, ?Closure $callback = null)
     {
@@ -115,9 +116,10 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Reset the password for the given token.
      *
-     * @param  array  $credentials
-     * @param  \Closure  $callback
+     * @param array $credentials
+     * @param \Closure $callback
      * @return string
+     * @throws \Throwable
      */
     public function reset(#[\SensitiveParameter] array $credentials, Closure $callback)
     {

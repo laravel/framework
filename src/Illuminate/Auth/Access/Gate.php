@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Illuminate\Auth\Access\Events\GateEvaluated;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
@@ -425,11 +426,12 @@ class Gate implements GateContract
     /**
      * Get the raw result from the authorization callback.
      *
-     * @param  string  $ability
-     * @param  mixed  $arguments
+     * @param string $ability
+     * @param mixed $arguments
      * @return mixed
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws BindingResolutionException
      */
     public function raw($ability, $arguments = [])
     {
@@ -461,10 +463,11 @@ class Gate implements GateContract
     /**
      * Determine whether the callback/method can be called with the given user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  \Closure|string|array  $class
-     * @param  string|null  $method
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param \Closure|string|array $class
+     * @param string|null $method
      * @return bool
+     * @throws \ReflectionException
      */
     protected function canBeCalledWithUser($user, $class, $method = null)
     {
@@ -556,10 +559,11 @@ class Gate implements GateContract
     /**
      * Call all of the before callbacks and return if a result is given.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param string $ability
+     * @param array $arguments
      * @return bool|null
+     * @throws \ReflectionException
      */
     protected function callBeforeCallbacks($user, $ability, array $arguments)
     {
@@ -577,11 +581,12 @@ class Gate implements GateContract
     /**
      * Call all of the after callbacks with check result.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  bool|null  $result
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string $ability
+     * @param array $arguments
+     * @param bool|null $result
      * @return bool|null
+     * @throws \ReflectionException
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
@@ -601,11 +606,12 @@ class Gate implements GateContract
     /**
      * Dispatch a gate evaluation event.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  bool|null  $result
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param string $ability
+     * @param array $arguments
+     * @param bool|null $result
      * @return void
+     * @throws BindingResolutionException
      */
     protected function dispatchGateEvaluatedEvent($user, $ability, array $arguments, $result)
     {
@@ -619,10 +625,12 @@ class Gate implements GateContract
     /**
      * Resolve the callable for the given ability and arguments.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  string  $ability
-     * @param  array  $arguments
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param string $ability
+     * @param array $arguments
      * @return callable
+     * @throws \ReflectionException
+     * @throws BindingResolutionException
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
@@ -653,8 +661,9 @@ class Gate implements GateContract
     /**
      * Get a policy instance for a given class.
      *
-     * @param  object|string  $class
+     * @param object|string $class
      * @return mixed
+     * @throws BindingResolutionException
      */
     public function getPolicyFor($class)
     {
@@ -801,11 +810,12 @@ class Gate implements GateContract
     /**
      * Call the "before" method on the given policy, if applicable.
      *
-     * @param  mixed  $policy
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
+     * @param mixed $policy
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string $ability
+     * @param array $arguments
      * @return mixed
+     * @throws \ReflectionException
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
@@ -821,11 +831,12 @@ class Gate implements GateContract
     /**
      * Call the appropriate method on the given policy.
      *
-     * @param  mixed  $policy
-     * @param  string  $method
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  array  $arguments
+     * @param mixed $policy
+     * @param string $method
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param array $arguments
      * @return mixed
+     * @throws \ReflectionException
      */
     protected function callPolicyMethod($policy, $method, $user, array $arguments)
     {

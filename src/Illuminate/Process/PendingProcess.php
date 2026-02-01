@@ -366,9 +366,10 @@ class PendingProcess
     /**
      * Resolve the given fake handler for a synchronous process.
      *
-     * @param  string  $command
-     * @param  \Closure  $fake
+     * @param string $command
+     * @param \Closure $fake
      * @return mixed
+     * @throws \Throwable
      */
     protected function resolveSynchronousFake(string $command, Closure $fake)
     {
