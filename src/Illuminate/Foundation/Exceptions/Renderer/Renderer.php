@@ -97,7 +97,6 @@ class Renderer
         return $this->viewFactory->make('laravel-exceptions-renderer::show', [
             'exception' => $exception,
             'exceptionAsMarkdown' => $exceptionAsMarkdown,
-            'includeDecorations' => $this->shouldIncludeDecorations(),
         ])->render();
     }
 
@@ -129,15 +128,5 @@ class Renderer
         return '<script>'
             .file_get_contents(static::DIST.'scripts.js')
             .'</script>'.$viteJsAutoRefresh;
-    }
-
-    /**
-     * Determine if decorative elements should be included in the rendered output.
-     *
-     * @return bool
-     */
-    protected function shouldIncludeDecorations()
-    {
-        return ! app()->runningUnitTests() && ! app()->runningInConsole();
     }
 }
