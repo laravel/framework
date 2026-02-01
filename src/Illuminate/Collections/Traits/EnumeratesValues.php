@@ -1126,8 +1126,7 @@ trait EnumeratesValues
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return match (true) {
-                    is_string($value) => true,
-                    $value instanceof \Stringable => true,
+                    is_string($value), $value instanceof \Stringable => true,
                     default => false,
                 };
             });

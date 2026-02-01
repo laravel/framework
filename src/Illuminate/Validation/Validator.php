@@ -877,9 +877,7 @@ class Validator implements ValidatorContract
         $originalAttribute = $this->replacePlaceholderInString($attribute);
 
         $attribute = match (true) {
-            $rule instanceof Rules\Email => $attribute,
-            $rule instanceof Rules\File => $attribute,
-            $rule instanceof Rules\Password => $attribute,
+            $rule instanceof Rules\Email, $rule instanceof Rules\File, $rule instanceof Rules\Password => $attribute,
             default => $originalAttribute,
         };
 
