@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Model;
@@ -160,6 +161,14 @@ class DatabaseEloquentModelAttributesTest extends TestCase
         $model = new ModelWithGuardedAttribute;
 
         $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_unguarded_attribute(): void
+    {
+        $model = new ModelWithUnguardedAttribute;
+
+        $this->assertSame([], $model->getGuarded());
+        $this->assertFalse($model->isGuarded('anything'));
     }
 
     public function test_hidden_attribute(): void
@@ -340,6 +349,12 @@ class ModelWithFillableAttributeAndProperty extends Model
 
 #[Guarded(['id', 'secret'])]
 class ModelWithGuardedAttribute extends Model
+{
+    //
+}
+
+#[Unguarded]
+class ModelWithUnguardedAttribute extends Model
 {
     //
 }

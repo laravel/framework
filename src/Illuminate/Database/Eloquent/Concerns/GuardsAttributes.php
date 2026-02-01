@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\Unguarded;
 
 trait GuardsAttributes
 {
@@ -49,7 +50,11 @@ trait GuardsAttributes
         }
 
         if ($this->guarded === ['*']) {
-            $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? ['*'];
+            if (static::resolveClassAttribute(Unguarded::class) !== null) {
+                $this->guarded = [];
+            } else {
+                $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? ['*'];
+            }
         }
     }
 
