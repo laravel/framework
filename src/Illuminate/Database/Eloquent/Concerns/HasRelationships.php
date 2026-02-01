@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Database\ClassMorphViolationException;
+use Illuminate\Database\Eloquent\Attributes\Touches;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
@@ -1034,7 +1035,7 @@ trait HasRelationships
     {
         return tap(new $class, function ($instance) {
             if (! $instance->getConnectionName()) {
-                $instance->setConnection($this->connection);
+                $instance->setConnection($this->getConnectionName());
             }
         });
     }
@@ -1169,7 +1170,7 @@ trait HasRelationships
      */
     public function getTouchedRelations()
     {
-        return $this->touches;
+        return static::resolveClassAttribute(Touches::class, 'relations') ?? $this->touches;
     }
 
     /**

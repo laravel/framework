@@ -13,6 +13,8 @@ use DateTimeInterface;
 use Illuminate\Contracts\Database\Eloquent\Castable;
 use Illuminate\Contracts\Database\Eloquent\CastsInboundAttributes;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
@@ -363,12 +365,14 @@ trait HasAttributes
      */
     protected function getArrayableAppends()
     {
-        if (! count($this->appends)) {
+        $appends = $this->getAppends();
+
+        if (! count($appends)) {
             return [];
         }
 
         return $this->getArrayableItems(
-            array_combine($this->appends, $this->appends)
+            array_combine($appends, $appends)
         );
     }
 
@@ -1639,7 +1643,9 @@ trait HasAttributes
      */
     public function getDateFormat()
     {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+        return static::resolveClassAttribute(DateFormat::class, 'format')
+            ?? $this->dateFormat
+            ?? $this->getConnection()->getQueryGrammar()->getDateFormat();
     }
 
     /**
@@ -2383,7 +2389,7 @@ trait HasAttributes
      */
     public function getAppends()
     {
-        return $this->appends;
+        return static::resolveClassAttribute(Appends::class, 'columns') ?? $this->appends;
     }
 
     /**
@@ -2420,7 +2426,7 @@ trait HasAttributes
      */
     public function hasAppended($attribute)
     {
-        return in_array($attribute, $this->appends);
+        return in_array($attribute, $this->getAppends());
     }
 
     /**

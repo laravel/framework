@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l:*)",
+      "Bash(for f in /Users/taylor/Documents/Code/laravel-framework/src/Illuminate/Database/Eloquent/Attributes/{Table,PrimaryKey,Incrementing,KeyType,Connection,Timestamps,DateFormat,Fillable,Guarded,Hidden,Visible,Appends,Touches}.php)",
+      "Bash(do php -l \"$f\")",
+      "Bash(done)"
+    ]
+  }
+}

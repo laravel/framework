@@ -14,9 +14,17 @@ use Illuminate\Contracts\Support\CanBeEscapedWhenCastToString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Eloquent\Attributes\Boot;
+use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\Incrementing;
 use Illuminate\Database\Eloquent\Attributes\Initialize;
+use Illuminate\Database\Eloquent\Attributes\KeyType;
+use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
 use Illuminate\Database\Eloquent\Attributes\Scope as LocalScope;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\UseEloquentBuilder;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
@@ -284,6 +292,13 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     protected static array $isMassPrunable;
 
     /**
+     * Cache of resolved class attributes.
+     *
+     * @var array<class-string<self>, array<class-string, mixed>>
+     */
+    protected static array $classAttributes = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string|null
@@ -448,7 +463,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         static::$booted = [];
         static::$bootedCallbacks = [];
-
+        static::$classAttributes = [];
         static::$globalScopes = [];
     }
 
@@ -491,7 +506,18 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         $class = $class ?: static::class;
 
-        if (! get_class_vars($class)['timestamps'] || ! $class::UPDATED_AT) {
+        if (! $class::UPDATED_AT) {
+            return true;
+        }
+
+        if (static::resolveClassAttribute(WithoutTimestamps::class, null, $class) !== null) {
+            return true;
+        }
+
+        $timestamps = static::resolveClassAttribute(Timestamps::class, 'enabled', $class)
+            ?? get_class_vars($class)['timestamps'];
+
+        if (! $timestamps) {
             return true;
         }
 
@@ -1969,7 +1995,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getConnectionName()
     {
-        return enum_value($this->connection);
+        return static::resolveClassAttribute(Connection::class, 'name') ?? enum_value($this->connection);
     }
 
     /**
@@ -2034,7 +2060,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        return static::resolveClassAttribute(Table::class, 'name')
+            ?? $this->table
+            ?? Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**
@@ -2057,7 +2085,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyName()
     {
-        return $this->primaryKey;
+        return static::resolveClassAttribute(PrimaryKey::class, 'name') ?? $this->primaryKey;
     }
 
     /**
@@ -2090,7 +2118,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyType()
     {
-        return $this->keyType;
+        return static::resolveClassAttribute(KeyType::class, 'type') ?? $this->keyType;
     }
 
     /**
@@ -2113,7 +2141,11 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getIncrementing()
     {
-        return $this->incrementing;
+        if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
+            return false;
+        }
+
+        return static::resolveClassAttribute(Incrementing::class, 'enabled') ?? $this->incrementing;
     }
 
     /**
@@ -2426,6 +2458,41 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function broadcastChannel()
     {
         return str_replace('\\', '.', get_class($this)).'.'.$this->getKey();
+    }
+
+    /**
+     * Resolve a class attribute value from the model.
+     *
+     * @template TAttribute of object
+     *
+     * @param  class-string<TAttribute>  $attributeClass
+     * @param  string|null  $property
+     * @param  string|null  $class
+     * @return mixed
+     */
+    protected static function resolveClassAttribute(string $attributeClass, ?string $property = null, ?string $class = null)
+    {
+        $class = $class ?? static::class;
+
+        $cacheKey = $class.'@'.$attributeClass;
+
+        if (array_key_exists($cacheKey, static::$classAttributes)) {
+            return static::$classAttributes[$cacheKey];
+        }
+
+        try {
+            $attributes = (new ReflectionClass($class))->getAttributes($attributeClass);
+
+            if (count($attributes) > 0) {
+                $instance = $attributes[0]->newInstance();
+
+                return static::$classAttributes[$cacheKey] = $property ? $instance->{$property} : $instance;
+            }
+        } catch (Exception) {
+            //
+        }
+
+        return static::$classAttributes[$cacheKey] = null;
     }
 
     /**

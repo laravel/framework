@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+
 trait GuardsAttributes
 {
     /**
@@ -39,7 +42,7 @@ trait GuardsAttributes
      */
     public function getFillable()
     {
-        return $this->fillable;
+        return static::resolveClassAttribute(Fillable::class, 'columns') ?? $this->fillable;
     }
 
     /**
@@ -75,9 +78,11 @@ trait GuardsAttributes
      */
     public function getGuarded()
     {
-        return self::$unguarded === true
-            ? []
-            : $this->guarded;
+        if (self::$unguarded === true) {
+            return [];
+        }
+
+        return static::resolveClassAttribute(Guarded::class, 'columns') ?? $this->guarded;
     }
 
     /**

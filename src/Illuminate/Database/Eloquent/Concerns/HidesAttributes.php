@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Visible;
+
 trait HidesAttributes
 {
     /**
@@ -25,7 +28,7 @@ trait HidesAttributes
      */
     public function getHidden()
     {
-        return $this->hidden;
+        return static::resolveClassAttribute(Hidden::class, 'columns') ?? $this->hidden;
     }
 
     /**
@@ -61,7 +64,7 @@ trait HidesAttributes
      */
     public function getVisible()
     {
-        return $this->visible;
+        return static::resolveClassAttribute(Visible::class, 'columns') ?? $this->visible;
     }
 
     /**
