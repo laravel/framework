@@ -320,11 +320,9 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function __construct(array $attributes = [])
     {
         $this->bootIfNotBooted();
-
         $this->initializeTraits();
-
+        $this->initializeModelAttributes();
         $this->syncOriginal();
-
         $this->fill($attributes);
     }
 
@@ -428,6 +426,33 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     {
         foreach (static::$traitInitializers[static::class] as $method) {
             $this->{$method}();
+        }
+    }
+
+    /**
+     * Initialize the model attributes from class attributes.
+     *
+     * @return void
+     */
+    public function initializeModelAttributes()
+    {
+        $this->table ??= static::resolveClassAttribute(Table::class, 'name');
+        $this->connection ??= static::resolveClassAttribute(Connection::class, 'name');
+
+        if ($this->primaryKey === 'id') {
+            $this->primaryKey = static::resolveClassAttribute(PrimaryKey::class, 'name') ?? $this->primaryKey;
+        }
+
+        if ($this->keyType === 'int') {
+            $this->keyType = static::resolveClassAttribute(KeyType::class, 'type') ?? $this->keyType;
+        }
+
+        if ($this->incrementing === true) {
+            if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
+                $this->incrementing = false;
+            } elseif (($value = static::resolveClassAttribute(Incrementing::class, 'enabled')) !== null) {
+                $this->incrementing = $value;
+            }
         }
     }
 
@@ -1995,7 +2020,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getConnectionName()
     {
-        return static::resolveClassAttribute(Connection::class, 'name') ?? enum_value($this->connection);
+        return enum_value($this->connection);
     }
 
     /**
@@ -2060,9 +2085,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getTable()
     {
-        return static::resolveClassAttribute(Table::class, 'name')
-            ?? $this->table
-            ?? Str::snake(Str::pluralStudly(class_basename($this)));
+        return $this->table ?? Str::snake(Str::pluralStudly(class_basename($this)));
     }
 
     /**
@@ -2085,7 +2108,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyName()
     {
-        return static::resolveClassAttribute(PrimaryKey::class, 'name') ?? $this->primaryKey;
+        return $this->primaryKey;
     }
 
     /**
@@ -2118,7 +2141,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getKeyType()
     {
-        return static::resolveClassAttribute(KeyType::class, 'type') ?? $this->keyType;
+        return $this->keyType;
     }
 
     /**
@@ -2141,11 +2164,7 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
      */
     public function getIncrementing()
     {
-        if (static::resolveClassAttribute(WithoutIncrementing::class) !== null) {
-            return false;
-        }
-
-        return static::resolveClassAttribute(Incrementing::class, 'enabled') ?? $this->incrementing;
+        return $this->incrementing;
     }
 
     /**
@@ -2699,8 +2718,8 @@ abstract class Model implements Arrayable, ArrayAccess, CanBeEscapedWhenCastToSt
     public function __wakeup()
     {
         $this->bootIfNotBooted();
-
         $this->initializeTraits();
+        $this->initializeModelAttributes();
 
         if (static::isAutomaticallyEagerLoadingRelationships()) {
             $this->withRelationshipAutoloading();

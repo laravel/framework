@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Initialize;
 
 trait GuardsAttributes
 {
@@ -36,13 +37,30 @@ trait GuardsAttributes
     protected static $guardableColumns = [];
 
     /**
+     * Initialize the GuardsAttributes trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeGuardsAttributes()
+    {
+        if (empty($this->fillable)) {
+            $this->fillable = static::resolveClassAttribute(Fillable::class, 'columns') ?? [];
+        }
+
+        if ($this->guarded === ['*']) {
+            $this->guarded = static::resolveClassAttribute(Guarded::class, 'columns') ?? ['*'];
+        }
+    }
+
+    /**
      * Get the fillable attributes for the model.
      *
      * @return array<string>
      */
     public function getFillable()
     {
-        return static::resolveClassAttribute(Fillable::class, 'columns') ?? $this->fillable;
+        return $this->fillable;
     }
 
     /**
@@ -78,11 +96,9 @@ trait GuardsAttributes
      */
     public function getGuarded()
     {
-        if (self::$unguarded === true) {
-            return [];
-        }
-
-        return static::resolveClassAttribute(Guarded::class, 'columns') ?? $this->guarded;
+        return self::$unguarded === true
+            ? []
+            : $this->guarded;
     }
 
     /**

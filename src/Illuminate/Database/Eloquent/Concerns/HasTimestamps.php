@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Attributes\Initialize;
 use Illuminate\Database\Eloquent\Attributes\Timestamps;
 use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
 use Illuminate\Support\Facades\Date;
@@ -21,6 +22,23 @@ trait HasTimestamps
      * @var array
      */
     protected static $ignoreTimestampsOn = [];
+
+    /**
+     * Initialize the HasTimestamps trait.
+     *
+     * @return void
+     */
+    #[Initialize]
+    public function initializeHasTimestamps()
+    {
+        if ($this->timestamps === true) {
+            if (static::resolveClassAttribute(WithoutTimestamps::class) !== null) {
+                $this->timestamps = false;
+            } elseif (($value = static::resolveClassAttribute(Timestamps::class, 'enabled')) !== null) {
+                $this->timestamps = $value;
+            }
+        }
+    }
 
     /**
      * Update the model's update timestamp.
@@ -133,12 +151,7 @@ trait HasTimestamps
      */
     public function usesTimestamps()
     {
-        if (static::resolveClassAttribute(WithoutTimestamps::class) !== null) {
-            return false;
-        }
-
-        return (static::resolveClassAttribute(Timestamps::class, 'enabled') ?? $this->timestamps)
-            && ! static::isIgnoringTimestamps($this::class);
+        return $this->timestamps && ! static::isIgnoringTimestamps($this::class);
     }
 
     /**
