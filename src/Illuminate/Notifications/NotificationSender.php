@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Queue\Attributes\Connection;
+use Illuminate\Queue\Attributes\Queue as QueueAttribute;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
@@ -18,7 +21,7 @@ use Throwable;
 
 class NotificationSender
 {
-    use Localizable;
+    use Localizable, ReadsQueueAttributes;
 
     /**
      * The notification manager instance.
@@ -229,7 +232,7 @@ class NotificationSender
                     $notification->locale = $this->locale;
                 }
 
-                $connection = $notification->connection
+                $connection = $this->getAttributeValue($notification, Connection::class, 'connection')
                     ?? $this->manager->resolveConnectionFromQueueRoute($notification)
                     ?? null;
 
@@ -237,7 +240,7 @@ class NotificationSender
                     $connection = $notification->viaConnections()[$channel] ?? $connection;
                 }
 
-                $queue = $notification->queue
+                $queue = $this->getAttributeValue($notification, QueueAttribute::class, 'queue')
                     ?? $this->manager->resolveQueueFromQueueRoute($notification)
                     ?? null;
 

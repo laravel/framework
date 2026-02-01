@@ -12,6 +12,12 @@ use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Queue\ShouldBeEncrypted;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\FailOnTimeout;
+use Illuminate\Queue\Attributes\MaxExceptions;
+use Illuminate\Queue\Attributes\ReadsQueueAttributes;
+use Illuminate\Queue\Attributes\Timeout;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Support\Collection;
@@ -22,7 +28,7 @@ use Throwable;
 
 abstract class Queue
 {
-    use InteractsWithTime;
+    use InteractsWithTime, ReadsQueueAttributes;
 
     /**
      * The IoC container instance.
@@ -164,10 +170,10 @@ abstract class Queue
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $this->getJobTries($job),
-            'maxExceptions' => $job->maxExceptions ?? null,
-            'failOnTimeout' => $job->failOnTimeout ?? false,
+            'maxExceptions' => $this->getAttributeValue($job, MaxExceptions::class, 'maxExceptions'),
+            'failOnTimeout' => $this->getAttributeValue($job, FailOnTimeout::class, 'failOnTimeout') ?? false,
             'backoff' => $this->getJobBackoff($job),
-            'timeout' => $job->timeout ?? null,
+            'timeout' => $this->getAttributeValue($job, Timeout::class, 'timeout'),
             'retryUntil' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => $job,
@@ -217,12 +223,10 @@ abstract class Queue
      */
     public function getJobTries($job)
     {
-        if (! method_exists($job, 'tries') && ! isset($job->tries)) {
-            return;
-        }
+        $tries = $this->getAttributeValue($job, Tries::class, 'tries');
 
-        if (is_null($tries = $job->tries ?? $job->tries())) {
-            return;
+        if (method_exists($job, 'tries')) {
+            $tries = $job->tries();
         }
 
         return $tries;
@@ -236,11 +240,13 @@ abstract class Queue
      */
     public function getJobBackoff($job)
     {
-        if (! method_exists($job, 'backoff') && ! isset($job->backoff)) {
-            return;
+        $backoff = $this->getAttributeValue($job, Backoff::class, 'backoff');
+
+        if (method_exists($job, 'backoff')) {
+            $backoff = $job->backoff();
         }
 
-        if (is_null($backoff = $job->backoff ?? $job->backoff())) {
+        if (is_null($backoff)) {
             return;
         }
 
@@ -326,7 +332,6 @@ abstract class Queue
      * Create the given payload using any registered payload hooks.
      *
      * @param  string  $queue
-     * @param  array  $payload
      * @return array
      */
     protected function withCreatePayloadHooks($queue, array $payload)
@@ -472,7 +477,6 @@ abstract class Queue
     /**
      * Set the queue configuration array.
      *
-     * @param  array  $config
      * @return $this
      */
     public function setConfig(array $config)
@@ -495,7 +499,6 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Container\Container  $container
      * @return void
      */
     public function setContainer(Container $container)
