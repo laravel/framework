@@ -2,9 +2,12 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Console\Isolatable;
 use Illuminate\Support\Traits\Macroable;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -89,6 +92,8 @@ class Command extends SymfonyCommand
      */
     public function __construct()
     {
+        $this->configureFromAttributes();
+
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.
@@ -121,6 +126,28 @@ class Command extends SymfonyCommand
 
         if ($this instanceof Isolatable) {
             $this->configureIsolation();
+        }
+    }
+
+    /**
+     * Configure the command from class attributes.
+     *
+     * @return void
+     */
+    protected function configureFromAttributes()
+    {
+        $reflection = new ReflectionClass($this);
+
+        $signature = $reflection->getAttributes(Signature::class);
+
+        if (count($signature) > 0) {
+            $this->signature = $signature[0]->newInstance()->signature;
+        }
+
+        $description = $reflection->getAttributes(Description::class);
+
+        if (count($description) > 0) {
+            $this->description = $description[0]->newInstance()->description;
         }
     }
 
