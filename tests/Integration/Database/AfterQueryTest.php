@@ -187,6 +187,20 @@ class AfterQueryTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($afterQueryIds->toArray(), $posts->pluck('id')->toArray());
     }
 
+    public function testAfterQueryKeyByOnEagerBelongsToManyRelationship()
+    {
+        $user = AfterQueryUser::create();
+        $firstPost = AfterQueryPost::create();
+        $secondPost = AfterQueryPost::create();
+
+        $user->posts()->attach($firstPost);
+        $user->posts()->attach($secondPost);
+
+        $posts = AfterQueryUser::with('posts')->first()->posts;
+
+        $this->assertEqualsCanonicalizing($posts->pluck('id')->toArray(), $posts->keys()->toArray());
+    }
+
     public function testAfterQueryHookOnHasManyThroughRelationship()
     {
         $user = AfterQueryUser::create();
@@ -363,7 +377,9 @@ class AfterQueryUser extends Model
 
     public function posts()
     {
-        return $this->belongsToMany(AfterQueryPost::class, 'users_posts', 'user_id', 'post_id')->withTimestamps();
+        return $this->belongsToMany(AfterQueryPost::class, 'users_posts', 'user_id', 'post_id')
+            ->afterQuery(fn (Collection $posts) => $posts->keyBy(fn (AfterQueryPost $post) => $post->id))
+            ->withTimestamps();
     }
 }
 

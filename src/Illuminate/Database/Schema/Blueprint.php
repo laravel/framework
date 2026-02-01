@@ -97,7 +97,7 @@ class Blueprint
      *
      * @param  \Illuminate\Database\Connection  $connection
      * @param  string  $table
-     * @param  \Closure|null  $callback
+     * @param  (\Closure(self): void)|null  $callback
      */
     public function __construct(Connection $connection, $table, ?Closure $callback = null)
     {
@@ -1819,7 +1819,7 @@ class Blueprint
      * Add the columns from the callback after the given column.
      *
      * @param  string  $column
-     * @param  \Closure  $callback
+     * @param  (\Closure(self): void)  $callback
      * @return void
      */
     public function after($column, Closure $callback)
