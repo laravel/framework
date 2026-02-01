@@ -1086,7 +1086,7 @@ class Arr
     /**
      * Sort the array using the given callback or "dot" notation.
      *
-     * @template TKey
+     * @template TKey of array-key
      * @template TValue
      *
      * @param  iterable<TKey, TValue>  $array
@@ -1101,6 +1101,7 @@ class Arr
     /**
      * Sort the array in descending order using the given callback or "dot" notation.
      *
+     * @template TKey of array-key
      * @template TValue
      *
      * @param  iterable<TValue>  $array
