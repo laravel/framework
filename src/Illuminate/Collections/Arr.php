@@ -1104,7 +1104,7 @@ class Arr
      * @template TKey of array-key
      * @template TValue
      *
-     * @param  iterable<TValue>  $array
+     * @param  iterable<TKey, TValue>  $array
      * @param  callable|string|null|array<int, (callable(TValue, TValue): -1|0|1)|array{string, 'asc'|'desc'}>  $callback
      * @return array<TKey, TValue>
      */
