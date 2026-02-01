@@ -1,0 +1,369 @@
+<?php
+
+namespace Illuminate\Tests\Database;
+
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Connection;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\Incrementing;
+use Illuminate\Database\Eloquent\Attributes\KeyType;
+use Illuminate\Database\Eloquent\Attributes\PrimaryKey;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\Timestamps;
+use Illuminate\Database\Eloquent\Attributes\Touches;
+use Illuminate\Database\Eloquent\Attributes\Visible;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
+use Illuminate\Database\Eloquent\Attributes\WithoutTimestamps;
+use Illuminate\Database\Eloquent\Model;
+use PHPUnit\Framework\TestCase;
+
+class DatabaseEloquentModelAttributesTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ], 'secondary');
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
+
+        Model::clearBootedModels();
+    }
+
+    public function test_table_attribute(): void
+    {
+        $model = new ModelWithTableAttribute;
+
+        $this->assertSame('custom_table_name', $model->getTable());
+    }
+
+    public function test_table_property_takes_precedence(): void
+    {
+        $model = new ModelWithTableAttributeAndProperty;
+
+        $this->assertSame('property_table', $model->getTable());
+    }
+
+    public function test_primary_key_attribute(): void
+    {
+        $model = new ModelWithPrimaryKeyAttribute;
+
+        $this->assertSame('custom_id', $model->getKeyName());
+    }
+
+    public function test_primary_key_property_takes_precedence(): void
+    {
+        $model = new ModelWithPrimaryKeyAttributeAndProperty;
+
+        $this->assertSame('property_id', $model->getKeyName());
+    }
+
+    public function test_key_type_attribute(): void
+    {
+        $model = new ModelWithKeyTypeAttribute;
+
+        $this->assertSame('string', $model->getKeyType());
+    }
+
+    public function test_key_type_property_takes_precedence(): void
+    {
+        $model = new ModelWithKeyTypeAttributeAndProperty;
+
+        $this->assertSame('uuid', $model->getKeyType());
+    }
+
+    public function test_incrementing_attribute(): void
+    {
+        $model = new ModelWithIncrementingFalseAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_without_incrementing_attribute(): void
+    {
+        $model = new ModelWithoutIncrementingAttribute;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_incrementing_property_takes_precedence(): void
+    {
+        $model = new ModelWithIncrementingAttributeAndProperty;
+
+        $this->assertFalse($model->getIncrementing());
+    }
+
+    public function test_connection_attribute(): void
+    {
+        $model = new ModelWithConnectionAttribute;
+
+        $this->assertSame('secondary', $model->getConnectionName());
+    }
+
+    public function test_timestamps_attribute(): void
+    {
+        $model = new ModelWithTimestampsFalseAttribute;
+
+        $this->assertFalse($model->usesTimestamps());
+    }
+
+    public function test_without_timestamps_attribute(): void
+    {
+        $model = new ModelWithoutTimestampsAttribute;
+
+        $this->assertFalse($model->usesTimestamps());
+    }
+
+    public function test_timestamps_property_takes_precedence(): void
+    {
+        $model = new ModelWithTimestampsAttributeAndProperty;
+
+        $this->assertFalse($model->usesTimestamps());
+    }
+
+    public function test_date_format_attribute(): void
+    {
+        $model = new ModelWithDateFormatAttribute;
+
+        $this->assertSame('U', $model->getDateFormat());
+    }
+
+    public function test_fillable_attribute(): void
+    {
+        $model = new ModelWithFillableAttribute;
+
+        $this->assertSame(['name', 'email'], $model->getFillable());
+    }
+
+    public function test_fillable_property_takes_precedence(): void
+    {
+        $model = new ModelWithFillableAttributeAndProperty;
+
+        $this->assertSame(['title'], $model->getFillable());
+    }
+
+    public function test_guarded_attribute(): void
+    {
+        $model = new ModelWithGuardedAttribute;
+
+        $this->assertSame(['id', 'secret'], $model->getGuarded());
+    }
+
+    public function test_hidden_attribute(): void
+    {
+        $model = new ModelWithHiddenAttribute;
+
+        $this->assertSame(['password', 'secret'], $model->getHidden());
+    }
+
+    public function test_visible_attribute(): void
+    {
+        $model = new ModelWithVisibleAttribute;
+
+        $this->assertSame(['id', 'name'], $model->getVisible());
+    }
+
+    public function test_appends_attribute(): void
+    {
+        $model = new ModelWithAppendsAttribute;
+
+        $this->assertSame(['full_name', 'is_admin'], $model->getAppends());
+    }
+
+    public function test_touches_attribute(): void
+    {
+        $model = new ModelWithTouchesAttribute;
+
+        $this->assertSame(['post', 'author'], $model->getTouchedRelations());
+    }
+
+    public function test_merge_fillable_works_with_attribute(): void
+    {
+        $model = new ModelWithFillableAttribute;
+
+        $this->assertSame(['name', 'email'], $model->getFillable());
+
+        $model->mergeFillable(['phone']);
+
+        $this->assertSame(['name', 'email', 'phone'], $model->getFillable());
+    }
+
+    public function test_merge_hidden_works_with_attribute(): void
+    {
+        $model = new ModelWithHiddenAttribute;
+
+        $this->assertSame(['password', 'secret'], $model->getHidden());
+
+        $model->mergeHidden(['api_key']);
+
+        $this->assertSame(['password', 'secret', 'api_key'], $model->getHidden());
+    }
+
+    public function test_set_fillable_overrides_attribute(): void
+    {
+        $model = new ModelWithFillableAttribute;
+
+        $this->assertSame(['name', 'email'], $model->getFillable());
+
+        $model->fillable(['only_this']);
+
+        $this->assertSame(['only_this'], $model->getFillable());
+    }
+
+    public function test_set_hidden_overrides_attribute(): void
+    {
+        $model = new ModelWithHiddenAttribute;
+
+        $this->assertSame(['password', 'secret'], $model->getHidden());
+
+        $model->setHidden(['only_this']);
+
+        $this->assertSame(['only_this'], $model->getHidden());
+    }
+
+    public function test_is_ignoring_touch_with_timestamps_attribute(): void
+    {
+        $this->assertTrue(ModelWithoutTimestampsAttribute::isIgnoringTouch());
+        $this->assertTrue(ModelWithTimestampsFalseAttribute::isIgnoringTouch());
+        $this->assertFalse(ModelWithFillableAttribute::isIgnoringTouch());
+    }
+}
+
+#[Table('custom_table_name')]
+class ModelWithTableAttribute extends Model
+{
+    //
+}
+
+#[Table('attribute_table')]
+class ModelWithTableAttributeAndProperty extends Model
+{
+    protected $table = 'property_table';
+}
+
+#[PrimaryKey('custom_id')]
+class ModelWithPrimaryKeyAttribute extends Model
+{
+    //
+}
+
+#[PrimaryKey('attribute_id')]
+class ModelWithPrimaryKeyAttributeAndProperty extends Model
+{
+    protected $primaryKey = 'property_id';
+}
+
+#[KeyType('string')]
+class ModelWithKeyTypeAttribute extends Model
+{
+    //
+}
+
+#[KeyType('string')]
+class ModelWithKeyTypeAttributeAndProperty extends Model
+{
+    protected $keyType = 'uuid';
+}
+
+#[Incrementing(false)]
+class ModelWithIncrementingFalseAttribute extends Model
+{
+    //
+}
+
+#[WithoutIncrementing]
+class ModelWithoutIncrementingAttribute extends Model
+{
+    //
+}
+
+#[Incrementing(false)]
+class ModelWithIncrementingAttributeAndProperty extends Model
+{
+    public $incrementing = false;
+}
+
+#[Connection('secondary')]
+class ModelWithConnectionAttribute extends Model
+{
+    //
+}
+
+#[Timestamps(false)]
+class ModelWithTimestampsFalseAttribute extends Model
+{
+    //
+}
+
+#[WithoutTimestamps]
+class ModelWithoutTimestampsAttribute extends Model
+{
+    //
+}
+
+#[Timestamps(false)]
+class ModelWithTimestampsAttributeAndProperty extends Model
+{
+    public $timestamps = false;
+}
+
+#[DateFormat('U')]
+class ModelWithDateFormatAttribute extends Model
+{
+    //
+}
+
+#[Fillable(['name', 'email'])]
+class ModelWithFillableAttribute extends Model
+{
+    //
+}
+
+#[Fillable(['name', 'email'])]
+class ModelWithFillableAttributeAndProperty extends Model
+{
+    protected $fillable = ['title'];
+}
+
+#[Guarded(['id', 'secret'])]
+class ModelWithGuardedAttribute extends Model
+{
+    //
+}
+
+#[Hidden(['password', 'secret'])]
+class ModelWithHiddenAttribute extends Model
+{
+    //
+}
+
+#[Visible(['id', 'name'])]
+class ModelWithVisibleAttribute extends Model
+{
+    //
+}
+
+#[Appends(['full_name', 'is_admin'])]
+class ModelWithAppendsAttribute extends Model
+{
+    //
+}
+
+#[Touches(['post', 'author'])]
+class ModelWithTouchesAttribute extends Model
+{
+    //
+}
