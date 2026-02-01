@@ -210,13 +210,13 @@ class NotificationSenderTest extends TestCase
         $sender->sendNow($notifiable, new DummyNotificationWithViaConnections(), ['mail']);
     }
 
-    public function testItPreservesLocaleSetInViaMethod()
+    public function testItPreservesNotificationStateMutatedInViaMethod()
     {
         $notifiable = new AnonymousNotifiable;
         $manager = m::mock(ChannelManager::class);
         $manager->shouldReceive('driver')->andReturn($driver = m::mock());
         $driver->shouldReceive('send')->once()->withArgs(function ($notifiable, $notification) {
-            return $notification->locale === 'fr';
+            return $notification->channelData === 'default';
         });
         $bus = m::mock(BusDispatcher::class);
 
@@ -225,15 +225,9 @@ class NotificationSenderTest extends TestCase
         $events->shouldReceive('until')->with(m::type(NotificationSending::class))->andReturn(true);
         $events->shouldReceive('dispatch')->once();
 
-        $app = m::mock(\Illuminate\Container\Container::class);
-        $app->shouldReceive('getLocale')->andReturn('en');
-        $app->shouldReceive('setLocale')->with('fr')->once();
-        $app->shouldReceive('setLocale')->with('en')->once();
-        \Illuminate\Container\Container::setInstance($app);
-
         $sender = new NotificationSender($manager, $bus, $events);
 
-        $sender->sendNow($notifiable, new DummyNotificationWithLocaleInVia);
+        $sender->sendNow($notifiable, new DummyNotificationWithViaMutation);
     }
 }
 
@@ -417,11 +411,13 @@ class TestDatabaseNotificationMiddleware
     }
 }
 
-class DummyNotificationWithLocaleInVia extends Notification
+class DummyNotificationWithViaMutation extends Notification
 {
+    public $channelData = null;
+
     public function via($notifiable)
     {
-        $this->locale = 'fr';
+        $this->channelData = $notifiable->routeConfig ?? 'default';
 
         return 'mail';
     }
