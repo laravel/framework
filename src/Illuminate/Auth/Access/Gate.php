@@ -432,6 +432,7 @@ class Gate implements GateContract
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws BindingResolutionException
+     * @throws \ReflectionException
      */
     public function raw($ability, $arguments = [])
     {
