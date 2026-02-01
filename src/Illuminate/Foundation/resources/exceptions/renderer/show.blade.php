@@ -31,7 +31,7 @@
 
     <x-laravel-exceptions-renderer::separator />
 
-    @if ($includeDecorations)
+    @if (! app()->runningUnitTests() && ! app()->runningInConsole())
         <x-laravel-exceptions-renderer::section-container class="pb-0 sm:pb-0">
             <x-laravel-exceptions-renderer::laravel-ascii-spotlight />
         </x-laravel-exceptions-renderer::section-container>
