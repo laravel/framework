@@ -71,7 +71,7 @@ trait InteractsWithIO
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return ($key is null ? array<string|bool|int|float|array|null> : string|bool|int|float|array|null)
+     * @return ($key is null ? array<array|string|float|int|bool|null> : array|string|float|int|bool|null)
      */
     public function argument($key = null)
     {
@@ -85,7 +85,7 @@ trait InteractsWithIO
     /**
      * Get all of the arguments passed to the command.
      *
-     * @return array<string|bool|int|float|array|null>
+     * @return array<array|string|float|int|bool|null>
      */
     public function arguments()
     {
@@ -107,7 +107,7 @@ trait InteractsWithIO
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @return ($key is null ? array<string|bool|int|float|array|null> : string|bool|int|float|array|null)
+     * @return ($key is null ? array<array|string|float|int|bool|null> : array|string|float|int|bool|null)
      */
     public function option($key = null)
     {
@@ -121,7 +121,7 @@ trait InteractsWithIO
     /**
      * Get all of the options passed to the command.
      *
-     * @return array<string|bool|int|float|array|null>
+     * @return array<array|string|float|int|bool|null>
      */
     public function options()
     {
@@ -204,7 +204,7 @@ trait InteractsWithIO
      * Give the user a single choice from an array of answers.
      *
      * @param  string  $question
-     * @param  array<string|bool|int|float|\Stringable>  $choices
+     * @param  array<\Stringable|string|float|int|bool>  $choices
      * @param  string|int|null  $default
      * @param  ?positive-int  $attempts
      * @param  bool  $multiple
