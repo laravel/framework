@@ -15,6 +15,13 @@ use Traversable;
 trait CollectsResources
 {
     /**
+     * The cached Collects attribute values.
+     *
+     * @var array<class-string, class-string|false>
+     */
+    protected static $cachedCollectsAttributes = [];
+
+    /**
      * Map the given collection resource into its individual resources.
      *
      * @param  mixed  $resource
@@ -50,10 +57,16 @@ trait CollectsResources
     {
         $collects = null;
 
-        $attribute = (new ReflectionClass($this))->getAttributes(Collects::class);
+        if (! array_key_exists(static::class, static::$cachedCollectsAttributes)) {
+            $attribute = (new ReflectionClass($this))->getAttributes(Collects::class);
 
-        if (count($attribute) > 0) {
-            $collects = $attribute[0]->newInstance()->class;
+            static::$cachedCollectsAttributes[static::class] = count($attribute) > 0
+                ? $attribute[0]->newInstance()->class
+                : false;
+        }
+
+        if (static::$cachedCollectsAttributes[static::class]) {
+            $collects = static::$cachedCollectsAttributes[static::class];
         } elseif ($this->collects) {
             $collects = $this->collects;
         } elseif (str_ends_with(class_basename($this), 'Collection') &&

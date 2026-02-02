@@ -59,6 +59,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static bool $forceWrapping = false;
 
     /**
+     * The cached preserve keys attribute values.
+     *
+     * @var array<class-string, bool>
+     */
+    protected static $cachedPreserveKeysAttributes = [];
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -88,7 +95,13 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     public static function collection($resource)
     {
         return tap(static::newCollection($resource), function ($collection) {
-            if (count((new ReflectionClass(static::class))->getAttributes(PreserveKeys::class)) > 0) {
+            if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
+                static::$cachedPreserveKeysAttributes[static::class] = count(
+                    (new ReflectionClass(static::class))->getAttributes(PreserveKeys::class)
+                ) > 0;
+            }
+
+            if (static::$cachedPreserveKeysAttributes[static::class]) {
                 $collection->preserveKeys = true;
             } elseif (property_exists(static::class, 'preserveKeys')) {
                 $collection->preserveKeys = (new static([]))->preserveKeys === true;

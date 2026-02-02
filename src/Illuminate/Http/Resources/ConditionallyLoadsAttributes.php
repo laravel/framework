@@ -87,7 +87,13 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        if (count((new ReflectionClass($this))->getAttributes(PreserveKeys::class)) > 0) {
+        if (! array_key_exists(static::class, static::$cachedPreserveKeysAttributes)) {
+            static::$cachedPreserveKeysAttributes[static::class] = count(
+                (new ReflectionClass($this))->getAttributes(PreserveKeys::class)
+            ) > 0;
+        }
+
+        if (static::$cachedPreserveKeysAttributes[static::class]) {
             return $data;
         }
 

@@ -153,6 +153,13 @@ abstract class Factory
     protected static $expandRelationshipsByDefault = true;
 
     /**
+     * The cached model class names resolved from attributes.
+     *
+     * @var array<class-string, class-string<TModel>|false>
+     */
+    protected static $cachedModelAttributes = [];
+
+    /**
      * Create a new factory instance.
      *
      * @param  int|null  $count
@@ -894,10 +901,16 @@ abstract class Factory
      */
     public function modelName()
     {
-        $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
+        if (! array_key_exists(static::class, static::$cachedModelAttributes)) {
+            $attribute = (new ReflectionClass($this))->getAttributes(UseModel::class);
 
-        if (count($attribute) > 0) {
-            return $attribute[0]->newInstance()->class;
+            static::$cachedModelAttributes[static::class] = count($attribute) > 0
+                ? $attribute[0]->newInstance()->class
+                : false;
+        }
+
+        if (static::$cachedModelAttributes[static::class]) {
+            return static::$cachedModelAttributes[static::class];
         }
 
         if ($this->model !== null) {
