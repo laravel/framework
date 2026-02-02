@@ -196,7 +196,7 @@ class MaintenanceModeTest extends TestCase
     }
 
     #[DataProvider('retryAfterDatetimeProvider')]
-    public function test_maintenance_mode_retry_can_accept_datetime(string $datetime): void
+    public function testMaintenanceModeRetryCanAcceptDatetime(string $datetime): void
     {
         Carbon::setTestNow('2023-01-01 00:00:00');
 
